@@ -1,0 +1,81 @@
+{
+  "last_updated": "2026-09-18T21:14:39.983987+00:00",
+  "agegroup_id": 3,
+  "divisions": [
+    {
+      "division_name": "Under 9C Navy",
+      "teams": [
+        "Blackheath Rhinos Black",
+        "Chislehurst Wanderers Lions",
+        "Ebbsfleet United Blue",
+        "Eversley Rangers",
+        "Hayden Youth Bears",
+        "Junior Reds Knights",
+        "Long Lane Tigers",
+        "Longfield Tigers FC",
+        "Metrogas FC White",
+        "Northumberland Heath",
+        "ShooterBallers FC"
+      ],
+      "team_count_label": "11 teams"
+    },
+    {
+      "division_name": "Under 9C Silver",
+      "teams": [
+        "AFC Lewisham White",
+        "Chislehurst Wanderers Tigers",
+        "Dulwich Hamlet JFC Pink",
+        "Dynamo Youth Silver",
+        "Fisher Youth",
+        "Hillyfielders Hawks",
+        "Kekoa Red",
+        "KSI Coaching FC White",
+        "Palace Knights Yellow",
+        "Regans FC Black",
+        "The Bosco FC Dons",
+        "Wildcats FS Club Lions"
+      ],
+      "team_count_label": "12 teams"
+    },
+    {
+      "division_name": "Under 9D Navy",
+      "teams": [
+        "AFC Green Court Dukes",
+        "Blackheath Rhinos Grey",
+        "Chislehurst Wanderers Panthers",
+        "Dartford Royals Blue",
+        "Erith Town Selkent",
+        "Eversley Rangers Red",
+        "Junior Reds Athletic",
+        "Junior Reds Sabres",
+        "Phoenix Sports Panthers",
+        "Shooters Hill AFC Gunners",
+        "Shooters Hill AFC Valiants",
+        "Slade Green Knights",
+        "Welling Sport"
+      ],
+      "team_count_label": "13 teams"
+    },
+    {
+      "division_name": "Under 9D Silver",
+      "teams": [
+        "ABC CFC Community",
+        "Baldon Sports Tigers",
+        "Blackheath Rhinos White",
+        "Blackheath Village",
+        "Deptford United",
+        "Deptford United Falcons",
+        "Gipsy Hill FC Whites",
+        "KSI Coaching FC Navy",
+        "Lewisham Borough Cobras",
+        "Palace Knights Blue",
+        "S.E. Eagles FC",
+        "Vikings FC Blue"
+      ],
+      "team_count_label": "12 teams"
+    }
+  ],
+  "fixtures": [],
+  "removed_fixtures": [],
+  "fixtures_note": "Empty means no fixtures currently published (release is irregular, ~1 week's notice) - not an error state. change_status/removed_fixtures are NOT reliable yet - see fixture_identity() docstring for why."
+}
