@@ -29,6 +29,7 @@ Confirmed against real responses (Sept 2026):
 """
 
 import json
+import os
 import requests
 from bs4 import BeautifulSoup
 from datetime import datetime, timezone
@@ -164,6 +165,8 @@ def load_previous_output():
 
 
 def main():
+    os.makedirs(os.path.dirname(OUTPUT_PATH) or ".", exist_ok=True)
+
     divisions_html = fetch_json(f"divisionsspage/{AGEGROUP_ID}")
     divisions = parse_divisions(divisions_html)
 
