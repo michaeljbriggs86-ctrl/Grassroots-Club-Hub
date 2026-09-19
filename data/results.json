@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-09-19T09:05:04.606364+00:00",
+  "last_updated": "2026-09-19T11:04:45.316220+00:00",
   "agegroup_id": 3,
   "divisions": [
     {
@@ -11,13 +11,14 @@
         "Eversley Rangers",
         "Hayden Youth Bears",
         "Junior Reds Knights",
+        "Junior Reds Titans",
         "Long Lane Tigers",
         "Longfield Tigers FC",
         "Metrogas FC White",
         "Northumberland Heath",
         "ShooterBallers FC"
       ],
-      "team_count_label": "11 teams"
+      "team_count_label": "12 teams"
     },
     {
       "division_name": "Under 9C Silver",
