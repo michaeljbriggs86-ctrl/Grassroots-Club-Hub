@@ -5,15 +5,220 @@ Purpose:
   Exercise the standings parser with non-zero values while preserving the
   real DOM structure observed from Selkent /public/resultsTable/{division_id}.
 
-Do not use this file as evidence of a real match, table, score, team position,
-or historical Selkent record.
+IMPORTANT:
+  - Every team, ID, score and statistic in this file is fictional.
+  - This file must never be treated as historical Selkent data.
+  - "row_order" may be derived by the parser from <tbody> order.
+  - Do NOT interpret row order as an official league position when teams
+    are level on points. Selkent itself warns that tied-team rules are not
+    fully represented by the displayed table ordering.
+
+Observed real Selkent table columns:
+  Team
+  Played
+  Won
+  Drawn
+  Lost
+  GF
+  GA
+  Points
+
+The data-team-id and data-division-id attributes mirror attributes observed
+on real Selkent resultsTable responses, but the numeric values below are
+deliberately synthetic.
 -->
-Table
-SYNTHETIC Under 12 Test Division Updated at: SYNTHETIC
-Scroll table to right to view all columns.
-Team	Played	Won	Drawn	Lost	GF	GA	Points
-Synthetic Albion	5	4	1	0	13	4	13
-Synthetic Borough	5	4	1	0	11	5	13
-Synthetic City	5	2	0	3	7	9	6
-Note: Table does not yet take account of rules for determining winner if teams on equal points
-Results - SYNTHETIC Under 12 Test Division
+
+<meta
+  name="grassroots-club-hub-test-fixture"
+  content="SYNTHETIC-nonzero-standings"
+/>
+
+<div class="row">
+
+  <div class="col-xs-12 col-md-6">
+
+    <h3>
+      Table
+    </h3>
+
+    <div class="panel panel-static">
+
+      <div class="panel-heading">
+        <span style="font-size:14px;font-weight:bold;">
+          SYNTHETIC Under 12 Test Division
+        </span>
+
+        <span
+          class="pull-right"
+          style="font-size:11px;font-style:italic;"
+        >
+          Updated at: SYNTHETIC
+        </span>
+      </div>
+
+      <div class="panel-body">
+
+        <div class="table-responsive">
+
+          <div class="visible-xs-block">
+            Scroll table to right to view all columns.
+          </div>
+
+          <table
+            class="table table-striped table-bordered table-hover table-condensed"
+            style="color:#21205F;font-weight:bold;"
+          >
+
+            <thead>
+              <tr>
+                <th>Team</th>
+
+                <th style="text-align:center;">
+                  Played
+                </th>
+
+                <th style="text-align:center;">
+                  Won
+                </th>
+
+                <th style="text-align:center;">
+                  Drawn
+                </th>
+
+                <th style="text-align:center;">
+                  Lost
+                </th>
+
+                <th style="text-align:center;">
+                  GF
+                </th>
+
+                <th style="text-align:center;">
+                  GA
+                </th>
+
+                <th style="text-align:center;">
+                  Points
+                </th>
+              </tr>
+            </thead>
+
+            <tbody>
+
+              <tr>
+                <td
+                  class="selectTeam"
+                  data-team-id="900001"
+                  data-division-id="990001"
+                >
+                  Synthetic Albion
+                </td>
+
+                <td style="text-align:center;">5</td>
+                <td style="text-align:center;">4</td>
+                <td style="text-align:center;">1</td>
+                <td style="text-align:center;">0</td>
+                <td style="text-align:center;">13</td>
+                <td style="text-align:center;">4</td>
+                <td style="text-align:center;">13</td>
+              </tr>
+
+              <tr>
+                <td
+                  class="selectTeam"
+                  data-team-id="900002"
+                  data-division-id="990001"
+                >
+                  Synthetic Borough
+                </td>
+
+                <td style="text-align:center;">5</td>
+                <td style="text-align:center;">4</td>
+                <td style="text-align:center;">1</td>
+                <td style="text-align:center;">0</td>
+                <td style="text-align:center;">11</td>
+                <td style="text-align:center;">5</td>
+                <td style="text-align:center;">13</td>
+              </tr>
+
+              <tr>
+                <td
+                  class="selectTeam"
+                  data-team-id="900003"
+                  data-division-id="990001"
+                >
+                  Synthetic City
+                </td>
+
+                <td style="text-align:center;">5</td>
+                <td style="text-align:center;">2</td>
+                <td style="text-align:center;">0</td>
+                <td style="text-align:center;">3</td>
+                <td style="text-align:center;">7</td>
+                <td style="text-align:center;">9</td>
+                <td style="text-align:center;">6</td>
+              </tr>
+
+              <tr>
+                <td
+                  class="selectTeam"
+                  data-team-id="900004"
+                  data-division-id="990001"
+                >
+                  Synthetic Rovers
+                </td>
+
+                <td style="text-align:center;">5</td>
+                <td style="text-align:center;">1</td>
+                <td style="text-align:center;">0</td>
+                <td style="text-align:center;">4</td>
+                <td style="text-align:center;">4</td>
+                <td style="text-align:center;">17</td>
+                <td style="text-align:center;">3</td>
+              </tr>
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+        <span style="font-size:11px;font-style:italic;">
+          Note: Table does not yet take account of rules for determining
+          winner if teams on equal points
+        </span>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <div
+    id="results-990001"
+    class="col-xs-12 col-md-6"
+  >
+
+    <h3>
+      Results
+
+      <span class="noDisplay">
+        - SYNTHETIC Under 12 Test Division
+      </span>
+
+      <span class="pull-right">
+        <button
+          type="button"
+          class="printResults btn btn-sm btn-info"
+          data-div-id="#results-990001"
+        >
+          Print
+        </button>
+      </span>
+
+    </h3>
+
+  </div>
+
+</div>
