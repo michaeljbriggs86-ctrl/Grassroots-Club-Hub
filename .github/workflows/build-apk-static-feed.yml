@@ -1,0 +1,153 @@
+name: Build Grassroots Club Hub APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Find Android source ZIP
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          mapfile -t SOURCE_ZIPS < <(
+            find . -maxdepth 1 -type f -iname '*Android*.zip' -print | sort
+          )
+
+          if [ "${#SOURCE_ZIPS[@]}" -eq 0 ]; then
+            echo "ERROR: No Android source ZIP found in repository root."
+            ls -la
+            exit 1
+          fi
+
+          if [ "${#SOURCE_ZIPS[@]}" -gt 1 ]; then
+            echo "ERROR: More than one Android source ZIP found."
+            printf ' - %s\n' "${SOURCE_ZIPS[@]}"
+            exit 1
+          fi
+
+          SOURCE_ZIP="${SOURCE_ZIPS[0]}"
+          echo "Using Android source: $SOURCE_ZIP"
+
+          rm -rf extracted
+          mkdir -p extracted
+          unzip -q "$SOURCE_ZIP" -d extracted
+
+          SETTINGS="$(find extracted -type f -name settings.gradle -print -quit)"
+          if [ -z "$SETTINGS" ]; then
+            echo "ERROR: settings.gradle was not found inside the ZIP."
+            exit 1
+          fi
+
+          PROJECT_DIR="$(dirname "$SETTINGS")"
+          echo "PROJECT_DIR=$PROJECT_DIR" >> "$GITHUB_ENV"
+          echo "Android project found at: $PROJECT_DIR"
+
+      - name: Verify integrated v2.2.4 source
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          MAIN="$PROJECT_DIR/app/src/main/java/com/grassrootsclubhub/universal/MainActivity.java"
+          INDEX="$PROJECT_DIR/app/src/main/assets/index.html"
+          CLOUD="$PROJECT_DIR/app/src/main/assets/cloud.js"
+          OVERLAY="$PROJECT_DIR/app/src/main/assets/static-feed-overlay.js"
+          GRADLE="$PROJECT_DIR/app/build.gradle"
+
+          for required in "$MAIN" "$INDEX" "$CLOUD" "$OVERLAY" "$GRADLE"; do
+            test -f "$required" || { echo "ERROR: Missing expected source file: $required"; exit 1; }
+          done
+
+          grep -F 'GrassrootsClubHub/2.2.4' "$MAIN"
+          grep -F 'raw.githubusercontent.com' "$MAIN"
+          grep -F '/michaeljbriggs86-ctrl/Grassroots-Club-Hub/main/data/directory.json' "$MAIN"
+          grep -F '/michaeljbriggs86-ctrl/Grassroots-Club-Hub/main/data/results.json' "$MAIN"
+          grep -F 'static-feed-overlay.js' "$INDEX"
+          grep -F 'versionCode 2204' "$GRADLE"
+          grep -F "versionName '2.2.4'" "$GRADLE"
+          grep -F 'approved-mockup-2026-09-19-v1' "$CLOUD"
+          grep -F 'Welcome Back' "$CLOUD"
+          grep -F 'Player Access' "$CLOUD"
+          grep -F 'Create Club Account' "$CLOUD"
+
+          node --check "$OVERLAY"
+          node --check "$CLOUD"
+          node --check "$PROJECT_DIR/app/src/main/assets/onboarding.js"
+          node --check "$PROJECT_DIR/app/src/main/assets/app.js"
+
+          echo "Verified v2.2.4 source already contains static-feed integration and approved login UI."
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Verify Android SDK
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f "$ANDROID_HOME/platforms/android-35/android.jar"
+          test -d "$ANDROID_HOME/build-tools/35.0.0"
+          echo "Android SDK 35 ready."
+
+      - name: Set up Gradle 8.9
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
+      - name: Build Universal APK
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd "$PROJECT_DIR"
+          gradle :app:assembleDebug --no-daemon --stacktrace
+
+      - name: Verify built APK
+        shell: bash
+        run: |
+          set -euo pipefail
+          APK="$PROJECT_DIR/app/build/outputs/apk/debug/app-debug.apk"
+          test -f "$APK" || { echo "ERROR: APK was not produced."; exit 1; }
+
+          unzip -l "$APK" | grep -F 'assets/static-feed-overlay.js'
+          unzip -p "$APK" assets/index.html | grep -F 'static-feed-overlay.js'
+          unzip -p "$APK" assets/cloud.js | grep -F 'approved-mockup-2026-09-19-v1'
+          unzip -p "$APK" assets/cloud.js | grep -F 'Welcome Back'
+          unzip -p "$APK" assets/cloud.js | grep -F 'Player Access'
+          unzip -p "$APK" assets/cloud.js | grep -F 'Create Club Account'
+          unzip -p "$APK" classes.dex | strings | grep -F 'GrassrootsClubHub/2.2.4'
+
+          echo "Built APK contains the static feed integration and approved v2.2.4 login UI markers."
+
+      - name: Prepare APK
+        shell: bash
+        run: |
+          set -euo pipefail
+          APK="$PROJECT_DIR/app/build/outputs/apk/debug/app-debug.apk"
+          cp "$APK" Grassroots-Club-Hub-v2.2.4-mockup-exact-ui.apk
+          sha256sum Grassroots-Club-Hub-v2.2.4-mockup-exact-ui.apk | tee Grassroots-Club-Hub-v2.2.4-mockup-exact-ui.apk.sha256
+          ls -lh Grassroots-Club-Hub-v2.2.4-mockup-exact-ui.apk
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Grassroots-Club-Hub-APK-v2.2.4-Mockup-Exact-UI
+          path: |
+            Grassroots-Club-Hub-v2.2.4-mockup-exact-ui.apk
+            Grassroots-Club-Hub-v2.2.4-mockup-exact-ui.apk.sha256
+          if-no-files-found: error
+          retention-days: 30
