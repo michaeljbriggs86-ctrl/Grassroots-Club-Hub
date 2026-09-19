@@ -41,9 +41,9 @@ where it's allowed to live, and which age groups it applies to.
 
 | Data type | Visibility | Where it lives | Age scope | Notes |
 |---|---|---|---|---|
-| Selkent divisions / club-team directory | Public | GitHub static JSON (`data/directory.json`) | All ages | Team membership per division (division name + team list), NOT standings/points/W-D-L — confirmed Sept 2026 no standings data exists in any tested payload. **Open question**: does Selkent's site expose standings/table data anywhere, or is "league table" just this division/team grouping? Confirm before building a standings feature |
+| Selkent divisions / club-team directory | Public | GitHub static JSON (`data/directory.json`) | All ages | Team membership per division (division name + team list), NOT standings/points/W-D-L. **Confirmed 2026-09-19**: real standings data (Played/Won/Drawn/Lost/GF/GA/Points) exists on a separate Selkent endpoint (`resultsTable/{division_id}`), not in the data directory.json currently scrapes from. Standings will belong in the generalized results.json, not here |
 | Selkent fixtures | Public | GitHub static JSON (`data/results.json`, to be generalized) | All ages | Publicly available on Selkent's own site regardless of age. **Currently U9-only** — not yet generalized to all age groups |
-| Selkent published results (and standings, if they exist — see open question above) | Public | GitHub static JSON (`data/results.json`, to be generalized) | **U12 and up only** | Selkent's own site does not publish results for U7–U11 (FA rule, see Section 4). Nothing to scrape for younger ages — this is not a scraping gap, the data doesn't exist externally. **Currently U9-only, not yet generalized or split by U12+ scope** |
+| Selkent published results and standings (table) | Public | GitHub static JSON (`data/results.json`, to be generalized) | **U12 and up only** | Selkent's own site does not publish results for U7–U11 (FA rule, see Section 4). Nothing to scrape for younger ages — this is not a scraping gap, the data doesn't exist externally. **Currently U9-only, not yet generalized or split by U12+ scope**. **Standings parser is UNTESTED against real numbers as of 2026-09-19** — the season had not started when this was checked, so every captured row was all-zero. This confirms the column structure exists and parses, but not that real multi-digit numbers, tiebreak ordering (position is currently assumed = row order, unverified), or non-numeric cells (e.g. a dash for an unplayed fixture) are handled correctly. **Do not mark this feature as working, and do not let the app depend on it, until spot-checked against at least one round of real, non-zero Selkent results** |
 | Club-entered results for U7–U11 teams | **Private — club only** | Supabase (`save_team_state` / `get_team_state_for_me`, existing RLS + role checks) | U7–U11 only | Clubs may log results internally for their own use; must never appear in any public file or public-facing view |
 | Team rosters / player data | Private — club/coach/parent scoped | Supabase | All ages | Existing `can_read_team` / `can_edit_team` checks apply |
 | U7–U11 safeguarding info | Private — admin/staff, own club, own team only | Supabase (`upsert_u11_safeguarding_info`, `export_u11_safeguarding_pack`) | U7–U11 only | Confirmed (Sept 2026) all related functions have real authorization checks |
@@ -125,3 +125,16 @@ Check this section before any scope decision, not after.
   on whether Selkent exposes standings data anywhere at all — unconfirmed as
   of this entry. Also made explicit in Section 1 (not just Section 2) that
   results.json is still U9-only, not yet generalized.
+- **2026-09-19 (later same day):** Open question above answered — ChatGPT
+  confirmed real standings data (Played/Won/Drawn/Lost/GF/GA/Points) exists
+  via Selkent's `resultsTable/{division_id}` endpoint, separate from the
+  division/team-list data directory.json currently scrapes. Standings belong
+  in the future generalized results.json. **However**: every row checked so
+  far is all-zero because the season hadn't started yet at time of checking.
+  This confirms the column structure exists, not that the parser handles
+  real (non-zero, multi-digit) numbers, unplayed-fixture cells, or tiebreak
+  ordering correctly — position is currently assumed to equal row order,
+  which is unverified. **Explicit trigger**: revisit and spot-check the
+  standings parser against at least one round of real, non-zero Selkent
+  results once the season starts, before treating this feature as working
+  or letting the app depend on it.
