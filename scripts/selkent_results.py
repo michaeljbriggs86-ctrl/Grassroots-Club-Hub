@@ -36,7 +36,15 @@ EXPECTED_HEADERS = [
     "Points",
 ]
 
-TIE_DISCLAIMER_FRAGMENT = "equal points"
+# Verified against the complete captured real resultsTable/4253 payload.
+#
+# Match the stable explanatory clause rather than the final tie wording.
+# Selkent's captured source currently ends "...teams on equal points", but
+# matching the stable clause also remains safe if the provider later changes
+# that tail to wording such as "...teams level on points".
+TIE_DISCLAIMER_PREFIX = (
+    "table does not yet take account of rules for determining winner"
+)
 
 
 class StandingsParseError(ValueError):
@@ -93,6 +101,9 @@ def _find_standings_table(soup: BeautifulSoup) -> Tag:
     """
     Find the table whose headers exactly match the verified Selkent standings
     contract. This prevents accidentally parsing another table on the page.
+
+    The complete captured real resultsTable/4253 payload confirms that Selkent
+    currently supplies this table using <thead> and <tbody>.
     """
     matches: list[Tag] = []
 
@@ -126,6 +137,16 @@ def _find_standings_table(soup: BeautifulSoup) -> Tag:
 def _extract_division_metadata(
     table: Tag,
 ) -> tuple[str | None, str | None]:
+    """
+    Extract division name and source update text.
+
+    The complete captured real resultsTable/4253 payload confirms the current
+    Selkent structure:
+      div.panel.panel-static
+        div.panel-heading
+          span (division name)
+          span.pull-right (Updated at: ...)
+    """
     panel = table.find_parent(
         "div",
         class_=lambda value: value and "panel-static" in str(value).split(),
@@ -179,9 +200,16 @@ def _extract_division_metadata(
 
 
 def _extract_tie_disclaimer(soup: BeautifulSoup) -> str | None:
+    """
+    Return Selkent's table-order disclaimer when present.
+
+    Match the stable explanatory clause instead of the final wording about
+    tied points. This avoids silently losing source_disclaimer if Selkent
+    changes "on equal points" to an equivalent phrase.
+    """
     for element in soup.find_all(string=True):
         text = _normalise_text(str(element))
-        if TIE_DISCLAIMER_FRAGMENT in text.lower():
+        if TIE_DISCLAIMER_PREFIX in text.lower():
             return text
     return None
 
