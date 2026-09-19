@@ -41,9 +41,9 @@ where it's allowed to live, and which age groups it applies to.
 
 | Data type | Visibility | Where it lives | Age scope | Notes |
 |---|---|---|---|---|
-| Selkent divisions / league tables | Public | GitHub static JSON (`data/directory.json`) | All ages | Selkent publishes this itself; safe to mirror publicly |
-| Selkent fixtures | Public | GitHub static JSON (`data/results.json`, to be generalized) | All ages | Publicly available on Selkent's own site regardless of age |
-| Selkent published results | Public | GitHub static JSON | **U12 and up only** | Selkent's own site does not publish results for U7–U11 (FA rule, see Section 4). Nothing to scrape for younger ages — this is not a scraping gap, the data doesn't exist externally |
+| Selkent divisions / club-team directory | Public | GitHub static JSON (`data/directory.json`) | All ages | Team membership per division (division name + team list), NOT standings/points/W-D-L — confirmed Sept 2026 no standings data exists in any tested payload. **Open question**: does Selkent's site expose standings/table data anywhere, or is "league table" just this division/team grouping? Confirm before building a standings feature |
+| Selkent fixtures | Public | GitHub static JSON (`data/results.json`, to be generalized) | All ages | Publicly available on Selkent's own site regardless of age. **Currently U9-only** — not yet generalized to all age groups |
+| Selkent published results (and standings, if they exist — see open question above) | Public | GitHub static JSON (`data/results.json`, to be generalized) | **U12 and up only** | Selkent's own site does not publish results for U7–U11 (FA rule, see Section 4). Nothing to scrape for younger ages — this is not a scraping gap, the data doesn't exist externally. **Currently U9-only, not yet generalized or split by U12+ scope** |
 | Club-entered results for U7–U11 teams | **Private — club only** | Supabase (`save_team_state` / `get_team_state_for_me`, existing RLS + role checks) | U7–U11 only | Clubs may log results internally for their own use; must never appear in any public file or public-facing view |
 | Team rosters / player data | Private — club/coach/parent scoped | Supabase | All ages | Existing `can_read_team` / `can_edit_team` checks apply |
 | U7–U11 safeguarding info | Private — admin/staff, own club, own team only | Supabase (`upsert_u11_safeguarding_info`, `export_u11_safeguarding_pack`) | U7–U11 only | Confirmed (Sept 2026) all related functions have real authorization checks |
@@ -116,3 +116,12 @@ Check this section before any scope decision, not after.
   Selkent ingestion system in Supabase nobody had cross-checked against the
   GitHub Actions pipeline, and (c) a public/private data conflict between
   "Selkent league fully accessible" and "club results private to the club."
+- **2026-09-19:** Correction applied following Section 0 conflict caught by
+  ChatGPT on first read: Section 1 previously described `data/directory.json`
+  as holding "league tables," but it only contains division/team-membership
+  data (division name + team list), no standings/points/W-D-L. Split the
+  "Selkent divisions / league tables" row into "divisions / club-team
+  directory" (accurate, matches directory.json) and flagged an open question
+  on whether Selkent exposes standings data anywhere at all — unconfirmed as
+  of this entry. Also made explicit in Section 1 (not just Section 2) that
+  results.json is still U9-only, not yet generalized.
