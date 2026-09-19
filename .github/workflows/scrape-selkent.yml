@@ -1,0 +1,38 @@
+name: Scrape Selkent Results
+
+on:
+  schedule:
+    # One daily production refresh for all public Selkent feed data:
+    # fixtures (all ages), published U12+ results, and U12+ standings.
+    - cron: '0 7 * * *'
+  workflow_dispatch:
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests beautifulsoup4
+
+      - name: Run parser tests
+        run: python -m unittest discover -s tests -p "test_*.py" -v
+
+      - name: Run generalized Selkent scraper
+        run: python scripts/scrape.py
+
+      - name: Commit updated public feed
+        run: |
+          git config user.name "selkent-sync-bot"
+          git config user.email "actions@github.com"
+          git add data/results.json
+          git diff --staged --quiet || git commit -m "Update Selkent public feed [automated]"
+          git push
