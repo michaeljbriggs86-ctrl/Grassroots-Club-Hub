@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-09-18T21:37:02.891192+00:00",
+  "last_updated": "2026-09-20T22:13:39.325285+00:00",
   "clubs": [
     {
       "club_id": 514,
@@ -542,7 +542,6 @@
       "teams": [
         "AFC Lewisham White",
         "Boca FC Bears",
-        "Boca FC Grizzlies",
         "Cray Wanderers Cobras",
         "Fisher Youth",
         "Foots Cray Lions Red",
@@ -552,7 +551,7 @@
         "Samuel Montagu Yellow",
         "Welling United Red"
       ],
-      "team_count_label": "11 teams"
+      "team_count_label": "10 teams"
     },
     {
       "age_group": "U8X",
@@ -560,10 +559,10 @@
       "division_name": "Under 8X Orange",
       "teams": [
         "AFC Unity",
+        "Boca FC Grizzlies",
         "Castle Hill United FC",
         "Crayford Arrows Cannons",
         "Guru Nanak Youth",
-        "IEXEL F.C Gold",
         "New Ash Green JFC Vikings",
         "Next Level FC Reds",
         "Northumberland Heath",
@@ -617,12 +616,13 @@
         "Hillyfielders Falcons",
         "Kekoa",
         "Lewisham Borough Cobras",
+        "Lewisham Project White",
         "London Legends Gold",
         "Long Lane Panthers",
         "Long Lane Pumas",
         "Wildcats FS Club Lions"
       ],
-      "team_count_label": "9 teams"
+      "team_count_label": "10 teams"
     },
     {
       "age_group": "U8",
@@ -740,7 +740,7 @@
       "division_name": "Under 8C Silver",
       "teams": [
         "AFC Lewisham White",
-        "Athenlay FC",
+        "Athenlay",
         "Beacons White",
         "Blackheath Rhinos Black",
         "Blackheath Rhinos White",
@@ -817,13 +817,14 @@
         "Eversley Rangers",
         "Hayden Youth Bears",
         "Junior Reds Knights",
+        "Junior Reds Titans",
         "Long Lane Tigers",
         "Longfield Tigers FC",
         "Metrogas FC White",
         "Northumberland Heath",
         "ShooterBallers FC"
       ],
-      "team_count_label": "11 teams"
+      "team_count_label": "12 teams"
     },
     {
       "age_group": "U9",
@@ -880,7 +881,7 @@
         "Gipsy Hill FC Whites",
         "KSI Coaching FC Navy",
         "Lewisham Borough Cobras",
-        "Palace Knights Blue",
+        "Palace Knights White",
         "S.E. Eagles FC",
         "Vikings FC Blue"
       ],
@@ -945,7 +946,7 @@
       "division_name": "Under 10X B Silver",
       "teams": [
         "Ballers SE",
-        "Cray Valley (PM) FC Green",
+        "Cray Valley (PM) FC",
         "Cray Wanderers Cobras",
         "Dulwich Village Orange",
         "Dulwich Village White",
@@ -1293,7 +1294,7 @@
       "agegroup_id": 5,
       "division_name": "Under 11C Navy",
       "teams": [
-        "AFC Gravesend AFC GRAVESEND HEARTS",
+        "AFC Gravesend Hearts",
         "AFC Unity",
         "Baldon Sports Tigers",
         "Castle Hill United FC",
@@ -1334,19 +1335,16 @@
       "teams": [
         "AFC Green Court Dukes",
         "AFC Green Court Knights",
-        "Cray Wanderers Lionesses",
         "Crayford Arrows Greens",
         "Dartford Royals blue",
         "Guru Nanak Youth Yellow",
-        "Junior Reds Warriors",
         "Phoenix Sports Tigers",
         "Punjab United",
-        "ShooterBallers FC",
         "Slade Green Knights",
         "Sutton Athletic Greens",
         "Welling United Claret"
       ],
-      "team_count_label": "13 teams"
+      "team_count_label": "10 teams"
     },
     {
       "age_group": "U11",
@@ -1355,27 +1353,40 @@
       "teams": [
         "AFC Gravesend Diamonds",
         "Chislehurst Wanderers Tigers",
+        "Cray Wanderers Lionesses",
         "Erith & Belvedere Selkent",
         "Erith Town Red",
-        "Junior Reds Athletic",
-        "Junior Reds Sabres",
-        "Long Lane Tigers",
-        "Red Devils Red Devils",
-        "S.E. Eagles FC",
-        "Shooters Hill AFC Jaguars",
+        "Junior Reds Warriors",
+        "ShooterBallers FC",
         "Sutton Athletic Whites",
         "Swanley Rangers Under 11 black",
         "Welling Sport"
       ],
-      "team_count_label": "13 teams"
+      "team_count_label": "10 teams"
+    },
+    {
+      "age_group": "U11",
+      "agegroup_id": 5,
+      "division_name": "Under 11D Red",
+      "teams": [
+        "Abbeymead FC",
+        "Baldon Sports Lions",
+        "Junior Reds Athletic",
+        "Junior Reds Sabres",
+        "Red Devils Red Devils",
+        "S.E. Eagles FC",
+        "Shooters Hill AFC Jaguars",
+        "Sporting Club Thamesmead Black",
+        "Teviot Rangers Red",
+        "Woolwich Wanderers FC"
+      ],
+      "team_count_label": "10 teams"
     },
     {
       "age_group": "U11",
       "agegroup_id": 5,
       "division_name": "Under 11D Silver",
       "teams": [
-        "Abbeymead FC",
-        "Baldon Sports Lions",
         "Bermondsey Utd FC",
         "Blackheath Rhinos Grey",
         "Blackheath Rhinos Yellow",
@@ -1383,12 +1394,10 @@
         "Junior Reds Titans",
         "Kidbrooke Kings Kidbrooke Youth",
         "KSI Coaching FC Navy",
-        "Sporting Club Thamesmead Black",
-        "Teviot Rangers Red",
-        "The Bosco FC Dons",
-        "Woolwich Wanderers FC"
+        "Long Lane Tigers",
+        "The Bosco FC Dons"
       ],
-      "team_count_label": "13 teams"
+      "team_count_label": "9 teams"
     },
     {
       "age_group": "U12X",
@@ -1416,15 +1425,14 @@
         "AFC Lewisham Blue",
         "Dartford FC Black",
         "Dulwich Village Black",
-        "Dynamo Youth Dynamo Blue",
-        "Dynamo Youth Dynamo White",
+        "Dynamo Youth White",
         "Erith & Belvedere",
         "Lewisham Borough Cobras",
         "Regans FC Silver",
         "Russellers Blues",
         "Samuel Montagu Green"
       ],
-      "team_count_label": "10 teams"
+      "team_count_label": "9 teams"
     },
     {
       "age_group": "U12X",
@@ -1439,7 +1447,7 @@
         "Hayden Youth Magpies",
         "Metrogas FC Black",
         "Metrogas FC White",
-        "Sporting Club Thamesmead Red"
+        "Welling United White"
       ],
       "team_count_label": "9 teams"
     },
@@ -1469,46 +1477,37 @@
         "Dartford Royals white",
         "Foots Cray Lions Black",
         "Hayden Youth Panthers",
-        "IEXEL F.C Gold",
-        "ST Sports FC United",
-        "Swanscombe Tigers Yellow",
-        "Welling United Blue"
-      ],
-      "team_count_label": "8 teams"
-    },
-    {
-      "age_group": "U12X",
-      "agegroup_id": 22,
-      "division_name": "Under 12X C Orange",
-      "teams": [
-        "Blackheath Wdrs",
-        "Fisher Youth",
         "Junior Reds Valiants",
-        "London Legends Blue",
         "Metrogas FC Red",
         "Newpark Football Club",
         "Russellers Reds",
         "Samuel Montagu Blue",
-        "Teviot Rangers Blue"
+        "ST Sports FC United",
+        "Swanscombe Tigers Yellow",
+        "Teviot Rangers Blue",
+        "Welling United Blue"
       ],
-      "team_count_label": "9 teams"
+      "team_count_label": "13 teams"
     },
     {
       "age_group": "U12X",
       "agegroup_id": 22,
       "division_name": "Under 12X C Silver",
       "teams": [
-        "Athenlay FC X",
+        "Athenlay",
+        "Blackheath Wdrs",
         "Dulwich Hamlet JFC Navy",
         "Dulwich Village Red",
         "Dulwich Village White",
+        "Fisher Youth",
         "Lewisham Project Navy",
         "Lewisham Tigers Greens",
         "Lewisham Youth Black",
         "Lewisham Youth Green",
-        "London Kickers FC"
+        "London Kickers FC",
+        "London Legends Blue"
       ],
-      "team_count_label": "9 teams"
+      "team_count_label": "12 teams"
     },
     {
       "age_group": "U12",
@@ -1660,9 +1659,10 @@
         "Junior Reds Athletic",
         "Junior Reds Sabres",
         "KSI Coaching FC Navy",
-        "Mayow Park Rangers FC"
+        "Mayow Park Rangers FC",
+        "Mighty Warriors FC Jupiter"
       ],
-      "team_count_label": "12 teams"
+      "team_count_label": "13 teams"
     },
     {
       "age_group": "U12",
@@ -1735,7 +1735,7 @@
         "Eagles & Stars FC",
         "Fleetdown United",
         "Lewisham Project Gold",
-        "Next Level FC Reds",
+        "Next Level FC Black",
         "Next Level FC Whites",
         "Omarie Youth Omarie Youth Red",
         "Parkwood Rangers Lions",
@@ -1829,11 +1829,10 @@
         "Junior Reds Spartans",
         "Junior Reds Titans",
         "S.E. Eagles FC Gold",
-        "S.E. Lions FC Gold",
         "Teviot Rangers Yellow",
         "Total FC"
       ],
-      "team_count_label": "11 teams"
+      "team_count_label": "10 teams"
     },
     {
       "age_group": "U13",
@@ -1876,10 +1875,10 @@
       "agegroup_id": 23,
       "division_name": "Under 14X B",
       "teams": [
-        "Athenlay FC X",
+        "AFC Lewisham",
+        "Athenlay FC",
         "Dulwich Village Blue",
         "Hillyfielders Eagles",
-        "IEXEL F.C Gold",
         "Junior Reds Valiants",
         "London Legends white",
         "Newpark Football Club",
@@ -1912,7 +1911,7 @@
       "agegroup_id": 23,
       "division_name": "Under 14X C Silver",
       "teams": [
-        "Athenlay RYE X",
+        "Athenlay RYE",
         "Baldon Sports Panthers",
         "Bermondsey Utd FC",
         "Dulwich Village Red",
@@ -1998,7 +1997,7 @@
       "agegroup_id": 7,
       "division_name": "Under 14C Navy",
       "teams": [
-        "AFC Gravesend AFC GRAVESEND HEARTS",
+        "AFC Gravesend Hearts",
         "Fleetdown United",
         "Guru Nanak Youth",
         "Hayden Youth Sharks",
@@ -2147,7 +2146,7 @@
       "teams": [
         "Baldon Sports Pumas",
         "Beacons Red",
-        "Blue Stars Elite FC",
+        "Blue Stars Elite FC Stars",
         "Dulwich Hamlet JFC",
         "Dulwich Village Blue",
         "EWD Eagles Youth",
@@ -2254,38 +2253,38 @@
     {
       "age_group": "U16",
       "agegroup_id": 10,
-      "division_name": "Under 16C",
+      "division_name": "Under 16C Navy",
       "teams": [
         "AFC Lewisham White",
-        "Halls AFC",
+        "Blackheath Rhinos Black",
+        "Hayden Youth Panthers",
+        "Junior Reds Athletic",
+        "Junior Reds Valiants",
         "Mayow Park Rangers FC Blue",
         "Northumberland Heath",
-        "South Darenth Purples",
         "Sutton Dynamo FC",
         "Swanley Rangers Under 16 black",
         "Total FC"
       ],
-      "team_count_label": "8 teams"
+      "team_count_label": "10 teams"
     },
     {
       "age_group": "U16",
       "agegroup_id": 10,
-      "division_name": "Under 16D",
+      "division_name": "Under 16C Silver",
       "teams": [
         "Athenlay RYE",
-        "Blackheath Rhinos Black",
         "Dartford Royals white",
         "Dulwich Village White",
         "Falconwood FC Black",
-        "Hayden Youth Panthers",
-        "Junior Reds Athletic",
-        "Junior Reds Valiants",
+        "Halls AFC",
         "Kent United FC Kent United",
         "Kingsdale Orange",
         "Mayow Park Rangers FC White",
+        "South Darenth Purples",
         "Woolwich Wanderers FC"
       ],
-      "team_count_label": "12 teams"
+      "team_count_label": "10 teams"
     },
     {
       "age_group": "U17",
@@ -2487,11 +2486,6 @@
       "club_name": "Boca FC"
     },
     {
-      "team_name": "Boca FC Grizzlies",
-      "club_id": 513,
-      "club_name": "Boca FC"
-    },
-    {
       "team_name": "Cray Wanderers Cobras",
       "club_id": 250,
       "club_name": "Cray Wanderers"
@@ -2537,6 +2531,11 @@
       "club_name": "AFC Unity"
     },
     {
+      "team_name": "Boca FC Grizzlies",
+      "club_id": 513,
+      "club_name": "Boca FC"
+    },
+    {
       "team_name": "Castle Hill United FC",
       "club_id": 487,
       "club_name": "Castle Hill United FC"
@@ -2550,11 +2549,6 @@
       "team_name": "Guru Nanak Youth",
       "club_id": 281,
       "club_name": "Guru Nanak Youth"
-    },
-    {
-      "team_name": "IEXEL F.C Gold",
-      "club_id": 506,
-      "club_name": "IEXEL F.C"
     },
     {
       "team_name": "New Ash Green JFC Vikings",
@@ -2700,6 +2694,11 @@
       "team_name": "Lewisham Borough Cobras",
       "club_id": 286,
       "club_name": "Lewisham Borough"
+    },
+    {
+      "team_name": "Lewisham Project White",
+      "club_id": 442,
+      "club_name": "Lewisham Project"
     },
     {
       "team_name": "London Legends Gold",
@@ -3037,7 +3036,7 @@
       "club_name": "AFC Lewisham"
     },
     {
-      "team_name": "Athenlay FC",
+      "team_name": "Athenlay",
       "club_id": 238,
       "club_name": "Athenlay"
     },
@@ -3262,6 +3261,11 @@
       "club_name": "Junior Reds"
     },
     {
+      "team_name": "Junior Reds Titans",
+      "club_id": 292,
+      "club_name": "Junior Reds"
+    },
+    {
       "team_name": "Long Lane Tigers",
       "club_id": 303,
       "club_name": "Long Lane"
@@ -3457,7 +3461,7 @@
       "club_name": "Lewisham Borough"
     },
     {
-      "team_name": "Palace Knights Blue",
+      "team_name": "Palace Knights White",
       "club_id": 480,
       "club_name": "Palace Knights"
     },
@@ -3622,7 +3626,7 @@
       "club_name": "Ballers SE"
     },
     {
-      "team_name": "Cray Valley (PM) FC Green",
+      "team_name": "Cray Valley (PM) FC",
       "club_id": 547,
       "club_name": "Cray Valley (PM) FC"
     },
@@ -4602,7 +4606,7 @@
       "club_name": "ST Sports FC"
     },
     {
-      "team_name": "AFC Gravesend AFC GRAVESEND HEARTS",
+      "team_name": "AFC Gravesend Hearts",
       "club_id": 308,
       "club_name": "AFC Gravesend"
     },
@@ -4727,11 +4731,6 @@
       "club_name": "AFC Green Court"
     },
     {
-      "team_name": "Cray Wanderers Lionesses",
-      "club_id": 250,
-      "club_name": "Cray Wanderers"
-    },
-    {
       "team_name": "Crayford Arrows Greens",
       "club_id": 251,
       "club_name": "Crayford Arrows"
@@ -4747,11 +4746,6 @@
       "club_name": "Guru Nanak Youth"
     },
     {
-      "team_name": "Junior Reds Warriors",
-      "club_id": 292,
-      "club_name": "Junior Reds"
-    },
-    {
       "team_name": "Phoenix Sports Tigers",
       "club_id": 318,
       "club_name": "Phoenix Sports"
@@ -4760,11 +4754,6 @@
       "team_name": "Punjab United",
       "club_id": 473,
       "club_name": "Punjab United"
-    },
-    {
-      "team_name": "ShooterBallers FC",
-      "club_id": 498,
-      "club_name": "ShooterBallers FC"
     },
     {
       "team_name": "Slade Green Knights",
@@ -4792,6 +4781,11 @@
       "club_name": "Chislehurst Wanderers"
     },
     {
+      "team_name": "Cray Wanderers Lionesses",
+      "club_id": 250,
+      "club_name": "Cray Wanderers"
+    },
+    {
       "team_name": "Erith & Belvedere Selkent",
       "club_id": 454,
       "club_name": "Erith & Belvedere"
@@ -4802,34 +4796,14 @@
       "club_name": "Erith Town"
     },
     {
-      "team_name": "Junior Reds Athletic",
+      "team_name": "Junior Reds Warriors",
       "club_id": 292,
       "club_name": "Junior Reds"
     },
     {
-      "team_name": "Junior Reds Sabres",
-      "club_id": 292,
-      "club_name": "Junior Reds"
-    },
-    {
-      "team_name": "Long Lane Tigers",
-      "club_id": 303,
-      "club_name": "Long Lane"
-    },
-    {
-      "team_name": "Red Devils Red Devils",
-      "club_id": 320,
-      "club_name": "Red Devils"
-    },
-    {
-      "team_name": "S.E. Eagles FC",
-      "club_id": 497,
-      "club_name": "S.E. Eagles FC"
-    },
-    {
-      "team_name": "Shooters Hill AFC Jaguars",
-      "club_id": 499,
-      "club_name": "Shooters Hill AFC"
+      "team_name": "ShooterBallers FC",
+      "club_id": 498,
+      "club_name": "ShooterBallers FC"
     },
     {
       "team_name": "Sutton Athletic Whites",
@@ -4855,6 +4829,46 @@
       "team_name": "Baldon Sports Lions",
       "club_id": 239,
       "club_name": "Baldon Sports"
+    },
+    {
+      "team_name": "Junior Reds Athletic",
+      "club_id": 292,
+      "club_name": "Junior Reds"
+    },
+    {
+      "team_name": "Junior Reds Sabres",
+      "club_id": 292,
+      "club_name": "Junior Reds"
+    },
+    {
+      "team_name": "Red Devils Red Devils",
+      "club_id": 320,
+      "club_name": "Red Devils"
+    },
+    {
+      "team_name": "S.E. Eagles FC",
+      "club_id": 497,
+      "club_name": "S.E. Eagles FC"
+    },
+    {
+      "team_name": "Shooters Hill AFC Jaguars",
+      "club_id": 499,
+      "club_name": "Shooters Hill AFC"
+    },
+    {
+      "team_name": "Sporting Club Thamesmead Black",
+      "club_id": 540,
+      "club_name": "Sporting Club Thamesmead"
+    },
+    {
+      "team_name": "Teviot Rangers Red",
+      "club_id": 333,
+      "club_name": "Teviot Rangers"
+    },
+    {
+      "team_name": "Woolwich Wanderers FC",
+      "club_id": 566,
+      "club_name": "Woolwich Wanderers FC"
     },
     {
       "team_name": "Bermondsey Utd FC",
@@ -4892,24 +4906,14 @@
       "club_name": "KSI Coaching FC"
     },
     {
-      "team_name": "Sporting Club Thamesmead Black",
-      "club_id": 540,
-      "club_name": "Sporting Club Thamesmead"
-    },
-    {
-      "team_name": "Teviot Rangers Red",
-      "club_id": 333,
-      "club_name": "Teviot Rangers"
+      "team_name": "Long Lane Tigers",
+      "club_id": 303,
+      "club_name": "Long Lane"
     },
     {
       "team_name": "The Bosco FC Dons",
       "club_id": 427,
       "club_name": "The Bosco FC"
-    },
-    {
-      "team_name": "Woolwich Wanderers FC",
-      "club_id": 566,
-      "club_name": "Woolwich Wanderers FC"
     },
     {
       "team_name": "Ballon Dor FC",
@@ -4977,12 +4981,7 @@
       "club_name": "Dulwich Village"
     },
     {
-      "team_name": "Dynamo Youth Dynamo Blue",
-      "club_id": 263,
-      "club_name": "Dynamo Youth"
-    },
-    {
-      "team_name": "Dynamo Youth Dynamo White",
+      "team_name": "Dynamo Youth White",
       "club_id": 263,
       "club_name": "Dynamo Youth"
     },
@@ -5052,9 +5051,9 @@
       "club_name": "Metrogas FC"
     },
     {
-      "team_name": "Sporting Club Thamesmead Red",
-      "club_id": 540,
-      "club_name": "Sporting Club Thamesmead"
+      "team_name": "Welling United White",
+      "club_id": 254,
+      "club_name": "Welling United"
     },
     {
       "team_name": "AFC Lewisham White",
@@ -5122,44 +5121,9 @@
       "club_name": "Hayden Youth"
     },
     {
-      "team_name": "IEXEL F.C Gold",
-      "club_id": 506,
-      "club_name": "IEXEL F.C"
-    },
-    {
-      "team_name": "ST Sports FC United",
-      "club_id": 294,
-      "club_name": "ST Sports FC"
-    },
-    {
-      "team_name": "Swanscombe Tigers Yellow",
-      "club_id": 332,
-      "club_name": "Swanscombe Tigers"
-    },
-    {
-      "team_name": "Welling United Blue",
-      "club_id": 254,
-      "club_name": "Welling United"
-    },
-    {
-      "team_name": "Blackheath Wdrs",
-      "club_id": 246,
-      "club_name": "Blackheath Wdrs"
-    },
-    {
-      "team_name": "Fisher Youth",
-      "club_id": 395,
-      "club_name": "Fisher Youth"
-    },
-    {
       "team_name": "Junior Reds Valiants",
       "club_id": 292,
       "club_name": "Junior Reds"
-    },
-    {
-      "team_name": "London Legends Blue",
-      "club_id": 397,
-      "club_name": "London Legends"
     },
     {
       "team_name": "Metrogas FC Red",
@@ -5182,14 +5146,34 @@
       "club_name": "Samuel Montagu"
     },
     {
+      "team_name": "ST Sports FC United",
+      "club_id": 294,
+      "club_name": "ST Sports FC"
+    },
+    {
+      "team_name": "Swanscombe Tigers Yellow",
+      "club_id": 332,
+      "club_name": "Swanscombe Tigers"
+    },
+    {
       "team_name": "Teviot Rangers Blue",
       "club_id": 333,
       "club_name": "Teviot Rangers"
     },
     {
-      "team_name": "Athenlay FC X",
+      "team_name": "Welling United Blue",
+      "club_id": 254,
+      "club_name": "Welling United"
+    },
+    {
+      "team_name": "Athenlay",
       "club_id": 238,
       "club_name": "Athenlay"
+    },
+    {
+      "team_name": "Blackheath Wdrs",
+      "club_id": 246,
+      "club_name": "Blackheath Wdrs"
     },
     {
       "team_name": "Dulwich Hamlet JFC Navy",
@@ -5205,6 +5189,11 @@
       "team_name": "Dulwich Village White",
       "club_id": 261,
       "club_name": "Dulwich Village"
+    },
+    {
+      "team_name": "Fisher Youth",
+      "club_id": 395,
+      "club_name": "Fisher Youth"
     },
     {
       "team_name": "Lewisham Project Navy",
@@ -5230,6 +5219,11 @@
       "team_name": "London Kickers FC",
       "club_id": 562,
       "club_name": "London Kickers FC"
+    },
+    {
+      "team_name": "London Legends Blue",
+      "club_id": 397,
+      "club_name": "London Legends"
     },
     {
       "team_name": "Ballon Dor FC",
@@ -5682,6 +5676,11 @@
       "club_name": "Mayow Park Rangers FC"
     },
     {
+      "team_name": "Mighty Warriors FC Jupiter",
+      "club_id": 398,
+      "club_name": "Mighty Warriors FC"
+    },
+    {
       "team_name": "AFC Green Court Dukes",
       "club_id": 432,
       "club_name": "AFC Green Court"
@@ -5892,7 +5891,7 @@
       "club_name": "Lewisham Project"
     },
     {
-      "team_name": "Next Level FC Reds",
+      "team_name": "Next Level FC Black",
       "club_id": 493,
       "club_name": "Next Level FC"
     },
@@ -6162,11 +6161,6 @@
       "club_name": "S.E. Eagles FC"
     },
     {
-      "team_name": "S.E. Lions FC Gold",
-      "club_id": 524,
-      "club_name": "S.E. Lions FC"
-    },
-    {
       "team_name": "Teviot Rangers Yellow",
       "club_id": 333,
       "club_name": "Teviot Rangers"
@@ -6277,7 +6271,12 @@
       "club_name": "Teviot Rangers"
     },
     {
-      "team_name": "Athenlay FC X",
+      "team_name": "AFC Lewisham",
+      "club_id": 234,
+      "club_name": "AFC Lewisham"
+    },
+    {
+      "team_name": "Athenlay FC",
       "club_id": 238,
       "club_name": "Athenlay"
     },
@@ -6290,11 +6289,6 @@
       "team_name": "Hillyfielders Eagles",
       "club_id": 288,
       "club_name": "Hillyfielders"
-    },
-    {
-      "team_name": "IEXEL F.C Gold",
-      "club_id": 506,
-      "club_name": "IEXEL F.C"
     },
     {
       "team_name": "Junior Reds Valiants",
@@ -6377,7 +6371,7 @@
       "club_name": "Welling United"
     },
     {
-      "team_name": "Athenlay RYE X",
+      "team_name": "Athenlay RYE",
       "club_id": 238,
       "club_name": "Athenlay"
     },
@@ -6607,7 +6601,7 @@
       "club_name": "Teviot Rangers"
     },
     {
-      "team_name": "AFC Gravesend AFC GRAVESEND HEARTS",
+      "team_name": "AFC Gravesend Hearts",
       "club_id": 308,
       "club_name": "AFC Gravesend"
     },
@@ -7032,7 +7026,7 @@
       "club_name": "Beacons"
     },
     {
-      "team_name": "Blue Stars Elite FC",
+      "team_name": "Blue Stars Elite FC Stars",
       "club_id": 533,
       "club_name": "Blue Stars Elite FC"
     },
@@ -7342,9 +7336,24 @@
       "club_name": "AFC Lewisham"
     },
     {
-      "team_name": "Halls AFC",
-      "club_id": 282,
-      "club_name": "Halls AFC"
+      "team_name": "Blackheath Rhinos Black",
+      "club_id": 409,
+      "club_name": "Blackheath Rhinos"
+    },
+    {
+      "team_name": "Hayden Youth Panthers",
+      "club_id": 283,
+      "club_name": "Hayden Youth"
+    },
+    {
+      "team_name": "Junior Reds Athletic",
+      "club_id": 292,
+      "club_name": "Junior Reds"
+    },
+    {
+      "team_name": "Junior Reds Valiants",
+      "club_id": 292,
+      "club_name": "Junior Reds"
     },
     {
       "team_name": "Mayow Park Rangers FC Blue",
@@ -7355,11 +7364,6 @@
       "team_name": "Northumberland Heath",
       "club_id": 520,
       "club_name": "Northumberland Heath"
-    },
-    {
-      "team_name": "South Darenth Purples",
-      "club_id": 325,
-      "club_name": "South Darenth"
     },
     {
       "team_name": "Sutton Dynamo FC",
@@ -7382,11 +7386,6 @@
       "club_name": "Athenlay"
     },
     {
-      "team_name": "Blackheath Rhinos Black",
-      "club_id": 409,
-      "club_name": "Blackheath Rhinos"
-    },
-    {
       "team_name": "Dartford Royals white",
       "club_id": 256,
       "club_name": "Dartford Royals"
@@ -7402,19 +7401,9 @@
       "club_name": "Falconwood FC"
     },
     {
-      "team_name": "Hayden Youth Panthers",
-      "club_id": 283,
-      "club_name": "Hayden Youth"
-    },
-    {
-      "team_name": "Junior Reds Athletic",
-      "club_id": 292,
-      "club_name": "Junior Reds"
-    },
-    {
-      "team_name": "Junior Reds Valiants",
-      "club_id": 292,
-      "club_name": "Junior Reds"
+      "team_name": "Halls AFC",
+      "club_id": 282,
+      "club_name": "Halls AFC"
     },
     {
       "team_name": "Kent United FC Kent United",
@@ -7430,6 +7419,11 @@
       "team_name": "Mayow Park Rangers FC White",
       "club_id": 504,
       "club_name": "Mayow Park Rangers FC"
+    },
+    {
+      "team_name": "South Darenth Purples",
+      "club_id": 325,
+      "club_name": "South Darenth"
     },
     {
       "team_name": "Woolwich Wanderers FC",
