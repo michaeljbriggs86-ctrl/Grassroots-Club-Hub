@@ -20,6 +20,7 @@ jobs:
         run: |
           set -euo pipefail
           python verification/verify_v2_2_9_pitchkind_ui.py
+          python -m pip install --quiet requests beautifulsoup4
           python -m unittest discover -s tests -p "test_*.py" -v
           node --check app/src/main/assets/cloud.js
           node --check app/src/main/assets/onboarding.js
