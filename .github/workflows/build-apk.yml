@@ -1,4 +1,4 @@
-name: Android APK v2.2.11 PitchKind
+name: Android APK v2.2.12 PitchKind
 
 on:
   workflow_dispatch:
@@ -19,7 +19,7 @@ jobs:
       - name: Verify source contract
         run: |
           set -euo pipefail
-          python verification/verify_v2_2_11_pitchkind_ui.py
+          python verification/verify_v2_2_12_pitchkind_ui.py
           python -m pip install --quiet requests beautifulsoup4
           python -m unittest discover -s tests -p "test_*.py" -v
           node --check app/src/main/assets/cloud.js
@@ -96,28 +96,28 @@ jobs:
           unzip -l "$APK" | grep -q 'assets/pitchkind-wt_logo-primary.svg'
           unzip -l "$APK" | grep -q 'assets/pitchkind-wt_mark.svg'
           unzip -p "$APK" assets/index.html | grep -q '<title>PitchKind</title>'
-          unzip -p "$APK" assets/index.html | grep -q 'App version 2.2.11'
+          unzip -p "$APK" assets/index.html | grep -q 'App version 2.2.12'
           unzip -p "$APK" assets/app.js > "$RUNNER_TEMP/pitchkind-apk-app.js"
           unzip -p "$APK" assets/styles.css > "$RUNNER_TEMP/pitchkind-apk-styles.css"
           grep -Fq "function openNewMatchForCompetition(competition,status='scheduled')" "$RUNNER_TEMP/pitchkind-apk-app.js"
-          grep -Fq 'v2.2.11 — full-screen Match played flow' "$RUNNER_TEMP/pitchkind-apk-styles.css"
+          grep -Fq 'v2.2.12 — full-screen Match played flow' "$RUNNER_TEMP/pitchkind-apk-styles.css"
           DEX_DIR="$RUNNER_TEMP/pitchkind-apk-dex"
           rm -rf "$DEX_DIR"
           mkdir -p "$DEX_DIR"
           unzip -qq "$APK" 'classes*.dex' -d "$DEX_DIR"
-          grep -aR -Fq 'GrassrootsClubHub/2.2.11' "$DEX_DIR"
+          grep -aR -Fq 'GrassrootsClubHub/2.2.12' "$DEX_DIR"
           ! unzip -p "$APK" assets/index.html | grep -q 'CONNECT • ORGANISE • GROW THE GAME'
           ! unzip -p "$APK" assets/index.html | grep -q 'More Than A Game'
           mkdir -p dist
-          cp "$APK" dist/PitchKind-v2.2.11-debug.apk
-          sha256sum dist/PitchKind-v2.2.11-debug.apk > dist/PitchKind-v2.2.11-debug.apk.sha256
+          cp "$APK" dist/PitchKind-v2.2.12-debug.apk
+          sha256sum dist/PitchKind-v2.2.12-debug.apk > dist/PitchKind-v2.2.12-debug.apk.sha256
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: PitchKind-v2.2.11-debug
+          name: PitchKind-v2.2.12-debug
           path: |
-            dist/PitchKind-v2.2.11-debug.apk
-            dist/PitchKind-v2.2.11-debug.apk.sha256
+            dist/PitchKind-v2.2.12-debug.apk
+            dist/PitchKind-v2.2.12-debug.apk.sha256
           if-no-files-found: error
           retention-days: 14

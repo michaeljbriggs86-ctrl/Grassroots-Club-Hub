@@ -1,6 +1,7 @@
 import sys
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPTS = ROOT / "scripts"
@@ -8,11 +9,16 @@ SCRIPTS = ROOT / "scripts"
 if str(SCRIPTS) not in sys.path:
     sys.path.insert(0, str(SCRIPTS))
 
+import scrape
+
 from scrape import (
     SelkentFeedError,
     UnverifiedFixtureMarkupError,
+    collect_fixtures,
     has_unparsed_published_results,
+    merge_fixture_rows,
     parse_divisions,
+    parse_fixture_week_ids,
     parse_fixtures,
     parse_public_results_agegroups,
     parse_results_divisions,
@@ -156,6 +162,105 @@ class GeneralizedSelkentFeedTests(unittest.TestCase):
                 }
             ],
         )
+
+
+    def test_fixture_week_ids_are_discovered_from_real_provider_shape(self):
+        html = """
+        <div>
+          <a data-week-id="2" role="tab" data-toggle="tab">27/09/26</a>
+          <a data-week-id="3" role="tab" data-toggle="tab">04/10/26</a>
+          <a data-week-id="3" role="tab" data-toggle="tab">duplicate</a>
+        </div>
+        """
+        self.assertEqual(parse_fixture_week_ids(html), [2, 3])
+
+    def test_verified_week_three_valiants_fixture_parses(self):
+        html = """
+        <div id="fixtureContainer">
+          <h2 class="subHead">04/10/26 - Week 3</h2>
+          <div class="panel panel-static">
+            <div class="panel-heading">
+              <div class="panel-title">Under 9D Navy</div>
+            </div>
+            <div class="panel-body">
+              <div class="row fixtureRow" data-team-ids="972;999;">
+                <div class="col-xs-5">Shooters Hill AFC Valiants</div>
+                <div class="col-xs-1">v</div>
+                <div class="col-xs-5">Phoenix Sports Panthers</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        """
+        fixtures, status = parse_fixtures(html)
+        self.assertEqual(status, "verified_fixture_rows_v1")
+        self.assertEqual(fixtures[0]["date"], "2026-10-04")
+        self.assertEqual(fixtures[0]["home"], "Shooters Hill AFC Valiants")
+        self.assertEqual(fixtures[0]["away"], "Phoenix Sports Panthers")
+
+    def test_collect_fixtures_fetches_every_advertised_week_without_u9_special_case(self):
+        base = """
+        <div>
+          <a data-week-id="2" role="tab" data-toggle="tab">27/09/26</a>
+          <a data-week-id="3" role="tab" data-toggle="tab">04/10/26</a>
+          <div id="fixtureContainer"></div>
+        </div>
+        """
+        week_two = """
+        <div id="fixtureContainer">
+          <h2 class="subHead">27/09/26 - Week 2</h2>
+          <div class="panel-title">Under 8 Test</div>
+          <div class="fixtureRow" data-team-ids="10;11;">
+            <div class="col-xs-5">Example Home</div>
+            <div class="col-xs-1">v</div>
+            <div class="col-xs-5">Example Away</div>
+          </div>
+        </div>
+        """
+        week_three = """
+        <div id="fixtureContainer">
+          <h2 class="subHead">04/10/26 - Week 3</h2>
+          <div class="panel-title">Under 8 Test</div>
+          <div class="fixtureRow" data-team-ids="12;13;">
+            <div class="col-xs-5">Second Home</div>
+            <div class="col-xs-1">v</div>
+            <div class="col-xs-5">Second Away</div>
+          </div>
+        </div>
+        """
+        payloads = {
+            "fixturespage/2": base,
+            "fixturespage/2/2": week_two,
+            "fixturespage/2/3": week_three,
+        }
+
+        with patch.object(scrape, "fetch_json", side_effect=lambda path: payloads[path]) as fetch:
+            with patch.object(scrape, "_sleep_between_requests", return_value=None):
+                result = collect_fixtures({2: "U8"})
+
+        self.assertEqual(
+            [call.args[0] for call in fetch.call_args_list],
+            ["fixturespage/2", "fixturespage/2/2", "fixturespage/2/3"],
+        )
+        self.assertEqual(result[2]["fixture_week_ids"], [2, 3])
+        self.assertEqual(
+            [row["date"] for row in result[2]["fixtures"]],
+            ["2026-09-27", "2026-10-04"],
+        )
+        self.assertEqual(
+            result[2]["fixture_parse_status"],
+            "verified_multiweek_fixture_rows_v2",
+        )
+
+    def test_merge_fixture_rows_deduplicates_stable_provider_identity(self):
+        row = {
+            "date": "2026-10-04",
+            "division_name": "Under 9D Navy",
+            "home": "Shooters Hill AFC Valiants",
+            "away": "Phoenix Sports Panthers",
+            "provider_team_ids": ["972", "999"],
+        }
+        self.assertEqual(merge_fixture_rows([row], [dict(row)]), [row])
 
     def test_unknown_populated_fixture_markup_still_fails_closed(self):
         html = """

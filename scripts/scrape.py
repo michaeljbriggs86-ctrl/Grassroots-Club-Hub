@@ -439,6 +439,76 @@ def parse_fixtures(html: str) -> tuple[list[dict[str, Any]], str]:
     return fixtures, "verified_fixture_rows_v1"
 
 
+
+def parse_fixture_week_ids(html: str) -> list[int]:
+    """
+    Discover every fixture week Selkent currently advertises for an age group.
+
+    Verified real shape (2026-09-21):
+      <a data-week-id="2" role="tab" data-toggle="tab">27/09/26</a>
+      <a data-week-id="3" role="tab" data-toggle="tab">04/10/26</a>
+
+    The provider's week IDs are authoritative. We do not calculate fixture
+    Sundays locally.
+    """
+    soup = BeautifulSoup(html, "html.parser")
+    week_ids: set[int] = set()
+
+    for tab in soup.select("[data-week-id]"):
+        raw = str(tab.get("data-week-id", "")).strip()
+        if raw.isdigit():
+            week_ids.add(int(raw))
+
+    return sorted(week_ids)
+
+
+def _fixture_identity(row: dict[str, Any]) -> tuple[Any, ...]:
+    provider_ids = tuple(
+        str(item).strip()
+        for item in row.get("provider_team_ids", [])
+        if str(item).strip()
+    )
+
+    if len(provider_ids) >= 2:
+        participants: tuple[Any, ...] = ("provider_ids",) + provider_ids
+    else:
+        participants = (
+            "names",
+            _normalise_text(str(row.get("home", ""))).casefold(),
+            _normalise_text(str(row.get("away", ""))).casefold(),
+        )
+
+    return (
+        str(row.get("date", "")),
+        _normalise_text(str(row.get("division_name", ""))).casefold(),
+        participants,
+    )
+
+
+def merge_fixture_rows(*groups: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Merge independently fetched fixture weeks without publishing duplicates."""
+    merged: list[dict[str, Any]] = []
+    seen: set[tuple[Any, ...]] = set()
+
+    for group in groups:
+        for row in group:
+            identity = _fixture_identity(row)
+            if identity in seen:
+                continue
+            seen.add(identity)
+            merged.append(row)
+
+    return sorted(
+        merged,
+        key=lambda row: (
+            str(row.get("date", "")),
+            _normalise_text(str(row.get("division_name", ""))).casefold(),
+            _normalise_text(str(row.get("home", ""))).casefold(),
+            _normalise_text(str(row.get("away", ""))).casefold(),
+        ),
+    )
+
+
 def has_unparsed_published_results(html: str) -> bool:
     """
     Detect whether a resultsTable payload now contains actual match-result
@@ -475,19 +545,51 @@ def has_unparsed_published_results(html: str) -> bool:
 def collect_fixtures(
     fixture_agegroups: dict[int, str],
 ) -> dict[int, dict[str, Any]]:
+    """
+    Collect every fixture week Selkent advertises for every discovered age group.
+
+    The base endpoint discovers provider week IDs. Each advertised week is then
+    fetched explicitly through:
+        fixturespage/{agegroup_id}/{week_id}
+
+    If Selkent exposes no week tabs, retain the verified single-page behaviour.
+    Any advertised week that cannot be fetched/parsed aborts the complete build,
+    preserving the previous known-good public feed.
+    """
     collected: dict[int, dict[str, Any]] = {}
 
     for agegroup_id, label in sorted(
         fixture_agegroups.items(),
         key=lambda item: item[0],
     ):
-        html = fetch_json(f"fixturespage/{agegroup_id}")
-        fixtures, parse_status = parse_fixtures(html)
+        base_html = fetch_json(f"fixturespage/{agegroup_id}")
+        week_ids = parse_fixture_week_ids(base_html)
+
+        if week_ids:
+            groups: list[list[dict[str, Any]]] = []
+
+            for week_id in week_ids:
+                week_html = fetch_json(
+                    f"fixturespage/{agegroup_id}/{week_id}"
+                )
+                week_fixtures, _week_status = parse_fixtures(week_html)
+                groups.append(week_fixtures)
+                _sleep_between_requests()
+
+            fixtures = merge_fixture_rows(*groups)
+            parse_status = (
+                "verified_multiweek_fixture_rows_v2"
+                if fixtures
+                else "verified_empty_multiweek_v2"
+            )
+        else:
+            fixtures, parse_status = parse_fixtures(base_html)
 
         collected[agegroup_id] = {
             "age_group": label,
             "fixtures": fixtures,
             "fixture_parse_status": parse_status,
+            "fixture_week_ids": week_ids,
         }
 
         _sleep_between_requests()
@@ -585,6 +687,11 @@ def build_payload() -> dict[str, Any]:
                 if fixture_data is not None
                 else "not_available"
             ),
+            "fixture_week_ids": (
+                fixture_data.get("fixture_week_ids", [])
+                if fixture_data is not None
+                else []
+            ),
         }
 
         if standings_data is not None:
@@ -609,7 +716,7 @@ def build_payload() -> dict[str, Any]:
         "coverage": {
             "fixtures": {
                 "scope": "all Selkent age groups",
-                "parser_status": "verified_empty_and_fixture_rows_v1",
+                "parser_status": "verified_empty_fixture_rows_and_multiweek_v2",
             },
             "standings": {
                 "scope": "Selkent-public Results age groups only",

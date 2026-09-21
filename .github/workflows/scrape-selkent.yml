@@ -2,9 +2,9 @@ name: Scrape Selkent Results
 
 on:
   schedule:
-    # One daily production refresh for all public Selkent feed data:
-    # fixtures (all ages), published U12+ results, and U12+ standings.
-    - cron: '0 7 * * *'
+    # Refresh public Selkent feed data every six hours so newly published
+    # fixtures become available to the app promptly across all age groups.
+    - cron: '0 */6 * * *'
   workflow_dispatch:
 
 jobs:
