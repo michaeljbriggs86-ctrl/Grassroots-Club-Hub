@@ -36,7 +36,7 @@ check('ClubHubNative preserved','"ClubHubNative"' in main)
 check('static feed host preserved','raw.githubusercontent.com' in main and 'Grassroots-Club-Hub/main/data/directory.json' in main and 'Grassroots-Club-Hub/main/data/results.json' in main)
 check('Android app label PitchKind','>PitchKind<' in strings)
 check('HTML title PitchKind','<title>PitchKind</title>' in index)
-check('About version 2.2.11','App version 2.2.12' in index)
+check('About version 2.2.12','App version 2.2.12' in index)
 check('manifest name PitchKind',manifest.get('name')=='PitchKind' and manifest.get('short_name')=='PitchKind')
 check('manifest version 2.2.12',manifest.get('version')=='2.2.12')
 check('v1.4 marker','approved-app-ui-2026-09-21-v1.4-pitchkind' in cloud and 'approved-app-ui-2026-09-21-v1.4-pitchkind' in txt('app/src/main/assets/app-design-system.css'))
@@ -162,14 +162,24 @@ check(
 u9 = next((g for g in results_feed.get('age_groups', []) if g.get('age_group') == 'U9'), {})
 u9_fixtures = u9.get('fixtures') or []
 check(
-    'verified populated U9 fixture feed retained',
-    u9.get('fixture_parse_status') == 'verified_fixture_rows_v1'
+    'verified populated U9 multi-week fixture feed retained',
+    u9.get('fixture_parse_status') == 'verified_multiweek_fixture_rows_v2'
+    and 2 in (u9.get('fixture_week_ids') or [])
+    and 3 in (u9.get('fixture_week_ids') or [])
     and any(
         f.get('date') == '2026-09-27'
         and f.get('division_name') == 'Under 9D Navy'
         and f.get('home') == 'Junior Reds Sabres'
         and f.get('away') == 'Shooters Hill AFC Valiants'
         and f.get('provider_team_ids') == ['139', '972']
+        for f in u9_fixtures
+    )
+    and any(
+        f.get('date') == '2026-10-04'
+        and f.get('division_name') == 'Under 9D Navy'
+        and f.get('home') == 'Shooters Hill AFC Valiants'
+        and f.get('away') == 'Phoenix Sports Panthers'
+        and f.get('provider_team_ids') == ['972', '771']
         for f in u9_fixtures
     ),
 )
