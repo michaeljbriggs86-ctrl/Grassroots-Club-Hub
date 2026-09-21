@@ -46,8 +46,47 @@ jobs:
         with:
           gradle-version: '8.9'
 
+      - name: Restore permanent PitchKind signing key
+        env:
+          PITCHKIND_KEYSTORE_B64: ${{ secrets.PITCHKIND_KEYSTORE_B64 }}
+        run: |
+          set -euo pipefail
+          test -n "$PITCHKIND_KEYSTORE_B64"
+          KEYSTORE="$RUNNER_TEMP/pitchkind-signing.p12"
+          printf '%s' "$PITCHKIND_KEYSTORE_B64" | base64 --decode > "$KEYSTORE"
+          chmod 600 "$KEYSTORE"
+          echo "PITCHKIND_KEYSTORE_FILE=$KEYSTORE" >> "$GITHUB_ENV"
+
       - name: Build debug APK
+        env:
+          PITCHKIND_KEYSTORE_PASSWORD: ${{ secrets.PITCHKIND_KEYSTORE_PASSWORD }}
+          PITCHKIND_KEY_ALIAS: ${{ secrets.PITCHKIND_KEY_ALIAS }}
+          PITCHKIND_KEY_PASSWORD: ${{ secrets.PITCHKIND_KEY_PASSWORD }}
         run: gradle :app:assembleDebug --no-daemon --stacktrace
+
+      - name: Verify permanent APK signer
+        env:
+          PITCHKIND_KEYSTORE_PASSWORD: ${{ secrets.PITCHKIND_KEYSTORE_PASSWORD }}
+          PITCHKIND_KEY_ALIAS: ${{ secrets.PITCHKIND_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          APK='app/build/outputs/apk/debug/app-debug.apk'
+
+          EXPECTED="$(
+            keytool -list -v               -keystore "$PITCHKIND_KEYSTORE_FILE"               -storetype PKCS12               -storepass "$PITCHKIND_KEYSTORE_PASSWORD"               -alias "$PITCHKIND_KEY_ALIAS" |
+            awk -F': ' '/SHA256:/{gsub(/:/,"",$2); print tolower($2); exit}'
+          )"
+
+          ACTUAL="$(
+            "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --print-certs "$APK" |
+            awk -F': ' '/Signer #1 certificate SHA-256 digest:/{gsub(/:/,"",$2); print tolower($2); exit}'
+          )"
+
+          test -n "$EXPECTED"
+          test -n "$ACTUAL"
+          test "$EXPECTED" = "$ACTUAL"
+
+          echo "Permanent PitchKind signer verified: $ACTUAL"
 
       - name: APK content gate
         run: |

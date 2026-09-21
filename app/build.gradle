@@ -1,13 +1,39 @@
 plugins { id 'com.android.application' }
 
+def pitchKindKeystoreFile = System.getenv('PITCHKIND_KEYSTORE_FILE')
+def pitchKindKeystorePassword = System.getenv('PITCHKIND_KEYSTORE_PASSWORD')
+def pitchKindKeyAlias = System.getenv('PITCHKIND_KEY_ALIAS')
+def pitchKindKeyPassword = System.getenv('PITCHKIND_KEY_PASSWORD')
+
 android {
     namespace 'com.grassrootsclubhub.universal'
     compileSdk 35
+
     defaultConfig {
         applicationId 'com.grassrootsclubhub.universal'
         minSdk 26
         targetSdk 35
         versionCode 2209
         versionName '2.2.9'
+    }
+
+    signingConfigs {
+        pitchkind {
+            if (pitchKindKeystoreFile) {
+                storeFile file(pitchKindKeystoreFile)
+                storePassword pitchKindKeystorePassword
+                keyAlias pitchKindKeyAlias
+                keyPassword pitchKindKeyPassword
+                storeType 'PKCS12'
+            }
+        }
+    }
+
+    buildTypes {
+        debug {
+            if (pitchKindKeystoreFile) {
+                signingConfig signingConfigs.pitchkind
+            }
+        }
     }
 }

@@ -112,6 +112,25 @@ check(
     and 'attendance-switch' in txt('app/src/main/assets/styles.css'),
 )
 
+build_gradle = txt('app/build.gradle')
+apk_workflow = txt('.github/workflows/build-apk.yml')
+
+check(
+    'permanent signing Gradle config present',
+    'PITCHKIND_KEYSTORE_FILE' in build_gradle
+    and "storeType 'PKCS12'" in build_gradle
+    and 'signingConfig signingConfigs.pitchkind' in build_gradle,
+)
+
+check(
+    'permanent signing workflow present',
+    'PITCHKIND_KEYSTORE_B64' in apk_workflow
+    and 'PITCHKIND_KEYSTORE_PASSWORD' in apk_workflow
+    and 'PITCHKIND_KEY_ALIAS' in apk_workflow
+    and 'PITCHKIND_KEY_PASSWORD' in apk_workflow
+    and 'Verify permanent APK signer' in apk_workflow,
+)
+
 print(f'\n{passed} passed; {len(fail)} failed')
 if fail:
     print('Failures:')
