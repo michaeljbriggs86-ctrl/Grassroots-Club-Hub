@@ -39,6 +39,7 @@ public class MainActivity extends Activity {
     private String pendingAuthUri = null;
     private ValueCallback<Uri[]> filePathCallback = null;
     private static final int FILE_CHOOSER_REQUEST = 5173;
+    private static final String NATIVE_USER_AGENT = "Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 Chrome/126 Mobile Safari/537.36 GrassrootsClubHub/2.2.11";
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
 
     @Override public void onCreate(Bundle savedInstanceState) {
@@ -58,7 +59,7 @@ public class MainActivity extends Activity {
         s.setBuiltInZoomControls(false);
         s.setDisplayZoomControls(false);
         s.setMediaPlaybackRequiresUserGesture(false);
-        s.setUserAgentString("Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 Chrome/126 Mobile Safari/537.36 GrassrootsClubHub/2.2.10");
+        s.setUserAgentString(NATIVE_USER_AGENT);
 
         CookieManager.getInstance().setAcceptCookie(true);
         CookieManager.getInstance().setAcceptThirdPartyCookies(webView, false);
@@ -287,7 +288,7 @@ public class MainActivity extends Activity {
                     c.setConnectTimeout(15000);
                     c.setReadTimeout(20000);
                     c.setRequestMethod(m);
-                    c.setRequestProperty("User-Agent", webView.getSettings().getUserAgentString());
+                    c.setRequestProperty("User-Agent", NATIVE_USER_AGENT);
                     c.setRequestProperty("Accept", staticFamily
                         ? "application/json,text/plain;q=0.9,*/*;q=0.8"
                         : "text/html,application/xhtml+xml,application/json;q=0.9,*/*;q=0.8");
@@ -364,7 +365,7 @@ public class MainActivity extends Activity {
             s.setAllowFileAccessFromFileURLs(false);
             s.setAllowUniversalAccessFromFileURLs(false);
             s.setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW);
-            s.setUserAgentString(webView.getSettings().getUserAgentString());
+            s.setUserAgentString(NATIVE_USER_AGENT);
             CookieManager.getInstance().setAcceptThirdPartyCookies(renderer, false);
             final JSONArray choices;
             try { choices = new JSONArray(choicesJson == null ? "[]" : choicesJson); }

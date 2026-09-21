@@ -915,3 +915,45 @@ html[data-theme="dark"] .match-report-progress span.complete{background:#17311f;
   .match-report-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
   .match-report-actions>*{width:100%}
 }
+
+
+/* v2.2.11 — full-screen Match played flow */
+dialog.report-wizard-mode{
+  width:100vw!important;
+  max-width:none!important;
+  height:100dvh!important;
+  max-height:100dvh!important;
+  margin:0!important;
+  padding:0!important;
+  border:0!important;
+  border-radius:0!important;
+  background:var(--white)!important;
+}
+dialog.report-wizard-mode::backdrop{background:var(--white)}
+.report-wizard-mode #match-detail-form{
+  min-height:100dvh;
+  box-sizing:border-box;
+  display:flex;
+  flex-direction:column;
+  overflow-y:auto;
+  padding:calc(16px + var(--android-inset-top,0px)) 18px calc(16px + var(--android-inset-bottom,0px));
+}
+.report-wizard-mode .modal-heading{flex:0 0 auto}
+.report-wizard-mode .detail-match-summary{flex:0 0 auto}
+.report-wizard-mode .match-report-progress{flex:0 0 auto;margin-top:8px}
+.report-wizard-mode .detail-feature-section{
+  flex:1 0 auto;
+  width:100%;
+  box-sizing:border-box;
+  border-top:0;
+  padding:16px 0 24px;
+}
+.report-wizard-mode .match-report-actions{
+  flex:0 0 auto;
+  margin-top:auto;
+  padding:12px 0 0;
+  background:var(--white);
+}
+@media(min-width:600px){
+  .report-wizard-mode #match-detail-form{width:min(100%,720px);margin:0 auto;padding-left:24px;padding-right:24px}
+}

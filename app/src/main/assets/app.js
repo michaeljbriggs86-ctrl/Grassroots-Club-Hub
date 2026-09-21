@@ -2997,7 +2997,7 @@ function setCompetitionOptions(mode='all',selected=''){
   if(normalized)sel.value=normalized;
 }
 
-function openNewMatchForCompetition(competition,status='played'){
+function openNewMatchForCompetition(competition,status='scheduled'){
   if(!requireCoach())return;
   resetMatchForm();
   const sel=document.getElementById('match-competition');
@@ -3020,9 +3020,9 @@ function resetMatchForm(){
   document.getElementById('match-competition').value=isPublishedLeagueTeam()?'League':'Division';
   document.getElementById('match-gf').value=0;
   document.getElementById('match-ga').value=0;
-  const status=document.getElementById('match-status');if(status)status.value='played';
+  const status=document.getElementById('match-status');if(status)status.value='scheduled';
   document.getElementById('form-title').textContent='Add Match';
-  document.getElementById('form-kicker').textContent='Matchday entry';
+  document.getElementById('form-kicker').textContent='Fixture entry';
   document.getElementById('cancel-edit').classList.add('hidden');
   populateTournamentSelect('');updateTournamentMatchUI('');
   setDefaultDate();
@@ -3263,7 +3263,7 @@ document.addEventListener('click',e=>{
   const attendanceToggle=e.target.closest('[data-attendance-toggle]');if(attendanceToggle&&isCoach()){const present=attendanceToggle.dataset.status!=='attended';attendanceToggle.dataset.status=present?'attended':'unavailable';attendanceToggle.classList.toggle('is-present',present);attendanceToggle.setAttribute('aria-pressed',present?'true':'false');const label=attendanceToggle.querySelector('.attendance-switch-label');if(label)label.textContent=present?'Present':'Not present';return;}
   const edit=e.target.closest('[data-edit-match]');if(edit){editMatch(edit.dataset.editMatch);return;}
   const addDivision=e.target.closest('[data-add-division-team]'); if(addDivision){ openDivisionResultEntry(addDivision.dataset.addDivisionTeam||'',addDivision.dataset.addDivisionVenue||''); return; }
-  const addCompetition=e.target.closest('[data-add-competition]');if(addCompetition){const comp=addCompetition.dataset.addCompetition||'Friendly';openNewMatchForCompetition(comp,addCompetition.dataset.defaultStatus||'played');return;}
+  const addCompetition=e.target.closest('[data-add-competition]');if(addCompetition){const comp=addCompetition.dataset.addCompetition||'Friendly';openNewMatchForCompetition(comp,addCompetition.dataset.defaultStatus||'scheduled');return;}
   const editTournament=e.target.closest('[data-edit-tournament]');if(editTournament){openTournamentDialog(editTournament.dataset.editTournament);return;}
   const addTournamentGameBtn=e.target.closest('[data-add-tournament-game]');if(addTournamentGameBtn){addTournamentGame(addTournamentGameBtn.dataset.addTournamentGame);return;}
   const deleteTournamentBtn=e.target.closest('[data-delete-tournament]');if(deleteTournamentBtn){deleteTournament(deleteTournamentBtn.dataset.deleteTournament);return;}
