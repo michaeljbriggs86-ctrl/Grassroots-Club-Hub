@@ -3,10 +3,10 @@
  *
  * Static authorities:
  *   directory/division membership -> data/directory.json
- *   U12+ standings               -> data/results.json schema v2
+ *   fixtures (all ages)           -> data/results.json schema v2
+ *   U12+ standings                  -> data/results.json schema v2
  *
  * Temporary live Selkent fallback remains ONLY for:
- *   fixtures
  *   published match results
  */
 (function(){
@@ -18,6 +18,7 @@
   const RESULTS_CACHE_KEY='grassrootsHub_static_results_v2';
   const DIRECTORY_SOURCE='github-static-directory-v1';
   const TABLE_SOURCE='github-static-results-v2';
+  const FIXTURE_SOURCE='github-static-fixtures-v2';
 
   const original={
     syncProviderClubTeams: typeof window.syncProviderClubTeams==='function'?window.syncProviderClubTeams:null,
@@ -259,6 +260,51 @@
     return results.age_groups.filter(a=>Array.isArray(a.standings)).map(a=>String(a.age_group||'')).filter(Boolean);
   }
 
+  function sameTeam(a='',b=''){
+    const x=norm(a),y=norm(b);if(!x||!y)return false;
+    return x===y||(x.length>8&&y.includes(x))||(y.length>8&&x.includes(y));
+  }
+
+  function adaptStaticFixtures(ageEntry){
+    if(!ageEntry||!Array.isArray(ageEntry.fixtures))throw new Error(`No ${ageCode()} fixtures array in static Selkent feed`);
+    const division=norm(state?.division?.name||''),self=String(state?.division?.teamName||state?.meta?.teamName||'').trim();
+    if(!self)throw new Error('Current team identity is missing');
+    const rows=[];
+    for(const row of ageEntry.fixtures){
+      if(division&&norm(row?.division_name||'')!==division)continue;
+      const home=String(row?.home||'').trim(),away=String(row?.away||'').trim();
+      const ownHome=sameTeam(home,self),ownAway=sameTeam(away,self);
+      if(ownHome===ownAway)continue;
+      const opponent=ownHome?away:home;
+      if(!opponent)continue;
+      rows.push({
+        date:String(row?.date||''),time:'',opponent,venue:ownHome?'H':'A',
+        competition:(typeof window.isPublishedLeagueTeam==='function'&&window.isPublishedLeagueTeam())?'League':'Division',
+        providerTeamIds:Array.isArray(row?.provider_team_ids)?row.provider_team_ids.map(String):[],
+        raw:`${home} v ${away}`,source:'selkent-static'
+      });
+    }
+    return rows.sort((a,b)=>(a.date||'9999-99-99').localeCompare(b.date||'9999-99-99')||(a.opponent||'').localeCompare(b.opponent||''));
+  }
+
+  async function applyStaticFixtures(silent=true,force=false){
+    state.selkent=state.selkent||{};
+    const results=await loadResults(force),ageEntry=findResultsAge(results);
+    if(!ageEntry)throw new Error(`No ${ageCode()} entry in static Selkent results feed`);
+    const previous=(typeof window.nextPublishedFixture==='function')?window.nextPublishedFixture():null;
+    const rows=adaptStaticFixtures(ageEntry);
+    state.selkent.fixtures=rows;
+    state.selkent.fixtureSource=FIXTURE_SOURCE;
+    state.selkent.fixturesGeneratedAt=results.last_updated||'';
+    state.selkent.lastFixtureScan=new Date().toISOString();
+    const next=(typeof window.nextPublishedFixture==='function')?window.nextPublishedFixture():(rows[0]||null);
+    try{if(next&&typeof window.ensureFixtureKitColours==='function')await window.ensureFixtureKitColours(next);}catch(_){ }
+    try{if(typeof window.updateFixtureTracking==='function')window.updateFixtureTracking(previous,next);}catch(_){ }
+    persistWithoutRender();
+    if(!silent&&typeof window.toast==='function')window.toast(`${rows.length} team fixture${rows.length===1?'':'s'} loaded from Selkent feed`);
+    return rows;
+  }
+
   async function liveFixtureFallback(){
     const sk=state.selkent||{};
     const choices=[state?.meta?.ageGroup,state?.division?.name].filter(Boolean);
@@ -361,8 +407,12 @@
       await window.refreshPublishedLeagueAges(true);
       if(typeof window.leagueTableEnabled!=='function'||window.leagueTableEnabled())await applyStaticStandings(true,false);else{state.selkent.table=[];state.selkent.tableSource=TABLE_SOURCE;}
 
-      let fixtureData={fixtures:[],teams:[]};
-      try{fixtureData=await liveFixtureFallback();state.selkent.fixtures=fixtureData.fixtures||[];}catch(_){/* keep last-known-good fixtures on live fallback failure */}
+      try{
+        await applyStaticFixtures(true,false);
+      }catch(_){
+        /* Migration-only safety fallback. A validated static fixture feed is authoritative. */
+        try{const fixtureData=await liveFixtureFallback();state.selkent.fixtures=fixtureData.fixtures||[];state.selkent.fixtureSource='selkent-live-fallback';state.selkent.lastFixtureScan=new Date().toISOString();}catch(__){/* keep last-known-good fixtures */}
+      }
 
       if(typeof window.leagueTableEnabled!=='function'||window.leagueTableEnabled()){
         try{const live=await liveResultFallback();state.selkent.results=live.results||[];if(typeof window.syncOwnLeagueMatchesFromSelkent==='function')window.syncOwnLeagueMatchesFromSelkent(state.selkent.results);}catch(_){/* keep last-known-good published results */}
@@ -426,6 +476,7 @@
       await window.syncProviderClubTeams(true);
       await applyStaticDivision(true,false);
       await window.refreshPublishedLeagueAges(true);
+      await applyStaticFixtures(true,false);
       if(typeof window.leagueTableEnabled!=='function'||window.leagueTableEnabled())await applyStaticStandings(true,false);else{state.selkent.table=[];state.selkent.tableSource=TABLE_SOURCE;}
       persistWithoutRender();if(typeof window.renderAll==='function')window.renderAll();
     }catch(_){/* retain last-known-good app state; normal sync can retry */}
@@ -434,7 +485,7 @@
   window.ClubHubStaticSelkent={
     DIRECTORY_URL:STATIC_DIRECTORY_URL,
     RESULTS_URL:STATIC_RESULTS_URL,
-    loadDirectory,loadResults,applyStaticDivision,applyStaticStandings,prime:primeStaticFeeds
+    loadDirectory,loadResults,applyStaticDivision,applyStaticFixtures,applyStaticStandings,prime:primeStaticFeeds
   };
 
   /* Start before the existing delayed automatic Selkent sync fires. */

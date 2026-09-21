@@ -885,7 +885,7 @@ html[data-theme="dark"] .league-table thead{background:#111914!important}
 
 
 /* v2.2.9 — streamlined match reporting */
-.match-played-action{min-height:44px!important;padding:8px 14px!important}
+.match-played-action{min-height:48px!important;padding:8px 14px!important}
 .report-wizard-mode{width:min(94vw,560px)}
 .report-wizard-mode .detail-feature-section{border-top:0;padding-top:6px}
 .match-report-progress{display:flex;gap:6px;overflow-x:auto;padding:4px 0 10px;scrollbar-width:none}

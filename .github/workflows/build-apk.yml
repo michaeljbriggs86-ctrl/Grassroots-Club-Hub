@@ -1,4 +1,4 @@
-name: Android APK v2.2.9 PitchKind
+name: Android APK v2.2.10 PitchKind
 
 on:
   workflow_dispatch:
@@ -19,7 +19,7 @@ jobs:
       - name: Verify source contract
         run: |
           set -euo pipefail
-          python verification/verify_v2_2_9_pitchkind_ui.py
+          python verification/verify_v2_2_10_pitchkind_ui.py
           python -m pip install --quiet requests beautifulsoup4
           python -m unittest discover -s tests -p "test_*.py" -v
           node --check app/src/main/assets/cloud.js
@@ -96,19 +96,19 @@ jobs:
           unzip -l "$APK" | grep -q 'assets/pitchkind-wt_logo-primary.svg'
           unzip -l "$APK" | grep -q 'assets/pitchkind-wt_mark.svg'
           unzip -p "$APK" assets/index.html | grep -q '<title>PitchKind</title>'
-          unzip -p "$APK" assets/index.html | grep -q 'App version 2.2.9'
+          unzip -p "$APK" assets/index.html | grep -q 'App version 2.2.10'
           ! unzip -p "$APK" assets/index.html | grep -q 'CONNECT • ORGANISE • GROW THE GAME'
           ! unzip -p "$APK" assets/index.html | grep -q 'More Than A Game'
           mkdir -p dist
-          cp "$APK" dist/PitchKind-v2.2.9-debug.apk
-          sha256sum dist/PitchKind-v2.2.9-debug.apk > dist/PitchKind-v2.2.9-debug.apk.sha256
+          cp "$APK" dist/PitchKind-v2.2.10-debug.apk
+          sha256sum dist/PitchKind-v2.2.10-debug.apk > dist/PitchKind-v2.2.10-debug.apk.sha256
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: PitchKind-v2.2.9-debug
+          name: PitchKind-v2.2.10-debug
           path: |
-            dist/PitchKind-v2.2.9-debug.apk
-            dist/PitchKind-v2.2.9-debug.apk.sha256
+            dist/PitchKind-v2.2.10-debug.apk
+            dist/PitchKind-v2.2.10-debug.apk.sha256
           if-no-files-found: error
           retention-days: 14

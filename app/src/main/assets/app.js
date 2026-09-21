@@ -1236,11 +1236,28 @@ function shouldScanFixtures(){
   if(!state.selkent?.lastFixtureScan)return true;
   return Date.now()-new Date(state.selkent.lastFixtureScan).getTime()>FIXTURE_SCAN_INTERVAL_MS;
 }
+function fixtureLinkedMatch(f={}){
+  const opponent=normalizeTeamKey(f.opponent||''),venue=String(f.venue||'').toUpperCase(),date=String(f.date||'');
+  if(!opponent||!date)return null;
+  return state.matches.find(m=>String(m.date||'')===date&&normalizeTeamKey(m.opponent||'')===opponent&&String(m.venue||'').toUpperCase()===venue)||null;
+}
+function fixtureIsReported(f={}){const m=fixtureLinkedMatch(f);return !!m&&['played','abandoned'].includes(matchStatus(m));}
 function upcomingFixtures(){
   const today=new Date();today.setHours(0,0,0,0);
-  return [...(state.selkent?.fixtures||[])].filter(f=>!f.date||new Date(f.date+'T12:00:00')>=today).sort((a,b)=>(a.date||'9999-99-99').localeCompare(b.date||'9999-99-99')||(a.time||'99:99').localeCompare(b.time||'99:99'));
+  return [...(state.selkent?.fixtures||[])].filter(f=>(!f.date||new Date(f.date+'T12:00:00')>=today)&&!fixtureIsReported(f)).sort((a,b)=>(a.date||'9999-99-99').localeCompare(b.date||'9999-99-99')||(a.time||'99:99').localeCompare(b.time||'99:99'));
 }
 function nextPublishedFixture(){return upcomingFixtures()[0]||null;}
+function openNextFixtureMatchReport(){
+  if(!requireCoach())return;
+  const f=nextPublishedFixture();if(!f)return toast('No published fixture available');
+  let m=fixtureLinkedMatch(f);
+  if(!m){
+    const competition=isPublishedLeagueTeam()?'League':'Division';
+    m={id:uid('m'),date:f.date||new Date().toISOString().slice(0,10),opponent:f.opponent||'Opponent',competition,type:competition,tournamentId:null,venue:String(f.venue||'').toUpperCase(),duration:null,stage:'',gf:0,ga:0,status:'scheduled',notes:'',source:'selkent-fixture',providerTeamIds:Array.isArray(f.providerTeamIds)?[...f.providerTeamIds]:[]};
+    state.matches.push(m);saveState();auditEvent('fixture_report_started','match',m.id,`Started match report vs ${m.opponent}`,null,m);
+  }
+  openMatchReport(m.id);
+}
 function fixtureStableKey(f={}){
   return [selkentNorm(f.opponent||'tbc'),String(f.venue||'').toUpperCase(),selkentNorm(f.competition||'fixture')].join('|');
 }
@@ -1332,6 +1349,13 @@ async function ensureFixtureKitColours(fixture){
 }
 async function scanUpcomingFixtures(silent=true){
   if(state.selkent?.enabled===false||!state.division?.name)return false;
+  if(window.ClubHubStaticSelkent?.applyStaticFixtures){
+    try{
+      await window.ClubHubStaticSelkent.applyStaticFixtures(silent,true);
+      renderNextMatch();renderMatchPageNextFixture();refreshMatchAvailability(true);renderSelkentFixtures();renderLeagueQuickView();renderMatchdayDashboard();
+      return true;
+    }catch(_){/* use the isolated live migration fallback below only if the static feed cannot be read */}
+  }
   try{
     const page=await fetchSelkentSelected(state.selkent.fixturesUrl||STARTER_DATA.selkent.fixturesUrl,[state.meta.ageGroup,state.division.name].filter(Boolean));
     const parsed=parseSelkentHtml(page.html,page.url);
@@ -1355,7 +1379,7 @@ function renderNextMatch(){
   const f=nextPublishedFixture(),status=document.getElementById('next-match-status'),ackPanel=document.getElementById('fixture-ack-panel');
   if(!f){
     card.classList.add('no-fixture');document.getElementById('next-match-opponent').textContent='TBC';document.getElementById('next-match-when').textContent='Date / kick-off TBC';document.getElementById('next-match-venue').textContent='Venue TBC';document.getElementById('next-match-kits').textContent='Kit colours and away details will appear when confirmed.';
-    const map=document.getElementById('next-match-map');if(map){map.classList.add('hidden');map.removeAttribute('href');}const cal=document.getElementById('next-match-calendar');if(cal)cal.classList.add('hidden');if(status)status.textContent='';if(ackPanel)ackPanel.classList.add('hidden');return;
+    const map=document.getElementById('next-match-map');if(map){map.classList.add('hidden');map.removeAttribute('href');}const cal=document.getElementById('next-match-calendar');if(cal)cal.classList.add('hidden');const played=document.getElementById('next-match-played');if(played)played.classList.add('hidden');if(status)status.textContent='';if(ackPanel)ackPanel.classList.add('hidden');return;
   }
   card.classList.remove('no-fixture');document.getElementById('next-match-opponent').textContent=f.opponent||'TBC';document.getElementById('next-match-when').textContent=[f.date?formatDate(f.date):'TBC',f.time||'Kick-off TBC'].filter(Boolean).join(' · ');document.getElementById('next-match-venue').textContent=f.venue==='A'?'Away':f.venue==='H'?'Home':'Venue TBC';
   const ownKey=selkentNorm(clubSettings().display_name||state.meta?.clubName||'club');const own=state.selkent?.kitColours?.[ownKey]||clubSettings().config?.kit_colours||'Kit TBC';
@@ -1366,6 +1390,7 @@ function renderNextMatch(){
   document.getElementById('next-match-kits').textContent=kits+awayInfo;
   const map=document.getElementById('next-match-map'),mapHref=f.venue==='A'?mapsHref(f.groundName||detail.groundName,f.address||detail.address):mapsHref(f.groundName,f.address);if(map){map.classList.toggle('hidden',!mapHref);if(mapHref)map.href=mapHref;else map.removeAttribute('href');}
   const cal=document.getElementById('next-match-calendar');if(cal)cal.classList.toggle('hidden',!f.date);
+  const played=document.getElementById('next-match-played');if(played)played.classList.toggle('hidden',!isCoach());
   const ack=fixtureAckState();
   if(status){status.textContent=ack.status==='confirmed'?'Confirmed':ack.status==='issue'?'Issue':ack.status==='changed'?'Changed':'';status.classList.toggle('hidden',!status.textContent);}
   if(ackPanel){ackPanel.className=`fixture-ack ${ack.status}`;ackPanel.classList.toggle('hidden',!(isCoach()||isAdminTeamPreviewMode()||['parent','player'].includes(currentRole)));const label=document.getElementById('fixture-ack-label'),detailEl=document.getElementById('fixture-ack-detail'),actions=ackPanel.querySelector('.fixture-ack-actions');if(label)label.textContent=ack.label;if(detailEl)detailEl.textContent=ack.note||ack.detail;if(actions)actions.classList.toggle('hidden',!isCoach());}
@@ -1377,7 +1402,7 @@ function renderMatchPageNextFixture(){
   const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
   if(!f){
     card.classList.add('no-fixture');set('matches-next-opponent','TBC');set('matches-next-when','Date / kick-off TBC');set('matches-next-venue','Venue TBC');set('matches-next-kits','Kit colours and away details will appear when confirmed.');
-    const map=document.getElementById('matches-next-map');if(map){map.classList.add('hidden');map.removeAttribute('href');}const cal=document.getElementById('matches-next-calendar');if(cal)cal.classList.add('hidden');
+    const map=document.getElementById('matches-next-map');if(map){map.classList.add('hidden');map.removeAttribute('href');}const cal=document.getElementById('matches-next-calendar');if(cal)cal.classList.add('hidden');const played=document.getElementById('matches-next-played');if(played)played.classList.add('hidden');
     return;
   }
   card.classList.remove('no-fixture');
@@ -1393,6 +1418,7 @@ function renderMatchPageNextFixture(){
   const map=document.getElementById('matches-next-map'),href=f.venue==='A'?mapsHref(ground,address):mapsHref(f.groundName,f.address);
   if(map){map.classList.toggle('hidden',!href);if(href)map.href=href;else map.removeAttribute('href');}
   const cal=document.getElementById('matches-next-calendar');if(cal)cal.classList.toggle('hidden',!f.date);
+  const played=document.getElementById('matches-next-played');if(played)played.classList.toggle('hidden',!isCoach());
 }
 
 function divisionOpponents(){
@@ -3265,6 +3291,8 @@ document.getElementById('availability-deadline-save')?.addEventListener('click',
 document.getElementById('availability-reminder-send')?.addEventListener('click',sendAvailabilityReminder);
 document.getElementById('next-match-calendar')?.addEventListener('click',()=>addFixtureToCalendar());
 document.getElementById('matches-next-calendar')?.addEventListener('click',()=>addFixtureToCalendar());
+document.getElementById('next-match-played')?.addEventListener('click',openNextFixtureMatchReport);
+document.getElementById('matches-next-played')?.addEventListener('click',openNextFixtureMatchReport);
 document.getElementById('matchday-add-calendar')?.addEventListener('click',()=>addFixtureToCalendar());
 document.getElementById('matchday-notify-squad')?.addEventListener('click',notifySelectedSquad);
 document.querySelectorAll('[data-profile-availability]').forEach(b=>b.addEventListener('click',()=>saveProfileAvailability(b.dataset.profileAvailability)));
