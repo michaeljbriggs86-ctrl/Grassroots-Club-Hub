@@ -1,0 +1,40 @@
+LIVE BACKEND CONTRACT — Android v2.2.2 / backend RPC contract v2.2.1
+
+Status check: 2026-09-19
+Backend status: DEPLOYED-LIVE — last verified 2026-09-18.
+Evidence: LIVE_BACKEND_EXPORT_Shooters_Hill_Team_Tracker_2026-09-18,
+read directly from the connected production Supabase project.
+
+The Android client version is 2.2.2. The RPC contract remains labelled v2.2.1
+because the 2.2.2 change is the Selkent static-feed acquisition layer, not a new
+backend RPC contract.
+
+Key read/write RPCs used by the client include:
+- get_team_state_for_me
+- get_club_overview_for_me
+- save_team_state
+- list_parent_player_links / save_parent_player_links
+- list_player_account_links
+- list_active_messages / send_club_message / mark_club_message_read
+- get_club_compliance_status
+- set_dispute_reviewers
+- set_club_safeguarding_contacts
+- get_concern_routing / raise_club_concern
+- list_general_disputes / list_dispute_messages
+- upsert_u11_safeguarding_info / export_u11_safeguarding_pack
+- list_safeguarding_export_audit
+- request_club_cancellation / cancel_club_cancellation
+
+Hard backend invariants recorded by the verified contract:
+1. competition_rules: age_group <= 11 => results_published=false.
+2. club_settings.results_publish_from_age is NULL or >= 12.
+3. U7-U11 parent/player responses contain no scores, W/D/L, GF/GA/GD, win rate or tables.
+4. U7-U11 parent/player responses do not contain the name-to-shirt-number mapping.
+5. U7-U11 performance events are keyed by shirt number.
+6. Inbox is Club Admin/coach/assistant/parent only; active view expires each message after 60 days.
+7. Safeguarding concern content is not persisted in the concern log.
+8. General club deletion is due 30 days after cancellation request; safeguarding log is excluded from that purge.
+9. Selkent is the only enabled automatic competition provider for this Android release scope.
+
+This is a deployment contract/release record, not a substitute for the live
+schema. A future DEPLOYED-LIVE claim must be rechecked against the live project.

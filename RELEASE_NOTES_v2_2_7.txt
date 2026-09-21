@@ -1,0 +1,17 @@
+Grassroots Club Hub v2.2.7 — Brand System Integration
+
+Status at source handoff: WRITTEN; TESTED status is established only by the bundled verification script/test outputs. BUILT requires an inspected APK from these exact bytes.
+
+Changes:
+- adopts the grass-O Grassroots Club Hub identity;
+- official tagline is CONNECT • ORGANISE • GROW THE GAME;
+- replaces the old shield/legacy lock-up on authentication;
+- product splash is fixed to the platform brand and can no longer be overwritten by club configuration;
+- Android/PWA launcher icons use the new product mark;
+- club-creation onboarding carries the wide product banner;
+- Settings includes a branded About panel;
+- missing club badges use the neutral Grassroots Club Hub mark instead of generated initials;
+- verified/configured club badges remain on signed-in club/team surfaces;
+- UI guideline advanced to v1.2 with explicit product-brand vs club-brand placement rules.
+
+No league/data/age-group source-of-truth scope is changed.

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img" aria-labelledby="t">
+<title id="t">Grassroots Club Hub mark</title>
+<g aria-hidden="true">
+      <circle cx="256" cy="240" r="132" fill="none" stroke="#0B5D35" stroke-width="54"/>
+      <path d="M 196.6 335.0 C 192.6 273.0, 220.4 232.1, 245.4 183.2
+               C 240.2 244.0, 248.1 290.2, 256.0 335.0
+               C 260.0 271.7, 279.8 222.8, 311.4 174.0
+               C 299.6 237.4, 294.3 291.5, 295.6 335.0
+               C 308.8 284.9, 329.9 246.6, 351.0 222.8
+               C 335.2 282.2, 329.9 312.6, 327.3 336.4 Z" fill="#168848"/>
+    </g>
+<path d="M145 385 C182 361 222 350 256 350 C298 350 337 362 371 386" fill="none" stroke="#168848" stroke-width="22" stroke-linecap="round"/>
+</svg>

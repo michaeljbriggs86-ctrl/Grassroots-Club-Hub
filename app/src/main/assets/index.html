@@ -1,0 +1,761 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0B5D35" />
+  <meta name="description" content="Configurable grassroots football club team management hub." />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="icon-192.png" />
+  <link rel="apple-touch-icon" href="icon-192.png" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="cloud.css" />
+  <link rel="stylesheet" href="onboarding.css" />
+  <link rel="stylesheet" href="app-design-system.css" />
+  <title>PitchKind</title>
+</head>
+<body class="splash-active">
+
+  <div id="app-splash" class="app-splash" aria-hidden="true">
+    <div class="app-splash-inner">
+      <img src="pitchkind-wt_logo-reverse.svg" alt="PitchKind — Organise, Connect, Play" class="app-splash-logo" />
+    </div>
+  </div>
+
+  <section id="activation-gate" class="activation-gate hidden" aria-live="polite">
+    <div class="activation-card">
+      <img src="pitchkind-wt_logo-primary.svg" alt="PitchKind — Organise, Connect, Play" class="activation-logo" />
+      <p class="kicker">Secure team access</p>
+      <h1 id="activation-role-title">Activate team access</h1>
+      <p class="muted" id="activation-role-copy">Paste the access code supplied by your club administrator.</p>
+      <label>Access code<textarea id="activation-code" rows="6" autocomplete="off" spellcheck="false" placeholder="VA1.…"></textarea></label>
+      <p class="activation-error hidden" id="activation-error"></p>
+      <button class="primary-button large" id="activate-account-btn">Activate this device</button>
+      <p class="activation-help">The code fixes this installation to one team and one access level. A Coach or Parent cannot switch teams from inside the app.</p>
+    </div>
+  </section>
+  <div class="app-shell">
+    <header class="hero">
+      <div class="hero-pattern" aria-hidden="true"></div>
+      <div class="hero-inner">
+        <div class="club-logo-wrap" aria-label="Club logo">
+          <img src="pitchkind-wt_mark.svg" alt="PitchKind placeholder" class="club-logo" />
+        </div>
+        <div class="hero-copy">
+          <p class="eyebrow" id="hero-club-name">GRASSROOTS CLUB HUB</p>
+          <h1 id="hero-team-name">TEAM</h1>
+          <p class="season-line" id="hero-season-line">U9 · 2026/27</p>
+        </div>
+      </div>
+      <div class="hero-profile-actions">
+        <button type="button" class="hero-notification-button hidden" id="notification-bell" aria-label="Notifications">🔔<span class="notification-badge hidden" id="notification-badge">0</span></button>
+        <button type="button" class="hero-profile-button hidden" id="hero-profile-switch">Coach view</button>
+        <button type="button" class="hero-profile-button hidden" id="hero-admin-preview-back">Club overview</button>
+      </div>
+    </header>
+
+    <nav class="top-nav-tabs" id="top-nav-tabs" aria-label="Main navigation">
+      <button type="button" class="top-nav-tab nav-item active" data-nav="home" data-team-nav>Home</button>
+      <button type="button" class="top-nav-tab nav-item" data-nav="matches" data-team-nav>Matches</button>
+      <button type="button" class="top-nav-tab nav-item hidden" id="league-nav-item" data-nav="league" data-team-nav data-league-nav>League</button>
+      <button type="button" class="top-nav-tab nav-item" data-nav="squad" data-team-nav>Squad</button>
+      <button type="button" class="top-nav-tab nav-item hidden" id="club-global-tab" data-nav="club" data-admin-club-root>Club</button>
+      <button type="button" class="top-nav-tab nav-item hidden" data-nav="club-fixtures" data-admin-global-nav>Fixtures</button>
+      <button type="button" class="top-nav-tab nav-item hidden" data-nav="club-results" data-results-global-nav>Results</button>
+      <button type="button" class="top-nav-tab nav-item hidden" data-nav="club-coaches" data-admin-global-nav>Coaches</button>
+      <button type="button" class="top-nav-tab nav-item hidden" data-nav="inbox">Inbox<span class="notification-badge hidden" id="global-inbox-badge">0</span></button>
+      <button type="button" class="top-nav-tab nav-item" data-nav="more">More</button>
+    </nav>
+
+    <main id="app" class="content" aria-live="polite">
+      <section id="view-home" class="view active" data-view="home">
+        <div class="section-title-row">
+          <div>
+            <p class="kicker" id="dashboard-season-kicker">2026/27 season</p>
+            <h2 id="home-screen-title">Dashboard</h2>
+          </div>
+        </div>
+
+        <section class="panel club-notices-panel hidden" id="home-club-notices">
+          <div class="panel-heading"><div><p class="kicker">Notifications</p><h3>Club notices</h3></div><span class="notice-unread-badge hidden" id="home-notices-unread">0 unread</span></div>
+          <div class="club-notices-list" id="home-club-notices-list"></div>
+        </section>
+
+        <div class="record-card knight-panel">
+          <div class="record-heading" id="primary-record-heading">League record</div>
+          <div class="record-main">
+            <span class="record-number" id="stat-played">0</span>
+            <span class="record-label">PLAYED</span>
+          </div>
+          <div class="record-split">
+            <div><strong id="stat-wins">0</strong><span>W</span></div>
+            <div><strong id="stat-draws">0</strong><span>D</span></div>
+            <div><strong id="stat-losses">0</strong><span>L</span></div>
+          </div>
+          <div class="record-footer">
+            <span><b id="stat-gf">0</b> GF</span>
+            <span><b id="stat-ga">0</b> GA</span>
+            <span><b id="stat-gd">0</b> GD</span>
+            <span><b id="stat-winrate">0%</b> Win rate</span>
+          </div>
+        </div>
+
+        <div class="running-count-grid">
+          <section class="panel running-count-card">
+            <p class="kicker">Overall</p>
+            <div class="running-main"><strong id="overall-played">0</strong><span>played</span></div>
+            <div class="running-split"><span><b id="overall-wins">0</b> W</span><span><b id="overall-draws">0</b> D</span><span><b id="overall-losses">0</b> L</span></div>
+            <div class="running-goals"><span><b id="overall-gf">0</b> GF</span><span><b id="overall-ga">0</b> GA</span></div>
+          </section>
+          <section class="panel running-count-card friendly-count-card">
+            <p class="kicker">Friendlies</p>
+            <div class="running-main"><strong id="friendly-played">0</strong><span>played</span></div>
+            <div class="running-split"><span><b id="friendly-wins">0</b> W</span><span><b id="friendly-draws">0</b> D</span><span><b id="friendly-losses">0</b> L</span></div>
+          </section>
+        </div>
+
+        <section class="panel league-summary-card" id="league-summary-card">
+          <div class="league-summary-copy">
+            <p class="kicker">League</p>
+            <h3 id="league-summary-name">Under 9D Navy</h3>
+            <p id="league-summary-text">11 opponents · 22 league matches</p>
+          </div>
+          <div class="league-progress-ring" aria-label="League fixture progress">
+            <strong id="league-played-count">0</strong><span id="league-total-count">/22</span>
+          </div>
+        </section>
+
+        <section class="panel next-match-card" id="next-match-card">
+          <div class="panel-heading"><div><p class="kicker">Next match</p><h3 id="next-match-opponent">TBC</h3></div><span class="next-match-status hidden" id="next-match-status"></span></div>
+          <div class="next-match-grid"><div><span>Date / time</span><strong id="next-match-when">—</strong></div><div><span>Venue</span><strong id="next-match-venue">—</strong></div></div>
+          <div class="next-match-kits"><span>Club colours</span><strong id="next-match-kits">Kit details will appear when a fixture is found.</strong></div><div class="next-match-links"><a class="map-link hidden" id="next-match-map" href="#">Open in Maps</a><button type="button" class="text-button compact hidden" id="next-match-calendar">Add to calendar</button></div>
+          <div class="fixture-ack hidden" id="fixture-ack-panel">
+            <div class="fixture-ack-copy"><strong id="fixture-ack-label">Awaiting confirmation</strong><span id="fixture-ack-detail">Confirm the fixture once you have checked the details.</span></div>
+            <div class="fixture-ack-actions" data-requires-edit>
+              <button type="button" class="secondary-button compact" id="fixture-report-issue">Report issue</button>
+              <button type="button" class="primary-button compact" id="fixture-confirm">Confirm fixture</button>
+            </div>
+          </div>
+          <div class="match-availability hidden" id="match-availability-panel">
+            <div class="match-availability-head"><div><strong>Match availability</strong><span id="match-availability-meta">Tell the coaching staff if your player can attend.</span></div><span class="availability-count" id="match-availability-count">0 replies</span></div>
+            <div class="parent-availability-controls hidden" id="parent-availability-controls">
+              <label>Player<select id="availability-player"></select></label>
+              <div class="availability-buttons" role="group" aria-label="Match availability">
+                <button type="button" class="availability-btn available" data-availability-status="available">Available</button>
+                <button type="button" class="availability-btn unsure" data-availability-status="unsure">Unsure</button>
+                <button type="button" class="availability-btn unavailable" data-availability-status="unavailable">Unavailable</button>
+              </div>
+            </div>
+            <div class="coach-availability-summary hidden" id="coach-availability-summary"></div>
+            <div class="availability-deadline" id="availability-deadline-panel">
+              <div><span class="helper">Response deadline</span><strong id="availability-deadline-text">No deadline set</strong></div>
+              <div class="availability-deadline-actions hidden" id="availability-deadline-actions">
+                <input id="availability-deadline-input" type="datetime-local" aria-label="Availability deadline" />
+                <button type="button" class="secondary-button compact" id="availability-deadline-save">Set deadline</button>
+                <button type="button" class="text-button compact" id="availability-reminder-send">Remind outstanding</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel matchday-dashboard hidden" id="matchday-dashboard">
+          <div class="panel-heading matchday-dashboard-heading">
+            <div><p class="kicker" id="matchday-dashboard-kicker">Next fixture prep</p><h3 id="matchday-dashboard-title">Matchday dashboard</h3></div>
+            <span class="matchday-dashboard-status" id="matchday-dashboard-status"></span>
+          </div>
+          <div class="matchday-dashboard-grid">
+            <article><span>Opponent</span><strong id="matchday-dashboard-opponent">TBC</strong></article>
+            <article><span>Kick-off</span><strong id="matchday-dashboard-kickoff">TBC</strong></article>
+            <article><span>Venue</span><strong id="matchday-dashboard-venue">TBC</strong></article>
+            <article><span>Availability</span><strong id="matchday-dashboard-availability">0 available</strong></article>
+            <article><span>Squad</span><strong id="matchday-dashboard-squad">0 selected</strong></article>
+            <article><span>Formation</span><strong id="matchday-dashboard-formation">TBC</strong></article>
+          </div>
+          <div class="matchday-dashboard-alert hidden" id="matchday-dashboard-alert"></div>
+          <p class="matchday-dashboard-kits" id="matchday-dashboard-kits"></p>
+          <div class="matchday-dashboard-actions">
+            <a class="secondary-button compact hidden" id="matchday-dashboard-map" href="#">Open in Maps</a>
+            <button type="button" class="secondary-button compact" id="matchday-add-calendar">Add to calendar</button>
+            <button type="button" class="secondary-button compact hidden" id="matchday-notify-squad">Notify selected squad</button>
+            <button type="button" class="primary-button compact" id="matchday-open-tactics">Open squad & tactics</button>
+          </div>
+          <div class="matchday-dashboard-note">
+            <div class="panel-heading"><div><strong>Private coaching note</strong><span class="helper">Coaching staff only</span></div></div>
+            <textarea id="matchday-dashboard-note-input" rows="3" maxlength="4000" placeholder="Match plan, reminders or coaching focus..."></textarea>
+            <p class="coach-note-readonly hidden" id="matchday-dashboard-note-readonly"></p>
+            <button type="button" class="secondary-button compact" id="save-matchday-dashboard-note">Save note</button>
+          </div>
+        </section>
+
+        <section class="panel league-table-panel hidden" id="league-table-panel">
+          <div class="panel-heading league-table-heading">
+            <div><p class="kicker">Standings</p><h3 data-league-table-title>League table</h3></div>
+            <span class="age-rule">U12+</span>
+          </div>
+          <div class="league-table-scroll">
+            <table class="league-table">
+              <thead><tr><th>#</th><th>Team</th><th>P</th><th>W</th><th>D</th><th>L</th><th>GF</th><th>GA</th><th>GD</th><th>Pts</th></tr></thead>
+              <tbody data-league-table-body></tbody>
+            </table>
+          </div>
+          <p class="table-meta" data-league-table-meta></p>
+        </section>
+
+        <div class="dashboard-grid">
+          <section class="panel">
+            <div class="panel-heading"><h3>Overall recent form</h3><button class="text-button" data-nav="matches">All matches</button></div>
+            <div id="recent-form" class="form-row"></div>
+            <div id="recent-matches" class="mini-list"></div>
+          </section>
+
+          <section class="panel" data-feature-panel="goals">
+            <div class="panel-heading"><h3>Top scorers</h3><span class="shield-mini">⚽</span></div>
+            <div id="top-scorers" class="ranking-list"></div>
+          </section>
+
+          <section class="panel" data-feature-panel="assists">
+            <div class="panel-heading"><h3>Top assists</h3><span class="shield-mini">A</span></div>
+            <div id="top-assists" class="ranking-list"></div>
+          </section>
+
+          <section class="panel" data-feature-panel="awards">
+            <div class="panel-heading"><h3>Player awards</h3><span class="shield-mini">★</span></div>
+            <div id="award-leaders" class="ranking-list"></div>
+            <details class="award-history-inline">
+              <summary>Award history</summary>
+              <div class="award-history-actions"><button class="text-button" id="add-award-btn" data-requires-edit>+ Add award</button></div>
+              <div id="awards-list" class="award-list"></div>
+            </details>
+          </section>
+
+          <section class="panel" data-feature-panel="bookings">
+            <div class="panel-heading"><h3>Discipline</h3><span class="shield-mini">▣</span></div>
+            <div id="booking-leaders" class="ranking-list"></div>
+          </section>
+        </div>
+        <section class="panel season-player-stats" id="season-player-stats">
+          <div class="panel-heading"><div><p class="kicker">Player contribution</p><h3>Season player stats</h3></div><span class="helper" id="season-player-stats-helper">Goals · assists · awards · matchday picks</span></div>
+          <div class="season-player-table-wrap"><table class="season-player-table"><thead><tr id="season-player-stats-head"><th>Player</th><th>G</th><th>A</th><th>G+A</th><th>Awards</th><th>Picks</th></tr></thead><tbody id="season-player-stats-body"></tbody></table></div>
+        </section>
+      </section>
+
+      <section id="view-matches" class="view" data-view="matches">
+        <div class="section-title-row">
+          <div><p class="kicker" id="matches-division-kicker">Under 9D Navy</p><h2>Matches</h2></div>
+          <button type="button" class="primary-button compact" data-action="quick-add" data-requires-edit>+ Add match</button>
+        </div>
+
+        <section class="panel next-match-card matches-next-fixture" id="matches-next-fixture">
+          <div class="panel-heading"><div><p class="kicker">Next fixture</p><h3 id="matches-next-opponent">TBC</h3></div></div>
+          <div class="next-match-grid"><div><span>Date / time</span><strong id="matches-next-when">Date / kick-off TBC</strong></div><div><span>Venue</span><strong id="matches-next-venue">Venue TBC</strong></div></div>
+          <div class="next-match-kits"><span>Match details</span><strong id="matches-next-kits">Kit colours and away details will appear when confirmed.</strong></div>
+          <div class="next-match-links"><a class="map-link hidden" id="matches-next-map" href="#">Open in Maps</a><button type="button" class="text-button compact hidden" id="matches-next-calendar">Add to calendar</button></div>
+        </section>
+
+        <details class="panel league-programme" open>
+          <summary>
+            <div><span class="kicker">League programme</span><strong id="league-programme-title">11 opponents · 2 meetings each</strong></div>
+            <span id="league-programme-progress">0 / 22</span>
+          </summary>
+          <div id="division-opponents" class="division-opponents"></div>
+        </details>
+
+        <section class="panel selkent-fixtures-panel" id="selkent-fixtures-panel">
+          <div class="panel-heading"><div><p class="kicker">League</p><h3>Further fixtures</h3></div><span class="match-section-count" id="selkent-fixtures-count">0</span></div>
+          <div id="selkent-fixtures-list" class="synced-fixture-list"></div>
+          <p class="table-meta hidden" id="selkent-fixtures-meta"></p>
+        </section>
+
+
+
+        <div class="filter-bar single-filter">
+          <input id="match-search" type="search" placeholder="Search opponent..." />
+        </div>
+
+        <section class="match-section" id="league-match-section">
+          <div class="match-section-heading"><div><p class="kicker">League</p><h3>League matches</h3></div><span class="match-section-count" id="league-match-count">0</span></div>
+          <div id="league-match-list" class="match-list"></div>
+        </section>
+
+        <section class="match-section friendly-section" id="friendly-match-section">
+          <div class="match-section-heading"><div><p class="kicker">Separate record</p><h3>Friendlies</h3></div><span class="match-section-count" id="friendly-match-count">0</span></div>
+          <div id="friendly-match-list" class="match-list"></div>
+        </section>
+
+        <section class="match-section competition-games-section" id="competition-games-section">
+          <div class="match-section-heading"><div><p class="kicker">Knockout & group competitions</p><h3>Cup, Vase & Shield</h3></div></div>
+          <div class="competition-game-grid">
+            <details class="panel competition-games-panel" id="cup-games-panel" open><summary><div><strong>Challenge Cup</strong><small>Fixtures and results</small></div><div class="competition-summary-actions"><span class="match-section-count" id="cup-games-count">0</span></div></summary><div class="competition-table-scroll"><table class="competition-games-table"><thead><tr><th>Date</th><th>Round</th><th>Opponent</th><th>H/A</th><th>Status / result</th></tr></thead><tbody id="cup-games-body"></tbody></table></div></details>
+            <details class="panel competition-games-panel" id="vase-games-panel"><summary><div><strong>Challenge Vase</strong><small>Fixtures and results</small></div><div class="competition-summary-actions"><span class="match-section-count" id="vase-games-count">0</span></div></summary><div class="competition-table-scroll"><table class="competition-games-table"><thead><tr><th>Date</th><th>Round</th><th>Opponent</th><th>H/A</th><th>Status / result</th></tr></thead><tbody id="vase-games-body"></tbody></table></div></details>
+            <details class="panel competition-games-panel" id="shield-games-panel"><summary><div><strong>Shield</strong><small>Fixtures and results</small></div><div class="competition-summary-actions"><span class="match-section-count" id="shield-games-count">0</span></div></summary><div class="competition-table-scroll"><table class="competition-games-table"><thead><tr><th>Date</th><th>Round</th><th>Opponent</th><th>H/A</th><th>Status / result</th></tr></thead><tbody id="shield-games-body"></tbody></table></div></details>
+          </div>
+        </section>
+
+        <section class="match-section tournament-events-section" id="tournament-events-section">
+          <div class="match-section-heading"><div><p class="kicker">Event mode</p><h3>Tournaments</h3></div><div class="match-section-actions"><span class="match-section-count" id="tournament-event-count">0</span><button type="button" class="secondary-button compact" id="create-tournament" data-requires-edit>+ Tournament</button></div></div>
+          <div id="tournament-event-list" class="tournament-event-list"></div>
+        </section>
+
+        <section class="match-section" id="other-match-section">
+          <div class="match-section-heading"><div><p class="kicker">Other competitions</p><h3>Other games</h3></div><span class="match-section-count" id="other-match-count">0</span></div>
+          <div id="other-match-list" class="match-list"></div>
+        </section>
+      </section>
+
+      <section id="view-league" class="view" data-view="league">
+        <div class="section-title-row">
+          <div><p class="kicker">Published competition</p><h2 id="league-quick-title">League</h2></div>
+        </div>
+        <section class="panel league-table-panel">
+          <div class="panel-heading league-table-heading"><div><p class="kicker">Standings</p><h3 id="league-quick-table-title">League table</h3></div><span class="age-rule">Official</span></div>
+          <div class="league-table-scroll"><table class="league-table"><thead><tr><th>#</th><th>Team</th><th>P</th><th>W</th><th>D</th><th>L</th><th>GF</th><th>GA</th><th>GD</th><th>Pts</th></tr></thead><tbody id="league-quick-table-body"></tbody></table></div>
+          <p class="table-meta" id="league-quick-table-meta"></p>
+        </section>
+        <section class="panel">
+          <div class="panel-heading"><div><p class="kicker">Division</p><h3>Opponents</h3></div><span class="match-section-count" id="league-quick-opponent-count">0</span></div>
+          <div id="league-quick-opponents" class="division-opponents"></div>
+        </section>
+        <section class="panel selkent-fixtures-panel">
+          <div class="panel-heading"><div><p class="kicker">League</p><h3>Upcoming fixtures</h3></div><span class="match-section-count" id="league-quick-fixture-count">0</span></div>
+          <div id="league-quick-fixtures" class="synced-fixture-list"></div>
+        </section>
+      </section>
+
+      <section id="view-add" class="view" data-view="add">
+        <div class="section-title-row">
+          <div><p class="kicker" id="form-kicker">Matchday entry</p><h2 id="form-title">Add Match</h2></div>
+          <button class="text-button hidden" id="cancel-edit">Cancel edit</button>
+        </div>
+        <div class="read-only-card hidden" id="read-only-card">Parent mode is read-only. Switch to coach mode to add or edit records.</div>
+        <form id="match-form" class="form-stack">
+          <input type="hidden" id="match-id" />
+          <div class="panel form-panel">
+            <h3>Match details</h3>
+            <div class="form-grid two">
+              <label>Date<input id="match-date" type="date" required /></label>
+              <label id="match-opponent-input-wrap">Opponent<select id="match-opponent" required><option value="">Select same-age Selkent team</option></select><small class="helper" id="match-opponent-directory-help">Teams are filtered to this age group from the Selkent club directory.</small></label><datalist id="division-opponents-list"></datalist>
+              <label id="match-opponent-select-wrap" class="hidden">Opponent<select id="match-opponent-select"><option value="">Select opponent</option></select></label>
+              <label>Competition
+                <select id="match-competition">
+                  <option>League</option><option>Division</option><option>Friendly</option><option>Challenge Cup</option><option>Challenge Vase</option><option>Shield</option><option>Cup</option><option>Tournament</option><option>Preseason Tournament</option><option>Other</option>
+                </select>
+              </label>
+              <label>Match status
+                <select id="match-status"><option value="played">Played</option><option value="scheduled">Scheduled</option><option value="postponed">Postponed</option><option value="abandoned">Abandoned</option></select>
+              </label>
+              <label>Venue
+                <select id="match-venue"><option value="">Not set</option><option value="H">Home</option><option value="A">Away</option><option value="N">Neutral</option></select>
+              </label>
+              <label id="match-tournament-wrap" class="hidden">Tournament event<select id="match-tournament"><option value="">Choose tournament</option></select></label>
+              <label>Round / stage <span class="optional">optional</span><input id="match-stage" type="text" placeholder="e.g. Group A · Semi Final" /></label>
+            </div>
+            <div class="score-entry">
+              <label><span id="our-score-label">Our team</span><input id="match-gf" type="number" min="0" required value="0" /></label>
+              <span>–</span>
+              <label>Opponent<input id="match-ga" type="number" min="0" required value="0" /></label>
+            </div>
+            <label>Notes<textarea id="match-notes" rows="3" placeholder="Key moments or coaching notes..."></textarea></label>
+          </div>
+
+          <div class="panel form-panel">
+            <div class="panel-heading"><h3>Goalscorers</h3><span class="helper">Total should match GF</span></div>
+            <div id="scorer-inputs" class="scorer-grid"></div>
+            <div class="goal-check" id="goal-check">0 of 0 goals assigned</div>
+          </div>
+
+          <div class="panel form-panel" data-feature-panel="awards">
+            <h3>Player awards</h3>
+            <div class="form-grid" id="match-award-fields"></div>
+          </div>
+
+          <button class="primary-button large" type="submit">Save Match</button>
+        </form>
+      </section>
+
+      <section id="view-squad" class="view" data-view="squad">
+        <div class="section-title-row">
+          <div><p class="kicker">Current squad</p><h2 id="squad-team-name">Our team</h2></div>
+          <button class="primary-button compact" id="add-player-btn" data-requires-edit>+ Player</button>
+        </div>
+        <div class="squad-format-summary" id="squad-format-summary"></div>
+        <div class="squad-view-tabs" role="tablist" aria-label="Squad view">
+          <button type="button" class="squad-view-tab active" id="squad-list-tab" data-squad-page="0">Squad</button>
+          <button type="button" class="squad-view-tab" id="squad-tactics-tab" data-squad-page="1">Tactics board</button>
+        </div>
+        <div class="squad-swipe" id="squad-swipe">
+          <section class="squad-swipe-page" aria-label="Squad list">
+            <div class="panel squad-banner compact-squad-banner">
+              <div class="squad-count"><strong id="squad-count">0</strong><span>registered players</span></div>
+              <div class="squad-space-count" id="squad-space-count"></div>
+            </div>
+            <div id="squad-list" class="squad-list"></div>
+          </section>
+          <section class="squad-swipe-page" aria-label="Tactics board">
+            <div class="panel tactics-panel">
+              <div class="panel-heading tactics-heading"><div><p class="kicker">Matchday setup</p><h3>Tactics board</h3><p class="muted" id="tactics-help">Choose the matchday squad first. The selected players feed directly into the formation and substitutes bench.</p></div><button type="button" class="secondary-button compact" id="reset-tactics" data-requires-edit>Reset</button></div>
+              <div class="matchday-squad-picker" id="matchday-squad-picker">
+                <div class="matchday-squad-head"><div><strong id="matchday-squad-title">Matchday squad</strong><span id="matchday-squad-fixture">Current setup</span><small id="matchday-readiness-summary"></small></div><div class="matchday-squad-head-actions"><button type="button" class="text-button compact hidden" id="select-all-available">Select all available</button><b id="matchday-squad-count">0 / 0</b></div></div>
+                <div class="matchday-squad-options" id="matchday-squad-options"></div>
+              </div>
+              <label class="formation-control">Formation<select id="tactics-formation" aria-label="Formation"></select></label>
+              <div class="tactics-pitch" id="tactics-pitch" aria-label="Football tactics board">
+                <span class="pitch-halfway"></span><span class="pitch-circle"></span><span class="pitch-box pitch-box-top"></span><span class="pitch-box pitch-box-bottom"></span>
+              </div>
+              <div class="tactics-bench-wrap"><div class="panel-heading"><h3>Substitutes</h3><span class="helper" id="tactics-matchday-limit"></span></div><div class="tactics-bench" id="tactics-bench"></div></div>
+            </div>
+          </section>
+        </div>
+      </section>
+
+      <section id="view-inbox" class="view" data-view="inbox">
+        <div class="section-title-row"><div><p class="kicker">Private club messaging</p><h2>Inbox</h2></div><button type="button" class="secondary-button compact" id="refresh-club-inbox">Refresh <span class="notification-badge hidden" id="club-inbox-badge">0</span></button></div>
+        <section class="panel"><div class="panel-heading"><div><h3>Messages</h3><p class="muted" id="club-inbox-help">Messages leave the active inbox 60 days after they are sent.</p></div></div><div class="onboard-grid"><label>Conversation<select id="inbox-contact-select"><option value="">Choose…</option></select></label><label>Subject<input id="inbox-subject" maxlength="120"/></label><label class="onboard-field-wide">Message<textarea id="inbox-message-body" rows="4" maxlength="4000"></textarea></label></div><p class="helper" id="inbox-compose-hint"></p><button type="button" class="primary-button" id="send-inbox-message">Send</button><div class="inbox-thread" id="inbox-thread"></div></section>
+        <section class="panel concern-panel"><div class="panel-heading"><div><p class="kicker">Complaint / concern</p><h3>Raise an issue</h3></div></div><label>Category<select id="concern-category"><option value="general">General dispute / complaint</option><option value="safeguarding">Safeguarding concern about a child</option></select></label><label>Subject<input id="concern-subject" maxlength="120"/></label><label>Details<textarea id="concern-body" rows="4" maxlength="4000"></textarea></label><p class="muted">Safeguarding concern content is not stored. If Safeguarding is selected, the app records only that you raised a concern and directs you to external safeguarding contacts.</p><button type="button" class="secondary-button" id="submit-concern">Continue</button><div class="provider-summary" id="concern-result"></div></section>
+        <section class="panel hidden" id="dispute-reviewer-panel"><div class="panel-heading"><div><p class="kicker">Restricted role</p><h3>Dispute Reviewer</h3><p class="muted">Only assigned reviewers can open retained dispute material. Access is audited.</p></div></div><div id="reviewer-dispute-list"><div class="empty-state compact-empty">No open disputes loaded.</div></div><label>Retained message thread ID<input id="reviewer-thread-id" placeholder="Thread UUID"/></label><button type="button" class="secondary-button" id="load-retained-thread">Open retained thread</button><div id="reviewer-retained-thread" class="inbox-thread"></div></section>
+      </section>
+
+      <section id="view-club" class="view" data-view="club">
+        <div class="section-title-row"><div><p class="kicker" id="club-view-kicker">Club administration</p><h2 id="club-view-title">Club Overview</h2></div></div>
+
+        <section class="club-admin-panel hidden" id="club-fixtures-panel">
+          <section class="panel admin-fixture-centre">
+            <div class="panel-heading"><div><p class="kicker">Club-wide schedule</p><h3>Fixture Centre</h3></div></div>
+            <label class="admin-filter-label">Age group<select id="admin-fixtures-age"><option value="all">All age groups</option></select></label>
+            <div class="admin-fixture-list" id="admin-fixture-list"></div>
+          </section>
+        </section>
+
+        <section class="club-results-panel hidden" id="club-results-panel">
+          <section class="panel club-results-browser">
+            <div class="panel-heading"><div><p class="kicker">Results browser</p><h3>Club results</h3></div></div>
+            <p class="muted">Choose an age group to browse results. Club Admin sees the full internal played-match history; Coach views show only results published by Selkent.</p>
+            <label class="club-results-age-label">Age group<select id="club-results-age"></select></label>
+            <div id="club-results-list" class="club-results-list"></div>
+            <div class="club-results-pager">
+              <button type="button" class="secondary-button compact" id="club-results-prev">← Previous</button>
+              <span id="club-results-page">0 of 0</span>
+              <button type="button" class="secondary-button compact" id="club-results-next">Next →</button>
+            </div>
+          </section>
+        </section>
+
+        <section class="admin-club-overview" id="admin-club-overview">
+          <section class="panel admin-dashboard-summary">
+            <div class="admin-dashboard-head">
+              <div><p class="kicker">Club at a glance</p><h3>2026/27 overview</h3></div>
+              
+            </div>
+            <div class="admin-overview-stats">
+              <article class="admin-stat"><span>Teams</span><strong id="admin-team-count">0</strong></article>
+              <article class="admin-stat"><span>Coaching staff</span><strong id="admin-coach-count">0</strong></article>
+              <article class="admin-stat"><span>Fixtures</span><strong id="admin-fixtures-count">0</strong></article>
+              <article class="admin-stat"><span>Squad alerts</span><strong id="admin-squad-alert-count">0</strong></article>
+              <article class="admin-stat"><span>Attention</span><strong id="admin-alert-count">0</strong></article>
+            </div>
+            <p class="muted admin-overview-meta" id="admin-overview-meta"></p>
+          </section>
+
+          <section class="panel admin-announcement-centre">
+            <div class="panel-heading"><div><p class="kicker">Notifications</p><h3>Club notices</h3><p class="muted">Broadcast a read-only notification to the relevant members.</p></div></div>
+            <div class="announcement-compose-grid">
+              <label>Title<input id="announcement-title" type="text" maxlength="120" placeholder="e.g. Training cancelled" /></label>
+              <label>Audience<select id="announcement-audience"><option value="whole_club">Whole club</option><option value="coaches">All coaching staff</option><option value="parents">All parents</option><option value="age_group">One age group</option><option value="team">One team</option></select></label>
+              <label class="hidden" id="announcement-age-wrap">Age group<select id="announcement-age"></select></label>
+              <label class="hidden" id="announcement-team-wrap">Team<select id="announcement-team"></select></label>
+              <label class="announcement-body-label">Message<textarea id="announcement-body" rows="3" maxlength="4000" placeholder="Write the club notice…"></textarea></label>
+              <label class="checkbox-line"><input id="announcement-important" type="checkbox" /> Important</label>
+              <label class="checkbox-line"><input id="announcement-pinned" type="checkbox" /> Pin to top</label>
+              <button type="button" class="primary-button" id="announcement-send">Publish notice</button>
+            </div>
+            <div class="admin-announcements-list" id="admin-announcements-list"></div>
+          </section>
+
+          <section class="admin-team-overview-panel">
+            <div class="admin-section-heading"><div><p class="kicker">Teams</p><h3>Browse by age group</h3></div><span class="admin-section-hint">Tap an age group, then a team</span></div>
+            <div class="admin-team-grid admin-age-group-list" id="admin-team-grid"></div>
+          </section>
+
+          <section class="panel admin-weekend-panel">
+            <div class="panel-heading"><div><p class="kicker">Next weekend</p><h3>Weekend at a glance</h3><p class="muted" id="admin-weekend-meta"></p></div></div>
+            <div class="admin-weekend-list" id="admin-weekend-list"></div>
+          </section>
+
+          <section class="panel admin-attention-panel">
+            <div class="admin-attention-list" id="admin-attention-list"></div>
+          </section>
+        </section>
+
+        <section class="panel admin-season-management" id="admin-season-management-panel" data-admin-season-panel>
+          <div class="panel-heading"><div><p class="kicker">Season control</p><h3>Archive & rollover</h3></div><span class="age-rule">Club Admin</span></div>
+          <p class="muted">Archive the current season before starting the next one. Squads and account links carry forward; current-season matches, awards and attendance reset only after a confirmed rollover.</p>
+          <div class="season-management-actions">
+            <button type="button" class="secondary-button" id="archive-current-season">Archive current season</button>
+            <label>New season<input id="rollover-season-name" type="text" placeholder="2027/28" maxlength="12" /></label>
+            <button type="button" class="primary-button" id="rollover-season">Start new season</button>
+          </div>
+          <p class="helper">U8–U14 move up one age group. U15 remains U15 while the app scope is capped at U15.</p>
+        </section>
+
+        <section class="club-admin-panel hidden" id="club-coaches-panel">
+          <section class="panel admin-coach-centre">
+            <div class="panel-heading"><div><p class="kicker">Club staff</p><h3>Coaching Staff</h3></div></div>
+            <p class="muted">See coaching-staff assignments or create a Coach / Assistant Coach invite.</p>
+            <div class="admin-coach-invite">
+              <label>Role<select id="admin-coach-invite-role"><option value="coach">Coach</option><option value="assistant_coach">Assistant Coach</option><option value="club_admin">Club Admin</option></select></label>
+              <label>Team<select id="admin-coach-invite-team"></select></label>
+              <button type="button" class="secondary-button" id="create-admin-coach-invite">Create staff invite</button>
+              <div class="admin-invite-output hidden" id="admin-coach-invite-output"><input id="admin-coach-invite-code" type="text" readonly/><button type="button" class="text-button" id="copy-admin-coach-invite">Copy</button></div>
+            </div>
+            <div id="club-coaches-list" class="team-members-list admin-coach-list"></div>
+            <div class="admin-access-management">
+              <div class="panel-heading"><div><p class="kicker">Access management</p><h3>All app access</h3></div><label class="admin-access-filter">Show<select id="admin-access-filter"><option value="all">Everyone</option><option value="club_admin">Club Admins</option><option value="staff">Coaching staff</option><option value="parent">Parents</option><option value="pending_parent">Pending parents</option><option value="player">Players</option></select></label></div>
+              <div class="admin-access-stats" id="admin-access-stats"></div>
+              <div class="team-members-list admin-access-list" id="admin-access-list"><div class="empty-state compact-empty">Loading club access…</div></div>
+            </div>
+          </section>
+        </section>
+
+      </section>
+
+      <section id="view-more" class="view" data-view="more">
+        <div class="section-title-row"><div><p class="kicker">App controls</p><h2>Settings</h2></div></div>
+        <div class="settings-accordion-list">
+
+          <details class="panel settings-accordion" id="match-detail-settings" data-requires-edit data-coach-ui-only>
+            <summary><span>Match details</span><span class="settings-chevron">⌄</span></summary>
+            <div class="settings-accordion-body">
+              <p class="muted">Choose which match details the coach wishes to record. Turning an option off does not delete any details already recorded.</p>
+              <div class="feature-toggle-list">
+                <label class="toggle-row"><input id="feature-goals" type="checkbox" /><span><strong>Goalscorers</strong></span></label>
+                <label class="toggle-row"><input id="feature-assists" type="checkbox" /><span><strong>Assists</strong></span></label>
+                <label class="toggle-row"><input id="feature-awards" type="checkbox" /><span><strong>Player awards</strong></span></label>
+                <label class="toggle-row" data-discipline-only><input id="feature-bookings" type="checkbox" /><span><strong>Bookings</strong></span></label><p class="muted mini-soccer-note hidden" id="mini-soccer-discipline-note">Bookings are not used for Mini-Soccer (U7–U10), so disciplinary controls are hidden for this team.</p>
+              </div>
+              <button class="primary-button setup-save" id="save-feature-settings">Save options</button>
+              <div class="custom-award-settings" id="custom-award-settings">
+                <div class="panel-heading"><div><h3>Award types</h3><p class="muted">Create the awards your team uses. Removing a type does not delete awards already recorded.</p></div></div>
+                <div id="award-types-list" class="award-type-list"></div>
+                <div class="inline-add-row"><input id="new-award-type" type="text" maxlength="48" placeholder="e.g. Coaches Player of the Match"/><button type="button" class="secondary-button compact" id="add-award-type">Add award</button></div>
+              </div>
+            </div>
+          </details>
+
+          <details class="panel settings-accordion" id="team-access-settings" data-requires-edit data-coach-ui-only>
+            <summary><span>Team access</span><span class="settings-chevron">⌄</span></summary>
+            <div class="settings-accordion-body">
+              <p class="muted">Coaches can invite parents. Player app access is available to U15 squads only and is read-only apart from the linked player’s match availability.</p>
+              <div class="team-access-invite-block">
+                <button class="primary-button setup-save" id="generate-team-parent-invite">Create parent invite</button>
+                <label class="assignment-output-label">Parent invite code<input id="team-parent-invite-code" type="text" readonly placeholder="Create an invite above" /></label>
+                <button class="secondary-button setup-save" id="copy-team-parent-invite">Copy parent invite</button>
+              </div>
+              <div class="team-access-invite-block" id="team-player-invite-section">
+                <label>Player profile<select id="team-player-invite-player"><option value="">Choose player…</option></select></label>
+                <button class="primary-button setup-save" id="generate-team-player-invite">Create reusable player code</button>
+                <label class="assignment-output-label">Player Access code<input id="team-player-invite-code" type="text" readonly placeholder="Choose a player and create a reusable code" /></label>
+                <button class="secondary-button setup-save" id="copy-team-player-invite">Copy player code</button>
+                <p class="helper">Player app access is available to U15 squads only. Player accounts receive club notifications but cannot message other players, parents or coaches.</p>
+              </div>
+              <div class="panel-heading access-members-heading"><h3>Team members</h3></div>
+              <div id="team-members-list" class="team-members-list"></div>
+            </div>
+          </details>
+
+          <details class="panel settings-accordion hidden" id="club-admin-access-settings" data-admin-settings-only>
+            <summary><span>Club Admin access</span><span class="settings-chevron">⌄</span></summary>
+            <div class="settings-accordion-body">
+              <p class="muted">Create an invite for another Club Admin. Club Admins can view all teams read-only and manage club-wide administration.</p>
+              <button type="button" class="primary-button setup-save" id="create-club-admin-invite">Create Club Admin invite</button>
+              <div class="admin-invite-output hidden" id="club-admin-invite-output">
+                <label class="assignment-output-label">Club Admin invite code<input id="club-admin-invite-code" type="text" readonly placeholder="Create an invite above" /></label>
+                <button type="button" class="secondary-button setup-save" id="copy-club-admin-invite">Copy invite code</button>
+              </div>
+            </div>
+          </details>
+
+          <details class="panel settings-accordion hidden" id="club-compliance-settings" data-admin-settings-only>
+            <summary><span>Data protection & safeguarding</span><span class="settings-chevron">⌄</span></summary>
+            <div class="settings-accordion-body">
+              <p class="muted" id="compliance-status">Loading compliance status…</p>
+              <div class="onboard-grid"><label>Primary Dispute Reviewer<input id="compliance-primary-reviewer" placeholder="Full name"/></label><label>Reviewer account<select id="compliance-primary-user"></select></label><label>Backup reviewer<input id="compliance-backup-reviewer" placeholder="Full name"/></label><label>Backup account<select id="compliance-backup-user"></select></label><label class="onboard-field-wide checkbox-line"><input id="compliance-fallback" type="checkbox"/> Use league / County FA welfare fallback if no independent backup is available</label><label>Club Welfare Officer<input id="compliance-welfare-name" placeholder="Full name"/></label><label>Welfare contact<input id="compliance-welfare-contact" placeholder="Email or phone"/></label><label>County FA<input id="compliance-county-fa" value="London FA"/></label><label>County FA safeguarding contact<input id="compliance-county-contact" placeholder="Email / phone / contact route"/></label></div>
+              <button type="button" class="primary-button setup-save" id="save-compliance-settings">Save compliance settings</button>
+              <hr/><p class="muted" id="club-cancel-status">Club active</p><div class="season-management-actions"><button type="button" class="secondary-button" id="request-club-cancellation">Cancel club · start 30-day deletion window</button><button type="button" class="text-button" id="cancel-club-cancellation">Withdraw cancellation</button></div>
+            </div>
+          </details>
+
+          <details class="panel settings-accordion hidden" id="u11-safeguarding-panel">
+            <summary><span>U7–U11 emergency / medical information</span><span class="settings-chevron">⌄</span></summary>
+            <div class="settings-accordion-body"><p class="muted">This is the only U7–U11 export route. Performance stats, squad history and name-to-shirt mappings cannot be exported.</p><label>Player<select id="u11-safeguarding-player"></select></label><label>Emergency contact name<input id="u11-emergency-name"/></label><label>Emergency contact phone<input id="u11-emergency-phone"/></label><label>Medical / allergy information<textarea id="u11-medical-info" rows="3"></textarea></label><div class="season-management-actions"><button type="button" class="primary-button" id="save-u11-safeguarding">Save information</button><button type="button" class="secondary-button" id="export-u11-safeguarding">Export safeguarding pack</button></div><p class="helper">Every export is logged and visible to Club Admin.</p><div id="safeguarding-export-audit" class="audit-history-list"></div></div>
+          </details>
+
+          <details class="panel settings-accordion" id="season-history-settings" data-staff-history>
+            <summary><span>Season history</span><span class="settings-chevron">⌄</span></summary>
+            <div class="settings-accordion-body">
+              <p class="muted">Archived seasons are read only and preserve the match record from before rollover.</p>
+              <div class="season-history-controls"><select id="season-history-select"><option value="">No archived seasons yet</option></select><button type="button" class="secondary-button compact" id="open-season-archive">View archive</button></div>
+              <div id="season-history-summary" class="archive-summary"></div>
+            </div>
+          </details>
+
+          <details class="panel settings-accordion" id="audit-history-settings" data-staff-history>
+            <summary><span>Audit history</span><span class="settings-chevron">⌄</span></summary>
+            <div class="settings-accordion-body">
+              <p class="muted">Recent football-data and access changes. Club Admins see club-wide history; coaches see their own team.</p>
+              <button type="button" class="secondary-button compact" id="refresh-audit-history">Refresh history</button>
+              <div id="audit-history-list" class="audit-history-list"><div class="empty-state compact-empty">Open this section to load history.</div></div>
+            </div>
+          </details>
+
+          <details class="panel settings-accordion" id="universal-core-settings">
+            <summary><span>Club configuration</span><span class="settings-chevron">⌄</span></summary>
+            <div class="settings-accordion-body">
+              <p class="muted">Universal Core v1 reads branding, provider and football rules from the club configuration rather than hard-coded app values.</p>
+              <div id="universal-config-summary"></div>
+              <div id="universal-config-rules" class="universal-config-rules"></div>
+            </div>
+          </details>
+
+          <details class="panel settings-accordion" id="appearance-settings">
+            <summary><span>Appearance</span><span class="settings-chevron">⌄</span></summary>
+            <div class="settings-accordion-body">
+              <p class="muted">Choose how the app looks on this device.</p>
+              <label>Theme
+                <select id="appearance-theme">
+                  <option value="system">Use device setting</option>
+                  <option value="light">Light</option>
+                  <option value="dark">Dark</option>
+                </select>
+              </label>
+            </div>
+          </details>
+
+          <details class="panel settings-accordion" id="access-panel">
+            <summary><span>My account</span><span class="settings-chevron">⌄</span></summary>
+            <div class="settings-accordion-body">
+              <div class="panel-heading"><span class="account-role-badge" id="account-role-badge">Club Admin</span></div>
+              <p class="muted" id="access-summary">Account access details.</p>
+              <button type="button" class="secondary-button setup-save" id="admin-account-mode-switch" data-admin-only>Switch to Coach view</button>
+            </div>
+          </details>
+          <section class="panel gch-about-card" id="gch-about-card" aria-label="About PitchKind">
+            <img src="pitchkind-wt_logo-primary.svg" alt="PitchKind — Organise, Connect, Play" class="gch-about-banner" />
+            <div class="gch-about-copy">
+              <strong>PitchKind</strong>
+              <span>ORGANISE | CONNECT | PLAY</span>
+              <small>App version 2.2.8</small>
+            </div>
+          </section>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <dialog id="match-detail-dialog" class="modal match-detail-modal">
+    <form method="dialog" id="match-detail-form">
+      <div class="modal-heading"><div><p class="kicker">Match details</p><h3 id="match-detail-title">Add match details</h3></div><button type="button" class="icon-button small" data-close-dialog aria-label="Close">×</button></div>
+      <input type="hidden" id="match-detail-id" />
+      <div class="detail-match-summary" id="match-detail-summary"></div>
+      <section class="detail-feature-section" id="detail-goals-section" data-detail-feature="goals"><div class="panel-heading"><h3>Goalscorers</h3><span class="helper">Goals</span></div><div id="detail-goals-inputs" class="detail-player-grid"></div></section>
+      <section class="detail-feature-section" id="detail-assists-section" data-detail-feature="assists"><div class="panel-heading"><h3>Assists</h3><span class="helper">Assists</span></div><div id="detail-assists-inputs" class="detail-player-grid"></div></section>
+      <section class="detail-feature-section" id="detail-awards-section" data-detail-feature="awards"><h3>Player awards</h3><div class="form-grid" id="detail-award-fields"></div></section>
+      <section class="detail-feature-section match-attendance-section hidden" id="match-attendance-section"><div class="panel-heading"><div><h3>Attendance</h3><span class="helper" id="match-attendance-helper">Attendance status</span></div></div><div id="match-attendance-list" class="match-attendance-list"></div></section>
+      <section class="detail-feature-section secure-coach-note hidden" id="coach-note-section"><div class="panel-heading"><div><h3>Coaching notes</h3><span class="helper">Coaching staff only · not visible to parents</span></div></div><textarea id="coach-match-note" rows="4" maxlength="4000" placeholder="Private coaching observations, follow-up points or development notes..."></textarea><p class="coach-note-readonly hidden" id="coach-note-readonly"></p></section>
+      <div class="empty-detail-options hidden" id="empty-detail-options">All match detail options are switched off. Enable the options you want under More → Match detail options.</div>
+      <div class="modal-actions"><button type="button" class="secondary-button" data-close-dialog>Cancel</button><button id="save-match-details" type="submit" class="primary-button">Save details</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="parent-link-dialog" class="modal parent-link-modal">
+    <form method="dialog" id="parent-link-form">
+      <div class="modal-heading"><div><p class="kicker">Parent access</p><h3 id="parent-link-title">Link player</h3></div><button type="button" class="icon-button small" data-close-dialog aria-label="Close">×</button></div>
+      <p class="muted">Choose which player or players belong to this parent account. Parents can only submit availability for linked players.</p>
+      <input type="hidden" id="parent-link-user-id" />
+      <div class="parent-link-player-list" id="parent-link-player-list"></div>
+      <div class="modal-actions"><button type="button" class="secondary-button" data-close-dialog>Cancel</button><button type="submit" class="primary-button">Save player links</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="player-profile-dialog" class="modal player-profile-modal">
+    <div class="player-profile-shell">
+      <div class="modal-heading"><div><p class="kicker">Player profile</p><h3 id="player-profile-name">Player</h3></div><button type="button" class="icon-button small" data-close-dialog aria-label="Close">×</button></div>
+      <div class="player-profile-hero" id="player-profile-hero"></div>
+      <div class="player-profile-stats" id="player-profile-stats"></div>
+      <section class="player-profile-availability hidden" id="player-profile-availability">
+        <div class="panel-heading"><div><h3>Next match availability</h3><p class="muted" id="player-profile-fixture">Upcoming fixture</p></div></div>
+        <div class="availability-buttons" role="group" aria-label="Player availability">
+          <button type="button" class="availability-btn available" data-profile-availability="available">Available</button>
+          <button type="button" class="availability-btn unsure" data-profile-availability="unsure">Unsure</button>
+          <button type="button" class="availability-btn unavailable" data-profile-availability="unavailable">Unavailable</button>
+        </div>
+        <p class="muted" id="player-profile-availability-note">Only linked parent accounts can change availability.</p>
+      </section>
+      <div class="player-profile-readonly-note">Profiles are read only. Availability is the only parent-controlled field.</div>
+    </div>
+  </dialog>
+
+  <dialog id="player-dialog" class="modal">
+    <form method="dialog" id="player-form" novalidate>
+      <div class="modal-heading"><h3 id="player-dialog-title">Add player</h3><button type="button" class="icon-button small" data-close-dialog aria-label="Close">×</button></div>
+      <input type="hidden" id="player-original-number" />
+      <label>Shirt number<input id="player-number" type="number" min="1" max="99" inputmode="numeric" required /></label>
+      <label>Player name<input id="player-name" type="text" required /></label>
+      <label>Jersey / role
+        <select id="player-role"><option value="outfield">Outfield</option><option value="goalkeeper">Goalkeeper</option></select>
+      </label>
+      <label>Status<select id="player-status"><option value="active">Active</option><option value="inactive">Inactive</option></select></label>
+      <button type="button" class="danger-button remove-player-button hidden" id="remove-player">Remove player from squad</button>
+      <p class="muted player-remove-note hidden" id="remove-player-note">Historical goals, assists, bookings and awards will be kept.</p>
+      <div class="modal-actions"><button type="button" class="secondary-button" data-close-dialog>Cancel</button><button id="save-player" type="submit" class="primary-button">Save</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="award-dialog" class="modal">
+    <form method="dialog" id="award-form">
+      <div class="modal-heading"><h3>Add award</h3><button type="button" class="icon-button small" data-close-dialog aria-label="Close">×</button></div>
+      <label>Date<input id="standalone-award-date" type="date" required /></label>
+      <label>Event / opponent<input id="standalone-award-event" type="text" required placeholder="e.g. September Player of the Month" /></label>
+      <label>Award type<input id="standalone-award-type" type="text" required placeholder="e.g. Player of the Month" /></label>
+      <label>Player<select id="standalone-award-player" required></select></label>
+      <label>Notes<textarea id="standalone-award-notes" rows="2"></textarea></label>
+      <div class="modal-actions"><button type="button" class="secondary-button" data-close-dialog>Cancel</button><button id="save-award" type="submit" class="primary-button">Save</button></div>
+    </form>
+  </dialog>
+
+
+  <dialog id="tournament-dialog" class="modal tournament-modal">
+    <form method="dialog" id="tournament-form">
+      <div class="modal-heading"><div><p class="kicker">Tournament event</p><h3 id="tournament-dialog-title">Create tournament</h3></div><button type="button" class="icon-button small" data-close-dialog aria-label="Close">×</button></div>
+      <input type="hidden" id="tournament-id" />
+      <label>Tournament name<input id="tournament-name" type="text" required maxlength="100" placeholder="e.g. Autumn Trophy" /></label>
+      <div class="form-grid two"><label>Date<input id="tournament-date" type="date" required /></label><label>Location<input id="tournament-location" type="text" maxlength="160" placeholder="Venue / ground" /></label></div>
+      <label>Format<select id="tournament-format"><option value="group_knockout">Group + knockout</option><option value="round_robin">Round robin</option><option value="knockout">Knockout</option><option value="festival">Festival / mini tournament</option></select></label>
+      <div class="panel-heading"><div><h3>Tournament squad</h3><span class="helper">Select the players registered for this event.</span></div></div>
+      <div id="tournament-squad-list" class="parent-link-player-list"></div>
+      <div class="modal-actions"><button type="button" class="secondary-button" data-close-dialog>Cancel</button><button type="submit" class="primary-button">Save tournament</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="season-archive-dialog" class="modal season-archive-modal">
+    <div class="season-archive-shell">
+      <div class="modal-heading"><div><p class="kicker">Read-only history</p><h3 id="season-archive-title">Archived season</h3></div><button type="button" class="icon-button small" data-close-dialog aria-label="Close">×</button></div>
+      <div id="season-archive-body" class="season-archive-body"></div>
+      <div class="modal-actions"><button type="button" class="primary-button" data-close-dialog>Done</button></div>
+    </div>
+  </dialog>
+
+  <dialog id="notification-dialog" class="modal notification-modal">
+    <div class="notification-shell">
+      <div class="modal-heading"><div><p class="kicker">Updates</p><h3>Notifications</h3></div><button type="button" class="icon-button small" data-close-dialog aria-label="Close">×</button></div>
+      <div class="notification-list" id="notification-list"></div>
+      <div class="modal-actions"><button type="button" class="secondary-button" id="notifications-mark-all">Mark all read</button><button type="button" class="primary-button" data-close-dialog>Done</button></div>
+    </div>
+  </dialog>
+
+  <div id="toast" class="toast" role="status"></div>
+  <script src="cloud-config.js"></script>
+  <script src="onboarding.js"></script>
+  <script src="cloud.js"></script>
+  <script src="app.js"></script>
+  <script src="static-feed-overlay.js"></script>
+</body>
+</html>

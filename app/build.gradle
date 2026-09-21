@@ -1,0 +1,13 @@
+plugins { id 'com.android.application' }
+
+android {
+    namespace 'com.grassrootsclubhub.universal'
+    compileSdk 35
+    defaultConfig {
+        applicationId 'com.grassrootsclubhub.universal'
+        minSdk 26
+        targetSdk 35
+        versionCode 2208
+        versionName '2.2.8'
+    }
+}

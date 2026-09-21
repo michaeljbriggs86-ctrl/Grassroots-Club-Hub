@@ -1,0 +1,24 @@
+PitchKind v2.2.8 - PitchKind UI identity alignment
+
+This version is based on the verified v2.2.7 source and implements the current PitchKind visual identity while preserving release-sensitive internal identifiers.
+
+Changes:
+- app-facing name is PitchKind;
+- uses the approved PitchKind primary/reverse/mark SVG assets unchanged;
+- launcher/PWA raster icons are conversions of the approved app-icon SVG;
+- splash, authentication, club onboarding and About use PitchKind branding;
+- missing club badges use the PitchKind mark only as the neutral product placeholder;
+- retired Grassroots Club Hub visual assets are removed from deployable app assets and retained only under legacy_reference_do_not_deploy;
+- legacy More Than A Game hero art is removed from deployable assets; current hero files are crop/resize derivatives with the retired text region removed;
+- version advanced to 2.2.8 / 2208;
+- one GitHub Actions workflow verifies source, builds the debug APK, runs an APK content gate, creates a SHA-256 checksum and uploads the artifact.
+
+Intentionally unchanged:
+- applicationId / Java package: com.grassrootsclubhub.universal;
+- auth callback scheme: grassrootsclubhub://;
+- ClubHub/ClubHubNative internal bridge names;
+- existing static-feed GitHub host/path;
+- backend/database identifiers.
+
+No claim is made that unresolved functional bugs outside this visual-identity update are fixed.
+DEPLOYED/LIVE: not claimed.

@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024" role="img" aria-labelledby="t">
+<title id="t">Grassroots Club Hub round app icon</title>
+<circle cx="512" cy="512" r="472" fill="#0B5D35"/>
+<g aria-hidden="true">
+      <circle cx="512" cy="475" r="245" fill="none" stroke="#FFFFFF" stroke-width="88"/>
+      <path d="M 401.8 651.4 C 394.4 536.2, 445.9 460.3, 492.4 369.6
+               C 482.6 482.4, 497.3 568.1, 512.0 651.4
+               C 519.4 533.8, 556.1 443.1, 614.9 352.5
+               C 592.9 470.1, 583.0 570.5, 585.5 651.4
+               C 610.0 558.3, 649.2 487.2, 688.4 443.1
+               C 659.0 553.4, 649.2 609.8, 644.3 653.9 Z" fill="#68C77E"/>
+    </g>
+<path d="M300 740 C365 700 444 680 512 680 C598 680 671 703 730 744" fill="none" stroke="#68C77E" stroke-width="38" stroke-linecap="round"/>
+</svg>

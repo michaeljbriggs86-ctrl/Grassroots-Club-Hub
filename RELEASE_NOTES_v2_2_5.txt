@@ -1,0 +1,15 @@
+Grassroots Club Hub v2.2.5 — App-Wide UI Standard
+
+Status at source package creation: WRITTEN + TESTED at source level; APK status requires separate artifact build/inspection.
+
+Key changes:
+- Promotes the approved green/white football design into a governing app-wide design system.
+- Adds design_reference/APP-UI-DESIGN-GUIDELINES.md as the single UI authority for ChatGPT, Claude and future contributors.
+- Replaces constructed SVG football/goal scenes with realistic generated raster football imagery.
+- Applies common colour, typography, card, form, action, navigation and spacing tokens across authenticated and unauthenticated areas.
+- Adds responsive rules for small phones, standard phones, large phones, foldables/tablets and landscape.
+- Short screens scroll rather than compressing fields/buttons/text below the approved readable sizes.
+- Adds actual generated football imagery to the authenticated app header and login family.
+- Removes stale build-apk-static-feed.REPLACEMENT.yml sidecar from the source archive.
+
+Non-negotiable: no design deviations or exceptions unless explicitly discussed and approved by Mike and recorded in the project handoff/governing documents.

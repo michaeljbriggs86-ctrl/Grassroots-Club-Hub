@@ -1,0 +1,83 @@
+Grassroots Club Hub Android Universal v2.2.4 — Mock-up Exact Login UI
+Date: 19 September 2026
+
+STATUS
+  WRITTEN: yes
+  TESTED: source syntax + structural UI acceptance checks
+  BUILT APK: NOT VERIFIED
+  DEPLOYED-LIVE: NOT VERIFIED / NOT CLAIMED
+
+Acceptance target change
+- The approved login mock-up dated 2026-09-19 is now the UI acceptance target,
+  not merely inspiration or a loose design theme.
+- The source embeds a design revision marker:
+    approved-mockup-2026-09-19-v1
+- Future auth UI changes should be treated as regressions unless they preserve
+  the approved screen hierarchy and visual design system or are explicitly approved.
+
+Adult Login — default opening screen
+- Matches the approved hierarchy:
+    Grassroots Club Hub branding
+    football hero scene + handwritten accent
+    Welcome Back
+    adult email address
+    password + show/hide control
+    Forgot password?
+    green Log In CTA
+    outlined Player Login CTA
+    Club Sign Up link
+    adult-routing explanation
+    grass footer
+- The two migration/setup links previously shown on the default screen have been
+  removed from the primary UI so the opening screen now matches the approved mock-up.
+- Legacy/setup/recovery routes remain code-supported when reached from their
+  relevant account state; they no longer visually compete with the three primary routes.
+
+Player Access
+- Separate U15-only Player Access screen.
+- Player Name + reusable Player Code.
+- No player email or phone requested.
+- Safeguarding explanation panel, Enter App CTA, Back to Main Login action.
+- Existing client and pending server-side U15 checks remain intact.
+
+Create Club Account
+- Separate Club Sign Up screen with Club Name, Email address, Password and
+  County FA / League selector.
+- Continues into the existing universal club onboarding flow.
+- Selkent automatic setup and manual setup boundaries are unchanged.
+
+Visual system encoded directly in app/src/main/assets/cloud.css
+- Approved Grassroots green token family.
+- White/light canvas.
+- 430px primary screen composition target with responsive mobile adjustments.
+- Rounded input fields and buttons.
+- Full-width gradient green primary CTAs.
+- Outlined green secondary CTA.
+- Strong black headings + restrained grey support copy.
+- Football scene assets for Adult / Player / Club screens.
+- Handwritten hero accent treatment.
+- Pale green safeguarding/info surfaces.
+- Grass footer treatment.
+
+Design evidence retained in source
+- design_reference/APPROVED_LOGIN_MOCKUP_2026-09-19.png
+- design_reference/LOGIN_DESIGN_BRIEF_2026-09-19.png
+- design_reference/LOGIN_DESIGN_SPEC.md
+
+Verification performed
+- node --check cloud.js
+- node --check onboarding.js
+- node --check app.js
+- CSS brace balance check
+- verification/verify_v2_2_4_mockup_exact_ui.py
+- 23/23 structural UI acceptance checks passed
+- versionName 2.2.4 / versionCode 2204
+- native marker GrassrootsClubHub/2.2.4
+- static-feed-overlay.js remains referenced
+
+Not verified here
+- v2.2.4 APK build/contents
+- device screenshot from an installed v2.2.4 APK
+- live deployment of reusable Player Access backend
+- end-to-end player-code login against live Supabase
+- distributed/installed app version

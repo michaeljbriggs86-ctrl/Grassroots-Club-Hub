@@ -1,0 +1,464 @@
+/*
+ * PitchKind — governing app-wide UI system
+ * Revision: approved-app-ui-2026-09-21-v1.4-pitchkind
+ * Authority: shared Drive canonical APP-UI-DESIGN-GUIDELINES.md (bundled dated snapshot under design_reference/)
+ * No deviations without explicit approval recorded per project protocol.
+ */
+:root{
+  --gch-green-950:#064526;
+  --gch-green-900:#0B5D35;
+  --gch-green-800:#0D6A3A;
+  --gch-green-700:#0F7B42;
+  --gch-green-600:#168848;
+  --gch-green-500:#29A64D;
+  --gch-soft-green:#EEF6F1;
+  --gch-info-green:#E8F7ED;
+  --gch-canvas:#F3F6F4;
+  --gch-white:#FFFFFF;
+  --gch-ink:#111715;
+  --gch-copy:#4F5F55;
+  --gch-muted:#66756D;
+  --gch-line:#D8E0DA;
+  --gch-error:#A52626;
+  --gch-error-bg:#FFF0F0;
+  --gch-radius-field:12px;
+  --gch-radius-button:12px;
+  --gch-radius-card:18px;
+  --gch-shadow-card:0 7px 24px rgba(10,75,42,.07);
+  --gch-shadow-action:0 8px 18px rgba(11,93,53,.18);
+  --gch-content-max:900px;
+  --gch-font:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+
+  /* Map legacy tokens to the governing system so older screens inherit it. */
+  --green:var(--gch-green-600);
+  --green-2:var(--gch-green-900);
+  --green-3:var(--gch-soft-green);
+  --ink:var(--gch-ink);
+  --muted:var(--gch-muted);
+  --bg:var(--gch-canvas);
+  --white:var(--gch-white);
+  --radius:var(--gch-radius-card);
+
+  --auth-green-950:var(--gch-green-950);
+  --auth-green-900:var(--gch-green-900);
+  --auth-green-800:var(--gch-green-800);
+  --auth-green-700:var(--gch-green-700);
+  --auth-green-600:var(--gch-green-600);
+  --auth-green-500:var(--gch-green-500);
+  --auth-ink:var(--gch-ink);
+  --auth-copy:var(--gch-copy);
+  --auth-muted:var(--gch-muted);
+  --auth-line:var(--gch-line);
+  --auth-soft:var(--gch-soft-green);
+  --auth-canvas:var(--gch-canvas);
+  --auth-radius-field:var(--gch-radius-field);
+  --auth-radius-button:var(--gch-radius-button);
+  --auth-font:var(--gch-font);
+}
+
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%;background:var(--gch-canvas)}
+html,body{max-width:100%;overflow-x:hidden}
+body{background:var(--gch-canvas);color:var(--gch-ink);font-family:var(--gch-font);line-height:1.45}
+button,input,select,textarea{font-family:inherit}
+button,a,input,select,textarea{touch-action:manipulation}
+button,.nav-item,.top-nav-tab,.hero-profile-button{min-height:44px}
+img{max-width:100%}
+
+/* ---------- Global authenticated shell ---------- */
+.app-shell{width:100%;max-width:960px;min-height:100dvh;margin:0 auto;background:var(--gch-canvas)}
+.hero{
+  min-height:clamp(150px,24vw,220px);
+  padding:calc(18px + var(--android-inset-top,0px)) clamp(16px,4vw,28px) 20px;
+  color:#fff;
+  background:
+    linear-gradient(90deg,rgba(3,39,21,.82) 0%,rgba(4,66,34,.68) 48%,rgba(8,82,42,.38) 100%),
+    url('football-pitch-hero.jpg') center 48%/cover no-repeat;
+  border-radius:0 0 24px 24px;
+  box-shadow:0 10px 28px rgba(7,65,35,.16);
+}
+.hero-pattern{display:none!important}
+.hero-inner{grid-template-columns:clamp(64px,12vw,88px) minmax(0,1fr);gap:14px;align-items:center}
+.club-logo-wrap{width:clamp(64px,12vw,88px);height:clamp(64px,12vw,88px);border-radius:18px;background:rgba(255,255,255,.96);border:1px solid rgba(255,255,255,.65);box-shadow:0 8px 20px rgba(0,0,0,.14)}
+.club-logo{width:90%;height:90%;border-radius:0;filter:none}
+.hero-copy{min-width:0}
+.hero-copy h1{font-size:clamp(27px,6vw,38px);line-height:1.02;letter-spacing:-.03em;overflow-wrap:anywhere}
+.eyebrow{color:#e6f4eb;font-size:clamp(10px,2.4vw,12px)}
+.season-line{font-size:clamp(12px,2.8vw,14px)}
+.hero-profile-actions{max-width:52%;flex-wrap:wrap;justify-content:flex-end}
+.hero-profile-button,.hero-notification-button{backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+
+.top-nav-tabs{
+  position:sticky;top:0;z-index:30;
+  display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;
+  padding:8px max(10px,env(safe-area-inset-left)) 8px max(10px,env(safe-area-inset-right));
+  background:rgba(255,255,255,.97);border-bottom:1px solid var(--gch-line);
+  box-shadow:0 3px 14px rgba(8,68,37,.05);
+}
+.top-nav-tabs::-webkit-scrollbar{display:none}
+.top-nav-tab{flex:0 0 auto;border-radius:10px;padding:9px 12px;color:var(--gch-muted);font-size:12px;font-weight:800}
+.top-nav-tab.active{background:var(--gch-soft-green);color:var(--gch-green-800)}
+
+.content{width:100%;max-width:var(--gch-content-max);margin:0 auto;padding:clamp(16px,3vw,24px) clamp(14px,3.2vw,24px) calc(112px + var(--android-inset-bottom,0px) + env(safe-area-inset-bottom))}
+.section-title-row{align-items:center;margin-bottom:16px}
+.section-title-row h2{font-size:clamp(24px,5vw,32px);line-height:1.08;letter-spacing:-.025em}
+.kicker{color:var(--gch-green-700);font-size:11px;letter-spacing:.08em}
+
+.panel,.match-card,.record-card,.club-result-row,.admin-team-card,.team-member-row,.read-only-card{
+  border-radius:var(--gch-radius-card);
+  border-color:var(--gch-line);
+  box-shadow:var(--gch-shadow-card);
+}
+.panel{padding:clamp(14px,3vw,18px);background:var(--gch-white)}
+.panel h3{font-size:clamp(16px,3.6vw,19px)}
+
+/* Replace the old dark novelty dashboard panel with the common card family. */
+.knight-panel{background:linear-gradient(145deg,#f7fbf8,#e9f5ed)!important;color:var(--gch-ink)!important;border-color:#d8e7dc!important}
+.knight-panel::after{display:none!important}
+.record-label,.record-split span,.record-footer{color:var(--gch-muted)!important}
+.record-split div{background:#fff!important;border-color:#dbe6de!important}
+.record-footer{border-top-color:#dbe6de!important}
+.record-footer b,.record-number,.record-split strong{color:var(--gch-green-900)!important}
+
+.primary-button,.auth-primary,.onboard-next,.badge-picker-button{
+  min-height:48px;border-radius:var(--gch-radius-button)!important;
+  background:linear-gradient(180deg,#188b49 0%,#0d713a 100%)!important;
+  color:#fff!important;box-shadow:var(--gch-shadow-action)!important;font-weight:850!important;
+}
+.secondary-button,.auth-secondary{
+  min-height:46px;border-radius:var(--gch-radius-button)!important;background:#fff!important;
+  border:1.5px solid var(--gch-green-700)!important;color:var(--gch-green-900)!important;font-weight:800!important;
+}
+.danger-button{min-height:44px;border-radius:var(--gch-radius-button)}
+.text-button,.inline-action,.map-link{color:var(--gch-green-700)!important}
+
+input,select,textarea,.auth-field,.onboard-card input,.onboard-card select,.onboard-card textarea{
+  min-height:48px;border-radius:var(--gch-radius-field)!important;border-color:var(--gch-line)!important;background:#fff!important;color:var(--gch-ink)!important;
+}
+textarea{min-height:96px}
+input:focus,select:focus,textarea:focus,.auth-field:focus-within{border-color:var(--gch-green-600)!important;box-shadow:0 0 0 3px rgba(22,136,72,.12)!important}
+label{line-height:1.35}
+
+/* Lists and text must wrap instead of being squeezed/truncated. */
+.match-opponent,.mini-team,.rank-name,.team-member-copy strong,.club-result-score span,.panel p,.helper,.muted{overflow-wrap:anywhere}
+.team-member-copy strong{white-space:normal}
+
+/* Tables may scroll explicitly rather than compress columns to unreadability. */
+.league-table,.table-wrap,.division-table,.responsive-table{display:block;max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.league-table table,.table-wrap table,.division-table table,.responsive-table table{min-width:620px}
+
+/* Navigation remains readable; do not shrink to fit excessive destinations. */
+.bottom-nav{
+  left:50%;transform:translateX(-50%);width:min(960px,100%);
+  padding-left:max(8px,env(safe-area-inset-left));padding-right:max(8px,env(safe-area-inset-right));
+  background:rgba(255,255,255,.98);border-top:1px solid var(--gch-line);box-shadow:0 -7px 24px rgba(6,62,34,.08)
+}
+.bottom-nav .nav-item{min-width:56px;min-height:52px;color:var(--gch-muted);font-size:11px;line-height:1.15}
+.bottom-nav .nav-item.active{color:var(--gch-green-800)}
+
+/* ---------- Authentication — v1.1 responsive + imagery correction ---------- */
+body.auth-open{
+  overflow:auto!important;
+  background:var(--gch-canvas)!important;
+}
+body.auth-open #activation-gate{
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  align-items:flex-start!important;
+  justify-content:center!important;
+  background:var(--gch-canvas)!important;
+  -webkit-overflow-scrolling:touch;
+  padding:0!important;
+}
+.auth-showcase{
+  width:min(520px,100%)!important;
+  min-height:100dvh!important;
+  height:auto!important;
+  margin:0 auto!important;
+  padding-top:0!important;
+  overflow:visible!important;
+  background:#fff!important;
+  box-shadow:0 0 46px rgba(22,64,37,.10)!important;
+}
+/* Safe-area inset is applied exactly once, here. Native code converts physical px to CSS px. */
+.auth-brand{
+  min-height:78px!important;
+  padding:calc(10px + var(--android-inset-top,0px)) 20px 10px!important;
+  background:#fff!important;
+}
+.auth-brand img{width:50px!important;height:56px!important}
+.auth-brand-copy strong{font-size:24px!important;line-height:.98!important}
+.auth-brand-copy small{font-size:7px!important;margin-top:6px!important}
+.auth-back{
+  top:calc(8px + var(--android-inset-top,0px))!important;
+  left:10px!important;
+}
+.auth-scene{
+  position:relative!important;
+  width:100%!important;
+  height:clamp(168px,42vw,220px)!important;
+  flex:0 0 auto!important;
+  background-size:cover!important;
+  background-repeat:no-repeat!important;
+  background-position:center 50%!important;
+  overflow:hidden!important;
+}
+.auth-adult .auth-scene,
+.auth-player .auth-scene,
+.auth-club .auth-scene{
+  background-image:url('football-login-adult.jpg')!important;
+}
+.auth-player .auth-scene{background-position:center 48%!important}
+.auth-club .auth-scene{background-position:center 46%!important}
+.auth-scene:after{
+  content:""!important;
+  position:absolute!important;
+  inset:0!important;
+  background:linear-gradient(to bottom,rgba(0,0,0,0) 0%,rgba(0,0,0,.02) 72%,rgba(255,255,255,.10) 100%)!important;
+  pointer-events:none!important;
+}
+/* The approved generated hero already contains the handwritten brand accent. Never duplicate it in DOM/CSS. */
+.auth-scene-note{display:none!important}
+.auth-main{
+  margin-top:0!important;
+  padding:18px clamp(18px,5vw,26px) 26px!important;
+  background:#fff!important;
+}
+.auth-main h1,.auth-simple-card h1{
+  font-size:clamp(29px,7.2vw,36px)!important;
+  line-height:1.04!important;
+  margin:0!important;
+}
+.auth-lead{
+  font-size:clamp(14px,3.4vw,16px)!important;
+  line-height:1.45!important;
+  margin:9px auto 20px!important;
+}
+.auth-fields{gap:11px!important}
+.auth-field{min-height:56px!important;border-radius:12px!important}
+.auth-field input,.auth-field select{
+  height:54px!important;
+  font-size:15px!important;
+}
+.auth-eye{height:52px!important}
+.auth-forgot{font-size:13px!important;margin:9px 0 18px auto!important}
+.auth-primary,.auth-secondary{
+  min-height:56px!important;
+  border-radius:12px!important;
+  font-size:16px!important;
+}
+.auth-caption{font-size:12px!important;line-height:1.5!important}
+.auth-divider{margin:20px 4px 14px!important}
+/* No second decorative/photographic strip beneath the form. It was visually noisy and could expose low-res imagery. */
+.auth-grass-footer{
+  margin-top:auto!important;
+  min-height:52px!important;
+  padding:14px 16px calc(14px + var(--android-inset-bottom,0px) + env(safe-area-inset-bottom))!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  color:var(--gch-green-900)!important;
+  background:linear-gradient(180deg,#f7fbf8 0%,var(--gch-soft-green) 100%)!important;
+  border-top:1px solid #dce8df!important;
+}
+.auth-grass-footer:before,.auth-grass-footer:after{display:none!important}
+.auth-grass-footer span{
+  color:var(--gch-green-900)!important;
+  font-size:9px!important;
+  letter-spacing:.18em!important;
+  line-height:1.35!important;
+}
+
+/* Small/short phones scroll naturally; controls never shrink below the minimum touch size. */
+@media(max-width:374px){
+  .auth-brand{padding-left:14px!important;padding-right:14px!important}
+  .auth-brand img{width:46px!important;height:52px!important}
+  .auth-brand-copy strong{font-size:22px!important}
+  .auth-brand-copy small{font-size:6.5px!important;white-space:normal!important;line-height:1.25!important}
+  .auth-scene{height:164px!important}
+  .auth-main{padding:16px 16px 22px!important}
+  .auth-main h1{font-size:28px!important}
+}
+@media(max-height:730px){
+  .auth-showcase{min-height:100dvh!important}
+  .auth-scene{height:160px!important}
+  .auth-main{padding-top:15px!important}
+  .auth-field{min-height:54px!important}
+  .auth-field input,.auth-field select{height:52px!important}
+  .auth-primary,.auth-secondary{min-height:54px!important}
+}
+
+/* Foldables / small tablets: keep the stack but allow more breathing room. */
+@media(min-width:600px) and (max-width:899px) and (orientation:portrait){
+  body.auth-open #activation-gate{padding:16px 0!important}
+  .auth-showcase{
+    width:min(620px,calc(100% - 32px))!important;
+    min-height:calc(100dvh - 32px)!important;
+    border-radius:22px!important;
+    overflow:hidden!important;
+  }
+  .auth-scene{height:250px!important}
+  .auth-main{padding:24px 34px 30px!important}
+}
+
+/* Large tablets / web: use a deliberate two-panel composition rather than stretching a phone layout. */
+@media(min-width:900px){
+  body.auth-open #activation-gate{padding:20px!important;align-items:center!important}
+  .auth-showcase{
+    width:min(980px,calc(100vw - 40px))!important;
+    min-height:min(760px,calc(100dvh - 40px))!important;
+    display:grid!important;
+    grid-template-columns:minmax(0,1.08fr) minmax(380px,.92fr)!important;
+    grid-template-rows:auto 1fr auto!important;
+    border-radius:24px!important;
+    overflow:hidden!important;
+  }
+  .auth-brand{grid-column:1/-1!important;grid-row:1!important}
+  .auth-scene{
+    grid-column:1!important;
+    grid-row:2!important;
+    width:100%!important;
+    height:100%!important;
+    min-height:560px!important;
+  }
+  .auth-main{
+    grid-column:2!important;
+    grid-row:2!important;
+    margin:0!important;
+    padding:36px 40px!important;
+    display:flex!important;
+    flex-direction:column!important;
+    justify-content:center!important;
+  }
+  .auth-grass-footer{grid-column:1/-1!important;grid-row:3!important}
+}
+
+/* Landscape phones: preserve readable controls using the same split strategy when height is scarce. */
+@media(orientation:landscape) and (min-width:600px) and (max-height:620px){
+  body.auth-open #activation-gate{padding:0!important;display:flex!important}
+  .auth-showcase{
+    width:100%!important;
+    max-width:none!important;
+    min-height:100dvh!important;
+    display:grid!important;
+    grid-template-columns:minmax(280px,.92fr) minmax(360px,1.08fr)!important;
+    grid-template-rows:auto 1fr!important;
+    border-radius:0!important;
+    overflow:visible!important;
+  }
+  .auth-brand{grid-column:1/-1!important;grid-row:1!important;min-height:68px!important;padding-top:calc(6px + var(--android-inset-top,0px))!important;padding-bottom:6px!important}
+  .auth-scene{grid-column:1!important;grid-row:2!important;height:100%!important;min-height:330px!important}
+  .auth-main{grid-column:2!important;grid-row:2!important;padding:18px 28px 24px!important;justify-content:flex-start!important}
+  .auth-grass-footer{display:none!important}
+}
+
+/* ---------- Onboarding ---------- */
+.universal-onboarding{background:var(--gch-canvas)!important;color:var(--gch-ink)!important}
+.onboard-shell{max-width:960px!important;background:#fff!important;border-color:var(--gch-line)!important;border-radius:22px!important}
+.onboard-main{background:#fff!important}
+.onboard-card{border-radius:var(--gch-radius-card)!important;background:#fbfdfb!important;border-color:#dce7df!important}
+.onboard-heading h1{font-size:clamp(28px,6vw,38px)!important;line-height:1.08!important}
+.setup-choice,.provider-option,.provider-route-step,.provider-result,.team-row,.onboard-rule-card{border-radius:14px!important}
+
+/* ---------- Responsive structure ---------- */
+@media(max-width:899px){
+  .app-shell{max-width:100%}
+  .content{max-width:760px}
+}
+
+@media(max-width:680px){
+  .record-card{grid-template-columns:1fr!important;gap:14px!important}
+  .record-footer{grid-column:auto!important;grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  .running-count-grid,.form-grid.two,.next-match-grid,.filter-bar,.score-entry,.dashboard-grid,.club-result-score{grid-template-columns:1fr!important}
+  .match-card{grid-template-columns:auto minmax(0,1fr)!important}
+  .match-score{grid-column:2!important;text-align:left!important}
+  .match-actions{grid-column:1/-1!important;justify-content:flex-start!important;flex-wrap:wrap!important}
+  .scorer-grid{grid-template-columns:1fr!important}
+  .hero-profile-actions{position:static!important;max-width:none!important;margin-top:12px!important;justify-content:flex-start!important}
+  body.admin-club-mode .hero-copy,body.admin-coach-mode .hero-copy,body.admin-preview-mode .hero-copy{padding-right:0!important}
+}
+
+@media(max-width:520px){
+  .content{padding-left:14px;padding-right:14px}
+  .hero{padding-left:14px;padding-right:14px;border-radius:0 0 20px 20px}
+  .hero-inner{grid-template-columns:64px minmax(0,1fr)}
+  .club-logo-wrap{width:64px;height:64px;border-radius:14px}
+  .top-nav-tab{padding:8px 10px}
+  .panel,.match-card,.record-card{border-radius:16px}
+  .form-row,.fixture-ack-actions,.next-match-links,.team-member-actions{flex-wrap:wrap}
+  .form-row>*{flex:1 1 100%}
+}
+
+@media(max-width:374px){
+  .content{padding-left:12px;padding-right:12px}
+  .auth-main{padding-left:16px!important;padding-right:16px!important}
+  .auth-brand-copy strong{font-size:22px!important}
+  .auth-brand-copy small{white-space:normal!important;line-height:1.25!important}
+  .auth-scene-note{right:16px!important;font-size:17px!important}
+  .bottom-nav{overflow-x:auto;justify-content:flex-start}
+  .bottom-nav .nav-item{flex:0 0 64px!important}
+}
+
+@media(min-width:600px){
+  .content{padding-left:24px;padding-right:24px}
+  .running-count-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .dashboard-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+  .onboard-grid{gap:16px}
+}
+
+@media(min-width:900px){
+  .content{padding-left:30px;padding-right:30px}
+  .hero{border-radius:0 0 28px 28px}
+  .form-grid.two{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+
+/* Landscape: keep readable sizes and allow scroll rather than squeeze. */
+@media(orientation:landscape) and (max-height:560px){
+  .hero{min-height:132px}
+  .auth-showcase{min-height:auto!important}
+  .auth-scene{height:150px!important}
+  body.auth-open #activation-gate{display:block!important}
+}
+
+
+/* ---------- v1.1 app-wide responsive integrity ---------- */
+.app-shell,.content,.panel,.match-card,.record-card,.admin-team-card,.team-member-row,.onboard-shell,.onboard-card{min-width:0}
+.content>*{max-width:100%;min-width:0}
+input,select,textarea,button{max-width:100%}
+svg,canvas,video{max-width:100%}
+.hero-copy,.team-member-copy,.match-main,.panel,.form-grid>*{min-width:0}
+
+/* Independent card grids expand and collapse instead of becoming cramped. */
+@media(min-width:681px){
+  .dashboard-grid,.running-count-grid{grid-template-columns:repeat(auto-fit,minmax(240px,1fr))!important}
+}
+@media(max-width:360px){
+  .content{padding-left:12px!important;padding-right:12px!important}
+  .hero{padding-left:12px!important;padding-right:12px!important}
+  .primary-button,.secondary-button,.danger-button{width:100%}
+  .section-title-row{gap:8px;flex-wrap:wrap}
+}
+
+/* No content-bearing fixed-height region may hide overflow. */
+.panel,.record-card,.match-card,.admin-team-card,.team-member-row{height:auto!important}
+
+/* Android/foldable safe areas: values are already normalized to CSS px by MainActivity. */
+:root{
+  --gch-safe-top:var(--android-inset-top,0px);
+  --gch-safe-bottom:var(--android-inset-bottom,0px);
+}
+
+
+/* v1.4 PitchKind visual-identity integration */
+.auth-brand{justify-content:center!important;min-height:96px!important;padding:calc(10px + var(--android-inset-top,0px)) 18px 8px!important}
+.auth-brand .auth-brand-lockup,.auth-brand>img{width:min(370px,86vw)!important;height:auto!important;max-height:96px!important;object-fit:contain!important;flex:0 1 auto!important}
+.auth-brand-copy{display:none!important}
+.club-logo-wrap.platform-club-placeholder .club-logo{width:82%!important;height:82%!important;object-fit:contain!important}
+.gch-about-card{overflow:hidden!important;padding:0!important;background:#fff!important}
+.gch-about-banner{display:block;width:min(320px,82%);height:auto;max-height:180px;object-fit:contain;background:var(--gch-white);margin:16px auto 0}
+.gch-about-copy{display:grid;gap:4px;padding:14px 16px 16px}
+.gch-about-copy strong{color:var(--gch-green-900);font-size:17px;font-weight:900}
+.gch-about-copy span{color:var(--gch-green-700);font-size:10px;font-weight:900;letter-spacing:.12em}
+.gch-about-copy small{color:var(--gch-muted);font-size:12px;font-weight:650}
+@media(max-width:374px){.auth-brand{min-height:88px!important}.auth-brand .auth-brand-lockup,.auth-brand>img{width:min(330px,88vw)!important;max-height:84px!important}}
+@media(min-width:600px){.auth-brand .auth-brand-lockup,.auth-brand>img{width:min(410px,70vw)!important}}

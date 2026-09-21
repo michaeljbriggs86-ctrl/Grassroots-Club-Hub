@@ -1,0 +1,98 @@
+#!/usr/bin/env python3
+from pathlib import Path
+import hashlib, json, re, struct, sys
+root=Path(__file__).resolve().parents[1]
+assets=root/'app/src/main/assets'
+fail=[]; passed=0
+
+def check(name, cond):
+    global passed
+    if cond: passed+=1; print('PASS',name)
+    else: fail.append(name); print('FAIL',name)
+
+def txt(p): return (root/p).read_text(encoding='utf-8')
+def sha(p): return hashlib.sha256((root/p).read_bytes()).hexdigest()
+
+gradle=txt('app/build.gradle')
+main=txt('app/src/main/java/com/grassrootsclubhub/universal/MainActivity.java')
+strings=txt('app/src/main/res/values/strings.xml')
+index=txt('app/src/main/assets/index.html')
+app=txt('app/src/main/assets/app.js')
+cloud=txt('app/src/main/assets/cloud.js')
+onboard=txt('app/src/main/assets/onboarding.js')
+sw=txt('app/src/main/assets/service-worker.js')
+manifest=json.loads(txt('app/src/main/assets/manifest.json'))
+
+check('versionCode 2208','versionCode 2208' in gradle)
+check('versionName 2.2.8',"versionName '2.2.8'" in gradle)
+check('applicationId preserved',"applicationId 'com.grassrootsclubhub.universal'" in gradle)
+check('native marker version','GrassrootsClubHub/2.2.8' in main)
+check('auth scheme preserved','"grassrootsclubhub".equalsIgnoreCase' in main and 'android:scheme="grassrootsclubhub"' in txt('app/src/main/AndroidManifest.xml'))
+check('ClubHubNative preserved','"ClubHubNative"' in main)
+check('static feed host preserved','raw.githubusercontent.com' in main and 'Grassroots-Club-Hub/main/data/directory.json' in main and 'Grassroots-Club-Hub/main/data/results.json' in main)
+check('Android app label PitchKind','>PitchKind<' in strings)
+check('HTML title PitchKind','<title>PitchKind</title>' in index)
+check('About version 2.2.8','App version 2.2.8' in index)
+check('manifest name PitchKind',manifest.get('name')=='PitchKind' and manifest.get('short_name')=='PitchKind')
+check('manifest version 2.2.8',manifest.get('version')=='2.2.8')
+check('v1.4 marker','approved-app-ui-2026-09-21-v1.4-pitchkind' in cloud and 'approved-app-ui-2026-09-21-v1.4-pitchkind' in txt('app/src/main/assets/app-design-system.css'))
+
+hashes={
+ 'pitchkind-wt_logo-primary.svg':'5b8ef5b72e2d6d1b283a0a489f27fd33faedafc3b57ea1027dd5fbd9b9b5e900',
+ 'pitchkind-wt_logo-reverse.svg':'54beb69b69e226edf24861db56bf8afab17badf7b4b32f3f78e33be8be1614d9',
+ 'pitchkind-wt_mark.svg':'bcf214780a10b7c682c0cde92475c948151ffc772c457a837c30765df81a3efb',
+ 'pitchkind-wt_mark-reverse.svg':'7978318a04a1a09964410a596e1168406e75ecc80e89808612e516d892b342f2',
+ 'pitchkind-wt_app-icon.svg':'ddab3592640bc05e7974d474e0f06dae1a104bc5478b7920eb08e0be6173a754',
+ 'pitchkind-wt_app-icon-foreground.svg':'dcd648d4f93efe3f7ba7be200d58baaace7cd29323b6cff704c28cb8ec803c4f',
+}
+for name,want in hashes.items():
+    check(name+' exact approved bytes', (assets/name).exists() and sha('app/src/main/assets/'+name)==want)
+
+active_text='\n'.join([index,app,cloud,onboard,sw,txt('app/src/main/assets/app-design-system.css'),txt('app/src/main/assets/onboarding.css')])
+check('no retired official tagline in active UI','CONNECT • ORGANISE • GROW THE GAME' not in active_text)
+check('no More Than A Game text in active UI','More Than A Game' not in active_text)
+check('no retired visual asset refs',not re.search(r'(?<![A-Za-z0-9_-])gch-(?:logo|mark|banner|app-icon)', active_text))
+check('splash uses reverse PitchKind logo','pitchkind-wt_logo-reverse.svg' in index)
+check('auth uses primary PitchKind logo','pitchkind-wt_logo-primary.svg' in cloud)
+check('onboarding uses primary PitchKind logo','pitchkind-wt_logo-primary.svg' in onboard)
+check('fallback uses PitchKind mark',"img.src=logo||'pitchkind-wt_mark.svg'" in app)
+check('demo club does not masquerade platform mark as club badge',"logo_asset:''" in cloud)
+check('service worker caches PitchKind assets','pitchkind-wt_logo-primary.svg' in sw and 'gch-logo-primary.svg' not in sw)
+
+# Image dimensions without external libraries.
+def png_size(p):
+    b=p.read_bytes()[:24]
+    if b[:8]!=b'\x89PNG\r\n\x1a\n': return None
+    return struct.unpack('>II',b[16:24])
+def jpeg_size(p):
+    data=p.read_bytes(); i=2
+    if data[:2]!=b'\xff\xd8': return None
+    while i < len(data)-9:
+        if data[i]!=0xFF: i+=1; continue
+        marker=data[i+1]; i+=2
+        if marker in (0xD8,0xD9): continue
+        if i+2>len(data): break
+        ln=int.from_bytes(data[i:i+2],'big')
+        if marker in range(0xC0,0xC4):
+            h=int.from_bytes(data[i+3:i+5],'big'); w=int.from_bytes(data[i+5:i+7],'big'); return (w,h)
+        i+=ln
+    return None
+for name,size in {'icon-192.png':(192,192),'icon-512.png':(512,512),'icon-maskable-512.png':(512,512)}.items():
+    check(name+' dimensions',png_size(assets/name)==size)
+for name in ['football-login-adult.jpg','football-login-player.jpg','football-login-club.jpg','football-pitch-hero.jpg']:
+    check(name+' 2048x740',jpeg_size(assets/name)==(2048,740))
+
+for density,size in {'mdpi':48,'hdpi':72,'xhdpi':96,'xxhdpi':144,'xxxhdpi':192}.items():
+    for name in ['ic_launcher.png','ic_launcher_round.png']:
+        check(f'{density}/{name} dimensions',png_size(root/f'app/src/main/res/mipmap-{density}/{name}')==(size,size))
+
+check('single APK workflow',(root/'.github/workflows/build-apk.yml').exists() and len(list((root/'.github/workflows').glob('build-apk*.y*ml')))==1)
+check('current UI guide bundled',(root/'APP-UI-DESIGN-GUIDELINES.md').exists() and 'Version 1.4' in txt('APP-UI-DESIGN-GUIDELINES.md'))
+check('brand guide bundled',(root/'BRAND-GUIDELINES.md').exists() and 'Version 1.0' in txt('BRAND-GUIDELINES.md'))
+check('image provenance bundled',(root/'IMAGE-PROVENANCE-v2.2.8.md').exists())
+
+print(f'\n{passed} passed; {len(fail)} failed')
+if fail:
+    print('Failures:')
+    for x in fail: print('-',x)
+    sys.exit(1)

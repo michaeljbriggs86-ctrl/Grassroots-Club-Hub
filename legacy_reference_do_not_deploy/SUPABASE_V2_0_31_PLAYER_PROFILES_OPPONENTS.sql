@@ -1,0 +1,18 @@
+-- AI COLLABORATION PROTOCOL NOTE — 2026-09-19
+-- STATUS: WRITTEN historical reference only; DO NOT DEPLOY.
+-- Any older 'live'/'deployed' wording below is a historical note and is not a current deployment claim.
+
+-- Documentation only: the v2.0.31 database migrations have already been applied
+-- to the Grassroots Club Hub Supabase project.
+--
+-- Main live changes:
+--   * public.selkent_team_directory (RLS, authenticated read)
+--   * match_availability unique(team_id, fixture_key, player_name)
+--   * shared parent/player availability RLS
+--   * public.player_account_links
+--   * profiles/invitations support role = 'player'
+--   * player invites limited to teams U15 and below
+--   * mark_my_player_pin_set() and mark_my_pending_parent_pin_set()
+--   * notifications include player accounts
+--   * authenticated SELECT/INSERT access revoked from public.club_messages
+--   * Selkent synchronisation handled by Edge Function selkent-teams-sync v3

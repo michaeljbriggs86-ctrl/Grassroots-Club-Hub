@@ -1,0 +1,44 @@
+Grassroots Club Hub Android Universal v2.2.2 — Static Feed Build
+Date: 19 September 2026
+
+Protocol status
+  BUILT — verified by inspecting the actual APK on 2026-09-19.
+  DEPLOYED-LIVE — NOT VERIFIED.
+
+Verified APK evidence
+- Version marker: GrassrootsClubHub/2.2.2
+- assets/static-feed-overlay.js: present
+- index.html reference to static-feed-overlay.js: present
+- Native bridge allowlists only the approved GitHub Raw directory/results paths
+  for static-feed requests.
+- v2.2.2 APK SHA-256:
+  c38dea003e8f5f2342188fd5afa806b744cdf9a3275a2788aa4db09d5d84e246
+
+Static-feed changes
+- BUILT: directory/division membership via data/directory.json.
+- BUILT: U12+ standings via schema-v2 data/results.json.
+- PLANNED: static fixture cutover after real populated fixture markup is captured
+  and tested.
+- PLANNED: static published-result cutover after real populated U12+ result markup
+  is captured and tested.
+- Temporary live Selkent fixture/result fallbacks remain deliberately isolated.
+
+Release-pipeline finding
+- A separate legacy 2.2.1 APK was also BUILT by the old workflow.
+- The downloaded artifact Grassroots-Club-Hub-APK (11).zip is that 2.2.1 build.
+- It does not contain static-feed-overlay.js.
+- Therefore static-feed integration must not be described as DEPLOYED-LIVE until
+  the exact distributed/installed APK is verified.
+
+2.2.1 base retained
+- Selkent/manual onboarding scope.
+- U7-U11 public result suppression and private-stat handling.
+- Role-based inbox/access restrictions.
+- Safeguarding/dispute routing rules.
+- Native WebView hardening and browser handoff rules.
+- Live Supabase RPC contract verified separately on 2026-09-18.
+
+Build
+- Source package workflow: .github/workflows/android.yml
+- Debug task: gradle :app:assembleDebug
+- Workflow source must remain readable; no base64-embedded Java/JS patch payloads.

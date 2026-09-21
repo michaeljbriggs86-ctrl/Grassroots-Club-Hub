@@ -1,0 +1,42 @@
+Grassroots Club Hub v2.2.6 — Responsive & Imagery Corrections
+
+Status at source package creation: WRITTEN + TESTED at source level. APK status requires separate artifact build/inspection.
+
+Reason for revision
+Installed-device review of v2.2.5 showed three unacceptable defects:
+1. a large blank area above the Grassroots Club Hub logo on high-density Android devices;
+2. visibly low-resolution/blurred football hero imagery;
+3. layout behaviour that still felt stretched/cramped rather than intentionally responsive.
+
+Root cause fixed
+- Android WindowInsets were physical pixels but were written directly into WebView CSS variables.
+- The same top inset was also being added in more than one auth layer.
+- Earlier generated hero exports were only 1400x720 and highly compressed (~100 KB), with visible blur.
+
+v2.2.6 corrections
+- MainActivity converts physical insets by Android display density before exposing CSS px.
+- Defensive safe-area limits are applied (top 56 CSS px, bottom 72 CSS px).
+- Authentication shell no longer reapplies the top inset; the brand header owns it exactly once.
+- Hero files replaced with generated 2048x740 JPEG assets (~560 KB each, high-quality encoding).
+- Auth DOM no longer adds a duplicate handwritten slogan over hero art.
+- The second photographic footer strip is removed.
+- Fields/buttons remain 54–56 px minimum on short screens.
+- Small phones scroll naturally.
+- Foldable/small-tablet portrait receives a wider stacked layout.
+- 900+ CSS px layouts use an intentional image/form split.
+- Short landscape layouts use a dedicated split layout.
+- App-wide overflow/wrapping/min-width protections strengthened for cards/forms/navigation/tables.
+
+Governing UI standard
+APP-UI-DESIGN-GUIDELINES v1.1 — Responsive & Imagery Corrections.
+Code marker: approved-app-ui-2026-09-19-v1.1-responsive-imagery
+No deviations. No exceptions unless explicitly discussed and approved by Mike.
+
+Verification
+- 42/42 v2.2.6 source checks passed.
+- JavaScript syntax checks passed for cloud.js, onboarding.js, app.js and static-feed-overlay.js.
+- CSS braces balanced.
+- High-resolution JPEG guards passed.
+
+Backend/data scope
+No backend or data-source authority expansion is introduced by this revision. U15 Player Access backend remains WRITTEN / NOT DEPLOYED.

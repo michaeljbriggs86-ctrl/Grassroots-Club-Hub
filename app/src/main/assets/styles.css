@@ -1,0 +1,884 @@
+:root{
+  --green:#218a21;
+  --green-2:#145f19;
+  --green-3:#e8f5e8;
+  --ink:#111715;
+  --muted:#66756d;
+  --bg:#f3f6f4;
+  --white:#ffffff;
+  --win:#17924a;
+  --draw:#8a8f94;
+  --loss:#c9473b;
+  --radius:22px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+body{min-height:100vh}
+body.role-parent [data-requires-edit]{display:none!important}
+body.role-parent .editable-inputs input,
+body.role-parent .editable-inputs select,
+body.role-parent .editable-inputs textarea{pointer-events:none}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+.app-shell{width:min(820px,100%);margin:0 auto;min-height:100vh;position:relative;background:var(--bg)}
+.hero{position:relative;overflow:hidden;padding:18px 18px 18px;background:linear-gradient(145deg,#050a06 0%,#111713 40%,var(--green) 100%);color:#fff;border-bottom-left-radius:28px;border-bottom-right-radius:28px;box-shadow:0 10px 34px rgba(0,0,0,.18)}
+.hero-pattern{position:absolute;inset:0;background:radial-gradient(circle at 14% 18%,rgba(255,255,255,.11) 0 3px,transparent 4px),radial-gradient(circle at 88% 22%,rgba(255,255,255,.08) 0 4px,transparent 5px),radial-gradient(circle at 70% 85%,rgba(255,255,255,.05) 0 4px,transparent 5px);opacity:.55;pointer-events:none}
+.hero-topbar{position:relative;z-index:1;display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}
+.mode-pill{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.16);border-radius:999px;padding:8px 12px;font-size:12px;font-weight:900;letter-spacing:.3px}
+.hero-inner{position:relative;z-index:1;display:grid;grid-template-columns:92px 1fr;gap:14px;align-items:center}
+.club-logo-wrap{width:92px;height:92px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.1);border:2px solid rgba(255,255,255,.18);box-shadow:inset 0 0 0 6px rgba(255,255,255,.04)}
+.club-logo{width:88px;height:88px;object-fit:contain;border-radius:50%;filter:drop-shadow(0 4px 7px rgba(0,0,0,.22))}
+.hero-copy h1{margin:2px 0 4px;font-size:36px;line-height:.94;font-weight:1000;letter-spacing:.8px}
+.eyebrow{margin:0;color:#cfe7d4;font-size:11px;font-weight:900;letter-spacing:1.5px}.season-line{margin:0;color:#edf7f0;font-size:13px;font-weight:700}
+.hero-subrow{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px}.hero-badge{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.14);padding:6px 10px;border-radius:999px;font-size:11px;font-weight:850;color:#f3fbf5}
+.brand-mark{width:72px;height:81px;display:grid;place-items:center;opacity:.82}.brand-mark svg{width:100%;height:100%}.shield-fill{fill:#fff}.shield-line,.helmet,.neck,.ball-line{fill:none;stroke:#fff;stroke-width:3}.visor,.ball{fill:#0e1512}.visor-cut{fill:#fff}.plume,.sword{fill:#31b64b}.role-banner{position:relative;z-index:1;margin-top:14px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.12);padding:10px 12px;border-radius:14px;font-size:12px;font-weight:800;color:#edf8f0}
+.content{padding:18px 16px calc(118px + env(safe-area-inset-bottom))}.view{display:none}.view.active{display:block}.section-title-row{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin:0 0 14px}.section-title-row h2{margin:3px 0 0;font-size:28px;line-height:1;font-weight:1000}.kicker{margin:0;color:var(--muted);font-size:12px;font-weight:900;letter-spacing:1px;text-transform:uppercase}
+.icon-button,.text-button{appearance:none;border:0;background:#fff;border-radius:14px;padding:10px 12px;font-size:22px;box-shadow:none}.text-button{border:0;background:none;color:var(--green);font-weight:850;padding:6px;font-size:14px}.hidden{display:none!important}
+.primary-button,.secondary-button,.danger-button{border:0;border-radius:14px;padding:13px 16px;font-weight:900}.primary-button{background:var(--green);color:#fff;box-shadow:0 7px 16px rgba(11,95,58,.22)}.primary-button.compact,.secondary-button.compact{padding:10px 15px}.primary-button.large{width:100%;padding:16px;font-size:16px}.secondary-button{background:#eef2ef;color:var(--ink);border:1px solid #d8dfda}.secondary-button.tiny{padding:8px 10px;font-size:12px}.danger-button{background:#fbe8e6;color:#8d2e29}
+.panel{background:var(--white);border:1px solid #e2e8e4;border-radius:var(--radius);padding:17px;margin-bottom:14px;box-shadow:0 6px 18px rgba(9,45,27,.055)}.panel h3{margin:0 0 12px;font-size:17px}.panel-heading{display:flex;align-items:center;justify-content:space-between;gap:12px}.panel-heading h3{margin:0}.muted,.helper{color:var(--muted)}.helper{font-size:12px}.small-text{font-size:12px}.shield-mini{background:var(--green-3);color:var(--green);width:31px;height:31px;border-radius:10px;display:grid;place-items:center;font-weight:900}
+.knight-panel{background:linear-gradient(135deg,#0d1712,#17271d);color:#fff;border-color:#17271d;position:relative;overflow:hidden}.knight-panel::after{content:"⚔";position:absolute;right:12px;top:-22px;font-size:108px;color:rgba(255,255,255,.04);transform:rotate(-25deg)}
+.record-card{display:grid;grid-template-columns:1fr 1.7fr;gap:18px;padding:20px}.record-main{display:flex;flex-direction:column}.record-number{font-size:58px;font-weight:1000;line-height:.86}.record-label{font-size:11px;letter-spacing:2px;color:#b9c7be;font-weight:900;margin-top:8px}.record-split{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;align-self:center}.record-split div{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:11px 8px;text-align:center}.record-split strong{display:block;font-size:24px}.record-split span{font-size:11px;color:#b8c8be;font-weight:900}.record-footer{grid-column:1/-1;display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding-top:14px;border-top:1px solid rgba(255,255,255,.1);font-size:11px;color:#bac7bf;text-align:center}.record-footer b{display:block;color:#fff;font-size:16px}
+.dashboard-grid{display:grid;grid-template-columns:1fr;gap:0}.form-row{display:flex;gap:8px;margin:14px 0}.form-chip{width:34px;height:34px;border-radius:10px;color:#fff;display:grid;place-items:center;font-weight:1000}.form-chip.W{background:var(--win)}.form-chip.D{background:var(--draw)}.form-chip.L{background:var(--loss)}.form-empty{color:var(--muted);font-size:13px}
+.mini-list,.ranking-list,.award-list{display:flex;flex-direction:column}.mini-item,.rank-item,.award-item{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 0;border-top:1px solid #edf1ee}.mini-item:first-child,.rank-item:first-child,.award-item:first-child{border-top:0}.mini-team{font-weight:800}.mini-meta{font-size:12px;color:var(--muted)}.scoreline{font-weight:1000;font-size:17px;white-space:nowrap}.rank-left{display:flex;align-items:center;gap:10px}.rank-no{width:28px;height:28px;border-radius:9px;background:#eef4f0;color:var(--green);display:grid;place-items:center;font-weight:1000;font-size:12px}.rank-name{font-weight:850}.rank-value{font-weight:1000;color:var(--green)}.next-action-panel{background:linear-gradient(135deg,#e3f2e9,#f8fbf9);border-color:#cfe5d7}.next-action-panel p:not(.kicker){color:#4d5e54;margin:0 0 15px}
+.filter-bar{display:grid;grid-template-columns:1.4fr 1fr;gap:9px;margin-bottom:14px}.filter-bar input,.filter-bar select,input,select,textarea{width:100%;border:1px solid #d8e0da;border-radius:12px;background:#fff;color:var(--ink);padding:12px;outline:none}.filter-bar input:focus,.filter-bar select:focus,input:focus,select:focus,textarea:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(11,95,58,.1)}
+.match-list{display:flex;flex-direction:column;gap:11px}.match-card{background:#fff;border:1px solid #e0e7e2;border-radius:18px;padding:15px;display:grid;grid-template-columns:auto 1fr auto;gap:13px;align-items:center;box-shadow:0 4px 12px rgba(9,45,27,.04)}.result-badge{width:39px;height:39px;border-radius:12px;display:grid;place-items:center;color:#fff;font-weight:1000}.result-badge.W{background:var(--win)}.result-badge.D{background:var(--draw)}.result-badge.L{background:var(--loss)}.match-opponent{font-weight:900;font-size:15px}.match-meta{font-size:11.5px;color:var(--muted);margin-top:3px}.match-score{font-size:22px;font-weight:1000;white-space:nowrap;text-align:right}.match-actions{grid-column:2/-1;display:flex;gap:12px;justify-content:flex-end;margin-top:-2px}.inline-action{border:0;background:none;color:var(--green);font-weight:850;font-size:12px;padding:3px}.inline-action.delete{color:#9f3c36}
+.form-stack{display:flex;flex-direction:column;gap:0}.form-panel h3{margin-bottom:14px}.form-grid{display:grid;grid-template-columns:1fr;gap:12px}.form-grid.two{grid-template-columns:1fr 1fr}.form-panel label,.modal label{display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:850;color:#405047}.score-entry{display:grid;grid-template-columns:1fr auto 1fr;align-items:end;gap:12px;margin:14px 0}.score-entry span{font-size:26px;font-weight:1000;padding-bottom:10px}.score-entry input{text-align:center;font-size:27px;font-weight:1000}.scorer-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}.scorer-row{display:grid;grid-template-columns:1fr 66px;gap:8px;align-items:center;background:#f5f8f6;border-radius:12px;padding:9px 10px}.scorer-player{font-weight:800;font-size:13px}.shirt-tag{color:var(--green);font-size:11px;font-weight:1000;margin-right:5px}.scorer-row input{text-align:center;padding:8px}.goal-check{margin-top:12px;border-radius:10px;background:#eef3f0;padding:10px 12px;font-size:12px;font-weight:850;color:#54655b}.goal-check.good{background:#e3f4e9;color:#09693b}.goal-check.bad{background:#fae9e7;color:#913d36}
+.read-only-card{margin-bottom:12px;background:#fff7e7;border:1px solid #f3d69a;color:#775a13;padding:12px 14px;border-radius:16px;font-size:13px;font-weight:800}
+.squad-banner{display:flex;align-items:center;justify-content:space-between;gap:20px;background:linear-gradient(135deg,#0c422b,var(--green));color:#fff}.squad-banner p{margin:0;color:#d9e9df;font-size:12px;max-width:330px}.squad-count strong{display:block;font-size:34px;line-height:1}.squad-count span{font-size:11px;color:#d9e9df}.squad-list{display:grid;grid-template-columns:1fr;gap:9px}.player-card{background:#fff;border:1px solid #e1e7e3;border-radius:16px;padding:12px 14px;display:grid;grid-template-columns:46px 1fr auto;align-items:center;gap:12px}.shirt-circle{width:46px;height:46px;border-radius:14px;background:var(--ink);color:#fff;display:grid;place-items:center;font-size:18px;font-weight:1000;border:3px solid #d7e2db}.player-name{font-weight:950}.player-sub{font-size:11px;color:var(--muted);margin-top:2px}.player-card.vacant{background:#f7f9f8;border-style:dashed}.player-card.vacant .shirt-circle{background:#dfe5e1;color:#66736b}.player-card.vacant .player-name{color:#7d8982;font-weight:700}.player-edit{border:0;background:#edf4ef;color:var(--green);border-radius:10px;padding:8px 10px;font-weight:850}
+.award-item{align-items:flex-start}.award-type{font-size:11px;color:var(--green);font-weight:900;text-transform:uppercase;letter-spacing:.6px}.award-player{font-weight:950}.award-event{font-size:12px;color:var(--muted)}.award-date{font-size:11px;color:var(--muted);white-space:nowrap}.button-stack{display:grid;grid-template-columns:1fr;gap:9px}.two-buttons{grid-template-columns:1fr 1fr}.pin-grid{margin-top:14px;align-items:end}.align-end{align-self:end}.file-label{text-align:center;cursor:pointer}.file-label input{display:none}.danger-zone{border-color:#f1d5d2}
+.bottom-nav{position:fixed;z-index:30;bottom:0;left:50%;transform:translateX(-50%);width:min(820px,100%);min-height:74px;height:auto;padding:8px 8px max(10px,env(safe-area-inset-bottom));background:rgba(255,255,255,.97);backdrop-filter:blur(18px);border-top:1px solid #dfe6e1;display:grid;grid-template-columns:repeat(4,1fr);box-shadow:0 -8px 20px rgba(10,30,18,.06)}.nav-item{border:0;background:none;color:#728077;font-size:10px;font-weight:850;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px}.nav-item.active{color:var(--green)}.nav-item.disabled{opacity:.35}.nav-item.disabled .nav-add{background:#aeb7b1;box-shadow:none}.nav-icon{font-size:23px;line-height:1}.add-nav{position:relative}.nav-add{width:43px;height:43px;border-radius:14px;background:var(--green);color:#fff;display:grid;place-items:center;font-size:26px;margin-top:-22px;box-shadow:0 7px 16px rgba(11,95,58,.3);border:3px solid #fff}.add-nav span:last-child{margin-top:0}
+.modal{border:0;border-radius:22px;padding:0;width:min(92vw,460px);box-shadow:0 24px 70px rgba(0,0,0,.25)}.small-modal{width:min(92vw,380px)}.modal::backdrop{background:rgba(5,15,9,.55);backdrop-filter:blur(3px)}.modal form{padding:19px;display:flex;flex-direction:column;gap:12px}.modal-heading{display:flex;justify-content:space-between;align-items:center}.modal-heading h3{margin:0}.modal-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px}.pin-error{font-size:12px;font-weight:800;color:#9d2f27}
+.toast{position:fixed;z-index:100;left:50%;bottom:92px;transform:translate(-50%,20px);background:#0d1712;color:#fff;padding:12px 16px;border-radius:13px;font-size:13px;font-weight:750;opacity:0;pointer-events:none;transition:.2s;box-shadow:0 8px 30px rgba(0,0,0,.22)}.toast.show{opacity:1;transform:translate(-50%,0)}
+.empty-state{text-align:center;padding:30px 14px;color:var(--muted)}.empty-state strong{display:block;color:var(--ink);font-size:16px;margin-bottom:4px}
+@media(min-width:650px){.content{padding:26px 26px 105px}.dashboard-grid{grid-template-columns:1fr 1fr;gap:14px}.dashboard-grid .panel{margin-bottom:0}.record-card{margin-bottom:14px}.squad-list{grid-template-columns:1fr 1fr}.form-grid{grid-template-columns:1fr 1fr}.button-stack{grid-template-columns:1fr 1fr}.hero{padding-left:30px;padding-right:30px}.hero-inner{grid-template-columns:100px 1fr}}
+@media(max-width:500px){.hero-inner{grid-template-columns:82px 1fr}.record-card{grid-template-columns:.8fr 1.8fr}.record-footer{grid-template-columns:repeat(2,1fr)}.filter-bar{grid-template-columns:1fr}.two-buttons{grid-template-columns:1fr}.hero-copy h1{font-size:31px}}
+@media(max-width:420px){.form-grid.two{grid-template-columns:1fr}.scorer-grid{grid-template-columns:1fr}.squad-banner{align-items:flex-start;flex-direction:column;gap:10px}}
+
+/* Simplified 2026/27 league layout */
+.hero-inner{margin-top:0}
+.league-summary-card{display:flex;align-items:center;justify-content:space-between;gap:18px;background:linear-gradient(135deg,#ffffff,#f1f8f2)}
+.league-summary-copy h3{margin:3px 0 3px;font-size:19px}
+.league-summary-copy p:last-child{margin:0;color:var(--muted);font-size:12px}
+.league-progress-ring{width:70px;height:70px;border-radius:50%;display:flex;align-items:baseline;justify-content:center;gap:2px;flex-shrink:0;background:var(--ink);color:#fff;padding-top:21px;border:5px solid #dcecdf}
+.league-progress-ring strong{font-size:24px;line-height:1}.league-progress-ring span{font-size:11px;color:#c7d3cb;font-weight:900}
+.league-programme{padding:0;overflow:hidden}
+.league-programme summary{list-style:none;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 17px;cursor:pointer}
+.league-programme summary::-webkit-details-marker{display:none}
+.league-programme summary>div{display:flex;flex-direction:column;gap:4px}.league-programme summary strong{font-size:16px}.league-programme summary>span{font-size:12px;font-weight:950;color:var(--green);background:var(--green-3);padding:8px 10px;border-radius:999px;white-space:nowrap}
+.division-opponents{border-top:1px solid #e8ede9;padding:0 17px 8px}
+.division-row{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;padding:11px 0;border-top:1px solid #edf1ee}.division-row:first-child{border-top:0}
+.division-team{font-weight:850;font-size:13px}.division-results{display:flex;align-items:center;justify-content:flex-end;gap:5px;flex-wrap:wrap}.division-count{font-size:11px;font-weight:950;color:var(--muted);min-width:28px;text-align:right}
+.league-result{display:inline-flex;align-items:center;justify-content:center;min-width:32px;height:25px;border-radius:8px;color:#fff;font-size:10px;font-weight:950;padding:0 6px}.league-result.W{background:var(--win)}.league-result.D{background:var(--draw)}.league-result.L{background:var(--loss)}
+.league-slot{width:25px;height:25px;border-radius:8px;border:1px dashed #cfd8d2;background:#f8faf9}
+.optional{font-size:10px;color:var(--muted);font-weight:700}
+@media(max-width:500px){.hero{padding-top:17px}.club-logo-wrap{width:82px;height:82px}.club-logo{width:78px;height:78px}.season-line{font-size:12px}.league-summary-card{padding:14px 15px}.league-progress-ring{width:62px;height:62px;padding-top:18px}.league-programme summary{padding:14px 15px}.division-opponents{padding:0 15px 8px}.division-team{font-size:12.5px}}
+
+/* 2026-09 reusable team + separated league/friendly update */
+.record-heading{grid-column:1/-1;font-size:12px;font-weight:950;letter-spacing:1.2px;text-transform:uppercase;color:#d5e1d9;margin-bottom:-6px}
+.running-count-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.running-count-card{margin:0;padding:14px 15px;min-width:0}
+.running-main{display:flex;align-items:baseline;gap:7px;margin-top:5px}.running-main strong{font-size:32px;line-height:1;font-weight:1000}.running-main span{font-size:11px;color:var(--muted);font-weight:850}
+.running-split{display:flex;gap:12px;margin-top:10px;font-size:11px;color:var(--muted);font-weight:800}.running-split b{color:var(--ink);font-size:14px}
+.running-goals{display:flex;gap:12px;margin-top:7px;padding-top:7px;border-top:1px solid #edf1ee;font-size:10px;color:var(--muted);font-weight:800}.running-goals b{color:var(--green);font-size:12px}
+.friendly-count-card{background:linear-gradient(135deg,#fff,#f6faf7)}
+.single-filter{grid-template-columns:1fr}
+.match-section{margin:20px 0 24px}.match-section-heading{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin:0 2px 10px}.match-section-heading h3{margin:2px 0 0;font-size:20px}.match-section-count{min-width:34px;height:34px;padding:0 10px;border-radius:11px;background:#eaf3ed;color:var(--green);display:grid;place-items:center;font-size:13px;font-weight:1000}.friendly-section{padding:14px;border:1px solid #dce9df;background:linear-gradient(135deg,#edf6ef,#f9fbfa);border-radius:20px}.friendly-section .match-section-heading{margin:0 0 10px}.friendly-section .match-card{box-shadow:none}
+.compact-squad-banner{justify-content:flex-start;padding:16px 18px;min-height:86px}.compact-squad-banner .squad-count strong{font-size:38px}
+.player-card{grid-template-columns:58px 1fr auto}
+.jersey-icon{position:relative;width:58px;height:54px;display:grid;place-items:center}.jersey-icon svg{position:absolute;inset:0;width:100%;height:100%;filter:drop-shadow(0 2px 2px rgba(0,0,0,.12))}.jersey-icon svg path{fill:var(--green);stroke:#0e5222;stroke-width:1.5}.jersey-icon span{position:relative;z-index:1;color:#fff;font-size:17px;font-weight:1000;line-height:1;text-shadow:0 1px 2px rgba(0,0,0,.35);margin-top:3px}.jersey-icon.goalkeeper svg path{fill:#f2d33f;stroke:#9f8610}.jersey-icon.goalkeeper span{color:#121612;text-shadow:none}.player-card:has(.jersey-icon.goalkeeper){border-color:#e9dfaa;background:linear-gradient(135deg,#fff,#fffdf2)}
+.settings-grid .full-span{grid-column:1/-1}.setup-save{margin-top:14px;width:100%}
+.score-entry label>span:first-child{min-height:18px}
+@media(max-width:500px){.running-count-grid{grid-template-columns:1fr 1fr}.running-count-card{padding:13px}.running-main strong{font-size:28px}.running-split{gap:8px}.match-section{margin-top:17px}.friendly-section{padding:12px}}
+@media(max-width:360px){.running-count-grid{grid-template-columns:1fr}}
+
+/* Distribution roles + editable league list */
+.league-editor-help{margin-top:-2px;margin-bottom:14px}
+#settings-opponents{min-height:190px;resize:vertical;line-height:1.45}
+body.build-parent .read-only-card{display:none!important}
+body.build-parent .bottom-nav{grid-template-columns:repeat(4,1fr)}
+body.build-parent .bottom-nav .add-nav{display:none!important}
+
+
+/* U11+ league table and pasted results */
+.league-table-panel{overflow:hidden}
+.league-table-heading{align-items:flex-end;margin-bottom:10px}.league-table-heading h3{margin:2px 0 0}.age-rule{font-size:10px;font-weight:950;color:var(--green);background:var(--green-3);border-radius:999px;padding:6px 8px}
+.league-table-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:0 -5px;padding:0 5px}.league-table{width:100%;min-width:590px;border-collapse:collapse;font-size:11px}.league-table th{color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.4px;font-weight:900;padding:8px 6px;border-bottom:1px solid #dfe7e2;text-align:center}.league-table th:nth-child(2){text-align:left}.league-table td{padding:9px 6px;border-bottom:1px solid #edf1ee;text-align:center;font-variant-numeric:tabular-nums}.league-table .team-cell{text-align:left;font-weight:800;max-width:220px}.league-table .pos{font-weight:900;color:var(--muted);width:26px}.league-table .pts{font-weight:1000;color:var(--green)}.league-table tr.our-team-row td{background:#e9f6eb;font-weight:950}.league-table tr.our-team-row .team-cell{color:var(--green-2)}.league-table tr:last-child td{border-bottom:0}.table-meta{margin:9px 0 0;color:var(--muted);font-size:10.5px}.table-empty{text-align:center!important;color:var(--muted);padding:20px!important}
+.league-import-panel textarea{margin-top:10px;min-height:142px;resize:vertical}.import-help{font-size:12px;margin:8px 0 0}.import-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}.import-feedback{font-size:11.5px;font-weight:800;margin-top:9px;min-height:16px}.import-feedback.good{color:#08743e}.import-feedback.warn{color:#9b5b12}.imported-results-details{margin-top:12px;border-top:1px solid #e9eeeb;padding-top:10px}.imported-results-details summary{cursor:pointer;color:var(--green);font-weight:850;font-size:12px}.imported-result-row{display:flex;align-items:center;justify-content:space-between;gap:10px;border-top:1px solid #edf1ee;padding:9px 0;font-size:11.5px}.imported-result-row:first-child{margin-top:6px}.imported-result-row strong{display:block}.imported-result-row span{display:block;color:var(--muted);font-size:10px;margin-top:2px}.compact-empty{padding:14px 4px;font-size:11px}.settings-note{margin:10px 0 0;color:var(--muted);font-size:10.5px}.match-section-count{display:inline-grid;place-items:center;min-width:28px;height:28px;padding:0 8px;border-radius:999px;background:var(--green-3);color:var(--green);font-size:11px;font-weight:950}
+@media(max-width:500px){.import-actions{grid-template-columns:1fr}.league-table{min-width:560px}}
+
+/* Selkent automatic sync */
+.selkent-sync-settings{background:linear-gradient(135deg,#fff,#f4faf5)}
+.sync-dot{width:12px;height:12px;border-radius:50%;background:#aab4ae;box-shadow:0 0 0 5px #eef2ef}.sync-dot.good{background:#1f9d50;box-shadow:0 0 0 5px #e5f5e9}.sync-dot.busy{background:#d39c1a;box-shadow:0 0 0 5px #fff3d5}.sync-dot.bad{background:#c94b40;box-shadow:0 0 0 5px #fbe8e6}
+.toggle-row{display:flex;align-items:center;gap:11px;border:1px solid #dfe8e1;border-radius:14px;padding:12px 13px;margin:12px 0;background:#fff}.toggle-row input{width:20px;height:20px;accent-color:var(--green);flex:0 0 auto}.toggle-row span{display:flex;flex-direction:column;gap:2px}.toggle-row strong{font-size:13px}.toggle-row small{font-size:10.5px;color:var(--muted);font-weight:650}
+.selkent-fixtures-panel{background:linear-gradient(135deg,#fff,#f7fbf8)}.synced-fixture-list{display:flex;flex-direction:column}.synced-fixture{display:grid;grid-template-columns:70px 1fr auto;gap:10px;align-items:center;padding:10px 0;border-top:1px solid #edf1ee}.synced-fixture:first-child{border-top:0}.synced-fixture-date{font-size:11px;font-weight:900;color:var(--green)}.synced-fixture-opponent{font-size:13px;font-weight:850}.synced-fixture-venue{font-size:10px;font-weight:950;color:var(--muted);background:#eef3f0;border-radius:999px;padding:5px 8px}.sync-source-link{color:var(--green);font-weight:850;text-decoration:none}
+@media(max-width:420px){.synced-fixture{grid-template-columns:62px 1fr auto}.synced-fixture-opponent{font-size:12px}}
+\n\n/* v1.6 secure club roles + team assignment lock */\nbody:not(.role-admin) [data-admin-only]{display:none!important}\n.app-shell.account-locked{display:none!important}\n.activation-gate{position:fixed;inset:0;z-index:5000;background:linear-gradient(145deg,#071009,#102016 58%,#218a21);padding:22px;overflow:auto;display:grid;place-items:center}\n.activation-card{width:min(520px,100%);background:#fff;border-radius:26px;padding:24px;box-shadow:0 24px 70px rgba(0,0,0,.32)}\n.activation-logo{display:block;width:min(360px,88%);height:auto;max-height:116px;object-fit:contain;margin:0 auto 15px}.activation-card h1{margin:4px 0 9px;font-size:29px;line-height:1}.activation-card>.kicker{text-align:center}.activation-card>h1,.activation-card>p{text-align:center}\n.activation-card label{display:flex;flex-direction:column;gap:7px;font-size:12px;font-weight:900;color:#405047;margin-top:17px}.activation-card textarea{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:10.5px;line-height:1.35;word-break:break-all;resize:vertical}.activation-error{background:#fbe8e6;color:#8d2e29;border-radius:12px;padding:10px 12px;font-size:12px;font-weight:800;text-align:left!important}.activation-help{font-size:10.5px!important;color:var(--muted);margin:12px 0 0!important}.activation-card .primary-button{margin-top:12px}\n.account-role-badge{display:inline-flex;align-items:center;justify-content:center;padding:7px 10px;border-radius:999px;background:var(--green-3);color:var(--green-2);font-size:10.5px;font-weight:950;text-transform:uppercase;letter-spacing:.4px}\n.locked-team-note{margin:13px 0 0;padding:10px 12px;border-radius:12px;background:#eef7f0;border:1px solid #d5e8da;color:#225d32;font-size:11px;font-weight:800}\nbody.team-locked #settings-team-name,body.team-locked #settings-age-group,body.team-locked #settings-league-team-name{background:#f1f4f2;color:#657168;border-color:#dfe4e1;opacity:1}\n.admin-assignment-panel{background:linear-gradient(135deg,#fff,#f2f9f3)}.assignment-output-label{display:flex;flex-direction:column;gap:6px;margin-top:14px;font-size:12px;font-weight:850;color:#405047}.assignment-output-label textarea{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:10px;line-height:1.35;word-break:break-all;resize:vertical}.assignment-code-meta{margin:12px 0 -2px;font-size:11px;font-weight:800;color:var(--green-2)}\nbody.build-parent .bottom-nav{grid-template-columns:repeat(4,1fr)}\n@media(max-width:500px){.activation-gate{padding:14px}.activation-card{padding:20px;border-radius:22px}.activation-card h1{font-size:25px}}\n
+
+/* v2.0.5 — responsive navigation, club admin overview, synced match details */
+.auto-team-summary,.league-auto-status{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}.auto-team-summary>div,.league-auto-status>div{background:#f4f8f5;border:1px solid #e0e8e2;border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:3px}.auto-team-summary span,.league-auto-status span{font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);font-weight:900}.auto-team-summary strong,.league-auto-status strong{font-size:15px}.auto-team-summary small{font-size:10px;color:var(--muted);line-height:1.3}.manual-league-fallback,.data-maintenance{margin-top:14px;border-top:1px solid #e8eeea;padding-top:12px}.manual-league-fallback summary,.data-maintenance summary{cursor:pointer;color:var(--green);font-size:12px;font-weight:900}.manual-league-fields{margin-top:12px}.feature-toggle-list{display:grid;gap:9px;margin-top:12px}.match-detail-settings .toggle-row{margin:0}.data-maintenance .button-stack{margin-top:10px}.danger-button.compact{padding:10px 12px;font-size:12px}
+.admin-overview-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}.admin-stat{margin:0;padding:12px;display:flex;flex-direction:column;gap:3px}.admin-stat span{font-size:10px;color:var(--muted);font-weight:850}.admin-stat strong{font-size:25px;color:var(--green-2)}.admin-team-overview-panel{margin-bottom:14px}.admin-overview-meta{font-size:11px;margin:8px 0 10px}.admin-team-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.admin-team-card{border:1px solid #dfe8e1;border-radius:16px;padding:12px;background:#fbfdfb;display:flex;flex-direction:column;gap:7px}.admin-team-card.active-team{border-color:#75bd81;box-shadow:0 0 0 2px rgba(33,138,33,.08)}.admin-team-card-head{display:flex;align-items:center;gap:7px}.admin-team-card-head span{font-size:10px;font-weight:950;color:#fff;background:var(--green);border-radius:999px;padding:4px 7px}.admin-team-card-head strong{font-size:14px}.admin-team-division{font-size:11px;color:var(--muted);min-height:28px}.admin-team-mini{display:flex;flex-wrap:wrap;gap:8px;font-size:10px;color:#5c6b62}.admin-team-card small{font-size:9.5px;color:#809087}.admin-team-card button{margin-top:auto}.selected-team-divider{display:flex;align-items:center;gap:10px;margin:2px 0 14px;color:var(--muted);font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.8px}.selected-team-divider::before,.selected-team-divider::after{content:"";height:1px;background:#dce4df;flex:1}
+.match-detail-badges{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px}.match-detail-badges span{font-size:9px;font-weight:900;color:#31503b;background:#eef5f0;border-radius:999px;padding:3px 6px}.match-detail-modal{width:min(94vw,520px);max-height:calc(100dvh - 28px);overflow:auto}.match-detail-modal form{padding-bottom:max(20px,env(safe-area-inset-bottom))}.detail-match-summary{background:#eef6f0;border-radius:13px;padding:11px 12px;display:flex;justify-content:space-between;gap:8px;align-items:center}.detail-match-summary strong{font-size:12px}.detail-match-summary span{font-size:12px;color:var(--muted);text-align:right}.detail-feature-section{border-top:1px solid #e5ebe7;padding-top:12px}.detail-feature-section h3{margin:0 0 10px}.detail-player-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}.detail-player-row{background:#f6f8f7;border-radius:11px;padding:8px;display:grid!important;grid-template-columns:1fr 56px;align-items:center;gap:7px}.detail-player-row span{font-size:11px}.detail-player-row b{color:var(--green)}.detail-player-row input{padding:7px;text-align:center}.detail-booking-grid{display:grid;gap:7px}.detail-booking-row{display:grid;grid-template-columns:1fr 58px 58px;gap:7px;align-items:center;background:#f6f8f7;border-radius:11px;padding:8px}.detail-booking-row>span{font-size:11px}.detail-booking-row b{color:var(--green)}.detail-booking-row label{display:grid!important;grid-template-columns:auto 1fr;align-items:center;gap:4px!important;font-size:10px!important}.detail-booking-row input{padding:7px;text-align:center}.empty-detail-options{background:#fff7e7;border:1px solid #f2d79e;color:#715a1c;border-radius:12px;padding:12px;font-size:12px;line-height:1.4}
+@media(max-width:560px){.admin-overview-stats{grid-template-columns:1fr 1fr}.admin-team-grid{grid-template-columns:1fr}.auto-team-summary{grid-template-columns:1fr}.detail-player-grid{grid-template-columns:1fr}.bottom-nav{padding-bottom:max(12px,env(safe-area-inset-bottom))}.content{padding-bottom:calc(126px + env(safe-area-inset-bottom))}}
+
+.manual-result-fallback{margin-top:12px;border-top:1px solid #e8eeea;padding-top:10px}.manual-result-fallback summary{color:var(--green);font-size:12px;font-weight:900;cursor:pointer}.manual-result-fallback .muted{font-size:11px;margin:9px 0}
+
+/* v2.0.6 — authoritative division + league table sync */
+.selkent-source-card{margin:13px 0;background:#f4f8f5;border:1px solid #dfe9e1;border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:3px}.selkent-source-card span{font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);font-weight:900}.selkent-source-card strong{font-size:13px;color:var(--green-2)}.selkent-source-card small{font-size:10px;line-height:1.35;color:var(--muted)}
+html,body{min-height:100%;min-height:100dvh}.bottom-nav{bottom:0;padding-bottom:max(12px,env(safe-area-inset-bottom));min-height:calc(72px + env(safe-area-inset-bottom))}.content{padding-bottom:calc(132px + env(safe-area-inset-bottom))}
+
+/* v2.0.7 — adaptive system-bar clearance, floating navigation and compact settings */
+:root{--android-inset-bottom:0px}
+html,body{min-height:100%;min-height:100dvh}
+.content{padding-bottom:calc(108px + var(--android-inset-bottom,0px) + env(safe-area-inset-bottom))}
+.bottom-nav{
+  bottom:var(--android-inset-bottom,0px);
+  min-height:72px;
+  padding:8px 8px max(10px,env(safe-area-inset-bottom));
+  grid-template-columns:repeat(4,1fr);
+  transform:translateX(-50%);
+  transition:transform .24s cubic-bezier(.2,.7,.2,1),opacity .18s ease,box-shadow .18s ease;
+  will-change:transform,opacity;
+}
+body.role-admin .bottom-nav{grid-template-columns:repeat(5,1fr)}
+.bottom-nav.nav-hidden{
+  transform:translate(-50%,calc(100% + var(--android-inset-bottom,0px) + 28px));
+  opacity:0;
+  pointer-events:none;
+  box-shadow:none;
+}
+body:has(dialog[open]) .bottom-nav{transform:translate(-50%,calc(100% + var(--android-inset-bottom,0px) + 28px));opacity:0;pointer-events:none}
+
+/* Settings are deliberately compact: one collapsed list until the coach opens an item. */
+.settings-accordion-list{display:flex;flex-direction:column;gap:10px}
+.settings-accordion{margin:0;padding:0;overflow:hidden}
+.settings-accordion>summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 17px;font-size:15px;font-weight:950;color:var(--ink);user-select:none}
+.settings-accordion>summary::-webkit-details-marker{display:none}
+.settings-accordion[open]>summary{border-bottom:1px solid #e7ece8;background:#fbfdfb}
+.settings-chevron{color:var(--green);font-size:18px;line-height:1;transition:transform .18s ease}
+.settings-accordion[open] .settings-chevron{transform:rotate(180deg)}
+.settings-accordion-body{padding:15px 17px 17px}
+.nested-settings{border:1px solid #e3eae5;border-radius:13px;background:#f9fbfa;padding:0;margin-top:12px}
+.nested-settings>summary{list-style:none;cursor:pointer;padding:12px 13px;color:var(--green-2)!important;font-size:12px!important;font-weight:900!important}
+.nested-settings>summary::-webkit-details-marker{display:none}
+.nested-settings[open]{padding-bottom:12px}
+.nested-settings[open]>:not(summary){margin-left:12px;margin-right:12px}
+.server-backup-note{margin:13px 0;padding:12px 13px;border-radius:13px;background:#eef7f0;border:1px solid #d7e8da;display:flex;flex-direction:column;gap:3px}
+.server-backup-note strong{font-size:12px;color:var(--green-2)}
+.server-backup-note span{font-size:10.5px;line-height:1.4;color:var(--muted)}
+
+/* Team access / approval list */
+.access-members-heading{margin-top:16px;padding-top:14px;border-top:1px solid #e8eeea}
+.team-members-list{display:flex;flex-direction:column;gap:8px;margin-top:9px}
+.team-member-row{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;border:1px solid #e1e9e3;border-radius:14px;padding:11px 12px;background:#fbfdfb}
+.team-member-row.pending{border-color:#efd99e;background:#fff9e9}
+.team-member-copy{min-width:0;display:flex;flex-direction:column;gap:2px}
+.team-member-copy strong{font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.team-member-copy span{font-size:10.5px;color:var(--muted)}
+.team-member-actions{display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.member-role-pill{display:inline-flex;align-items:center;padding:4px 7px;border-radius:999px;background:#eaf4ed;color:var(--green-2);font-size:9.5px;font-weight:950;text-transform:uppercase}
+.team-member-row.pending .member-role-pill{background:#fff0c4;color:#7a5b09}
+.member-empty{padding:13px 4px;color:var(--muted);font-size:11px;text-align:center}
+
+/* Award history now lives with Player awards rather than Settings. */
+.award-history-inline{margin-top:11px;border-top:1px solid #e8eeea;padding-top:10px}
+.award-history-inline>summary{cursor:pointer;list-style:none;color:var(--green);font-weight:900;font-size:12px;display:flex;align-items:center;justify-content:space-between}
+.award-history-inline>summary::-webkit-details-marker{display:none}
+.award-history-actions{display:flex;justify-content:flex-end;margin:7px 0 2px}
+
+/* Dialogs stay inside the usable viewport when the software keyboard/system bar is visible. */
+dialog.modal{
+  max-height:calc(100dvh - var(--android-inset-bottom,0px) - 20px);
+  overflow:hidden;
+}
+.modal form{
+  max-height:calc(100dvh - var(--android-inset-bottom,0px) - 20px);
+  overflow-y:auto;
+  overscroll-behavior:contain;
+  padding-bottom:max(16px,env(safe-area-inset-bottom));
+}
+.modal-actions{position:sticky;bottom:-1px;z-index:3;background:linear-gradient(to bottom,rgba(255,255,255,.88),#fff 24%);padding-top:12px;padding-bottom:2px}
+
+/* Keep compact output fields readable now invites are short one-time codes. */
+.assignment-output-label input{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:14px;font-weight:800;letter-spacing:.4px}
+
+@media(max-width:560px){
+  .content{padding-bottom:calc(104px + var(--android-inset-bottom,0px) + env(safe-area-inset-bottom))}
+  .bottom-nav{bottom:var(--android-inset-bottom,0px);min-height:70px;padding-bottom:max(10px,env(safe-area-inset-bottom))}
+  .settings-accordion>summary{padding:15px 15px}.settings-accordion-body{padding:14px 15px 16px}
+  .team-member-row{grid-template-columns:1fr}.team-member-actions{justify-content:flex-start}
+}
+.member-group-label{margin:9px 2px 2px;color:var(--muted);font-size:9.5px;font-weight:950;text-transform:uppercase;letter-spacing:.8px}
+
+/* v2.0.8 — Club Admin/Coach UI switch and squad removal */
+.admin-ui-mode-panel{margin-bottom:12px;display:flex;flex-direction:column;gap:10px}.admin-ui-mode-panel>div:first-child{display:flex;align-items:center;justify-content:space-between;gap:12px}.admin-ui-mode-panel>div:first-child strong{font-size:13px}.admin-ui-mode-panel>div:first-child span{font-size:11px;color:var(--muted);font-weight:800}.admin-ui-mode-switch{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:5px;border:1px solid #dfe8e1;background:#f3f7f4;border-radius:14px}.mode-switch-button{appearance:none;border:0;border-radius:10px;padding:10px 8px;background:transparent;color:#657168;font:inherit;font-size:11px;font-weight:900}.mode-switch-button.active{background:#fff;color:var(--green-2);box-shadow:0 2px 8px rgba(16,66,34,.09)}
+body.admin-club-mode .bottom-nav{grid-template-columns:repeat(2,1fr)}
+body.admin-coach-mode .bottom-nav{grid-template-columns:repeat(4,1fr)}
+.remove-player-button{width:100%;margin-top:14px}.player-remove-note{margin:7px 2px 0;font-size:10.5px!important;line-height:1.4}
+
+
+/* v2.0.9 — dual Club Admin/Coach profile switch + safe Selkent parsing */
+.hero-profile-actions{position:absolute;z-index:4;top:max(12px,env(safe-area-inset-top));right:14px;display:flex;gap:7px;align-items:center}
+.hero-profile-button{border:1px solid rgba(255,255,255,.3);background:rgba(5,14,8,.72);color:#fff;border-radius:999px;padding:8px 11px;font-size:11px;font-weight:900;box-shadow:0 5px 18px rgba(0,0,0,.18);backdrop-filter:blur(8px)}
+.hero-profile-button:active{transform:translateY(1px)}
+body.admin-club-mode .hero-copy,body.admin-coach-mode .hero-copy,body.admin-preview-mode .hero-copy{padding-right:116px}
+.admin-team-card[data-admin-open-team]{cursor:pointer;transition:transform .12s ease,box-shadow .12s ease,border-color .12s ease}
+.admin-team-card[data-admin-open-team]:active{transform:scale(.992)}
+.admin-team-card[data-admin-open-team]:focus-visible{outline:3px solid rgba(0,145,34,.28);outline-offset:2px}
+body.admin-preview-mode [data-coach-ui-only]{display:none!important}
+@media(max-width:500px){
+  .hero-profile-actions{top:max(10px,env(safe-area-inset-top));right:10px}
+  .hero-profile-button{font-size:10px;padding:7px 9px;max-width:116px;white-space:normal;line-height:1.1}
+  body.admin-club-mode .hero-copy,body.admin-coach-mode .hero-copy,body.admin-preview-mode .hero-copy{padding-right:104px}
+}
+
+/* v2.0.10 — Selkent-published competition mode + quick League tab */
+body.team-has-league:not(.role-admin) .bottom-nav{grid-template-columns:repeat(5,1fr)}
+body.admin-coach-mode.team-has-league .bottom-nav{grid-template-columns:repeat(5,1fr)}
+body.admin-preview-mode.team-has-league .bottom-nav{grid-template-columns:repeat(6,1fr)}
+body.admin-club-mode.team-has-league .bottom-nav{grid-template-columns:repeat(2,1fr)}
+.competition-mode-pill{margin-left:auto;display:inline-flex;align-items:center;border-radius:999px;padding:4px 8px;font-style:normal;font-size:9px;font-weight:950;letter-spacing:.35px;text-transform:uppercase;white-space:nowrap}
+.competition-mode-pill.league{background:#dff4e4;color:#08772d}.competition-mode-pill.no-league{background:#eef1ef;color:#5c6861}
+#view-league .league-table-panel{display:block}
+#view-league .division-row{padding:10px 0}
+#add-division-result{white-space:nowrap}
+@media(max-width:420px){body.admin-preview-mode.team-has-league .bottom-nav .nav-item{font-size:9px}.competition-mode-pill{font-size:8px;padding:3px 6px}}
+
+/* v2.0.11 — status-bar safe header, competition nav, coach club results and custom awards */
+:root{--android-inset-top:0px}
+.hero{padding-top:calc(18px + var(--android-inset-top,0px))}
+.hero-profile-actions{top:calc(12px + var(--android-inset-top,0px))}
+body:not(.team-has-league) [data-league-nav]{display:none!important}
+body.role-coach .bottom-nav{grid-template-columns:repeat(5,1fr)}
+body.role-coach.team-has-league .bottom-nav{grid-template-columns:repeat(6,1fr)}
+body.admin-coach-mode .bottom-nav{grid-template-columns:repeat(5,1fr)}
+body.admin-coach-mode.team-has-league .bottom-nav{grid-template-columns:repeat(6,1fr)}
+body.role-coach #admin-club-overview,body.role-coach #admin-assignment-panel,body.role-coach #admin-coach-access-panel{display:none!important}
+body.role-coach #coach-club-results{display:block!important}
+body.role-parent .club-nav-item{display:none!important}
+.club-results-list{display:grid;gap:10px}.club-result-row{border:1px solid #e0e9e2;border-radius:16px;padding:12px;background:#f8fbf9}.club-result-meta{display:flex;justify-content:space-between;gap:10px;color:var(--muted);font-size:10px;font-weight:850;margin-bottom:7px}.club-result-score{display:grid;grid-template-columns:1fr auto 1fr;gap:9px;align-items:center;font-size:12px}.club-result-score span:last-child{text-align:right}.club-result-score strong{font-size:18px;color:var(--green-2)}
+.custom-award-settings{margin-top:16px;padding-top:14px;border-top:1px solid #e1e8e3}.award-type-list{display:grid;gap:7px}.award-type-row{display:flex;align-items:center;justify-content:space-between;gap:10px;background:#f6f9f7;border:1px solid #e2eae4;border-radius:12px;padding:9px 10px;font-size:12px;font-weight:800}.inline-add-row{display:grid;grid-template-columns:1fr auto;gap:8px;margin-top:10px}.inline-add-row input{min-width:0}
+@media(max-width:500px){.hero{padding-top:calc(16px + var(--android-inset-top,0px))}.hero-profile-actions{top:calc(9px + var(--android-inset-top,0px))}.bottom-nav .nav-item{font-size:9px}.club-result-score{font-size:11px}.inline-add-row{grid-template-columns:1fr}.inline-add-row button{width:100%}}
+.activation-gate{padding-top:calc(22px + var(--android-inset-top,0px))}
+
+/* v2.0.12 — no-league home/away matrix + consistent result colours */
+.division-matrix-head,.division-matrix-row{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(74px,.7fr) minmax(74px,.7fr);gap:8px;align-items:center}
+.division-matrix-head{padding:0 0 8px;color:var(--muted);font-size:10px;font-weight:950;text-transform:uppercase;letter-spacing:.08em;border-bottom:1px solid #e7ede9}
+.division-matrix-head span:nth-child(n+2){text-align:center}
+.division-matrix-row{padding:10px 0;border-bottom:1px solid #edf1ee}
+.division-matrix-row:last-child{border-bottom:0}
+.division-team-link{border:0;background:none;padding:4px 0;color:var(--green);font:inherit;font-weight:950;text-align:left;text-decoration:underline;text-decoration-thickness:1.5px;text-underline-offset:3px;cursor:pointer}
+.division-team-label{font-weight:900;color:#17221b}
+.division-result-cell{width:100%;min-height:38px;border:0;border-radius:10px;display:flex;align-items:center;justify-content:center;padding:6px 5px;color:#fff;font-size:11px;font-weight:1000;white-space:nowrap}
+button.division-result-cell{cursor:pointer}
+.division-result-cell.W{background:var(--win)}
+.division-result-cell.D{background:var(--draw)}
+.division-result-cell.L{background:var(--loss)}
+.division-result-empty{width:100%;min-height:38px;border-radius:10px;background:#f0f3f1;color:#8d9891;display:grid;place-items:center;font-weight:900}
+.match-card.result-W,.club-result-row.result-W,.imported-result-row.result-W{background:#eff9f3;border-color:#a8d8b9}
+.match-card.result-D,.club-result-row.result-D,.imported-result-row.result-D{background:#f3f4f4;border-color:#c8cccf}
+.match-card.result-L,.club-result-row.result-L,.imported-result-row.result-L{background:#fcf0ef;border-color:#e4b1ac}
+.club-result-row.result-W .club-result-score strong{color:var(--win)}
+.club-result-row.result-D .club-result-score strong{color:#656b70}
+.club-result-row.result-L .club-result-score strong{color:var(--loss)}
+@media(max-width:390px){.division-matrix-head,.division-matrix-row{grid-template-columns:minmax(0,1.25fr) 68px 68px;gap:6px}.division-result-cell{font-size:10px}.division-team-link,.division-team-label{font-size:12px}}
+
+
+/* v2.0.13 — match status + Cup/Vase/Shield competition tables */
+.result-badge.PST,.competition-result-pill.PST{background:#8a6a22;color:#fff}.result-badge.ABD,.competition-result-pill.ABD{background:#9b5429;color:#fff}.result-badge.SCH,.competition-result-pill.SCH{background:#66727a;color:#fff}
+.match-card.status-postponed{background:#fff9e9;border-color:#e5d19a}.match-card.status-abandoned{background:#fff3ea;border-color:#e3b594}.match-card.status-scheduled{background:#f4f7f8;border-color:#cfd7db}
+.division-result-cell.PST{background:#8a6a22}.division-result-cell.ABD{background:#9b5429}.division-result-cell.SCH{background:#66727a}
+.status-no-score{opacity:.58}.match-heading-actions{display:flex;align-items:center;gap:8px}.competition-game-grid{display:grid;gap:12px}.competition-games-panel{padding:0;overflow:hidden}.competition-games-panel summary{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 15px;cursor:pointer;list-style:none}.competition-games-panel summary::-webkit-details-marker{display:none}.competition-games-panel summary strong{display:block;font-size:15px}.competition-games-panel summary small{display:block;color:var(--muted);font-size:10.5px;margin-top:2px}.competition-summary-actions{display:flex;align-items:center;gap:8px}.competition-table-scroll{overflow-x:auto;border-top:1px solid #e6ece8}.competition-games-table{width:100%;border-collapse:collapse;min-width:570px}.competition-games-table th,.competition-games-table td{text-align:left;padding:10px 11px;border-bottom:1px solid #edf1ee;font-size:11.5px}.competition-games-table th{font-size:10px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);background:#f8faf8}.competition-games-table tr.result-W td{background:#eff9f3}.competition-games-table tr.result-D td{background:#f3f4f4}.competition-games-table tr.result-L td{background:#fcf0ef}.competition-games-table tr.status-postponed td{background:#fff9e9}.competition-games-table tr.status-abandoned td{background:#fff3ea}.competition-games-table tr.status-scheduled td{background:#f4f7f8}.competition-result-pill{display:inline-flex;align-items:center;justify-content:center;min-width:58px;padding:5px 8px;border-radius:999px;font-weight:950;color:#fff;background:#748079}.competition-result-pill.W{background:var(--win)}.competition-result-pill.D{background:var(--draw)}.competition-result-pill.L{background:var(--loss)}.competition-game-link{border:0;background:none;padding:0;color:var(--green);font-weight:900;text-align:left}.empty-competition:not([open]){opacity:.88}
+@media(max-width:500px){.competition-games-panel summary{padding:12px}.competition-summary-actions .secondary-button{padding:7px 9px}.match-heading-actions{gap:6px}}
+
+.form-chip.PST{background:#8a6a22}.form-chip.ABD{background:#9b5429}.form-chip.SCH{background:#66727a}
+
+
+/* v2.0.14 — next fixture, kit colours and mandatory default award */
+.next-match-card{display:grid;gap:14px}
+.next-match-card.no-fixture{opacity:.9}
+.next-match-status{font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;padding:6px 9px;border-radius:999px;background:#e8f4e8;color:#1f6d26;white-space:nowrap}
+.next-match-grid{display:grid;grid-template-columns:1.5fr .7fr;gap:10px}
+.next-match-grid>div,.next-match-kits{border:1px solid #dfe8df;border-radius:12px;padding:11px 12px;background:#f9fbf9;display:flex;flex-direction:column;gap:3px}
+.next-match-grid span,.next-match-kits span{font-size:.72rem;text-transform:uppercase;letter-spacing:.04em;color:#687268;font-weight:700}
+.next-match-grid strong,.next-match-kits strong{font-size:.95rem;color:#183d1b}
+.default-award-badge{display:inline-block;margin-left:7px;padding:2px 6px;border-radius:999px;background:#e6f2e6;color:#1b6b23;font-size:.65rem;text-transform:uppercase;letter-spacing:.04em;vertical-align:middle}
+.mini-soccer-note{margin:8px 0 0}
+@media(max-width:430px){.next-match-grid{grid-template-columns:1fr 1fr}.next-match-status{font-size:.65rem}}
+
+/* v2.0.16 — solid footer nav + grouped club overview */
+.bottom-nav{
+  background:linear-gradient(145deg,#050a06 0%,#111713 40%,var(--green) 100%)!important;
+  backdrop-filter:none!important;
+  border-top:1px solid rgba(255,255,255,.08)!important;
+  box-shadow:0 -12px 28px rgba(0,0,0,.26)!important;
+}
+.bottom-nav .nav-item{color:rgba(255,255,255,.72)}
+.bottom-nav .nav-item .nav-icon{color:inherit}
+.bottom-nav .nav-item.active{color:#fff}
+.bottom-nav .nav-item.active .nav-icon{
+  text-shadow:0 0 10px rgba(255,255,255,.16);
+}
+.bottom-nav .nav-item.active span:last-child{font-weight:1000}
+.bottom-nav .nav-item:active{transform:translateY(1px)}
+
+.admin-age-group-list{display:flex;flex-direction:column;gap:10px}
+.admin-age-group{margin:0;padding:0;overflow:hidden}
+.admin-age-group>summary{list-style:none;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:15px 16px;cursor:pointer;font-weight:950;font-size:15px}
+.admin-age-group>summary::-webkit-details-marker{display:none}
+.admin-age-group>summary span{color:var(--muted);font-size:11px;font-weight:900}
+.admin-age-group[open]>summary{border-bottom:1px solid #e6ede8;background:#fbfdfb}
+.admin-age-group-body{padding:14px 15px 16px;display:grid;gap:10px}
+.admin-team-card .secondary-button{pointer-events:none}
+
+/* v2.0.17 — cleaner Club Admin dashboard */
+.admin-dashboard-summary{margin-bottom:14px;padding:16px;background:linear-gradient(145deg,#ffffff,#f1f8f3)}
+.admin-dashboard-head,.admin-section-heading{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.admin-dashboard-head h3,.admin-section-heading h3{margin:2px 0 0;font-size:18px}
+.admin-dashboard-summary .admin-overview-stats{margin:14px 0 8px;grid-template-columns:repeat(4,1fr)}
+.admin-dashboard-summary .admin-stat{border:1px solid #dce8df;border-radius:14px;background:#fff;padding:11px 10px;min-width:0}
+.admin-dashboard-summary .admin-stat span{font-size:9.5px;text-transform:uppercase;letter-spacing:.04em}
+.admin-dashboard-summary .admin-stat strong{font-size:24px;line-height:1.05}
+.admin-team-overview-panel{margin-bottom:14px}
+.admin-section-heading{padding:4px 2px 10px}
+.admin-section-hint{font-size:10px;color:var(--muted);font-weight:800;text-align:right}
+.admin-overview-meta{margin:6px 0 0!important}
+
+.admin-age-group-list{display:flex!important;flex-direction:column;gap:9px}
+.admin-age-group{border:1px solid #dfe8e1;border-radius:16px;background:#fff;box-shadow:0 4px 14px rgba(20,58,32,.04)}
+.admin-age-group>summary{padding:14px 15px}
+.admin-age-group>summary strong{font-size:16px;color:var(--ink)}
+.admin-age-group>summary span{font-size:10.5px;color:var(--muted)}
+.admin-age-group-body{padding:6px 12px 10px;gap:0}
+.admin-team-row{display:grid;grid-template-columns:minmax(0,1fr) auto 10px 14px;gap:10px;align-items:center;padding:12px 2px;border-bottom:1px solid #edf1ee;cursor:pointer;transition:background .14s ease}
+.admin-team-row:last-child{border-bottom:0}
+.admin-team-row:active{background:#f3f8f4}
+.admin-team-row:focus-visible{outline:3px solid rgba(0,145,34,.22);outline-offset:2px;border-radius:10px}
+.admin-team-row.active-team{background:#eef8f0;border-radius:10px;padding-left:8px;padding-right:8px}
+.admin-team-row-main{min-width:0;display:flex;flex-direction:column;gap:3px}
+.admin-team-row-title{display:flex;align-items:center;gap:7px;min-width:0}
+.admin-team-row-title strong{font-size:13.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.admin-team-row-main>span{font-size:10.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.admin-team-row-stats{display:flex;gap:7px;color:#66736a;font-size:9.5px;font-weight:800;white-space:nowrap}
+.admin-team-row-stats b{color:var(--ink)}
+.admin-sync-dot{width:8px;height:8px;border-radius:999px;display:block}
+.admin-sync-dot.synced{background:#1f9c3a;box-shadow:0 0 0 3px #e2f4e6}
+.admin-sync-dot.needs-sync{background:#b3bab5;box-shadow:0 0 0 3px #eef1ef}
+.admin-row-chevron{font-size:24px;line-height:1;color:#8b958e;font-weight:400}
+
+.admin-management-panel{margin-top:14px;padding:0;overflow:hidden}
+.admin-management-panel>summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 17px}
+.admin-management-panel>summary::-webkit-details-marker{display:none}
+.admin-management-panel>summary strong{display:block;font-size:15px;margin-top:2px}
+.admin-management-panel[open]>summary{border-bottom:1px solid #e5ebe7;background:#fbfdfb}
+.admin-management-panel[open] .settings-chevron{transform:rotate(180deg)}
+.admin-management-body{padding:0 16px 16px}
+.admin-access-block{padding:16px 0;border-bottom:1px solid #e8eeea}
+.admin-access-block:last-child{border-bottom:0;padding-bottom:0}
+.admin-access-block .panel-heading{align-items:flex-start}
+.admin-assignment-panel{background:none!important}
+
+@media(max-width:560px){
+  .admin-dashboard-summary .admin-overview-stats{grid-template-columns:repeat(2,1fr)}
+  .admin-dashboard-summary .admin-stat strong{font-size:22px}
+  .admin-team-row{grid-template-columns:minmax(0,1fr) auto 9px 12px;gap:7px}
+  .admin-team-row-stats{gap:5px;font-size:9px}
+  .admin-team-row-title .competition-mode-pill{font-size:8px;padding:3px 6px}
+  .admin-section-hint{display:none}
+}
+
+
+/* v2.0.18 — squad tactics, club results browser and fixture directory detail */
+.squad-format-summary{display:flex;gap:7px;flex-wrap:wrap;margin:0 0 12px}
+.squad-format-summary span{display:inline-flex;align-items:center;min-height:28px;padding:5px 9px;border-radius:999px;background:#e9f5eb;color:#146127;font-size:11px;font-weight:900;border:1px solid #d2e7d6}
+.squad-format-summary span:nth-child(3){background:#e8f0f8;color:#315f83;border-color:#d5e1ec}.squad-format-summary span:nth-child(4){background:#fff3d8;color:#78550e;border-color:#ead8ad}
+.squad-view-tabs,.club-view-tabs{display:flex;gap:5px;background:#e9efeb;border-radius:15px;padding:4px;margin:0 0 12px}
+.squad-view-tab,.club-view-tab{flex:1;border:0;background:transparent;border-radius:11px;padding:10px 8px;color:#627168;font-weight:900}.squad-view-tab.active,.club-view-tab.active{background:#fff;color:#0b6f25;box-shadow:0 3px 10px rgba(22,53,29,.09)}
+.squad-swipe{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;overscroll-behavior-x:contain;margin:0 -14px;padding:0 14px}.squad-swipe::-webkit-scrollbar{display:none}.squad-swipe-page{flex:0 0 100%;min-width:100%;scroll-snap-align:start;padding-right:1px}
+.squad-space-count{font-size:11px;color:var(--muted,#68766d);font-weight:850;margin-top:4px}.tactics-panel{overflow:hidden}.tactics-heading{align-items:flex-start}.tactics-heading .muted{margin:3px 0 0;max-width:260px}
+.tactics-pitch{position:relative;width:min(100%,430px);aspect-ratio:0.68/1;margin:12px auto 0;border-radius:16px;overflow:hidden;border:2px solid rgba(255,255,255,.88);background:linear-gradient(90deg,#207d32 0 12.5%,#278c3a 12.5% 25%,#207d32 25% 37.5%,#278c3a 37.5% 50%,#207d32 50% 62.5%,#278c3a 62.5% 75%,#207d32 75% 87.5%,#278c3a 87.5%);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);touch-action:none}
+.pitch-halfway{position:absolute;left:0;right:0;top:50%;border-top:2px solid rgba(255,255,255,.75)}.pitch-circle{position:absolute;width:82px;height:82px;left:50%;top:50%;transform:translate(-50%,-50%);border:2px solid rgba(255,255,255,.75);border-radius:50%}.pitch-box{position:absolute;left:23%;width:54%;height:16%;border:2px solid rgba(255,255,255,.75)}.pitch-box-top{top:-2px}.pitch-box-bottom{bottom:-2px}
+.tactics-player{position:absolute;transform:translate(-50%,-50%);width:60px;min-height:50px;border:0;border-radius:15px;padding:5px;background:#fff;color:#0a3214;box-shadow:0 5px 14px rgba(0,0,0,.28);font-size:9px;font-weight:900;line-height:1.1;touch-action:none;z-index:3}.tactics-player b{display:block;font-size:14px;margin-bottom:2px}.tactics-player.goalkeeper{background:#fff1a9}.tactics-player.selected,.tactics-bench-player.selected{outline:3px solid #ffd54e}
+.tactics-bench-wrap{margin-top:14px}.tactics-bench{display:flex;gap:7px;flex-wrap:wrap}.tactics-bench-player{border:1px solid #d5e0d8;background:#fff;color:#173d20;border-radius:999px;padding:8px 10px;font-size:11px;font-weight:900}.tactics-readonly .tactics-player,.tactics-readonly .tactics-bench-player{cursor:default}
+.club-results-age-label{display:grid;gap:6px;font-size:12px;font-weight:900;color:#405047;margin:13px 0}.club-results-age-label select{width:100%;border:1px solid #d8e3db;border-radius:13px;background:#fff;padding:11px}
+.club-results-pager{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center;margin-top:12px}.club-results-pager span{text-align:center;color:#68766d;font-size:11px;font-weight:900}.club-results-pager button:last-child{justify-self:stretch}
+.club-results-page-group{display:grid;gap:9px}.club-result-row{border:1px solid #dce6df;border-radius:16px;background:#fff;padding:12px}.club-result-meta{display:flex;justify-content:space-between;gap:8px;color:#657269;font-size:10px;font-weight:900;margin-bottom:9px}.club-result-score{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:8px;align-items:center;text-align:center}.club-result-score span{font-size:11px;font-weight:850}.club-result-score strong{background:#071009;color:#fff;border-radius:10px;padding:7px 10px;font-size:18px}.club-result-row.result-W{border-left:4px solid #14923a}.club-result-row.result-L{border-left:4px solid #d44742}.club-result-row.result-D{border-left:4px solid #7b8580}
+.fixture-directory-detail{display:block;margin-top:5px;color:#5f6f65;font-size:11px;line-height:1.35}.next-match-directory{margin-top:7px;color:#dce9df;font-size:11px;line-height:1.4}
+@media(max-width:430px){.tactics-player{width:54px;min-height:46px}.club-result-score{grid-template-columns:minmax(0,1fr) 48px minmax(0,1fr)}}
+
+/* v2.0.19 — auth recovery reliability fix; no visual layout changes. */
+
+
+/* v2.0.20 — Club Admin workflow + Admin ↔ Coach inbox */
+.admin-dashboard-summary .admin-overview-stats{grid-template-columns:repeat(3,1fr)}
+.admin-attention-list{margin-top:12px;display:grid;gap:6px}.admin-attention-heading{display:flex;justify-content:space-between;align-items:center;padding:2px 2px 4px}.admin-attention-heading strong{font-size:12px}.admin-attention-heading span{min-width:24px;height:24px;border-radius:999px;background:#fff0d8;color:#7a5200;display:grid;place-items:center;font-size:10px;font-weight:950}
+.admin-attention-row{display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:center;border:1px solid #e4eae6;border-radius:11px;background:#fff;padding:9px 10px;text-align:left;color:var(--ink)}.admin-attention-row span{font-size:10px;font-weight:950;color:#59665d}.admin-attention-row strong{font-size:11px}.admin-attention-row b{font-size:18px;color:#8a948d}.admin-attention-row.high{border-left:4px solid #d54b42}.admin-attention-row.medium{border-left:4px solid #e3a62c}.admin-attention-row.low{border-left:4px solid #7e9aad}.admin-health-good{margin-top:11px;border-radius:11px;background:#eaf7ed;color:#186729;padding:10px 12px;font-size:11px;font-weight:900}
+.squad-capacity.full{color:#a72922}.squad-capacity.near{color:#976400}
+.club-view-tabs{overflow-x:auto;scrollbar-width:none}.club-view-tabs::-webkit-scrollbar{display:none}.club-view-tab{flex:0 0 auto;min-width:82px;white-space:nowrap}.inbox-tab-badge{display:inline-grid;place-items:center;min-width:18px;height:18px;padding:0 5px;border-radius:999px;background:#d73832;color:#fff;font-size:9px;margin-left:3px}.inbox-tab-badge.hidden{display:none}
+.admin-filter-label{display:grid;gap:6px;font-size:11px;font-weight:900;margin:12px 0}.admin-filter-label select,.admin-coach-invite select,.inbox-contact-bar select{width:100%;border:1px solid #d8e3db;border-radius:12px;background:#fff;padding:10px 11px;font:inherit}
+.admin-fixture-list{display:grid;gap:8px;margin-top:10px}.admin-fixture-row{display:grid;grid-template-columns:92px minmax(0,1fr) auto;gap:10px;align-items:flex-start;border:1px solid #dfe7e1;border-radius:14px;background:#fff;padding:11px}.admin-fixture-row.tbc{background:#f7f9f7;border-style:dashed}.admin-fixture-date{display:flex;flex-direction:column;gap:3px}.admin-fixture-date strong{font-size:11px}.admin-fixture-date span{font-size:9.5px;color:var(--muted);font-weight:800}.admin-fixture-main{display:flex;min-width:0;flex-direction:column;gap:3px}.admin-fixture-main strong{font-size:12px}.admin-fixture-main span{font-size:10px;color:#526158;font-weight:800}.admin-fixture-main small{font-size:9.5px;color:var(--muted);line-height:1.3}.fixture-source-pill{display:inline-flex;border-radius:999px;background:#eef1ef;color:#637168;padding:4px 7px;font-size:8.5px;font-weight:950}.fixture-source-pill.selkent{background:#e3f4e7;color:#176a29}
+.admin-coach-invite{display:grid;gap:9px;margin:12px 0 15px;padding:12px;border-radius:14px;background:#f5f9f6;border:1px solid #e0e9e2}.admin-coach-invite label{display:grid;gap:6px;font-size:11px;font-weight:900}.admin-invite-output{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center}.admin-invite-output.hidden{display:none}.admin-invite-output input{min-width:0;border:1px solid #d8e3db;border-radius:10px;padding:9px;font:inherit;background:#fff}
+.club-inbox-card{padding:15px}.inbox-contact-bar{margin:12px 0}.inbox-contact-bar label{display:grid;gap:6px;font-size:11px;font-weight:900}.inbox-thread{display:flex;flex-direction:column;gap:8px;min-height:170px;max-height:50vh;overflow-y:auto;padding:10px;border:1px solid #e2e9e4;border-radius:14px;background:#f7faf8}.inbox-message{max-width:88%;border-radius:14px;padding:10px 11px;background:#fff;border:1px solid #e0e8e2;align-self:flex-start}.inbox-message.mine{align-self:flex-end;background:#e5f5e8;border-color:#cae7cf}.inbox-message-meta{display:flex;justify-content:space-between;gap:10px;margin-bottom:5px}.inbox-message-meta strong{font-size:9.5px}.inbox-message-meta span{font-size:8.5px;color:var(--muted)}.inbox-message-subject{display:block;font-size:11px;margin-bottom:3px}.inbox-message p{margin:0;font-size:11px;line-height:1.42}.inbox-message small{display:block;margin-top:5px;text-align:right;color:#758179;font-size:8.5px}.inbox-compose{display:grid;gap:10px;margin-top:12px}.inbox-compose label{display:grid;gap:6px;font-size:11px;font-weight:900}.inbox-compose input,.inbox-compose textarea{width:100%;box-sizing:border-box;border:1px solid #d8e3db;border-radius:12px;background:#fff;padding:10px 11px;font:inherit}.inbox-compose-actions{display:flex;align-items:center;justify-content:space-between;gap:10px}.inbox-compose-actions .helper{font-size:9.5px;color:var(--muted)}
+.readonly-detail-row{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:9px 2px;border-bottom:1px solid #e7ece8}.readonly-detail-row:last-child{border-bottom:0}.readonly-detail-row span{font-size:11px}.readonly-detail-row strong{font-size:11px;color:#164f23}.readonly-dialog #save-match-details{display:none!important}
+@media(max-width:560px){.admin-dashboard-summary .admin-overview-stats{grid-template-columns:repeat(2,1fr)}.admin-fixture-row{grid-template-columns:75px minmax(0,1fr)}.fixture-source-pill{grid-column:1/-1;justify-self:start}.inbox-message{max-width:94%}}
+
+
+/* v2.0.21 — horizontal navigation, footer removal and background-first status UI */
+.bottom-nav{display:none!important}
+.content{padding-bottom:calc(28px + var(--android-inset-bottom,0px) + env(safe-area-inset-bottom))!important}
+.top-nav-tabs{
+  position:sticky;
+  top:calc(var(--android-inset-top,0px) + 4px);
+  z-index:28;
+  display:flex;
+  gap:5px;
+  overflow-x:auto;
+  scrollbar-width:none;
+  width:min(1040px,calc(100% - 28px));
+  margin:12px auto 10px;
+  padding:5px;
+  border-radius:16px;
+  background:#e9efeb;
+  box-shadow:0 7px 18px rgba(18,48,27,.08);
+  -webkit-overflow-scrolling:touch;
+}
+.top-nav-tabs::-webkit-scrollbar{display:none}
+.top-nav-tabs.hidden{display:none!important}
+.top-nav-tab.nav-item{
+  flex:0 0 auto;
+  min-width:82px;
+  min-height:44px;
+  display:block;
+  padding:10px 14px;
+  border:0;
+  border-radius:12px;
+  background:transparent;
+  color:#52645b;
+  font-size:12px;
+  font-weight:950;
+  line-height:1.15;
+  white-space:nowrap;
+}
+.top-nav-tab.nav-item.active{
+  background:#fff;
+  color:var(--green);
+  box-shadow:0 3px 10px rgba(22,53,29,.09);
+}
+.club-view-tabs{
+  position:sticky;
+  top:calc(var(--android-inset-top,0px) + 4px);
+  z-index:27;
+  box-shadow:0 7px 18px rgba(18,48,27,.06);
+}
+.admin-team-row{grid-template-columns:minmax(0,1fr) auto 14px}
+.admin-dashboard-summary .admin-overview-stats{grid-template-columns:repeat(auto-fit,minmax(110px,1fr))}
+body.view-club.admin-club-mode .top-nav-tabs{display:none!important}
+body.role-parent [data-coach-ui-only]{display:none!important}
+body.role-parent [data-requires-edit]{display:none!important}
+body.admin-preview-mode [data-requires-edit]{display:none!important}
+@media(min-width:650px){
+  .content{padding-bottom:40px!important}
+}
+@media(max-width:560px){
+  .top-nav-tabs{width:calc(100% - 20px);margin:9px auto 8px;padding:4px}
+  .top-nav-tab.nav-item{min-width:76px;padding:10px 12px;font-size:11.5px}
+  .club-view-tabs{top:calc(var(--android-inset-top,0px) + 3px)}
+  .admin-team-row{grid-template-columns:minmax(0,1fr) auto 12px}
+}
+
+
+/* v2.0.22 — fixed top navigation and simplified automated workflow */
+.top-nav-tabs{
+  position:sticky!important;
+  top:var(--android-inset-top,0px)!important;
+  z-index:40!important;
+  width:100%!important;
+  max-width:none!important;
+  margin:0!important;
+  padding:6px max(10px,calc((100% - 1040px)/2 + 10px))!important;
+  border-radius:0!important;
+  background:#e9efeb!important;
+  border-bottom:1px solid #d8e2da!important;
+  box-shadow:none!important;
+  box-sizing:border-box;
+}
+.top-nav-tabs.hidden{display:flex!important}
+body.view-club.admin-club-mode .top-nav-tabs{display:flex!important}
+.club-view-tabs{display:none!important}
+.admin-attention-panel{margin-top:14px}
+.formation-control{display:grid;grid-template-columns:auto minmax(130px,220px);gap:10px;align-items:center;margin:0 0 12px;font-size:11px;font-weight:900;color:#53645a}
+.formation-control select{width:100%;border:1px solid #d7e1da;border-radius:11px;padding:9px 10px;background:#fff;font:inherit;color:#153c20}
+.map-link{display:inline-flex;align-items:center;justify-content:center;width:max-content;margin-top:10px;padding:9px 12px;border-radius:11px;background:#e5f3e8;color:#0b6f2c;font-size:10.5px;font-weight:950;text-decoration:none;border:1px solid #cbe3d0}
+.map-link.compact{margin-top:6px;padding:6px 9px;font-size:9.5px}
+.map-link.hidden{display:none!important}
+.synced-fixture .map-link{grid-column:1/-1}
+@media(max-width:560px){
+  .top-nav-tabs{padding:5px 8px!important}
+  .top-nav-tab.nav-item{min-width:74px;padding:10px 11px;font-size:11px}
+  .formation-control{grid-template-columns:1fr;margin-bottom:10px}
+}
+
+
+/* v2.0.25 — opening splash, fixture acknowledgement, matchday squad + access management */
+.app-splash{position:fixed;inset:0;z-index:30000;display:grid;place-items:center;background:radial-gradient(circle at 50% 42%,#218a21 0%,#145f19 44%,#071009 100%);transition:opacity .45s ease,visibility .45s ease}
+.app-splash-inner{width:min(88vw,560px);text-align:center;color:#fff;animation:splashIn .55s ease both}.app-splash-logo{display:block;width:100%;height:auto;max-height:260px;object-fit:contain;filter:drop-shadow(0 16px 28px rgba(0,0,0,.34))}.app-splash.splash-hide{opacity:0;visibility:hidden;pointer-events:none}body.splash-active{overflow:hidden}@keyframes splashIn{from{opacity:0;transform:scale(.92)}to{opacity:1;transform:scale(1)}}
+.fixture-ack{margin-top:14px;padding-top:13px;border-top:1px solid #e4ebe6;display:flex;align-items:center;justify-content:space-between;gap:12px}.fixture-ack-copy{display:flex;flex-direction:column;gap:3px}.fixture-ack-copy strong{font-size:13px}.fixture-ack-copy span{font-size:11px;color:var(--muted);line-height:1.35}.fixture-ack-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}.fixture-ack.confirmed .fixture-ack-copy strong{color:var(--win)}.fixture-ack.issue .fixture-ack-copy strong,.fixture-ack.changed .fixture-ack-copy strong{color:#a43c31}.fixture-ack.awaiting .fixture-ack-copy strong{color:#8a6500}.fixture-ack-pill{display:inline-flex;align-items:center;padding:5px 8px;border-radius:999px;font-size:10px;font-weight:950;background:#f0f3f1;color:#536159}.fixture-ack-pill.confirmed{background:#e7f6ec;color:#167540}.fixture-ack-pill.issue,.fixture-ack-pill.changed{background:#fbe9e7;color:#9d372f}.fixture-ack-pill.awaiting{background:#fff4d9;color:#855f00}
+.matchday-squad-picker{margin:10px 0 14px;padding:13px;border-radius:16px;background:#f6f9f7;border:1px solid #dfe8e1}.matchday-squad-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:10px}.matchday-squad-head>div{display:flex;flex-direction:column;gap:2px}.matchday-squad-head strong{font-size:14px}.matchday-squad-head span{font-size:11px;color:var(--muted)}.matchday-squad-head b{font-size:12px;background:#fff;border:1px solid #dce4de;border-radius:999px;padding:6px 9px}.matchday-squad-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.matchday-player-option{display:flex;align-items:center;gap:8px;padding:9px 10px;border-radius:12px;background:#fff;border:1px solid #dde6df;font-size:12px;font-weight:800}.matchday-player-option input{accent-color:var(--green);width:17px;height:17px}.matchday-player-option.selected{border-color:#8fc493;background:#edf8ee}.matchday-player-option.disabled-limit{opacity:.48}
+.admin-access-management{margin-top:18px;padding-top:18px;border-top:1px solid #e3e9e5}.admin-access-filter{display:flex;align-items:center;gap:7px;font-size:11px;font-weight:900;color:var(--muted)}.admin-access-filter select{border:1px solid #dbe4de;border-radius:10px;background:#fff;padding:8px}.admin-access-stats{display:flex;gap:7px;flex-wrap:wrap;margin:12px 0}.admin-access-stat{background:#f0f5f1;border:1px solid #dfe8e1;border-radius:999px;padding:6px 9px;font-size:10px;font-weight:900}.admin-access-row-role{display:flex;gap:6px;align-items:center;flex-wrap:wrap}.access-method-pill{font-size:9px;font-weight:950;text-transform:uppercase;letter-spacing:.4px;color:#647069}
+@media(max-width:520px){.fixture-ack{align-items:flex-start;flex-direction:column}.fixture-ack-actions{width:100%}.fixture-ack-actions button{flex:1}.matchday-squad-options{grid-template-columns:1fr}.admin-access-management .panel-heading{align-items:flex-start;flex-direction:column}.admin-access-filter{width:100%;justify-content:space-between}.admin-access-filter select{flex:1;max-width:220px}}
+
+/* v2.0.26 numbered shirt clarity + weekend overview */
+.mini-jersey{position:relative;display:inline-grid;place-items:center;width:32px;height:30px;flex:0 0 32px;vertical-align:middle}.mini-jersey svg{position:absolute;inset:0;width:100%;height:100%;filter:drop-shadow(0 1px 1px rgba(0,0,0,.12))}.mini-jersey svg path{fill:var(--green);stroke:#0e5222;stroke-width:1.8}.mini-jersey b{position:relative;z-index:1;color:#fff;font-size:11px;font-weight:1000;line-height:1;margin-top:2px}.mini-jersey.goalkeeper svg path{fill:#f2d33f;stroke:#9f8610}.mini-jersey.goalkeeper b{color:#111}.mini-jersey.compact{width:27px;height:25px;flex-basis:27px}.mini-jersey.tactics-shirt{width:30px;height:28px}.rank-no{display:none}.matchday-player-label,.tactics-bench-player{display:flex;align-items:center;gap:7px}.tactics-player{display:flex!important;flex-direction:column;align-items:center;justify-content:center;gap:2px}.tactics-player>span:last-child{font-size:11px;font-weight:900;line-height:1.05}.admin-weekend-panel{margin-top:18px}.admin-weekend-list{display:flex;flex-direction:column;gap:9px}.weekend-fixture-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 14px;border:1px solid #dfe8e2;border-radius:14px;background:#fff}.weekend-fixture-row>div{display:flex;flex-direction:column;gap:3px}.weekend-fixture-row span,.weekend-fixture-row small{color:var(--muted)}.weekend-fixture-row.warning{border-color:#efc05c;background:#fffaf0}.weekend-fixture-row.warning small{color:#8a5b00;font-weight:800}
+
+/* v2.0.27 PIN access, RSVP, secure coaching notes and player stats */
+.match-availability{margin-top:14px;padding:14px;border-radius:16px;background:#f6f9f7;border:1px solid #dfe8e1}.match-availability-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}.match-availability-head>div{display:flex;flex-direction:column;gap:2px}.match-availability-head span{font-size:11px;color:var(--muted)}.availability-count{white-space:nowrap;font-size:11px!important;font-weight:900;background:#fff;border:1px solid #dbe5dd;border-radius:999px;padding:6px 9px;color:#24562b!important}.parent-availability-controls{margin-top:12px;display:grid;gap:10px}.parent-availability-controls label{display:grid;gap:5px;font-size:11px;font-weight:900;color:var(--muted)}.availability-buttons{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.availability-btn{border:1px solid #dce5df;border-radius:12px;background:#fff;padding:10px 7px;font-weight:900}.availability-btn.available.selected{background:#e6f7e8;border-color:#64aa70;color:#146324}.availability-btn.unsure.selected{background:#fff7dd;border-color:#e7bf55;color:#7d5b00}.availability-btn.unavailable.selected{background:#fff0ee;border-color:#df7c70;color:#9a261a}.coach-availability-summary{margin-top:12px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.availability-summary-group{padding:10px;border-radius:12px;background:#fff;border:1px solid #e0e6e2}.availability-summary-group>strong{display:block;font-size:11px;margin-bottom:7px}.availability-summary-group>div{display:flex;flex-direction:column;gap:5px}.availability-summary-group span{display:flex;align-items:center;gap:5px;font-size:11px;font-weight:800}.availability-summary-group em{font-size:11px;color:var(--muted);font-style:normal}.availability-summary-group.available{border-color:#b8dcbc}.availability-summary-group.unsure{border-color:#ecd98f}.availability-summary-group.unavailable{border-color:#e8bbb5}
+.season-player-stats{margin-top:18px}.season-player-table-wrap{overflow-x:auto}.season-player-table{width:100%;border-collapse:collapse;min-width:520px}.season-player-table th,.season-player-table td{padding:10px 8px;border-bottom:1px solid #edf1ee;text-align:center;font-size:12px}.season-player-table th:first-child,.season-player-table td:first-child{text-align:left}.season-player-name{display:flex;align-items:center;gap:7px}.secure-coach-note{border-top:1px solid #e7ece8;padding-top:14px}.secure-coach-note textarea{width:100%;resize:vertical}.coach-note-readonly{margin:0;padding:12px;border-radius:12px;background:#f6f9f7;white-space:pre-wrap}.team-member-row .member-role-pill+button[data-reset-parent-pin]{white-space:nowrap}
+@media(max-width:620px){.coach-availability-summary{grid-template-columns:1fr}.availability-buttons{grid-template-columns:1fr}.season-player-stats{overflow:hidden}}
+
+/* v2.0.28 linked parents, RSVP-driven squad, fixture diffs and matchday dashboard */
+.matchday-squad-head small{font-size:10px;color:var(--muted);font-weight:800;margin-top:2px}.matchday-squad-head-actions{display:flex;align-items:center;gap:8px}.matchday-player-label>span:last-child{display:flex;flex-direction:column;gap:1px}.matchday-player-label small{font-size:9px;color:#738078;font-weight:850}.matchday-player-option.availability-available{border-left:4px solid #3ca257}.matchday-player-option.availability-unsure{border-left:4px solid #e0b440}.matchday-player-option.availability-unavailable{border-left:4px solid #dc6b5d;background:#fbf4f3}.matchday-player-option.availability-unavailable:not(.selected){opacity:.62}.matchday-player-option.availability-no-response{border-left:4px solid #aeb8b1}.parent-link-player-list{display:grid;gap:8px;margin:14px 0}.parent-link-player{display:flex;align-items:center;gap:9px;padding:10px 12px;border:1px solid #dfe7e1;border-radius:13px;background:#fff;font-weight:900}.parent-link-player input{width:18px;height:18px;accent-color:var(--green)}
+.matchday-dashboard{margin-top:16px;background:linear-gradient(145deg,#fff,#f1f8f3)}.matchday-dashboard-heading{align-items:flex-start}.matchday-dashboard-status{display:inline-flex;align-items:center;padding:6px 9px;border-radius:999px;font-size:10px;font-weight:950;background:#eef2ef;color:#59665e}.matchday-dashboard-status.confirmed{background:#e6f6ea;color:#14743a}.matchday-dashboard-status.changed,.matchday-dashboard-status.issue{background:#fbeae8;color:#a13c31}.matchday-dashboard-status.awaiting{background:#fff4d9;color:#855f00}.matchday-dashboard-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:12px 0}.matchday-dashboard-grid article{padding:10px;border-radius:13px;background:#fff;border:1px solid #dfe8e1;display:flex;flex-direction:column;gap:3px}.matchday-dashboard-grid span{font-size:9px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);font-weight:900}.matchday-dashboard-grid strong{font-size:12px}.matchday-dashboard-alert{margin:10px 0;padding:10px 12px;border-radius:12px;background:#fff0ee;border:1px solid #e8bbb5;color:#8f3027;font-size:11px;font-weight:850;line-height:1.4}.matchday-dashboard-kits{margin:8px 0;color:#5d6a62;font-size:11px}.matchday-dashboard-actions{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 0}.matchday-dashboard-note{margin-top:13px;padding-top:13px;border-top:1px solid #dfe8e1}.matchday-dashboard-note textarea{width:100%;resize:vertical}.matchday-dashboard-note .panel-heading{margin-bottom:8px}
+@media(max-width:620px){.matchday-dashboard-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.matchday-squad-head{flex-direction:column}.matchday-squad-head-actions{width:100%;justify-content:space-between}}
+
+/* v2.0.29 dashboard reflow, removable award actions and mini-soccer score entry */
+@media(min-width:650px){.dashboard-grid .panel.dashboard-fill-row{grid-column:1/-1}}
+.award-item-actions{display:flex;align-items:flex-end;gap:8px;flex-direction:column}.award-item-actions .inline-action{font-size:9px;padding:5px 7px}
+.division-team-link{border:0;background:none;color:inherit;font:inherit;font-weight:900;padding:0;text-align:left;cursor:pointer}.division-team-link:hover,.division-team-link:focus{color:var(--green);text-decoration:underline}.division-result-add{background:#eef7f0!important;color:var(--green)!important;border:1px dashed #a9cdb1!important;font-size:9px!important;white-space:nowrap}
+.matches-next-fixture{margin-top:0}
+
+/* v2.0.30 announcements, attendance and grouped club health */
+.club-notices-panel{margin-bottom:16px}.club-notices-list{display:grid;gap:10px}.club-notice{border:1px solid rgba(21,90,33,.15);border-radius:14px;padding:12px;background:#fff}.club-notice.unread{border-left:4px solid #218a21}.club-notice.important{background:#fff9e8;border-color:#e6bd52}.club-notice.pinned{box-shadow:0 2px 10px rgba(0,0,0,.05)}.club-notice-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.club-notice-head>div{display:grid;gap:2px}.club-notice-head strong{font-size:15px}.club-notice-head span,.club-notice time{font-size:11px;color:#6b756b}.club-notice p{margin:8px 0 6px;line-height:1.45}.notice-unread-badge{background:#218a21;color:#fff;border-radius:999px;padding:4px 8px;font-size:11px;font-weight:700}
+.admin-announcement-centre{margin:16px 0}.announcement-compose-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.announcement-compose-grid label{display:grid;gap:5px;font-size:12px;font-weight:700}.announcement-compose-grid input,.announcement-compose-grid select,.announcement-compose-grid textarea{width:100%}.announcement-body-label{grid-column:1/-1}.announcement-compose-grid .checkbox-line{display:flex;align-items:center;gap:8px}.announcement-compose-grid .checkbox-line input{width:auto}.admin-announcements-list{display:grid;gap:8px;margin-top:14px}.admin-announcement-row{display:flex;justify-content:space-between;gap:12px;border-top:1px solid #e9ede9;padding-top:10px}.admin-announcement-row>div{display:grid;gap:3px}.admin-announcement-row span{font-size:11px;color:#667066}.admin-announcement-row p{margin:2px 0 0;font-size:13px}.admin-announcement-row.expired{opacity:.58}
+.match-attendance-list{display:grid;gap:8px}.attendance-player-row{display:flex;align-items:center;justify-content:space-between;gap:10px;border:1px solid #e5eae5;border-radius:12px;padding:8px 10px;background:#fff}.attendance-player-row>span{display:flex;align-items:center;gap:8px;min-width:0}.attendance-player-row select{min-width:130px}.attendance-player-row.readonly b{font-size:12px;color:#3f5a43}
+.admin-health-groups{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.admin-health-group{border:1px solid #dfe7df;border-radius:14px;padding:12px;background:#fff;display:grid;gap:4px}.admin-health-group.warn{border-color:#e7c47a;background:#fffaf0}.admin-health-group>span{font-size:12px;color:#5e6b60;font-weight:700}.admin-health-group>strong{font-size:26px;line-height:1}.admin-health-group>small{color:#727d73}.admin-health-group>div{display:flex;flex-wrap:wrap;gap:5px;margin-top:4px}.health-team-link{border:0;background:#edf6ed;color:#236d29;border-radius:999px;padding:5px 8px;font-size:10px;font-weight:700}.health-team-link.static{display:inline-block}
+@media(max-width:680px){.announcement-compose-grid{grid-template-columns:1fr}.announcement-body-label{grid-column:auto}.admin-health-groups{grid-template-columns:1fr}.club-notice-head{align-items:center}.attendance-player-row{align-items:center}.attendance-player-row select{min-width:120px}}
+
+/* v2.0.31 — appearance themes, read-only player profiles and Selkent opponent selector */
+html[data-theme="dark"]{
+  color-scheme:dark;
+  --ink:#f2f7f3;
+  --muted:#a9b8ae;
+  --bg:#0d1310;
+  --white:#151d18;
+  --green-3:#17311f;
+}
+html[data-theme="dark"] body,
+html[data-theme="dark"] .app-shell{background:var(--bg);color:var(--ink)}
+html[data-theme="dark"] .panel,
+html[data-theme="dark"] .match-card,
+html[data-theme="dark"] .player-card,
+html[data-theme="dark"] .settings-accordion,
+html[data-theme="dark"] .modal,
+html[data-theme="dark"] dialog,
+html[data-theme="dark"] .team-member-row,
+html[data-theme="dark"] .synced-fixture,
+html[data-theme="dark"] .division-matrix-row,
+html[data-theme="dark"] .division-matrix-head,
+html[data-theme="dark"] .next-match-card,
+html[data-theme="dark"] .admin-announcement-row,
+html[data-theme="dark"] .attendance-player-row,
+html[data-theme="dark"] .season-player-table-wrap{
+  background:#151d18!important;
+  border-color:#27342c!important;
+  color:var(--ink)!important;
+}
+html[data-theme="dark"] input,
+html[data-theme="dark"] select,
+html[data-theme="dark"] textarea{
+  background:#101713!important;
+  color:#f2f7f3!important;
+  border-color:#35443a!important;
+}
+html[data-theme="dark"] option{background:#101713;color:#f2f7f3}
+html[data-theme="dark"] .secondary-button,
+html[data-theme="dark"] .icon-button{
+  background:#202a23!important;color:#f2f7f3!important;border-color:#35443a!important;
+}
+html[data-theme="dark"] .scorer-row,
+html[data-theme="dark"] .goal-check,
+html[data-theme="dark"] .nested-settings,
+html[data-theme="dark"] .server-backup-note,
+html[data-theme="dark"] .next-action-panel{
+  background:#17211b!important;border-color:#2d3c32!important;color:var(--ink)!important;
+}
+html[data-theme="dark"] .settings-accordion[open]>summary{background:#17211b!important;border-color:#27342c!important}
+html[data-theme="dark"] .mini-item,
+html[data-theme="dark"] .rank-item,
+html[data-theme="dark"] .award-item{border-color:#28352d!important}
+html[data-theme="dark"] .season-player-table th,
+html[data-theme="dark"] .season-player-table td{border-color:#28352d!important;color:var(--ink)!important}
+html[data-theme="dark"] .read-only-card{background:#2d2818;color:#f3d98f;border-color:#564b2b}
+html[data-theme="dark"] .player-profile-readonly-note{background:#18211b;border-color:#2d3a31;color:#aebbb2}
+
+.player-profile-card{cursor:pointer;position:relative}
+.player-profile-card:hover{border-color:#b9d8c1}
+.player-profile-modal{max-width:520px}
+.player-profile-shell{display:flex;flex-direction:column;gap:14px}
+.player-profile-hero{display:grid;grid-template-columns:84px 1fr;gap:16px;align-items:center;padding:14px;border-radius:18px;background:linear-gradient(135deg,var(--green-3),var(--white));border:1px solid #d9e8dd}
+.player-profile-hero .player-profile-jersey{display:grid;place-items:center}
+.player-profile-hero .jersey{transform:scale(.84);transform-origin:center}
+.player-profile-hero strong{display:block;font-size:23px;line-height:1.05}
+.player-profile-hero span{display:block;margin-top:6px;color:var(--muted);font-size:12px;font-weight:750}
+.player-profile-stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.player-profile-stats article{border:1px solid #e0e8e2;background:var(--white);border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:4px}
+.player-profile-stats span{font-size:11px;color:var(--muted);font-weight:800}
+.player-profile-stats strong{font-size:22px}
+.player-profile-availability{border-top:1px solid #e3eae5;padding-top:14px}
+.player-profile-readonly-note{padding:10px 12px;border-radius:12px;background:#f4f7f5;border:1px solid #e2e8e4;color:var(--muted);font-size:11px;line-height:1.4}
+#match-opponent-input-wrap .helper{margin-top:1px;font-weight:650;line-height:1.35}
+
+@media(max-width:520px){
+  .player-profile-stats{grid-template-columns:1fr 1fr}
+  .player-profile-hero{grid-template-columns:72px 1fr}
+}
+
+/* v2.0.31 player-access hardening + complete appearance treatment */
+body.role-player [data-coach-ui-only],
+body.role-player [data-requires-edit],
+body.role-player .player-edit,
+body.role-player .match-actions .delete{display:none!important}
+.team-access-invite-block{display:grid;gap:8px;padding:12px 0;border-top:1px solid #e4ebe6}.team-access-invite-block:first-of-type{border-top:0;padding-top:0}.team-access-invite-block label{display:grid;gap:5px;font-size:11px;font-weight:850;color:var(--muted)}
+html[data-theme="dark"] .top-nav-tabs{background:#111914!important;border-color:#28352d!important}
+html[data-theme="dark"] .top-nav-tab.nav-item{color:#b7c4bb!important}
+html[data-theme="dark"] .top-nav-tab.nav-item.active{background:#203027!important;color:#8ee09a!important;box-shadow:none!important}
+html[data-theme="dark"] .club-notice,
+html[data-theme="dark"] .availability-summary-group,
+html[data-theme="dark"] .matchday-player-option,
+html[data-theme="dark"] .matchday-squad-picker,
+html[data-theme="dark"] .matchday-dashboard,
+html[data-theme="dark"] .matchday-dashboard-grid article,
+html[data-theme="dark"] .parent-link-player,
+html[data-theme="dark"] .admin-health-group,
+html[data-theme="dark"] .player-profile-stats article{
+  background:#151d18!important;border-color:#2b3930!important;color:var(--ink)!important;
+}
+html[data-theme="dark"] .matchday-dashboard{background:linear-gradient(145deg,#151d18,#101713)!important}
+html[data-theme="dark"] .club-notice.important{background:#2d2818!important;border-color:#5b4c24!important}
+html[data-theme="dark"] .availability-btn{background:#17211b!important;color:var(--ink)!important;border-color:#344239!important}
+html[data-theme="dark"] .availability-btn.available.selected{background:#16351f!important;color:#a7eab2!important}
+html[data-theme="dark"] .availability-btn.unsure.selected{background:#372f16!important;color:#f2d780!important}
+html[data-theme="dark"] .availability-btn.unavailable.selected{background:#3a1d1a!important;color:#f0aaa2!important}
+html[data-theme="dark"] .player-profile-hero{border-color:#2c3b31!important;background:linear-gradient(135deg,#17311f,#151d18)!important}
+html[data-theme="dark"] .map-link{background:#193322!important;color:#8ee09a!important;border-color:#2f5038!important}
+html[data-theme="dark"] .health-team-link{background:#1c3322!important;color:#95dfa0!important}
+
+/* v2.0.32 weekly-cycle controls */
+.hero-notification-button{position:relative;border:1px solid rgba(255,255,255,.28);background:rgba(0,0,0,.16);color:#fff;border-radius:999px;min-width:42px;height:38px;padding:0 12px;font-size:18px;display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.notification-badge{position:absolute;right:-5px;top:-7px;min-width:20px;height:20px;padding:0 5px;border-radius:999px;background:#b91c1c;color:#fff;font-size:11px;line-height:20px;text-align:center;font-weight:800;border:2px solid rgba(255,255,255,.9)}
+.availability-deadline{margin-top:12px;padding-top:12px;border-top:1px solid var(--border,#d8ded9);display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}
+.availability-deadline>div:first-child{display:flex;flex-direction:column;gap:2px}.availability-deadline-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.availability-deadline-actions input{min-width:210px}
+.notification-modal{width:min(680px,calc(100vw - 24px));max-height:84vh}.notification-shell{display:flex;flex-direction:column;gap:12px}.notification-list{display:grid;gap:10px;overflow:auto;max-height:60vh;padding-right:2px}.notification-item{border:1px solid var(--border,#d8ded9);border-radius:14px;padding:12px;background:var(--panel,#fff);display:grid;gap:6px}.notification-item.unread{border-left:4px solid #218a21}.notification-item.important{border-left-color:#b91c1c}.notification-item-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}.notification-item-head strong{font-size:14px}.notification-item time,.notification-item small{font-size:11px;color:var(--muted,#667085)}.notification-item p{margin:0;line-height:1.4}.notification-item-actions{display:flex;justify-content:flex-end}.test-mode-banner{position:sticky;top:0;z-index:9999;background:#8a4b08;color:#fff;padding:7px 12px;text-align:center;font-weight:800;font-size:12px;letter-spacing:.04em}.quick-test-login{margin-top:10px;border-style:dashed!important}.quick-test-note{font-size:11px;color:var(--muted,#667085);text-align:center;margin:4px 0 0}
+@media(max-width:620px){.availability-deadline{align-items:stretch}.availability-deadline-actions{display:grid;grid-template-columns:1fr 1fr}.availability-deadline-actions input{grid-column:1/-1;width:100%}.matchday-dashboard-actions{gap:7px}.matchday-dashboard-actions>*{flex:1 1 auto}}
+
+/* v2.0.33 — dark-mode contrast hardening */
+html[data-theme="dark"]{
+  --border:#344239;
+  --panel:#151d18;
+}
+html[data-theme="dark"] .muted,
+html[data-theme="dark"] .helper,
+html[data-theme="dark"] .kicker,
+html[data-theme="dark"] .player-sub,
+html[data-theme="dark"] .team-member-copy span,
+html[data-theme="dark"] .admin-team-mini,
+html[data-theme="dark"] .admin-team-card small,
+html[data-theme="dark"] .admin-team-row-stats,
+html[data-theme="dark"] .admin-row-chevron,
+html[data-theme="dark"] .club-result-meta,
+html[data-theme="dark"] .club-results-pager span,
+html[data-theme="dark"] .fixture-directory-detail,
+html[data-theme="dark"] .admin-fixture-main span,
+html[data-theme="dark"] .access-method-pill,
+html[data-theme="dark"] .notification-item time,
+html[data-theme="dark"] .notification-item small,
+html[data-theme="dark"] .club-notice-head span,
+html[data-theme="dark"] .club-notice time,
+html[data-theme="dark"] .admin-announcement-row span,
+html[data-theme="dark"] .admin-health-group>span,
+html[data-theme="dark"] .admin-health-group>small,
+html[data-theme="dark"] .player-profile-hero span,
+html[data-theme="dark"] .player-profile-stats span,
+html[data-theme="dark"] .team-access-invite-block label,
+html[data-theme="dark"] .quick-test-note{
+  color:#b9c7be!important;
+}
+html[data-theme="dark"] .form-panel label,
+html[data-theme="dark"] .modal label,
+html[data-theme="dark"] .activation-card label,
+html[data-theme="dark"] .assignment-output-label,
+html[data-theme="dark"] .club-results-age-label,
+html[data-theme="dark"] .formation-control,
+html[data-theme="dark"] .division-team-label{
+  color:#e6efe9!important;
+}
+html[data-theme="dark"] .next-action-panel p:not(.kicker),
+html[data-theme="dark"] .next-match-grid strong,
+html[data-theme="dark"] .next-match-kits strong,
+html[data-theme="dark"] .readonly-detail-row strong,
+html[data-theme="dark"] .attendance-player-row.readonly b{
+  color:#d8e7dc!important;
+}
+html[data-theme="dark"] .next-match-grid span,
+html[data-theme="dark"] .next-match-kits span{
+  color:#aebcb2!important;
+}
+html[data-theme="dark"] .mode-switch-button,
+html[data-theme="dark"] .squad-view-tab,
+html[data-theme="dark"] .club-view-tab{
+  color:#c3d0c7!important;
+}
+html[data-theme="dark"] .mode-switch-button.active,
+html[data-theme="dark"] .squad-view-tab.active,
+html[data-theme="dark"] .club-view-tab.active{
+  background:#203027!important;
+  color:#96e3a0!important;
+}
+html[data-theme="dark"] .tactics-player,
+html[data-theme="dark"] .tactics-bench-player,
+html[data-theme="dark"] .notification-item,
+html[data-theme="dark"] .selkent-source-card,
+html[data-theme="dark"] .manual-result-fallback,
+html[data-theme="dark"] .admin-age-group,
+html[data-theme="dark"] .feature-toggle-list .toggle-row{
+  background:#151d18!important;
+  color:#f2f7f3!important;
+  border-color:#344239!important;
+}
+html[data-theme="dark"] .formation-control select{
+  background:#101713!important;
+  color:#f2f7f3!important;
+  border-color:#35443a!important;
+}
+html[data-theme="dark"] .division-result-empty,
+html[data-theme="dark"] .fixture-source-pill,
+html[data-theme="dark"] .competition-mode-pill.no-league{
+  background:#202a23!important;
+  color:#c5d2c9!important;
+  border-color:#35443a!important;
+}
+html[data-theme="dark"] .squad-format-summary span{
+  background:#193322!important;
+  color:#98e3a3!important;
+  border-color:#2f5038!important;
+}
+html[data-theme="dark"] .squad-format-summary span:nth-child(3){
+  background:#1a2b3b!important;color:#a9cceb!important;border-color:#32485b!important;
+}
+html[data-theme="dark"] .squad-format-summary span:nth-child(4){
+  background:#382e17!important;color:#efd98d!important;border-color:#584923!important;
+}
+html[data-theme="dark"] .admin-health-group.warn,
+html[data-theme="dark"] .match-card.status-postponed,
+html[data-theme="dark"] .match-card.status-abandoned,
+html[data-theme="dark"] .match-card.status-scheduled{
+  color:#f2f7f3!important;
+}
+html[data-theme="dark"] .admin-health-group.warn{background:#2b2517!important;border-color:#594b28!important}
+html[data-theme="dark"] .danger-button{background:#3b1d1b!important;color:#f0b1aa!important;border:1px solid #63302c!important}
+html[data-theme="dark"] .goal-check{background:#1a241e!important;color:#d0dcd3!important}
+html[data-theme="dark"] .goal-check.good{background:#14301f!important;color:#9fe0b4!important}
+html[data-theme="dark"] .goal-check.bad{background:#3a1d1a!important;color:#f0aaa2!important}
+html[data-theme="dark"] .pin-error,
+html[data-theme="dark"] .inline-action.delete,
+html[data-theme="dark"] .squad-capacity.full{color:#f1a59e!important}
+html[data-theme="dark"] .squad-capacity.near{color:#f0cf75!important}
+html[data-theme="dark"] ::placeholder{color:#839188!important;opacity:1}
+html[data-theme="dark"] input:disabled,
+html[data-theme="dark"] select:disabled,
+html[data-theme="dark"] textarea:disabled{color:#a9b7ad!important;opacity:.9}
+
+/* v2.0.34 season history, audit trail and tournament mode */
+.match-section-actions,.tournament-event-actions,.season-management-actions,.season-history-controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.tournament-event-list{display:grid;gap:14px}.tournament-event-card{padding:18px}.tournament-event-head{display:flex;justify-content:space-between;gap:16px;align-items:flex-start}.tournament-event-head h3{margin:2px 0 4px}.tournament-summary-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px;margin:14px 0}.tournament-summary-grid span,.archive-stat-grid span{background:var(--surface-soft,#eef5ef);border:1px solid var(--line,#d9e4dc);border-radius:12px;padding:10px;text-align:center;font-size:.78rem}.tournament-summary-grid b,.archive-stat-grid b{display:block;font-size:1.12rem;margin-bottom:2px}.tournament-game-list{display:grid;gap:8px}.tournament-game-list .match-card{margin:0}.tournament-delete{margin-top:12px}.season-management-actions label{min-width:170px;flex:1}.season-history-controls select{flex:1;min-width:190px}.archive-summary{margin-top:12px;color:var(--muted,#66736a)}.archive-stat-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px;margin-bottom:14px}.archive-match-list{display:grid;gap:7px;max-height:48vh;overflow:auto}.archive-match-row{display:grid;grid-template-columns:86px minmax(120px,1fr) minmax(90px,.7fr) 64px;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line,#d9e4dc)}.audit-history-list{display:grid;gap:8px;margin-top:12px;max-height:520px;overflow:auto}.audit-row{display:flex;justify-content:space-between;gap:14px;padding:11px 0;border-bottom:1px solid var(--line,#d9e4dc)}.audit-row>div:first-child{display:grid;gap:3px}.audit-row span,.audit-row small{color:var(--muted,#66736a);font-size:.82rem}.audit-meta{text-align:right;display:grid;gap:3px}.season-archive-body{min-width:min(720px,82vw)}
+[data-theme="dark"] .tournament-summary-grid span,[data-theme="dark"] .archive-stat-grid span{background:#18251d;border-color:#314238;color:#edf7f0}[data-theme="dark"] .archive-summary,[data-theme="dark"] .audit-row span,[data-theme="dark"] .audit-row small{color:#b8c9bd}
+@media(max-width:720px){.tournament-event-head{display:grid}.tournament-summary-grid,.archive-stat-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.archive-match-row{grid-template-columns:72px 1fr 58px}.archive-match-row span:nth-child(3){display:none}.season-archive-body{min-width:0}.audit-row{display:grid}.audit-meta{text-align:left}}
+
+
+/* v2.0.35 — scheduled match controls, Admin Results isolation and dark-mode full contrast pass */
+html[data-theme="dark"] .mini-meta,
+html[data-theme="dark"] .nav-item,
+html[data-theme="dark"] .player-card.vacant .player-name,
+html[data-theme="dark"] .admin-attention-row span,
+html[data-theme="dark"] .admin-attention-row b,
+html[data-theme="dark"] .matchday-player-label small,
+html[data-theme="dark"] .matchday-dashboard-kits,
+html[data-theme="dark"] .detail-match-summary span,
+html[data-theme="dark"] .server-backup-note span,
+html[data-theme="dark"] .auto-team-summary span,
+html[data-theme="dark"] .league-auto-status span,
+html[data-theme="dark"] .admin-team-division,
+html[data-theme="dark"] .admin-team-mini,
+html[data-theme="dark"] .table-meta,
+html[data-theme="dark"] .member-empty,
+html[data-theme="dark"] .archive-summary,
+html[data-theme="dark"] .audit-row span,
+html[data-theme="dark"] .audit-row small{
+  color:#b9c7be!important;
+}
+html[data-theme="dark"] .settings-accordion>summary,
+html[data-theme="dark"] .nested-settings>summary,
+html[data-theme="dark"] .server-backup-note strong,
+html[data-theme="dark"] .admin-team-card-head strong,
+html[data-theme="dark"] .detail-player-row span,
+html[data-theme="dark"] .detail-booking-row>span,
+html[data-theme="dark"] .match-opponent,
+html[data-theme="dark"] .match-score,
+html[data-theme="dark"] .scoreline,
+html[data-theme="dark"] .rank-name,
+html[data-theme="dark"] .mini-team,
+html[data-theme="dark"] .panel h3,
+html[data-theme="dark"] .section-title-row h2{
+  color:#f2f7f3!important;
+}
+html[data-theme="dark"] .admin-team-card,
+html[data-theme="dark"] .admin-assignment-panel,
+html[data-theme="dark"] .auto-team-summary>div,
+html[data-theme="dark"] .league-auto-status>div,
+html[data-theme="dark"] .detail-match-summary,
+html[data-theme="dark"] .detail-player-row,
+html[data-theme="dark"] .detail-booking-row,
+html[data-theme="dark"] .server-backup-note,
+html[data-theme="dark"] .member-role-pill,
+html[data-theme="dark"] .match-detail-badges span,
+html[data-theme="dark"] .division-result-add,
+html[data-theme="dark"] .empty-detail-options{
+  background:#17211b!important;
+  border-color:#344239!important;
+  color:#e6efe9!important;
+}
+html[data-theme="dark"] .admin-team-card.active-team{border-color:#4f8f5b!important;box-shadow:0 0 0 2px rgba(79,143,91,.16)!important}
+html[data-theme="dark"] .team-member-row.pending{background:#2b2517!important;border-color:#594b28!important}
+html[data-theme="dark"] .team-member-row.pending .member-role-pill{background:#382e17!important;color:#efd98d!important;border-color:#584923!important}
+html[data-theme="dark"] .empty-detail-options{background:#2b2517!important;color:#f0dc9c!important;border-color:#594b28!important}
+html[data-theme="dark"] .match-detail-badges span{background:#1b3022!important;color:#9ee0a8!important;border:1px solid #2f5038!important}
+html[data-theme="dark"] .division-result-add{background:#193322!important;color:#98e3a3!important;border-color:#2f5038!important}
+html[data-theme="dark"] .matchday-dashboard-status{background:#202a23!important;color:#d5e2d9!important;border:1px solid #35443a!important}
+html[data-theme="dark"] .matchday-dashboard-status.confirmed{background:#16351f!important;color:#a7eab2!important;border-color:#2f5038!important}
+html[data-theme="dark"] .matchday-dashboard-status.awaiting{background:#372f16!important;color:#f2d780!important;border-color:#584923!important}
+html[data-theme="dark"] .matchday-dashboard-status.changed,
+html[data-theme="dark"] .matchday-dashboard-status.issue{background:#3a1d1a!important;color:#f0aaa2!important;border-color:#63302c!important}
+html[data-theme="dark"] .matchday-dashboard-alert{background:#3a1d1a!important;border-color:#63302c!important;color:#f0aaa2!important}
+html[data-theme="dark"] .fixture-ack-pill{background:#202a23!important;color:#d5e2d9!important;border:1px solid #35443a!important}
+html[data-theme="dark"] .fixture-ack-pill.awaiting{background:#372f16!important;color:#f2d780!important;border-color:#584923!important}
+html[data-theme="dark"] .fixture-ack-pill.issue,
+html[data-theme="dark"] .fixture-ack-pill.changed{background:#3a1d1a!important;color:#f0aaa2!important;border-color:#63302c!important}
+html[data-theme="dark"] .fixture-ack.awaiting .fixture-ack-copy strong,
+html[data-theme="dark"] .weekend-fixture-row.warning small{color:#f0cf75!important}
+html[data-theme="dark"] .club-result-row.result-D .club-result-score strong{color:#d4ddd6!important}
+html[data-theme="dark"] .rank-no,
+html[data-theme="dark"] .shield-mini{background:#193322!important;color:#98e3a3!important}
+html[data-theme="dark"] .text-button,
+html[data-theme="dark"] .inline-action,
+html[data-theme="dark"] .division-team-link{color:#8ee09a!important}
+html[data-theme="dark"] .competition-games-table th,
+html[data-theme="dark"] .competition-games-table td,
+html[data-theme="dark"] .league-table th,
+html[data-theme="dark"] .league-table td{color:#e6efe9!important;border-color:#2f3d33!important}
+html[data-theme="dark"] .competition-games-table thead,
+html[data-theme="dark"] .league-table thead{background:#111914!important}
+
+/* Universal Core v1 */
+:root{--club-secondary:#fff}.club-logo-wrap.platform-club-placeholder{background:#fff;border-color:rgba(255,255,255,.82)}.club-logo-wrap.platform-club-placeholder::after,.club-logo-wrap.generic-club-mark::after{content:none!important}.quick-test-club-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}@media(max-width:430px){.quick-test-club-grid{grid-template-columns:1fr}}
+
+.universal-config-brand{display:flex;align-items:center;gap:10px;margin:10px 0}.universal-config-brand>div{display:flex;flex-direction:column}.universal-config-brand small{color:var(--muted);margin-top:2px}.universal-swatch{width:38px;height:38px;border-radius:12px;border:2px solid var(--white);box-shadow:0 0 0 1px #dce5df}.universal-config-chips{display:flex;flex-wrap:wrap;gap:6px}.universal-config-chips span{font-size:10px;font-weight:900;background:var(--green-3);color:var(--green-2);padding:6px 8px;border-radius:999px}.universal-config-rules{margin-top:12px}.universal-rule-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}.universal-rule-grid span{background:var(--bg);border-radius:12px;padding:9px;text-align:center}.universal-rule-grid b{display:block;font-size:15px}.universal-rule-grid small{font-size:9px;color:var(--muted)}@media(max-width:500px){.universal-rule-grid{grid-template-columns:1fr 1fr}}
+
+/* v2.2.1 compliance UI */
+.inbox-thread{display:grid;gap:10px;margin-top:16px}.inbox-message{padding:12px;border:1px solid var(--border,#dbe5de);border-radius:12px}.inbox-message.mine{margin-left:8%;background:rgba(33,138,33,.08)}.inbox-message.theirs{margin-right:8%}.inbox-message-meta{display:flex;justify-content:space-between;gap:12px;font-size:.82rem}.inbox-message p{margin:8px 0}.concern-panel{margin-top:16px}.mini-results-restricted .record-card,.mini-results-restricted .running-count-grid{display:none!important}

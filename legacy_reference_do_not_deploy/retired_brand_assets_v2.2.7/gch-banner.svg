@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="320" viewBox="0 0 1600 320" role="img" aria-labelledby="t d">
+<title id="t">Grassroots Club Hub banner</title><desc id="d">Grassroots Club Hub. Connect, organise, grow the game.</desc>
+<rect width="1600" height="320" rx="28" fill="#0B5D35"/>
+<circle cx="1380" cy="65" r="260" fill="#0F7B42" opacity=".22"/>
+<circle cx="1535" cy="290" r="310" fill="#064526" opacity=".52"/>
+<path d="M0 300 L8 276 L13 300 Z" fill="#168848" opacity=".55"/><path d="M36 300 L26 269 L49 300 Z" fill="#168848" opacity=".55"/><path d="M72 300 L80 262 L85 300 Z" fill="#168848" opacity=".55"/><path d="M108 300 L98 255 L121 300 Z" fill="#168848" opacity=".55"/><path d="M144 300 L152 248 L157 300 Z" fill="#168848" opacity=".55"/><path d="M180 300 L170 276 L193 300 Z" fill="#168848" opacity=".55"/><path d="M216 300 L224 269 L229 300 Z" fill="#168848" opacity=".55"/><path d="M252 300 L242 262 L265 300 Z" fill="#168848" opacity=".55"/><path d="M288 300 L296 255 L301 300 Z" fill="#168848" opacity=".55"/><path d="M324 300 L314 248 L337 300 Z" fill="#168848" opacity=".55"/><path d="M360 300 L368 276 L373 300 Z" fill="#168848" opacity=".55"/><path d="M396 300 L386 269 L409 300 Z" fill="#168848" opacity=".55"/><path d="M432 300 L440 262 L445 300 Z" fill="#168848" opacity=".55"/><path d="M468 300 L458 255 L481 300 Z" fill="#168848" opacity=".55"/><path d="M504 300 L512 248 L517 300 Z" fill="#168848" opacity=".55"/><path d="M540 300 L530 276 L553 300 Z" fill="#168848" opacity=".55"/><path d="M576 300 L584 269 L589 300 Z" fill="#168848" opacity=".55"/><path d="M612 300 L602 262 L625 300 Z" fill="#168848" opacity=".55"/><path d="M648 300 L656 255 L661 300 Z" fill="#168848" opacity=".55"/><path d="M684 300 L674 248 L697 300 Z" fill="#168848" opacity=".55"/><path d="M720 300 L728 276 L733 300 Z" fill="#168848" opacity=".55"/><path d="M756 300 L746 269 L769 300 Z" fill="#168848" opacity=".55"/><path d="M792 300 L800 262 L805 300 Z" fill="#168848" opacity=".55"/><path d="M828 300 L818 255 L841 300 Z" fill="#168848" opacity=".55"/><path d="M864 300 L872 248 L877 300 Z" fill="#168848" opacity=".55"/><path d="M900 300 L890 276 L913 300 Z" fill="#168848" opacity=".55"/><path d="M936 300 L944 269 L949 300 Z" fill="#168848" opacity=".55"/><path d="M972 300 L962 262 L985 300 Z" fill="#168848" opacity=".55"/><path d="M1008 300 L1016 255 L1021 300 Z" fill="#168848" opacity=".55"/><path d="M1044 300 L1034 248 L1057 300 Z" fill="#168848" opacity=".55"/><path d="M1080 300 L1088 276 L1093 300 Z" fill="#168848" opacity=".55"/><path d="M1116 300 L1106 269 L1129 300 Z" fill="#168848" opacity=".55"/><path d="M1152 300 L1160 262 L1165 300 Z" fill="#168848" opacity=".55"/><path d="M1188 300 L1178 255 L1201 300 Z" fill="#168848" opacity=".55"/><path d="M1224 300 L1232 248 L1237 300 Z" fill="#168848" opacity=".55"/><path d="M1260 300 L1250 276 L1273 300 Z" fill="#168848" opacity=".55"/><path d="M1296 300 L1304 269 L1309 300 Z" fill="#168848" opacity=".55"/><path d="M1332 300 L1322 262 L1345 300 Z" fill="#168848" opacity=".55"/><path d="M1368 300 L1376 255 L1381 300 Z" fill="#168848" opacity=".55"/><path d="M1404 300 L1394 248 L1417 300 Z" fill="#168848" opacity=".55"/><path d="M1440 300 L1448 276 L1453 300 Z" fill="#168848" opacity=".55"/><path d="M1476 300 L1466 269 L1489 300 Z" fill="#168848" opacity=".55"/><path d="M1512 300 L1520 262 L1525 300 Z" fill="#168848" opacity=".55"/><path d="M1548 300 L1538 255 L1561 300 Z" fill="#168848" opacity=".55"/><path d="M1584 300 L1592 248 L1597 300 Z" fill="#168848" opacity=".55"/>
+<g transform="translate(80 32) scale(.84)">
+
+<rect width="920" height="280" fill="none"/>
+<g font-family="Inter,Segoe UI,Arial,sans-serif" fill="#FFFFFF">
+  <text x="34" y="95" font-size="72" font-weight="900" letter-spacing="-2.3">GRASSR</text>
+  <g aria-hidden="true">
+      <circle cx="359" cy="70" r="29" fill="none" stroke="#FFFFFF" stroke-width="13"/>
+      <path d="M 345.9 90.9 C 345.1 77.2, 351.2 68.3, 356.7 57.5
+               C 355.5 70.9, 357.3 81.0, 359.0 90.9
+               C 359.9 77.0, 364.2 66.2, 371.2 55.5
+               C 368.6 69.4, 367.4 81.3, 367.7 90.9
+               C 370.6 79.9, 375.2 71.5, 379.9 66.2
+               C 376.4 79.3, 375.2 86.0, 374.7 91.2 Z" fill="#68C77E"/>
+    </g>
+  <text x="396" y="95" font-size="72" font-weight="900" letter-spacing="-2.3">OTS</text>
+  <text x="35" y="176" font-size="67" font-weight="900" letter-spacing="-1.8">CLUB HUB</text>
+  <line x1="35" y1="206" x2="676" y2="206" stroke="#68C77E" stroke-width="4" stroke-linecap="round"/>
+  <text x="35" y="242" font-size="22" font-weight="800" letter-spacing="2.1">CONNECT • ORGANISE • GROW THE GAME</text>
+</g>
+</g>
+</svg>
