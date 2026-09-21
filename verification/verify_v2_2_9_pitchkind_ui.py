@@ -23,18 +23,18 @@ onboard=txt('app/src/main/assets/onboarding.js')
 sw=txt('app/src/main/assets/service-worker.js')
 manifest=json.loads(txt('app/src/main/assets/manifest.json'))
 
-check('versionCode 2208','versionCode 2208' in gradle)
-check('versionName 2.2.8',"versionName '2.2.8'" in gradle)
+check('versionCode 2209','versionCode 2209' in gradle)
+check('versionName 2.2.9',"versionName '2.2.9'" in gradle)
 check('applicationId preserved',"applicationId 'com.grassrootsclubhub.universal'" in gradle)
-check('native marker version','GrassrootsClubHub/2.2.8' in main)
+check('native marker version','GrassrootsClubHub/2.2.9' in main)
 check('auth scheme preserved','"grassrootsclubhub".equalsIgnoreCase' in main and 'android:scheme="grassrootsclubhub"' in txt('app/src/main/AndroidManifest.xml'))
 check('ClubHubNative preserved','"ClubHubNative"' in main)
 check('static feed host preserved','raw.githubusercontent.com' in main and 'Grassroots-Club-Hub/main/data/directory.json' in main and 'Grassroots-Club-Hub/main/data/results.json' in main)
 check('Android app label PitchKind','>PitchKind<' in strings)
 check('HTML title PitchKind','<title>PitchKind</title>' in index)
-check('About version 2.2.8','App version 2.2.8' in index)
+check('About version 2.2.9','App version 2.2.9' in index)
 check('manifest name PitchKind',manifest.get('name')=='PitchKind' and manifest.get('short_name')=='PitchKind')
-check('manifest version 2.2.8',manifest.get('version')=='2.2.8')
+check('manifest version 2.2.9',manifest.get('version')=='2.2.9')
 check('v1.4 marker','approved-app-ui-2026-09-21-v1.4-pitchkind' in cloud and 'approved-app-ui-2026-09-21-v1.4-pitchkind' in txt('app/src/main/assets/app-design-system.css'))
 
 hashes={
@@ -90,6 +90,27 @@ check('single APK workflow',(root/'.github/workflows/build-apk.yml').exists() an
 check('current UI guide bundled',(root/'APP-UI-DESIGN-GUIDELINES.md').exists() and 'Version 1.4' in txt('APP-UI-DESIGN-GUIDELINES.md'))
 check('brand guide bundled',(root/'BRAND-GUIDELINES.md').exists() and 'Version 1.0' in txt('BRAND-GUIDELINES.md'))
 check('image provenance bundled',(root/'IMAGE-PROVENANCE-v2.2.8.md').exists())
+
+check(
+    'Inbox role routing fixed',
+    "view==='inbox'&&!['admin','coach','assistant_coach','parent'].includes(currentRole)" in app,
+)
+check(
+    'verified live Selkent fixture parser present',
+    "fixtureContainer.querySelectorAll('h2.subHead,.panel-title,.fixtureRow')" in app
+    and "providerTeamIds" in app,
+)
+check(
+    'Match played wizard present',
+    'data-match-played' in app
+    and 'matchReportStepDefinitions' in app
+    and 'match-report-score-section' in index,
+)
+check(
+    'attendance slider present',
+    'data-attendance-toggle' in app
+    and 'attendance-switch' in txt('app/src/main/assets/styles.css'),
+)
 
 print(f'\n{passed} passed; {len(fail)} failed')
 if fail:

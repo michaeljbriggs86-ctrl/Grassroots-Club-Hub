@@ -15,14 +15,14 @@ Architecture contract (see ARCHITECTURE.md):
 
 Current verification boundary:
 - Empty fixtureContainer is verified against real Selkent payloads.
-- Populated fixture markup is NOT yet verified.
+- Populated fixture markup is verified for h2.subHead / .panel-title / .fixtureRow payloads.
 - Standings table shape is verified against real Selkent payloads and tested
   with an explicitly synthetic non-zero fixture.
 - Published result-row markup is NOT yet verified against a real non-empty
   result payload.
 
-This script intentionally stops publication if populated fixture/result markup
-appears before its parser has been verified.
+This script intentionally stops publication for unknown populated fixture shapes
+or published-result markup that has not yet been verified.
 """
 
 from __future__ import annotations
@@ -344,11 +344,15 @@ def parse_results_divisions(html: str) -> list[dict[str, Any]]:
 
 def parse_fixtures(html: str) -> tuple[list[dict[str, Any]], str]:
     """
-    Parse a fixture response only within the currently verified boundary.
+    Parse the verified Selkent fixture shape.
 
-    Empty fixtureContainer has been verified from real Selkent payloads.
-    Populated markup has not. We therefore fail closed if content appears
-    instead of pretending an inferred parser is production-ready.
+    Verified real populated shape (2026-09-21):
+      h2.subHead                       -> fixture date / week
+      .panel-title                     -> division
+      .fixtureRow[data-team-ids]       -> home / away fixture
+      .fixtureRow.nonFixture           -> status row; ignore
+
+    Unknown populated shapes still fail closed.
     """
     soup = BeautifulSoup(html, "html.parser")
     container = soup.select_one("#fixtureContainer")
@@ -359,13 +363,80 @@ def parse_fixtures(html: str) -> tuple[list[dict[str, Any]], str]:
     if not container.get_text(" ", strip=True):
         return [], "verified_empty"
 
-    sample = _normalise_text(container.get_text(" ", strip=True))[:500]
+    fixtures: list[dict[str, Any]] = []
+    current_date = ""
+    current_division = ""
 
-    raise UnverifiedFixtureMarkupError(
-        "A populated Selkent fixture response is now live, but populated "
-        "fixture markup has not yet been verified. Publication stopped to "
-        f"protect the previous feed. Text sample: {sample!r}"
-    )
+    for element in container.select("h2.subHead, .panel-title, .fixtureRow"):
+        classes = set(element.get("class", []))
+
+        if element.name == "h2" and "subHead" in classes:
+            match = re.search(
+                r"(\d{1,2})/(\d{1,2})/(\d{2,4})",
+                element.get_text(" ", strip=True),
+            )
+            if not match:
+                raise UnverifiedFixtureMarkupError(
+                    "Fixture date heading has an unsupported shape"
+                )
+
+            day, month, year = match.groups()
+            year_number = int(year)
+            if year_number < 100:
+                year_number += 2000
+
+            current_date = (
+                f"{year_number:04d}-{int(month):02d}-{int(day):02d}"
+            )
+            continue
+
+        if "panel-title" in classes:
+            current_division = _normalise_text(
+                element.get_text(" ", strip=True)
+            )
+            continue
+
+        if "fixtureRow" not in classes:
+            continue
+
+        if "nonFixture" in classes:
+            continue
+
+        columns = [
+            _normalise_text(child.get_text(" ", strip=True))
+            for child in element.find_all("div", recursive=False)
+            if "col-xs-5" in child.get("class", [])
+        ]
+
+        if len(columns) < 2 or not current_date or not current_division:
+            raise UnverifiedFixtureMarkupError(
+                "Populated fixture row has an unsupported shape"
+            )
+
+        provider_team_ids = [
+            item
+            for item in str(element.get("data-team-ids", "")).split(";")
+            if item
+        ]
+
+        fixtures.append(
+            {
+                "date": current_date,
+                "division_name": current_division,
+                "home": columns[0],
+                "away": columns[-1],
+                "provider_team_ids": provider_team_ids,
+            }
+        )
+
+    if not fixtures:
+        sample = _normalise_text(container.get_text(" ", strip=True))[:500]
+        raise UnverifiedFixtureMarkupError(
+            "Fixture container is populated but no verified fixture rows "
+            f"were parsed. Text sample: {sample!r}"
+        )
+
+    return fixtures, "verified_fixture_rows_v1"
 
 
 def has_unparsed_published_results(html: str) -> bool:
@@ -538,7 +609,7 @@ def build_payload() -> dict[str, Any]:
         "coverage": {
             "fixtures": {
                 "scope": "all Selkent age groups",
-                "parser_status": "verified_empty_only",
+                "parser_status": "verified_empty_and_fixture_rows_v1",
             },
             "standings": {
                 "scope": "Selkent-public Results age groups only",
@@ -560,8 +631,8 @@ def build_payload() -> dict[str, Any]:
                 "from this public feed."
             ),
             (
-                "A non-empty fixture or published-result payload currently "
-                "fails closed until its real markup has been verified."
+                "Unknown fixture shapes and non-empty published-result payloads "
+                "fail closed until their real markup has been verified."
             ),
             (
                 "Standings preserve Selkent display sequence as row_order; "

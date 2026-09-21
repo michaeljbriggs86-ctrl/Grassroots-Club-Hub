@@ -642,7 +642,7 @@
             <div class="gch-about-copy">
               <strong>PitchKind</strong>
               <span>ORGANISE | CONNECT | PLAY</span>
-              <small>App version 2.2.8</small>
+              <small>App version 2.2.9</small>
             </div>
           </section>
         </div>
@@ -655,13 +655,27 @@
       <div class="modal-heading"><div><p class="kicker">Match details</p><h3 id="match-detail-title">Add match details</h3></div><button type="button" class="icon-button small" data-close-dialog aria-label="Close">×</button></div>
       <input type="hidden" id="match-detail-id" />
       <div class="detail-match-summary" id="match-detail-summary"></div>
+      <div class="match-report-progress hidden" id="match-report-progress" aria-label="Match report progress"></div>
+      <section class="detail-feature-section match-report-score-section hidden" id="match-report-score-section">
+        <div class="panel-heading"><div><h3>Scoreline</h3><span class="helper">Enter the final score</span></div></div>
+        <div class="match-report-score-grid">
+          <label>Our score<input id="match-report-gf" type="number" min="0" inputmode="numeric" value="0" /></label>
+          <span aria-hidden="true">–</span>
+          <label>Opposition<input id="match-report-ga" type="number" min="0" inputmode="numeric" value="0" /></label>
+        </div>
+      </section>
       <section class="detail-feature-section" id="detail-goals-section" data-detail-feature="goals"><div class="panel-heading"><h3>Goalscorers</h3><span class="helper">Goals</span></div><div id="detail-goals-inputs" class="detail-player-grid"></div></section>
       <section class="detail-feature-section" id="detail-assists-section" data-detail-feature="assists"><div class="panel-heading"><h3>Assists</h3><span class="helper">Assists</span></div><div id="detail-assists-inputs" class="detail-player-grid"></div></section>
       <section class="detail-feature-section" id="detail-awards-section" data-detail-feature="awards"><h3>Player awards</h3><div class="form-grid" id="detail-award-fields"></div></section>
       <section class="detail-feature-section match-attendance-section hidden" id="match-attendance-section"><div class="panel-heading"><div><h3>Attendance</h3><span class="helper" id="match-attendance-helper">Attendance status</span></div></div><div id="match-attendance-list" class="match-attendance-list"></div></section>
       <section class="detail-feature-section secure-coach-note hidden" id="coach-note-section"><div class="panel-heading"><div><h3>Coaching notes</h3><span class="helper">Coaching staff only · not visible to parents</span></div></div><textarea id="coach-match-note" rows="4" maxlength="4000" placeholder="Private coaching observations, follow-up points or development notes..."></textarea><p class="coach-note-readonly hidden" id="coach-note-readonly"></p></section>
       <div class="empty-detail-options hidden" id="empty-detail-options">All match detail options are switched off. Enable the options you want under More → Match detail options.</div>
-      <div class="modal-actions"><button type="button" class="secondary-button" data-close-dialog>Cancel</button><button id="save-match-details" type="submit" class="primary-button">Save details</button></div>
+      <div class="modal-actions match-report-actions">
+        <button type="button" class="secondary-button hidden" id="match-report-back">Back</button>
+        <button type="button" class="secondary-button" id="match-detail-cancel" data-close-dialog>Cancel</button>
+        <button type="button" class="primary-button hidden" id="match-report-next">Next</button>
+        <button id="save-match-details" type="submit" class="primary-button">Save details</button>
+      </div>
     </form>
   </dialog>
 

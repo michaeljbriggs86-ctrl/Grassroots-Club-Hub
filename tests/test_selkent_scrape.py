@@ -112,7 +112,52 @@ class GeneralizedSelkentFeedTests(unittest.TestCase):
         self.assertEqual(fixtures, [])
         self.assertEqual(status, "verified_empty")
 
-    def test_populated_fixture_markup_fails_closed(self):
+    def test_verified_populated_fixture_rows_parse(self):
+        html = """
+        <div id="fixtureContainer">
+          <h2 class="subHead">
+            <a name="U92026-09-27"></a>
+            27/09/26 - Week 2
+          </h2>
+          <div class="panel panel-static">
+            <div class="panel-heading">
+              <div class="panel-title">Under 9D Navy</div>
+            </div>
+            <div class="panel-body">
+              <div class="row fixtureRow"
+                   data-team-ids="139;972;">
+                <div class="col-xs-5">Junior Reds Sabres</div>
+                <div class="col-xs-1">v</div>
+                <div class="col-xs-5">Shooters Hill AFC Valiants</div>
+              </div>
+              <div class="row fixtureRow nonFixture"
+                   data-team-ids="2236;">
+                <div class="col-xs-5">Blackheath Rhinos Grey</div>
+                <div class="col-xs-1"></div>
+                <div class="col-xs-5">On Standby</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        """
+
+        fixtures, status = parse_fixtures(html)
+
+        self.assertEqual(status, "verified_fixture_rows_v1")
+        self.assertEqual(
+            fixtures,
+            [
+                {
+                    "date": "2026-09-27",
+                    "division_name": "Under 9D Navy",
+                    "home": "Junior Reds Sabres",
+                    "away": "Shooters Hill AFC Valiants",
+                    "provider_team_ids": ["139", "972"],
+                }
+            ],
+        )
+
+    def test_unknown_populated_fixture_markup_still_fails_closed(self):
         html = """
         <div id="fixtureContainer">
           <div>Fictional Home v Fictional Away</div>
