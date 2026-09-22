@@ -39,7 +39,7 @@
       <div class="hero-pattern" aria-hidden="true"></div>
       <div class="hero-inner">
         <div class="club-logo-wrap" aria-label="Club logo">
-          <img src="pitchkind-wt_mark.svg" alt="PitchKind placeholder" class="club-logo" />
+          <img src="shooters-hill-logo.png" alt="Shooters Hill AFC logo" class="club-logo" />
         </div>
         <div class="hero-copy">
           <p class="eyebrow" id="hero-club-name">GRASSROOTS CLUB HUB</p>
@@ -81,7 +81,45 @@
           <div class="club-notices-list" id="home-club-notices-list"></div>
         </section>
 
-        <div class="record-card knight-panel">
+        <section class="panel next-match-card" id="next-match-card">
+          <div class="panel-heading"><div><p class="kicker">Next match</p><h3 id="next-match-opponent">TBC</h3></div><span class="next-match-status hidden" id="next-match-status"></span></div>
+          <div class="match-versus next-fixture-versus" id="next-match-versus"></div>
+          <div class="next-match-grid"><div><span>Date / time</span><strong id="next-match-when">—</strong></div><div><span>Competition</span><strong id="next-match-venue">—</strong></div></div>
+          <div class="match-venue-card next-fixture-venue"><div><span>Venue</span><strong id="next-match-ground">Ground TBC</strong><small id="next-match-address">Address TBC</small></div><a class="map-link hidden" id="next-match-map" href="#">Open in Maps</a></div>
+          <div class="fixture-map-preview hidden" id="next-match-map-preview"><iframe id="next-match-map-frame" title="Next match venue map" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe></div>
+          <div class="kit-clash-warning hidden" id="next-match-kit-warning"></div>
+          <div class="fixture-kit-toggle-host hidden" id="next-match-kit-toggle"></div>
+          <div class="next-match-kits hidden"><span>Club colours</span><strong id="next-match-kits">Kit details will appear when a fixture is found.</strong></div><div class="next-match-links"><button type="button" class="text-button compact hidden" id="next-match-calendar">Add to calendar</button><button type="button" class="primary-button compact match-played-action hidden" id="next-match-played" data-requires-edit>Match played</button></div>
+          <div class="fixture-ack hidden" id="fixture-ack-panel">
+            <div class="fixture-ack-copy"><strong id="fixture-ack-label">Awaiting confirmation</strong><span id="fixture-ack-detail">Confirm the fixture once you have checked the details.</span></div>
+            <div class="fixture-ack-actions" data-requires-edit>
+              <button type="button" class="secondary-button compact" id="fixture-report-issue">Report issue</button>
+              <button type="button" class="primary-button compact" id="fixture-confirm">Confirm fixture</button>
+            </div>
+          </div>
+          <div class="match-availability hidden" id="match-availability-panel">
+            <div class="match-availability-head"><div><strong>Match availability</strong><span id="match-availability-meta">Tell the coaching staff if your player can attend.</span></div><span class="availability-count" id="match-availability-count">0 replies</span></div>
+            <div class="parent-availability-controls hidden" id="parent-availability-controls">
+              <label>Player<select id="availability-player"></select></label>
+              <div class="availability-buttons" role="group" aria-label="Match availability">
+                <button type="button" class="availability-btn available" data-availability-status="available">Available</button>
+                <button type="button" class="availability-btn unsure" data-availability-status="unsure">Unsure</button>
+                <button type="button" class="availability-btn unavailable" data-availability-status="unavailable">Unavailable</button>
+              </div>
+            </div>
+            <div class="coach-availability-summary hidden" id="coach-availability-summary"></div>
+            <div class="availability-deadline" id="availability-deadline-panel">
+              <div><span class="helper">Response deadline</span><strong id="availability-deadline-text">No deadline set</strong></div>
+              <div class="availability-deadline-actions hidden" id="availability-deadline-actions">
+                <input id="availability-deadline-input" type="datetime-local" aria-label="Availability deadline" />
+                <button type="button" class="secondary-button compact" id="availability-deadline-save">Set deadline</button>
+                <button type="button" class="text-button compact" id="availability-reminder-send">Remind outstanding</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <div class="record-card knight-panel dashboard-record-retired">
           <div class="record-heading" id="primary-record-heading">League record</div>
           <div class="record-main">
             <span class="record-number" id="stat-played">0</span>
@@ -125,42 +163,7 @@
           </div>
         </section>
 
-        <section class="panel next-match-card" id="next-match-card">
-          <div class="panel-heading"><div><p class="kicker">Next match</p><h3 id="next-match-opponent">TBC</h3></div><span class="next-match-status hidden" id="next-match-status"></span></div>
-          <div class="match-versus next-fixture-versus" id="next-match-versus"></div>
-          <div class="next-match-grid"><div><span>Date / time</span><strong id="next-match-when">—</strong></div><div><span>Competition</span><strong id="next-match-venue">—</strong></div></div>
-          <div class="match-venue-card next-fixture-venue"><div><span>Venue</span><strong id="next-match-ground">Ground TBC</strong><small id="next-match-address">Address TBC</small></div><a class="map-link hidden" id="next-match-map" href="#">Open in Maps</a></div>
-          <div class="fixture-map-preview hidden" id="next-match-map-preview"><iframe id="next-match-map-frame" title="Next match venue map" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe></div>
-          <div class="kit-clash-warning hidden" id="next-match-kit-warning"></div>
-          <div class="next-match-kits hidden"><span>Club colours</span><strong id="next-match-kits">Kit details will appear when a fixture is found.</strong></div><div class="next-match-links"><button type="button" class="text-button compact hidden" id="next-match-calendar">Add to calendar</button><button type="button" class="primary-button compact match-played-action hidden" id="next-match-played" data-requires-edit>Match played</button></div>
-          <div class="fixture-ack hidden" id="fixture-ack-panel">
-            <div class="fixture-ack-copy"><strong id="fixture-ack-label">Awaiting confirmation</strong><span id="fixture-ack-detail">Confirm the fixture once you have checked the details.</span></div>
-            <div class="fixture-ack-actions" data-requires-edit>
-              <button type="button" class="secondary-button compact" id="fixture-report-issue">Report issue</button>
-              <button type="button" class="primary-button compact" id="fixture-confirm">Confirm fixture</button>
-            </div>
-          </div>
-          <div class="match-availability hidden" id="match-availability-panel">
-            <div class="match-availability-head"><div><strong>Match availability</strong><span id="match-availability-meta">Tell the coaching staff if your player can attend.</span></div><span class="availability-count" id="match-availability-count">0 replies</span></div>
-            <div class="parent-availability-controls hidden" id="parent-availability-controls">
-              <label>Player<select id="availability-player"></select></label>
-              <div class="availability-buttons" role="group" aria-label="Match availability">
-                <button type="button" class="availability-btn available" data-availability-status="available">Available</button>
-                <button type="button" class="availability-btn unsure" data-availability-status="unsure">Unsure</button>
-                <button type="button" class="availability-btn unavailable" data-availability-status="unavailable">Unavailable</button>
-              </div>
-            </div>
-            <div class="coach-availability-summary hidden" id="coach-availability-summary"></div>
-            <div class="availability-deadline" id="availability-deadline-panel">
-              <div><span class="helper">Response deadline</span><strong id="availability-deadline-text">No deadline set</strong></div>
-              <div class="availability-deadline-actions hidden" id="availability-deadline-actions">
-                <input id="availability-deadline-input" type="datetime-local" aria-label="Availability deadline" />
-                <button type="button" class="secondary-button compact" id="availability-deadline-save">Set deadline</button>
-                <button type="button" class="text-button compact" id="availability-reminder-send">Remind outstanding</button>
-              </div>
-            </div>
-          </div>
-        </section>
+
 
         <section class="panel matchday-dashboard hidden" id="matchday-dashboard">
           <div class="panel-heading matchday-dashboard-heading">
@@ -176,7 +179,6 @@
             <article><span>Formation</span><strong id="matchday-dashboard-formation">TBC</strong></article>
           </div>
           <div class="matchday-dashboard-alert hidden" id="matchday-dashboard-alert"></div>
-          <p class="matchday-dashboard-kits" id="matchday-dashboard-kits"></p>
           <div class="kit-clash-warning hidden" id="matchday-dashboard-kit-warning"></div>
           <div class="matchday-dashboard-actions">
             <a class="secondary-button compact hidden" id="matchday-dashboard-map" href="#">Open in Maps</a>
@@ -257,6 +259,7 @@
           <div class="match-venue-card next-fixture-venue"><div><span>Venue</span><strong id="matches-next-ground">Ground TBC</strong><small id="matches-next-address">Address TBC</small></div><a class="map-link hidden" id="matches-next-map" href="#">Open in Maps</a></div>
           <div class="fixture-map-preview hidden" id="matches-next-map-preview"><iframe id="matches-next-map-frame" title="Next fixture venue map" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe></div>
           <div class="kit-clash-warning hidden" id="matches-next-kit-warning"></div>
+          <div class="fixture-kit-toggle-host hidden" id="matches-next-kit-toggle"></div>
           <div class="next-match-kits hidden"><span>Match details</span><strong id="matches-next-kits">Kit colours and away details will appear when confirmed.</strong></div>
           <div class="next-match-links"><button type="button" class="text-button compact hidden" id="matches-next-calendar">Add to calendar</button><button type="button" class="primary-button compact match-played-action hidden" id="matches-next-played" data-requires-edit>Match played</button></div>
         </section>
@@ -652,7 +655,7 @@
             <div class="gch-about-copy">
               <strong>PitchKind</strong>
               <span>ORGANISE | CONNECT | PLAY</span>
-              <small>App version 2.2.16</small>
+              <small>App version 2.2.17</small>
             </div>
           </section>
         </div>
@@ -673,14 +676,7 @@
         </div>
         <div class="fixture-map-preview hidden" id="match-detail-map-preview"><iframe id="match-detail-map-frame" title="Match venue map" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe></div>
         <div class="kit-clash-warning hidden" id="match-detail-kit-warning"></div>
-        <details class="match-kit-correction hidden" id="match-kit-correction">
-          <summary>Correct kit colours</summary>
-          <div class="form-grid two">
-            <label>Home team kit<input id="match-home-kit-colours" type="text" maxlength="80" placeholder="e.g. Green and white" /></label>
-            <label>Away team kit<input id="match-away-kit-colours" type="text" maxlength="80" placeholder="e.g. Red and black" /></label>
-          </div>
-          <p class="helper">This correction applies to this match only.</p>
-        </details>
+        <div class="fixture-kit-toggle-host hidden" id="match-detail-kit-toggle"></div>
       </section>
       <div class="match-report-progress hidden" id="match-report-progress" aria-label="Match report progress"></div>
       <section class="detail-feature-section match-report-score-section hidden" id="match-report-score-section">
@@ -715,11 +711,12 @@
       <div class="club-kit-grid" id="club-detail-kits"></div>
       <div class="match-venue-card club-detail-venue"><div><span>Home ground</span><strong id="club-detail-ground">Ground TBC</strong><small id="club-detail-address">Address TBC</small></div><a class="map-link hidden" id="club-detail-map" href="#">Open in Maps</a></div>
       <div class="fixture-map-preview hidden" id="club-detail-map-preview"><iframe id="club-detail-map-frame" title="Club home ground map" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe></div>
-      <section class="club-kit-admin hidden" id="club-kit-admin">
-        <div class="panel-heading"><div><h3>Kit details</h3><span class="helper">Club Admin only · private club-side override</span></div></div>
-        <div class="form-grid two"><label>Home kit override <span class="optional">optional</span><input id="club-kit-home-override" maxlength="80" placeholder="Use only if provider colours need correcting" /></label><label>Away kit colours<input id="club-kit-away" maxlength="80" placeholder="e.g. Blue shirts, blue shorts, blue socks" /></label></div>
-        <button type="button" class="primary-button" id="save-club-kit-profile">Save kit details</button>
-      </section>
+      <details class="club-kit-admin club-shirt-editor hidden" id="club-kit-admin">
+        <summary>Edit shirt colours</summary>
+        <p class="helper">Club Admin and Coaches · shirt colours only</p>
+        <div class="form-grid two"><label>Home shirt colours<input id="club-kit-home-override" maxlength="60" placeholder="e.g. Green and white" /></label><label>Away shirt colours<input id="club-kit-away" maxlength="60" placeholder="e.g. Navy blue" /></label></div>
+        <button type="button" class="primary-button" id="save-club-kit-profile">Save shirt colours</button>
+      </details>
       <div class="modal-actions"><button type="button" class="primary-button" data-close-dialog>Done</button></div>
     </div>
   </dialog>

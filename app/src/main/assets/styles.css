@@ -998,3 +998,29 @@ html[data-theme="dark"] .fixture-map-preview{background:#101713;border-color:#34
 html[data-theme="dark"] .further-fixture-card,html[data-theme="dark"] .club-kit-grid article,html[data-theme="dark"] .programme-status.not-played{background:#151d18!important;border-color:#344239!important;color:#f2f7f3!important}
 html[data-theme="dark"] .club-detail-link{color:#98e3a3}
 @media(max-width:390px){.further-fixture-card{padding:11px}.further-fixture-head{flex-direction:column}.club-kit-grid{grid-template-columns:1fr}.kit-clash-warning{flex-direction:column}.kit-clash-warning .text-button{width:100%;text-align:left}}
+
+
+/* v2.2.17 — dashboard priority, shirt selection, dark availability and logo */
+.record-card.knight-panel.dashboard-record-retired{display:none!important}
+.fixture-kit-toggle-host:empty{display:none!important}
+.fixture-kit-toggle{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 12px;border:1px solid #D8E0DA;border-radius:12px;background:var(--white)}
+.fixture-kit-toggle>span{font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:900}
+.fixture-kit-toggle>div{display:grid;grid-template-columns:1fr 1fr;gap:6px;min-width:190px}
+.fixture-kit-toggle button{min-height:42px;border:1px solid #D8E0DA;border-radius:10px;background:var(--white);color:var(--muted);font:inherit;font-size:12px;font-weight:900;padding:7px 10px}
+.fixture-kit-toggle button.active{background:var(--green);border-color:var(--green);color:#fff}
+.fixture-kit-toggle button:disabled{opacity:.5}
+.club-shirt-editor{border:1px solid #D8E0DA;border-radius:14px;padding:0;background:var(--white);overflow:hidden}
+.club-shirt-editor>summary{list-style:none;cursor:pointer;padding:12px 14px;color:var(--green);font-weight:900}.club-shirt-editor>summary::-webkit-details-marker{display:none}
+.club-shirt-editor[open]{padding-bottom:14px}.club-shirt-editor[open]>*:not(summary){margin-left:14px;margin-right:14px}.club-shirt-editor .form-grid{margin-top:10px}.club-shirt-editor input{width:100%;min-width:0;box-sizing:border-box}.club-shirt-editor .primary-button{margin-top:10px}
+.club-detail-modal{width:min(94vw,720px)}.club-detail-shell{box-sizing:border-box;max-height:calc(100dvh - var(--android-inset-bottom,0px) - 20px);overflow-y:auto;padding:19px;overscroll-behavior:contain}.club-detail-shell>.modal-actions{margin-left:-19px;margin-right:-19px;padding-left:19px;padding-right:19px}
+.mini-jersey b{position:absolute!important;inset:0!important;display:grid!important;place-items:center!important;margin:0!important;transform:translateY(1px)}
+.coach-availability-summary{grid-template-columns:repeat(4,minmax(0,1fr))}
+.availability-summary-group span{display:grid;grid-template-columns:32px minmax(0,1fr);align-items:center;gap:8px;min-height:32px}
+.availability-summary-group span .mini-jersey{justify-self:center}
+html[data-theme="dark"] .match-availability{background:#151d18!important;border-color:#344239!important;color:#f2f7f3!important}
+html[data-theme="dark"] .availability-summary-group,html[data-theme="dark"] .availability-count,html[data-theme="dark"] .availability-deadline,html[data-theme="dark"] .parent-availability-controls,html[data-theme="dark"] .fixture-kit-toggle,html[data-theme="dark"] .fixture-kit-toggle button,html[data-theme="dark"] .club-shirt-editor{background:#101713!important;border-color:#344239!important;color:#f2f7f3!important}
+html[data-theme="dark"] .availability-summary-group em,html[data-theme="dark"] .match-availability-head span,html[data-theme="dark"] .availability-deadline .helper{color:#b9c7be!important}
+html[data-theme="dark"] .fixture-kit-toggle button.active{background:var(--green)!important;color:#fff!important;border-color:var(--green)!important}
+html[data-theme="dark"] .modal-actions{background:linear-gradient(to bottom,rgba(21,29,24,.88),#151d18 24%)!important}
+@media(max-width:760px){.coach-availability-summary{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:520px){.coach-availability-summary{grid-template-columns:1fr}.fixture-kit-toggle{align-items:flex-start;flex-direction:column}.fixture-kit-toggle>div{width:100%;min-width:0}.club-shirt-editor .form-grid.two{grid-template-columns:1fr}}
