@@ -1,4 +1,4 @@
-name: Android APK v2.2.19 PitchKind
+name: Android APK v2.2.20 PitchKind
 
 on:
   workflow_dispatch:
@@ -19,7 +19,7 @@ jobs:
       - name: Verify source contract
         run: |
           set -euo pipefail
-          python verification/verify_v2_2_19_pitchkind_ui.py
+          python verification/verify_v2_2_20_pitchkind_ui.py
           python verification/verify_club_logo_quality.py
           python -m pip install --quiet requests beautifulsoup4
           python -m unittest discover -s tests -p "test_*.py" -v
@@ -101,9 +101,10 @@ jobs:
           python verification/verify_club_logo_quality.py --asset "$RUNNER_TEMP/shooters-hill-logo.png"
           test "$(sha256sum "$RUNNER_TEMP/shooters-hill-logo.png" | awk '{print $1}')" = "ea3b232a45b197da47d76ffc4bc38440eef9a096a9510af5a988aabc3df71bce"
           unzip -p "$APK" assets/index.html | grep -q '<title>PitchKind</title>'
-          unzip -p "$APK" assets/index.html | grep -q 'App version 2.2.19'
+          unzip -p "$APK" assets/index.html | grep -q 'App version 2.2.20'
           unzip -p "$APK" assets/app.js > "$RUNNER_TEMP/pitchkind-apk-app.js"
           unzip -p "$APK" assets/styles.css > "$RUNNER_TEMP/pitchkind-apk-styles.css"
+          unzip -p "$APK" assets/app-design-system.css > "$RUNNER_TEMP/pitchkind-apk-design-system.css"
           grep -Fq "function openNewMatchForCompetition(competition,status='scheduled')" "$RUNNER_TEMP/pitchkind-apk-app.js"
           grep -Fq "async function undoMatchPlayed()" "$RUNNER_TEMP/pitchkind-apk-app.js"
           grep -Fq "function renderMatchOverview(m)" "$RUNNER_TEMP/pitchkind-apk-app.js"
@@ -121,25 +122,26 @@ jobs:
           grep -Fq "function themePreference(){return localStorage.getItem(THEME_KEY)||'dark';}" "$RUNNER_TEMP/pitchkind-apk-app.js"
           grep -Fq 'v2.2.11 — full-screen Match played flow' "$RUNNER_TEMP/pitchkind-apk-styles.css"
           grep -Fq 'v2.2.18 — explicit squad pages, tactics-first layout and settings cleanup' "$RUNNER_TEMP/pitchkind-apk-styles.css"
+          grep -Fq 'v2.2.20 — verified club badge hero formatting' "$RUNNER_TEMP/pitchkind-apk-design-system.css"
           unzip -p "$APK" assets/index.html | grep -q 'id="squad-pages"'
           unzip -p "$APK" assets/index.html | grep -q 'Rules &amp; procedures'
           DEX_DIR="$RUNNER_TEMP/pitchkind-apk-dex"
           rm -rf "$DEX_DIR"
           mkdir -p "$DEX_DIR"
           unzip -qq "$APK" 'classes*.dex' -d "$DEX_DIR"
-          grep -aR -Fq 'GrassrootsClubHub/2.2.19' "$DEX_DIR"
+          grep -aR -Fq 'GrassrootsClubHub/2.2.20' "$DEX_DIR"
           ! unzip -p "$APK" assets/index.html | grep -q 'CONNECT • ORGANISE • GROW THE GAME'
           ! unzip -p "$APK" assets/index.html | grep -q 'More Than A Game'
           mkdir -p dist
-          cp "$APK" dist/PitchKind-v2.2.19-debug.apk
-          sha256sum dist/PitchKind-v2.2.19-debug.apk > dist/PitchKind-v2.2.19-debug.apk.sha256
+          cp "$APK" dist/PitchKind-v2.2.20-debug.apk
+          sha256sum dist/PitchKind-v2.2.20-debug.apk > dist/PitchKind-v2.2.20-debug.apk.sha256
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: PitchKind-v2.2.19-debug
+          name: PitchKind-v2.2.20-debug
           path: |
-            dist/PitchKind-v2.2.19-debug.apk
-            dist/PitchKind-v2.2.19-debug.apk.sha256
+            dist/PitchKind-v2.2.20-debug.apk
+            dist/PitchKind-v2.2.20-debug.apk.sha256
           if-no-files-found: error
           retention-days: 14
