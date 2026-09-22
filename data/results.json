@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "provider": "Selkent",
-  "last_updated": "2026-09-22T12:04:58.850505+00:00",
+  "last_updated": "2026-09-22T18:05:19.089926+00:00",
   "fixture_agegroup_discovery_source": "selkent_divisions_all",
   "coverage": {
     "fixtures": {
@@ -2170,11 +2170,11 @@
         {
           "date": "2026-09-27",
           "division_name": "Under 9D Silver",
-          "home": "Deptford United",
-          "away": "Blackheath Rhinos White",
+          "home": "Blackheath Rhinos White",
+          "away": "Deptford United",
           "provider_team_ids": [
-            "944",
-            "849"
+            "849",
+            "944"
           ]
         },
         {
@@ -5119,6 +5119,16 @@
         {
           "date": "2026-09-27",
           "division_name": "Under 12C Orange",
+          "home": "Baldon Sports Tigers",
+          "away": "Welling United Red",
+          "provider_team_ids": [
+            "921",
+            "895"
+          ]
+        },
+        {
+          "date": "2026-09-27",
+          "division_name": "Under 12C Orange",
           "home": "Crayford Arrows White",
           "away": "Long Lane Jaguars",
           "provider_team_ids": [
@@ -5154,16 +5164,6 @@
           "provider_team_ids": [
             "995",
             "134"
-          ]
-        },
-        {
-          "date": "2026-09-27",
-          "division_name": "Under 12C Orange",
-          "home": "Welling United Red",
-          "away": "Baldon Sports Tigers",
-          "provider_team_ids": [
-            "895",
-            "921"
           ]
         },
         {
@@ -5269,21 +5269,21 @@
         {
           "date": "2026-09-27",
           "division_name": "Under 12D Navy",
-          "home": "ST Sports FC City",
-          "away": "Slade Green Knights Greens",
+          "home": "South Darenth Whites",
+          "away": "Welling United Green",
           "provider_team_ids": [
-            "5",
-            "98"
+            "184",
+            "897"
           ]
         },
         {
           "date": "2026-09-27",
           "division_name": "Under 12D Navy",
-          "home": "Welling United Green",
-          "away": "South Darenth Whites",
+          "home": "ST Sports FC City",
+          "away": "Slade Green Knights Greens",
           "provider_team_ids": [
-            "897",
-            "184"
+            "5",
+            "98"
           ]
         },
         {
@@ -12682,6 +12682,16 @@
         {
           "date": "2026-09-27",
           "division_name": "Senior Division Two",
+          "home": "Istead United Colts",
+          "away": "Cray Valley (PM) FC",
+          "provider_team_ids": [
+            "1009",
+            "320"
+          ]
+        },
+        {
+          "date": "2026-09-27",
+          "division_name": "Senior Division Two",
           "home": "Kingsdale Red",
           "away": "Vikings FC",
           "provider_team_ids": [
@@ -12767,6 +12777,16 @@
           "provider_team_ids": [
             "904",
             "631"
+          ]
+        },
+        {
+          "date": "2026-10-04",
+          "division_name": "Senior London Cup",
+          "home": "Cray Valley (PM) FC",
+          "away": "Chislehurst Glebe Li (Non-Selkent)",
+          "provider_team_ids": [
+            "320",
+            "2233"
           ]
         }
       ],
@@ -13590,7 +13610,7 @@
           "date": "2026-10-04",
           "division_name": "Under8X Navy",
           "home": "Cray Wanderers Lions",
-          "away": "ShooterBallers FC",
+          "away": "ShooterBallers FC Green",
           "provider_team_ids": [
             "568",
             "843"
@@ -13659,7 +13679,7 @@
         {
           "date": "2026-10-04",
           "division_name": "Under8X Navy",
-          "home": "ShooterBallers FC",
+          "home": "ShooterBallers FC Green",
           "away": "Cray Wanderers Lions",
           "provider_team_ids": [
             "843",
