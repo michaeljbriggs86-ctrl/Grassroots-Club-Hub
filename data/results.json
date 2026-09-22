@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "provider": "Selkent",
-  "last_updated": "2026-09-22T06:05:29.528964+00:00",
+  "last_updated": "2026-09-22T12:04:58.850505+00:00",
   "fixture_agegroup_discovery_source": "selkent_divisions_all",
   "coverage": {
     "fixtures": {
@@ -2823,11 +2823,11 @@
         {
           "date": "2026-09-27",
           "division_name": "Under 10C Red",
-          "home": "Sporting Club Thamesmead Black",
-          "away": "Teviot Rangers Red",
+          "home": "Teviot Rangers Red",
+          "away": "Sporting Club Thamesmead Black",
           "provider_team_ids": [
-            "216",
-            "756"
+            "756",
+            "216"
           ]
         },
         {
@@ -4326,11 +4326,11 @@
         {
           "date": "2026-09-27",
           "division_name": "Under 11D Red",
-          "home": "Sporting Club Thamesmead Black",
-          "away": "S.E. Eagles FC",
+          "home": "S.E. Eagles FC",
+          "away": "Sporting Club Thamesmead Black",
           "provider_team_ids": [
-            "221",
-            "473"
+            "473",
+            "221"
           ]
         },
         {
