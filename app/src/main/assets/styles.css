@@ -982,3 +982,19 @@ html[data-theme="dark"] .next-match-grid span,
 html[data-theme="dark"] .next-match-kits span{color:#b9c7be!important}
 html[data-theme="dark"] .fixture-map-preview{background:#101713;border-color:#344239}
 @media(max-width:390px){.fixture-map-preview{height:152px}.next-fixture-versus{padding-left:7px;padding-right:7px}}
+
+
+/* v2.2.16 — fixture cards, kit profiles, clash warnings and safe programme */
+.club-detail-link{border:0;background:transparent;padding:0;color:var(--green);font:inherit;font-weight:900;text-decoration:underline;text-underline-offset:3px;cursor:pointer;max-width:100%;overflow-wrap:anywhere}
+.match-team-side .club-detail-link{font-size:13px;line-height:1.2;text-align:center}
+.kit-clash-warning{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:12px 14px;border:1px solid #A52626;border-radius:12px;background:#FFF0F0;color:#A52626;font-size:13px;font-weight:800;line-height:1.4}
+.kit-clash-warning .text-button{flex:0 0 auto;color:#A52626}
+.synced-fixture-list{display:grid;gap:16px}
+.further-fixture-card{display:grid;gap:12px;padding:14px;border:1px solid var(--line,#D8E0DA);border-radius:18px;background:var(--white,#FFFFFF)}
+.further-fixture-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}.further-fixture-head>div{display:grid;gap:3px}.further-fixture-head strong{font-size:14px}.further-fixture-map{height:168px}
+.programme-status{display:flex;align-items:center;justify-content:center;min-height:44px;border:1px solid var(--line,#D8E0DA);border-radius:12px;padding:8px 10px;font-size:12px;font-weight:850;text-align:center}
+.programme-status.played{background:#EEF6F1;color:var(--green-2)}.programme-status.not-played{background:var(--white,#FFFFFF);color:var(--muted)}.programme-status.postponed{background:#FFF0F0;color:#A52626}
+.club-detail-shell{display:grid;gap:14px}.club-detail-club-name{margin:-8px 0 0;color:var(--muted);font-weight:700}.club-kit-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.club-kit-grid article{display:grid;justify-items:center;gap:6px;text-align:center;padding:14px;border:1px solid var(--line,#D8E0DA);border-radius:16px;background:var(--white,#FFFFFF)}.club-kit-grid article>span{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:900}.club-kit-grid article strong{font-size:13px}.club-kit-admin{display:grid;gap:12px;padding-top:4px}
+html[data-theme="dark"] .further-fixture-card,html[data-theme="dark"] .club-kit-grid article,html[data-theme="dark"] .programme-status.not-played{background:#151d18!important;border-color:#344239!important;color:#f2f7f3!important}
+html[data-theme="dark"] .club-detail-link{color:#98e3a3}
+@media(max-width:390px){.further-fixture-card{padding:11px}.further-fixture-head{flex-direction:column}.club-kit-grid{grid-template-columns:1fr}.kit-clash-warning{flex-direction:column}.kit-clash-warning .text-button{width:100%;text-align:left}}

@@ -128,9 +128,10 @@
         <section class="panel next-match-card" id="next-match-card">
           <div class="panel-heading"><div><p class="kicker">Next match</p><h3 id="next-match-opponent">TBC</h3></div><span class="next-match-status hidden" id="next-match-status"></span></div>
           <div class="match-versus next-fixture-versus" id="next-match-versus"></div>
-          <div class="next-match-grid"><div><span>Date / time</span><strong id="next-match-when">—</strong></div><div><span>Home / away</span><strong id="next-match-venue">—</strong></div></div>
+          <div class="next-match-grid"><div><span>Date / time</span><strong id="next-match-when">—</strong></div><div><span>Competition</span><strong id="next-match-venue">—</strong></div></div>
           <div class="match-venue-card next-fixture-venue"><div><span>Venue</span><strong id="next-match-ground">Ground TBC</strong><small id="next-match-address">Address TBC</small></div><a class="map-link hidden" id="next-match-map" href="#">Open in Maps</a></div>
           <div class="fixture-map-preview hidden" id="next-match-map-preview"><iframe id="next-match-map-frame" title="Next match venue map" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe></div>
+          <div class="kit-clash-warning hidden" id="next-match-kit-warning"></div>
           <div class="next-match-kits hidden"><span>Club colours</span><strong id="next-match-kits">Kit details will appear when a fixture is found.</strong></div><div class="next-match-links"><button type="button" class="text-button compact hidden" id="next-match-calendar">Add to calendar</button><button type="button" class="primary-button compact match-played-action hidden" id="next-match-played" data-requires-edit>Match played</button></div>
           <div class="fixture-ack hidden" id="fixture-ack-panel">
             <div class="fixture-ack-copy"><strong id="fixture-ack-label">Awaiting confirmation</strong><span id="fixture-ack-detail">Confirm the fixture once you have checked the details.</span></div>
@@ -176,6 +177,7 @@
           </div>
           <div class="matchday-dashboard-alert hidden" id="matchday-dashboard-alert"></div>
           <p class="matchday-dashboard-kits" id="matchday-dashboard-kits"></p>
+          <div class="kit-clash-warning hidden" id="matchday-dashboard-kit-warning"></div>
           <div class="matchday-dashboard-actions">
             <a class="secondary-button compact hidden" id="matchday-dashboard-map" href="#">Open in Maps</a>
             <button type="button" class="secondary-button compact" id="matchday-add-calendar">Add to calendar</button>
@@ -251,9 +253,10 @@
         <section class="panel next-match-card matches-next-fixture" id="matches-next-fixture">
           <div class="panel-heading"><div><p class="kicker">Next fixture</p><h3 id="matches-next-opponent">TBC</h3></div></div>
           <div class="match-versus next-fixture-versus" id="matches-next-versus"></div>
-          <div class="next-match-grid"><div><span>Date / time</span><strong id="matches-next-when">Date / kick-off TBC</strong></div><div><span>Home / away</span><strong id="matches-next-venue">Venue TBC</strong></div></div>
+          <div class="next-match-grid"><div><span>Date / time</span><strong id="matches-next-when">Date / kick-off TBC</strong></div><div><span>Competition</span><strong id="matches-next-venue">Venue TBC</strong></div></div>
           <div class="match-venue-card next-fixture-venue"><div><span>Venue</span><strong id="matches-next-ground">Ground TBC</strong><small id="matches-next-address">Address TBC</small></div><a class="map-link hidden" id="matches-next-map" href="#">Open in Maps</a></div>
           <div class="fixture-map-preview hidden" id="matches-next-map-preview"><iframe id="matches-next-map-frame" title="Next fixture venue map" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe></div>
+          <div class="kit-clash-warning hidden" id="matches-next-kit-warning"></div>
           <div class="next-match-kits hidden"><span>Match details</span><strong id="matches-next-kits">Kit colours and away details will appear when confirmed.</strong></div>
           <div class="next-match-links"><button type="button" class="text-button compact hidden" id="matches-next-calendar">Add to calendar</button><button type="button" class="primary-button compact match-played-action hidden" id="matches-next-played" data-requires-edit>Match played</button></div>
         </section>
@@ -649,7 +652,7 @@
             <div class="gch-about-copy">
               <strong>PitchKind</strong>
               <span>ORGANISE | CONNECT | PLAY</span>
-              <small>App version 2.2.15</small>
+              <small>App version 2.2.16</small>
             </div>
           </section>
         </div>
@@ -669,6 +672,7 @@
           <a class="map-link hidden" id="match-detail-map" href="#">Open in Maps</a>
         </div>
         <div class="fixture-map-preview hidden" id="match-detail-map-preview"><iframe id="match-detail-map-frame" title="Match venue map" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe></div>
+        <div class="kit-clash-warning hidden" id="match-detail-kit-warning"></div>
         <details class="match-kit-correction hidden" id="match-kit-correction">
           <summary>Correct kit colours</summary>
           <div class="form-grid two">
@@ -702,6 +706,22 @@
         <button id="save-match-details" type="submit" class="primary-button">Save details</button>
       </div>
     </form>
+  </dialog>
+
+  <dialog id="club-detail-dialog" class="modal club-detail-modal">
+    <div class="club-detail-shell">
+      <div class="modal-heading"><div><p class="kicker">Club details</p><h3 id="club-detail-title">Club</h3></div><button type="button" class="icon-button small" data-close-dialog aria-label="Close">×</button></div>
+      <p class="club-detail-club-name" id="club-detail-club-name"></p>
+      <div class="club-kit-grid" id="club-detail-kits"></div>
+      <div class="match-venue-card club-detail-venue"><div><span>Home ground</span><strong id="club-detail-ground">Ground TBC</strong><small id="club-detail-address">Address TBC</small></div><a class="map-link hidden" id="club-detail-map" href="#">Open in Maps</a></div>
+      <div class="fixture-map-preview hidden" id="club-detail-map-preview"><iframe id="club-detail-map-frame" title="Club home ground map" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe></div>
+      <section class="club-kit-admin hidden" id="club-kit-admin">
+        <div class="panel-heading"><div><h3>Kit details</h3><span class="helper">Club Admin only · private club-side override</span></div></div>
+        <div class="form-grid two"><label>Home kit override <span class="optional">optional</span><input id="club-kit-home-override" maxlength="80" placeholder="Use only if provider colours need correcting" /></label><label>Away kit colours<input id="club-kit-away" maxlength="80" placeholder="e.g. Blue shirts, blue shorts, blue socks" /></label></div>
+        <button type="button" class="primary-button" id="save-club-kit-profile">Save kit details</button>
+      </section>
+      <div class="modal-actions"><button type="button" class="primary-button" data-close-dialog>Done</button></div>
+    </div>
   </dialog>
 
   <dialog id="parent-link-dialog" class="modal parent-link-modal">
