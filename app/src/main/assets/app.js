@@ -2216,6 +2216,7 @@ function resetMatchReportMode(){
   document.getElementById('match-report-score-section')?.classList.add('hidden');
   document.getElementById('match-report-back')?.classList.add('hidden');
   document.getElementById('match-report-next')?.classList.add('hidden');
+  document.getElementById('undo-match-played')?.classList.add('hidden');
   const save=document.getElementById('save-match-details');if(save){save.classList.remove('hidden');save.textContent='Save details';}
 }
 function changeMatchReportStep(delta){
@@ -2241,6 +2242,7 @@ function openMatchReport(matchId){
   detailPlayerInputs('detail-assists-inputs',m.id,'assists');
   renderAwardFields('detail-award-fields',m.id);
   document.getElementById('empty-detail-options')?.classList.add('hidden');
+  document.getElementById('undo-match-played')?.classList.add('hidden');
   document.getElementById('match-detail-dialog')?.classList.remove('readonly-dialog');
   document.getElementById('match-detail-dialog')?.classList.add('report-wizard-mode');
   document.getElementById('match-detail-dialog')?.showModal();
@@ -2262,6 +2264,7 @@ function openMatchDetails(matchId){
   let visible=0;document.querySelectorAll('[data-detail-feature]').forEach(sec=>{const on=featureEnabled(sec.dataset.detailFeature);sec.classList.toggle('hidden',!on);if(on)visible++;});
   document.getElementById('empty-detail-options').classList.toggle('hidden',visible>0);
   const saveBtn=document.getElementById('save-match-details');if(saveBtn)saveBtn.classList.toggle('hidden',!isCoach());
+  const undoBtn=document.getElementById('undo-match-played');if(undoBtn)undoBtn.classList.toggle('hidden',!(isCoach()&&isPlayedMatch(m)));
   document.getElementById('match-detail-dialog')?.classList.toggle('readonly-dialog',!isCoach());
   document.getElementById('match-detail-dialog').showModal();
   loadCoachMatchNote(m.id);
@@ -2297,6 +2300,76 @@ async function saveMatchDetails(e){
   saveState();if(reportMode&&matchStatus(beforeMatch)!=='played')auditEvent('match_played','match',id,`Marked match played vs ${m.opponent}`,beforeMatch,m);const afterDetails={goals:state.goals.filter(x=>x.matchId===id),assists:(state.assists||[]).filter(x=>x.matchId===id),bookings:(state.bookings||[]).filter(x=>x.matchId===id),awards:state.awards.filter(x=>x.matchId===id)};auditEvent('match_details_updated','match_details',id,`Updated match details vs ${m.opponent}`,beforeDetails,afterDetails);document.getElementById('match-detail-dialog').close();resetMatchReportMode();toast(reportMode?'Match report saved':'Match details saved');
   if(CLOUD_MODE&&isCoach()&&window.ClubHubCloud?.notifyMatchReport&&isPlayedMatch(m)){window.ClubHubCloud.notifyMatchReport(m.id,m.opponent,matchScoreText(m)).then(()=>refreshNotifications(true)).catch(()=>{});}
 }
+
+async function undoMatchPlayed(){
+  if(!requireCoach())return;
+  const id=document.getElementById('match-detail-id')?.value||'';
+  const m=state.matches.find(x=>x.id===id);
+  if(!m||!isPlayedMatch(m)){toast('This match is not marked as played');return;}
+  const warning=`Undo match played against ${m.opponent}?
+
+This returns the match to Scheduled and removes the recorded score, attendance, goals, assists, bookings, awards and private post-match coaching note.
+
+The Selkent fixture, matchday squad and availability are kept.`;
+  if(!confirm(warning))return;
+
+  const beforeMatch=JSON.parse(JSON.stringify(m));
+  const beforeDetails={
+    goals:state.goals.filter(x=>x.matchId===id),
+    assists:(state.assists||[]).filter(x=>x.matchId===id),
+    bookings:(state.bookings||[]).filter(x=>x.matchId===id),
+    awards:state.awards.filter(x=>x.matchId===id),
+    attendance:JSON.parse(JSON.stringify(__matchAttendanceRows||[]))
+  };
+
+  let noteWarning=false;
+  if(CLOUD_MODE&&isCoach()){
+    try{
+      await window.ClubHubCloud.saveMatchAttendance(id,[]);
+      __matchAttendanceRows=[];
+      await refreshAppearanceStats(false);
+    }catch(err){
+      alert('Could not clear match attendance, so the result has not been undone. Check your connection and try again.');
+      return;
+    }
+    try{
+      await window.ClubHubCloud.saveCoachMatchNote(id,'');
+    }catch(err){
+      noteWarning=true;
+    }
+  }
+
+  m.status='scheduled';
+  m.gf=0;
+  m.ga=0;
+  state.goals=state.goals.filter(x=>x.matchId!==id);
+  state.assists=(state.assists||[]).filter(x=>x.matchId!==id);
+  state.bookings=(state.bookings||[]).filter(x=>x.matchId!==id);
+  state.awards=state.awards.filter(x=>x.matchId!==id);
+
+  const afterMatch=JSON.parse(JSON.stringify(m));
+  const afterDetails={goals:[],assists:[],bookings:[],awards:[],attendance:[]};
+
+  saveState();
+  auditEvent('match_played_undone','match',id,`Returned match vs ${m.opponent} to Scheduled`,beforeMatch,afterMatch);
+  auditEvent('match_report_cleared','match_details',id,`Cleared mistaken match report vs ${m.opponent}`,beforeDetails,afterDetails);
+
+  document.getElementById('match-detail-dialog')?.close();
+  resetMatchReportMode();
+
+  if(CLOUD_MODE&&isCoach()&&window.ClubHubCloud?.notifyMatchReopened){
+    try{
+      await window.ClubHubCloud.notifyMatchReopened(id,m.opponent);
+      await refreshNotifications(true);
+    }catch(err){
+      toast('Match restored; correction notification could not be sent');
+      return;
+    }
+  }
+
+  toast(noteWarning?'Match restored; coaching note could not be cleared':'Match returned to Scheduled');
+}
+
 function jerseyHTML(player){
   const role=player.role==='goalkeeper'?'goalkeeper':'outfield';
   return `<div class="jersey-icon ${role}" aria-label="${role==='goalkeeper'?'Goalkeeper':'Outfield'} jersey number ${player.number}">
@@ -3313,6 +3386,7 @@ document.getElementById('player-form').addEventListener('submit',savePlayer);
 document.getElementById('parent-link-form')?.addEventListener('submit',saveParentLinkDialog);
 document.getElementById('remove-player')?.addEventListener('click',removePlayerFromSquad);
 document.getElementById('match-detail-form').addEventListener('submit',saveMatchDetails);
+document.getElementById('undo-match-played')?.addEventListener('click',undoMatchPlayed);
 document.getElementById('match-report-back')?.addEventListener('click',()=>changeMatchReportStep(-1));
 document.getElementById('match-report-next')?.addEventListener('click',()=>changeMatchReportStep(1));
 document.getElementById('match-detail-dialog')?.addEventListener('close',resetMatchReportMode);
