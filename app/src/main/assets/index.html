@@ -127,8 +127,11 @@
 
         <section class="panel next-match-card" id="next-match-card">
           <div class="panel-heading"><div><p class="kicker">Next match</p><h3 id="next-match-opponent">TBC</h3></div><span class="next-match-status hidden" id="next-match-status"></span></div>
-          <div class="next-match-grid"><div><span>Date / time</span><strong id="next-match-when">—</strong></div><div><span>Venue</span><strong id="next-match-venue">—</strong></div></div>
-          <div class="next-match-kits"><span>Club colours</span><strong id="next-match-kits">Kit details will appear when a fixture is found.</strong></div><div class="next-match-links"><a class="map-link hidden" id="next-match-map" href="#">Open in Maps</a><button type="button" class="text-button compact hidden" id="next-match-calendar">Add to calendar</button><button type="button" class="primary-button compact match-played-action hidden" id="next-match-played" data-requires-edit>Match played</button></div>
+          <div class="match-versus next-fixture-versus" id="next-match-versus"></div>
+          <div class="next-match-grid"><div><span>Date / time</span><strong id="next-match-when">—</strong></div><div><span>Home / away</span><strong id="next-match-venue">—</strong></div></div>
+          <div class="match-venue-card next-fixture-venue"><div><span>Venue</span><strong id="next-match-ground">Ground TBC</strong><small id="next-match-address">Address TBC</small></div><a class="map-link hidden" id="next-match-map" href="#">Open in Maps</a></div>
+          <div class="fixture-map-preview hidden" id="next-match-map-preview"><iframe id="next-match-map-frame" title="Next match venue map" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe></div>
+          <div class="next-match-kits hidden"><span>Club colours</span><strong id="next-match-kits">Kit details will appear when a fixture is found.</strong></div><div class="next-match-links"><button type="button" class="text-button compact hidden" id="next-match-calendar">Add to calendar</button><button type="button" class="primary-button compact match-played-action hidden" id="next-match-played" data-requires-edit>Match played</button></div>
           <div class="fixture-ack hidden" id="fixture-ack-panel">
             <div class="fixture-ack-copy"><strong id="fixture-ack-label">Awaiting confirmation</strong><span id="fixture-ack-detail">Confirm the fixture once you have checked the details.</span></div>
             <div class="fixture-ack-actions" data-requires-edit>
@@ -247,9 +250,12 @@
 
         <section class="panel next-match-card matches-next-fixture" id="matches-next-fixture">
           <div class="panel-heading"><div><p class="kicker">Next fixture</p><h3 id="matches-next-opponent">TBC</h3></div></div>
-          <div class="next-match-grid"><div><span>Date / time</span><strong id="matches-next-when">Date / kick-off TBC</strong></div><div><span>Venue</span><strong id="matches-next-venue">Venue TBC</strong></div></div>
-          <div class="next-match-kits"><span>Match details</span><strong id="matches-next-kits">Kit colours and away details will appear when confirmed.</strong></div>
-          <div class="next-match-links"><a class="map-link hidden" id="matches-next-map" href="#">Open in Maps</a><button type="button" class="text-button compact hidden" id="matches-next-calendar">Add to calendar</button><button type="button" class="primary-button compact match-played-action hidden" id="matches-next-played" data-requires-edit>Match played</button></div>
+          <div class="match-versus next-fixture-versus" id="matches-next-versus"></div>
+          <div class="next-match-grid"><div><span>Date / time</span><strong id="matches-next-when">Date / kick-off TBC</strong></div><div><span>Home / away</span><strong id="matches-next-venue">Venue TBC</strong></div></div>
+          <div class="match-venue-card next-fixture-venue"><div><span>Venue</span><strong id="matches-next-ground">Ground TBC</strong><small id="matches-next-address">Address TBC</small></div><a class="map-link hidden" id="matches-next-map" href="#">Open in Maps</a></div>
+          <div class="fixture-map-preview hidden" id="matches-next-map-preview"><iframe id="matches-next-map-frame" title="Next fixture venue map" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe></div>
+          <div class="next-match-kits hidden"><span>Match details</span><strong id="matches-next-kits">Kit colours and away details will appear when confirmed.</strong></div>
+          <div class="next-match-links"><button type="button" class="text-button compact hidden" id="matches-next-calendar">Add to calendar</button><button type="button" class="primary-button compact match-played-action hidden" id="matches-next-played" data-requires-edit>Match played</button></div>
         </section>
 
         <details class="panel league-programme" open>
@@ -350,9 +356,9 @@
               <label>Round / stage <span class="optional">optional</span><input id="match-stage" type="text" placeholder="e.g. Group A · Semi Final" /></label>
             </div>
             <div class="score-entry">
-              <label><span id="our-score-label">Our team</span><input id="match-gf" type="number" min="0" required value="0" /></label>
+              <label><span id="our-score-label">Home</span><input id="match-gf" type="number" min="0" required value="0" /></label>
               <span>–</span>
-              <label>Opponent<input id="match-ga" type="number" min="0" required value="0" /></label>
+              <label>Away<input id="match-ga" type="number" min="0" required value="0" /></label>
             </div>
             <label>Notes<textarea id="match-notes" rows="3" placeholder="Key moments or coaching notes..."></textarea></label>
           </div>
@@ -369,6 +375,7 @@
           </div>
 
           <button class="primary-button large" type="submit">Save Match</button>
+          <button class="danger-button large hidden" type="button" id="delete-match-edit" data-delete-match="">Delete match</button>
         </form>
       </section>
 
@@ -642,7 +649,7 @@
             <div class="gch-about-copy">
               <strong>PitchKind</strong>
               <span>ORGANISE | CONNECT | PLAY</span>
-              <small>App version 2.2.14</small>
+              <small>App version 2.2.15</small>
             </div>
           </section>
         </div>
@@ -661,6 +668,7 @@
           <div><span>Venue</span><strong id="match-detail-ground">Ground TBC</strong><small id="match-detail-address">Address TBC</small></div>
           <a class="map-link hidden" id="match-detail-map" href="#">Open in Maps</a>
         </div>
+        <div class="fixture-map-preview hidden" id="match-detail-map-preview"><iframe id="match-detail-map-frame" title="Match venue map" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe></div>
         <details class="match-kit-correction hidden" id="match-kit-correction">
           <summary>Correct kit colours</summary>
           <div class="form-grid two">
@@ -674,9 +682,9 @@
       <section class="detail-feature-section match-report-score-section hidden" id="match-report-score-section">
         <div class="panel-heading"><div><h3>Scoreline</h3><span class="helper">Enter the final score</span></div></div>
         <div class="match-report-score-grid">
-          <label>Our score<input id="match-report-gf" type="number" min="0" inputmode="numeric" value="0" /></label>
+          <label>Home<input id="match-report-gf" type="number" min="0" inputmode="numeric" value="0" /></label>
           <span aria-hidden="true">–</span>
-          <label>Opposition<input id="match-report-ga" type="number" min="0" inputmode="numeric" value="0" /></label>
+          <label>Away<input id="match-report-ga" type="number" min="0" inputmode="numeric" value="0" /></label>
         </div>
       </section>
       <section class="detail-feature-section" id="detail-goals-section" data-detail-feature="goals"><div class="panel-heading"><h3>Goalscorers</h3><span class="helper">Goals</span></div><div id="detail-goals-inputs" class="detail-player-grid"></div></section>
@@ -687,6 +695,7 @@
       <div class="empty-detail-options hidden" id="empty-detail-options">All match detail options are switched off. Enable the options you want under More → Match detail options.</div>
       <div class="modal-actions match-report-actions">
         <button type="button" class="secondary-button hidden" id="match-report-back">Back</button>
+        <button type="button" class="danger-button hidden" id="delete-match-detail" data-delete-match="">Delete match</button>
         <button type="button" class="danger-button hidden" id="undo-match-played">Undo match played</button>
         <button type="button" class="secondary-button" id="match-detail-cancel" data-close-dialog>Cancel</button>
         <button type="button" class="primary-button hidden" id="match-report-next">Next</button>

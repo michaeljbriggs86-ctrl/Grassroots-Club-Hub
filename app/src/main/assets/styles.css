@@ -966,3 +966,19 @@ dialog.report-wizard-mode::backdrop{background:var(--white)}
 .match-venue-card{display:flex;align-items:center;justify-content:space-between;gap:12px;border:1px solid #d8e0da;border-radius:14px;padding:12px 13px;background:var(--white)}.match-venue-card>div{min-width:0;display:grid;gap:2px}.match-venue-card span{font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:900}.match-venue-card strong{font-size:13px}.match-venue-card small{font-size:11px;color:var(--muted);overflow-wrap:anywhere}.match-kit-correction{border:1px solid #d8e0da;border-radius:14px;background:var(--white);overflow:hidden}.match-kit-correction>summary{cursor:pointer;list-style:none;padding:11px 13px;font-size:12px;font-weight:900;color:var(--green-2)}.match-kit-correction>summary::-webkit-details-marker{display:none}.match-kit-correction[open]{padding-bottom:12px}.match-kit-correction[open]>:not(summary){margin-left:12px;margin-right:12px}.match-kit-correction .helper{margin:7px 12px 0}
 html[data-theme="dark"] .match-versus,html[data-theme="dark"] .match-venue-card,html[data-theme="dark"] .match-kit-correction{background:#151d18!important;border-color:#344239!important;color:#f2f7f3!important}html[data-theme="dark"] .match-team-side small,html[data-theme="dark"] .match-side-label,html[data-theme="dark"] .match-venue-card span,html[data-theme="dark"] .match-venue-card small{color:#b9c7be!important}html[data-theme="dark"] .match-versus-mark{background:#193322!important;color:#98e3a3!important}html[data-theme="dark"] .match-kit-correction>summary{color:#98e3a3!important}html[data-theme="dark"] .match-team-kit{color:#b9c7be}
 @media(max-width:390px){.match-versus{grid-template-columns:minmax(0,1fr) 28px minmax(0,1fr);padding:11px 8px}.match-versus-mark{width:28px;height:28px}.match-team-kit{width:47px;height:46px}.match-team-side strong{font-size:12px}.match-venue-card{align-items:flex-start;flex-direction:column}.match-venue-card .map-link{align-self:stretch;text-align:center}}
+
+
+/* v2.2.15 — visible fixture overview, map preview and match removal */
+.next-fixture-versus{margin-top:2px}
+.next-fixture-venue{margin-top:0}
+.fixture-map-preview{height:184px;border:1px solid #d8e0da;border-radius:16px;overflow:hidden;background:#e8efe9}
+.fixture-map-preview iframe{display:block;width:100%;height:100%;border:0;pointer-events:none;background:#e8efe9}
+#delete-match-edit{width:100%;margin-top:10px}
+html[data-theme="dark"] .next-match-grid>div,
+html[data-theme="dark"] .next-match-kits{background:#151d18!important;border-color:#344239!important;color:#f2f7f3!important}
+html[data-theme="dark"] .next-match-grid strong,
+html[data-theme="dark"] .next-match-kits strong{color:#f2f7f3!important}
+html[data-theme="dark"] .next-match-grid span,
+html[data-theme="dark"] .next-match-kits span{color:#b9c7be!important}
+html[data-theme="dark"] .fixture-map-preview{background:#101713;border-color:#344239}
+@media(max-width:390px){.fixture-map-preview{height:152px}.next-fixture-versus{padding-left:7px;padding-right:7px}}
