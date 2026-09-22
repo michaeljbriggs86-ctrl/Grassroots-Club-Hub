@@ -642,7 +642,7 @@
             <div class="gch-about-copy">
               <strong>PitchKind</strong>
               <span>ORGANISE | CONNECT | PLAY</span>
-              <small>App version 2.2.13</small>
+              <small>App version 2.2.14</small>
             </div>
           </section>
         </div>
@@ -655,6 +655,21 @@
       <div class="modal-heading"><div><p class="kicker">Match details</p><h3 id="match-detail-title">Add match details</h3></div><button type="button" class="icon-button small" data-close-dialog aria-label="Close">×</button></div>
       <input type="hidden" id="match-detail-id" />
       <div class="detail-match-summary" id="match-detail-summary"></div>
+      <section class="match-overview" id="match-overview-section">
+        <div class="match-versus" id="match-detail-versus"></div>
+        <div class="match-venue-card">
+          <div><span>Venue</span><strong id="match-detail-ground">Ground TBC</strong><small id="match-detail-address">Address TBC</small></div>
+          <a class="map-link hidden" id="match-detail-map" href="#">Open in Maps</a>
+        </div>
+        <details class="match-kit-correction hidden" id="match-kit-correction">
+          <summary>Correct kit colours</summary>
+          <div class="form-grid two">
+            <label>Home team kit<input id="match-home-kit-colours" type="text" maxlength="80" placeholder="e.g. Green and white" /></label>
+            <label>Away team kit<input id="match-away-kit-colours" type="text" maxlength="80" placeholder="e.g. Red and black" /></label>
+          </div>
+          <p class="helper">This correction applies to this match only.</p>
+        </details>
+      </section>
       <div class="match-report-progress hidden" id="match-report-progress" aria-label="Match report progress"></div>
       <section class="detail-feature-section match-report-score-section hidden" id="match-report-score-section">
         <div class="panel-heading"><div><h3>Scoreline</h3><span class="helper">Enter the final score</span></div></div>
