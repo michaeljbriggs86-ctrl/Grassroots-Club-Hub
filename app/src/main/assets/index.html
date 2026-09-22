@@ -392,29 +392,33 @@
         </div>
         <div class="squad-format-summary" id="squad-format-summary"></div>
         <div class="squad-view-tabs" role="tablist" aria-label="Squad view">
-          <button type="button" class="squad-view-tab active" id="squad-list-tab" data-squad-page="0">Squad</button>
-          <button type="button" class="squad-view-tab" id="squad-tactics-tab" data-squad-page="1">Tactics board</button>
+          <button type="button" class="squad-view-tab active" id="squad-list-tab" data-squad-page="0" aria-selected="true">Squad</button>
+          <button type="button" class="squad-view-tab" id="squad-tactics-tab" data-squad-page="1" aria-selected="false">Tactics board</button>
         </div>
-        <div class="squad-swipe" id="squad-swipe">
-          <section class="squad-swipe-page" aria-label="Squad list">
+        <div class="squad-pages" id="squad-pages">
+          <section class="squad-view-page" id="squad-list-page" data-squad-view="0" aria-label="Squad list">
             <div class="panel squad-banner compact-squad-banner">
               <div class="squad-count"><strong id="squad-count">0</strong><span>registered players</span></div>
               <div class="squad-space-count" id="squad-space-count"></div>
             </div>
             <div id="squad-list" class="squad-list"></div>
           </section>
-          <section class="squad-swipe-page" aria-label="Tactics board">
+          <section class="squad-view-page hidden" id="squad-tactics-page" data-squad-view="1" aria-label="Tactics board">
             <div class="panel tactics-panel">
-              <div class="panel-heading tactics-heading"><div><p class="kicker">Matchday setup</p><h3>Tactics board</h3><p class="muted" id="tactics-help">Choose the matchday squad first. The selected players feed directly into the formation and substitutes bench.</p></div><button type="button" class="secondary-button compact" id="reset-tactics" data-requires-edit>Reset</button></div>
-              <div class="matchday-squad-picker" id="matchday-squad-picker">
-                <div class="matchday-squad-head"><div><strong id="matchday-squad-title">Matchday squad</strong><span id="matchday-squad-fixture">Current setup</span><small id="matchday-readiness-summary"></small></div><div class="matchday-squad-head-actions"><button type="button" class="text-button compact hidden" id="select-all-available">Select all available</button><b id="matchday-squad-count">0 / 0</b></div></div>
-                <div class="matchday-squad-options" id="matchday-squad-options"></div>
-              </div>
+              <div class="panel-heading tactics-heading"><div><p class="kicker">Matchday setup</p><h3>Tactics board</h3><p class="muted" id="tactics-help">Drag players to position them. Tap two players to swap.</p></div><button type="button" class="secondary-button compact" id="reset-tactics" data-requires-edit>Reset</button></div>
               <label class="formation-control">Formation<select id="tactics-formation" aria-label="Formation"></select></label>
               <div class="tactics-pitch" id="tactics-pitch" aria-label="Football tactics board">
                 <span class="pitch-halfway"></span><span class="pitch-circle"></span><span class="pitch-box pitch-box-top"></span><span class="pitch-box pitch-box-bottom"></span>
               </div>
               <div class="tactics-bench-wrap"><div class="panel-heading"><h3>Substitutes</h3><span class="helper" id="tactics-matchday-limit"></span></div><div class="tactics-bench" id="tactics-bench"></div></div>
+              <details class="matchday-squad-picker tactics-squad-options" id="matchday-squad-picker">
+                <summary class="matchday-squad-summary"><div><strong id="matchday-squad-title">Matchday squad</strong><span id="matchday-squad-fixture">Current setup</span></div><b id="matchday-squad-count">0 / 0</b></summary>
+                <div class="tactics-squad-options-body">
+                  <small id="matchday-readiness-summary"></small>
+                  <div class="matchday-squad-head-actions"><button type="button" class="text-button compact hidden" id="select-all-available">Select all available</button></div>
+                  <div class="matchday-squad-options" id="matchday-squad-options"></div>
+                </div>
+              </details>
             </div>
           </section>
         </div>
@@ -531,14 +535,17 @@
       </section>
 
       <section id="view-more" class="view" data-view="more">
-        <div class="section-title-row"><div><p class="kicker">App controls</p><h2>Settings</h2></div></div>
+        <div class="section-title-row"><div><p class="kicker">Team &amp; app</p><h2>Settings</h2></div></div>
         <div class="settings-accordion-list">
 
-          <details class="panel settings-accordion" id="match-detail-settings" data-requires-edit data-coach-ui-only>
-            <summary><span>Match details</span><span class="settings-chevron">⌄</span></summary>
+<div class="settings-group-heading" data-coach-ui-only><span>Team</span><small>Tools and access for this team</small></div>
+
+<details class="panel settings-accordion" id="match-detail-settings" data-requires-edit data-coach-ui-only>
+            <summary><span>Features</span><span class="settings-chevron">⌄</span></summary>
             <div class="settings-accordion-body">
-              <p class="muted">Choose which match details the coach wishes to record. Turning an option off does not delete any details already recorded.</p>
+              <p class="muted">Choose the optional coaching tools this team uses. Turning a feature off does not delete information already recorded.</p>
               <div class="feature-toggle-list">
+                <label class="toggle-row"><input id="feature-tactics" type="checkbox" /><span><strong>Tactics board</strong><small>Line-up, formation and matchday squad planning</small></span></label>
                 <label class="toggle-row"><input id="feature-goals" type="checkbox" /><span><strong>Goalscorers</strong></span></label>
                 <label class="toggle-row"><input id="feature-assists" type="checkbox" /><span><strong>Assists</strong></span></label>
                 <label class="toggle-row"><input id="feature-awards" type="checkbox" /><span><strong>Player awards</strong></span></label>
@@ -553,7 +560,7 @@
             </div>
           </details>
 
-          <details class="panel settings-accordion" id="team-access-settings" data-requires-edit data-coach-ui-only>
+<details class="panel settings-accordion" id="team-access-settings" data-requires-edit data-coach-ui-only>
             <summary><span>Team access</span><span class="settings-chevron">⌄</span></summary>
             <div class="settings-accordion-body">
               <p class="muted">Coaches can invite parents. Player app access is available to U15 squads only and is read-only apart from the linked player’s match availability.</p>
@@ -574,7 +581,21 @@
             </div>
           </details>
 
-          <details class="panel settings-accordion hidden" id="club-admin-access-settings" data-admin-settings-only>
+<div class="settings-group-heading" data-staff-settings><span>Rules &amp; safeguarding</span><small>Matchday rules and club responsibilities</small></div>
+
+<details class="panel settings-accordion" id="rules-procedures-settings" data-staff-settings>
+            <summary><span>Rules &amp; procedures</span><span class="settings-chevron">⌄</span></summary>
+            <div class="settings-accordion-body">
+              <p class="muted">Current matchday rules and the steps used by this team.</p>
+              <div id="universal-config-rules" class="universal-config-rules"></div>
+              <div class="procedure-list">
+                <article><strong>Before the match</strong><span>Confirm fixture details, availability and the shirt choice.</span></article>
+                <article><strong>After the match</strong><span>Use Match played to record the score, attendance and any enabled match details.</span></article>
+              </div>
+            </div>
+          </details>
+
+<details class="panel settings-accordion hidden" id="club-admin-access-settings" data-admin-settings-only>
             <summary><span>Club Admin access</span><span class="settings-chevron">⌄</span></summary>
             <div class="settings-accordion-body">
               <p class="muted">Create an invite for another Club Admin. Club Admins can view all teams read-only and manage club-wide administration.</p>
@@ -586,7 +607,7 @@
             </div>
           </details>
 
-          <details class="panel settings-accordion hidden" id="club-compliance-settings" data-admin-settings-only>
+<details class="panel settings-accordion hidden" id="club-compliance-settings" data-admin-settings-only>
             <summary><span>Data protection & safeguarding</span><span class="settings-chevron">⌄</span></summary>
             <div class="settings-accordion-body">
               <p class="muted" id="compliance-status">Loading compliance status…</p>
@@ -596,12 +617,14 @@
             </div>
           </details>
 
-          <details class="panel settings-accordion hidden" id="u11-safeguarding-panel">
+<details class="panel settings-accordion hidden" id="u11-safeguarding-panel">
             <summary><span>U7–U11 emergency / medical information</span><span class="settings-chevron">⌄</span></summary>
             <div class="settings-accordion-body"><p class="muted">This is the only U7–U11 export route. Performance stats, squad history and name-to-shirt mappings cannot be exported.</p><label>Player<select id="u11-safeguarding-player"></select></label><label>Emergency contact name<input id="u11-emergency-name"/></label><label>Emergency contact phone<input id="u11-emergency-phone"/></label><label>Medical / allergy information<textarea id="u11-medical-info" rows="3"></textarea></label><div class="season-management-actions"><button type="button" class="primary-button" id="save-u11-safeguarding">Save information</button><button type="button" class="secondary-button" id="export-u11-safeguarding">Export safeguarding pack</button></div><p class="helper">Every export is logged and visible to Club Admin.</p><div id="safeguarding-export-audit" class="audit-history-list"></div></div>
           </details>
 
-          <details class="panel settings-accordion" id="season-history-settings" data-staff-history>
+<div class="settings-group-heading" data-staff-settings><span>History</span><small>Previous seasons and recorded changes</small></div>
+
+<details class="panel settings-accordion" id="season-history-settings" data-staff-history>
             <summary><span>Season history</span><span class="settings-chevron">⌄</span></summary>
             <div class="settings-accordion-body">
               <p class="muted">Archived seasons are read only and preserve the match record from before rollover.</p>
@@ -610,7 +633,7 @@
             </div>
           </details>
 
-          <details class="panel settings-accordion" id="audit-history-settings" data-staff-history>
+<details class="panel settings-accordion" id="audit-history-settings" data-staff-history>
             <summary><span>Audit history</span><span class="settings-chevron">⌄</span></summary>
             <div class="settings-accordion-body">
               <p class="muted">Recent football-data and access changes. Club Admins see club-wide history; coaches see their own team.</p>
@@ -619,16 +642,9 @@
             </div>
           </details>
 
-          <details class="panel settings-accordion" id="universal-core-settings">
-            <summary><span>Club configuration</span><span class="settings-chevron">⌄</span></summary>
-            <div class="settings-accordion-body">
-              <p class="muted">Universal Core v1 reads branding, provider and football rules from the club configuration rather than hard-coded app values.</p>
-              <div id="universal-config-summary"></div>
-              <div id="universal-config-rules" class="universal-config-rules"></div>
-            </div>
-          </details>
+<div class="settings-group-heading"><span>App</span><small>Device and account preferences</small></div>
 
-          <details class="panel settings-accordion" id="appearance-settings">
+<details class="panel settings-accordion" id="appearance-settings">
             <summary><span>Appearance</span><span class="settings-chevron">⌄</span></summary>
             <div class="settings-accordion-body">
               <p class="muted">Choose how the app looks on this device.</p>
@@ -642,7 +658,7 @@
             </div>
           </details>
 
-          <details class="panel settings-accordion" id="access-panel">
+<details class="panel settings-accordion" id="access-panel">
             <summary><span>My account</span><span class="settings-chevron">⌄</span></summary>
             <div class="settings-accordion-body">
               <div class="panel-heading"><span class="account-role-badge" id="account-role-badge">Club Admin</span></div>
@@ -650,12 +666,13 @@
               <button type="button" class="secondary-button setup-save" id="admin-account-mode-switch" data-admin-only>Switch to Coach view</button>
             </div>
           </details>
-          <section class="panel gch-about-card" id="gch-about-card" aria-label="About PitchKind">
+
+<section class="panel gch-about-card" id="gch-about-card" aria-label="About PitchKind">
             <img src="pitchkind-wt_logo-primary.svg" alt="PitchKind — Organise, Connect, Play" class="gch-about-banner" />
             <div class="gch-about-copy">
               <strong>PitchKind</strong>
               <span>ORGANISE | CONNECT | PLAY</span>
-              <small>App version 2.2.17</small>
+              <small>App version 2.2.18</small>
             </div>
           </section>
         </div>

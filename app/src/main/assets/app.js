@@ -1470,6 +1470,7 @@ function applyAccessMode(){
   document.querySelectorAll('[data-results-global-nav]').forEach(el=>el.classList.toggle('hidden',!(adminClub||coaching)));
   document.querySelectorAll('[data-admin-settings-only]').forEach(el=>el.classList.toggle('hidden',!adminClub));
   document.querySelectorAll('[data-staff-history]').forEach(el=>el.classList.toggle('hidden',!['admin','coach','assistant_coach'].includes(currentRole)));
+  document.querySelectorAll('[data-staff-settings]').forEach(el=>el.classList.toggle('hidden',!['admin','coach','assistant_coach'].includes(currentRole)));
   document.querySelectorAll('[data-admin-season-panel]').forEach(el=>el.classList.toggle('hidden',!adminClub));
   const topNav=document.getElementById('top-nav-tabs');
   if(topNav)topNav.classList.remove('hidden');
@@ -1526,7 +1527,7 @@ function applyAccessMode(){
 
 function navigate(view,scroll=true){
   const requested=view;
-  if(view==='more'){const h=document.querySelector('#view-more .section-title-row h2');const k=document.querySelector('#view-more .section-title-row .kicker');if(h)h.textContent=isClubOverviewMode()?'Club settings':'Settings';if(k)k.textContent=isClubOverviewMode()?'Club administration':'App controls';}
+  if(view==='more'){const h=document.querySelector('#view-more .section-title-row h2'),k=document.querySelector('#view-more .section-title-row .kicker');if(h)h.textContent=isClubOverviewMode()?'Club settings':'Settings';if(k)k.textContent=isClubOverviewMode()?'Club administration':'Team & app';}
   if(view==='club'&&isAdmin()&&!isClubOverviewMode()){adminUiMode='club';localStorage.setItem(ADMIN_UI_MODE_KEY,'club');}
   if(view==='club'){__clubTab='overview';view='club';}
   else if(view==='club-fixtures'){__clubTab='fixtures';view='club';}
@@ -1793,10 +1794,10 @@ async function markAllNotificationsRead(){const app=__appNotifications.filter(n=
 
 
 function renderUniversalClubConfiguration(){
-  const summary=document.getElementById('universal-config-summary'),rulesEl=document.getElementById('universal-config-rules');if(!summary||!rulesEl)return;
-  const s=clubSettings(),p=primaryProvider(),teams=clubTeams(),r=competitionRuleForAge(ageGroupNumber());
-  summary.innerHTML=`<div class="universal-config-brand"><span class="universal-swatch" style="background:${esc(s.primary_color||'#218a21')}"></span><div><strong>${esc(s.display_name||'Club')}</strong><small>${esc(s.short_name||'')} · ${esc(s.current_season||'')}</small></div></div><div class="universal-config-chips"><span>${esc(String(p.provider_type||s.default_provider_key||'manual').toUpperCase())} provider</span><span>${teams.length} teams</span><span>Results ${s.results_publish_from_age?'U'+s.results_publish_from_age+'+':'club rules'}</span></div>`;
-  rulesEl.innerHTML=r?`<div class="universal-rule-grid"><span><b>${esc(r.format)}</b><small>Format</small></span><span><b>${Number(r.players_on_pitch)}</b><small>On pitch</small></span><span><b>${Number(r.max_registered)}</b><small>Registered max</small></span><span><b>${Number(r.matchday_max)}</b><small>Matchday max</small></span></div><p class="helper">Rolling subs: ${r.rolling_substitutions?'Yes':'No'} · Published results: ${r.results_published?'Yes':'No'} · Player accounts: ${r.player_accounts_allowed?'Yes':'No'}</p>`:'<p class="helper">No age-specific rule is configured for this team yet.</p>';
+  const rulesEl=document.getElementById('universal-config-rules');if(!rulesEl)return;
+  const r=competitionRuleForAge(ageGroupNumber());if(!r){rulesEl.innerHTML='<p class="helper">No age-specific matchday rule is configured for this team yet.</p>';return;}
+  const resultsText=ageGroupNumber()<=11?'Scores remain private to authenticated club accounts':r.results_published?'Published results are available for this age group':'Scores remain private to authenticated club accounts';
+  rulesEl.innerHTML=`<div class="universal-rule-grid"><span><b>${esc(r.format)}</b><small>Format</small></span><span><b>${Number(r.players_on_pitch)}</b><small>On pitch</small></span><span><b>${Number(r.max_registered)}</b><small>Registered max</small></span><span><b>${Number(r.matchday_max)}</b><small>Matchday max</small></span></div><div class="rule-summary-list"><span><strong>Substitutions</strong>${r.rolling_substitutions?'Rolling substitutions':'Standard substitutions'}</span><span><strong>Results</strong>${esc(resultsText)}</span><span><strong>Player access</strong>${r.player_accounts_allowed?'Available for this age group':'Not available for this age group'}</span></div>`;
 }
 
 function applyMiniResultVisibility(){const restricted=miniResultsRestrictedView();document.querySelector('.record-card')?.classList.toggle('hidden',restricted);document.querySelector('.running-count-grid')?.classList.toggle('hidden',restricted);document.querySelector('#recent-form')?.closest('.panel')?.classList.toggle('hidden',restricted);document.getElementById('league-table-panel')?.classList.toggle('hidden',restricted||!isPublishedLeagueTeam());document.getElementById('league-summary-card')?.classList.toggle('hidden',restricted);document.getElementById('season-player-stats')?.classList.toggle('hidden',restricted);['export-json','export-matches','export-goals'].forEach(id=>document.getElementById(id)?.classList.toggle('hidden',ageGroupNumber()<=11));}
@@ -2584,7 +2585,13 @@ function ensureTacticsState(){
 function applyFormationTemplate(save=true){
   if(!isCoach()&&save)return;ensureTacticsState();const f=footballFormat(),slots=formationSlots(f.onPitch,state.tactics.formation);state.tactics.positions={};state.tactics.lineup.slice(0,f.onPitch).forEach((id,i)=>state.tactics.positions[id]=slotPos(slots[i]));__tacticsSelected=null;if(save)saveState();else renderTacticsBoard();
 }
-function setSquadPage(page){const swipe=document.getElementById('squad-swipe');if(!swipe)return;swipe.scrollTo({left:Number(page||0)*swipe.clientWidth,behavior:'smooth'});document.querySelectorAll('[data-squad-page]').forEach(b=>b.classList.toggle('active',Number(b.dataset.squadPage)===Number(page)));}
+let __squadPage=0;
+function setSquadPage(page){
+  const requested=Number(page)===1?1:0,target=requested===1&&!featureEnabled('tactics')?0:requested;
+  __squadPage=target;
+  document.querySelectorAll('[data-squad-view]').forEach(el=>el.classList.toggle('hidden',Number(el.dataset.squadView)!==target));
+  document.querySelectorAll('[data-squad-page]').forEach(b=>{const active=Number(b.dataset.squadPage)===target;b.classList.toggle('active',active);b.setAttribute('aria-selected',active?'true':'false');});
+}
 function renderMatchdaySquadPicker(){
   const box=document.getElementById('matchday-squad-options'),count=document.getElementById('matchday-squad-count'),title=document.getElementById('matchday-squad-title'),fixture=document.getElementById('matchday-squad-fixture');if(!box)return;
   ensureTacticsState();const f=footballFormat(),key=currentTacticsFixtureKey(),selected=state.tactics.matchdaySelections[key]||[],next=nextPublishedFixture();
@@ -2622,7 +2629,7 @@ function renderSquad(){
   const squad=rosterPlayers(),f=footballFormat();document.getElementById('squad-count').textContent=squad.length;const space=Math.max(0,f.registered-squad.length);const sc=document.getElementById('squad-space-count');if(sc)sc.textContent=`${space} registration space${space===1?'':'s'} remaining`;
   const summary=document.getElementById('squad-format-summary');if(summary)summary.innerHTML=`<span>${f.format}</span><span>${f.onPitch} on pitch</span><span>Max registered ${f.registered}</span><span>Matchday ${f.matchday}</span>`;
   document.getElementById('squad-list').innerHTML=squad.map((p,i)=>{const action=isCoach()?`<button class="player-edit" data-edit-player="${p.number}">Edit</button>`:'';const role=p.role==='goalkeeper'?'Goalkeeper':'Outfield';const status=p.status==='inactive'?' · Inactive':'';const ownPlayer=currentRole!=='player'||selkentNorm(window.ClubHubCloud?.context?.profile?.full_name||'')===selkentNorm(p.name);const profile=playerAccountsAllowedForAge(ageGroupNumber())&&ownPlayer?` data-player-profile="${esc(p.name)}" title="Open player profile"`:'';return `<article class="player-card player-profile-card"${profile}>${jerseyHTML(p)}<div><div class="player-name">${esc(p.name)}</div><div class="player-sub">${role}${status}</div></div>${action}</article>`;}).join('')||'<div class="empty-state"><strong>No players yet</strong>Add players to build the squad.</div>';
-  renderTacticsBoard();
+  if(featureEnabled('tactics'))renderTacticsBoard();else setSquadPage(0);
 }
 
 function renderPlayerSelects(){
@@ -2740,8 +2747,11 @@ function saveLeagueSettings(){
 }
 
 function renderFeatureSettings(){
-  ['goals','assists','awards','bookings'].forEach(name=>{const el=document.getElementById('feature-'+name);if(el)el.checked=featureEnabled(name);});
+  ['tactics','goals','assists','awards','bookings'].forEach(name=>{const el=document.getElementById('feature-'+name);if(el)el.checked=featureEnabled(name);});
   document.querySelectorAll('[data-feature-panel]').forEach(el=>el.classList.toggle('hidden',!featureEnabled(el.dataset.featurePanel)));
+  const tacticsOn=featureEnabled('tactics'),tacticsTab=document.getElementById('squad-tactics-tab'),openTactics=document.getElementById('matchday-open-tactics');
+  tacticsTab?.classList.toggle('hidden',!tacticsOn);openTactics?.classList.toggle('hidden',!tacticsOn);
+  if(!tacticsOn&&__squadPage===1)setSquadPage(0);
   reflowDashboardFeaturePanels();
   document.querySelectorAll('[data-discipline-only]').forEach(el=>el.classList.toggle('hidden',!disciplineApplies()));
   const note=document.getElementById('mini-soccer-discipline-note');if(note)note.classList.toggle('hidden',disciplineApplies());
@@ -2750,9 +2760,9 @@ function renderFeatureSettings(){
 function saveFeatureSettings(){
   if(!requireCoach())return;
   state.features=state.features||{};
-  ['goals','assists','awards'].forEach(name=>state.features[name]=!!document.getElementById('feature-'+name)?.checked);
+  ['tactics','goals','assists','awards'].forEach(name=>state.features[name]=!!document.getElementById('feature-'+name)?.checked);
   if(disciplineApplies())state.features.bookings=!!document.getElementById('feature-bookings')?.checked;
-  saveState();toast('Match detail options saved');
+  saveState();renderFeatureSettings();renderSquad();toast('Feature settings saved');
 }
 function clearDetailData(type){
   if(!requireCoach())return;
@@ -3641,7 +3651,7 @@ document.querySelectorAll('[data-close-dialog]').forEach(btn=>btn.addEventListen
 
 document.getElementById('squad-list-tab')?.addEventListener('click',()=>setSquadPage(0));
 document.getElementById('squad-tactics-tab')?.addEventListener('click',()=>setSquadPage(1));
-document.getElementById('squad-swipe')?.addEventListener('scroll',()=>{const s=document.getElementById('squad-swipe');if(!s)return;const p=Math.round(s.scrollLeft/Math.max(1,s.clientWidth));document.querySelectorAll('[data-squad-page]').forEach(b=>b.classList.toggle('active',Number(b.dataset.squadPage)===p));},{passive:true});
+// Squad and Tactics are explicit pages; horizontal swipe navigation is intentionally disabled.
 document.getElementById('reset-tactics')?.addEventListener('click',resetTactics);
 document.getElementById('select-all-available')?.addEventListener('click',selectAllAvailablePlayers);
 document.getElementById('matchday-open-tactics')?.addEventListener('click',()=>{navigate('squad');setTimeout(()=>setSquadPage(1),80);});
