@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "provider": "Selkent",
-  "last_updated": "2026-09-22T00:05:44.975353+00:00",
+  "last_updated": "2026-09-22T06:05:29.528964+00:00",
   "fixture_agegroup_discovery_source": "selkent_divisions_all",
   "coverage": {
     "fixtures": {
@@ -2201,10 +2201,10 @@
           "date": "2026-09-27",
           "division_name": "Under 9D Silver",
           "home": "Lewisham Borough Cobras",
-          "away": "Deptford United Falcons",
+          "away": "Blackheath Rhinos Grey",
           "provider_team_ids": [
             "287",
-            "2109"
+            "2236"
           ]
         },
         {
@@ -2360,16 +2360,6 @@
         {
           "date": "2026-10-04",
           "division_name": "Under 9D Navy",
-          "home": "Junior Reds Athletic",
-          "away": "Blackheath Rhinos Grey",
-          "provider_team_ids": [
-            "319",
-            "2236"
-          ]
-        },
-        {
-          "date": "2026-10-04",
-          "division_name": "Under 9D Navy",
           "home": "Shooters Hill AFC Valiants",
           "away": "Phoenix Sports Panthers",
           "provider_team_ids": [
@@ -2415,16 +2405,6 @@
           "provider_team_ids": [
             "1055",
             "168"
-          ]
-        },
-        {
-          "date": "2026-10-04",
-          "division_name": "Under 9D Silver",
-          "home": "Deptford United Falcons",
-          "away": "Palace Knights White",
-          "provider_team_ids": [
-            "2109",
-            "797"
           ]
         },
         {
@@ -5349,16 +5329,6 @@
         {
           "date": "2026-09-27",
           "division_name": "Under 12D Orange",
-          "home": "Thamesmead Tigers FC",
-          "away": "Sporting Club Thamesmead Red",
-          "provider_team_ids": [
-            "511",
-            "1082"
-          ]
-        },
-        {
-          "date": "2026-09-27",
-          "division_name": "Under 12D Orange",
           "home": "Woolwich Starlings FC",
           "away": "Vikings FC yellow",
           "provider_team_ids": [
@@ -6039,16 +6009,6 @@
         {
           "date": "2026-10-04",
           "division_name": "Under 12D Orange",
-          "home": "Sporting Club Thamesmead Red",
-          "away": "Eversley Rangers White",
-          "provider_team_ids": [
-            "1082",
-            "2084"
-          ]
-        },
-        {
-          "date": "2026-10-04",
-          "division_name": "Under 12D Orange",
           "home": "Vikings FC yellow",
           "away": "Junior Reds Spartans",
           "provider_team_ids": [
@@ -6630,10 +6590,154 @@
         },
         {
           "division_name": "Under 12D Orange",
-          "updated_at_text": null,
+          "updated_at_text": "22/09/26 04:39:25",
           "source_order_authoritative_for_ties": false,
           "source_disclaimer": "Note: Table does not yet take account of rules for determining winner if teams on equal points",
-          "rows": [],
+          "rows": [
+            {
+              "row_order": 1,
+              "provider_team_id": 331,
+              "provider_division_id": 4258,
+              "team_name": "Dartford Royals white",
+              "played": 0,
+              "won": 0,
+              "drawn": 0,
+              "lost": 0,
+              "gf": 0,
+              "ga": 0,
+              "points": 0
+            },
+            {
+              "row_order": 2,
+              "provider_team_id": 342,
+              "provider_division_id": 4258,
+              "team_name": "Erith Town Yellow",
+              "played": 0,
+              "won": 0,
+              "drawn": 0,
+              "lost": 0,
+              "gf": 0,
+              "ga": 0,
+              "points": 0
+            },
+            {
+              "row_order": 3,
+              "provider_team_id": 2084,
+              "provider_division_id": 4258,
+              "team_name": "Eversley Rangers White",
+              "played": 0,
+              "won": 0,
+              "drawn": 0,
+              "lost": 0,
+              "gf": 0,
+              "ga": 0,
+              "points": 0
+            },
+            {
+              "row_order": 4,
+              "provider_team_id": 367,
+              "provider_division_id": 4258,
+              "team_name": "Junior Reds Spartans",
+              "played": 0,
+              "won": 0,
+              "drawn": 0,
+              "lost": 0,
+              "gf": 0,
+              "ga": 0,
+              "points": 0
+            },
+            {
+              "row_order": 5,
+              "provider_team_id": 375,
+              "provider_division_id": 4258,
+              "team_name": "Long Lane Lions",
+              "played": 0,
+              "won": 0,
+              "drawn": 0,
+              "lost": 0,
+              "gf": 0,
+              "ga": 0,
+              "points": 0
+            },
+            {
+              "row_order": 6,
+              "provider_team_id": 798,
+              "provider_division_id": 4258,
+              "team_name": "Metrogas FC Blue",
+              "played": 0,
+              "won": 0,
+              "drawn": 0,
+              "lost": 0,
+              "gf": 0,
+              "ga": 0,
+              "points": 0
+            },
+            {
+              "row_order": 7,
+              "provider_team_id": 542,
+              "provider_division_id": 4258,
+              "team_name": "SE Dons Football Club Dragons",
+              "played": 0,
+              "won": 0,
+              "drawn": 0,
+              "lost": 0,
+              "gf": 0,
+              "ga": 0,
+              "points": 0
+            },
+            {
+              "row_order": 8,
+              "provider_team_id": 2107,
+              "provider_division_id": 4258,
+              "team_name": "South Darenth Blues",
+              "played": 0,
+              "won": 0,
+              "drawn": 0,
+              "lost": 0,
+              "gf": 0,
+              "ga": 0,
+              "points": 0
+            },
+            {
+              "row_order": 9,
+              "provider_team_id": 511,
+              "provider_division_id": 4258,
+              "team_name": "Thamesmead Tigers FC",
+              "played": 0,
+              "won": 0,
+              "drawn": 0,
+              "lost": 0,
+              "gf": 0,
+              "ga": 0,
+              "points": 0
+            },
+            {
+              "row_order": 10,
+              "provider_team_id": 308,
+              "provider_division_id": 4258,
+              "team_name": "Vikings FC yellow",
+              "played": 0,
+              "won": 0,
+              "drawn": 0,
+              "lost": 0,
+              "gf": 0,
+              "ga": 0,
+              "points": 0
+            },
+            {
+              "row_order": 11,
+              "provider_team_id": 817,
+              "provider_division_id": 4258,
+              "team_name": "Woolwich Starlings FC",
+              "played": 0,
+              "won": 0,
+              "drawn": 0,
+              "lost": 0,
+              "gf": 0,
+              "ga": 0,
+              "points": 0
+            }
+          ],
           "provider_division_id": 4258
         },
         {
@@ -9679,16 +9783,6 @@
         },
         {
           "date": "2026-09-27",
-          "division_name": "U15 Friendly",
-          "home": "Swanscombe Tigers Yellows",
-          "away": "Blackheath Rhinos Black",
-          "provider_team_ids": [
-            "1012",
-            "864"
-          ]
-        },
-        {
-          "date": "2026-09-27",
           "division_name": "Under 15A",
           "home": "AFC Lewisham Blue",
           "away": "Omarie Youth Red",
@@ -9950,10 +10044,10 @@
         {
           "date": "2026-09-27",
           "division_name": "Under 15D Silver",
-          "home": "Blackheath Rhinos White",
+          "home": "Blackheath Rhinos Black",
           "away": "Beacons Black",
           "provider_team_ids": [
-            "865",
+            "864",
             "938"
           ]
         },
@@ -10281,10 +10375,10 @@
           "date": "2026-10-04",
           "division_name": "Under 15D Silver",
           "home": "Greenwich Peninsula Lions",
-          "away": "Blackheath Rhinos White",
+          "away": "Shooters Hill AFC Romans",
           "provider_team_ids": [
             "737",
-            "865"
+            "980"
           ]
         },
         {
@@ -10894,10 +10988,141 @@
         },
         {
           "division_name": "Under 15D Silver",
-          "updated_at_text": null,
+          "updated_at_text": "22/09/26 05:20:20",
           "source_order_authoritative_for_ties": false,
           "source_disclaimer": "Note: Table does not yet take account of rules for determining winner if teams on equal points",
-          "rows": [],
+          "rows": [
+            {
+              "row_order": 1,
+              "provider_team_id": 911,
+              "provider_division_id": 4285,
+              "team_name": "Baldon Sports Lions",
+              "played": 0,
+              "won": 0,
+              "drawn": 0,
+              "lost": 0,
+              "gf": 0,
+              "ga": 0,
+              "points": 0
+            },
+            {
+              "row_order": 2,
+              "provider_team_id": 938,
+              "provider_division_id": 4285,
+              "team_name": "Beacons Black",
+              "played": 0,
+              "won": 0,
+              "drawn": 0,
+              "lost": 0,
+              "gf": 0,
+              "ga": 0,
+              "points": 0
+            },
+            {
+              "row_order": 3,
+              "provider_team_id": 864,
+              "provider_division_id": 4285,
+              "team_name": "Blackheath Rhinos Black",
+              "played": 0,
+              "won": 0,
+              "drawn": 0,
+              "lost": 0,
+              "gf": 0,
+              "ga": 0,
+              "points": 0
+            },
+            {
+              "row_order": 4,
+              "provider_team_id": 1072,
+              "provider_division_id": 4285,
+              "team_name": "Dulwich Village Red",
+              "played": 0,
+              "won": 0,
+              "drawn": 0,
+              "lost": 0,
+              "gf": 0,
+              "ga": 0,
+              "points": 0
+            },
+            {
+              "row_order": 5,
+              "provider_team_id": 736,
+              "provider_division_id": 4285,
+              "team_name": "Greenwich Peninsula Jaguars",
+              "played": 0,
+              "won": 0,
+              "drawn": 0,
+              "lost": 0,
+              "gf": 0,
+              "ga": 0,
+              "points": 0
+            },
+            {
+              "row_order": 6,
+              "provider_team_id": 737,
+              "provider_division_id": 4285,
+              "team_name": "Greenwich Peninsula Lions",
+              "played": 0,
+              "won": 0,
+              "drawn": 0,
+              "lost": 0,
+              "gf": 0,
+              "ga": 0,
+              "points": 0
+            },
+            {
+              "row_order": 7,
+              "provider_team_id": 39,
+              "provider_division_id": 4285,
+              "team_name": "Junior Reds Valiants",
+              "played": 0,
+              "won": 0,
+              "drawn": 0,
+              "lost": 0,
+              "gf": 0,
+              "ga": 0,
+              "points": 0
+            },
+            {
+              "row_order": 8,
+              "provider_team_id": 58,
+              "provider_division_id": 4285,
+              "team_name": "Lewisham Youth",
+              "played": 0,
+              "won": 0,
+              "drawn": 0,
+              "lost": 0,
+              "gf": 0,
+              "ga": 0,
+              "points": 0
+            },
+            {
+              "row_order": 9,
+              "provider_team_id": 980,
+              "provider_division_id": 4285,
+              "team_name": "Shooters Hill AFC Romans",
+              "played": 0,
+              "won": 0,
+              "drawn": 0,
+              "lost": 0,
+              "gf": 0,
+              "ga": 0,
+              "points": 0
+            },
+            {
+              "row_order": 10,
+              "provider_team_id": 706,
+              "provider_division_id": 4285,
+              "team_name": "The Bosco FC Dons",
+              "played": 0,
+              "won": 0,
+              "drawn": 0,
+              "lost": 0,
+              "gf": 0,
+              "ga": 0,
+              "points": 0
+            }
+          ],
           "provider_division_id": 4285
         }
       ],
@@ -13304,16 +13529,6 @@
         {
           "date": "2026-10-04",
           "division_name": "Under 8X Yellow",
-          "home": "Blackheath Rhinos White",
-          "away": "Slade Green Knights",
-          "provider_team_ids": [
-            "1068",
-            "91"
-          ]
-        },
-        {
-          "date": "2026-10-04",
-          "division_name": "Under 8X Yellow",
           "home": "Bridon Ropes",
           "away": "Junior Reds Valiants",
           "provider_team_ids": [
@@ -13359,16 +13574,6 @@
           "provider_team_ids": [
             "318",
             "2050"
-          ]
-        },
-        {
-          "date": "2026-10-04",
-          "division_name": "Under 8X Yellow",
-          "home": "Slade Green Knights",
-          "away": "Blackheath Rhinos White",
-          "provider_team_ids": [
-            "91",
-            "1068"
           ]
         },
         {
