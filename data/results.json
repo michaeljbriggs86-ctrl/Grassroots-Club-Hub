@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "provider": "Selkent",
-  "last_updated": "2026-09-23T06:05:12.981120+00:00",
+  "last_updated": "2026-09-23T12:05:51.099421+00:00",
   "fixture_agegroup_discovery_source": "selkent_divisions_all",
   "coverage": {
     "fixtures": {
@@ -12058,10 +12058,10 @@
           "date": "2026-09-27",
           "division_name": "U17 Kent Cup",
           "home": "Dartford Celtic",
-          "away": "Kent United (Non-Selkent)",
+          "away": "Dartford Celtic",
           "provider_team_ids": [
             "2058",
-            "2171"
+            "2058"
           ]
         },
         {
