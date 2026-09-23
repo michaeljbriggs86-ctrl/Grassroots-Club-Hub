@@ -2844,9 +2844,9 @@ async function refreshTeamMembers(quiet=false){
   if(!quiet)list.innerHTML='<div class="empty-state compact-empty">Loading team access…</div>';
   try{
     const teamId=window.ClubHubCloud?.currentTeam?.()?.id||null;
-    const [rows,links,playerLinks]=await Promise.all([window.ClubHubCloud.listTeamMembers(teamId),window.ClubHubCloud.listParentPlayerLinks(null),window.ClubHubCloud.listPlayerAccountLinks(null)]);__teamParentLinks=links||[];__teamPlayerAccountLinks=playerLinks||[];
+    const [rows,links,playerLinks,pendingRequests]=await Promise.all([window.ClubHubCloud.listTeamMembers(teamId),window.ClubHubCloud.listParentPlayerLinks(null),window.ClubHubCloud.listPlayerAccountLinks(null),window.ClubHubCloud.listPendingParentRequests(teamId)]);__teamParentLinks=links||[];__teamPlayerAccountLinks=playerLinks||[];const requestByUser=new Map((pendingRequests||[]).map(r=>[String(r.user_id),r]));
     const pending=rows.filter(r=>r.role==='pending_parent'),active=rows.filter(r=>r.role!=='pending_parent'),preview=isAdminTeamPreviewMode();
-    const rowHtml=r=>{const pendingRow=r.role==='pending_parent',staff=['club_admin','coach','assistant_coach'].includes(r.role),parent=r.role==='parent',player=r.role==='player';const roleText=r.role==='club_admin'?'Club Admin · Coach':r.role==='assistant_coach'?'Assistant Coach':r.role==='coach'?'Coach':player?'Player profile':pendingRow?'Parent · awaiting approval':'Parent';const pill=r.role==='club_admin'?'Admin Coach':r.role==='assistant_coach'?'Assistant':r.role==='coach'?'Coach':player?'Player':pendingRow?'Pending':'Parent';const canRemove=!preview&&(!staff||(isAdmin()&&isClubOverviewMode()));const pinState=player?(r.access_method==='player_code'?'Reusable code':r.pin_reset_required?'Temporary PIN':r.pin_set?'PIN set':'Legacy access'):parent?(r.access_method==='email'?'Email login':r.pin_reset_required?'Temporary PIN':r.pin_set?'Legacy PIN':'Email login'):'';const linked=parent?__teamParentLinks.filter(x=>x.parent_user_id===r.user_id):player?__teamPlayerAccountLinks.filter(x=>x.user_id===r.user_id):[];const linkText=linked.length?` · ${linked.map(x=>x.player_name).join(', ')}`:(parent?' · No player linked':'');return `<div class="team-member-row ${pendingRow?'pending':''}"><div class="team-member-copy"><strong>${esc(r.full_name||'Member')}</strong><span>${esc(roleText)}${pinState?' · '+esc(pinState):''}${(parent||player)?esc(linkText):''}</span></div><div class="team-member-actions"><span class="member-role-pill">${pill}</span>${!preview&&pendingRow?`<button class="inline-action" data-approve-parent="${r.user_id}">Approve</button>`:''}${!preview&&parent?`<button class="inline-action" data-link-parent-player="${r.user_id}" data-parent-name="${esc(r.full_name||'Parent')}">Link player</button>${r.access_method!=='email'?`<button class="inline-action" data-reset-parent-pin="${r.user_id}" data-parent-name="${esc(r.full_name||'Parent')}">Reset legacy PIN</button>`:''}`:''}${canRemove?`<button class="inline-action delete" data-remove-member="${r.user_id}">Remove</button>`:''}</div></div>`;};
+    const rowHtml=r=>{const pendingRow=r.role==='pending_parent',staff=['club_admin','coach','assistant_coach'].includes(r.role),parent=r.role==='parent',player=r.role==='player';const req=pendingRow?requestByUser.get(String(r.user_id)):null;const pendingDetail=req?` · Child: ${req.child_name} · ${req.parent_email}`:'';const roleText=r.role==='club_admin'?'Club Admin · Coach':r.role==='assistant_coach'?'Assistant Coach':r.role==='coach'?'Coach':player?'Player profile':pendingRow?'Parent · awaiting approval'+pendingDetail:'Parent';const pill=r.role==='club_admin'?'Admin Coach':r.role==='assistant_coach'?'Assistant':r.role==='coach'?'Coach':player?'Player':pendingRow?'Pending':'Parent';const canRemove=!preview&&(!staff||(isAdmin()&&isClubOverviewMode()));const pinState=player?(r.access_method==='player_code'?'Reusable code':r.pin_reset_required?'Temporary PIN':r.pin_set?'PIN set':'Legacy access'):parent?(r.access_method==='email'?'Email login':r.pin_reset_required?'Temporary PIN':r.pin_set?'Legacy PIN':'Email login'):'';const linked=parent?__teamParentLinks.filter(x=>x.parent_user_id===r.user_id):player?__teamPlayerAccountLinks.filter(x=>x.user_id===r.user_id):[];const linkText=linked.length?` · ${linked.map(x=>x.player_name).join(', ')}`:(parent?' · No player linked':'');return `<div class="team-member-row ${pendingRow?'pending':''}"><div class="team-member-copy"><strong>${esc(r.full_name||'Member')}</strong><span>${esc(roleText)}${pinState?' · '+esc(pinState):''}${(parent||player)?esc(linkText):''}</span></div><div class="team-member-actions"><span class="member-role-pill">${pill}</span>${!preview&&pendingRow?`<button class="inline-action" data-approve-parent="${r.user_id}">Approve</button>`:''}${!preview&&parent?`<button class="inline-action" data-link-parent-player="${r.user_id}" data-parent-name="${esc(r.full_name||'Parent')}">Link player</button>${r.access_method!=='email'?`<button class="inline-action" data-reset-parent-pin="${r.user_id}" data-parent-name="${esc(r.full_name||'Parent')}">Reset legacy PIN</button>`:''}`:''}${canRemove?`<button class="inline-action delete" data-remove-member="${r.user_id}">Remove</button>`:''}</div></div>`;};
     list.innerHTML=(pending.length?`<div class="member-group-label">Awaiting approval</div>${pending.map(rowHtml).join('')}`:'')+(active.length?`<div class="member-group-label">Active access</div>${active.map(rowHtml).join('')}`:'')||'<div class="empty-state compact-empty">No team access accounts yet.</div>';
   }catch(err){list.innerHTML='<div class="empty-state compact-empty">Team access is temporarily unavailable.</div>';}
 }
@@ -2859,16 +2859,6 @@ async function openParentLinkDialog(userId,parentName='Parent'){
 async function saveParentLinkDialog(e){
   e.preventDefault();if(!requireCoach())return;const userId=document.getElementById('parent-link-user-id')?.value||'',checked=[...document.querySelectorAll('#parent-link-player-list input[type="checkbox"]:checked')].map(el=>({name:el.value,number:Number(el.dataset.shirtNumber)||null}));
   try{await window.ClubHubCloud.saveParentPlayerLinks(userId,checked);auditEvent('player_link_updated','access',userId,checked.length?`Linked parent to ${checked.map(x=>x.player_name||x.name||x).join(', ')}`:'Cleared parent player links',null,checked);document.getElementById('parent-link-dialog')?.close();toast(checked.length?'Player link saved':'Player links cleared');__teamMembersStamp=0;await refreshTeamMembers(false);}catch(err){alert(err.message||err);}
-}
-async function createTeamParentInvite(){
-  if(!requireCoach())return;
-  if(!CLOUD_MODE)return toast('Cloud access is required.');
-  const team=window.ClubHubCloud?.currentTeam?.();if(!team)return;
-  try{
-    const invite=await window.ClubHubCloud.createInvite({teamId:team.id,role:'parent',label:'',expiresHours:168});
-    const out=document.getElementById('team-parent-invite-code');if(out)out.value=invite?.code||'';
-    toast('Parent account invite created');
-  }catch(err){alert('Could not create parent invite: '+(err.message||err));}
 }
 function populateTeamPlayerInviteOptions(){
   const wrap=document.getElementById('team-player-invite-section'),sel=document.getElementById('team-player-invite-player');if(!wrap||!sel)return;
@@ -2899,11 +2889,6 @@ async function removeTeamMember(userId){
   if(!confirm("Remove this person\'s access? Their football data is not deleted."))return;
   try{await window.ClubHubCloud.removeTeamMember(userId);auditEvent('access_removed','access',userId,'Removed team app access');toast('Access removed');await refreshTeamMembers(false);}catch(err){alert(err.message||err);}
 }
-async function copyTeamParentInvite(){
-  const el=document.getElementById('team-parent-invite-code');if(!el?.value)return toast('Create an invite first');
-  try{await navigator.clipboard.writeText(el.value);toast('Invite code copied');}catch{el.select();document.execCommand('copy');toast('Invite code copied');}
-}
-
 let __clubCoachStamp=0;
 async function refreshClubCoaches(quiet=false){
   const list=document.getElementById('club-coaches-list');if(!list||!CLOUD_MODE||!isAdmin())return;
@@ -3641,8 +3626,6 @@ const activateBtn=document.getElementById('activate-account-btn');if(activateBtn
 const assignmentRoleSelect=document.getElementById('assignment-role');if(assignmentRoleSelect)assignmentRoleSelect.addEventListener('change',updateAssignmentRoleUi);
 const generateBtn=document.getElementById('generate-assignment-code');if(generateBtn)generateBtn.addEventListener('click',generateAssignmentCode);
 const copyBtn=document.getElementById('copy-assignment-code');if(copyBtn)copyBtn.addEventListener('click',copyAssignmentCode);
-const parentInviteBtn=document.getElementById('generate-team-parent-invite');if(parentInviteBtn)parentInviteBtn.addEventListener('click',createTeamParentInvite);
-const copyParentInviteBtn=document.getElementById('copy-team-parent-invite');if(copyParentInviteBtn)copyParentInviteBtn.addEventListener('click',copyTeamParentInvite);
 const playerInviteBtn=document.getElementById('generate-team-player-invite');if(playerInviteBtn)playerInviteBtn.addEventListener('click',createTeamPlayerInvite);
 const copyPlayerInviteBtn=document.getElementById('copy-team-player-invite');if(copyPlayerInviteBtn)copyPlayerInviteBtn.addEventListener('click',copyTeamPlayerInvite);
 const refreshMembersBtn=document.getElementById('refresh-team-members');if(refreshMembersBtn)refreshMembersBtn.addEventListener('click',()=>refreshTeamMembers(false));

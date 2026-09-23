@@ -1,0 +1,85 @@
+LIVE BACKEND CONTRACT — Android v2.2.22 / parent self-signup
+
+Status check: 2026-09-23
+Production Supabase project: obntycksmkcnkprrcutg
+
+Parent onboarding model
+-----------------------
+The normal parent path is self-signup, not a coach-generated invite:
+parent name + email + password -> select club -> select team -> type child/player
+name -> pending coach verification -> approval -> coach explicitly links the real
+squad player -> email/password access.
+
+The parent NEVER selects from a player list during signup.
+
+Live production migrations:
+- 20260923192456 / parent_self_signup_requests
+- 20260923193851 / parent_approval_requires_explicit_player_link
+
+The first migration adds public.parent_access_requests plus:
+- public.request_parent_access(p_team_id,p_child_name)
+- public.list_pending_parent_requests(p_team_id)
+- revised public.approve_parent(p_user_id)
+
+The second migration corrects approval semantics:
+- submitted child_name is identification context only;
+- approve_parent DOES NOT create public.parent_player_links;
+- coach approval grants the parent account only;
+- coaching staff must use the existing Link player control after approval to
+  allocate the verified parent to the correct actual squad player.
+
+Verified live state after the correction:
+- total parent self-signup requests = 0;
+- approved requests = 0;
+- matching automatically-created parent links = 0;
+- pg_get_functiondef(public.approve_parent) contains no parent_player_links INSERT.
+
+Other verified access rules:
+- request_parent_access requires auth.uid();
+- only pending/pending_parent profiles can request access;
+- selected team must be active;
+- request sets role=pending_parent and access_method=email;
+- pending_parent is gated before team data is loaded;
+- coaches/assistant coaches can list requests only for their own team;
+- Club Admin is constrained to own-club teams;
+- approval requires a real pending parent request;
+- approval notification tells the parent to use email + password and that the
+  coach will link the correct player profile.
+
+The request table has RLS enabled and direct anon/authenticated table access is
+revoked. SECURITY DEFINER RPCs enforce role/team checks.
+
+Public club/team selection uses:
+- public.list_login_clubs()
+- public.list_login_teams(p_club_slug)
+
+The previously deployed adult-email-invite function is SUPERSEDED and disabled:
+- version 2;
+- verify_jwt: true;
+- returns HTTP 410 directing clients to Parent Sign Up.
+
+Earlier migration 20260923153641 / email_bound_parent_invites remains only for
+legacy fallback compatibility, not the normal parent flow.
+
+U7-U11 result privacy remains DEPLOYED / TESTED from migration
+20260923064334 / tighten_u11_parent_result_sanitizer.
+
+End-to-end signup/email confirmation/coach approval/manual Link player/device
+acceptance is NOT YET TESTED until Mike completes it in the built Android app.
+
+U7-U11 privacy regression evidence
+----------------------------------
+Migration 20260923064334 / tighten_u11_parent_result_sanitizer remains DEPLOYED / TESTED.
+
+Verified live synthetic privacy test:
+- U9 input containing a 3-2 match plus goals/assists/bookings returned no score/result fields.
+- goals = [].
+- assists = [].
+- bookings = [].
+- Selkent results/table were empty.
+- name-to-shirt-number mapping was not returned.
+- resultRestricted=true was present on the sanitized match row.
+- the same test payload passed through age 12 unchanged.
+
+The server RPC remains the authoritative privacy boundary; the Android client
+sanitizer is defense in depth only.

@@ -10,6 +10,7 @@
   const TEAM_STATE_CACHE_PREFIX = 'grassroots_hub_team_state_cache_v1_';
   const INVITE_LOCK_KEY = 'grassroots_hub_invite_lock_v1';
   const PENDING_PARENT_PIN_KEY = 'grassroots_hub_pending_parent_pin_v1';
+  const PENDING_PARENT_REQUEST_KEY = 'pitchkind_pending_parent_request_v1';
   const TEST_MODE_KEY = 'grassroots_hub_debug_test_mode_v1';
   const TEST_CLUB_KEY = 'grassroots_hub_debug_club_v1';
   const LOGIN_CLUB_KEY = 'grassroots_hub_login_club_v1';
@@ -121,9 +122,9 @@
     saveSession(data);
     return data;
   }
-  async function signUp(email,password,fullName,inviteCode){
+  async function signUp(email,password,fullName,inviteCode,metadata={}){
     const url=base()+'/auth/v1/signup?redirect_to='+encodeURIComponent(AUTH_REDIRECT);
-    const res=await fetch(url,{method:'POST',headers:authHeaders(),body:JSON.stringify({email,password,data:{full_name:fullName||''}})});
+    const res=await fetch(url,{method:'POST',headers:authHeaders(),body:JSON.stringify({email,password,data:{full_name:fullName||'',...(metadata||{})}})});
     const data=await res.json();
     if(!res.ok)throw new Error(data?.msg||data?.message||data?.error_description||'Account creation failed');
     if(inviteCode)localStorage.setItem(INVITE_KEY,inviteCode.trim());
@@ -245,6 +246,11 @@
         setGateHtml('newpassword','Password reset verified. Choose your new password below.');
         return 'recovery';
       }
+      const parentMeta=session?.user?.user_metadata||{},metaTeam=String(parentMeta.requested_team_id||''),metaChild=String(parentMeta.requested_child_name||'').trim();
+      if(parentMeta.parent_signup&&metaTeam&&metaChild){
+        try{await requestParentAccess(metaTeam,metaChild);localStorage.removeItem(PENDING_PARENT_REQUEST_KEY);context=await getContext();setGateHtml('approval','Your email is confirmed. Your parent access request is waiting for coach approval.');return 'parentrequest';}
+        catch(e){setGateHtml('signin','Your account was created, but the parent access request could not be submitted. '+(e.message||''));return 'error';}
+      }
       if(!duringBootstrap) location.reload();
       return type||'auth';
     }catch(e){
@@ -279,7 +285,23 @@
       clubSel.onchange=()=>loadTeams().catch(()=>{teamSel.innerHTML='<option value="">Teams unavailable</option>';});if(clubSel.value)await loadTeams();
     }catch{clubSel.innerHTML='<option value="">Club list unavailable</option>';teamSel.innerHTML='<option value="">Choose a club first</option>';}
   }
+  async function populateParentSignupChoices(){
+    const clubSel=document.getElementById('cloud-parent-club'),teamSel=document.getElementById('cloud-parent-team');if(!clubSel||!teamSel)return;
+    try{
+      const clubs=await listLoginClubs();
+      clubSel.innerHTML='<option value="">Choose club…</option>'+clubs.map(c=>`<option value="${escapeHtml(c.slug)}">${escapeHtml(c.display_name)}</option>`).join('');
+      const saved=localStorage.getItem(LOGIN_CLUB_KEY)||'';if(clubs.some(c=>c.slug===saved))clubSel.value=saved;else if(clubs.length===1)clubSel.value=clubs[0].slug;
+      const loadTeams=async()=>{const slug=clubSel.value||'';localStorage.setItem(LOGIN_CLUB_KEY,slug);teamSel.innerHTML='<option value="">Loading teams…</option>';const teams=await listLoginTeams(slug);teamSel.innerHTML='<option value="">Choose team…</option>'+teams.map(t=>`<option value="${escapeHtml(t.id)}">${escapeHtml(t.label||('U'+t.age_group+' '+t.name))}</option>`).join('');};
+      clubSel.onchange=()=>loadTeams().catch(()=>{teamSel.innerHTML='<option value="">Teams unavailable</option>';});if(clubSel.value)await loadTeams();
+    }catch{clubSel.innerHTML='<option value="">Club list unavailable</option>';teamSel.innerHTML='<option value="">Choose a club first</option>';}
+  }
   async function claimInvite(code){return await rpc('claim_invite',{p_code:String(code||'').trim()});}
+  async function requestParentAccess(teamId,childName){return await rpc('request_parent_access',{p_team_id:String(teamId||''),p_child_name:String(childName||'').trim()});}
+  async function listPendingParentRequests(teamId=null){
+    if(!['admin','coach','assistant_coach'].includes(role()))return [];
+    const data=await rpc('list_pending_parent_requests',{p_team_id:teamId||null});
+    return Array.isArray(data)?data:[];
+  }
   async function listTeams(){
     if(testModeActive())return [TEST_TEAM];
     const {data}=await request('/rest/v1/teams?select=id,club_id,name,age_group,division,season,selkent_label,league_name,active&active=eq.true&order=age_group.asc,name.asc');
@@ -728,20 +750,33 @@
         <p class="auth-notice ${message?'':'hidden'}" id="cloud-auth-notice">${escapeHtml(message)}</p><p class="activation-error hidden" id="cloud-auth-error"></p>
         <button class="auth-primary" id="cloud-auth-submit">Log In <span>→</span></button>
         <button class="auth-secondary" id="cloud-player-login"><span class="auth-button-icon">${authIcon('user')}</span><span>Player Login</span></button>
-        <button class="auth-link-strong auth-club-signup-link" id="cloud-create-club">Club Sign Up</button>
+        <button class="auth-link-strong" id="cloud-parent-signup">Parent Sign Up</button>
         <div class="auth-divider"></div>
         <p class="auth-caption">One login page for all adult users — you’ll be redirected to the right account after sign in.</p>`;
       gate.innerHTML=authMainScreen({screen:'adult',heroNote:'More<br/>Than<br/>A Game',title:'Welcome Back',copy:'Admins, Coaches and Parents sign in with email and password.',body});
       bindPasswordToggle('cloud-password','cloud-password-toggle');
       document.getElementById('cloud-forgot-password')?.addEventListener('click',()=>setGateHtml('forgot'));
       document.getElementById('cloud-player-login')?.addEventListener('click',()=>setGateHtml('playerlogin'));
-      document.getElementById('cloud-create-club')?.addEventListener('click',()=>setGateHtml('clubsignup'));
+      document.getElementById('cloud-parent-signup')?.addEventListener('click',()=>setGateHtml('parentsignup'));
       document.getElementById('cloud-auth-submit')?.addEventListener('click',async()=>{
         const email=document.getElementById('cloud-email')?.value?.trim()||'',password=document.getElementById('cloud-password')?.value||'';
         if(!email||!password)return authError('Enter your email and password.');
         const btn=document.getElementById('cloud-auth-submit');if(btn){btn.disabled=true;btn.innerHTML='Signing in…';}
         try{localStorage.removeItem(TEST_MODE_KEY);setInviteAccessLocked(false);await signIn(email,password);await hydrateSessionUser();const signedContext=await getContext();if(!signedContext?.profile)throw new Error('Sign in succeeded, but no club access profile is attached to this account.');context=signedContext;hideGate();window.dispatchEvent(new CustomEvent('clubhub-authenticated',{detail:{source:'signin'}}));}
         catch(e){const msg=e.message||String(e);if(/confirm|verified/i.test(msg)){localStorage.setItem(VERIFY_EMAIL_KEY,email);setGateHtml('verify','Your email still needs confirming.',email);}else authError(msg);if(btn){btn.disabled=false;btn.innerHTML='Log In <span>→</span>';}}
+      });return;
+    }
+
+    if(mode==='parentsignup'){
+      const body=`<div class="auth-fields">${authField({icon:'user',id:'cloud-parent-name',placeholder:'Parent / guardian name',autocomplete:'name'})}${authField({icon:'mail',id:'cloud-parent-email',type:'email',placeholder:'Email address',autocomplete:'username',value:prefillEmail})}${authField({icon:'lock',id:'cloud-parent-password',type:'password',placeholder:'Create password',autocomplete:'new-password'})}<div class="auth-field"><span class="auth-field-icon">${authIcon('club')}</span><select id="cloud-parent-club"><option value="">Loading clubs…</option></select></div><div class="auth-field"><span class="auth-field-icon">${authIcon('league')}</span><select id="cloud-parent-team"><option value="">Choose a club first</option></select></div>${authField({icon:'user',id:'cloud-parent-child',placeholder:'Child / player name',autocomplete:'off'})}</div><p class="auth-notice ${message?'':'hidden'}" id="cloud-auth-notice">${escapeHtml(message)}</p><p class="activation-error hidden" id="cloud-auth-error"></p><button class="auth-primary" id="cloud-parent-signup-submit">Request Parent Access <span>→</span></button><button class="auth-link-strong" id="cloud-parent-signup-back">Back to Main Login</button>`;
+      gate.innerHTML=authMainScreen({screen:'adult',heroNote:'One<br/>Team<br/>Together',title:'Parent Sign Up',copy:'Create your account, choose your club and team, then submit your child’s name for coach approval.',body,back:true});
+      populateParentSignupChoices();
+      const back=()=>setGateHtml('signin');document.getElementById('auth-screen-back')?.addEventListener('click',back);document.getElementById('cloud-parent-signup-back')?.addEventListener('click',back);
+      document.getElementById('cloud-parent-signup-submit')?.addEventListener('click',async()=>{
+        const name=document.getElementById('cloud-parent-name')?.value?.trim()||'',email=document.getElementById('cloud-parent-email')?.value?.trim()||'',password=document.getElementById('cloud-parent-password')?.value||'',teamId=document.getElementById('cloud-parent-team')?.value||'',child=document.getElementById('cloud-parent-child')?.value?.trim()||'';
+        if(name.length<2)return authError('Enter your name.');if(!/^\S+@\S+\.\S+$/.test(email))return authError('Enter a valid email address.');if(password.length<8)return authError('Use at least 8 characters for the password.');if(!teamId)return authError('Choose your club and team.');if(child.length<2)return authError('Enter your child or player name.');
+        const pending={team_id:teamId,child_name:child};localStorage.setItem(PENDING_PARENT_REQUEST_KEY,JSON.stringify(pending));const btn=document.getElementById('cloud-parent-signup-submit');if(btn){btn.disabled=true;btn.innerHTML='Creating…';}
+        try{const data=await signUp(email,password,name,'',{parent_signup:true,requested_team_id:teamId,requested_child_name:child});if(data?.access_token){await requestParentAccess(teamId,child);localStorage.removeItem(PENDING_PARENT_REQUEST_KEY);context=await getContext();setGateHtml('approval','Your request has been sent to the coaching staff for verification.');return;}setGateHtml('verify','Account created. Confirm your email, then your access request will be sent to the coaching staff.',email);}catch(e){authError(e.message||String(e));if(btn){btn.disabled=false;btn.innerHTML='Request Parent Access <span>→</span>';}}
       });return;
     }
 
@@ -894,7 +929,7 @@
       if(!document.getElementById('test-mode-banner')){const b=document.createElement('div');b.id='test-mode-banner';b.className='test-mode-banner';b.textContent='UNIVERSAL TEST MODE · '+(clubConfiguration?.settings?.display_name||'Demo club')+' · cloud writes disabled';document.body.prepend(b);}
       return {configured:true,role:'coach',profile:context.profile,club:context.club,configuration:clubConfiguration,team:oldShapeTeam(picked),teams:visibleTeamList(),email:''};
     }
-    if(INITIAL_AUTH_CALLBACK&&!initialAuthCallbackHandled){initialAuthCallbackHandled=true;const callbackType=await handleAuthCallback(INITIAL_AUTH_CALLBACK,{duringBootstrap:true});if(callbackType==='recovery'||callbackType==='error')return null;}
+    if(INITIAL_AUTH_CALLBACK&&!initialAuthCallbackHandled){initialAuthCallbackHandled=true;const callbackType=await handleAuthCallback(INITIAL_AUTH_CALLBACK,{duringBootstrap:true});if(['recovery','parentrequest','error'].includes(callbackType))return null;}
     const valid=await ensureFreshSession();
     if(!valid){clearAccountLocalData();setGateHtml('signin');return null;}
     const pendingAdultInvite=localStorage.getItem(INVITE_KEY)||'';
@@ -908,6 +943,10 @@
       context=await getContext();
     }catch(e){saveSession(null);clearAccountLocalData();setGateHtml('signin','Your saved access expired. Sign in again.');return null;}
     if(!context?.profile){saveSession(null);clearAccountLocalData();setGateHtml('signin','No club access profile is attached to this account.');return null;}
+    if(context.profile.role==='pending'){
+      const pm=session?.user?.user_metadata||{},teamId=String(pm.requested_team_id||''),child=String(pm.requested_child_name||'').trim();
+      if(pm.parent_signup&&teamId&&child){try{await requestParentAccess(teamId,child);context=await getContext();localStorage.removeItem(PENDING_PARENT_REQUEST_KEY);}catch(e){setGateHtml('signin','Your account is verified, but the parent access request could not be submitted. '+(e.message||''));return null;}}
+    }
     try{clubConfiguration=await getClubConfiguration();}catch{clubConfiguration=null;}
     if(context.profile.role==='pending_parent'){
       setGateHtml('approval','Your parent account is ready. Waiting for coach approval.');return null;
@@ -955,7 +994,7 @@
 
   window.ClubHubCloud={
     configured,bootstrap,loadInitialState,queueStateSave,pullLatest,startPolling,
-    role,canEdit,canAdmin,assignedTeam,currentTeam,coachTeam,hasDualCoachAccess,visibleTeamList,getClubConfiguration,listLoginClubs,listLoginTeams,createInvite,listTeamMembers,listClubCoaches,listClubAccessAccounts,removeClubCoach,listPublishedClubResults,listParentPlayerLinks,saveParentPlayerLinks,listPlayerAccountLinks,listMatchAvailability,saveMatchAvailability,listSelkentTeamDirectory,syncSelkentTeamDirectory,getCoachMatchNote,saveCoachMatchNote,listAnnouncements,createAnnouncement,markAnnouncementRead,deleteAnnouncement,listMatchAttendance,saveMatchAttendance,getAvailabilitySettings,setAvailabilityDeadline,sendAvailabilityReminder,listNotifications,markNotificationRead,notifyFixtureChange,notifySelectedSquad,notifyMatchReport,notifyMatchReopened,listPlayerAppearanceStats,recordAuditEvent,listAuditHistory,listSeasonArchives,getSeasonArchive,archiveCurrentSeason,rolloverClubSeason,resetParentPin,setAccessPin,approveParent,removeTeamMember,syncTeamDirectory,switchAdminTeam,getClubOverview,signOut,handleAuthCallback,listMessageContacts,listClubMessages,sendClubMessage,markClubMessagesRead,getClubComplianceStatus,setDisputeReviewers,setClubSafeguardingContacts,getConcernRouting,raiseClubConcern,listGeneralDisputes,listDisputeMessages,upsertU11SafeguardingInfo,exportU11SafeguardingPack,listSafeguardingExportAudit,requestClubCancellation,cancelClubCancellation,
+    role,canEdit,canAdmin,assignedTeam,currentTeam,coachTeam,hasDualCoachAccess,visibleTeamList,getClubConfiguration,listLoginClubs,listLoginTeams,createInvite,requestParentAccess,listPendingParentRequests,listTeamMembers,listClubCoaches,listClubAccessAccounts,removeClubCoach,listPublishedClubResults,listParentPlayerLinks,saveParentPlayerLinks,listPlayerAccountLinks,listMatchAvailability,saveMatchAvailability,listSelkentTeamDirectory,syncSelkentTeamDirectory,getCoachMatchNote,saveCoachMatchNote,listAnnouncements,createAnnouncement,markAnnouncementRead,deleteAnnouncement,listMatchAttendance,saveMatchAttendance,getAvailabilitySettings,setAvailabilityDeadline,sendAvailabilityReminder,listNotifications,markNotificationRead,notifyFixtureChange,notifySelectedSquad,notifyMatchReport,notifyMatchReopened,listPlayerAppearanceStats,recordAuditEvent,listAuditHistory,listSeasonArchives,getSeasonArchive,archiveCurrentSeason,rolloverClubSeason,resetParentPin,setAccessPin,approveParent,removeTeamMember,syncTeamDirectory,switchAdminTeam,getClubOverview,signOut,handleAuthCallback,listMessageContacts,listClubMessages,sendClubMessage,markClubMessagesRead,getClubComplianceStatus,setDisputeReviewers,setClubSafeguardingContacts,getConcernRouting,raiseClubConcern,listGeneralDisputes,listDisputeMessages,upsertU11SafeguardingInfo,exportU11SafeguardingPack,listSafeguardingExportAudit,requestClubCancellation,cancelClubCancellation,
     updateCloudPanel,
     get context(){return context;},get configuration(){return clubConfiguration;},get session(){return session;},get revision(){return activeRevision;},get testMode(){return testModeActive();}
   };
