@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "provider": "Selkent",
-  "last_updated": "2026-09-23T00:06:00.855373+00:00",
+  "last_updated": "2026-09-23T06:05:12.981120+00:00",
   "fixture_agegroup_discovery_source": "selkent_divisions_all",
   "coverage": {
     "fixtures": {
@@ -5538,6 +5538,16 @@
         },
         {
           "date": "2026-10-04",
+          "division_name": "U12 London Girls Cup",
+          "home": "Charlton Athletic (Non-Selkent)",
+          "away": "ST Sports FC Girls Sabres",
+          "provider_team_ids": [
+            "2249",
+            "2"
+          ]
+        },
+        {
+          "date": "2026-10-04",
           "division_name": "Under 12A Navy",
           "home": "Cray Wanderers Panthers",
           "away": "Ebbsfleet United Red",
@@ -5794,16 +5804,6 @@
           "provider_team_ids": [
             "692",
             "161"
-          ]
-        },
-        {
-          "date": "2026-10-04",
-          "division_name": "Under 12C Navy",
-          "home": "Punjab United",
-          "away": "ST Sports FC Girls Sabres",
-          "provider_team_ids": [
-            "25",
-            "2"
           ]
         },
         {
@@ -15839,21 +15839,21 @@
         {
           "date": "2026-09-27",
           "division_name": "Under 14X C Silver",
-          "home": "Sporting Club Thamesmead Red",
-          "away": "Bermondsey Utd FC",
+          "home": "SE Dons Football Club Panthers",
+          "away": "Welling United Purple",
           "provider_team_ids": [
-            "220",
-            "10"
+            "2137",
+            "903"
           ]
         },
         {
           "date": "2026-09-27",
           "division_name": "Under 14X C Silver",
-          "home": "Welling United Purple",
-          "away": "SE Dons Football Club Panthers",
+          "home": "Sporting Club Thamesmead Red",
+          "away": "Bermondsey Utd FC",
           "provider_team_ids": [
-            "903",
-            "2137"
+            "220",
+            "10"
           ]
         },
         {
