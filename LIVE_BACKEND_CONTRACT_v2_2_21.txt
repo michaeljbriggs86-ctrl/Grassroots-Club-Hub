@@ -1,0 +1,45 @@
+LIVE BACKEND CONTRACT — Android v2.2.21 / U7-U11 parent-result privacy hardening
+
+Status check: 2026-09-23
+Production Supabase project: obntycksmkcnkprrcutg
+Backend status for this change: DEPLOYED / TESTED against the live project.
+App v2.2.21 status in this file: source contract only; APK/device status must be verified separately.
+
+Migration:
+- version: 20260923064334
+- name: tighten_u11_parent_result_sanitizer
+
+Authoritative read path:
+- Android calls public.get_team_state_for_me(p_team_id).
+- For U7-U11 parent/player roles, get_team_state_for_me returns
+  public.sanitize_mini_soccer_state(team_state.state, age).
+- Club Admin / coach / assistant coach use the staff hydration path instead.
+
+Verified live U7-U11 parent/player restrictions after the migration:
+1. Match rows contain no gf, ga, score, result, outcome, points, won, drawn,
+   lost, goalDifference, winRate or private match notes.
+2. goals = [].
+3. assists = [].
+4. bookings = [].
+5. leagueResults = [].
+6. selkent.results = [] and selkent.table = [].
+7. U7-U11 publishedLeagueAges entries are removed.
+8. name-to-shirt-number mapping is not returned.
+9. resultRestricted=true is added to sanitized match rows.
+10. Awards remain available because an award does not itself disclose a score/result.
+
+Synthetic live verification performed 2026-09-23:
+- U9 input containing a 3-2 match plus goals/assists/bookings returned no score
+  fields and empty goals/assists/bookings arrays.
+- The same test payload passed through age 12 unchanged.
+- pg_get_functiondef was read back after deployment and contained the new
+  goals/assists/bookings restrictions.
+- notify_match_report was independently inspected: for U7-U11 it does not
+  include p_score in the parent/player notification body.
+
+Android v2.2.21 adds a second client-side sanitizer as defense in depth.
+The server RPC remains the authoritative privacy boundary. Client-side hiding
+alone is never sufficient evidence for this rule.
+
+Existing unrelated Supabase security-advisor findings remain open and are not
+claimed resolved by this migration.

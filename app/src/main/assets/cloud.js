@@ -331,12 +331,43 @@
     if(!found)found=visibleTeams[0];
     localStorage.setItem(ACTIVE_TEAM_KEY,found.id);return found;
   }
+  function sanitizeMiniSoccerParentStateClient(input,age,profileRole=context?.profile?.role||''){
+    const restricted=Number(age)>=7&&Number(age)<=11&&['parent','player'].includes(String(profileRole||''));
+    if(!restricted||!input||typeof input!=='object')return input;
+    const copy=JSON.parse(JSON.stringify(input));
+    copy.matches=(Array.isArray(copy.matches)?copy.matches:[]).map(match=>{
+      const m={...(match||{})};
+      ['gf','ga','score','result','outcome','points','won','drawn','lost','goalDifference','winRate','notes'].forEach(key=>delete m[key]);
+      m.resultRestricted=true;
+      return m;
+    });
+    copy.goals=[];
+    copy.assists=[];
+    copy.bookings=[];
+    copy.leagueResults=[];
+    if(copy.selkent&&typeof copy.selkent==='object'){
+      copy.selkent.results=[];
+      copy.selkent.table=[];
+      if(Array.isArray(copy.selkent.publishedLeagueAges)){
+        copy.selkent.publishedLeagueAges=copy.selkent.publishedLeagueAges.filter(v=>!/^(?:U(?:[7-9]|10|11))$/i.test(String(v||'')));
+      }
+    }
+    copy.squad=(Array.isArray(copy.squad)?copy.squad:[]).map(player=>{
+      const p={...(player||{})};
+      delete p.number;
+      return p;
+    });
+    ['record','leagueTable','table','winRate','played','won','drawn','lost','gf','ga','gd','goalDifference'].forEach(key=>delete copy[key]);
+    copy.meta={...(copy.meta||{}),miniSoccerResultRestriction:true,miniSoccerResultRestrictionAges:'U7-U11'};
+    return copy;
+  }
   async function fetchTeamState(teamId){
     const data=await rpc('get_team_state_for_me',{p_team_id:teamId});
     const row=Array.isArray(data)?data[0]:data;
     if(row){
       activeRevision=Number(row.revision||0);lastRemoteUpdatedAt=row.updated_at||'';
       const age=Number((visibleTeams.find(t=>t.id===teamId)||activeTeam)?.age_group||0);
+      if(row.state)row.state=sanitizeMiniSoccerParentStateClient(row.state,age,context?.profile?.role||'');
       // Never persist the U7-U11 staff identity mapping in a device cache.
       if(age>=7&&age<=11)localStorage.removeItem(TEAM_STATE_CACHE_PREFIX+teamId);else cacheTeamState(teamId,row);
     }else{activeRevision=-1;lastRemoteUpdatedAt='';}
