@@ -107,7 +107,7 @@ jobs:
           unzip -p "$APK" assets/styles.css > "$RUNNER_TEMP/pitchkind-apk-styles.css"
           unzip -p "$APK" assets/app-design-system.css > "$RUNNER_TEMP/pitchkind-apk-design-system.css"
           grep -Fq "function sanitizeMiniSoccerParentStateClient(input,age,profileRole=context?.profile?.role||'')" "$RUNNER_TEMP/pitchkind-apk-cloud.js"
-          grep -Fq "if(mode===\'parentsignup\')" "$RUNNER_TEMP/pitchkind-apk-cloud.js"
+          grep -Fq "if(mode==='parentsignup')" "$RUNNER_TEMP/pitchkind-apk-cloud.js"
           grep -Fq "request_parent_access" "$RUNNER_TEMP/pitchkind-apk-cloud.js"
           grep -Fq "list_pending_parent_requests" "$RUNNER_TEMP/pitchkind-apk-cloud.js"
           grep -Fq "Parent Sign Up" "$RUNNER_TEMP/pitchkind-apk-cloud.js"
