@@ -1057,3 +1057,24 @@ html[data-theme="dark"] .procedure-list article,
 html[data-theme="dark"] .rule-summary-list>span{background:#101713!important;border-color:#344239!important;color:#f2f7f3!important}
 html[data-theme="dark"] .tactics-squad-options-body{border-color:#344239!important}
 @media(max-width:520px){.settings-group-heading{align-items:flex-start;flex-direction:column;gap:2px}.settings-group-heading small{text-align:left}}
+
+/* v2.2.24 — pending parent review alignment and approval UX */
+.team-member-row.pending{grid-template-columns:minmax(0,1fr)!important;align-items:start!important}
+.team-member-row.pending .team-member-copy strong{white-space:normal;overflow:visible;text-overflow:clip;overflow-wrap:anywhere}
+.team-member-copy span{line-height:1.4;overflow-wrap:anywhere;word-break:break-word}
+.team-member-row.pending .team-member-actions{width:100%;justify-content:flex-start;align-items:center}
+.pending-parent-details{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:8px}
+.pending-parent-details span{display:flex;flex-direction:column;gap:2px;min-width:0;padding:8px 10px;border:1px solid var(--border,#d8e0da);border-radius:10px;background:var(--white)}
+.pending-parent-details b{font-size:9.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
+.parent-approve-action,.notification-review-action{min-height:44px;padding:10px 14px}
+.notification-item-head>div{min-width:0}
+.notification-item-head strong,.notification-item p{white-space:normal;overflow-wrap:anywhere;word-break:break-word}
+.notification-item time{flex:0 0 auto}
+.notification-item-actions{display:flex;justify-content:flex-end;align-items:center;gap:8px;flex-wrap:wrap}
+@media(max-width:560px){
+  .pending-parent-details{grid-template-columns:1fr}
+  .team-member-row.pending .team-member-actions>*{flex:0 1 auto}
+  .parent-approve-action{flex:1 1 100%!important;width:100%}
+  .notification-item-head{display:grid;grid-template-columns:minmax(0,1fr) auto}
+}
+html[data-theme="dark"] .pending-parent-details span{background:#151d18!important;border-color:#344239!important;color:#f2f7f3!important}

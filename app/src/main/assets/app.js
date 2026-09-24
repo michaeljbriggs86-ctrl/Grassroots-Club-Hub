@@ -1471,6 +1471,7 @@ function applyAccessMode(){
   document.querySelectorAll('[data-admin-settings-only]').forEach(el=>el.classList.toggle('hidden',!adminClub));
   document.querySelectorAll('[data-staff-history]').forEach(el=>el.classList.toggle('hidden',!['admin','coach','assistant_coach'].includes(currentRole)));
   document.querySelectorAll('[data-staff-settings]').forEach(el=>el.classList.toggle('hidden',!['admin','coach','assistant_coach'].includes(currentRole)));
+  const teamAccessPanel=document.getElementById('team-access-settings');if(teamAccessPanel)teamAccessPanel.classList.toggle('hidden',!['admin','coach','assistant_coach'].includes(currentRole)||(isAdmin()&&isClubOverviewMode()));
   document.querySelectorAll('[data-admin-season-panel]').forEach(el=>el.classList.toggle('hidden',!adminClub));
   const topNav=document.getElementById('top-nav-tabs');
   if(topNav)topNav.classList.remove('hidden');
@@ -1785,12 +1786,32 @@ function renderNotificationCenter(){
   const noticeRows=__announcementRows.filter(a=>(!a.expires_at||new Date(a.expires_at).getTime()>Date.now())).map(a=>({source:'announcement',id:a.id,title:a.title,body:a.body,created_at:a.created_at,read_at:a.read_at,important:a.important,type:'club_announcement'}));
   const appRows=__appNotifications.map(n=>({...n,source:'app'}));const rows=[...appRows,...noticeRows].sort((a,b)=>String(b.created_at||'').localeCompare(String(a.created_at||'')));const unread=rows.filter(r=>!r.read_at).length;
   if(badge){badge.textContent=unread>99?'99+':String(unread);badge.classList.toggle('hidden',!unread);}
-  if(!list)return;list.innerHTML=rows.length?rows.map(r=>`<article class="notification-item ${r.read_at?'read':'unread'} ${r.important?'important':''}"><div class="notification-item-head"><div><strong>${esc(r.title||'Notification')}</strong><small>${r.source==='announcement'?'Club notice':String(r.type||'update').replace(/_/g,' ')}</small></div><time>${notificationDate(r.created_at)}</time></div><p>${esc(r.body||'')}</p>${!r.read_at?`<div class="notification-item-actions"><button type="button" class="text-button compact" ${r.source==='announcement'?`data-read-announcement="${r.id}"`:`data-read-notification="${r.id}"`}>Mark read</button></div>`:''}</article>`).join(''):'<div class="empty-state compact-empty">No notifications yet.</div>';
+  if(!list)return;list.innerHTML=rows.length?rows.map(r=>{const parentReview=r.source==='app'&&r.type==='parent_access_request'&&['admin','coach','assistant_coach'].includes(currentRole);const mark=!r.read_at?`<button type="button" class="text-button compact" ${r.source==='announcement'?`data-read-announcement="${r.id}"`:`data-read-notification="${r.id}"`}>Mark read</button>`:'';const review=parentReview?`<button type="button" class="secondary-button compact notification-review-action" data-review-parent-request="${r.id}">Review request</button>`:'';return `<article class="notification-item ${r.read_at?'read':'unread'} ${r.important?'important':''}"><div class="notification-item-head"><div><strong>${esc(r.title||'Notification')}</strong><small>${r.source==='announcement'?'Club notice':String(r.type||'update').replace(/_/g,' ')}</small></div><time>${notificationDate(r.created_at)}</time></div><p>${esc(r.body||'')}</p>${review||mark?`<div class="notification-item-actions">${review}${mark}</div>`:''}</article>`;}).join(''):'<div class="empty-state compact-empty">No notifications yet.</div>';
 }
 async function refreshNotifications(quiet=true){if(!CLOUD_MODE||!['admin','coach','assistant_coach','parent','player'].includes(currentRole)||!window.ClubHubCloud?.listNotifications)return;if(quiet&&Date.now()-__notificationStamp<15000){renderNotificationCenter();return;}__notificationStamp=Date.now();try{__appNotifications=await window.ClubHubCloud.listNotifications();renderNotificationCenter();}catch(_){if(!quiet)toast('Notifications are temporarily unavailable');}}
 function openNotifications(){renderNotificationCenter();document.getElementById('notification-dialog')?.showModal();}
 async function markAppNotificationRead(id){try{await window.ClubHubCloud.markNotificationRead(id);const row=__appNotifications.find(n=>n.id===id);if(row)row.read_at=new Date().toISOString();renderNotificationCenter();}catch(_){toast('Could not update notification');}}
 async function markAllNotificationsRead(){const app=__appNotifications.filter(n=>!n.read_at),ann=__announcementRows.filter(a=>!a.read_at);try{await Promise.all([...app.map(n=>window.ClubHubCloud.markNotificationRead(n.id)),...ann.map(a=>window.ClubHubCloud.markAnnouncementRead(a.id))]);const now=new Date().toISOString();app.forEach(n=>n.read_at=now);ann.forEach(a=>a.read_at=now);renderAnnouncements();renderNotificationCenter();toast('Notifications marked read');}catch(_){toast('Could not mark all notifications read');}}
+
+async function reviewParentAccessNotification(notificationId){
+  const row=__appNotifications.find(n=>String(n.id)===String(notificationId));
+  if(!row||row.type!=='parent_access_request')return toast('Parent request is no longer available.');
+  const targetId=String(row.team_id||'');
+  try{
+    if(isAdmin()&&targetId&&String(window.ClubHubCloud?.currentTeam?.()?.id||'')!==targetId){
+      const team=(window.ClubHubCloud?.visibleTeamList?.()||[]).find(t=>String(t.id)===targetId);
+      if(!team)throw new Error('The requested team is not available to this account.');
+      await switchAdminTeamAndLoad(team);
+      adminUiMode='view';localStorage.setItem(ADMIN_UI_MODE_KEY,'view');
+    }
+    document.getElementById('notification-dialog')?.close();
+    navigate('more',false);applyAccessMode();
+    const panel=document.getElementById('team-access-settings');if(panel){panel.classList.remove('hidden');panel.open=true;}
+    __teamMembersStamp=0;await refreshTeamMembers(false);
+    if(!row.read_at)await markAppNotificationRead(row.id);
+    panel?.scrollIntoView({behavior:'smooth',block:'start'});
+  }catch(err){alert(err.message||err);}
+}
 
 
 function renderUniversalClubConfiguration(){
@@ -2839,14 +2860,26 @@ let __teamParentLinks=[];
 let __teamPlayerAccountLinks=[];
 async function refreshTeamMembers(quiet=false){
   const list=document.getElementById('team-members-list');
-  if(!list||!CLOUD_MODE||!(isCoach()||isAdminTeamPreviewMode()))return;
+  if(!list||!CLOUD_MODE||!['admin','coach','assistant_coach'].includes(currentRole))return;
   if(quiet&&Date.now()-__teamMembersStamp<12000)return;__teamMembersStamp=Date.now();
   if(!quiet)list.innerHTML='<div class="empty-state compact-empty">Loading team access…</div>';
   try{
     const teamId=window.ClubHubCloud?.currentTeam?.()?.id||null;
     const [rows,links,playerLinks,pendingRequests]=await Promise.all([window.ClubHubCloud.listTeamMembers(teamId),window.ClubHubCloud.listParentPlayerLinks(null),window.ClubHubCloud.listPlayerAccountLinks(null),window.ClubHubCloud.listPendingParentRequests(teamId)]);__teamParentLinks=links||[];__teamPlayerAccountLinks=playerLinks||[];const requestByUser=new Map((pendingRequests||[]).map(r=>[String(r.user_id),r]));
     const pending=rows.filter(r=>r.role==='pending_parent'),active=rows.filter(r=>r.role!=='pending_parent'),preview=isAdminTeamPreviewMode();
-    const rowHtml=r=>{const pendingRow=r.role==='pending_parent',staff=['club_admin','coach','assistant_coach'].includes(r.role),parent=r.role==='parent',player=r.role==='player';const req=pendingRow?requestByUser.get(String(r.user_id)):null;const pendingDetail=req?` · Child: ${req.child_name} · ${req.parent_email}`:'';const roleText=r.role==='club_admin'?'Club Admin · Coach':r.role==='assistant_coach'?'Assistant Coach':r.role==='coach'?'Coach':player?'Player profile':pendingRow?'Parent · awaiting approval'+pendingDetail:'Parent';const pill=r.role==='club_admin'?'Admin Coach':r.role==='assistant_coach'?'Assistant':r.role==='coach'?'Coach':player?'Player':pendingRow?'Pending':'Parent';const canRemove=!preview&&(!staff||(isAdmin()&&isClubOverviewMode()));const pinState=player?(r.access_method==='player_code'?'Reusable code':r.pin_reset_required?'Temporary PIN':r.pin_set?'PIN set':'Legacy access'):parent?(r.access_method==='email'?'Email login':r.pin_reset_required?'Temporary PIN':r.pin_set?'Legacy PIN':'Email login'):'';const linked=parent?__teamParentLinks.filter(x=>x.parent_user_id===r.user_id):player?__teamPlayerAccountLinks.filter(x=>x.user_id===r.user_id):[];const linkText=linked.length?` · ${linked.map(x=>x.player_name).join(', ')}`:(parent?' · No player linked':'');return `<div class="team-member-row ${pendingRow?'pending':''}"><div class="team-member-copy"><strong>${esc(r.full_name||'Member')}</strong><span>${esc(roleText)}${pinState?' · '+esc(pinState):''}${(parent||player)?esc(linkText):''}</span></div><div class="team-member-actions"><span class="member-role-pill">${pill}</span>${!preview&&pendingRow?`<button class="inline-action" data-approve-parent="${r.user_id}">Approve</button>`:''}${!preview&&parent?`<button class="inline-action" data-link-parent-player="${r.user_id}" data-parent-name="${esc(r.full_name||'Parent')}">Link player</button>${r.access_method!=='email'?`<button class="inline-action" data-reset-parent-pin="${r.user_id}" data-parent-name="${esc(r.full_name||'Parent')}">Reset legacy PIN</button>`:''}`:''}${canRemove?`<button class="inline-action delete" data-remove-member="${r.user_id}">Remove</button>`:''}</div></div>`;};
+    const rowHtml=r=>{
+      const pendingRow=r.role==='pending_parent',staff=['club_admin','coach','assistant_coach'].includes(r.role),parent=r.role==='parent',player=r.role==='player';
+      const req=pendingRow?requestByUser.get(String(r.user_id)):null;
+      const roleText=r.role==='club_admin'?'Club Admin · Coach':r.role==='assistant_coach'?'Assistant Coach':r.role==='coach'?'Coach':player?'Player profile':pendingRow?'Parent · awaiting approval':'Parent';
+      const pill=r.role==='club_admin'?'Admin Coach':r.role==='assistant_coach'?'Assistant':r.role==='coach'?'Coach':player?'Player':pendingRow?'Pending':'Parent';
+      const canApprove=pendingRow&&['admin','coach','assistant_coach'].includes(currentRole);
+      const canRemove=!preview&&(!staff||(isAdmin()&&isClubOverviewMode()));
+      const pinState=player?(r.access_method==='player_code'?'Reusable code':r.pin_reset_required?'Temporary PIN':r.pin_set?'PIN set':'Legacy access'):parent?(r.access_method==='email'?'Email login':r.pin_reset_required?'Temporary PIN':r.pin_set?'Legacy PIN':'Email login'):'';
+      const linked=parent?__teamParentLinks.filter(x=>x.parent_user_id===r.user_id):player?__teamPlayerAccountLinks.filter(x=>x.user_id===r.user_id):[];
+      const linkText=linked.length?` · ${linked.map(x=>x.player_name).join(', ')}`:(parent?' · No player linked':'');
+      const pendingInfo=req?`<div class="pending-parent-details"><span><b>Child name</b>${esc(req.child_name||'Not supplied')}</span><span><b>Email</b>${esc(req.parent_email||'Not supplied')}</span></div>`:'';
+      return `<div class="team-member-row ${pendingRow?'pending':''}"><div class="team-member-copy"><strong>${esc(r.full_name||'Member')}</strong><span>${esc(roleText)}${pinState?' · '+esc(pinState):''}${(parent||player)?esc(linkText):''}</span>${pendingInfo}</div><div class="team-member-actions"><span class="member-role-pill">${pill}</span>${canApprove?`<button class="primary-button compact parent-approve-action" data-approve-parent="${r.user_id}">Approve parent</button>`:''}${!preview&&parent&&isCoach()?`<button class="inline-action" data-link-parent-player="${r.user_id}" data-parent-name="${esc(r.full_name||'Parent')}">Link player</button>${r.access_method!=='email'?`<button class="inline-action" data-reset-parent-pin="${r.user_id}" data-parent-name="${esc(r.full_name||'Parent')}">Reset legacy PIN</button>`:''}`:''}${canRemove?`<button class="inline-action delete" data-remove-member="${r.user_id}">Remove</button>`:''}</div></div>`;
+    };
     list.innerHTML=(pending.length?`<div class="member-group-label">Awaiting approval</div>${pending.map(rowHtml).join('')}`:'')+(active.length?`<div class="member-group-label">Active access</div>${active.map(rowHtml).join('')}`:'')||'<div class="empty-state compact-empty">No team access accounts yet.</div>';
   }catch(err){list.innerHTML='<div class="empty-state compact-empty">Team access is temporarily unavailable.</div>';}
 }
@@ -2862,7 +2895,7 @@ async function saveParentLinkDialog(e){
 }
 function populateTeamPlayerInviteOptions(){
   const wrap=document.getElementById('team-player-invite-section'),sel=document.getElementById('team-player-invite-player');if(!wrap||!sel)return;
-  const allowed=playerAccountsAllowedForAge(ageGroupNumber());wrap.classList.toggle('hidden',!allowed);if(!allowed)return;
+  const allowed=playerAccountsAllowedForAge(ageGroupNumber())&&isCoach();wrap.classList.toggle('hidden',!allowed);if(!allowed)return;
   const keep=sel.value;sel.innerHTML='<option value="">Choose player…</option>'+activePlayers().map(p=>`<option value="${esc(p.name)}">#${p.number} ${esc(p.name)}</option>`).join('');if([...sel.options].some(o=>o.value===keep))sel.value=keep;
 }
 async function createTeamPlayerInvite(){
@@ -2877,8 +2910,9 @@ async function copyTeamPlayerInvite(){
 }
 
 async function approveParent(userId){
-  if(!requireCoach())return;
-  try{await window.ClubHubCloud.approveParent(userId);auditEvent('parent_approved','access',userId,'Approved parent access');toast('Parent approved');await refreshTeamMembers(false);}catch(err){alert(err.message||err);}
+  if(!['admin','coach','assistant_coach'].includes(currentRole))return toast('Staff access is required to approve parents.');
+  if(!confirm('Approve this parent account? Player linking remains a separate coach action.'))return;
+  try{await window.ClubHubCloud.approveParent(userId);auditEvent('parent_approved','access',userId,'Approved parent access');toast('Parent approved');__teamMembersStamp=0;await refreshTeamMembers(false);await refreshNotifications(false);}catch(err){alert(err.message||err);}
 }
 async function resetParentPin(userId,parentName='Parent'){
   if(!requireCoach())return;if(!confirm(`Reset ${parentName}'s PIN? The old PIN will stop working.`))return;
@@ -3552,6 +3586,7 @@ document.addEventListener('click',e=>{
   const dlr=e.target.closest('[data-delete-league-result]'); if(dlr){ deleteLeagueResult(dlr.dataset.deleteLeagueResult); return; }
   const readNotice=e.target.closest('[data-read-announcement]');if(readNotice){markAnnouncementRead(readNotice.dataset.readAnnouncement);return;}
   const delNotice=e.target.closest('[data-delete-announcement]');if(delNotice){deleteAnnouncement(delNotice.dataset.deleteAnnouncement);return;}
+  const reviewParentRequest=e.target.closest('[data-review-parent-request]');if(reviewParentRequest){reviewParentAccessNotification(reviewParentRequest.dataset.reviewParentRequest);return;}
   const readNotification=e.target.closest('[data-read-notification]');if(readNotification){markAppNotificationRead(readNotification.dataset.readNotification);return;}
 });
 document.getElementById('appearance-theme')?.addEventListener('change',e=>applyTheme(e.target.value));
