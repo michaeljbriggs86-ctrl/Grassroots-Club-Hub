@@ -1504,11 +1504,17 @@ function drawSharePlaceholderBadge(ctx,x,y,teamName,colours='TBC'){
   const club=clubIdentityName(teamName),initials=clubPlaceholderInitials(teamName),[primary,pairSecondary]=clubIdentityColours(teamName,colours),secondary=pairSecondary===primary?'#D8E0DA':pairSecondary;
   ctx.save();ctx.translate(x,y);ctx.beginPath();ctx.arc(0,0,84,0,Math.PI*2);ctx.fillStyle=primary;ctx.fill();ctx.lineWidth=10;ctx.strokeStyle=secondary;ctx.stroke();ctx.lineWidth=2;ctx.strokeStyle='#D8E0DA';ctx.beginPath();ctx.arc(0,0,94,0,Math.PI*2);ctx.stroke();ctx.fillStyle=shareBadgeTextColour(primary);ctx.font='900 54px system-ui,sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(initials,0,2);ctx.restore();return club;
 }
-function loadShareBadgeImage(src=''){
-  return new Promise(resolve=>{if(!src)return resolve(null);const img=new Image();let done=false;const finish=v=>{if(done)return;done=true;clearTimeout(timer);resolve(v);};const timer=setTimeout(()=>finish(null),3500);img.onload=()=>finish(img);img.onerror=()=>finish(null);if(/^https?:/i.test(src))img.crossOrigin='anonymous';img.src=src;});
+async function loadShareBadgeImage(src=''){
+  if(!src)return null;
+  let safeSrc=String(src);
+  if(!/^data:/i.test(safeSrc)&&!/^https?:/i.test(safeSrc)){
+    try{safeSrc=window.ClubHubNative?.assetDataUrl?String(window.ClubHubNative.assetDataUrl(safeSrc)||''):'';}catch(_){safeSrc='';}
+    if(!safeSrc)return null;
+  }
+  return new Promise(resolve=>{const img=new Image();let done=false;const finish=v=>{if(done)return;done=true;clearTimeout(timer);resolve(v);};const timer=setTimeout(()=>finish(null),3500);img.onload=()=>finish(img);img.onerror=()=>finish(null);if(/^https?:/i.test(safeSrc))img.crossOrigin='anonymous';img.src=safeSrc;});
 }
 async function drawShareClubIdentity(ctx,x,y,teamName,colours='TBC'){
-  const src=verifiedTeamBadgeUrl(teamName);if(src){const img=await loadShareBadgeImage(src);if(img){const max=188,ratio=Math.min(max/img.naturalWidth,max/img.naturalHeight),w=img.naturalWidth*ratio,h=img.naturalHeight*ratio;ctx.drawImage(img,x-w/2,y-h/2,w,h);return;}}
+  const src=verifiedTeamBadgeUrl(teamName);if(src){const img=await loadShareBadgeImage(src);if(img){const max=188,ratio=Math.min(max/img.naturalWidth,max/img.naturalHeight),w=img.naturalWidth*ratio,h=img.naturalHeight*ratio;ctx.save();ctx.beginPath();ctx.arc(x,y,94,0,Math.PI*2);ctx.clip();ctx.drawImage(img,x-w/2,y-h/2,w,h);ctx.restore();return;}}
   drawSharePlaceholderBadge(ctx,x,y,teamName,colours);
 }
 function matchdayArrivalTime(time=''){
@@ -1528,6 +1534,7 @@ function matchdayShareCaption(f={},d={},names={},ctx={}){
   return lines.filter(Boolean).join('\n');
 }
 async function shareNextMatchImage(){
+  try{
   const f=nextPublishedFixture();if(!f)return toast('No fixture available');const confirmed=fixtureDetailsConfirmed(f),d=resolvedFixture(f);if(!confirmed||!d.time||!d.groundName||!d.address){toast('Confirm kick-off, venue and kit before sharing matchday info');document.getElementById('next-match-confirm-time')?.focus();return;}
   const ctx=fixtureOverviewContext(d),names=homeFixtureTeamNames(f),arrival=matchdayArrivalTime(d.time),caption=matchdayShareCaption(f,d,names,ctx),canvas=document.createElement('canvas');canvas.width=1080;canvas.height=1080;const g=canvas.getContext('2d');
   g.fillStyle='#111715';g.fillRect(0,0,1080,1080);g.fillStyle='#29A64D';g.font='800 34px system-ui,sans-serif';g.fillText('MATCHDAY INFO',72,80);
@@ -1546,13 +1553,16 @@ async function shareNextMatchImage(){
   const dataUrl=canvas.toDataURL('image/png');
   try{
     if(window.ClubHubNative?.shareMatchCard){
-      const ok=window.ClubHubNative.shareMatchCard(dataUrl,caption);
-      if(ok){toast('Opening share options');return;}
-      return toast('Could not prepare matchday share image');
+      window.ClubHubNative.shareMatchCard(dataUrl,caption);
+      return;
     }
     if(window.ClubHubNative?.sharePngDataUrl){window.ClubHubNative.sharePngDataUrl(dataUrl);return toast('Opening share options');}
   }catch(_){return toast('Could not open share options');}
   const a=document.createElement('a');a.href=dataUrl;a.download=`PitchKind_${String(f.date||'match')}_${safeFileName()}.png`;a.click();toast('Matchday image saved');
+  }catch(e){
+    console.error('matchday share failed',e);
+    toast('Could not prepare matchday share. Please try again.');
+  }
 }
 function renderNextMatch(){
   const card=document.getElementById('next-match-card');if(!card)return;const f=nextPublishedFixture(),dateEl=document.getElementById('next-match-home-date');

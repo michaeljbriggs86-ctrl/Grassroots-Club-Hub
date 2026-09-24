@@ -1091,7 +1091,7 @@ html[data-theme="dark"] .next-match-summary-card,html[data-theme="dark"] .fixtur
 .match-team-side{grid-template-rows:auto 92px minmax(48px,auto) 42px;align-content:start;justify-items:center;gap:7px}
 .match-team-badge-slot{width:92px;height:92px;display:grid;place-items:center}
 .club-identity-badge{display:grid;place-items:center;width:86px;height:86px;max-width:86px;max-height:86px}
-.verified-club-badge{object-fit:contain}
+.verified-club-badge{object-fit:contain;border-radius:50%;clip-path:circle(50%);overflow:hidden}
 .club-placeholder-badge{border-radius:50%;background:var(--club-badge-primary);border:7px solid var(--club-badge-secondary);outline:2px solid #D8E0DA;box-sizing:border-box;color:#FFFFFF;font-size:24px;font-weight:900;letter-spacing:.03em;text-align:center}
 .club-placeholder-badge[style*="#ffffff" i],.club-placeholder-badge[style*="#f1cf49" i],.club-placeholder-badge[style*="#77bce8" i]{color:#111715}
 .match-team-side .match-team-name{min-height:48px;width:100%;display:flex;align-items:center;justify-content:center;text-align:center;font-size:13px;line-height:1.18;padding:0 2px}
@@ -1167,3 +1167,7 @@ html[data-theme="dark"] .next-fixture-action-bar{
   .next-fixture-action-bar{grid-template-columns:1fr 1fr}
   .next-fixture-action-bar .text-button{grid-column:1/-1;min-height:38px}
 }
+
+
+/* v2.2.30 - verified badge clipping and matchday share diagnostics */
+.verified-club-badge{background:transparent!important}

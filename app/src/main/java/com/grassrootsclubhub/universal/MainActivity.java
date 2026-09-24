@@ -24,6 +24,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
@@ -42,7 +43,7 @@ public class MainActivity extends Activity {
     private String pendingAuthUri = null;
     private ValueCallback<Uri[]> filePathCallback = null;
     private static final int FILE_CHOOSER_REQUEST = 5173;
-    private static final String NATIVE_USER_AGENT = "Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 Chrome/126 Mobile Safari/537.36 GrassrootsClubHub/2.2.29";
+    private static final String NATIVE_USER_AGENT = "Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 Chrome/126 Mobile Safari/537.36 GrassrootsClubHub/2.2.30";
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
 
     @Override public void onCreate(Bundle savedInstanceState) {
@@ -435,15 +436,43 @@ public class MainActivity extends Activity {
             });
         }
 
-        @JavascriptInterface public boolean shareMatchCard(String dataUrl, String caption) {
+        @JavascriptInterface public String assetDataUrl(String assetName) {
+            String name = assetName == null ? "" : assetName.trim();
+            if (name.contains("..") || !name.matches("[A-Za-z0-9_./-]+\\.(png|jpg|jpeg|webp)")) return "";
+            try (InputStream in = getAssets().open(name); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+                byte[] buf = new byte[8192];
+                int n; int total = 0;
+                while ((n = in.read(buf)) > 0) {
+                    total += n;
+                    if (total > 2_000_000) return "";
+                    out.write(buf, 0, n);
+                }
+                String lower = name.toLowerCase();
+                String mime = lower.endsWith(".png") ? "image/png" : (lower.endsWith(".webp") ? "image/webp" : "image/jpeg");
+                return "data:" + mime + ";base64," + Base64.encodeToString(out.toByteArray(), Base64.NO_WRAP);
+            } catch (Exception ignored) {
+                return "";
+            }
+        }
+
+        @JavascriptInterface public void shareMatchCard(String dataUrl, String caption) {
             try {
                 String value = dataUrl == null ? "" : dataUrl;
                 int comma = value.indexOf(',');
-                if (comma < 0 || !value.substring(0, comma).toLowerCase().contains("image/png")) return false;
+                if (comma < 0 || !value.substring(0, comma).toLowerCase().contains("image/png")) {
+                    main.post(() -> android.widget.Toast.makeText(MainActivity.this, "Could not prepare matchday image", android.widget.Toast.LENGTH_LONG).show());
+                    return;
+                }
                 byte[] bytes = Base64.decode(value.substring(comma + 1), Base64.DEFAULT);
-                if (bytes.length == 0 || bytes.length > 12_000_000) return false;
+                if (bytes.length == 0 || bytes.length > 12_000_000) {
+                    main.post(() -> android.widget.Toast.makeText(MainActivity.this, "Matchday image is too large to share", android.widget.Toast.LENGTH_LONG).show());
+                    return;
+                }
                 File dir = new File(getCacheDir(), "share");
-                if (!dir.exists() && !dir.mkdirs()) return false;
+                if (!dir.exists() && !dir.mkdirs()) {
+                    main.post(() -> android.widget.Toast.makeText(MainActivity.this, "Could not prepare sharing", android.widget.Toast.LENGTH_LONG).show());
+                    return;
+                }
                 File target = new File(dir, "match-card.png");
                 try (FileOutputStream out = new FileOutputStream(target, false)) { out.write(bytes); }
                 Uri uri = Uri.parse("content://" + getPackageName() + ".share/match-card.png");
@@ -462,9 +491,8 @@ public class MainActivity extends Activity {
                         android.widget.Toast.makeText(MainActivity.this, "Could not open sharing", android.widget.Toast.LENGTH_LONG).show();
                     }
                 });
-                return true;
             } catch (Exception ignored) {
-                return false;
+                main.post(() -> android.widget.Toast.makeText(MainActivity.this, "Could not prepare matchday sharing", android.widget.Toast.LENGTH_LONG).show());
             }
         }
 

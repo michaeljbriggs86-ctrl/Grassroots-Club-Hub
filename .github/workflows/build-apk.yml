@@ -1,4 +1,4 @@
-name: Android APK v2.2.29 PitchKind
+name: Android APK v2.2.30 PitchKind
 
 on:
   workflow_dispatch:
@@ -19,7 +19,7 @@ jobs:
       - name: Verify source contract
         run: |
           set -euo pipefail
-          python verification/verify_v2_2_29_pitchkind_ui.py
+          python verification/verify_v2_2_30_pitchkind_ui.py
           python verification/verify_club_logo_quality.py
           python -m pip install --quiet requests beautifulsoup4
           python -m unittest discover -s tests -p "test_*.py" -v
@@ -103,7 +103,7 @@ jobs:
           python verification/verify_club_logo_quality.py --asset "$RUNNER_TEMP/shooters-hill-logo.png"
           test "$(sha256sum "$RUNNER_TEMP/shooters-hill-logo.png" | awk '{print $1}')" = "ea3b232a45b197da47d76ffc4bc38440eef9a096a9510af5a988aabc3df71bce"
           unzip -p "$APK" assets/index.html | grep -q '<title>PitchKind</title>'
-          unzip -p "$APK" assets/index.html | grep -q 'App version 2.2.29'
+          unzip -p "$APK" assets/index.html | grep -q 'App version 2.2.30'
           unzip -p "$APK" assets/app.js > "$RUNNER_TEMP/pitchkind-apk-app.js"
           unzip -p "$APK" assets/cloud.js > "$RUNNER_TEMP/pitchkind-apk-cloud.js"
           unzip -p "$APK" assets/styles.css > "$RUNNER_TEMP/pitchkind-apk-styles.css"
@@ -142,6 +142,9 @@ jobs:
           grep -Fq "function matchdayShareCaption" "$RUNNER_TEMP/pitchkind-apk-app.js"
           grep -Fq "https://www.google.com/maps/search/?api=1&query=" "$RUNNER_TEMP/pitchkind-apk-app.js"
           grep -Fq "shareMatchCard(dataUrl,caption)" "$RUNNER_TEMP/pitchkind-apk-app.js"
+          grep -Fq "ClubHubNative?.assetDataUrl" "$RUNNER_TEMP/pitchkind-apk-app.js"
+          grep -Fq "ctx.arc(x,y,94,0,Math.PI*2);ctx.clip()" "$RUNNER_TEMP/pitchkind-apk-app.js"
+          grep -Fq "matchday share failed" "$RUNNER_TEMP/pitchkind-apk-app.js"
           unzip -p "$APK" assets/index.html | grep -Fq "Confirm fixture details"
           unzip -p "$APK" assets/index.html | grep -Fq 'id="next-match-share">Share matchday info'
           unzip -p "$APK" assets/index.html | grep -Fq 'id="matches-next-share">Share matchday info'
@@ -163,21 +166,23 @@ jobs:
           rm -rf "$DEX_DIR"
           mkdir -p "$DEX_DIR"
           unzip -qq "$APK" 'classes*.dex' -d "$DEX_DIR"
-          grep -aR -Fq 'GrassrootsClubHub/2.2.29' "$DEX_DIR"
+          grep -aR -Fq 'GrassrootsClubHub/2.2.30' "$DEX_DIR"
+          grep -aR -Fq 'assetDataUrl' "$DEX_DIR"
+          grep -aR -Fq 'Could not prepare matchday sharing' "$DEX_DIR"
           grep -aR -Fq 'PitchKind matchday info' "$DEX_DIR"
           grep -aR -Fq 'Share matchday info' "$DEX_DIR"
           ! unzip -p "$APK" assets/index.html | grep -q 'CONNECT • ORGANISE • GROW THE GAME'
           ! unzip -p "$APK" assets/index.html | grep -q 'More Than A Game'
           mkdir -p dist
-          cp "$APK" dist/PitchKind-v2.2.29-debug.apk
-          sha256sum dist/PitchKind-v2.2.29-debug.apk > dist/PitchKind-v2.2.29-debug.apk.sha256
+          cp "$APK" dist/PitchKind-v2.2.30-debug.apk
+          sha256sum dist/PitchKind-v2.2.30-debug.apk > dist/PitchKind-v2.2.30-debug.apk.sha256
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: PitchKind-v2.2.29-debug
+          name: PitchKind-v2.2.30-debug
           path: |
-            dist/PitchKind-v2.2.29-debug.apk
-            dist/PitchKind-v2.2.29-debug.apk.sha256
+            dist/PitchKind-v2.2.30-debug.apk
+            dist/PitchKind-v2.2.30-debug.apk.sha256
           if-no-files-found: error
           retention-days: 14
