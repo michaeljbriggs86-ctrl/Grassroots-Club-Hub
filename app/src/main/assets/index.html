@@ -81,42 +81,16 @@
           <div class="club-notices-list" id="home-club-notices-list"></div>
         </section>
 
-        <section class="panel next-match-card" id="next-match-card">
-          <div class="panel-heading"><div><p class="kicker">Next match</p><h3 id="next-match-opponent">TBC</h3></div><span class="next-match-status hidden" id="next-match-status"></span></div>
-          <div class="match-versus next-fixture-versus" id="next-match-versus"></div>
-          <div class="next-match-grid"><div><span>Date / time</span><strong id="next-match-when">—</strong></div><div><span>Competition</span><strong id="next-match-venue">—</strong></div></div>
-          <div class="match-venue-card next-fixture-venue"><div><span>Venue</span><strong id="next-match-ground">Ground TBC</strong><small id="next-match-address">Address TBC</small></div><a class="map-link hidden" id="next-match-map" href="#">Open in Maps</a></div>
-          <div class="fixture-map-preview hidden" id="next-match-map-preview"><iframe id="next-match-map-frame" title="Next match venue map" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe></div>
-          <div class="kit-clash-warning hidden" id="next-match-kit-warning"></div>
-          <div class="fixture-kit-toggle-host hidden" id="next-match-kit-toggle"></div>
-          <div class="next-match-kits hidden"><span>Club colours</span><strong id="next-match-kits">Kit details will appear when a fixture is found.</strong></div><div class="next-match-links"><button type="button" class="text-button compact hidden" id="next-match-calendar">Add to calendar</button><button type="button" class="primary-button compact match-played-action hidden" id="next-match-played" data-requires-edit>Match played</button></div>
-          <div class="fixture-ack hidden" id="fixture-ack-panel">
-            <div class="fixture-ack-copy"><strong id="fixture-ack-label">Awaiting confirmation</strong><span id="fixture-ack-detail">Confirm the fixture once you have checked the details.</span></div>
-            <div class="fixture-ack-actions" data-requires-edit>
-              <button type="button" class="secondary-button compact" id="fixture-report-issue">Report issue</button>
-              <button type="button" class="primary-button compact" id="fixture-confirm">Confirm fixture</button>
+        <section class="home-next-match" id="home-next-match">
+          <p class="kicker">Next match</p>
+          <button type="button" class="panel next-match-card next-match-summary-card" id="next-match-card" aria-haspopup="dialog" aria-controls="next-fixture-dialog">
+            <div class="next-match-summary-versus" id="next-match-home-teams" aria-label="Next match teams">
+              <div class="next-match-summary-team"><span class="next-match-summary-visual">—</span><strong>Team TBC</strong></div>
+              <span class="next-match-summary-v">V</span>
+              <div class="next-match-summary-team"><span class="next-match-summary-visual">—</span><strong>Team TBC</strong></div>
             </div>
-          </div>
-          <div class="match-availability hidden" id="match-availability-panel">
-            <div class="match-availability-head"><div><strong>Match availability</strong><span id="match-availability-meta">Tell the coaching staff if your player can attend.</span></div><span class="availability-count" id="match-availability-count">0 replies</span></div>
-            <div class="parent-availability-controls hidden" id="parent-availability-controls">
-              <label>Player<select id="availability-player"></select></label>
-              <div class="availability-buttons" role="group" aria-label="Match availability">
-                <button type="button" class="availability-btn available" data-availability-status="available">Available</button>
-                <button type="button" class="availability-btn unsure" data-availability-status="unsure">Unsure</button>
-                <button type="button" class="availability-btn unavailable" data-availability-status="unavailable">Unavailable</button>
-              </div>
-            </div>
-            <div class="coach-availability-summary hidden" id="coach-availability-summary"></div>
-            <div class="availability-deadline" id="availability-deadline-panel">
-              <div><span class="helper">Response deadline</span><strong id="availability-deadline-text">No deadline set</strong></div>
-              <div class="availability-deadline-actions hidden" id="availability-deadline-actions">
-                <input id="availability-deadline-input" type="datetime-local" aria-label="Availability deadline" />
-                <button type="button" class="secondary-button compact" id="availability-deadline-save">Set deadline</button>
-                <button type="button" class="text-button compact" id="availability-reminder-send">Remind outstanding</button>
-              </div>
-            </div>
-          </div>
+            <time class="next-match-summary-date" id="next-match-home-date">Date TBC</time>
+          </button>
         </section>
 
         <div class="record-card knight-panel dashboard-record-retired">
@@ -668,13 +642,61 @@
             <div class="gch-about-copy">
               <strong>PitchKind</strong>
               <span>ORGANISE | CONNECT | PLAY</span>
-              <small>App version 2.2.24</small>
+              <small>App version 2.2.25</small>
             </div>
           </section>
         </div>
       </section>
     </main>
   </div>
+
+  <dialog id="next-fixture-dialog" class="modal next-fixture-modal">
+    <div class="next-fixture-detail-shell">
+      <div class="modal-heading"><div><p class="kicker">Next match</p><h3 id="next-match-opponent">Fixture details</h3></div><button type="button" class="icon-button small" data-close-dialog aria-label="Close">×</button></div>
+      <span class="next-match-status hidden" id="next-match-status"></span>
+      <div class="match-versus next-fixture-versus" id="next-match-versus"></div>
+      <div class="next-match-grid"><div><span>Date / time</span><strong id="next-match-when">Date · Kick-off awaiting confirmation</strong></div><div><span>Competition</span><strong id="next-match-venue">—</strong></div></div>
+      <section class="fixture-confirmation-editor hidden" id="next-match-confirmation-editor" data-requires-edit>
+        <div class="panel-heading"><div><h3>Confirm match details</h3><span class="helper">Club information for parents</span></div></div>
+        <div class="form-grid two">
+          <label>Kick-off time<input id="next-match-confirm-time" type="time" /></label>
+          <label>Venue<select id="next-match-ground-select"><option value="">Select ground</option></select></label>
+        </div>
+        <div class="form-grid two hidden" id="next-match-manual-ground-fields">
+          <label>Ground name<input id="next-match-manual-ground" maxlength="120" placeholder="Ground name" /></label>
+          <label>Address<input id="next-match-manual-address" maxlength="180" placeholder="Full address" /></label>
+        </div>
+        <label>Our shirt<select id="next-match-kit-choice"><option value="home">Home</option><option value="away">Away</option></select></label>
+        <div class="fixture-confirmation-actions"><button type="button" class="secondary-button compact" id="fixture-report-issue">Report issue</button><button type="button" class="primary-button compact" id="fixture-confirm-details">Confirm for parents</button></div>
+      </section>
+      <div class="match-venue-card next-fixture-venue"><div><span>Venue</span><strong id="next-match-ground">Awaiting confirmation</strong><small id="next-match-address">Coach will confirm the match venue.</small></div><a class="map-link hidden" id="next-match-map" href="#">Open in Maps</a></div>
+      <div class="fixture-map-preview hidden" id="next-match-map-preview"><iframe id="next-match-map-frame" title="Next match venue map" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe></div>
+      <div class="kit-clash-warning hidden" id="next-match-kit-warning"></div>
+      <div class="fixture-ack" id="fixture-ack-panel"><div class="fixture-ack-copy"><strong id="fixture-ack-label">Awaiting match details</strong><span id="fixture-ack-detail">Kick-off and venue will appear after club confirmation.</span></div></div>
+      <div class="next-match-links"><button type="button" class="text-button compact hidden" id="next-match-calendar">Add to calendar</button><button type="button" class="secondary-button compact" id="next-match-share" data-requires-edit>Share match image</button><button type="button" class="primary-button compact match-played-action hidden" id="next-match-played" data-requires-edit>Match played</button></div>
+      <div class="match-availability hidden" id="match-availability-panel">
+        <div class="match-availability-head"><div><strong>Match availability</strong><span id="match-availability-meta">Tell the coaching staff if your player can attend.</span></div><span class="availability-count" id="match-availability-count">0 replies</span></div>
+        <div class="parent-availability-controls hidden" id="parent-availability-controls">
+          <label>Player<select id="availability-player"></select></label>
+          <div class="availability-buttons" role="group" aria-label="Match availability">
+            <button type="button" class="availability-btn available" data-availability-status="available">Available</button>
+            <button type="button" class="availability-btn unsure" data-availability-status="unsure">Unsure</button>
+            <button type="button" class="availability-btn unavailable" data-availability-status="unavailable">Unavailable</button>
+          </div>
+        </div>
+        <div class="coach-availability-summary hidden" id="coach-availability-summary"></div>
+        <div class="availability-deadline" id="availability-deadline-panel">
+          <div><span class="helper">Response deadline</span><strong id="availability-deadline-text">No deadline set</strong></div>
+          <div class="availability-deadline-actions hidden" id="availability-deadline-actions">
+            <input id="availability-deadline-input" type="datetime-local" aria-label="Availability deadline" />
+            <button type="button" class="secondary-button compact" id="availability-deadline-save">Set deadline</button>
+            <button type="button" class="text-button compact" id="availability-reminder-send">Remind outstanding</button>
+          </div>
+        </div>
+      </div>
+      <div class="modal-actions"><button type="button" class="primary-button" data-close-dialog>Done</button></div>
+    </div>
+  </dialog>
 
   <dialog id="match-detail-dialog" class="modal match-detail-modal">
     <form method="dialog" id="match-detail-form">

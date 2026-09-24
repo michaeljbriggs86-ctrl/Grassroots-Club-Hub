@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.provider.CalendarContract;
+import android.util.Base64;
 import android.view.WindowInsets;
 import android.webkit.CookieManager;
 import android.webkit.JavascriptInterface;
@@ -23,6 +24,8 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
@@ -39,7 +42,7 @@ public class MainActivity extends Activity {
     private String pendingAuthUri = null;
     private ValueCallback<Uri[]> filePathCallback = null;
     private static final int FILE_CHOOSER_REQUEST = 5173;
-    private static final String NATIVE_USER_AGENT = "Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 Chrome/126 Mobile Safari/537.36 GrassrootsClubHub/2.2.24";
+    private static final String NATIVE_USER_AGENT = "Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 Chrome/126 Mobile Safari/537.36 GrassrootsClubHub/2.2.25";
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
 
     @Override public void onCreate(Bundle savedInstanceState) {
@@ -428,6 +431,28 @@ public class MainActivity extends Activity {
                         .putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, start.toInstant().toEpochMilli())
                         .putExtra(CalendarContract.EXTRA_EVENT_END_TIME, end.toInstant().toEpochMilli());
                     startActivity(intent);
+                } catch (Exception ignored) {}
+            });
+        }
+
+        @JavascriptInterface public void sharePngDataUrl(String dataUrl) {
+            main.post(() -> {
+                try {
+                    String value = dataUrl == null ? "" : dataUrl;
+                    int comma = value.indexOf(',');
+                    if (comma < 0 || !value.substring(0, comma).toLowerCase().contains("image/png")) return;
+                    byte[] bytes = Base64.decode(value.substring(comma + 1), Base64.DEFAULT);
+                    if (bytes.length == 0 || bytes.length > 2_000_000) return;
+                    File dir = new File(getCacheDir(), "share");
+                    if (!dir.exists() && !dir.mkdirs()) return;
+                    File target = new File(dir, "match-card.png");
+                    try (FileOutputStream out = new FileOutputStream(target, false)) { out.write(bytes); }
+                    Uri uri = Uri.parse("content://" + getPackageName() + ".share/match-card.png");
+                    Intent share = new Intent(Intent.ACTION_SEND)
+                        .setType("image/png")
+                        .putExtra(Intent.EXTRA_STREAM, uri)
+                        .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    startActivity(Intent.createChooser(share, "Share match"));
                 } catch (Exception ignored) {}
             });
         }
