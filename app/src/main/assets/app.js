@@ -1469,10 +1469,10 @@ function renderCompactNextMatchTeams(f={}){
   host.innerHTML=`<div class="next-match-summary-team"><span class="next-match-summary-visual">${teamIdentityVisualHtml(names.home,ctx.homeKit)}</span><strong>${esc(names.home)}</strong></div><span class="next-match-summary-v">V</span><div class="next-match-summary-team"><span class="next-match-summary-visual">${teamIdentityVisualHtml(names.away,ctx.awayKit)}</span><strong>${esc(names.away)}</strong></div>`;
 }
 function renderFixtureConfirmationEditor(f={}){
-  const editor=document.getElementById('next-match-confirmation-editor');if(!editor)return;
-  const can=canConfirmFixtureDetails();editor.classList.toggle('hidden',!can);if(!can)return;
-  const o=fixtureOverride(f),grounds=groundOptionsForFixture(f),select=document.getElementById('next-match-ground-select'),time=document.getElementById('next-match-confirm-time'),kit=document.getElementById('next-match-kit-choice'),confirmBtn=document.getElementById('fixture-confirm-details');
-  if(time)time.value=o.time||'';if(kit)kit.value=fixtureKitChoice(f);if(confirmBtn)confirmBtn.textContent=o.confirmedAt?'Update confirmed details':'Confirm fixture details';
+  const editor=document.getElementById('next-match-confirmation-editor'),confirmBtn=document.getElementById('fixture-confirm-details'),shareBtn=document.getElementById('next-match-share');if(!editor)return;
+  const can=canConfirmFixtureDetails(),o=fixtureOverride(f);editor.classList.toggle('hidden',!can);if(confirmBtn){confirmBtn.classList.toggle('hidden',!can);confirmBtn.textContent=o.confirmedAt?'Update details':'Confirm details';}if(shareBtn)shareBtn.classList.toggle('hidden',!can);if(!can)return;
+  const grounds=groundOptionsForFixture(f),select=document.getElementById('next-match-ground-select'),time=document.getElementById('next-match-confirm-time'),kit=document.getElementById('next-match-kit-choice');
+  if(time)time.value=o.time||'';if(kit)kit.value=fixtureKitChoice(f);
   if(select){select.innerHTML='<option value="">Select ground</option>'+grounds.map((g,i)=>`<option value="${i}">${esc(g.name)} — ${esc(g.address)}</option>`).join('')+'<option value="__other__">Other / manual venue</option>';let selected='';if(o.groundName){const idx=grounds.findIndex(g=>selkentNorm(g.name)===selkentNorm(o.groundName)&&selkentNorm(g.address)===selkentNorm(o.address));selected=idx>=0?String(idx):'__other__';}else if(grounds.length===1)selected='0';select.value=selected;}
   syncFixtureGroundEditor();
 }
@@ -3715,6 +3715,7 @@ document.getElementById('notifications-mark-all')?.addEventListener('click',mark
 document.getElementById('availability-deadline-save')?.addEventListener('click',saveAvailabilityDeadline);
 document.getElementById('availability-reminder-send')?.addEventListener('click',sendAvailabilityReminder);
 document.getElementById('next-match-card')?.addEventListener('click',openNextFixtureDetails);
+document.getElementById('matches-next-details')?.addEventListener('click',openNextFixtureDetails);
 document.getElementById('next-match-ground-select')?.addEventListener('change',syncFixtureGroundEditor);
 document.getElementById('fixture-confirm-details')?.addEventListener('click',saveFixtureConfirmation);
 document.getElementById('next-match-share')?.addEventListener('click',shareNextMatchImage);

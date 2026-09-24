@@ -1116,3 +1116,54 @@ html[data-theme="dark"] .match-kit-secondary small{color:#b9c7be!important}
   .next-match-summary-visual .club-identity-badge{width:60px;height:60px;max-width:60px;max-height:60px}
   .next-match-summary-visual .club-placeholder-badge{font-size:17px;border-width:5px}
 }
+
+
+/* v2.2.28 - reachable next-match workflow and persistent actions */
+.next-fixture-modal{
+  width:min(94vw,720px);
+  max-height:calc(100dvh - var(--android-inset-bottom,0px) - 20px);
+  overflow:hidden;
+}
+.next-fixture-detail-shell{
+  box-sizing:border-box;
+  display:grid;
+  grid-template-rows:auto minmax(0,1fr) auto;
+  max-height:calc(100dvh - var(--android-inset-bottom,0px) - 20px);
+  overflow:hidden;
+}
+.next-fixture-detail-shell>.modal-heading{
+  padding:17px 19px 12px;
+  border-bottom:1px solid var(--line,#D8E0DA);
+  background:var(--white,#FFFFFF);
+  z-index:4;
+}
+.next-fixture-scroll{
+  min-height:0;
+  overflow-y:auto;
+  overscroll-behavior:contain;
+  padding:14px 19px 20px;
+  display:grid;
+  gap:14px;
+  -webkit-overflow-scrolling:touch;
+}
+.next-fixture-action-bar{
+  flex:0 0 auto;
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto;
+  gap:8px;
+  padding:12px 19px max(12px,env(safe-area-inset-bottom));
+  border-top:1px solid var(--line,#D8E0DA);
+  background:var(--white,#FFFFFF);
+  z-index:5;
+}
+.next-fixture-action-bar button{min-height:46px}
+.next-fixture-action-bar .text-button{padding-inline:12px}
+html[data-theme="dark"] .next-fixture-detail-shell>.modal-heading,
+html[data-theme="dark"] .next-fixture-action-bar{
+  background:#151d18!important;
+  border-color:#344239!important;
+}
+@media(max-width:440px){
+  .next-fixture-action-bar{grid-template-columns:1fr 1fr}
+  .next-fixture-action-bar .text-button{grid-column:1/-1;min-height:38px}
+}

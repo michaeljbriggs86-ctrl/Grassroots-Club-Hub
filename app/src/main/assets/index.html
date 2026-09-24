@@ -235,7 +235,7 @@
           <div class="kit-clash-warning hidden" id="matches-next-kit-warning"></div>
           <div class="fixture-kit-toggle-host hidden" id="matches-next-kit-toggle"></div>
           <div class="next-match-kits hidden"><span>Match details</span><strong id="matches-next-kits">Kit colours and away details will appear when confirmed.</strong></div>
-          <div class="next-match-links"><button type="button" class="text-button compact hidden" id="matches-next-calendar">Add to calendar</button><button type="button" class="secondary-button compact hidden" id="matches-next-share">Share match</button><button type="button" class="primary-button compact match-played-action hidden" id="matches-next-played" data-requires-edit>Match played</button></div>
+          <div class="next-match-links"><button type="button" class="secondary-button compact" id="matches-next-details">Match details</button><button type="button" class="text-button compact hidden" id="matches-next-calendar">Add to calendar</button><button type="button" class="secondary-button compact hidden" id="matches-next-share">Share match</button><button type="button" class="primary-button compact match-played-action hidden" id="matches-next-played" data-requires-edit>Match played</button></div>
         </section>
 
         <details class="panel league-programme" open>
@@ -642,7 +642,7 @@
             <div class="gch-about-copy">
               <strong>PitchKind</strong>
               <span>ORGANISE | CONNECT | PLAY</span>
-              <small>App version 2.2.27</small>
+              <small>App version 2.2.28</small>
             </div>
           </section>
         </div>
@@ -653,6 +653,7 @@
   <dialog id="next-fixture-dialog" class="modal next-fixture-modal">
     <div class="next-fixture-detail-shell">
       <div class="modal-heading"><div><p class="kicker">Next match</p><h3 id="next-match-opponent">Fixture details</h3></div><button type="button" class="icon-button small" data-close-dialog aria-label="Close">×</button></div>
+      <div class="next-fixture-scroll" id="next-fixture-scroll">
       <span class="next-match-status hidden" id="next-match-status"></span>
       <div class="match-versus next-fixture-versus" id="next-match-versus"></div>
       <div class="next-match-grid"><div><span>Date / time</span><strong id="next-match-when">Date · Kick-off awaiting confirmation</strong></div><div><span>Competition</span><strong id="next-match-venue">—</strong></div></div>
@@ -667,13 +668,13 @@
           <label>Address<input id="next-match-manual-address" maxlength="180" placeholder="Full address" /></label>
         </div>
         <label>Our shirt<select id="next-match-kit-choice"><option value="home">Home</option><option value="away">Away</option></select></label>
-        <div class="fixture-confirmation-actions"><button type="button" class="secondary-button compact" id="fixture-report-issue">Report issue</button><button type="button" class="primary-button compact" id="fixture-confirm-details">Confirm fixture details</button></div>
+        <div class="fixture-confirmation-actions"><button type="button" class="secondary-button compact" id="fixture-report-issue">Report issue</button></div>
       </section>
       <div class="match-venue-card next-fixture-venue"><div><span>Venue</span><strong id="next-match-ground">Awaiting confirmation</strong><small id="next-match-address">Coach will confirm the match venue.</small></div><a class="map-link hidden" id="next-match-map" href="#">Open in Maps</a></div>
       <div class="fixture-map-preview hidden" id="next-match-map-preview"><iframe id="next-match-map-frame" title="Next match venue map" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe></div>
       <div class="kit-clash-warning hidden" id="next-match-kit-warning"></div>
       <div class="fixture-ack" id="fixture-ack-panel"><div class="fixture-ack-copy"><strong id="fixture-ack-label">Awaiting match details</strong><span id="fixture-ack-detail">Kick-off and venue will appear after club confirmation.</span></div></div>
-      <div class="next-match-links"><button type="button" class="text-button compact hidden" id="next-match-calendar">Add to calendar</button><button type="button" class="secondary-button compact hidden" id="next-match-share">Share match</button><button type="button" class="primary-button compact match-played-action hidden" id="next-match-played" data-requires-edit>Match played</button></div>
+      <div class="next-match-links"><button type="button" class="text-button compact hidden" id="next-match-calendar">Add to calendar</button><button type="button" class="primary-button compact match-played-action hidden" id="next-match-played" data-requires-edit>Match played</button></div>
       <div class="match-availability hidden" id="match-availability-panel">
         <div class="match-availability-head"><div><strong>Match availability</strong><span id="match-availability-meta">Tell the coaching staff if your player can attend.</span></div><span class="availability-count" id="match-availability-count">0 replies</span></div>
         <div class="parent-availability-controls hidden" id="parent-availability-controls">
@@ -694,7 +695,8 @@
           </div>
         </div>
       </div>
-      <div class="modal-actions"><button type="button" class="primary-button" data-close-dialog>Done</button></div>
+      </div>
+      <div class="next-fixture-action-bar" id="next-fixture-action-bar"><button type="button" class="secondary-button hidden" id="next-match-share">Share match</button><button type="button" class="primary-button hidden" id="fixture-confirm-details">Confirm fixture details</button><button type="button" class="text-button" data-close-dialog>Done</button></div>
     </div>
   </dialog>
 
