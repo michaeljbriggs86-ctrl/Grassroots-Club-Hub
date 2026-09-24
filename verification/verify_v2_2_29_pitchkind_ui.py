@@ -905,10 +905,12 @@ check('v2.2.29 WhatsApp caption carries HTTPS Maps link and key matchday fields'
 check('v2.2.29 share snapshot requires confirmed matchday details',
     'Confirm kick-off, venue and kit before sharing matchday info' in app
     and 'if(!confirmed||!d.time||!d.groundName||!d.address)' in app)
-check('v2.2.29 native share includes image plus caption and removes old 2MB guard',
+check('v2.2.29 native share includes image plus caption and compile-safe URI permission setup',
     'shareMatchCard(String dataUrl, String caption)' in main
     and 'Intent.EXTRA_TEXT' in main
-    and 'ClipData.newUri' in main
+    and 'share.setClipData(android.content.ClipData.newUri' in main
+    and 'share.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);' in main
+    and '.putExtra(Intent.EXTRA_TITLE, "Matchday info")\n                            .setClipData(' not in main
     and 'bytes.length > 12_000_000' in main
     and 'bytes.length > 2_000_000' not in main
     and 'PitchKind matchday info' in main)

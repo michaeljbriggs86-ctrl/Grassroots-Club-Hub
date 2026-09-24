@@ -454,9 +454,9 @@ public class MainActivity extends Activity {
                             .setType("image/png")
                             .putExtra(Intent.EXTRA_STREAM, uri)
                             .putExtra(Intent.EXTRA_TEXT, text)
-                            .putExtra(Intent.EXTRA_TITLE, "Matchday info")
-                            .setClipData(android.content.ClipData.newUri(getContentResolver(), "PitchKind matchday info", uri))
-                            .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                            .putExtra(Intent.EXTRA_TITLE, "Matchday info");
+                        share.setClipData(android.content.ClipData.newUri(getContentResolver(), "PitchKind matchday info", uri));
+                        share.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                         startActivity(Intent.createChooser(share, "Share matchday info"));
                     } catch (Exception e) {
                         android.widget.Toast.makeText(MainActivity.this, "Could not open sharing", android.widget.Toast.LENGTH_LONG).show();
