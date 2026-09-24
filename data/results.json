@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "provider": "Selkent",
-  "last_updated": "2026-09-24T06:05:34.239670+00:00",
+  "last_updated": "2026-09-24T12:05:31.374136+00:00",
   "fixture_agegroup_discovery_source": "selkent_divisions_all",
   "coverage": {
     "fixtures": {
@@ -4784,16 +4784,6 @@
           "provider_team_ids": [
             "953",
             "694"
-          ]
-        },
-        {
-          "date": "2026-09-27",
-          "division_name": "U12 Friendly",
-          "home": "Welling United Silver",
-          "away": "Mighty Warriors FC Jupiter",
-          "provider_team_ids": [
-            "2126",
-            "2243"
           ]
         },
         {
