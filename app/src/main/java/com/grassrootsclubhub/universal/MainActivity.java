@@ -42,7 +42,7 @@ public class MainActivity extends Activity {
     private String pendingAuthUri = null;
     private ValueCallback<Uri[]> filePathCallback = null;
     private static final int FILE_CHOOSER_REQUEST = 5173;
-    private static final String NATIVE_USER_AGENT = "Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 Chrome/126 Mobile Safari/537.36 GrassrootsClubHub/2.2.28";
+    private static final String NATIVE_USER_AGENT = "Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 Chrome/126 Mobile Safari/537.36 GrassrootsClubHub/2.2.29";
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
 
     @Override public void onCreate(Bundle savedInstanceState) {
@@ -435,26 +435,41 @@ public class MainActivity extends Activity {
             });
         }
 
+        @JavascriptInterface public boolean shareMatchCard(String dataUrl, String caption) {
+            try {
+                String value = dataUrl == null ? "" : dataUrl;
+                int comma = value.indexOf(',');
+                if (comma < 0 || !value.substring(0, comma).toLowerCase().contains("image/png")) return false;
+                byte[] bytes = Base64.decode(value.substring(comma + 1), Base64.DEFAULT);
+                if (bytes.length == 0 || bytes.length > 12_000_000) return false;
+                File dir = new File(getCacheDir(), "share");
+                if (!dir.exists() && !dir.mkdirs()) return false;
+                File target = new File(dir, "match-card.png");
+                try (FileOutputStream out = new FileOutputStream(target, false)) { out.write(bytes); }
+                Uri uri = Uri.parse("content://" + getPackageName() + ".share/match-card.png");
+                String text = caption == null ? "" : caption.trim();
+                main.post(() -> {
+                    try {
+                        Intent share = new Intent(Intent.ACTION_SEND)
+                            .setType("image/png")
+                            .putExtra(Intent.EXTRA_STREAM, uri)
+                            .putExtra(Intent.EXTRA_TEXT, text)
+                            .putExtra(Intent.EXTRA_TITLE, "Matchday info")
+                            .setClipData(android.content.ClipData.newUri(getContentResolver(), "PitchKind matchday info", uri))
+                            .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                        startActivity(Intent.createChooser(share, "Share matchday info"));
+                    } catch (Exception e) {
+                        android.widget.Toast.makeText(MainActivity.this, "Could not open sharing", android.widget.Toast.LENGTH_LONG).show();
+                    }
+                });
+                return true;
+            } catch (Exception ignored) {
+                return false;
+            }
+        }
+
         @JavascriptInterface public void sharePngDataUrl(String dataUrl) {
-            main.post(() -> {
-                try {
-                    String value = dataUrl == null ? "" : dataUrl;
-                    int comma = value.indexOf(',');
-                    if (comma < 0 || !value.substring(0, comma).toLowerCase().contains("image/png")) return;
-                    byte[] bytes = Base64.decode(value.substring(comma + 1), Base64.DEFAULT);
-                    if (bytes.length == 0 || bytes.length > 2_000_000) return;
-                    File dir = new File(getCacheDir(), "share");
-                    if (!dir.exists() && !dir.mkdirs()) return;
-                    File target = new File(dir, "match-card.png");
-                    try (FileOutputStream out = new FileOutputStream(target, false)) { out.write(bytes); }
-                    Uri uri = Uri.parse("content://" + getPackageName() + ".share/match-card.png");
-                    Intent share = new Intent(Intent.ACTION_SEND)
-                        .setType("image/png")
-                        .putExtra(Intent.EXTRA_STREAM, uri)
-                        .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                    startActivity(Intent.createChooser(share, "Share match"));
-                } catch (Exception ignored) {}
-            });
+            shareMatchCard(dataUrl, "");
         }
 
         @JavascriptInterface public void reloadApp() {

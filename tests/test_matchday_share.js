@@ -1,0 +1,20 @@
+#!/usr/bin/env node
+const fs=require('fs'),vm=require('vm'),assert=require('assert');
+const source=fs.readFileSync('app/src/main/assets/app.js','utf8');
+const mapStart=source.indexOf("function mapsShareHref(...parts)");
+const mapEnd=source.indexOf('function allDivisionTeams()',mapStart);
+const start=source.indexOf("function matchdayArrivalTime(time='')");
+const end=source.indexOf('async function shareNextMatchImage()',start);
+assert(mapStart>=0&&mapEnd>mapStart&&start>=0&&end>start,'matchday share helper source not found');
+const box={mapQuery:(...parts)=>parts.map(x=>String(x||'').trim()).filter(Boolean).join(', ')};
+vm.createContext(box);
+vm.runInContext(source.slice(mapStart,mapEnd)+source.slice(start,end)+';this.matchdayArrivalTime=matchdayArrivalTime;this.mapsShareHref=mapsShareHref;this.shareDateText=shareDateText;',box);
+assert.equal(box.matchdayArrivalTime('12:00'),'11:30');
+assert.equal(box.matchdayArrivalTime('09:15'),'08:45');
+assert.equal(box.matchdayArrivalTime('00:15'),'23:45');
+assert.equal(box.matchdayArrivalTime('bad'),'');
+const maps=box.mapsShareHref('Crook Log Leisure Centre (rear of car park)','Brampton Road, Bexleyheath, DA7 4HH');
+assert(maps.startsWith('https://www.google.com/maps/search/?api=1&query='));
+assert(maps.includes('Crook%20Log%20Leisure%20Centre'));
+assert.equal(box.shareDateText('2026-09-27'),'Sunday, 27 September 2026');
+console.log('PASS matchday arrival calculation and WhatsApp Maps link helpers');
