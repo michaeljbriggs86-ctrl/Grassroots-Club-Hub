@@ -297,6 +297,20 @@
   }
   async function claimInvite(code){return await rpc('claim_invite',{p_code:String(code||'').trim()});}
   async function requestParentAccess(teamId,childName){return await rpc('request_parent_access',{p_team_id:String(teamId||''),p_child_name:String(childName||'').trim()});}
+  async function resumeParentSignupRequestFromMetadata(){
+    if(context?.profile?.role!=='pending')return false;
+    const metadata=session?.user?.user_metadata||{};
+    let local={};try{local=JSON.parse(localStorage.getItem(PENDING_PARENT_REQUEST_KEY)||'{}')||{};}catch{}
+    const teamId=String(metadata.requested_team_id||local.team_id||'').trim();
+    const child=String(metadata.requested_child_name||local.child_name||'').trim();
+    const isParentSignup=metadata.parent_signup===true||metadata.parent_signup==='true'||!!(local.team_id&&local.child_name);
+    if(!isParentSignup)return false;
+    if(!teamId||child.length<2)throw new Error('The saved parent signup is missing the selected team or child name.');
+    await requestParentAccess(teamId,child);
+    localStorage.removeItem(PENDING_PARENT_REQUEST_KEY);
+    context=await getContext();
+    return context?.profile?.role==='pending_parent';
+  }
   async function listPendingParentRequests(teamId=null){
     if(!['admin','coach','assistant_coach'].includes(role()))return [];
     const data=await rpc('list_pending_parent_requests',{p_team_id:teamId||null});
@@ -762,7 +776,7 @@
         const email=document.getElementById('cloud-email')?.value?.trim()||'',password=document.getElementById('cloud-password')?.value||'';
         if(!email||!password)return authError('Enter your email and password.');
         const btn=document.getElementById('cloud-auth-submit');if(btn){btn.disabled=true;btn.innerHTML='Signing in…';}
-        try{localStorage.removeItem(TEST_MODE_KEY);setInviteAccessLocked(false);await signIn(email,password);await hydrateSessionUser();const signedContext=await getContext();if(!signedContext?.profile)throw new Error('Sign in succeeded, but no club access profile is attached to this account.');context=signedContext;hideGate();window.dispatchEvent(new CustomEvent('clubhub-authenticated',{detail:{source:'signin'}}));}
+        try{localStorage.removeItem(TEST_MODE_KEY);setInviteAccessLocked(false);await signIn(email,password);await hydrateSessionUser();context=await getContext();if(!context?.profile)throw new Error('Sign in succeeded, but no club access profile is attached to this account.');if(context.profile.role==='pending'){await resumeParentSignupRequestFromMetadata();}if(context?.profile?.role==='pending_parent'){setGateHtml('approval','Your parent access request has been sent to the coaching staff for verification.');return;}hideGate();window.dispatchEvent(new CustomEvent('clubhub-authenticated',{detail:{source:'signin'}}));}
         catch(e){const msg=e.message||String(e);if(/confirm|verified/i.test(msg)){localStorage.setItem(VERIFY_EMAIL_KEY,email);setGateHtml('verify','Your email still needs confirming.',email);}else authError(msg);if(btn){btn.disabled=false;btn.innerHTML='Log In <span>→</span>';}}
       });return;
     }
@@ -830,7 +844,7 @@
     }
 
     if(mode==='verify'){
-      const email=prefillEmail||localStorage.getItem(VERIFY_EMAIL_KEY)||'';const body=`${authField({icon:'mail',id:'cloud-verify-email',type:'email',placeholder:'Email address',value:email})}<p class="auth-notice ${message?'':'hidden'}" id="cloud-auth-notice">${escapeHtml(message)}</p><p class="activation-error hidden" id="cloud-auth-error"></p><button class="auth-primary" id="cloud-resend-btn">Resend Email <span>→</span></button><button class="auth-link-strong" id="cloud-back-signin">Back to Login</button>`;gate.innerHTML=authSimple('Check Your Inbox','Tap the confirmation link in the email. It will return you to the app.',body,'VERIFY EMAIL');document.getElementById('cloud-resend-btn')?.addEventListener('click',async()=>{const addr=document.getElementById('cloud-verify-email')?.value?.trim();if(!addr)return authError('Enter your email address.');try{await resendSignup(addr);showNotice('Confirmation email sent.');}catch(e){authError(e.message||String(e));}});document.getElementById('cloud-back-signin')?.addEventListener('click',()=>setGateHtml('signin'));return;
+      const email=prefillEmail||localStorage.getItem(VERIFY_EMAIL_KEY)||'';const body=`${authField({icon:'mail',id:'cloud-verify-email',type:'email',placeholder:'Email address',value:email})}<p class="auth-notice ${message?'':'hidden'}" id="cloud-auth-notice">${escapeHtml(message)}</p><p class="activation-error hidden" id="cloud-auth-error"></p><button class="auth-primary" id="cloud-verify-continue">I’ve Verified My Email <span>→</span></button><button class="auth-link-strong" id="cloud-resend-btn">Resend confirmation email</button><button class="auth-link-strong" id="cloud-back-signin">Back to Login</button>`;gate.innerHTML=authSimple('Check Your Inbox','Tap the confirmation link, then return to PitchKind. If the browser does not reopen the app automatically, come back here and continue.',body,'VERIFY EMAIL');document.getElementById('cloud-verify-continue')?.addEventListener('click',()=>{const addr=document.getElementById('cloud-verify-email')?.value?.trim()||email;setGateHtml('signin','Sign in to finish sending your parent access request.',addr);});document.getElementById('cloud-resend-btn')?.addEventListener('click',async()=>{const addr=document.getElementById('cloud-verify-email')?.value?.trim();if(!addr)return authError('Enter your email address.');try{await resendSignup(addr);showNotice('Confirmation email sent. After confirming, return to PitchKind and continue.');}catch(e){authError(e.message||String(e));}});document.getElementById('cloud-back-signin')?.addEventListener('click',()=>setGateHtml('signin','',email));return;
     }
 
     if(mode==='forgot'){
@@ -944,8 +958,8 @@
     }catch(e){saveSession(null);clearAccountLocalData();setGateHtml('signin','Your saved access expired. Sign in again.');return null;}
     if(!context?.profile){saveSession(null);clearAccountLocalData();setGateHtml('signin','No club access profile is attached to this account.');return null;}
     if(context.profile.role==='pending'){
-      const pm=session?.user?.user_metadata||{},teamId=String(pm.requested_team_id||''),child=String(pm.requested_child_name||'').trim();
-      if(pm.parent_signup&&teamId&&child){try{await requestParentAccess(teamId,child);context=await getContext();localStorage.removeItem(PENDING_PARENT_REQUEST_KEY);}catch(e){setGateHtml('signin','Your account is verified, but the parent access request could not be submitted. '+(e.message||''));return null;}}
+      try{await resumeParentSignupRequestFromMetadata();}
+      catch(e){setGateHtml('signin','Your account is verified, but the parent access request could not be submitted. '+(e.message||''),session?.user?.email||'');return null;}
     }
     try{clubConfiguration=await getClubConfiguration();}catch{clubConfiguration=null;}
     if(context.profile.role==='pending_parent'){

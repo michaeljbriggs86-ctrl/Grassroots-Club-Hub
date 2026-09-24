@@ -1,0 +1,115 @@
+LIVE BACKEND CONTRACT — Android v2.2.22 / parent self-signup
+
+Status check: 2026-09-23
+Production Supabase project: obntycksmkcnkprrcutg
+
+Parent onboarding model
+-----------------------
+The normal parent path is self-signup, not a coach-generated invite:
+parent name + email + password -> select club -> select team -> type child/player
+name -> pending coach verification -> approval -> coach explicitly links the real
+squad player -> email/password access.
+
+The parent NEVER selects from a player list during signup.
+
+Live production migrations:
+- 20260923192456 / parent_self_signup_requests
+- 20260923193851 / parent_approval_requires_explicit_player_link
+
+The first migration adds public.parent_access_requests plus:
+- public.request_parent_access(p_team_id,p_child_name)
+- public.list_pending_parent_requests(p_team_id)
+- revised public.approve_parent(p_user_id)
+
+The second migration corrects approval semantics:
+- submitted child_name is identification context only;
+- approve_parent DOES NOT create public.parent_player_links;
+- coach approval grants the parent account only;
+- coaching staff must use the existing Link player control after approval to
+  allocate the verified parent to the correct actual squad player.
+
+Verified live state after the correction:
+- total parent self-signup requests = 0;
+- approved requests = 0;
+- matching automatically-created parent links = 0;
+- pg_get_functiondef(public.approve_parent) contains no parent_player_links INSERT.
+
+Other verified access rules:
+- request_parent_access requires auth.uid();
+- only pending/pending_parent profiles can request access;
+- selected team must be active;
+- request sets role=pending_parent and access_method=email;
+- pending_parent is gated before team data is loaded;
+- coaches/assistant coaches can list requests only for their own team;
+- Club Admin is constrained to own-club teams;
+- approval requires a real pending parent request;
+- approval notification tells the parent to use email + password and that the
+  coach will link the correct player profile.
+
+The request table has RLS enabled and direct anon/authenticated table access is
+revoked. SECURITY DEFINER RPCs enforce role/team checks.
+
+Public club/team selection uses:
+- public.list_login_clubs()
+- public.list_login_teams(p_club_slug)
+
+The previously deployed adult-email-invite function is SUPERSEDED and disabled:
+- version 2;
+- verify_jwt: true;
+- returns HTTP 410 directing clients to Parent Sign Up.
+
+Earlier migration 20260923153641 / email_bound_parent_invites remains only for
+legacy fallback compatibility, not the normal parent flow.
+
+U7-U11 result privacy remains DEPLOYED / TESTED from migration
+20260923064334 / tighten_u11_parent_result_sanitizer.
+
+End-to-end signup/email confirmation/coach approval/manual Link player/device
+acceptance is NOT YET TESTED until Mike completes it in the built Android app.
+
+U7-U11 privacy regression evidence
+----------------------------------
+Migration 20260923064334 / tighten_u11_parent_result_sanitizer remains DEPLOYED / TESTED.
+
+Verified live synthetic privacy test:
+- U9 input containing a 3-2 match plus goals/assists/bookings returned no score/result fields.
+- goals = [].
+- assists = [].
+- bookings = [].
+- Selkent results/table were empty.
+- name-to-shirt-number mapping was not returned.
+- resultRestricted=true was present on the sanitized match row.
+- the same test payload passed through age 12 unchanged.
+
+The server RPC remains the authoritative privacy boundary; the Android client
+sanitizer is defense in depth only.
+
+v2.2.23 parent verification recovery / coach notification evidence
+------------------------------------------------------------------
+Observed on Mike's Android device on 2026-09-23:
+- Parent Sign Up successfully created an Auth account.
+- Supabase confirmation link ended in browser at http://localhost:3000 with ERR_CONNECTION_REFUSED instead of returning to the Android custom scheme.
+- Direct live Auth inspection showed the test user's email_confirmed_at was set, proving the confirmation itself succeeded despite the broken final redirect.
+- The confirmed test profile remained role=pending with no club_id/team_id because the Android callback never ran request_parent_access.
+- Auth user metadata retained parent_signup=true, requested_team_id and requested_child_name, so the request is recoverable after normal sign-in.
+
+Android already declares grassrootsclubhub://auth-callback in AndroidManifest and cloud.js sends redirect_to=grassrootsclubhub://auth-callback. The observed localhost fallback therefore remains an OPEN Supabase Auth URL-configuration issue outside the database/Edge Function controls available to this automation. Do not claim the deep-link redirect itself fixed until Auth URL Configuration is updated and device-tested. Password-reset deep linking is subject to the same platform redirect configuration.
+
+v2.2.23 mitigation:
+- verify screen no longer depends on automatic return to the app;
+- parent can return to PitchKind and choose "I've Verified My Email";
+- normal email/password sign-in calls resumeParentSignupRequestFromMetadata();
+- bootstrap uses the same recovery helper;
+- authenticated user metadata/local pending state supplies the selected team and free-text child name;
+- request_parent_access remains the authoritative server write.
+
+Production migration 20260923200527 / notify_parent_access_requests is DEPLOYED.
+request_parent_access now creates/upserts an app_notifications row for relevant coaching staff / Club Admin when the parent request is actually submitted:
+- type = parent_access_request;
+- title = Parent access request;
+- body includes parent name and submitted child-name context;
+- notification points staff to Team access for verification;
+- duplicate retries reuse the request entity key.
+
+Live inspection at the time of this release showed the initial test account was email-confirmed but no parent_access_requests row existed yet. That is expected because the dead redirect prevented the app from submitting the request.
+After v2.2.23 installation, signing into that same confirmed test account should create the pending request and coach notification without creating another account.
