@@ -1197,7 +1197,7 @@ function saveSelkentSettings(){
 function furtherFixtureCardHtml(f,index){
   const d=resolvedFixture(f),confirmed=fixtureDetailsConfirmed(f),ctx=fixtureOverviewContext(d),warning=kitWarningHtml(ctx),toggle=kitToggleHtml(f,ctx),mapFrame=confirmed&&ctx.mapEmbedHref?`<div class="fixture-map-preview further-fixture-map"><iframe title="${esc(f.opponent||'Fixture')} venue map" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="${esc(ctx.mapEmbedHref)}"></iframe></div>`:'';
   const ground=confirmed?ctx.ground:'Awaiting confirmation',address=confirmed?ctx.address:'Club staff will confirm the venue.';
-  return `<article class="further-fixture-card"><div class="further-fixture-head"><div><span class="synced-fixture-date">${f.date?formatDate(f.date):'Date TBC'}${confirmed&&d.time?' · '+esc(d.time):''}</span><strong>${esc(fixtureCompetitionLabel(f))}</strong></div></div><div class="match-versus"><div class="match-team-side"><span class="match-side-label">Home</span>${teamKitIconHtml(ctx.homeTeam,ctx.homeKit)}${clubTeamLink(ctx.homeTeam)}<small>${esc(ctx.homeKitType)} · ${esc(ctx.homeKit)}</small></div><div class="match-versus-mark">V</div><div class="match-team-side"><span class="match-side-label">Away</span>${teamKitIconHtml(ctx.awayTeam,ctx.awayKit)}${clubTeamLink(ctx.awayTeam)}<small>${esc(ctx.awayKitType)} · ${esc(ctx.awayKit)}</small></div></div>${toggle}<div class="match-venue-card"><div><span>Venue</span><strong>${esc(ground)}</strong><small>${esc(address)}</small></div>${confirmed&&ctx.mapHref?`<a class="map-link" href="${esc(ctx.mapHref)}">Open in Maps</a>`:''}</div>${mapFrame}${warning}</article>`;
+  return `<article class="further-fixture-card"><div class="further-fixture-head"><div><span class="synced-fixture-date">${f.date?formatDate(f.date):'Date TBC'}${confirmed&&d.time?' · '+esc(d.time):''}</span><strong>${esc(fixtureCompetitionLabel(f))}</strong></div></div><div class="match-versus">${matchTeamSideHtml('Home',ctx.homeTeam,ctx.homeKit)}<div class="match-versus-mark">V</div>${matchTeamSideHtml('Away',ctx.awayTeam,ctx.awayKit)}</div>${toggle}<div class="match-venue-card"><div><span>Venue</span><strong>${esc(ground)}</strong><small>${esc(address)}</small></div>${confirmed&&ctx.mapHref?`<a class="map-link" href="${esc(ctx.mapHref)}">Open in Maps</a>`:''}</div>${mapFrame}${warning}</article>`;
 }
 
 function renderSelkentFixtures(){
@@ -1352,7 +1352,7 @@ function fixtureAckState(st=state,f=nextPublishedFixture()){
   return {status:'awaiting',label:'Awaiting confirmation',detail:'Confirm the fixture once the coach has checked the details.',note:'',changes:[]};
 }
 function setFixtureAcknowledgement(status){
-  if(!requireCoach())return;
+  if(!canConfirmFixtureDetails())return toast('Club staff access is required');
   const f=nextPublishedFixture();if(!f)return toast('No published fixture to confirm');
   let note='';if(status==='issue'){note=prompt('What needs checking with this fixture?','')||'';if(!note.trim())return;}
   state.selkent=state.selkent||{};state.selkent.fixtureAcknowledgement={status,fingerprint:fixtureFingerprint(f),key:fixtureStableKey(f),note:note.trim(),at:new Date().toISOString()};
@@ -1428,11 +1428,40 @@ function verifiedTeamBadgeUrl(teamName=''){
   }
   const d=state.selkent?.directoryDetails?.[selkentNorm(teamName)]||{};return d.logoVerified&&d.logoUrl?d.logoUrl:'';
 }
-function teamIdentityVisualHtml(teamName='',kit='TBC'){
-  const badge=verifiedTeamBadgeUrl(teamName);return badge?`<img class="next-match-team-badge" src="${esc(badge)}" alt="${esc(teamName)} club badge" />`:teamKitIconHtml(teamName,kit);
+function clubIdentityName(teamName=''){
+  const detail=state.selkent?.directoryDetails?.[selkentNorm(teamName)]||{};
+  if(detail.clubName)return String(detail.clubName).trim();
+  if(isOwnTeamName(teamName))return String(clubSettings().display_name||state.meta?.clubName||teamName||'Club').trim();
+  return String(teamName||'Club').trim();
+}
+function clubPlaceholderInitials(teamName=''){
+  const club=clubIdentityName(teamName),words=club.replace(/[^A-Za-z0-9 ]+/g,' ').split(/\s+/).filter(Boolean).filter(w=>!['fc','afc','jfc','football','club','youth'].includes(w.toLowerCase()));
+  if(!words.length)return 'FC';
+  if(words.length===1)return words[0].slice(0,2).toUpperCase();
+  return words.slice(0,3).map(w=>w[0]).join('').toUpperCase();
+}
+function clubIdentityColours(teamName='',kit='TBC'){
+  const detail=state.selkent?.directoryDetails?.[selkentNorm(teamName)]||{},source=knownKit(detail.colours)?detail.colours:kit;
+  return kitColourPair(source);
+}
+function kitColourDisplayText(colours='TBC'){
+  const clean=String(colours||'').replace(/\b(?:shirts?|jerseys?|tops?)\b/ig,'').replace(/\s+/g,' ').trim();
+  return clean&&knownKit(clean)?clean:'Kit TBC';
+}
+function clubPlaceholderBadgeHtml(teamName='',kit='TBC'){
+  const club=clubIdentityName(teamName),initials=clubPlaceholderInitials(teamName),pair=clubIdentityColours(teamName,kit),primary=pair[0],secondary=pair[1]===pair[0]?'#D8E0DA':pair[1];
+  return `<span class="club-identity-badge club-placeholder-badge" data-generated-club-badge="true" role="img" aria-label="${esc(club)} generic placeholder badge, ${esc(kitColourDisplayText(kit))}" title="${esc(club)} · generic PitchKind placeholder" style="--club-badge-primary:${primary};--club-badge-secondary:${secondary}"><span>${esc(initials)}</span></span>`;
+}
+function clubIdentityBadgeHtml(teamName='',kit='TBC'){
+  const badge=verifiedTeamBadgeUrl(teamName),club=clubIdentityName(teamName);
+  return badge?`<img class="club-identity-badge verified-club-badge" src="${esc(badge)}" alt="${esc(club)} club badge" />`:clubPlaceholderBadgeHtml(teamName,kit);
+}
+function teamIdentityVisualHtml(teamName='',kit='TBC'){return clubIdentityBadgeHtml(teamName,kit);}
+function matchTeamSideHtml(sideLabel,teamName,kit){
+  return `<div class="match-team-side"><span class="match-side-label">${esc(sideLabel)}</span><span class="match-team-badge-slot">${clubIdentityBadgeHtml(teamName,kit)}</span>${clubTeamLink(teamName,'match-team-name')}<div class="match-kit-secondary">${teamKitIconHtml(teamName,kit)}<small>${esc(kitColourDisplayText(kit))}</small></div></div>`;
 }
 function homeFixtureTeamNames(f={}){const own=ownTeamDisplayName(),away=String(f.venue||'').toUpperCase()==='A';return {home:away?(f.opponent||'Opponent'):own,away:away?own:(f.opponent||'Opponent')};}
-function canConfirmFixtureDetails(){return isCoach()||(isAdmin()&&!isAdminTeamPreviewMode());}
+function canConfirmFixtureDetails(){return isCoach()||isAdmin();}
 function groundOptionsForFixture(f={}){const names=homeFixtureTeamNames(f),homeDetail=state.selkent?.directoryDetails?.[selkentNorm(names.home)]||{};return Array.isArray(homeDetail.groundOptions)?homeDetail.groundOptions:[];}
 function renderCompactNextMatchTeams(f={}){
   const host=document.getElementById('next-match-home-teams');if(!host)return;
@@ -1442,8 +1471,8 @@ function renderCompactNextMatchTeams(f={}){
 function renderFixtureConfirmationEditor(f={}){
   const editor=document.getElementById('next-match-confirmation-editor');if(!editor)return;
   const can=canConfirmFixtureDetails();editor.classList.toggle('hidden',!can);if(!can)return;
-  const o=fixtureOverride(f),grounds=groundOptionsForFixture(f),select=document.getElementById('next-match-ground-select'),time=document.getElementById('next-match-confirm-time'),kit=document.getElementById('next-match-kit-choice');
-  if(time)time.value=o.time||'';if(kit)kit.value=fixtureKitChoice(f);
+  const o=fixtureOverride(f),grounds=groundOptionsForFixture(f),select=document.getElementById('next-match-ground-select'),time=document.getElementById('next-match-confirm-time'),kit=document.getElementById('next-match-kit-choice'),confirmBtn=document.getElementById('fixture-confirm-details');
+  if(time)time.value=o.time||'';if(kit)kit.value=fixtureKitChoice(f);if(confirmBtn)confirmBtn.textContent=o.confirmedAt?'Update confirmed details':'Confirm fixture details';
   if(select){select.innerHTML='<option value="">Select ground</option>'+grounds.map((g,i)=>`<option value="${i}">${esc(g.name)} — ${esc(g.address)}</option>`).join('')+'<option value="__other__">Other / manual venue</option>';let selected='';if(o.groundName){const idx=grounds.findIndex(g=>selkentNorm(g.name)===selkentNorm(o.groundName)&&selkentNorm(g.address)===selkentNorm(o.address));selected=idx>=0?String(idx):'__other__';}else if(grounds.length===1)selected='0';select.value=selected;}
   syncFixtureGroundEditor();
 }
@@ -1466,13 +1495,29 @@ function saveFixtureConfirmation(){
   saveState();auditEvent('fixture_details_confirmed','fixture',key,`Confirmed ${time} at ${groundName}`,before,{...after,shirt:choice});renderNextMatch();renderMatchPageNextFixture();renderSelkentFixtures();renderMatchdayDashboard();toast('Match details confirmed for parents');
 }
 function shareCardWrap(ctx,text,x,y,maxWidth,lineHeight){const words=String(text||'').split(/\s+/),lines=[];let line='';for(const word of words){const test=line?line+' '+word:word;if(ctx.measureText(test).width>maxWidth&&line){lines.push(line);line=word;}else line=test;}if(line)lines.push(line);lines.slice(0,3).forEach((l,i)=>ctx.fillText(l,x,y+i*lineHeight));return y+Math.min(lines.length,3)*lineHeight;}
-function drawShareJersey(ctx,x,y,colours='TBC'){
-  const [primary,secondary]=kitColourPair(colours),valiant=/^(?:green|blue).*white|white.*(?:green|blue)/i.test(String(colours||''));ctx.save();ctx.translate(x,y);ctx.fillStyle=primary;ctx.strokeStyle='#d8e0da';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(-54,-52);ctx.lineTo(-25,-66);ctx.lineTo(25,-66);ctx.lineTo(54,-52);ctx.lineTo(90,-26);ctx.lineTo(68,12);ctx.lineTo(50,-2);ctx.lineTo(50,70);ctx.lineTo(-50,70);ctx.lineTo(-50,-2);ctx.lineTo(-68,12);ctx.lineTo(-90,-26);ctx.closePath();ctx.fill();ctx.stroke();if(valiant){ctx.strokeStyle='#fff';ctx.lineWidth=5;[-1,0,1].forEach((n)=>{ctx.beginPath();ctx.moveTo(-52+n*8,-49+n*1);ctx.lineTo(-22+n*8,-62+n*1);ctx.stroke();ctx.beginPath();ctx.moveTo(52-n*8,-49+n*1);ctx.lineTo(22-n*8,-62+n*1);ctx.stroke();});ctx.fillStyle='rgba(0,0,0,.12)';[[-30,-20],[-4,4],[25,-14],[-22,35],[18,43]].forEach(([px,py])=>{ctx.beginPath();ctx.moveTo(px,py);ctx.lineTo(px+18,py+6);ctx.lineTo(px+5,py+18);ctx.closePath();ctx.fill();});}else if(secondary!==primary){ctx.fillStyle=secondary;ctx.fillRect(-10,-64,20,132);}ctx.restore();
+function drawShareJersey(ctx,x,y,colours='TBC',scale=1){
+  const [primary,secondary]=kitColourPair(colours),valiant=/^(?:green|blue).*white|white.*(?:green|blue)/i.test(String(colours||''));ctx.save();ctx.translate(x,y);ctx.scale(scale,scale);ctx.fillStyle=primary;ctx.strokeStyle='#d8e0da';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(-54,-52);ctx.lineTo(-25,-66);ctx.lineTo(25,-66);ctx.lineTo(54,-52);ctx.lineTo(90,-26);ctx.lineTo(68,12);ctx.lineTo(50,-2);ctx.lineTo(50,70);ctx.lineTo(-50,70);ctx.lineTo(-50,-2);ctx.lineTo(-68,12);ctx.lineTo(-90,-26);ctx.closePath();ctx.fill();ctx.stroke();if(valiant){ctx.strokeStyle='#fff';ctx.lineWidth=5;[-1,0,1].forEach((n)=>{ctx.beginPath();ctx.moveTo(-52+n*8,-49+n*1);ctx.lineTo(-22+n*8,-62+n*1);ctx.stroke();ctx.beginPath();ctx.moveTo(52-n*8,-49+n*1);ctx.lineTo(22-n*8,-62+n*1);ctx.stroke();});ctx.fillStyle='rgba(0,0,0,.12)';[[-30,-20],[-4,4],[25,-14],[-22,35],[18,43]].forEach(([px,py])=>{ctx.beginPath();ctx.moveTo(px,py);ctx.lineTo(px+18,py+6);ctx.lineTo(px+5,py+18);ctx.closePath();ctx.fill();});}else if(secondary!==primary){ctx.fillStyle=secondary;ctx.fillRect(-10,-64,20,132);}ctx.restore();
+}
+function shareBadgeTextColour(primary=''){return ['#ffffff','#f1cf49','#77bce8'].includes(String(primary).toLowerCase())?'#111715':'#ffffff';}
+function drawSharePlaceholderBadge(ctx,x,y,teamName,colours='TBC'){
+  const club=clubIdentityName(teamName),initials=clubPlaceholderInitials(teamName),[primary,pairSecondary]=clubIdentityColours(teamName,colours),secondary=pairSecondary===primary?'#D8E0DA':pairSecondary;
+  ctx.save();ctx.translate(x,y);ctx.beginPath();ctx.arc(0,0,84,0,Math.PI*2);ctx.fillStyle=primary;ctx.fill();ctx.lineWidth=10;ctx.strokeStyle=secondary;ctx.stroke();ctx.lineWidth=2;ctx.strokeStyle='#D8E0DA';ctx.beginPath();ctx.arc(0,0,94,0,Math.PI*2);ctx.stroke();ctx.fillStyle=shareBadgeTextColour(primary);ctx.font='900 54px system-ui,sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(initials,0,2);ctx.restore();return club;
+}
+function loadShareBadgeImage(src=''){
+  return new Promise(resolve=>{if(!src)return resolve(null);const img=new Image();let done=false;const finish=v=>{if(done)return;done=true;clearTimeout(timer);resolve(v);};const timer=setTimeout(()=>finish(null),3500);img.onload=()=>finish(img);img.onerror=()=>finish(null);if(/^https?:/i.test(src))img.crossOrigin='anonymous';img.src=src;});
+}
+async function drawShareClubIdentity(ctx,x,y,teamName,colours='TBC'){
+  const src=verifiedTeamBadgeUrl(teamName);if(src){const img=await loadShareBadgeImage(src);if(img){const max=188,ratio=Math.min(max/img.naturalWidth,max/img.naturalHeight),w=img.naturalWidth*ratio,h=img.naturalHeight*ratio;ctx.drawImage(img,x-w/2,y-h/2,w,h);return;}}
+  drawSharePlaceholderBadge(ctx,x,y,teamName,colours);
 }
 async function shareNextMatchImage(){
-  const f=nextPublishedFixture();if(!f)return toast('No fixture available');const d=resolvedFixture(f),confirmed=fixtureDetailsConfirmed(f),ctx=fixtureOverviewContext(d),canvas=document.createElement('canvas');canvas.width=1080;canvas.height=1080;const g=canvas.getContext('2d');
-  g.fillStyle='#101713';g.fillRect(0,0,1080,1080);g.fillStyle='#98e3a3';g.font='800 34px system-ui,sans-serif';g.fillText('NEXT MATCH',72,92);g.fillStyle='#f2f7f3';g.font='900 54px system-ui,sans-serif';const names=homeFixtureTeamNames(f);shareCardWrap(g,names.home,72,180,430,62);shareCardWrap(g,names.away,578,180,430,62);g.fillStyle='#98e3a3';g.font='900 44px system-ui,sans-serif';g.textAlign='center';g.fillText('V',540,292);g.textAlign='left';drawShareJersey(g,235,390,ctx.homeKit);drawShareJersey(g,845,390,ctx.awayKit);
-  g.fillStyle='#f2f7f3';g.font='800 42px system-ui,sans-serif';g.fillText(f.date?formatDate(f.date):'Date TBC',72,570);g.font='700 34px system-ui,sans-serif';g.fillStyle='#c5d2c9';g.fillText(confirmed&&d.time?`Kick-off ${d.time}`:'Kick-off awaiting confirmation',72,626);g.fillStyle='#f2f7f3';g.font='800 34px system-ui,sans-serif';g.fillText(confirmed?(d.groundName||'Venue TBC'):'Venue awaiting confirmation',72,714);g.fillStyle='#c5d2c9';g.font='600 28px system-ui,sans-serif';shareCardWrap(g,confirmed?(d.address||''):'Club staff will confirm the venue.',72,760,930,38);g.fillStyle='#98e3a3';g.font='800 28px system-ui,sans-serif';g.fillText(`Our shirt: ${fixtureKitChoice(f)==='away'?'Away':'Home'} · ${ctx.ownProfile[fixtureKitChoice(f)]||ctx.ownProfile.home}`,72,890);g.fillStyle='#aab8ae';g.font='600 24px system-ui,sans-serif';g.fillText('Shared from PitchKind',72,1000);
+  const f=nextPublishedFixture();if(!f)return toast('No fixture available');if(!fixtureDetailsConfirmed(f))return toast('Confirm fixture details before generating the match image');const d=resolvedFixture(f),ctx=fixtureOverviewContext(d),canvas=document.createElement('canvas');canvas.width=1080;canvas.height=1080;const g=canvas.getContext('2d'),names=homeFixtureTeamNames(f);
+  g.fillStyle='#111715';g.fillRect(0,0,1080,1080);g.fillStyle='#29A64D';g.font='800 34px system-ui,sans-serif';g.fillText('NEXT MATCH',72,82);
+  await Promise.all([drawShareClubIdentity(g,270,245,names.home,ctx.homeKit),drawShareClubIdentity(g,810,245,names.away,ctx.awayKit)]);
+  g.fillStyle='#29A64D';g.font='900 44px system-ui,sans-serif';g.textAlign='center';g.fillText('V',540,260);
+  g.fillStyle='#FFFFFF';g.font='900 40px system-ui,sans-serif';g.textAlign='center';shareCardWrap(g,names.home,270,380,390,46);shareCardWrap(g,names.away,810,380,390,46);
+  drawShareJersey(g,270,505,ctx.homeKit,.52);drawShareJersey(g,810,505,ctx.awayKit,.52);
+  g.textAlign='left';g.fillStyle='#FFFFFF';g.font='800 42px system-ui,sans-serif';g.fillText(f.date?formatDate(f.date):'Date TBC',72,650);g.font='800 34px system-ui,sans-serif';g.fillText(`Kick-off ${d.time}`,72,708);g.fillStyle='#FFFFFF';g.font='800 34px system-ui,sans-serif';g.fillText(d.groundName||'Venue TBC',72,784);g.fillStyle='#D8E0DA';g.font='600 28px system-ui,sans-serif';shareCardWrap(g,d.address||'',72,828,930,38);g.fillStyle='#29A64D';g.font='800 28px system-ui,sans-serif';g.fillText(`Our kit: ${fixtureKitChoice(f)==='away'?'Away':'Home'} · ${kitColourDisplayText(ctx.ownProfile[fixtureKitChoice(f)]||ctx.ownProfile.home)}`,72,932);g.fillStyle='#D8E0DA';g.font='600 24px system-ui,sans-serif';g.fillText('Shared from PitchKind',72,1010);
   const dataUrl=canvas.toDataURL('image/png');try{if(window.ClubHubNative?.sharePngDataUrl){window.ClubHubNative.sharePngDataUrl(dataUrl);return toast('Opening share options');}}catch(_){}const a=document.createElement('a');a.href=dataUrl;a.download=`PitchKind_${String(f.date||'match')}_${safeFileName()}.png`;a.click();toast('Match image saved');
 }
 
@@ -1484,7 +1529,7 @@ function renderNextMatch(){
   const ground=document.getElementById('next-match-ground'),address=document.getElementById('next-match-address'),map=document.getElementById('next-match-map'),mapWrap=document.getElementById('next-match-map-preview');if(!confirmed){if(ground)ground.textContent='Awaiting confirmation';if(address)address.textContent='Coach will confirm the match venue.';if(map)map.classList.add('hidden');if(mapWrap)mapWrap.classList.add('hidden');}
   const ack=fixtureAckState(),status=document.getElementById('next-match-status');if(status){status.textContent=confirmed?'Details confirmed':ack.status==='changed'?'Fixture changed':'Awaiting details';status.classList.remove('hidden');}
   const ackPanel=document.getElementById('fixture-ack-panel'),label=document.getElementById('fixture-ack-label'),detail=document.getElementById('fixture-ack-detail');if(ackPanel)ackPanel.className=`fixture-ack ${confirmed?'confirmed':ack.status}`;if(label)label.textContent=confirmed?'Match details confirmed':ack.status==='changed'?'Fixture changed — reconfirm':'Awaiting match details';if(detail)detail.textContent=confirmed?`Kick-off ${d.time} · ${d.groundName}`:(ack.status==='changed'?ack.detail:'Kick-off and venue will appear after club confirmation.');
-  const cal=document.getElementById('next-match-calendar');if(cal)cal.classList.toggle('hidden',!confirmed||!f.date);const played=document.getElementById('next-match-played');if(played)played.classList.toggle('hidden',!isCoach());const share=document.getElementById('next-match-share');if(share)share.classList.toggle('hidden',!canConfirmFixtureDetails());renderFixtureConfirmationEditor(f);refreshFixtureOverviewDirectory(f);
+  const cal=document.getElementById('next-match-calendar');if(cal)cal.classList.toggle('hidden',!confirmed||!f.date);const played=document.getElementById('next-match-played');if(played)played.classList.toggle('hidden',!isCoach());const share=document.getElementById('next-match-share');if(share){const staff=canConfirmFixtureDetails();share.classList.toggle('hidden',!staff);share.disabled=!confirmed;share.title=confirmed?'Generate a shareable match information image':'Confirm fixture details first';}renderFixtureConfirmationEditor(f);refreshFixtureOverviewDirectory(f);
 }
 
 function renderMatchPageNextFixture(){
@@ -2449,7 +2494,7 @@ function setMapPreview(wrapId,frameId,href){
 function renderFixtureOverview(prefix,f){
   const ctx=fixtureOverviewContext(f);
   const versus=document.getElementById(`${prefix}-versus`);
-  if(versus)versus.innerHTML=`<div class="match-team-side"><span class="match-side-label">Home</span>${teamKitIconHtml(ctx.homeTeam,ctx.homeKit)}${clubTeamLink(ctx.homeTeam)}<small>${esc(ctx.homeKitType)} · ${esc(ctx.homeKit||'Kit TBC')}</small></div><div class="match-versus-mark">V</div><div class="match-team-side"><span class="match-side-label">Away</span>${teamKitIconHtml(ctx.awayTeam,ctx.awayKit)}${clubTeamLink(ctx.awayTeam)}<small>${esc(ctx.awayKitType)} · ${esc(ctx.awayKit||'Kit TBC')}</small></div>`;
+  if(versus)versus.innerHTML=`${matchTeamSideHtml('Home',ctx.homeTeam,ctx.homeKit)}<div class="match-versus-mark">V</div>${matchTeamSideHtml('Away',ctx.awayTeam,ctx.awayKit)}`;
   const ground=document.getElementById(`${prefix}-ground`),address=document.getElementById(`${prefix}-address`),map=document.getElementById(`${prefix}-map`),warning=document.getElementById(`${prefix}-kit-warning`);
   if(ground)ground.textContent=ctx.ground;if(address)address.textContent=ctx.address;
   if(map){map.classList.toggle('hidden',!ctx.mapHref);if(ctx.mapHref)map.href=ctx.mapHref;else map.removeAttribute('href');}
@@ -2477,7 +2522,7 @@ function refreshFixtureOverviewDirectory(f={}){
 function renderMatchOverview(m){
   const ctx=matchOverviewContext(m);
   const versus=document.getElementById('match-detail-versus');
-  if(versus)versus.innerHTML=`<div class="match-team-side"><span class="match-side-label">Home</span>${teamKitIconHtml(ctx.homeTeam,ctx.homeKit)}${clubTeamLink(ctx.homeTeam)}<small>${esc(ctx.homeKitType)} · ${esc(ctx.homeKit||'Kit TBC')}</small></div><div class="match-versus-mark">V</div><div class="match-team-side"><span class="match-side-label">Away</span>${teamKitIconHtml(ctx.awayTeam,ctx.awayKit)}${clubTeamLink(ctx.awayTeam)}<small>${esc(ctx.awayKitType)} · ${esc(ctx.awayKit||'Kit TBC')}</small></div>`;
+  if(versus)versus.innerHTML=`${matchTeamSideHtml('Home',ctx.homeTeam,ctx.homeKit)}<div class="match-versus-mark">V</div>${matchTeamSideHtml('Away',ctx.awayTeam,ctx.awayKit)}`;
   const ground=document.getElementById('match-detail-ground'),address=document.getElementById('match-detail-address'),map=document.getElementById('match-detail-map'),warning=document.getElementById('match-detail-kit-warning');
   if(ground)ground.textContent=ctx.ground;if(address)address.textContent=ctx.address;
   if(map){map.classList.toggle('hidden',!ctx.mapHref);if(ctx.mapHref)map.href=ctx.mapHref;else map.removeAttribute('href');}

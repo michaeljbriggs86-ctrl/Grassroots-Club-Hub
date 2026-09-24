@@ -642,7 +642,7 @@
             <div class="gch-about-copy">
               <strong>PitchKind</strong>
               <span>ORGANISE | CONNECT | PLAY</span>
-              <small>App version 2.2.25</small>
+              <small>App version 2.2.26</small>
             </div>
           </section>
         </div>
@@ -656,7 +656,7 @@
       <span class="next-match-status hidden" id="next-match-status"></span>
       <div class="match-versus next-fixture-versus" id="next-match-versus"></div>
       <div class="next-match-grid"><div><span>Date / time</span><strong id="next-match-when">Date · Kick-off awaiting confirmation</strong></div><div><span>Competition</span><strong id="next-match-venue">—</strong></div></div>
-      <section class="fixture-confirmation-editor hidden" id="next-match-confirmation-editor" data-requires-edit>
+      <section class="fixture-confirmation-editor hidden" id="next-match-confirmation-editor">
         <div class="panel-heading"><div><h3>Confirm match details</h3><span class="helper">Club information for parents</span></div></div>
         <div class="form-grid two">
           <label>Kick-off time<input id="next-match-confirm-time" type="time" /></label>
@@ -667,13 +667,13 @@
           <label>Address<input id="next-match-manual-address" maxlength="180" placeholder="Full address" /></label>
         </div>
         <label>Our shirt<select id="next-match-kit-choice"><option value="home">Home</option><option value="away">Away</option></select></label>
-        <div class="fixture-confirmation-actions"><button type="button" class="secondary-button compact" id="fixture-report-issue">Report issue</button><button type="button" class="primary-button compact" id="fixture-confirm-details">Confirm for parents</button></div>
+        <div class="fixture-confirmation-actions"><button type="button" class="secondary-button compact" id="fixture-report-issue">Report issue</button><button type="button" class="primary-button compact" id="fixture-confirm-details">Confirm fixture details</button></div><button type="button" class="secondary-button fixture-share-action hidden" id="next-match-share">Generate match info image</button>
       </section>
       <div class="match-venue-card next-fixture-venue"><div><span>Venue</span><strong id="next-match-ground">Awaiting confirmation</strong><small id="next-match-address">Coach will confirm the match venue.</small></div><a class="map-link hidden" id="next-match-map" href="#">Open in Maps</a></div>
       <div class="fixture-map-preview hidden" id="next-match-map-preview"><iframe id="next-match-map-frame" title="Next match venue map" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe></div>
       <div class="kit-clash-warning hidden" id="next-match-kit-warning"></div>
       <div class="fixture-ack" id="fixture-ack-panel"><div class="fixture-ack-copy"><strong id="fixture-ack-label">Awaiting match details</strong><span id="fixture-ack-detail">Kick-off and venue will appear after club confirmation.</span></div></div>
-      <div class="next-match-links"><button type="button" class="text-button compact hidden" id="next-match-calendar">Add to calendar</button><button type="button" class="secondary-button compact" id="next-match-share" data-requires-edit>Share match image</button><button type="button" class="primary-button compact match-played-action hidden" id="next-match-played" data-requires-edit>Match played</button></div>
+      <div class="next-match-links"><button type="button" class="text-button compact hidden" id="next-match-calendar">Add to calendar</button><button type="button" class="primary-button compact match-played-action hidden" id="next-match-played" data-requires-edit>Match played</button></div>
       <div class="match-availability hidden" id="match-availability-panel">
         <div class="match-availability-head"><div><strong>Match availability</strong><span id="match-availability-meta">Tell the coaching staff if your player can attend.</span></div><span class="availability-count" id="match-availability-count">0 replies</span></div>
         <div class="parent-availability-controls hidden" id="parent-availability-controls">
