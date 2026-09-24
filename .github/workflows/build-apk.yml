@@ -1,4 +1,4 @@
-name: Android APK v2.2.26 PitchKind
+name: Android APK v2.2.27 PitchKind
 
 on:
   workflow_dispatch:
@@ -19,7 +19,7 @@ jobs:
       - name: Verify source contract
         run: |
           set -euo pipefail
-          python verification/verify_v2_2_26_pitchkind_ui.py
+          python verification/verify_v2_2_27_pitchkind_ui.py
           python verification/verify_club_logo_quality.py
           python -m pip install --quiet requests beautifulsoup4
           python -m unittest discover -s tests -p "test_*.py" -v
@@ -102,7 +102,7 @@ jobs:
           python verification/verify_club_logo_quality.py --asset "$RUNNER_TEMP/shooters-hill-logo.png"
           test "$(sha256sum "$RUNNER_TEMP/shooters-hill-logo.png" | awk '{print $1}')" = "ea3b232a45b197da47d76ffc4bc38440eef9a096a9510af5a988aabc3df71bce"
           unzip -p "$APK" assets/index.html | grep -q '<title>PitchKind</title>'
-          unzip -p "$APK" assets/index.html | grep -q 'App version 2.2.26'
+          unzip -p "$APK" assets/index.html | grep -q 'App version 2.2.27'
           unzip -p "$APK" assets/app.js > "$RUNNER_TEMP/pitchkind-apk-app.js"
           unzip -p "$APK" assets/cloud.js > "$RUNNER_TEMP/pitchkind-apk-cloud.js"
           unzip -p "$APK" assets/styles.css > "$RUNNER_TEMP/pitchkind-apk-styles.css"
@@ -138,7 +138,8 @@ jobs:
           grep -Fq "function matchTeamSideHtml" "$RUNNER_TEMP/pitchkind-apk-app.js"
           grep -Fq "function parseSelkentClubGroundOptions" "$RUNNER_TEMP/pitchkind-apk-app.js"
           unzip -p "$APK" assets/index.html | grep -Fq "Confirm fixture details"
-          unzip -p "$APK" assets/index.html | grep -Fq "Generate match info image"
+          unzip -p "$APK" assets/index.html | grep -Fq 'id="next-match-share">Share match'
+          unzip -p "$APK" assets/index.html | grep -Fq 'id="matches-next-share">Share match'
           grep -Fq "function reviewParentAccessNotification(notificationId)" "$RUNNER_TEMP/pitchkind-apk-app.js"
           grep -Fq "data-review-parent-request" "$RUNNER_TEMP/pitchkind-apk-app.js"
           grep -Fq "Approve parent" "$RUNNER_TEMP/pitchkind-apk-app.js"
@@ -154,19 +155,19 @@ jobs:
           rm -rf "$DEX_DIR"
           mkdir -p "$DEX_DIR"
           unzip -qq "$APK" 'classes*.dex' -d "$DEX_DIR"
-          grep -aR -Fq 'GrassrootsClubHub/2.2.26' "$DEX_DIR"
+          grep -aR -Fq 'GrassrootsClubHub/2.2.27' "$DEX_DIR"
           ! unzip -p "$APK" assets/index.html | grep -q 'CONNECT • ORGANISE • GROW THE GAME'
           ! unzip -p "$APK" assets/index.html | grep -q 'More Than A Game'
           mkdir -p dist
-          cp "$APK" dist/PitchKind-v2.2.26-debug.apk
-          sha256sum dist/PitchKind-v2.2.26-debug.apk > dist/PitchKind-v2.2.26-debug.apk.sha256
+          cp "$APK" dist/PitchKind-v2.2.27-debug.apk
+          sha256sum dist/PitchKind-v2.2.27-debug.apk > dist/PitchKind-v2.2.27-debug.apk.sha256
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: PitchKind-v2.2.26-debug
+          name: PitchKind-v2.2.27-debug
           path: |
-            dist/PitchKind-v2.2.26-debug.apk
-            dist/PitchKind-v2.2.26-debug.apk.sha256
+            dist/PitchKind-v2.2.27-debug.apk
+            dist/PitchKind-v2.2.27-debug.apk.sha256
           if-no-files-found: error
           retention-days: 14
