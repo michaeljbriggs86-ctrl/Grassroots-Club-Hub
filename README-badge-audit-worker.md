@@ -24,3 +24,17 @@ Rights are fail-closed. The current explicit allow-set is only:
 - project_approved_asset
 
 All other rights values, including legal_basis_not_reviewed, are held in E.
+
+Supported raster acquisition formats:
+- PNG
+- JPEG
+- WebP
+- GIF
+- BMP
+- AVIF
+- ICO (`image/x-icon` and `image/vnd.microsoft.icon`)
+
+AVIF and ICO remain subject to the same identity, technical-quality and rights
+gates as every other raster format. Supporting a file format does not promote
+an asset or weaken fail-closed review. Pillow performs the actual decode and
+dimension read; decode failures remain technical failures.

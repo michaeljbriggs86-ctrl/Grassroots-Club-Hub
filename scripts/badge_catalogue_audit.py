@@ -36,6 +36,9 @@ RASTER_MIME_EXT = {
     "image/webp": ".webp",
     "image/gif": ".gif",
     "image/bmp": ".bmp",
+    "image/avif": ".avif",
+    "image/x-icon": ".ico",
+    "image/vnd.microsoft.icon": ".ico",
 }
 VECTOR_MIME_EXT = {"image/svg+xml": ".svg"}
 ALL_IMAGE_MIME_EXT = {**RASTER_MIME_EXT, **VECTOR_MIME_EXT}
@@ -86,6 +89,14 @@ def sniff_mime(data: bytes, content_type: str = "") -> str:
         return "image/webp"
     if data.startswith((b"GIF87a", b"GIF89a")):
         return "image/gif"
+    if data.startswith(b"\x00\x00\x01\x00"):
+        return "image/x-icon"
+    if (
+        len(data) >= 12
+        and data[4:8] == b"ftyp"
+        and data[8:12] in {b"avif", b"avis", b"mif1", b"msf1"}
+    ):
+        return "image/avif"
     stripped = data.lstrip()
     if stripped.startswith(b"<svg") or b"<svg" in stripped[:1000]:
         return "image/svg+xml"

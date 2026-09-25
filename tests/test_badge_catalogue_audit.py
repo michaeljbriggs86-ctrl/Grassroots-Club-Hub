@@ -16,6 +16,25 @@ class BadgeCatalogueAuditTests(unittest.TestCase):
         data = b"\x89PNG\r\n\x1a\n" + b"x" * 32
         self.assertEqual(badgeaudit.sniff_mime(data, "text/plain"), "image/png")
 
+    def test_avif_magic_sniff(self):
+        data = b"\x00\x00\x00\x1cftypavif" + b"x" * 32
+        self.assertEqual(badgeaudit.sniff_mime(data, "text/plain"), "image/avif")
+
+    def test_ico_magic_sniff(self):
+        data = b"\x00\x00\x01\x00" + b"x" * 32
+        self.assertEqual(
+            badgeaudit.sniff_mime(data, "application/octet-stream"),
+            "image/x-icon",
+        )
+
+    def test_avif_and_ico_are_supported_raster_quality_types(self):
+        for mime in ("image/avif", "image/x-icon", "image/vnd.microsoft.icon"):
+            with self.subTest(mime=mime):
+                status, _ = badgeaudit.technical_quality(
+                    mime, b"x", 512, 700, 512
+                )
+                self.assertEqual(status, "pass_raster_512x700")
+
     def test_true_svg_vector_passes(self):
         data = b'<svg xmlns="http://www.w3.org/2000/svg"><path d="M0 0h10v10z"/></svg>'
         self.assertTrue(badgeaudit.svg_is_true_vector_bytes(data))
