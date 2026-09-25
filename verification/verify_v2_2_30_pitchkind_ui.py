@@ -376,8 +376,10 @@ check(
     and "matchTeamSideHtml('Away',ctx.awayTeam,ctx.awayKit)" in app,
 )
 check(
-    'redundant Home Away summary box replaced by Competition',
-    index.count('<span>Competition</span>') >= 2
+    'next-match popup omits redundant competition tile',
+    index.count('<span>Competition</span>') == 1
+    and 'class="next-match-grid next-fixture-time-only"' in index
+    and 'id="next-match-venue"' not in index
     and 'fixtureCompetitionLabel(f)' in app
     and 'Competition TBC' in app,
 )

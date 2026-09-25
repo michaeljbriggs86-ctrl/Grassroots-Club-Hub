@@ -650,13 +650,13 @@
     </main>
   </div>
 
-  <dialog id="next-fixture-dialog" class="modal next-fixture-modal">
+  <dialog id="next-fixture-dialog" class="modal next-fixture-modal" aria-labelledby="next-match-opponent">
     <div class="next-fixture-detail-shell">
-      <div class="modal-heading"><div><p class="kicker">Next match</p><h3 id="next-match-opponent">Fixture details</h3></div><button type="button" class="icon-button small" data-close-dialog aria-label="Close">×</button></div>
+      <div class="modal-heading"><div><p class="kicker">Next match</p><h3 id="next-match-opponent">Match details</h3></div><button type="button" class="icon-button small" data-close-dialog aria-label="Close">×</button></div>
       <div class="next-fixture-scroll" id="next-fixture-scroll">
       <span class="next-match-status hidden" id="next-match-status"></span>
       <div class="match-versus next-fixture-versus" id="next-match-versus"></div>
-      <div class="next-match-grid"><div><span>Date / time</span><strong id="next-match-when">Date · Kick-off awaiting confirmation</strong></div><div><span>Competition</span><strong id="next-match-venue">—</strong></div></div>
+      <div class="next-match-grid next-fixture-time-only"><div><span>Date / time</span><strong id="next-match-when">Date · Kick-off awaiting confirmation</strong></div></div>
       <section class="fixture-confirmation-editor hidden" id="next-match-confirmation-editor">
         <div class="panel-heading"><div><h3>Confirm match details</h3><span class="helper">Club information for parents</span></div></div>
         <div class="form-grid two">
