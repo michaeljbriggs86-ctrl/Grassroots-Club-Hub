@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "override_scope": "shooters_hill_pilot",
+  "override_status": "ACTIVE",
+  "approved_by": "Mike Briggs",
+  "approved_date": "2026-09-25",
+  "scope_definition": {
+    "max_clubs_in_active_roster": 1,
+    "permitted_club_ids": [
+      499
+    ],
+    "distribution": "private pilot testers only, no public/app-store release, no monetization"
+  },
+  "overridden_clubs": [],
+  "reapplication_trigger": [
+    "any club_id outside permitted_club_ids appears in the active app roster",
+    "the app is distributed to anyone outside the named pilot tester list",
+    "any monetization, ads, sponsorship, or paid distribution step is taken",
+    "override_status manually set to EXPIRED by Mike"
+  ]
+}

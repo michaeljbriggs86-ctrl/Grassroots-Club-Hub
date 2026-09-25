@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "captured_date": "2026-09-25",
+  "source": "live Supabase public.clubs joined to public.club_settings",
+  "selection_rule": "club_settings.active = true AND club_settings.is_demo = false",
+  "active_non_demo_clubs": [
+    {
+      "club_id": 499,
+      "club_name": "Shooters Hill AFC",
+      "selkent_club_url": "https://www.selkent.org.uk/public/clubs/499"
+    }
+  ],
+  "excluded_demo_clubs": [
+    {
+      "club_name": "Greenwich United FC",
+      "reason": "club_settings.is_demo = true"
+    }
+  ],
+  "distribution": {
+    "audience": "private_pilot_testers_only",
+    "named_pilot_testers": [
+      "Mike Briggs"
+    ],
+    "public_release": false,
+    "app_store_release": false,
+    "monetization": false,
+    "ads": false,
+    "sponsorship": false,
+    "paid_distribution": false
+  }
+}

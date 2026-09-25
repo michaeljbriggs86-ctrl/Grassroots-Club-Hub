@@ -1421,13 +1421,22 @@ function resolvedFixture(f={}){
 function pilotKitDefaults(teamName=''){
   const k=selkentNorm(teamName);return k.includes('shooters hill')&&k.includes('valiants')?{home:'Green and white',away:'Blue and white'}:{home:'',away:''};
 }
+function pilotBadgeOverrideAllowed(clubId){
+  const runtime=window.__PITCHKIND_PILOT_RIGHTS;
+  const id=Number(clubId);
+  if(!runtime||runtime.scope_verified!==true||runtime.override_status!=='ACTIVE'||!Number.isFinite(id))return false;
+  const active=Array.isArray(runtime.active_club_ids)?runtime.active_club_ids.map(Number):[];
+  const permitted=Array.isArray(runtime.permitted_club_ids)?runtime.permitted_club_ids.map(Number):[];
+  if(active.some(x=>!permitted.includes(x)))return false;
+  return Array.isArray(runtime.overridden_club_ids)&&runtime.overridden_club_ids.map(Number).includes(id);
+}
 function verifiedTeamBadgeUrl(teamName=''){
   if(isOwnTeamName(teamName)){
     const own=clubSettings(),configured=own.logo_url||own.logo_asset||'';
     if(configured)return configured;
     if(selkentNorm(own.display_name||state.meta?.clubName||'').includes('shooters hill'))return 'shooters-hill-logo.png';
   }
-  const d=state.selkent?.directoryDetails?.[selkentNorm(teamName)]||{};return d.logoVerified&&d.logoUrl?d.logoUrl:'';
+  const d=state.selkent?.directoryDetails?.[selkentNorm(teamName)]||{};return d.logoUrl&&(d.logoVerified===true||pilotBadgeOverrideAllowed(d.clubId))?d.logoUrl:'';
 }
 function clubIdentityName(teamName=''){
   const detail=state.selkent?.directoryDetails?.[selkentNorm(teamName)]||{};

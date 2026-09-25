@@ -16,6 +16,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Verify pilot rights scope
+        run: |
+          set -euo pipefail
+          python verification/verify_pilot_scope.py             --override app/src/main/assets/pilot_rights_override.json             --roster verification/pilot_active_roster.json             --emit-runtime-js app/src/main/assets/pilot-rights-runtime.js
+
       - name: Verify source contract
         run: |
           set -euo pipefail
@@ -99,6 +104,9 @@ jobs:
           unzip -l "$APK" | grep -q 'assets/pitchkind-wt_logo-primary.svg'
           unzip -l "$APK" | grep -q 'assets/pitchkind-wt_mark.svg'
           unzip -l "$APK" | grep -q 'assets/shooters-hill-logo.png'
+          unzip -l "$APK" | grep -q 'assets/pilot_rights_override.json'
+          unzip -l "$APK" | grep -q 'assets/pilot-rights-runtime.js'
+          unzip -p "$APK" assets/pilot-rights-runtime.js | grep -Fq 'scope_verified'
           unzip -p "$APK" assets/shooters-hill-logo.png > "$RUNNER_TEMP/shooters-hill-logo.png"
           python verification/verify_club_logo_quality.py --asset "$RUNNER_TEMP/shooters-hill-logo.png"
           test "$(sha256sum "$RUNNER_TEMP/shooters-hill-logo.png" | awk '{print $1}')" = "ea3b232a45b197da47d76ffc4bc38440eef9a096a9510af5a988aabc3df71bce"
