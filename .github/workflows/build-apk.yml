@@ -26,7 +26,7 @@ jobs:
           set -euo pipefail
           python verification/verify_v2_2_30_pitchkind_ui.py
           python verification/verify_club_logo_quality.py
-          python -m pip install --quiet requests beautifulsoup4
+          python -m pip install --quiet requests beautifulsoup4 pillow
           python -m unittest discover -s tests -p "test_*.py" -v
           node --check app/src/main/assets/cloud.js
           node --check app/src/main/assets/onboarding.js
