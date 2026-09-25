@@ -1172,3 +1172,32 @@ html[data-theme="dark"] .next-fixture-action-bar{
 
 /* v2.2.30 - verified badge clipping and matchday share diagnostics */
 .verified-club-badge{background:transparent!important}
+
+/* v2.2.32 - compact upcoming match details and clear Android navigation */
+.next-fixture-modal{
+  position:fixed;
+  top:calc(var(--android-inset-top,0px) + 12px);
+  bottom:calc(var(--android-inset-bottom,0px) + env(safe-area-inset-bottom) + 16px);
+  margin:auto;
+  max-height:calc(100dvh - var(--android-inset-top,0px) - var(--android-inset-bottom,0px) - env(safe-area-inset-bottom) - 28px);
+}
+.next-fixture-detail-shell{max-height:inherit}
+.next-fixture-action-bar{padding-bottom:18px}
+.next-fixture-modal .next-fixture-time-only{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.next-fixture-time-only>div{min-width:0;flex:1}
+.next-fixture-time-only #next-match-calendar{flex:0 0 auto;white-space:nowrap}
+.next-fixture-modal .fixture-map-preview{position:relative}
+.next-fixture-modal .fixture-map-preview .map-link{position:absolute;z-index:1;right:12px;bottom:12px;margin:0;background:#e5f3e8;box-shadow:0 2px 9px rgba(0,0,0,.24)}
+.next-fixture-modal .coach-availability-summary{grid-template-columns:repeat(2,minmax(0,1fr))}
+.next-fixture-modal .availability-summary-group{padding:0;min-width:0;overflow:hidden}
+.next-fixture-modal .availability-summary-group>summary{cursor:pointer;list-style:none;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:12px;font-size:12px;font-weight:900}
+.next-fixture-modal .availability-summary-group>summary::-webkit-details-marker{display:none}
+.next-fixture-modal .availability-summary-group>summary::after{content:'⌄';color:var(--green);font-size:17px;line-height:1}
+.next-fixture-modal .availability-summary-group[open]>summary::after{transform:rotate(180deg)}
+.next-fixture-modal .availability-summary-group>div{padding:0 12px 12px}
+.next-fixture-modal .availability-summary-group.awaiting{border-color:#b7c5bc}
+@media(max-width:520px){
+  .next-fixture-modal .coach-availability-summary{grid-template-columns:1fr}
+  .next-fixture-modal .next-fixture-time-only{flex-wrap:wrap}
+  .next-fixture-time-only #next-match-calendar{margin-left:auto}
+}

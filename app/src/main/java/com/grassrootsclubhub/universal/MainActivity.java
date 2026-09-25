@@ -43,7 +43,7 @@ public class MainActivity extends Activity {
     private String pendingAuthUri = null;
     private ValueCallback<Uri[]> filePathCallback = null;
     private static final int FILE_CHOOSER_REQUEST = 5173;
-    private static final String NATIVE_USER_AGENT = "Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 Chrome/126 Mobile Safari/537.36 GrassrootsClubHub/2.2.31";
+    private static final String NATIVE_USER_AGENT = "Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 Chrome/126 Mobile Safari/537.36 GrassrootsClubHub/2.2.32";
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
 
     @Override public void onCreate(Bundle savedInstanceState) {
@@ -138,7 +138,7 @@ public class MainActivity extends Activity {
         });
 
         handleIntent(getIntent());
-        webView.loadUrl("file:///android_asset/index.html?build=2231");
+        webView.loadUrl("file:///android_asset/index.html?build=2232");
         webView.requestApplyInsets();
     }
 
@@ -505,7 +505,7 @@ public class MainActivity extends Activity {
             main.post(() -> {
                 pageReady = false;
                 webView.clearHistory();
-                webView.loadUrl("file:///android_asset/index.html?build=2231");
+                webView.loadUrl("file:///android_asset/index.html?build=2232");
             });
         }
 
