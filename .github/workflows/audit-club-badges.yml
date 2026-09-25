@@ -1,0 +1,66 @@
+name: Audit PitchKind club badges
+
+on:
+  workflow_dispatch:
+    inputs:
+      max_clubs:
+        description: "Limit catalogue rows for a trial run; 0 means all"
+        required: false
+        default: "0"
+      workers:
+        description: "Concurrent HTTP workers"
+        required: false
+        default: "8"
+      browser_fallback:
+        description: "Use Chromium fallback for blocked club pages"
+        required: false
+        default: true
+        type: boolean
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install audit dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install requests beautifulsoup4 pillow playwright
+          if [ "${{ inputs.browser_fallback }}" = "true" ]; then
+            python -m playwright install --with-deps chromium
+          fi
+
+      - name: Run badge audit unit tests
+        run: python -m unittest tests/test_badge_catalogue_audit.py -v
+
+      - name: Run bulk acquisition audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          EXTRA=()
+          if [ "${{ inputs.browser_fallback }}" = "true" ]; then
+            EXTRA+=(--browser-fallback)
+          fi
+          python scripts/badge_catalogue_audit.py \
+            --catalog verification/club_badge_catalogue_seed_v10.json \
+            --output-dir badge-audit-output \
+            --workers "${{ inputs.workers }}" \
+            --max-clubs "${{ inputs.max_clubs }}" \
+            "${EXTRA[@]}"
+
+      - name: Upload review artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: PitchKind-club-badge-audit-${{ github.run_number }}
+          path: badge-audit-output/
+          if-no-files-found: error
+          retention-days: 14
