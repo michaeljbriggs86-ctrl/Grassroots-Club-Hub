@@ -29,18 +29,23 @@ scraper=txt('scripts/scrape.py')
 scraper_tests=txt('tests/test_selkent_scrape.py')
 backend_contract=txt('LIVE_BACKEND_CONTRACT_v2_2_24.txt')
 
-check('versionCode 2230','versionCode 2230' in gradle)
-check('versionName 2.2.30',"versionName '2.2.30'" in gradle)
+check('versionCode 2231','versionCode 2231' in gradle)
+check('versionName 2.2.31',"versionName '2.2.31'" in gradle)
 check('applicationId preserved',"applicationId 'com.grassrootsclubhub.universal'" in gradle)
-check('native marker version','GrassrootsClubHub/2.2.30' in main)
+check('native marker version','GrassrootsClubHub/2.2.31' in main)
 check('auth scheme preserved','"grassrootsclubhub".equalsIgnoreCase' in main and 'android:scheme="grassrootsclubhub"' in txt('app/src/main/AndroidManifest.xml'))
 check('ClubHubNative preserved','"ClubHubNative"' in main)
 check('static feed host preserved','raw.githubusercontent.com' in main and 'Grassroots-Club-Hub/main/data/directory.json' in main and 'Grassroots-Club-Hub/main/data/results.json' in main)
 check('Android app label PitchKind','>PitchKind<' in strings)
 check('HTML title PitchKind','<title>PitchKind</title>' in index)
-check('About version 2.2.30','App version 2.2.30' in index)
+check('About version 2.2.31','App version 2.2.31' in index)
 check('manifest name PitchKind',manifest.get('name')=='PitchKind' and manifest.get('short_name')=='PitchKind')
-check('manifest version 2.2.30',manifest.get('version')=='2.2.30')
+check('manifest version 2.2.31',manifest.get('version')=='2.2.31')
+check('v2.2.31 fresh native assets and visible build marker',
+      main.count('file:///android_asset/index.html?build=2231') == 2
+      and 's.setCacheMode(WebSettings.LOAD_NO_CACHE)' in main
+      and 'pitchkind-v2231-ui' in sw
+      and 'App version 2.2.31 · Build 2231' in index)
 check('v1.4 marker','approved-app-ui-2026-09-21-v1.4-pitchkind' in cloud and 'approved-app-ui-2026-09-21-v1.4-pitchkind' in txt('app/src/main/assets/app-design-system.css'))
 
 hashes={
@@ -133,9 +138,9 @@ check(
 )
 
 check(
-    'v2.2.30 native User-Agent constant',
+    'v2.2.31 native User-Agent constant',
     'private static final String NATIVE_USER_AGENT' in main
-    and 'GrassrootsClubHub/2.2.30' in main
+    and 'GrassrootsClubHub/2.2.31' in main
     and 'c.setRequestProperty("User-Agent", NATIVE_USER_AGENT);' in main,
 )
 
@@ -206,12 +211,12 @@ check(
 )
 
 check(
-    'v2.2.30 workflow and artifact gate',
-    'Android APK v2.2.30 PitchKind' in apk_workflow
+    'v2.2.31 workflow and artifact gate',
+    'Android APK v2.2.31 PitchKind' in apk_workflow
     and 'verify_v2_2_30_pitchkind_ui.py' in apk_workflow
-    and 'App version 2.2.30' in apk_workflow
-    and 'PitchKind-v2.2.30-debug.apk' in apk_workflow
-    and 'GrassrootsClubHub/2.2.30' in apk_workflow,
+    and 'App version 2.2.31' in apk_workflow
+    and 'PitchKind-v2.2.31-debug.apk' in apk_workflow
+    and 'GrassrootsClubHub/2.2.31' in apk_workflow,
 )
 
 
@@ -907,7 +912,7 @@ check('v2.2.29 WhatsApp caption carries HTTPS Maps link and key matchday fields'
 check('v2.2.29 share snapshot requires confirmed matchday details',
     'Confirm kick-off, venue and kit before sharing matchday info' in app
     and 'if(!confirmed||!d.time||!d.groundName||!d.address)' in app)
-check('v2.2.30 native share uses void bridge, image plus caption and visible failure feedback',
+check('v2.2.31 native share uses void bridge, image plus caption and visible failure feedback',
     'void shareMatchCard(String dataUrl, String caption)' in main
     and 'Intent.EXTRA_TEXT' in main
     and 'share.setClipData(android.content.ClipData.newUri' in main
@@ -915,7 +920,7 @@ check('v2.2.30 native share uses void bridge, image plus caption and visible fai
     and 'bytes.length > 12_000_000' in main
     and 'Could not prepare matchday sharing' in main
     and 'Could not open sharing' in main)
-check('v2.2.30 JS invokes native share without relying on return conversion',
+check('v2.2.31 JS invokes native share without relying on return conversion',
     'ClubHubNative?.shareMatchCard' in app
     and 'window.ClubHubNative.shareMatchCard(dataUrl,caption);' in app
     and 'const ok=window.ClubHubNative.shareMatchCard' not in app
@@ -926,19 +931,19 @@ check('v2.2.29 matchday helper regression test is wired into CI',
     (root/'tests/test_matchday_share.js').exists()
     and 'node tests/test_matchday_share.js' in apk_workflow)
 
-check('v2.2.30 verified badge clips opaque source corners in UI',
+check('v2.2.31 verified badge clips opaque source corners in UI',
     '.verified-club-badge{object-fit:contain;border-radius:50%;clip-path:circle(50%);overflow:hidden}' in styles)
-check('v2.2.30 share canvas uses origin-safe native asset data for bundled badges',
+check('v2.2.31 share canvas uses origin-safe native asset data for bundled badges',
     'async function loadShareBadgeImage' in app
     and 'ClubHubNative?.assetDataUrl' in app
     and 'String assetDataUrl(String assetName)' in main
     and 'Base64.NO_WRAP' in main)
-check('v2.2.30 verified badge is circularly clipped on shared canvas',
+check('v2.2.31 verified badge is circularly clipped on shared canvas',
     'ctx.arc(x,y,94,0,Math.PI*2);ctx.clip();ctx.drawImage' in app)
-check('v2.2.30 entire matchday share path surfaces JavaScript preparation errors',
+check('v2.2.31 entire matchday share path surfaces JavaScript preparation errors',
     "console.error('matchday share failed',e)" in app
     and 'Could not prepare matchday share. Please try again.' in app)
-check('v2.2.30 JavaScript no longer depends on bridge return conversion',
+check('v2.2.31 JavaScript no longer depends on bridge return conversion',
     'const ok=window.ClubHubNative.shareMatchCard' not in app
     and 'window.ClubHubNative.shareMatchCard(dataUrl,caption);' in app)
 
