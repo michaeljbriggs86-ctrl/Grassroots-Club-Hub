@@ -51,7 +51,7 @@ jobs:
             EXTRA+=(--browser-fallback)
           fi
           python scripts/badge_catalogue_audit.py \
-            --catalog verification/club_badge_catalogue_seed_v10.json \
+            --catalog verification/club_badge_catalogue_seed_v24.json \
             --output-dir badge-audit-output \
             --workers "${{ inputs.workers }}" \
             --max-clubs "${{ inputs.max_clubs }}" \
