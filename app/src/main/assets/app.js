@@ -1474,29 +1474,27 @@ function clubIdentityName(teamName=''){
   if(isOwnTeamName(teamName))return String(clubSettings().display_name||state.meta?.clubName||teamName||'Club').trim();
   return String(teamName||'Club').trim();
 }
-function clubPlaceholderInitials(teamName=''){
-  const club=clubIdentityName(teamName),words=club.replace(/[^A-Za-z0-9 ]+/g,' ').split(/\s+/).filter(Boolean).filter(w=>!['fc','afc','jfc','football','club','youth'].includes(w.toLowerCase()));
-  if(!words.length)return 'FC';
-  if(words.length===1)return words[0].slice(0,2).toUpperCase();
-  return words.slice(0,3).map(w=>w[0]).join('').toUpperCase();
-}
-function clubIdentityColours(teamName='',kit='TBC'){
-  const detail=state.selkent?.directoryDetails?.[selkentNorm(teamName)]||{},source=knownKit(detail.colours)?detail.colours:kit;
-  return kitColourPair(source);
-}
 function kitColourDisplayText(colours='TBC'){
   const clean=String(colours||'').replace(/\b(?:shirts?|jerseys?|tops?)\b/ig,'').replace(/\s+/g,' ').trim();
   return clean&&knownKit(clean)?clean:'Kit TBC';
 }
-function clubPlaceholderBadgeHtml(teamName='',kit='TBC'){
-  const club=clubIdentityName(teamName),initials=clubPlaceholderInitials(teamName),pair=clubIdentityColours(teamName,kit),primary=pair[0],secondary=pair[1]===pair[0]?'#D8E0DA':pair[1];
-  return `<span class="club-identity-badge club-placeholder-badge" data-generated-club-badge="true" role="img" aria-label="${esc(club)} generic placeholder badge, ${esc(kitColourDisplayText(kit))}" title="${esc(club)} · generic PitchKind placeholder" style="--club-badge-primary:${primary};--club-badge-secondary:${secondary}"><span>${esc(initials)}</span></span>`;
+function clubPlaceholderBadgeHtml(teamName=''){
+  const club=clubIdentityName(teamName);
+  return `<img class="club-identity-badge club-placeholder-badge" src="pitchkind-wt_mark.svg" alt="PitchKind placeholder for ${esc(club)}" />`;
 }
 function clubIdentityBadgeHtml(teamName='',kit='TBC'){
   const badge=verifiedTeamBadgeUrl(teamName),club=clubIdentityName(teamName);
   return badge?`<img class="club-identity-badge verified-club-badge" src="${esc(badge)}" alt="${esc(club)} club badge" />`:clubPlaceholderBadgeHtml(teamName,kit);
 }
 function teamIdentityVisualHtml(teamName='',kit='TBC'){return clubIdentityBadgeHtml(teamName,kit);}
+document.addEventListener('error',event=>{
+  const image=event.target;
+  if(!image?.classList?.contains('verified-club-badge'))return;
+  image.classList.remove('verified-club-badge');
+  image.classList.add('club-placeholder-badge');
+  image.alt='PitchKind placeholder';
+  image.src='pitchkind-wt_mark.svg';
+},true);
 function matchTeamSideHtml(sideLabel,teamName,kit){
   return `<div class="match-team-side"><span class="match-side-label">${esc(sideLabel)}</span><span class="match-team-badge-slot">${clubIdentityBadgeHtml(teamName,kit)}</span>${clubTeamLink(teamName,'match-team-name')}<div class="match-kit-secondary">${teamKitIconHtml(teamName,kit)}<small>${esc(kitColourDisplayText(kit))}</small></div></div>`;
 }
@@ -1541,23 +1539,22 @@ function shareCardWrap(ctx,text,x,y,maxWidth,lineHeight){const words=String(text
 function drawShareJersey(ctx,x,y,colours='TBC',scale=1){
   const [primary,secondary]=kitColourPair(colours),valiant=/^(?:green|blue).*white|white.*(?:green|blue)/i.test(String(colours||''));ctx.save();ctx.translate(x,y);ctx.scale(scale,scale);ctx.fillStyle=primary;ctx.strokeStyle='#d8e0da';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(-54,-52);ctx.lineTo(-25,-66);ctx.lineTo(25,-66);ctx.lineTo(54,-52);ctx.lineTo(90,-26);ctx.lineTo(68,12);ctx.lineTo(50,-2);ctx.lineTo(50,70);ctx.lineTo(-50,70);ctx.lineTo(-50,-2);ctx.lineTo(-68,12);ctx.lineTo(-90,-26);ctx.closePath();ctx.fill();ctx.stroke();if(valiant){ctx.strokeStyle='#fff';ctx.lineWidth=5;[-1,0,1].forEach((n)=>{ctx.beginPath();ctx.moveTo(-52+n*8,-49+n*1);ctx.lineTo(-22+n*8,-62+n*1);ctx.stroke();ctx.beginPath();ctx.moveTo(52-n*8,-49+n*1);ctx.lineTo(22-n*8,-62+n*1);ctx.stroke();});ctx.fillStyle='rgba(0,0,0,.12)';[[-30,-20],[-4,4],[25,-14],[-22,35],[18,43]].forEach(([px,py])=>{ctx.beginPath();ctx.moveTo(px,py);ctx.lineTo(px+18,py+6);ctx.lineTo(px+5,py+18);ctx.closePath();ctx.fill();});}else if(secondary!==primary){ctx.fillStyle=secondary;ctx.fillRect(-10,-64,20,132);}ctx.restore();
 }
-function shareBadgeTextColour(primary=''){return ['#ffffff','#f1cf49','#77bce8'].includes(String(primary).toLowerCase())?'#111715':'#ffffff';}
-function drawSharePlaceholderBadge(ctx,x,y,teamName,colours='TBC'){
-  const club=clubIdentityName(teamName),initials=clubPlaceholderInitials(teamName),[primary,pairSecondary]=clubIdentityColours(teamName,colours),secondary=pairSecondary===primary?'#D8E0DA':pairSecondary;
-  ctx.save();ctx.translate(x,y);ctx.beginPath();ctx.arc(0,0,84,0,Math.PI*2);ctx.fillStyle=primary;ctx.fill();ctx.lineWidth=10;ctx.strokeStyle=secondary;ctx.stroke();ctx.lineWidth=2;ctx.strokeStyle='#D8E0DA';ctx.beginPath();ctx.arc(0,0,94,0,Math.PI*2);ctx.stroke();ctx.fillStyle=shareBadgeTextColour(primary);ctx.font='900 54px system-ui,sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(initials,0,2);ctx.restore();return club;
-}
 async function loadShareBadgeImage(src=''){
   if(!src)return null;
   let safeSrc=String(src);
   if(!/^data:/i.test(safeSrc)&&!/^https?:/i.test(safeSrc)){
-    try{safeSrc=window.ClubHubNative?.assetDataUrl?String(window.ClubHubNative.assetDataUrl(safeSrc)||''):'';}catch(_){safeSrc='';}
+    if(!/^[a-z0-9][a-z0-9._/-]*$/i.test(safeSrc)||safeSrc.includes('..'))return null;
+    try{safeSrc=window.ClubHubNative?.assetDataUrl?String(window.ClubHubNative.assetDataUrl(safeSrc)||''):safeSrc;}catch(_){safeSrc='';}
     if(!safeSrc)return null;
   }
   return new Promise(resolve=>{const img=new Image();let done=false;const finish=v=>{if(done)return;done=true;clearTimeout(timer);resolve(v);};const timer=setTimeout(()=>finish(null),3500);img.onload=()=>finish(img);img.onerror=()=>finish(null);if(/^https?:/i.test(safeSrc))img.crossOrigin='anonymous';img.src=safeSrc;});
 }
 async function drawShareClubIdentity(ctx,x,y,teamName,colours='TBC'){
-  const src=verifiedTeamBadgeUrl(teamName);if(src){const img=await loadShareBadgeImage(src);if(img){const max=188,ratio=Math.min(max/img.naturalWidth,max/img.naturalHeight),w=img.naturalWidth*ratio,h=img.naturalHeight*ratio;ctx.save();ctx.beginPath();ctx.arc(x,y,94,0,Math.PI*2);ctx.clip();ctx.drawImage(img,x-w/2,y-h/2,w,h);ctx.restore();return;}}
-  drawSharePlaceholderBadge(ctx,x,y,teamName,colours);
+  const src=verifiedTeamBadgeUrl(teamName);
+  const image=(src&&await loadShareBadgeImage(src))||await loadShareBadgeImage('pitchkind-wt_mark.svg');
+  if(!image)return;
+  const max=188,ratio=Math.min(max/image.naturalWidth,max/image.naturalHeight),w=image.naturalWidth*ratio,h=image.naturalHeight*ratio;
+  ctx.drawImage(image,x-w/2,y-h/2,w,h);
 }
 function matchdayArrivalTime(time=''){
   const m=String(time||'').match(/^(\d{2}):(\d{2})$/);if(!m)return '';

@@ -21,9 +21,17 @@ class BadgePublisherTest(unittest.TestCase):
 
     def test_add_second_badge_and_revoke_first_without_other_directory_changes(self):
         initial = copy.deepcopy(self.directory)
+        # Exercise admission from an unbadged copy even when the live feed
+        # already contains this approved pilot badge.
+        cray = next(c for c in self.directory['clubs'] if c['club_id'] == 250)
+        for field in module.BADGE_FIELDS:
+            cray.pop(field, None)
+        self.directory.pop('pilot_badges_revision', None)
         changed, ids = module.update_directory(self.directory, self.manifest)
         self.assertTrue(changed)
         self.assertEqual(ids, [250])
+        for field in module.BADGE_FIELDS:
+            self.assertEqual(cray[field], self.manifest['badges'][0][field])
         revision = self.directory['pilot_badges_revision']
         unchanged, _ = module.update_directory(self.directory, self.manifest)
         self.assertFalse(unchanged)
