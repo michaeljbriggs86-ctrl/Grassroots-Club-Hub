@@ -78,6 +78,29 @@ Once those pass, a separate Android source change can switch the WebView from
 released as a newly tested APK. Browser-only testing does not verify the
 Android native sharing, sign-in callback, storage or offline behaviour.
 
-Branded email confirmation is a later step. The current Android confirmation
-Worker source remains on a separate local branch; do not redirect signup
-emails until the web host and Android return path have been device-tested.
+## Confirmation email branding
+
+`email-templates/confirm-signup.html` is a reviewable Supabase Auth **Confirm
+sign up** email body. Suggested subject: `Confirm your PitchKind email`. The
+HTML has inline colours and no remote images because the pilot host is behind
+Cloudflare Access; email clients cannot load a logo from that private host.
+The sender should display as PitchKind from an authenticated `pitchkind.com`
+mailbox after outbound email is configured. A public PNG export of the
+approved primary logo can be added later, when publicly hosted.
+
+For hosted Supabase, paste this HTML into Authentication > Email Templates >
+Confirm sign up, then send a test confirmation to an authorised test address.
+The email is managed by Supabase: pushing this file to Git does **not** update
+the live email. Check the project's template editing and mail settings before
+changing the dashboard. New Free projects on Supabase default SMTP cannot
+customise auth templates; custom SMTP allows it. The default SMTP also only
+sends to pre-authorised project addresses at a low rate, so configure an
+appropriate sender before inviting parents outside the pilot.
+
+Keep `{{ .ConfirmationURL }}` intact in both links. Supabase generates the
+confirmation URL with the redirect appropriate to the signup request: browser
+signups return to `https://test.pitchkind.com/`, Android signups retain the
+`grassrootsclubhub://auth-callback` redirect. Test one of each before considering
+the email live. The current Android confirmation Worker source is separate;
+no new redirect endpoint or change to the installed APK is required for this
+email template.
