@@ -565,7 +565,8 @@
     if(!['admin','coach','assistant_coach','parent'].includes(role()))return [];
     const data=await rpc('list_active_messages',{});
     const rows=Array.isArray(data)?data:[];
-    return rows.map(r=>({...r,id:r.message_id||r.id,created_at:r.sent_at||r.created_at}));
+    return rows.map(r=>({...r,id:r.message_id||r.id,created_at:r.sent_at||r.created_at}))
+      .sort((a,b)=>Date.parse(a.created_at)-Date.parse(b.created_at)||String(a.id).localeCompare(String(b.id)));
   }
   async function sendClubMessage({recipientUserId,subject='',body='',threadId=null}={}){
     if(!['admin','coach','assistant_coach','parent'].includes(role()))throw new Error('Inbox access required');
