@@ -3264,21 +3264,44 @@ async function refreshAdminFixtures(quiet=false){
   if(!CLOUD_MODE||!isAdmin())return;const list=document.getElementById('admin-fixture-list');if(!list)return;if(quiet&&Date.now()-__adminFixtureStamp<15000){renderAdminFixtures();return;}__adminFixtureStamp=Date.now();if(!quiet)list.innerHTML='<div class="empty-state compact-empty">Loading club fixtures…</div>';
   try{const rows=__adminOverviewRows.length?__adminOverviewRows:await window.ClubHubCloud.getClubOverview();__adminOverviewRows=rows;__adminFixtureRows=buildAdminFixtureRows(rows);renderAdminFixtures();const names=[...new Set(__adminFixtureRows.filter(f=>f.opponent&&f.opponent!=='TBC').map(f=>f.opponent))].slice(0,20);await Promise.all(names.map(fetchAdminDirectoryDetail));renderAdminFixtures();}catch(err){list.innerHTML=`<div class="empty-state compact-empty">Could not load fixtures: ${esc(err.message||err)}</div>`;}
 }
+let __staffInviteTeamId='';
+function clearStaffInviteOutput(){
+  document.getElementById('admin-coach-invite-output')?.classList.add('hidden');
+  const code=document.getElementById('admin-coach-invite-code');if(code)code.value='';
+  const target=document.getElementById('admin-coach-invite-target');if(target)target.textContent='';
+}
 function populateAdminCoachInviteTeams(){
-  const sel=document.getElementById('admin-coach-invite-team');if(!sel||!isAdmin())return;const teams=window.ClubHubCloud?.visibleTeamList?.()||[];const keep=sel.value;sel.innerHTML=teams.map(t=>`<option value="${t.id}">${esc(t.ageGroup)} ${esc(matchTeamLabel(t.teamName))}</option>`).join('');if(teams.some(t=>t.id===keep))sel.value=keep;
+  const sel=document.getElementById('admin-coach-invite-team');if(!sel||!isAdmin())return;
+  const teams=window.ClubHubCloud?.visibleTeamList?.()||[];
+  sel.innerHTML='<option value="">Choose team…</option>'+teams.map(t=>`<option value="${esc(t.id)}">${esc(t.ageGroup)} ${esc(matchTeamLabel(t.teamName))}</option>`).join('');
+  if(teams.some(t=>t.id===__staffInviteTeamId))sel.value=__staffInviteTeamId;
+  else {__staffInviteTeamId='';sel.value='';clearStaffInviteOutput();}
+}
+function staffInviteTeamChanged(){__staffInviteTeamId=document.getElementById('admin-coach-invite-team')?.value||'';clearStaffInviteOutput();}
+function staffInviteRoleChanged(){
+  const admin=document.getElementById('admin-coach-invite-role')?.value==='club_admin';
+  const team=document.getElementById('admin-coach-invite-team');if(team){team.disabled=admin;team.closest('label')?.classList.toggle('hidden',admin);}
+  clearStaffInviteOutput();
 }
 async function createAdminCoachInvite(){
   if(!isAdmin()||!CLOUD_MODE||!isClubOverviewMode())return;
-  const teamId=document.getElementById('admin-coach-invite-team')?.value;
+  const teamId=document.getElementById('admin-coach-invite-team')?.value||'';
   const rawRole=document.getElementById('admin-coach-invite-role')?.value||'coach';
   const inviteRole=['assistant_coach','club_admin'].includes(rawRole)?rawRole:'coach';
-  if(inviteRole!=='club_admin'&&!teamId)return toast('Choose a team');
+  const team=(window.ClubHubCloud?.visibleTeamList?.()||[]).find(t=>t.id===teamId);
+  if(inviteRole!=='club_admin'&&(!teamId||!team||teamId!==__staffInviteTeamId))return toast('Choose a team for this invite');
   const roleName=inviteRole==='club_admin'?'Club Admin':inviteRole==='assistant_coach'?'Assistant Coach':'Coach';
+  const targetName=inviteRole==='club_admin'?'all club teams':`${team.ageGroup} ${matchTeamLabel(team.teamName)}`;
+  if(!confirm(`Create a ${roleName} invite for ${targetName}?`))return;
+  const button=document.getElementById('create-admin-coach-invite');if(button){button.disabled=true;button.textContent='Creating invite…';}
+  clearStaffInviteOutput();
   try{
     const invite=await window.ClubHubCloud.createInvite({teamId:inviteRole==='club_admin'?null:teamId,role:inviteRole,label:`${roleName} invite`,expiresHours:168});
     if(!invite?.code)throw new Error('The invite service returned no code. Please try again.');
-    const wrap=document.getElementById('admin-coach-invite-output'),out=document.getElementById('admin-coach-invite-code');if(out)out.value=invite?.code||'';wrap?.classList.remove('hidden');toast(`${roleName} invite created`);
+    const wrap=document.getElementById('admin-coach-invite-output'),out=document.getElementById('admin-coach-invite-code'),target=document.getElementById('admin-coach-invite-target');
+    if(out)out.value=invite.code;if(target)target.textContent=`${roleName} · ${targetName}`;wrap?.classList.remove('hidden');toast(`${roleName} invite created for ${targetName}`);
   }catch(err){alert(err.message||err);}
+  finally{if(button){button.disabled=false;button.textContent='Create staff invite';}}
 }
 async function copyAdminCoachInvite(){const el=document.getElementById('admin-coach-invite-code');if(!el?.value)return toast('Create an invite first');try{await navigator.clipboard.writeText(el.value);toast('Staff invite copied');}catch{el.select();document.execCommand('copy');toast('Staff invite copied');}}
 
@@ -3900,6 +3923,8 @@ document.getElementById('tournament-form')?.addEventListener('submit',saveTourna
 document.getElementById('open-season-archive')?.addEventListener('click',openSeasonArchive);
 document.getElementById('refresh-audit-history')?.addEventListener('click',()=>refreshAuditHistory(false));
 document.getElementById('create-admin-coach-invite')?.addEventListener('click',createAdminCoachInvite);
+document.getElementById('admin-coach-invite-team')?.addEventListener('change',staffInviteTeamChanged);
+document.getElementById('admin-coach-invite-role')?.addEventListener('change',staffInviteRoleChanged);
 document.getElementById('copy-admin-coach-invite')?.addEventListener('click',copyAdminCoachInvite);
 document.getElementById('create-club-admin-invite')?.addEventListener('click',createClubAdminInvite);
 document.getElementById('copy-club-admin-invite')?.addEventListener('click',copyClubAdminInvite);
