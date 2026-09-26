@@ -3276,15 +3276,17 @@ async function createAdminCoachInvite(){
   const roleName=inviteRole==='club_admin'?'Club Admin':inviteRole==='assistant_coach'?'Assistant Coach':'Coach';
   try{
     const invite=await window.ClubHubCloud.createInvite({teamId:inviteRole==='club_admin'?null:teamId,role:inviteRole,label:`${roleName} invite`,expiresHours:168});
+    if(!invite?.code)throw new Error('The invite service returned no code. Please try again.');
     const wrap=document.getElementById('admin-coach-invite-output'),out=document.getElementById('admin-coach-invite-code');if(out)out.value=invite?.code||'';wrap?.classList.remove('hidden');toast(`${roleName} invite created`);
   }catch(err){alert(err.message||err);}
 }
-async function copyAdminCoachInvite(){const el=document.getElementById('admin-coach-invite-code');if(!el?.value)return;try{await navigator.clipboard.writeText(el.value);toast('Coach invite copied');}catch{el.select();document.execCommand('copy');toast('Coach invite copied');}}
+async function copyAdminCoachInvite(){const el=document.getElementById('admin-coach-invite-code');if(!el?.value)return toast('Create an invite first');try{await navigator.clipboard.writeText(el.value);toast('Staff invite copied');}catch{el.select();document.execCommand('copy');toast('Staff invite copied');}}
 
 async function createClubAdminInvite(){
   if(!CLOUD_MODE||!isAdmin()||!isClubOverviewMode())return;
   try{
     const invite=await window.ClubHubCloud.createInvite({teamId:null,role:'club_admin',label:'Club Admin invite',expiresHours:168});
+    if(!invite?.code)throw new Error('The invite service returned no code. Please try again.');
     const out=document.getElementById('club-admin-invite-code'),wrap=document.getElementById('club-admin-invite-output');if(out)out.value=invite?.code||'';wrap?.classList.remove('hidden');toast('Club Admin invite created');
   }catch(err){alert(err.message||err);}
 }
@@ -3897,6 +3899,10 @@ document.getElementById('create-tournament')?.addEventListener('click',()=>openT
 document.getElementById('tournament-form')?.addEventListener('submit',saveTournament);
 document.getElementById('open-season-archive')?.addEventListener('click',openSeasonArchive);
 document.getElementById('refresh-audit-history')?.addEventListener('click',()=>refreshAuditHistory(false));
+document.getElementById('create-admin-coach-invite')?.addEventListener('click',createAdminCoachInvite);
+document.getElementById('copy-admin-coach-invite')?.addEventListener('click',copyAdminCoachInvite);
+document.getElementById('create-club-admin-invite')?.addEventListener('click',createClubAdminInvite);
+document.getElementById('copy-club-admin-invite')?.addEventListener('click',copyClubAdminInvite);
 document.getElementById('archive-current-season')?.addEventListener('click',archiveCurrentSeason);
 document.getElementById('rollover-season')?.addEventListener('click',rolloverSeason);
 document.getElementById('match-form').addEventListener('submit',submitMatch);
