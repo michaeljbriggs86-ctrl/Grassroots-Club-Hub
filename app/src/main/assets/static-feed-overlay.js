@@ -85,7 +85,42 @@
     }
   }
 
-  function loadDirectory(force=false){return fetchStaticFeed(STATIC_DIRECTORY_URL,DIRECTORY_CACHE_KEY,validateDirectory,force);}
+  function attachDirectoryBadges(directory){
+    state.selkent=state.selkent||{};
+    const details=state.selkent.directoryDetails=state.selkent.directoryDetails||{};
+    const clubs=new Map(directory.clubs.map(club=>[Number(club.club_id),club]));
+    const links=new Map();
+    for(const link of directory.team_club_links){
+      const key=norm(link.team_name),id=Number(link.club_id);
+      if(!key||!clubs.has(id))continue;
+      if(links.has(key)&&links.get(key)!==id)links.set(key,null);
+      else if(!links.has(key))links.set(key,id);
+    }
+    const usable=club=>club?.logo_status==='pilot_verified'&&
+      /^https:\/\/[^\s/]+\//.test(String(club.logo_url||''))&&
+      /^[a-f0-9]{64}$/i.test(String(club.logo_sha256||''));
+    for(const [key,detail] of Object.entries(details)){
+      if(detail?.logoStatus==='pilot_verified'){
+        const id=links.get(key),club=clubs.get(id);
+        if(!club||!usable(club)||Number(detail.clubId)!==id){
+          details[key]={...detail,logoUrl:'',logoVerified:false,logoStatus:'',pilotLogoUrl:'',logoClubId:null};
+        }
+      }
+    }
+    for(const [key,id] of links){
+      const club=clubs.get(id);
+      if(!id||!usable(club))continue;
+      const current=details[key]||{};
+      details[key]={...current,clubId:id,clubName:club.club_name,
+        logoUrl:club.logo_url,logoStatus:'pilot_verified',logoVerified:false,
+        pilotLogoUrl:club.logo_url,logoClubId:id};
+    }
+    return directory;
+  }
+  function loadDirectory(force=false){
+    return fetchStaticFeed(STATIC_DIRECTORY_URL,DIRECTORY_CACHE_KEY,validateDirectory,force)
+      .then(attachDirectoryBadges);
+  }
   function loadResults(force=false){return fetchStaticFeed(STATIC_RESULTS_URL,RESULTS_CACHE_KEY,validateResults,force);}
 
   function persistWithoutRender(){
@@ -325,7 +360,7 @@
   window.syncProviderClubTeams=async function(silent=true){
     if(!isSelkentProvider()&&original.syncProviderClubTeams)return original.syncProviderClubTeams(silent);
     try{
-      const directory=await loadDirectory(false),teams=buildClubTeams(directory);
+      const directory=await loadDirectory(!silent),teams=buildClubTeams(directory);
       if(!teams.length)throw new Error('No current-club teams found in static Selkent directory');
       state.selkent=state.selkent||{};
       state.selkent.clubTeams=teams;

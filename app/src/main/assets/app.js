@@ -1430,13 +1430,36 @@ function pilotBadgeOverrideAllowed(clubId){
   if(active.some(x=>!permitted.includes(x)))return false;
   return Array.isArray(runtime.overridden_club_ids)&&runtime.overridden_club_ids.map(Number).includes(id);
 }
+function pilotVerifiedBadgeScopeAllowed(){
+  try{
+    const runtime=window.__PITCHKIND_PILOT_RIGHTS;
+    if(!runtime||runtime.scope_verified!==true||runtime.override_status!=='ACTIVE')return false;
+    const active=Array.isArray(runtime.active_club_ids)?runtime.active_club_ids.map(Number):[];
+    const permitted=Array.isArray(runtime.permitted_club_ids)?runtime.permitted_club_ids.map(Number):[];
+    if(active.length!==1||active[0]!==499||!permitted.includes(499))return false;
+    const androidPilot=window.ClubHubNative?.isDebugBuild?.()===true;
+    const browserPilot=!window.ClubHubNative&&window.location?.protocol==='https:'&&
+      window.location?.hostname==='test.pitchkind.com';
+    if(!(androidPilot||browserPilot)||providerType()!=='selkent')return false;
+    const urls=[primaryProvider()?.config?.club_url,state?.selkent?.clubUrl].filter(Boolean);
+    if(!urls.length)return false;
+    return urls.every(url=>{
+      const m=String(url).match(/^https:\/\/(?:www\.)?selkent\.org\.uk\/public\/clubs\/(\d+)(?:\/[^?#]*)?(?:\?[^#]*)?$/i);
+      return m&&Number(m[1])===499;
+    });
+  }catch(_){return false;}
+}
 function verifiedTeamBadgeUrl(teamName=''){
   if(isOwnTeamName(teamName)){
     const own=clubSettings(),configured=own.logo_url||own.logo_asset||'';
     if(configured)return configured;
     if(selkentNorm(own.display_name||state.meta?.clubName||'').includes('shooters hill'))return 'shooters-hill-logo.png';
   }
-  const d=state.selkent?.directoryDetails?.[selkentNorm(teamName)]||{};return d.logoUrl&&(d.logoVerified===true||pilotBadgeOverrideAllowed(d.clubId))?d.logoUrl:'';
+  const d=state.selkent?.directoryDetails?.[selkentNorm(teamName)]||{};
+  if(d.logoStatus==='pilot_verified'){
+    return d.pilotLogoUrl&&Number(d.clubId)===Number(d.logoClubId)&&pilotVerifiedBadgeScopeAllowed()?d.pilotLogoUrl:'';
+  }
+  return d.logoUrl&&(d.logoVerified===true||pilotBadgeOverrideAllowed(d.clubId))?d.logoUrl:'';
 }
 function clubIdentityName(teamName=''){
   const detail=state.selkent?.directoryDetails?.[selkentNorm(teamName)]||{};

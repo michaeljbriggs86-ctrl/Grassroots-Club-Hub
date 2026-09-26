@@ -2,8 +2,6 @@ name: Android APK v2.2.35 PitchKind
 
 on:
   workflow_dispatch:
-  push:
-    branches: [ main, master ]
 
 permissions:
   contents: read

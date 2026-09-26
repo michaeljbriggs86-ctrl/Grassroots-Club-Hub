@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "scope": "private_pilot",
+  "badges": [
+    {
+      "club_id": 250,
+      "club_name": "Cray Wanderers",
+      "logo_url": "https://www.cray-wanderers.com/wp-content/uploads/2020/10/Cray-Wanderers-FC-Web-Logo.png",
+      "logo_status": "pilot_verified",
+      "logo_source": "official_site_image",
+      "logo_updated_at": "2026-09-26",
+      "logo_sha256": "78dc32848d6919bcfe7c8b2aa6e93e766fd1c5d7d26fd166fdb8450345d11570",
+      "rights_status": "legal_basis_not_reviewed",
+      "review_basis": "Official club crest history and current official image; Selkent club ID 250; exact bytes 1080x1080, 167521 bytes, SHA-256 recorded here."
+    }
+  ]
+}

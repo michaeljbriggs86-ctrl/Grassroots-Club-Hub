@@ -32,6 +32,7 @@ from datetime import datetime, timezone
 
 from scrape import BASE_URL, fetch_json, parse_divisions
 from club_directory import scrape_club_directory, link_teams_to_clubs
+from publish_pilot_badges import update_directory
 
 DIVISIONS_ALL_URL = f"{BASE_URL}/divisions/all"
 
@@ -46,8 +47,16 @@ STILL_TO_VERIFY = {}
 
 OUTPUT_PATH = "data/directory.json"
 DIAGNOSTICS_PATH = "data/directory_scrape_diagnostics.json"
+PILOT_BADGES_PATH = "verification/pilot_verified_badges.json"
 
 DELAY_BETWEEN_REQUESTS_SECONDS = 1.5
+
+
+def attach_pilot_badges(clubs, path):
+    with open(path, "r", encoding="utf-8") as source:
+        manifest = json.load(source)
+    update_directory({"clubs": clubs, "team_club_links": []}, manifest)
+    return clubs
 
 
 def discover_agegroup_ids():
@@ -149,6 +158,8 @@ def main():
                 "match) - see ambiguous_club_matches in diagnostics for "
                 "anything flagged as uncertain.",
     }
+    with open(PILOT_BADGES_PATH, "r", encoding="utf-8") as source:
+        update_directory(payload, json.load(source))
     with open(OUTPUT_PATH, "w") as f:
         json.dump(payload, f, indent=2)
 
