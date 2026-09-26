@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-09-20T22:13:39.325285+00:00",
+  "last_updated": "2026-09-26T21:59:28.155872+00:00",
   "clubs": [
     {
       "club_id": 514,
@@ -115,7 +115,12 @@
     },
     {
       "club_id": 250,
-      "club_name": "Cray Wanderers"
+      "club_name": "Cray Wanderers",
+      "logo_url": "https://www.cray-wanderers.com/wp-content/uploads/2020/10/Cray-Wanderers-FC-Web-Logo.png",
+      "logo_status": "pilot_verified",
+      "logo_source": "official_site_image",
+      "logo_updated_at": "2026-09-26",
+      "logo_sha256": "78dc32848d6919bcfe7c8b2aa6e93e766fd1c5d7d26fd166fdb8450345d11570"
     },
     {
       "club_id": 251,
@@ -7666,5 +7671,6 @@
       "club_name": "Vikings FC"
     }
   ],
-  "note": "Panel parsing confirmed against all five format categories (mini-soccer, 9-a-side, X-category, 11-a-side, Senior) as of Sept 2026. Club/team linking is heuristic (name-prefix match) - see ambiguous_club_matches in diagnostics for anything flagged as uncertain."
+  "note": "Panel parsing confirmed against all five format categories (mini-soccer, 9-a-side, X-category, 11-a-side, Senior) as of Sept 2026. Club/team linking is heuristic (name-prefix match) - see ambiguous_club_matches in diagnostics for anything flagged as uncertain.",
+  "pilot_badges_revision": "ae4f8a7deab6590a62f60e1c786733f2b71716234e24fd6ced4f0e264690b03b"
 }
