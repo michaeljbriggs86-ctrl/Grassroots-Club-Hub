@@ -55,6 +55,7 @@ const FOOTBALL_FORMATS = {
 };
 const SELKENT_DIRECTORY_API='https://obntycksmkcnkprrcutg.supabase.co/functions/v1/selkent-directory';
 function footballFormat(){const r=competitionRuleForAge(ageGroupNumber());if(r)return{format:r.format,onPitch:Number(r.players_on_pitch),registered:Number(r.max_registered),matchday:Number(r.matchday_max),rollingSubstitutions:!!r.rolling_substitutions};return FOOTBALL_FORMATS[ageGroupNumber()]||FOOTBALL_FORMATS[14];}
+function selkentMinimumPlayers(format){return {'3v3':2,'5v5':4,'7v7':5,'9v9':6,'11v11':7}[String(format||'').toLowerCase()]||null;}
 
 function dismissOpeningSplash(){
   const splash=document.getElementById('app-splash');
@@ -1611,7 +1612,10 @@ async function shareNextMatchImage(){
 }
 function renderNextMatch(){
   const card=document.getElementById('next-match-card');if(!card)return;const f=nextPublishedFixture(),dateEl=document.getElementById('next-match-home-date');
-  document.getElementById('next-match-selkent-tasks')?.classList.toggle('hidden',!(isCoach()||isAdmin()));
+  const selkentStaff=(isCoach()||isAdmin())&&providerType()==='selkent';
+  document.getElementById('next-match-selkent-tasks')?.classList.toggle('hidden',!selkentStaff);
+  const minEl=document.getElementById('next-match-selkent-minimum'),rule=competitionRuleForAge(ageGroupNumber()),minimum=selkentMinimumPlayers(rule?.format);
+  if(minEl){minEl.textContent=minimum?`Selkent Rule 20(D): ${rule.format} requires at least ${minimum} players to start a competition match.`:'';minEl.classList.toggle('hidden',!minimum);}
   if(!f){card.classList.add('no-fixture');card.disabled=true;const teams=document.getElementById('next-match-home-teams');if(teams)teams.innerHTML='<div class="next-match-summary-team"><strong>Fixture TBC</strong></div>';if(dateEl)dateEl.textContent='Date TBC';document.getElementById('next-match-copy')?.classList.add('hidden');return;}
   card.classList.remove('no-fixture');card.disabled=false;renderCompactNextMatchTeams(f);if(dateEl)dateEl.textContent=f.date?formatDate(f.date):'Date TBC';
   const d=resolvedFixture(f),confirmed=fixtureDetailsConfirmed(f),set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};set('next-match-opponent','Upcoming match details');set('next-match-when',[f.date?formatDate(f.date):'Date TBC',confirmed&&d.time?`Kick-off ${d.time}`:'Kick-off awaiting confirmation',confirmed&&d.time?`Arrival ${matchdayArrivalTime(d.time)}`:''].filter(Boolean).join(' · '));renderFixtureOverview('next-match',d);/* Competition omitted from this popup. */
@@ -2038,10 +2042,12 @@ async function reviewParentAccessNotification(notificationId){
 
 function renderUniversalClubConfiguration(){
   const rulesEl=document.getElementById('universal-config-rules');if(!rulesEl)return;
+  document.getElementById('rules-procedures-settings')?.classList.toggle('hidden',providerType()!=='selkent');
   const age=ageGroupNumber();document.getElementById('selkent-mini-playing-time')?.classList.toggle('hidden',age<8||age>11);
   const r=competitionRuleForAge(age);if(!r){rulesEl.innerHTML='<p class="helper">No age-specific matchday rule is configured for this team yet.</p>';return;}
   const resultsText=age<=11?'Scores and tables are limited to coaching staff and club admins; parents and players do not see them':r.results_published?'Published results are available for this age group':'Scores are not publicly published for this age group';
-  rulesEl.innerHTML=`<div class="universal-rule-grid"><span><b>${esc(r.format)}</b><small>Format</small></span><span><b>${Number(r.players_on_pitch)}</b><small>On pitch</small></span><span><b>${Number(r.max_registered)}</b><small>Registration setting</small></span><span><b>${Number(r.matchday_max)}</b><small>Matchday setting</small></span></div><div class="rule-summary-list"><span><strong>Substitutions</strong>${r.rolling_substitutions?'Rolling substitutions':'Standard substitutions'}</span><span><strong>Results</strong>${esc(resultsText)}</span><span><strong>Player access</strong>${r.player_accounts_allowed?'Available for this age group':'Not available for this age group'}</span></div>`;
+  const minimum=selkentMinimumPlayers(r.format);
+  rulesEl.innerHTML=`<div class="universal-rule-grid"><span><b>${esc(r.format)}</b><small>Format</small></span><span><b>${Number(r.players_on_pitch)}</b><small>On pitch</small></span><span><b>${Number(r.max_registered)}</b><small>Registration setting</small></span><span><b>${Number(r.matchday_max)}</b><small>Matchday setting</small></span></div><div class="rule-summary-list">${minimum?`<span><strong>Minimum team · Rule 20(D), handbook p. 74</strong>${minimum} players for ${esc(r.format)} to start a competition match.</span>`:''}<span><strong>Substitutions</strong>${r.rolling_substitutions?'Rolling substitutions':'Standard substitutions'}</span><span><strong>Results</strong>${esc(resultsText)}</span><span><strong>Player access</strong>${r.player_accounts_allowed?'Available for this age group':'Not available for this age group'}</span></div>`;
 }
 
 function applyMiniResultVisibility(){const restricted=miniResultsRestrictedView();document.querySelector('.record-card')?.classList.toggle('hidden',restricted);document.querySelector('.running-count-grid')?.classList.toggle('hidden',restricted);document.querySelector('#recent-form')?.closest('.panel')?.classList.toggle('hidden',restricted);document.getElementById('league-table-panel')?.classList.toggle('hidden',restricted||!isPublishedLeagueTeam());document.getElementById('league-summary-card')?.classList.toggle('hidden',restricted);document.getElementById('season-player-stats')?.classList.toggle('hidden',restricted);['export-json','export-matches','export-goals'].forEach(id=>document.getElementById(id)?.classList.toggle('hidden',ageGroupNumber()<=11));}
