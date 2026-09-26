@@ -1200,6 +1200,21 @@ html[data-theme="dark"] .next-fixture-modal .match-team-side .club-detail-link{c
 html[data-theme="dark"] .fixture-edit-button{background:#193322;color:#fff;border-color:#344239}
 .next-fixture-modal .match-availability-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .next-fixture-modal .match-availability-head #availability-reminder-send{margin-left:auto}
+
+/* v2.2.34 - Matches card follows the confirmed-details layout. */
+.fixture-date-with-calendar{display:flex!important;flex-direction:row!important;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px 14px}
+.fixture-date-copy{display:grid;gap:3px;min-width:0;flex:1 1 220px}
+.fixture-date-with-calendar .text-button{margin-left:auto;min-height:44px;white-space:nowrap;padding:8px 10px}
+.matches-next-fixture .fixture-map-preview{position:relative}
+.matches-next-fixture .fixture-map-preview .map-link{position:absolute;z-index:1;right:12px;bottom:12px;margin:0;min-height:44px;display:grid;place-items:center;background:#e5f3e8;box-shadow:0 2px 9px rgba(0,0,0,.24)}
+.matches-next-fixture .next-fixture-versus{background:#173b26;border-color:#315944;color:#fff}
+.matches-next-fixture .match-team-side .club-detail-link{color:#fff;text-decoration-color:rgba(255,255,255,.7)}
+.matches-next-fixture .match-side-label,.matches-next-fixture .match-kit-secondary small{color:#d8e9dd}
+html[data-theme="dark"] .matches-next-fixture .match-team-side .club-detail-link{color:#fff!important}
+.matches-next-actions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;align-items:stretch;justify-content:start}
+.matches-next-actions button{width:100%;min-height:48px;padding:10px 12px;white-space:normal;line-height:1.2}
+@media(max-width:560px){.matches-next-actions{grid-template-columns:repeat(2,minmax(0,1fr))}.matches-next-actions button:last-child:not(.hidden){grid-column:1/-1}}
+@media(max-width:350px){.matches-next-actions{grid-template-columns:1fr}.matches-next-actions button:last-child:not(.hidden){grid-column:auto}}
 .next-fixture-modal .coach-availability-summary{grid-template-columns:repeat(2,minmax(0,1fr))}
 .next-fixture-modal .availability-summary-group{padding:0;min-width:0;overflow:hidden}
 .next-fixture-modal .availability-summary-group>summary{cursor:pointer;list-style:none;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:12px;font-size:12px;font-weight:900}
