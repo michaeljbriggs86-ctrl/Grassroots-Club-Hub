@@ -1978,17 +1978,25 @@ async function reviewParentAccessNotification(notificationId){
   if(!row||row.type!=='parent_access_request')return toast('Parent request is no longer available.');
   const targetId=String(row.team_id||'');
   try{
-    if(isAdmin()&&targetId&&String(window.ClubHubCloud?.currentTeam?.()?.id||'')!==targetId){
-      const team=(window.ClubHubCloud?.visibleTeamList?.()||[]).find(t=>String(t.id)===targetId);
-      if(!team)throw new Error('The requested team is not available to this account.');
-      await switchAdminTeamAndLoad(team);
+    if(isAdmin()){
+      if(targetId&&String(window.ClubHubCloud?.currentTeam?.()?.id||'')!==targetId){
+        const team=(window.ClubHubCloud?.visibleTeamList?.()||[]).find(t=>String(t.id)===targetId);
+        if(!team)throw new Error('The requested team is not available to this account.');
+        await switchAdminTeamAndLoad(team);
+      }
       adminUiMode='view';localStorage.setItem(ADMIN_UI_MODE_KEY,'view');
     }
     document.getElementById('notification-dialog')?.close();
     navigate('more',false);applyAccessMode();
     const panel=document.getElementById('team-access-settings');if(panel){panel.classList.remove('hidden');panel.open=true;}
-    __teamMembersStamp=0;await refreshTeamMembers(false);
-    if(!row.read_at)await markAppNotificationRead(row.id);
+    __teamMembersStamp=0;const pending=await refreshTeamMembers(false);
+    const requestId=/^parent-access-request:([0-9a-f-]{36})$/i.exec(String(row.entity_key||''))?.[1]||'';
+    if(pending===null){toast('Could not load parent requests. Reopen Team access to retry.');return;}
+    if(!pending||(requestId&&!__pendingParentRequests.some(req=>String(req.request_id)===requestId))){
+      toast('That request is no longer pending for this team. It may already have been approved.');
+      return;
+    }
+    if(requestId)openParentRequestReview(requestId);
     panel?.scrollIntoView({behavior:'smooth',block:'start'});
   }catch(err){alert(err.message||err);}
 }
@@ -3049,18 +3057,23 @@ let __teamPlayerAccountLinks=[];
 let __pendingParentRequests=[];
 async function refreshTeamMembers(quiet=false){
  const list=document.getElementById('team-members-list');
- if(!list||!CLOUD_MODE||!['admin','coach','assistant_coach'].includes(currentRole))return;
- if(quiet&&Date.now()-__teamMembersStamp<12000)return;__teamMembersStamp=Date.now();
+ if(!list||!CLOUD_MODE||!['admin','coach','assistant_coach'].includes(currentRole))return null;
+ if(quiet&&Date.now()-__teamMembersStamp<12000)return __pendingParentRequests.length;
+ __teamMembersStamp=Date.now();
  if(!quiet)list.innerHTML='<div class="empty-state compact-empty">Loading team access…</div>';
  try{
    const teamId=window.ClubHubCloud?.currentTeam?.()?.id||null;
-   const [rows,links,playerLinks,pendingRequests]=await Promise.all([
+   const [membersResult,linksResult,playerLinksResult,requestsResult]=await Promise.allSettled([
      window.ClubHubCloud.listTeamMembers(teamId),
      window.ClubHubCloud.listParentPlayerLinks(null),
      window.ClubHubCloud.listPlayerAccountLinks(null),
      window.ClubHubCloud.listPendingParentRequests(teamId)
    ]);
-   __teamParentLinks=links||[];__teamPlayerAccountLinks=playerLinks||[];__pendingParentRequests=pendingRequests||[];
+   const rows=membersResult.status==='fulfilled'?membersResult.value:[];
+   const parentLinksAvailable=linksResult.status==='fulfilled';
+   __teamParentLinks=parentLinksAvailable?(linksResult.value||[]):[];
+   __teamPlayerAccountLinks=playerLinksResult.status==='fulfilled'?(playerLinksResult.value||[]):[];
+   __pendingParentRequests=requestsResult.status==='fulfilled'?(requestsResult.value||[]):[];
    const preview=isAdminTeamPreviewMode();
    const requestHtml=__pendingParentRequests.map(req=>`<div class="team-member-row pending"><div class="team-member-copy"><strong>${esc(req.parent_name||'Parent')}</strong><span>Parent · awaiting child verification</span><div class="pending-parent-details"><span><b>Child name supplied</b>${esc(req.child_name||'Not supplied')}</span><span><b>Email</b>${esc(req.parent_email||'Not supplied')}</span></div></div><div class="team-member-actions"><span class="member-role-pill">Pending</span><button class="primary-button compact parent-approve-action" data-review-parent-request-id="${esc(req.request_id)}">Review request</button></div></div>`).join('');
    const active=(rows||[]).filter(r=>r.role!=='pending_parent');
@@ -3071,11 +3084,15 @@ async function refreshTeamMembers(quiet=false){
      const canRemove=!preview&&(!staff||(isAdmin()&&isClubOverviewMode()));
      const pinState=player?(r.access_method==='player_code'?'Reusable code':r.pin_reset_required?'Temporary PIN':r.pin_set?'PIN set':'Legacy access'):parent?(r.access_method==='email'?'Email login':r.pin_reset_required?'Temporary PIN':r.pin_set?'Legacy PIN':'Email login'):'';
      const linked=parent?__teamParentLinks.filter(x=>x.parent_user_id===r.user_id):player?__teamPlayerAccountLinks.filter(x=>x.user_id===r.user_id):[];
-     const linkText=linked.length?` · ${linked.map(x=>x.player_name).join(', ')}`:(parent?' · No player linked':'');
+     const linkText=linked.length?` · ${linked.map(x=>x.player_name).join(', ')}`:(parent?(parentLinksAvailable?' · No player linked':' · Player links unavailable'):'');
      return `<div class="team-member-row"><div class="team-member-copy"><strong>${esc(r.full_name||'Member')}</strong><span>${esc(roleText)}${pinState?' · '+esc(pinState):''}${(parent||player)?esc(linkText):''}</span></div><div class="team-member-actions"><span class="member-role-pill">${pill}</span>${!preview&&parent&&isCoach()?`<button class="inline-action" data-link-parent-player="${r.user_id}" data-parent-name="${esc(r.full_name||'Parent')}">Edit player links</button>${r.access_method!=='email'?`<button class="inline-action" data-reset-parent-pin="${r.user_id}" data-parent-name="${esc(r.full_name||'Parent')}">Reset legacy PIN</button>`:''}`:''}${canRemove?`<button class="inline-action delete" data-remove-member="${r.user_id}">Remove</button>`:''}</div></div>`;
    };
-   list.innerHTML=(requestHtml?`<div class="member-group-label">Awaiting child verification</div>${requestHtml}`:'')+(active.length?`<div class="member-group-label">Active access</div>${active.map(rowHtml).join('')}`:'')||'<div class="empty-state compact-empty">No team access accounts yet.</div>';
- }catch(err){list.innerHTML='<div class="empty-state compact-empty">Team access is temporarily unavailable.</div>';}
+   const warning=requestsResult.status==='rejected'?'<div class="empty-state compact-empty">Could not load parent requests. Reopen Team access to retry.</div>':'';
+   const membersWarning=membersResult.status==='rejected'?'<div class="empty-state compact-empty">Could not load active team members.</div>':'';
+   const linksWarning=!parentLinksAvailable?'<div class="empty-state compact-empty">Could not load parent player links. Reopen Team access to retry.</div>':'';
+   list.innerHTML=warning+membersWarning+linksWarning+((requestHtml?`<div class="member-group-label">Awaiting child verification</div>${requestHtml}`:'')+(active.length?`<div class="member-group-label">Active access</div>${active.map(rowHtml).join('')}`:'')||(!warning&&!membersWarning&&!linksWarning?'<div class="empty-state compact-empty">No team access accounts yet.</div>':''));
+   return requestsResult.status==='fulfilled'?__pendingParentRequests.length:null;
+ }catch(err){list.innerHTML='<div class="empty-state compact-empty">Team access is temporarily unavailable. Reopen to retry.</div>';return null;}
 }
 function openParentRequestReview(requestId){
  if(!['admin','coach','assistant_coach'].includes(currentRole))return toast('Staff access is required to review parent requests.');

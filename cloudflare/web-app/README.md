@@ -10,6 +10,23 @@ uses Supabase Auth, database RLS, and Edge Functions for private club data.
 The Android APK still loads bundled UI and fetches its public feeds from GitHub;
 it does **not** start loading web content as a consequence of this deploy.
 
+## Develop in the browser first
+
+Edit the shared UI in `app/src/main/assets/`. `build.py` copies only the
+approved files into the Worker build. Push reviewed changes to the connected
+Git branch to update the protected browser pilot; no APK build is needed for
+ordinary browser UI testing. The existing installed APK keeps its bundled
+v2.2.35 files until a separate Android release is prepared.
+
+For browser email confirmation and password reset, add the exact URL
+`https://test.pitchkind.com/` to Supabase Auth > URL Configuration > Redirect
+URLs. Keep the existing `grassrootsclubhub://auth-callback` entry for the
+installed Android app. The parent must be allowed through Cloudflare Access
+to open the test site after clicking an email link. If confirmation happens
+in a different browser, the parent can return to the site and sign in with
+their email and password; the stored signup metadata will resume the request.
+Test this with a new parent account before treating it as complete.
+
 The build exports a deliberately restricted file set. No signing key, roster
 verification file, Supabase service key, untracked source or private player
 data belongs in `dist/`. The Supabase publishable key is in the client as

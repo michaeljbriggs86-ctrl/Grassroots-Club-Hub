@@ -15,9 +15,10 @@
   const TEST_CLUB_KEY = 'grassroots_hub_debug_club_v1';
   const LOGIN_CLUB_KEY = 'grassroots_hub_login_club_v1';
   const APP_STATE_STORAGE_KEY = 'grassrootsHub_team_state_v1';
-  const AUTH_REDIRECT = 'grassrootsclubhub://auth-callback';
+  const AUTH_REDIRECT = location.protocol==='file:'?'grassrootsclubhub://auth-callback':location.origin+'/';
   const AUTH_DESIGN_REVISION = 'approved-app-ui-2026-09-21-v1.4-pitchkind';
-  const INITIAL_AUTH_CALLBACK = new URLSearchParams(location.search).get('auth_callback') || '';
+  const INITIAL_AUTH_CALLBACK = new URLSearchParams(location.search).get('auth_callback') ||
+    (/^(?:#)(?:.*&)?(?:access_token|error|error_code)=/.test(location.hash)?location.href:'');
   let initialAuthCallbackHandled = false;
   let session = null;
   let context = null;
@@ -230,7 +231,10 @@
       const get=(k)=>hash.get(k)||query.get(k)||'';
       const error=get('error_description')||get('error');
       const errorCode=get('error_code');
-      if(error){setGateHtml('signin',decodeURIComponent(error.replace(/\+/g,' '))+(errorCode?' ('+errorCode+')':''));return 'error';}
+      if(error){
+        if(u.origin===location.origin&&u.hash)history.replaceState(null,'',location.pathname+location.search);
+        setGateHtml('signin',decodeURIComponent(error.replace(/\+/g,' '))+(errorCode?' ('+errorCode+')':''));return 'error';
+      }
       const accessToken=get('access_token');
       const refreshToken=get('refresh_token');
       const type=get('type');
@@ -240,6 +244,7 @@
       }
       const expiresIn=Number(get('expires_in')||3600);
       saveSession({access_token:accessToken,refresh_token:refreshToken,token_type:get('token_type')||'bearer',expires_in:expiresIn,expires_at:Math.floor(Date.now()/1000)+expiresIn});
+      if(u.origin===location.origin&&u.hash)history.replaceState(null,'',location.pathname+location.search);
       await hydrateSessionUser();
       localStorage.removeItem(VERIFY_EMAIL_KEY);
       if(type==='recovery'){
