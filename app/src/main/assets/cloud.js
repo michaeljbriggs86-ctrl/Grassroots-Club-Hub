@@ -617,7 +617,7 @@
   async function listMatchAvailability(fixtureKey){
     if(testModeActive())return [];
     if(!activeTeam||!fixtureKey)return [];
-    const q=`/rest/v1/match_availability?select=id,team_id,fixture_key,parent_user_id,player_name,status,updated_at&team_id=eq.${encodeURIComponent(activeTeam.id)}&fixture_key=eq.${encodeURIComponent(fixtureKey)}&order=updated_at.desc`;
+    const q=`/rest/v1/match_availability?select=id,team_id,fixture_key,player_name,status,updated_at&team_id=eq.${encodeURIComponent(activeTeam.id)}&fixture_key=eq.${encodeURIComponent(fixtureKey)}&order=updated_at.desc`;
     const {data}=await request(q);return Array.isArray(data)?data:[];
   }
   async function saveMatchAvailability({fixtureKey,playerName,status}={}){
