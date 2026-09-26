@@ -1236,3 +1236,16 @@ html[data-theme="dark"] .matches-next-fixture .match-team-side .club-detail-link
 .parent-request-player-fieldset{border:0;padding:0;margin:4px 0 0;min-width:0}.parent-request-player-fieldset legend{font-size:12px;font-weight:900;color:var(--ink);padding:0;margin-bottom:6px}.parent-request-player{min-height:52px;cursor:pointer}.parent-request-player input[type="radio"]{width:20px;height:20px;flex:0 0 auto}
 html[data-theme="dark"] .parent-family-account{border-color:#344239!important}html[data-theme="dark"] .parent-request-summary span,html[data-theme="dark"] .parent-request-player{background:#151d18!important;border-color:#344239!important;color:#f2f7f3!important}
 @media(max-width:560px){.parent-family-actions{grid-template-columns:1fr}.parent-request-summary{grid-template-columns:1fr}.parent-request-summary span:last-child{grid-column:auto}}
+
+/* Selkent reference in the staff-only match detail view. */
+.selkent-task-guide{border:1px solid #d7e4d9;border-radius:16px;background:var(--white);color:var(--ink);overflow:hidden}
+.selkent-task-guide>summary{list-style:none;cursor:pointer;padding:13px 15px;font-size:13px;font-weight:900;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.selkent-task-guide>summary::-webkit-details-marker{display:none}
+.selkent-task-guide>summary::after{content:'⌄';color:var(--green);font-size:18px;line-height:1}
+.selkent-task-guide[open]>summary::after{transform:rotate(180deg)}
+.selkent-task-guide>div{padding:0 15px 15px;border-top:1px solid #d7e4d9;font-size:11.5px;line-height:1.5}
+.selkent-task-guide p{margin:12px 0 8px;color:var(--muted)}
+.selkent-task-guide ol{margin:0 0 10px;padding-left:20px}.selkent-task-guide li+li{margin-top:6px}
+.selkent-task-guide a{color:var(--green);font-weight:850}
+html[data-theme="dark"] .selkent-task-guide,html[data-theme="dark"] .selkent-task-guide>div{border-color:#344239}
+html[data-theme="dark"] .selkent-task-guide a,html[data-theme="dark"] .selkent-task-guide>summary::after{color:#98e3a3}
