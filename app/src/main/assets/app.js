@@ -424,7 +424,13 @@ function loadState(){
   } catch { return cloneStarter(); }
 }
 function saveState(){ persistLocalState(); renderAll(); if(CLOUD_MODE)window.ClubHubCloud?.queueStateSave?.(state); }
-function auditEvent(action,entityType,entityId,summary,before=null,after=null){if(!CLOUD_MODE||!['admin','coach','assistant_coach'].includes(currentRole)||window.ClubHubCloud?.testMode)return;window.ClubHubCloud?.recordAuditEvent?.({action,entityType,entityId,summary,before,after}).catch(()=>{});}
+function auditEvent(action,entityType,entityId,summary,before=null,after=null){
+  if(!CLOUD_MODE||!['admin','coach','assistant_coach'].includes(currentRole)||window.ClubHubCloud?.testMode)return;
+  const playerOrParent=['squad','player','parent','parent_access','player_link','safeguarding','attendance','award','matchday_squad'].includes(entityType)
+    ||(entityType==='access'&&(/^(parent_|player_)/.test(action)||['access_removed','pin_reset'].includes(action)));
+  if(!playerOrParent)return;
+  window.ClubHubCloud?.recordAuditEvent?.({action,entityType,entityId,summary,before,after}).catch(()=>{});
+}
 function uid(prefix){ return prefix + Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
 function matchStatus(m){const s=String(m?.status||'played').toLowerCase();return ['scheduled','postponed','abandoned','played'].includes(s)?s:'played';}
 function isPlayedMatch(m){return matchStatus(m)==='played';}
@@ -1699,6 +1705,7 @@ function applyAccessMode(){
   document.querySelectorAll('[data-results-global-nav]').forEach(el=>el.classList.toggle('hidden',!(adminClub||coaching)));
   document.querySelectorAll('[data-admin-settings-only]').forEach(el=>el.classList.toggle('hidden',!adminClub));
   document.querySelectorAll('[data-staff-history]').forEach(el=>el.classList.toggle('hidden',!['admin','coach','assistant_coach'].includes(currentRole)));
+  document.querySelectorAll('[data-admin-history]').forEach(el=>el.classList.toggle('hidden',!adminClub));
   document.querySelectorAll('[data-staff-settings]').forEach(el=>el.classList.toggle('hidden',!['admin','coach','assistant_coach'].includes(currentRole)));
   const teamAccessPanel=document.getElementById('team-access-settings');if(teamAccessPanel)teamAccessPanel.classList.toggle('hidden',!['admin','coach','assistant_coach'].includes(currentRole)||(isAdmin()&&isClubOverviewMode()));
   document.querySelectorAll('[data-admin-season-panel]').forEach(el=>el.classList.toggle('hidden',!adminClub));
@@ -2088,7 +2095,7 @@ function renderAll(){
   if(CLOUD_MODE&&['admin','coach','assistant_coach','parent'].includes(currentRole))refreshCompliancePanel();
   renderU11SafeguardingControls();
   if(CLOUD_MODE&&['coach','assistant_coach'].includes(currentRole)&&currentView==='club'&&__clubTab==='results')refreshCoachClubResults(true);
-  if(CLOUD_MODE&&['admin','coach','assistant_coach'].includes(currentRole)&&currentView==='more'){refreshSeasonHistory(true);refreshAuditHistory(true);}
+  if(CLOUD_MODE&&['admin','coach','assistant_coach'].includes(currentRole)&&currentView==='more'){refreshSeasonHistory(true);if(isClubOverviewMode())refreshAuditHistory(true);}
   const roll=document.getElementById('rollover-season-name');if(roll&&!roll.value)roll.value=suggestedNextSeason();
 }
 
@@ -2349,9 +2356,8 @@ async function openSeasonArchive(){const id=document.getElementById('season-hist
 async function archiveCurrentSeason(){if(!CLOUD_MODE||!isAdmin())return toast('Club Admin access required');if(!confirm(`Archive the current ${state.meta.season} season for all active teams? Existing archive snapshots for the same season will be refreshed.`))return;try{const n=await window.ClubHubCloud.archiveCurrentSeason(null);toast(`${n} team season${n===1?'':'s'} archived`);await refreshSeasonHistory(false);}catch(err){alert(err.message||err);}}
 function suggestedNextSeason(){const m=String(state.meta.season||'').match(/(20\d{2})\s*\/\s*(\d{2,4})/);if(!m)return'';const a=Number(m[1])+1;return `${a}/${String(a+1).slice(-2)}`;}
 async function rolloverSeason(){if(!CLOUD_MODE||!isAdmin())return toast('Club Admin access required');const input=document.getElementById('rollover-season-name');const next=String(input?.value||suggestedNextSeason()).trim();if(!next)return toast('Enter the new season');if(!confirm(`START ${next}?\n\nThe current season will be archived first. Match results, awards, attendance and fixture preparation will then reset for every active team. Squad and account links are kept.`))return;if(!confirm('This is a club-wide season rollover. Continue?'))return;try{const res=await window.ClubHubCloud.rolloverClubSeason(next);alert(`${res?.teams||0} teams rolled into ${next}. The app will now reload.`);location.reload();}catch(err){alert(err.message||err);}}
-async function refreshAuditHistory(silent=false){if(!CLOUD_MODE||!['admin','coach','assistant_coach'].includes(currentRole))return;try{const teamId=isAdminTeamPreviewMode()||isAdminCoachMode()?window.ClubHubCloud?.currentTeam?.()?.id:null;__auditRows=await window.ClubHubCloud.listAuditHistory(teamId||null,100);renderAuditHistory();}catch(err){if(!silent)toast(err.message||'Could not load audit history');}}
-function auditValueSummary(v){if(v==null)return'';if(typeof v==='string'||typeof v==='number')return String(v);if(v.opponent)return `${v.opponent}${v.gf!=null?` ${v.gf}–${v.ga}`:''}`;if(v.name)return v.name;return'';}
-function renderAuditHistory(){const box=document.getElementById('audit-history-list');if(!box)return;box.innerHTML=__auditRows.map(r=>`<article class="audit-row"><div><strong>${esc(r.summary||r.action)}</strong><span>${esc(r.user_name||'System')}${r.team_name?' · '+esc(r.team_name):''}</span></div><div class="audit-meta"><span>${new Date(r.created_at).toLocaleString('en-GB',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})}</span>${auditValueSummary(r.before_value)||auditValueSummary(r.after_value)?`<small>${esc(auditValueSummary(r.before_value))}${r.before_value&&r.after_value?' → ':''}${esc(auditValueSummary(r.after_value))}</small>`:''}</div></article>`).join('')||'<div class="empty-state compact-empty">No audit entries yet.</div>';}
+async function refreshAuditHistory(silent=false){if(!CLOUD_MODE||!isAdmin()||!isClubOverviewMode())return;try{__auditRows=await window.ClubHubCloud.listAuditHistory(null,100);renderAuditHistory();}catch(err){if(!silent)toast(err.message||'Could not load audit history');}}
+function renderAuditHistory(){const box=document.getElementById('audit-history-list');if(!box)return;box.innerHTML=__auditRows.map(r=>`<article class="audit-row"><div><strong>${esc(r.summary||r.action)}</strong><span>${esc(r.user_name||'System')}${r.team_name?' · '+esc(r.team_name):''}</span></div><div class="audit-meta"><span>${new Date(r.created_at).toLocaleString('en-GB',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})}</span></div></article>`).join('')||'<div class="empty-state compact-empty">No player or parent changes yet.</div>';}
 
 function configuredAwardTypes(){
   const types=normalizeAwardTypes(state.awardTypes);

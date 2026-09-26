@@ -595,7 +595,7 @@
             <div class="settings-accordion-body"><p class="muted">This is the only U7–U11 export route. Performance stats, squad history and name-to-shirt mappings cannot be exported.</p><label>Player<select id="u11-safeguarding-player"></select></label><label>Emergency contact name<input id="u11-emergency-name"/></label><label>Emergency contact phone<input id="u11-emergency-phone"/></label><label>Medical / allergy information<textarea id="u11-medical-info" rows="3"></textarea></label><div class="season-management-actions"><button type="button" class="primary-button" id="save-u11-safeguarding">Save information</button><button type="button" class="secondary-button" id="export-u11-safeguarding">Export safeguarding pack</button></div><p class="helper">Every export is logged and visible to Club Admin.</p><div id="safeguarding-export-audit" class="audit-history-list"></div></div>
           </details>
 
-<div class="settings-group-heading" data-staff-settings><span>History</span><small>Previous seasons and recorded changes</small></div>
+<div class="settings-group-heading" data-staff-settings><span>History</span><small>Previous seasons</small></div>
 
 <details class="panel settings-accordion" id="season-history-settings" data-staff-history>
             <summary><span>Season history</span><span class="settings-chevron">⌄</span></summary>
@@ -606,10 +606,10 @@
             </div>
           </details>
 
-<details class="panel settings-accordion" id="audit-history-settings" data-staff-history>
+<details class="panel settings-accordion hidden" id="audit-history-settings" data-admin-history>
             <summary><span>Audit history</span><span class="settings-chevron">⌄</span></summary>
             <div class="settings-accordion-body">
-              <p class="muted">Recent football-data and access changes. Club Admins see club-wide history; coaches see their own team.</p>
+              <p class="muted">Club-wide player activity and parent access changes. Recent updates only.</p>
               <button type="button" class="secondary-button compact" id="refresh-audit-history">Refresh history</button>
               <div id="audit-history-list" class="audit-history-list"><div class="empty-state compact-empty">Open this section to load history.</div></div>
             </div>

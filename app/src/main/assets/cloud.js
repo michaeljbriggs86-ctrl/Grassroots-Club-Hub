@@ -708,7 +708,7 @@
     return await rpc('record_audit_event',{p_team_id:target,p_action:String(action||'change'),p_entity_type:String(entityType||'record'),p_entity_id:entityId==null?null:String(entityId),p_summary:String(summary||''),p_before:before??null,p_after:after??null});
   }
   async function listAuditHistory(teamId=null,limit=100){
-    if(testModeActive()||!['admin','coach','assistant_coach'].includes(role()))return [];
+    if(testModeActive()||role()!=='admin')return [];
     const data=await rpc('list_audit_history',{p_team_id:teamId||null,p_limit:Number(limit)||100});
     return Array.isArray(data)?data:[];
   }
