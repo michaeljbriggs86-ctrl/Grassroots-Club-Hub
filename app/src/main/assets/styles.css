@@ -1150,7 +1150,7 @@ html[data-theme="dark"] .match-kit-secondary small{color:#b9c7be!important}
 .next-fixture-action-bar{
   flex:0 0 auto;
   display:grid;
-  grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto;
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,1fr) auto;
   gap:8px;
   padding:12px 19px max(12px,env(safe-area-inset-bottom));
   border-top:1px solid var(--line,#D8E0DA);
@@ -1211,7 +1211,7 @@ html[data-theme="dark"] .fixture-edit-button{background:#193322;color:#fff;borde
 .matches-next-fixture .match-team-side .club-detail-link{color:#fff;text-decoration-color:rgba(255,255,255,.7)}
 .matches-next-fixture .match-side-label,.matches-next-fixture .match-kit-secondary small{color:#d8e9dd}
 html[data-theme="dark"] .matches-next-fixture .match-team-side .club-detail-link{color:#fff!important}
-.matches-next-actions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;align-items:stretch;justify-content:start}
+.matches-next-actions{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;align-items:stretch;justify-content:start}
 .matches-next-actions button{width:100%;min-height:48px;padding:10px 12px;white-space:normal;line-height:1.2}
 @media(max-width:560px){.matches-next-actions{grid-template-columns:repeat(2,minmax(0,1fr))}.matches-next-actions button:last-child:not(.hidden){grid-column:1/-1}}
 @media(max-width:350px){.matches-next-actions{grid-template-columns:1fr}.matches-next-actions button:last-child:not(.hidden){grid-column:auto}}
