@@ -1473,22 +1473,25 @@ function matchTeamSideHtml(sideLabel,teamName,kit){
 function homeFixtureTeamNames(f={}){const own=ownTeamDisplayName(),away=String(f.venue||'').toUpperCase()==='A';return {home:away?(f.opponent||'Opponent'):own,away:away?own:(f.opponent||'Opponent')};}
 function canConfirmFixtureDetails(){return isCoach()||isAdmin();}
 function groundOptionsForFixture(f={}){const names=homeFixtureTeamNames(f),homeDetail=state.selkent?.directoryDetails?.[selkentNorm(names.home)]||{};return Array.isArray(homeDetail.groundOptions)?homeDetail.groundOptions:[];}
+let __fixtureEditingKey='';
+function matchTeamLabel(name=''){return String(name||'').replace(/_/g,' ').replace(/\s+/g,' ').trim();}
 function renderCompactNextMatchTeams(f={}){
   const host=document.getElementById('next-match-home-teams');if(!host)return;
   const display=resolvedFixture(f),ctx=fixtureOverviewContext(display),names=homeFixtureTeamNames(f);
-  host.innerHTML=`<div class="next-match-summary-team"><span class="next-match-summary-visual">${teamIdentityVisualHtml(names.home,ctx.homeKit)}</span><strong>${esc(names.home)}</strong></div><span class="next-match-summary-v">V</span><div class="next-match-summary-team"><span class="next-match-summary-visual">${teamIdentityVisualHtml(names.away,ctx.awayKit)}</span><strong>${esc(names.away)}</strong></div>`;
+  host.innerHTML=`<div class="next-match-summary-team"><span class="next-match-summary-visual">${teamIdentityVisualHtml(names.home,ctx.homeKit)}</span><strong>${esc(matchTeamLabel(names.home))}</strong></div><span class="next-match-summary-v">V</span><div class="next-match-summary-team"><span class="next-match-summary-visual">${teamIdentityVisualHtml(names.away,ctx.awayKit)}</span><strong>${esc(matchTeamLabel(names.away))}</strong></div>`;
 }
 function renderFixtureConfirmationEditor(f={}){
   const editor=document.getElementById('next-match-confirmation-editor'),confirmBtn=document.getElementById('fixture-confirm-details'),shareBtn=document.getElementById('next-match-share');if(!editor)return;
-  const can=canConfirmFixtureDetails(),o=fixtureOverride(f);editor.classList.toggle('hidden',!can);if(confirmBtn){confirmBtn.classList.toggle('hidden',!can);confirmBtn.textContent=o.confirmedAt?'Update details':'Confirm details';}if(shareBtn)shareBtn.classList.toggle('hidden',!can);if(!can)return;
+  const can=canConfirmFixtureDetails(),o=fixtureOverride(f),editing=can&&(!o.confirmedAt||__fixtureEditingKey===fixtureKitSelectionKey(f));editor.classList.toggle('hidden',!editing);if(confirmBtn){confirmBtn.classList.toggle('hidden',!editing);confirmBtn.textContent=o.confirmedAt?'Save changes':'Confirm fixture details';}if(shareBtn)shareBtn.classList.toggle('hidden',!can);if(!can||!editing)return;
   const grounds=groundOptionsForFixture(f),select=document.getElementById('next-match-ground-select'),time=document.getElementById('next-match-confirm-time'),kit=document.getElementById('next-match-kit-choice');
   if(time)time.value=o.time||'';if(kit)kit.value=fixtureKitChoice(f);
+  const manualGround=document.getElementById('next-match-manual-ground'),manualAddress=document.getElementById('next-match-manual-address');if(manualGround)manualGround.value=o.groundName||'';if(manualAddress)manualAddress.value=o.address||'';
   if(select){select.innerHTML='<option value="">Select ground</option>'+grounds.map((g,i)=>`<option value="${i}">${esc(g.name)} — ${esc(g.address)}</option>`).join('')+'<option value="__other__">Other / manual venue</option>';let selected='';if(o.groundName){const idx=grounds.findIndex(g=>selkentNorm(g.name)===selkentNorm(o.groundName)&&selkentNorm(g.address)===selkentNorm(o.address));selected=idx>=0?String(idx):'__other__';}else if(grounds.length===1)selected='0';select.value=selected;}
   syncFixtureGroundEditor();
 }
 function syncFixtureGroundEditor(){const select=document.getElementById('next-match-ground-select'),manual=document.getElementById('next-match-manual-ground-fields'),f=nextPublishedFixture(),o=f?fixtureOverride(f):{};if(!select||!manual)return;const isOther=select.value==='__other__';manual.classList.toggle('hidden',!isOther);if(isOther){const g=document.getElementById('next-match-manual-ground'),a=document.getElementById('next-match-manual-address');if(g&&!g.value)g.value=o.groundName||'';if(a&&!a.value)a.value=o.address||'';}}
 async function openNextFixtureDetails(){
-  const f=nextPublishedFixture();if(!f)return toast('No fixture has been released yet');const dlg=document.getElementById('next-fixture-dialog');dlg?.showModal();
+  const f=nextPublishedFixture();if(!f)return toast('No fixture has been released yet');__fixtureEditingKey='';const dlg=document.getElementById('next-fixture-dialog');dlg?.showModal();renderNextMatch();
   const names=homeFixtureTeamNames(f);try{await Promise.all([fetchClubDirectoryDetails(names.home),fetchClubDirectoryDetails(names.away)]);persistLocalState();renderNextMatch();}catch(_){}
   renderFixtureConfirmationEditor(f);
 }
@@ -1502,7 +1505,7 @@ function saveFixtureConfirmation(){
   state.selkent=state.selkent||{};state.selkent.fixtureOverrides=state.selkent.fixtureOverrides||{};state.selkent.fixtureKitSelections=state.selkent.fixtureKitSelections||{};
   const before=state.selkent.fixtureOverrides[key]||null,after={time,groundName,address,confirmedAt:new Date().toISOString()};state.selkent.fixtureOverrides[key]=after;state.selkent.fixtureKitSelections[key]=choice;
   state.selkent.fixtureAcknowledgement={status:'confirmed',fingerprint:fixtureFingerprint(f),key:fixtureStableKey(f),note:'',at:new Date().toISOString()};if(state.selkent.fixtureTracking){state.selkent.fixtureTracking.changed=false;state.selkent.fixtureTracking.previousSummary='';state.selkent.fixtureTracking.changes=[];}
-  saveState();auditEvent('fixture_details_confirmed','fixture',key,`Confirmed ${time} at ${groundName}`,before,{...after,shirt:choice});renderNextMatch();renderMatchPageNextFixture();renderSelkentFixtures();renderMatchdayDashboard();toast('Match details confirmed for parents');
+  saveState();auditEvent('fixture_details_confirmed','fixture',key,`Confirmed ${time} at ${groundName}`,before,{...after,shirt:choice});__fixtureEditingKey='';renderNextMatch();renderMatchPageNextFixture();renderSelkentFixtures();renderMatchdayDashboard();toast('Match details confirmed for parents');
 }
 function shareCardWrap(ctx,text,x,y,maxWidth,lineHeight){const words=String(text||'').split(/\s+/),lines=[];let line='';for(const word of words){const test=line?line+' '+word:word;if(ctx.measureText(test).width>maxWidth&&line){lines.push(line);line=word;}else line=test;}if(line)lines.push(line);lines.slice(0,3).forEach((l,i)=>ctx.fillText(l,x,y+i*lineHeight));return y+Math.min(lines.length,3)*lineHeight;}
 function drawShareJersey(ctx,x,y,colours='TBC',scale=1){
@@ -1580,7 +1583,7 @@ function renderNextMatch(){
   const d=resolvedFixture(f),confirmed=fixtureDetailsConfirmed(f),set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};set('next-match-opponent','Upcoming match details');set('next-match-when',[f.date?formatDate(f.date):'Date TBC',confirmed&&d.time?`Kick-off ${d.time}`:'Kick-off awaiting confirmation',confirmed&&d.time?`Arrival ${matchdayArrivalTime(d.time)}`:''].filter(Boolean).join(' · '));renderFixtureOverview('next-match',d);/* Competition omitted from this popup. */
   const ground=document.getElementById('next-match-ground'),address=document.getElementById('next-match-address'),map=document.getElementById('next-match-map'),mapWrap=document.getElementById('next-match-map-preview');if(!confirmed){if(ground)ground.textContent='Awaiting confirmation';if(address)address.textContent='Coach will confirm the match venue.';if(map)map.classList.add('hidden');if(mapWrap)mapWrap.classList.add('hidden');}
   const ack=fixtureAckState(),status=document.getElementById('next-match-status');if(status){status.textContent=confirmed?'Details confirmed':ack.status==='changed'?'Fixture changed':'Awaiting details';status.classList.remove('hidden');}
-  const cal=document.getElementById('next-match-calendar');if(cal)cal.classList.toggle('hidden',!confirmed||!f.date);const played=document.getElementById('next-match-played');if(played)played.classList.toggle('hidden',!isCoach());const share=document.getElementById('next-match-share');if(share){const staff=canConfirmFixtureDetails();share.classList.toggle('hidden',!staff);share.disabled=false;share.title=confirmed?'Share matchday image and WhatsApp details':'Confirm match details first';}renderFixtureConfirmationEditor(f);refreshFixtureOverviewDirectory(f);
+  const cal=document.getElementById('next-match-calendar');if(cal)cal.classList.toggle('hidden',!confirmed||!f.date);const edit=document.getElementById('next-match-edit');if(edit)edit.classList.toggle('hidden',!confirmed||!canConfirmFixtureDetails()||__fixtureEditingKey===fixtureKitSelectionKey(f));const share=document.getElementById('next-match-share');if(share){const staff=canConfirmFixtureDetails();share.classList.toggle('hidden',!staff);share.disabled=false;share.title=confirmed?'Share matchday image and WhatsApp details':'Confirm match details first';}renderFixtureConfirmationEditor(f);refreshFixtureOverviewDirectory(f);
 }
 
 function renderMatchPageNextFixture(){
@@ -1768,7 +1771,6 @@ async function refreshSelkentOpponentDirectory(force=false){
 let __availabilityRows=[];
 let __availabilityFixture='';
 let __parentPlayerLinks=[];
-let __availabilitySetting=null;
 let __appearanceStats=[];
 let __appearanceStamp=0;
 function appearanceStatFor(name){return __appearanceStats.find(r=>selkentNorm(r.player_name)===selkentNorm(name))||{appearances:0,starts:0,substitutes:0,present:0,unavailable:0,no_shows:0,recorded:0};}
@@ -1843,13 +1845,13 @@ async function refreshMatchAvailability(quiet=true){
   const fixtureKey=fixtureStableKey(f);__availabilityFixture=fixtureKey;panel.classList.remove('hidden');
   const personalControls=document.getElementById('parent-availability-controls'),coachSummary=document.getElementById('coach-availability-summary');
   personalControls?.classList.toggle('hidden',!['parent','player'].includes(currentRole));coachSummary?.classList.toggle('hidden',!(isCoach()||isAdminTeamPreviewMode()));
+  document.getElementById('availability-reminder-send')?.classList.toggle('hidden',!isCoach());
   let links=[];
   try{
     const ownId=window.ClubHubCloud?.session?.user?.id||'';
-    [__availabilityRows,links,__availabilitySetting]=await Promise.all([
+    [__availabilityRows,links]=await Promise.all([
       window.ClubHubCloud.listMatchAvailability(fixtureKey),
-      currentRole==='player'?window.ClubHubCloud.listPlayerAccountLinks(ownId):window.ClubHubCloud.listParentPlayerLinks(currentRole==='parent'?ownId:null),
-      window.ClubHubCloud.getAvailabilitySettings?window.ClubHubCloud.getAvailabilitySettings(fixtureKey):Promise.resolve(null)
+      currentRole==='player'?window.ClubHubCloud.listPlayerAccountLinks(ownId):window.ClubHubCloud.listParentPlayerLinks(currentRole==='parent'?ownId:null)
     ]);
     __parentPlayerLinks=links||[];
   }catch{if(!quiet)toast('Availability could not be refreshed');return;}
@@ -1869,7 +1871,6 @@ async function refreshMatchAvailability(quiet=true){
     if(coachSummary){const open=new Set([...coachSummary.querySelectorAll('details[open]')].map(el=>el.dataset.availabilityGroup));coachSummary.innerHTML=render('Available','available')+render('Unsure','unsure')+render('Unavailable','unavailable')+awaitingHtml;coachSummary.querySelectorAll('details').forEach(el=>{el.open=open.has(el.dataset.availabilityGroup);});}
     maybeAutoPrepareMatchdayFromAvailability();renderTacticsBoard();
   }
-  renderAvailabilityDeadline();
   renderMatchdayDashboard();
 }
 async function saveParentAvailability(status){
@@ -1877,15 +1878,6 @@ async function saveParentAvailability(status){
   try{await window.ClubHubCloud.saveMatchAvailability({fixtureKey:__availabilityFixture,playerName:player,status});toast('Availability saved');await refreshMatchAvailability(false);}catch(err){alert(err.message||err);}
 }
 
-function deadlineLocalValue(iso=''){if(!iso)return '';const d=new Date(iso);if(Number.isNaN(d.getTime()))return '';const pad=n=>String(n).padStart(2,'0');return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;}
-function renderAvailabilityDeadline(){
-  const panel=document.getElementById('availability-deadline-panel'),text=document.getElementById('availability-deadline-text'),actions=document.getElementById('availability-deadline-actions'),input=document.getElementById('availability-deadline-input');if(!panel)return;
-  const f=nextPublishedFixture();panel.classList.toggle('hidden',!f);if(!f)return;
-  const deadline=__availabilitySetting?.deadline?new Date(__availabilitySetting.deadline):null;
-  if(text){if(!deadline||Number.isNaN(deadline.getTime()))text.textContent='No deadline set';else{text.textContent=`${deadline.getTime()<Date.now()?'Deadline passed · ':'Respond by '}${deadline.toLocaleString('en-GB',{weekday:'short',day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})}`;}}
-  actions?.classList.toggle('hidden',!isCoach());if(input&&isCoach()&&document.activeElement!==input)input.value=deadlineLocalValue(__availabilitySetting?.deadline||'');
-}
-async function saveAvailabilityDeadline(){if(!requireCoach()||!__availabilityFixture)return;const raw=document.getElementById('availability-deadline-input')?.value||'';if(!raw)return toast('Choose a response deadline');const d=new Date(raw);if(Number.isNaN(d.getTime()))return toast('Choose a valid deadline');try{await window.ClubHubCloud.setAvailabilityDeadline(__availabilityFixture,d.toISOString());__availabilitySetting={fixture_key:__availabilityFixture,deadline:d.toISOString()};renderAvailabilityDeadline();toast('Availability deadline saved');await refreshNotifications(false);}catch(err){alert(err.message||err);}}
 async function sendAvailabilityReminder(){if(!requireCoach()||!__availabilityFixture)return;try{const sent=await window.ClubHubCloud.sendAvailabilityReminder(__availabilityFixture);toast(sent?`Reminder sent to ${sent} account${sent===1?'':'s'}`:'Everyone linked has responded');await refreshNotifications(false);}catch(err){alert(err.message||err);}}
 
 function matchdayFixtureNoteKey(){const f=nextPublishedFixture();return f?`fixture:${currentTacticsFixtureKey()}`:'';}
@@ -2502,7 +2494,7 @@ function setFixtureKitChoice(key,choice){
   const openId=document.getElementById('match-detail-id')?.value||'',m=(state.matches||[]).find(x=>x.id===openId);if(document.getElementById('match-detail-dialog')?.open&&m)renderMatchOverview(m);
   toast(`${choice==='away'?'Away':'Home'} shirt selected`);
 }
-function clubTeamLink(teamName='',extra=''){return `<button type="button" class="club-detail-link ${extra}" data-club-details-team="${esc(teamName)}">${esc(teamName)}</button>`;}
+function clubTeamLink(teamName='',extra=''){return `<button type="button" class="club-detail-link ${extra}" data-club-details-team="${esc(teamName)}">${esc(matchTeamLabel(teamName))}</button>`;}
 function kitWarningHtml(ctx){if(!ctx?.kitWarning||!(isCoach()||isAdmin()))return'';const review=(isAdmin()||isCoach())?`<button type="button" class="text-button compact" data-club-details-team="${esc(ctx.awayTeam)}">Review shirts</button>`:'';return `<div class="kit-clash-warning"><span>${esc(ctx.kitWarning)}</span>${review}</div>`;}
 
 function matchOverviewContext(m={}){
@@ -3762,17 +3754,16 @@ document.addEventListener('click',e=>{
 document.getElementById('appearance-theme')?.addEventListener('change',e=>applyTheme(e.target.value));
 document.getElementById('notification-bell')?.addEventListener('click',openNotifications);
 document.getElementById('notifications-mark-all')?.addEventListener('click',markAllNotificationsRead);
-document.getElementById('availability-deadline-save')?.addEventListener('click',saveAvailabilityDeadline);
 document.getElementById('availability-reminder-send')?.addEventListener('click',sendAvailabilityReminder);
 document.getElementById('next-match-card')?.addEventListener('click',openNextFixtureDetails);
 document.getElementById('matches-next-details')?.addEventListener('click',openNextFixtureDetails);
 document.getElementById('next-match-ground-select')?.addEventListener('change',syncFixtureGroundEditor);
 document.getElementById('fixture-confirm-details')?.addEventListener('click',saveFixtureConfirmation);
+document.getElementById('next-match-edit')?.addEventListener('click',()=>{const f=nextPublishedFixture();if(!f||!canConfirmFixtureDetails()||!fixtureDetailsConfirmed(f))return;__fixtureEditingKey=fixtureKitSelectionKey(f);renderFixtureConfirmationEditor(f);document.getElementById('next-match-edit')?.classList.add('hidden');document.getElementById('next-match-confirm-time')?.focus();});
 document.getElementById('next-match-share')?.addEventListener('click',shareNextMatchImage);
 document.getElementById('matches-next-share')?.addEventListener('click',shareNextMatchImage);
 document.getElementById('next-match-calendar')?.addEventListener('click',()=>addFixtureToCalendar());
 document.getElementById('matches-next-calendar')?.addEventListener('click',()=>addFixtureToCalendar());
-document.getElementById('next-match-played')?.addEventListener('click',openNextFixtureMatchReport);
 document.getElementById('matches-next-played')?.addEventListener('click',openNextFixtureMatchReport);
 document.getElementById('matchday-add-calendar')?.addEventListener('click',()=>addFixtureToCalendar());
 document.getElementById('matchday-notify-squad')?.addEventListener('click',notifySelectedSquad);
