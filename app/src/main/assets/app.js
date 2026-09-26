@@ -2015,8 +2015,9 @@ async function reviewParentAccessNotification(notificationId){
 
 function renderUniversalClubConfiguration(){
   const rulesEl=document.getElementById('universal-config-rules');if(!rulesEl)return;
-  const r=competitionRuleForAge(ageGroupNumber());if(!r){rulesEl.innerHTML='<p class="helper">No age-specific matchday rule is configured for this team yet.</p>';return;}
-  const resultsText=ageGroupNumber()<=11?'Scores remain private to authenticated club accounts':r.results_published?'Published results are available for this age group':'Scores remain private to authenticated club accounts';
+  const age=ageGroupNumber();document.getElementById('selkent-mini-playing-time')?.classList.toggle('hidden',age<8||age>11);
+  const r=competitionRuleForAge(age);if(!r){rulesEl.innerHTML='<p class="helper">No age-specific matchday rule is configured for this team yet.</p>';return;}
+  const resultsText=age<=11?'Scores and tables are limited to coaching staff and club admins; parents and players do not see them':r.results_published?'Published results are available for this age group':'Scores are not publicly published for this age group';
   rulesEl.innerHTML=`<div class="universal-rule-grid"><span><b>${esc(r.format)}</b><small>Format</small></span><span><b>${Number(r.players_on_pitch)}</b><small>On pitch</small></span><span><b>${Number(r.max_registered)}</b><small>Registration setting</small></span><span><b>${Number(r.matchday_max)}</b><small>Matchday setting</small></span></div><div class="rule-summary-list"><span><strong>Substitutions</strong>${r.rolling_substitutions?'Rolling substitutions':'Standard substitutions'}</span><span><strong>Results</strong>${esc(resultsText)}</span><span><strong>Player access</strong>${r.player_accounts_allowed?'Available for this age group':'Not available for this age group'}</span></div>`;
 }
 
