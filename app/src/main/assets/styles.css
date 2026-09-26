@@ -1228,3 +1228,11 @@ html[data-theme="dark"] .matches-next-fixture .match-team-side .club-detail-link
   .next-fixture-modal .next-fixture-time-only{flex-wrap:wrap}
   .next-fixture-time-only #next-match-calendar{margin-left:auto}
 }
+
+/* v2.2.31 — request-level family access and parent team switching */
+.parent-family-account{display:grid;gap:10px;margin-top:14px;padding-top:14px;border-top:1px solid var(--line,#D8E0DA)}
+.parent-family-account label{display:grid;gap:6px;font-size:12px;font-weight:850}.parent-family-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}.parent-family-actions button{min-height:48px}
+.parent-request-summary{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.parent-request-summary span{display:flex;flex-direction:column;gap:3px;padding:9px 10px;border:1px solid var(--line,#D8E0DA);border-radius:12px;background:var(--gch-white,#fff);min-width:0}.parent-request-summary span:last-child{grid-column:1/-1}.parent-request-summary b{font-size:9.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}.parent-request-summary strong{font-size:12px;overflow-wrap:anywhere}
+.parent-request-player-fieldset{border:0;padding:0;margin:4px 0 0;min-width:0}.parent-request-player-fieldset legend{font-size:12px;font-weight:900;color:var(--ink);padding:0;margin-bottom:6px}.parent-request-player{min-height:52px;cursor:pointer}.parent-request-player input[type="radio"]{width:20px;height:20px;flex:0 0 auto}
+html[data-theme="dark"] .parent-family-account{border-color:#344239!important}html[data-theme="dark"] .parent-request-summary span,html[data-theme="dark"] .parent-request-player{background:#151d18!important;border-color:#344239!important;color:#f2f7f3!important}
+@media(max-width:560px){.parent-family-actions{grid-template-columns:1fr}.parent-request-summary{grid-template-columns:1fr}.parent-request-summary span:last-child{grid-column:auto}}

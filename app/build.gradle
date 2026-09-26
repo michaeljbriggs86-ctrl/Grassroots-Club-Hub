@@ -13,8 +13,8 @@ android {
         applicationId 'com.grassrootsclubhub.universal'
         minSdk 26
         targetSdk 35
-        versionCode 2234
-        versionName '2.2.34'
+        versionCode 2235
+        versionName '2.2.35'
     }
 
     signingConfigs {

@@ -1,0 +1,65 @@
+PitchKind v2.2.31 live family-access backend contract
+Checked directly against Supabase production project obntycksmkcnkprrcutg on 2026-09-24.
+
+STATUS
+- Family/multi-team backend: DEPLOYED and directly inspected.
+- Android integration/runtime acceptance remains pending.
+- General app DEPLOYED/LIVE status is NOT claimed.
+
+PRODUCTION MIGRATIONS PRESENT
+- 20260924160146 require_verified_parent_player_link_before_approval
+- 20260924163101 parent_family_multi_team_access
+- 20260924163318 parent_family_multiteam_announcements
+- 20260924164120 retire_legacy_parent_approval_rpc
+
+REQUEST MODEL
+- public.request_parent_access(p_team_id uuid,p_child_name text) accepts pending, pending_parent or parent accounts.
+- A parent may submit multiple child/team requests inside the same club.
+- Cross-club child requests are rejected by the live function.
+- Child name is free-text identification context; the parent is not given squad/player choices.
+
+REQUEST-LEVEL APPROVAL
+- public.approve_parent_request(p_request_id uuid,p_player_name text) is SECURITY DEFINER with SET search_path=public.
+- anon EXECUTE: false. authenticated EXECUTE: true.
+- Caller must be Club Admin / Coach / Assistant Coach and passes club/team checks.
+- p_player_name must resolve to an ACTIVE player in that request team’s private team_state squad.
+- Approval inserts/upserts only the selected (team_id,parent_user_id,player_name) link.
+- Existing sibling links and links in other teams are not deleted.
+- An already-approved parent can receive another approved child/team request.
+
+LEGACY APPROVAL RETIRED
+- public.approve_parent(p_user_id uuid) remains server/internal only.
+- anon EXECUTE: false. authenticated EXECUTE: false.
+- Android must not call rpc('approve_parent',...).
+
+PARENT TEAM ACCESS
+- public.can_read_team(p_team uuid) authorises parents from parent_player_links.
+- public.get_team_state_for_me(p_team_id uuid) calls can_read_team and retains U7-U11 sanitisation.
+- public.teams RLS exposes a parent only linked teams in the same club.
+- Android team switching must therefore use only the authenticated visible team list.
+
+TEAM MEMBER / REQUEST LISTS
+- public.list_pending_parent_requests returns request_id,user_id,parent_name,parent_email,child_name,requested_at to authorised staff.
+- public.list_team_members_v2 derives ACTIVE parent membership from parent_player_links.
+- Pending requests must render independently from list_pending_parent_requests.
+
+SAME-TEAM SIBLINGS
+- parent_player_links uniqueness is (team_id,parent_user_id,player_name), so same-team siblings are representable.
+- approve_parent_request upserts one child without deleting existing sibling links.
+- save_parent_player_links remains a staff editing tool for one team and is not the approval path.
+
+U7-U11 PRIVACY
+- get_team_state_for_me still applies sanitize_mini_soccer_state for U7-U11 parent/player access.
+- Android must retain the client defence-in-depth sanitizer.
+
+SECURITY ADVISOR BOUNDARY
+Security advisor on 2026-09-24 still reported project-wide warnings including leaked-password protection disabled, 3 anonymous SECURITY DEFINER functions (get_demo_club_configuration, list_login_clubs, list_login_teams), and a wider authenticated SECURITY DEFINER warning set. These are NOT claimed resolved. list_login_clubs/list_login_teams are intentionally used before authentication and must not be revoked blindly.
+
+ACCEPTANCE STILL REQUIRED
+- first child request -> staff verification -> approval -> parent access;
+- second sibling on same team preserves first link;
+- second team gives same parent access to both linked teams;
+- parent switches only between linked teams;
+- cross-club add-child request is rejected;
+- parent add-child UI never exposes squad names;
+- U7-U11 parent view exposes no restricted result/performance data.

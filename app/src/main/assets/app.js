@@ -1614,6 +1614,31 @@ function requireCoach(message='Coach access is required to edit team data.'){
   return false;
 }
 function safeFileName(){ return (state.meta.teamName || 'Team').replace(/[^a-z0-9]+/gi,'_').replace(/^_|_$/g,'') || 'Team'; }
+function renderParentFamilyControls(){
+ const wrap=document.getElementById('parent-family-account');if(!wrap)return;
+ const parent=CLOUD_MODE&&currentRole==='parent';wrap.classList.toggle('hidden',!parent);if(!parent)return;
+ const select=document.getElementById('parent-family-team-select'),teams=window.ClubHubCloud?.visibleTeamList?.()||[],current=window.ClubHubCloud?.currentTeam?.();
+ if(select){const keep=select.value||current?.id||'';select.innerHTML=teams.map(t=>`<option value="${esc(t.id)}">${esc(matchTeamLabel([t.ageGroup,t.teamName].filter(Boolean).join(' ')))}</option>`).join('');if([...select.options].some(o=>o.value===String(keep)))select.value=String(keep);}
+ const note=document.getElementById('parent-family-team-note');if(note)note.textContent=teams.length>1?`${teams.length} linked teams available on this account.`:'This account currently has one linked team.';
+ const btn=document.getElementById('parent-family-team-switch');if(btn)btn.disabled=!select?.value||String(select.value)===String(current?.id||'');
+}
+async function switchParentFamilyTeam(){
+ if(currentRole!=='parent'||!CLOUD_MODE)return;
+ const teamId=document.getElementById('parent-family-team-select')?.value||'',current=window.ClubHubCloud?.currentTeam?.();if(!teamId||String(teamId)===String(current?.id||''))return;
+ const button=document.getElementById('parent-family-team-switch');if(button)button.disabled=true;
+ try{await window.ClubHubCloud.switchParentTeam(teamId);const now=window.ClubHubCloud.currentTeam?.();renderAll();resetMatchForm();await syncSelkent(true);toast(`Switched to ${now?.ageGroup||''} ${matchTeamLabel(now?.teamName||'team')}`.trim());}catch(err){alert(err.message||err);}finally{renderParentFamilyControls();}
+}
+async function openParentAddChildDialog(){
+ if(currentRole!=='parent'||!CLOUD_MODE)return;
+ const dlg=document.getElementById('parent-add-child-dialog'),select=document.getElementById('parent-add-child-team');if(!dlg||!select)return;
+ try{const teams=await window.ClubHubCloud.listCurrentClubLoginTeams();select.innerHTML='<option value="">Choose team…</option>'+teams.map(t=>`<option value="${esc(t.id)}">${esc(t.label||('U'+t.age_group+' '+t.name))}</option>`).join('');const child=document.getElementById('parent-add-child-name');if(child)child.value='';dlg.showModal();}catch(err){alert(err.message||err);}
+}
+async function submitParentAddChild(e){
+ e.preventDefault();if(currentRole!=='parent'||!CLOUD_MODE)return;
+ const teamId=document.getElementById('parent-add-child-team')?.value||'',child=document.getElementById('parent-add-child-name')?.value?.trim()||'';if(!teamId)return alert('Choose the team.');if(child.length<2)return alert('Type your child’s name.');
+ try{await window.ClubHubCloud.requestParentAccess(teamId,child);document.getElementById('parent-add-child-dialog')?.close();toast('Access request sent for staff verification');}catch(err){alert(err.message||err);}
+}
+
 function applyAccessMode(){
   if(isTeamLocked())enforceAssignedTeam(false);
   const preview=isAdminTeamPreviewMode();
@@ -1674,6 +1699,7 @@ function applyAccessMode(){
     else summary.textContent=`${roleLabel()} access requires activation by a Club Admin.`;
   }
   const badge=document.getElementById('account-role-badge');if(badge)badge.textContent=isAdminCoachMode()?'Coach':roleLabel();
+  renderParentFamilyControls();
   const readOnly=document.getElementById('read-only-card');
   if(readOnly){
     readOnly.classList.toggle('hidden',!readonly);
@@ -3020,62 +3046,90 @@ async function refreshAdminClubOverview(quiet=false){
 let __teamMembersStamp=0;
 let __teamParentLinks=[];
 let __teamPlayerAccountLinks=[];
+let __pendingParentRequests=[];
 async function refreshTeamMembers(quiet=false){
-  const list=document.getElementById('team-members-list');
-  if(!list||!CLOUD_MODE||!['admin','coach','assistant_coach'].includes(currentRole))return;
-  if(quiet&&Date.now()-__teamMembersStamp<12000)return;__teamMembersStamp=Date.now();
-  if(!quiet)list.innerHTML='<div class="empty-state compact-empty">Loading team access…</div>';
-  try{
-    const teamId=window.ClubHubCloud?.currentTeam?.()?.id||null;
-    const [rows,links,playerLinks,pendingRequests]=await Promise.all([window.ClubHubCloud.listTeamMembers(teamId),window.ClubHubCloud.listParentPlayerLinks(null),window.ClubHubCloud.listPlayerAccountLinks(null),window.ClubHubCloud.listPendingParentRequests(teamId)]);__teamParentLinks=links||[];__teamPlayerAccountLinks=playerLinks||[];const requestByUser=new Map((pendingRequests||[]).map(r=>[String(r.user_id),r]));
-    const pending=rows.filter(r=>r.role==='pending_parent'),active=rows.filter(r=>r.role!=='pending_parent'),preview=isAdminTeamPreviewMode();
-    const rowHtml=r=>{
-      const pendingRow=r.role==='pending_parent',staff=['club_admin','coach','assistant_coach'].includes(r.role),parent=r.role==='parent',player=r.role==='player';
-      const req=pendingRow?requestByUser.get(String(r.user_id)):null;
-      const roleText=r.role==='club_admin'?'Club Admin · Coach':r.role==='assistant_coach'?'Assistant Coach':r.role==='coach'?'Coach':player?'Player profile':pendingRow?'Parent · awaiting approval':'Parent';
-      const pill=r.role==='club_admin'?'Admin Coach':r.role==='assistant_coach'?'Assistant':r.role==='coach'?'Coach':player?'Player':pendingRow?'Pending':'Parent';
-      const canApprove=pendingRow&&['admin','coach','assistant_coach'].includes(currentRole);
-      const canRemove=!preview&&(!staff||(isAdmin()&&isClubOverviewMode()));
-      const pinState=player?(r.access_method==='player_code'?'Reusable code':r.pin_reset_required?'Temporary PIN':r.pin_set?'PIN set':'Legacy access'):parent?(r.access_method==='email'?'Email login':r.pin_reset_required?'Temporary PIN':r.pin_set?'Legacy PIN':'Email login'):'';
-      const linked=parent?__teamParentLinks.filter(x=>x.parent_user_id===r.user_id):player?__teamPlayerAccountLinks.filter(x=>x.user_id===r.user_id):[];
-      const linkText=linked.length?` · ${linked.map(x=>x.player_name).join(', ')}`:(parent?' · No player linked':'');
-      const pendingInfo=req?`<div class="pending-parent-details"><span><b>Child name</b>${esc(req.child_name||'Not supplied')}</span><span><b>Email</b>${esc(req.parent_email||'Not supplied')}</span></div>`:'';
-      return `<div class="team-member-row ${pendingRow?'pending':''}"><div class="team-member-copy"><strong>${esc(r.full_name||'Member')}</strong><span>${esc(roleText)}${pinState?' · '+esc(pinState):''}${(parent||player)?esc(linkText):''}</span>${pendingInfo}</div><div class="team-member-actions"><span class="member-role-pill">${pill}</span>${canApprove?`<button class="primary-button compact parent-approve-action" data-approve-parent="${r.user_id}">Approve parent</button>`:''}${!preview&&parent&&isCoach()?`<button class="inline-action" data-link-parent-player="${r.user_id}" data-parent-name="${esc(r.full_name||'Parent')}">Link player</button>${r.access_method!=='email'?`<button class="inline-action" data-reset-parent-pin="${r.user_id}" data-parent-name="${esc(r.full_name||'Parent')}">Reset legacy PIN</button>`:''}`:''}${canRemove?`<button class="inline-action delete" data-remove-member="${r.user_id}">Remove</button>`:''}</div></div>`;
-    };
-    list.innerHTML=(pending.length?`<div class="member-group-label">Awaiting approval</div>${pending.map(rowHtml).join('')}`:'')+(active.length?`<div class="member-group-label">Active access</div>${active.map(rowHtml).join('')}`:'')||'<div class="empty-state compact-empty">No team access accounts yet.</div>';
-  }catch(err){list.innerHTML='<div class="empty-state compact-empty">Team access is temporarily unavailable.</div>';}
+ const list=document.getElementById('team-members-list');
+ if(!list||!CLOUD_MODE||!['admin','coach','assistant_coach'].includes(currentRole))return;
+ if(quiet&&Date.now()-__teamMembersStamp<12000)return;__teamMembersStamp=Date.now();
+ if(!quiet)list.innerHTML='<div class="empty-state compact-empty">Loading team access…</div>';
+ try{
+   const teamId=window.ClubHubCloud?.currentTeam?.()?.id||null;
+   const [rows,links,playerLinks,pendingRequests]=await Promise.all([
+     window.ClubHubCloud.listTeamMembers(teamId),
+     window.ClubHubCloud.listParentPlayerLinks(null),
+     window.ClubHubCloud.listPlayerAccountLinks(null),
+     window.ClubHubCloud.listPendingParentRequests(teamId)
+   ]);
+   __teamParentLinks=links||[];__teamPlayerAccountLinks=playerLinks||[];__pendingParentRequests=pendingRequests||[];
+   const preview=isAdminTeamPreviewMode();
+   const requestHtml=__pendingParentRequests.map(req=>`<div class="team-member-row pending"><div class="team-member-copy"><strong>${esc(req.parent_name||'Parent')}</strong><span>Parent · awaiting child verification</span><div class="pending-parent-details"><span><b>Child name supplied</b>${esc(req.child_name||'Not supplied')}</span><span><b>Email</b>${esc(req.parent_email||'Not supplied')}</span></div></div><div class="team-member-actions"><span class="member-role-pill">Pending</span><button class="primary-button compact parent-approve-action" data-review-parent-request-id="${esc(req.request_id)}">Review request</button></div></div>`).join('');
+   const active=(rows||[]).filter(r=>r.role!=='pending_parent');
+   const rowHtml=r=>{
+     const staff=['club_admin','coach','assistant_coach'].includes(r.role),parent=r.role==='parent',player=r.role==='player';
+     const roleText=r.role==='club_admin'?'Club Admin · Coach':r.role==='assistant_coach'?'Assistant Coach':r.role==='coach'?'Coach':player?'Player profile':'Parent';
+     const pill=r.role==='club_admin'?'Admin Coach':r.role==='assistant_coach'?'Assistant':r.role==='coach'?'Coach':player?'Player':'Parent';
+     const canRemove=!preview&&(!staff||(isAdmin()&&isClubOverviewMode()));
+     const pinState=player?(r.access_method==='player_code'?'Reusable code':r.pin_reset_required?'Temporary PIN':r.pin_set?'PIN set':'Legacy access'):parent?(r.access_method==='email'?'Email login':r.pin_reset_required?'Temporary PIN':r.pin_set?'Legacy PIN':'Email login'):'';
+     const linked=parent?__teamParentLinks.filter(x=>x.parent_user_id===r.user_id):player?__teamPlayerAccountLinks.filter(x=>x.user_id===r.user_id):[];
+     const linkText=linked.length?` · ${linked.map(x=>x.player_name).join(', ')}`:(parent?' · No player linked':'');
+     return `<div class="team-member-row"><div class="team-member-copy"><strong>${esc(r.full_name||'Member')}</strong><span>${esc(roleText)}${pinState?' · '+esc(pinState):''}${(parent||player)?esc(linkText):''}</span></div><div class="team-member-actions"><span class="member-role-pill">${pill}</span>${!preview&&parent&&isCoach()?`<button class="inline-action" data-link-parent-player="${r.user_id}" data-parent-name="${esc(r.full_name||'Parent')}">Edit player links</button>${r.access_method!=='email'?`<button class="inline-action" data-reset-parent-pin="${r.user_id}" data-parent-name="${esc(r.full_name||'Parent')}">Reset legacy PIN</button>`:''}`:''}${canRemove?`<button class="inline-action delete" data-remove-member="${r.user_id}">Remove</button>`:''}</div></div>`;
+   };
+   list.innerHTML=(requestHtml?`<div class="member-group-label">Awaiting child verification</div>${requestHtml}`:'')+(active.length?`<div class="member-group-label">Active access</div>${active.map(rowHtml).join('')}`:'')||'<div class="empty-state compact-empty">No team access accounts yet.</div>';
+ }catch(err){list.innerHTML='<div class="empty-state compact-empty">Team access is temporarily unavailable.</div>';}
+}
+function openParentRequestReview(requestId){
+ if(!['admin','coach','assistant_coach'].includes(currentRole))return toast('Staff access is required to review parent requests.');
+ const req=__pendingParentRequests.find(r=>String(r.request_id)===String(requestId));
+ const dlg=document.getElementById('parent-request-review-dialog'),list=document.getElementById('parent-request-player-list');
+ if(!req||!dlg||!list)return toast('Parent request is no longer available.');
+ document.getElementById('parent-request-review-id').value=String(req.request_id||'');
+ document.getElementById('parent-request-review-parent').textContent=req.parent_name||'Parent';
+ document.getElementById('parent-request-review-child').textContent=req.child_name||'Not supplied';
+ document.getElementById('parent-request-review-email').textContent=req.parent_email||'Not supplied';
+ list.innerHTML=activePlayers().map(p=>`<label class="parent-link-player parent-request-player"><input type="radio" name="parent-request-player" value="${esc(p.name)}"/><span>${miniJerseyHTML(p.number,p.role,'compact')}</span><span>${esc(p.name)}</span></label>`).join('')||'<div class="empty-state compact-empty">Add an active player to the squad before approving this request.</div>';
+ dlg.showModal();
+}
+async function submitParentRequestReview(e){
+ e.preventDefault();
+ if(!['admin','coach','assistant_coach'].includes(currentRole))return toast('Staff access is required to review parent requests.');
+ const requestId=document.getElementById('parent-request-review-id')?.value||'';
+ const selected=document.querySelector('#parent-request-player-list input[name="parent-request-player"]:checked')?.value||'';
+ if(!selected)return alert('Select the correct active squad player before approving this request.');
+ const supplied=document.getElementById('parent-request-review-child')?.textContent||'the submitted child';
+ if(!confirm(`Approve this request and link "${supplied}" to ${selected}? Existing sibling and other-team links will be kept.`))return;
+ try{
+   await window.ClubHubCloud.approveParentRequest(requestId,selected);
+   auditEvent('parent_request_approved','access',requestId,`Approved parent request and linked ${selected}`);
+   document.getElementById('parent-request-review-dialog')?.close();toast(`Parent access approved for ${selected}`);
+   __teamMembersStamp=0;await refreshTeamMembers(false);await refreshNotifications(false);
+ }catch(err){alert(err.message||err);}
 }
 async function openParentLinkDialog(userId,parentName='Parent'){
-  if(!requireCoach())return;const dlg=document.getElementById('parent-link-dialog'),list=document.getElementById('parent-link-player-list');if(!dlg||!list)return;
-  document.getElementById('parent-link-user-id').value=userId;document.getElementById('parent-link-title').textContent=`Link player · ${parentName}`;
-  let links=[];try{links=await window.ClubHubCloud.listParentPlayerLinks(userId);}catch{}
-  const linked=new Set(links.map(x=>x.player_name));list.innerHTML=activePlayers().map(p=>`<label class="parent-link-player"><input type="checkbox" value="${esc(p.name)}" data-shirt-number="${p.number}" ${linked.has(p.name)?'checked':''}/>${miniJerseyHTML(p.number,p.role,'compact')}<span>${esc(p.name)}</span></label>`).join('')||'<div class="empty-state compact-empty">Add players to the squad before linking parents.</div>';dlg.showModal();
+ if(!requireCoach())return;const dlg=document.getElementById('parent-link-dialog'),list=document.getElementById('parent-link-player-list');if(!dlg||!list)return;
+ document.getElementById('parent-link-user-id').value=userId;document.getElementById('parent-link-title').textContent=`Edit player links · ${parentName}`;
+ let links=[];try{links=await window.ClubHubCloud.listParentPlayerLinks(userId);}catch{}
+ const linked=new Set(links.map(x=>x.player_name));list.innerHTML=activePlayers().map(p=>`<label class="parent-link-player"><input type="checkbox" value="${esc(p.name)}" data-shirt-number="${p.number}" ${linked.has(p.name)?'checked':''}/>${miniJerseyHTML(p.number,p.role,'compact')}<span>${esc(p.name)}</span></label>`).join('')||'<div class="empty-state compact-empty">Add players to the squad before linking parents.</div>';dlg.showModal();
 }
 async function saveParentLinkDialog(e){
-  e.preventDefault();if(!requireCoach())return;const userId=document.getElementById('parent-link-user-id')?.value||'',checked=[...document.querySelectorAll('#parent-link-player-list input[type="checkbox"]:checked')].map(el=>({name:el.value,number:Number(el.dataset.shirtNumber)||null}));
-  try{await window.ClubHubCloud.saveParentPlayerLinks(userId,checked);auditEvent('player_link_updated','access',userId,checked.length?`Linked parent to ${checked.map(x=>x.player_name||x.name||x).join(', ')}`:'Cleared parent player links',null,checked);document.getElementById('parent-link-dialog')?.close();toast(checked.length?'Player link saved':'Player links cleared');__teamMembersStamp=0;await refreshTeamMembers(false);}catch(err){alert(err.message||err);}
+ e.preventDefault();if(!requireCoach())return;const userId=document.getElementById('parent-link-user-id')?.value||'',checked=[...document.querySelectorAll('#parent-link-player-list input[type="checkbox"]:checked')].map(el=>({name:el.value,number:Number(el.dataset.shirtNumber)||null}));
+ try{await window.ClubHubCloud.saveParentPlayerLinks(userId,checked);auditEvent('player_link_updated','access',userId,checked.length?`Updated this team’s parent links: ${checked.map(x=>x.name).join(', ')}`:'Cleared this team’s parent player links',null,checked);document.getElementById('parent-link-dialog')?.close();toast(checked.length?'Player links saved':'Player links cleared');__teamMembersStamp=0;await refreshTeamMembers(false);}catch(err){alert(err.message||err);}
 }
 function populateTeamPlayerInviteOptions(){
-  const wrap=document.getElementById('team-player-invite-section'),sel=document.getElementById('team-player-invite-player');if(!wrap||!sel)return;
-  const allowed=playerAccountsAllowedForAge(ageGroupNumber())&&isCoach();wrap.classList.toggle('hidden',!allowed);if(!allowed)return;
-  const keep=sel.value;sel.innerHTML='<option value="">Choose player…</option>'+activePlayers().map(p=>`<option value="${esc(p.name)}">#${p.number} ${esc(p.name)}</option>`).join('');if([...sel.options].some(o=>o.value===keep))sel.value=keep;
+ const wrap=document.getElementById('team-player-invite-section'),sel=document.getElementById('team-player-invite-player');if(!wrap||!sel)return;
+ const allowed=playerAccountsAllowedForAge(ageGroupNumber())&&isCoach();wrap.classList.toggle('hidden',!allowed);if(!allowed)return;
+ const keep=sel.value;sel.innerHTML='<option value="">Choose player…</option>'+activePlayers().map(p=>`<option value="${esc(p.name)}">#${p.number} ${esc(p.name)}</option>`).join('');if([...sel.options].some(o=>o.value===keep))sel.value=keep;
 }
 async function createTeamPlayerInvite(){
-  if(!requireCoach()||!playerAccountsAllowedForAge(ageGroupNumber()))return toast('Player app access is not enabled for this age group.');
-  if(!CLOUD_MODE)return toast('Cloud access is required.');
-  const team=window.ClubHubCloud?.currentTeam?.(),player=document.getElementById('team-player-invite-player')?.value||'';if(!team||!player)return toast('Choose a player');
-  try{const invite=await window.ClubHubCloud.createInvite({teamId:team.id,role:'player',label:player,expiresHours:168});const out=document.getElementById('team-player-invite-code');if(out)out.value=invite?.code||'';toast(`Reusable Player Access code created for ${player}`);}catch(err){alert(err.message||err);}
+ if(!requireCoach()||!playerAccountsAllowedForAge(ageGroupNumber()))return toast('Player app access is not enabled for this age group.');
+ if(!CLOUD_MODE)return toast('Cloud access is required.');
+ const team=window.ClubHubCloud?.currentTeam?.(),player=document.getElementById('team-player-invite-player')?.value||'';if(!team||!player)return toast('Choose a player');
+ try{const invite=await window.ClubHubCloud.createInvite({teamId:team.id,role:'player',label:player,expiresHours:168});const out=document.getElementById('team-player-invite-code');if(out)out.value=invite?.code||'';toast(`Reusable Player Access code created for ${player}`);}catch(err){alert(err.message||err);}
 }
 async function copyTeamPlayerInvite(){
-  const el=document.getElementById('team-player-invite-code');if(!el?.value)return toast('Create a Player Access code first');
-  try{await navigator.clipboard.writeText(el.value);toast('Player Access code copied');}catch{el.select();document.execCommand('copy');toast('Player Access code copied');}
+ const el=document.getElementById('team-player-invite-code');if(!el?.value)return toast('Create a Player Access code first');
+ try{await navigator.clipboard.writeText(el.value);toast('Player Access code copied');}catch{el.select();document.execCommand('copy');toast('Player Access code copied');}
 }
 
-async function approveParent(userId){
-  if(!['admin','coach','assistant_coach'].includes(currentRole))return toast('Staff access is required to approve parents.');
-  if(!confirm('Approve this parent account? Player linking remains a separate coach action.'))return;
-  try{await window.ClubHubCloud.approveParent(userId);auditEvent('parent_approved','access',userId,'Approved parent access');toast('Parent approved');__teamMembersStamp=0;await refreshTeamMembers(false);await refreshNotifications(false);}catch(err){alert(err.message||err);}
-}
 async function resetParentPin(userId,parentName='Parent'){
   if(!requireCoach())return;if(!confirm(`Reset ${parentName}'s PIN? The old PIN will stop working.`))return;
   try{const data=await window.ClubHubCloud.resetParentPin(userId);const pin=data?.temporary_pin||'';if(pin){try{await navigator.clipboard.writeText(pin);}catch{}prompt(`Temporary PIN for ${data?.full_name||parentName}. It must be changed after sign-in.`,pin);}auditEvent('pin_reset','access',userId,`Reset PIN for ${data?.full_name||parentName}`);toast('Temporary PIN created');await refreshTeamMembers(false);}catch(err){alert(err.message||err);}
@@ -3734,7 +3788,7 @@ document.addEventListener('click',e=>{
   const addTournamentGameBtn=e.target.closest('[data-add-tournament-game]');if(addTournamentGameBtn){addTournamentGame(addTournamentGameBtn.dataset.addTournamentGame);return;}
   const deleteTournamentBtn=e.target.closest('[data-delete-tournament]');if(deleteTournamentBtn){deleteTournament(deleteTournamentBtn.dataset.deleteTournament);return;}
   const adminTeam=e.target.closest('[data-admin-open-team]'); if(adminTeam&&isAdmin()){const team=(window.ClubHubCloud?.visibleTeamList?.()||[]).find(t=>t.id===adminTeam.dataset.adminOpenTeam);if(team){switchAdminTeamAndLoad(team).then(()=>{adminUiMode='view';localStorage.setItem(ADMIN_UI_MODE_KEY,'view');renderAll();navigate('home',false);toast(`${team.ageGroup} ${team.teamName} opened read-only`);}).catch(err=>alert(err.message||err));}return;}
-  const approve=e.target.closest('[data-approve-parent]');if(approve){approveParent(approve.dataset.approveParent);return;}
+  const parentRequest=e.target.closest('[data-review-parent-request-id]');if(parentRequest){openParentRequestReview(parentRequest.dataset.reviewParentRequestId);return;}
   const resetPin=e.target.closest('[data-reset-parent-pin]');if(resetPin){resetParentPin(resetPin.dataset.resetParentPin,resetPin.dataset.parentName||'Parent');return;}
   const linkParent=e.target.closest('[data-link-parent-player]');if(linkParent){openParentLinkDialog(linkParent.dataset.linkParentPlayer,linkParent.dataset.parentName||'Parent');return;}
   const removeMember=e.target.closest('[data-remove-member]');if(removeMember){removeTeamMember(removeMember.dataset.removeMember);return;}
@@ -3784,6 +3838,11 @@ document.getElementById('cancel-edit').addEventListener('click',()=>{resetMatchF
 document.getElementById('add-player-btn').addEventListener('click',()=>openPlayerDialog());
 document.getElementById('player-form').addEventListener('submit',savePlayer);
 document.getElementById('parent-link-form')?.addEventListener('submit',saveParentLinkDialog);
+document.getElementById('parent-request-review-form')?.addEventListener('submit',submitParentRequestReview);
+document.getElementById('parent-family-team-select')?.addEventListener('change',renderParentFamilyControls);
+document.getElementById('parent-family-team-switch')?.addEventListener('click',switchParentFamilyTeam);
+document.getElementById('parent-family-add-child')?.addEventListener('click',openParentAddChildDialog);
+document.getElementById('parent-add-child-form')?.addEventListener('submit',submitParentAddChild);
 document.getElementById('remove-player')?.addEventListener('click',removePlayerFromSquad);
 document.getElementById('match-detail-form').addEventListener('submit',saveMatchDetails);
 document.getElementById('undo-match-played')?.addEventListener('click',undoMatchPlayed);

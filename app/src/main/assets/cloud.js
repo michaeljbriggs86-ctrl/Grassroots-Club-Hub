@@ -332,9 +332,10 @@
     return r==='club_admin'?'admin':r;
   }
   function assignedTeam(){
-    if(testModeActive())return oldShapeTeam(TEST_TEAM);
-    const t=context?.team||null;return oldShapeTeam(t);
-  }
+   if(testModeActive())return oldShapeTeam(TEST_TEAM);
+   const t=role()==='parent'?(activeTeam||context?.team||null):(context?.team||null);
+   return oldShapeTeam(t);
+ }
   function coachTeam(){
     if(testModeActive())return oldShapeTeam(TEST_TEAM);
     const direct=context?.coach_team||null;
@@ -358,15 +359,17 @@
     return stateName && teamName && (stateName===teamName || stateName.includes(teamName) || teamName.includes(stateName));
   }
   function chooseActiveTeam(localState){
-    if(!visibleTeams.length)return null;
-    const own=context?.team;
-    if(own)return visibleTeams.find(t=>t.id===own.id)||own;
-    const stored=localStorage.getItem(ACTIVE_TEAM_KEY);
-    let found=visibleTeams.find(t=>t.id===stored);
-    if(!found)found=visibleTeams.find(t=>teamMatchesState(t,localState));
-    if(!found)found=visibleTeams[0];
-    localStorage.setItem(ACTIVE_TEAM_KEY,found.id);return found;
-  }
+   if(!visibleTeams.length)return null;
+   const own=context?.team;
+   const stored=localStorage.getItem(ACTIVE_TEAM_KEY);
+   let found=null;
+   if(role()==='parent')found=visibleTeams.find(t=>t.id===stored)||null;
+   if(!found&&own)found=visibleTeams.find(t=>t.id===own.id)||(role()==='parent'?null:own);
+   if(!found)found=visibleTeams.find(t=>t.id===stored);
+   if(!found)found=visibleTeams.find(t=>teamMatchesState(t,localState));
+   if(!found)found=visibleTeams[0];
+   localStorage.setItem(ACTIVE_TEAM_KEY,found.id);return found;
+ }
   function sanitizeMiniSoccerParentStateClient(input,age,profileRole=context?.profile?.role||''){
     const restricted=Number(age)>=7&&Number(age)<=11&&['parent','player'].includes(String(profileRole||''));
     if(!restricted||!input||typeof input!=='object')return input;
@@ -485,6 +488,30 @@
     }
     updateCloudPanel();return oldShapeTeam(team);
   }
+  async function switchParentTeam(teamId){
+   if(role()!=='parent')throw new Error('Parent access required');
+   const team=visibleTeams.find(t=>String(t.id)===String(teamId));
+   if(!team)throw new Error('This team is not linked to your parent account');
+   const previousRevision=activeRevision,previousUpdatedAt=lastRemoteUpdatedAt;
+   let row;
+   try{row=await fetchTeamState(team.id);}
+   catch(err){activeRevision=previousRevision;lastRemoteUpdatedAt=previousUpdatedAt;throw err;}
+   if(!row?.state){activeRevision=previousRevision;lastRemoteUpdatedAt=previousUpdatedAt;throw new Error('Team information is not available');}
+   activeTeam=team;
+   localStorage.setItem(ACTIVE_TEAM_KEY,team.id);
+   context={...(context||{}),team};
+   hooks.onRemoteState&&hooks.onRemoteState(row.state,{reason:'parent-team-switch'});
+   updateCloudPanel();
+   return oldShapeTeam(team);
+ }
+
+ async function listCurrentClubLoginTeams(){
+   if(role()!=='parent')return [];
+   const slug=String(clubConfiguration?.settings?.slug||'').trim();
+   if(!slug)return [];
+   return await listLoginTeams(slug);
+ }
+
   async function createInvite({teamId,role:inviteRole,label='',expiresHours=168}){
     if(!['admin','coach','assistant_coach'].includes(role()))throw new Error('Coaching staff or Club Admin access required');
     if(['coach','assistant_coach'].includes(role())&&!['parent','player'].includes(inviteRole))throw new Error('Coaching staff can only invite parents or players');
@@ -657,11 +684,13 @@
   async function notifyMatchReport(matchId,opponent,score){if(testModeActive())return 0;if(!activeTeam||!canEdit())return 0;return Number(await rpc('notify_match_report',{p_team_id:activeTeam.id,p_match_id:String(matchId||''),p_opponent:String(opponent||''),p_score:String(score||'')})||0);}
   async function notifyMatchReopened(matchId,opponent){if(testModeActive())return 0;if(!activeTeam||!canEdit())return 0;return Number(await rpc('notify_match_reopened',{p_team_id:activeTeam.id,p_match_id:String(matchId||''),p_opponent:String(opponent||'')})||0);}
   async function listPlayerAppearanceStats(){if(testModeActive())return [];if(!activeTeam)return [];const data=await rpc('list_player_appearance_stats',{p_team_id:activeTeam.id});return Array.isArray(data)?data:[];}
-
-  async function approveParent(userId){
-    if(!['admin','coach','assistant_coach'].includes(role()))throw new Error('Coaching staff or Club Admin access required');
-    return await rpc('approve_parent',{p_user_id:userId});
-  }
+  async function approveParentRequest(requestId,playerName){
+   if(!['admin','coach','assistant_coach'].includes(role()))throw new Error('Coaching staff or Club Admin access required');
+   const req=String(requestId||'').trim(),player=String(playerName||'').trim();
+   if(!req)throw new Error('Choose a parent request');
+   if(!player)throw new Error('Select the verified squad player first');
+   return await rpc('approve_parent_request',{p_request_id:req,p_player_name:player});
+ }
   async function removeTeamMember(userId){
     if(!['admin','coach','assistant_coach'].includes(role()))throw new Error('Coaching staff or Club Admin access required');
     return await rpc('remove_team_member',{p_user_id:userId});
@@ -953,7 +982,7 @@
     const teamCache=cachedTeams();
     let teamFetch=null;
     try{
-      teamFetch=listTeams().catch(()=>teamCache);
+      teamFetch=listTeams().catch(()=>null);
       context=await getContext();
     }catch(e){saveSession(null);clearAccountLocalData();setGateHtml('signin','Your saved access expired. Sign in again.');return null;}
     if(!context?.profile){saveSession(null);clearAccountLocalData();setGateHtml('signin','No club access profile is attached to this account.');return null;}
@@ -968,7 +997,11 @@
     if(context.profile.role==='player'&&context.profile.access_method!=='player_code'&&!context.profile.pin_set_at){setGateHtml('pinsetup','This is a legacy player account. Create a 6-digit PIN to continue.');return null;}
     if(context.profile.role==='revoked'){clearAccountLocalData();setGateHtml('revoked');return null;}
     if(context.profile.role==='pending'){setGateHtml('adultsetup','This account has not been attached to a club yet. Enter the invitation supplied by your club.');return null;}
-    if(teamCache.length){visibleTeams=teamCache;teamFetch?.then(rows=>{if(Array.isArray(rows)&&rows.length){visibleTeams=rows;}}).catch(()=>{});}else visibleTeams=await teamFetch;
+    if(context.profile.role==='parent'){
+      const linked=await teamFetch;
+      if(!Array.isArray(linked)){setGateHtml('signin','Could not verify linked teams. Please try again.');return null;}
+      visibleTeams=linked;
+    }else if(teamCache.length){visibleTeams=teamCache;teamFetch?.then(rows=>{if(Array.isArray(rows)&&rows.length){visibleTeams=rows;}}).catch(()=>{});}else visibleTeams=(await teamFetch)||[];
     activeTeam=chooseActiveTeam(options.localState||null);
     if(!activeTeam){setGateHtml('join','No team is available to this account.');return null;}
     if(inviteAccessActive() && inviteAccessLocked()){setGateHtml('resume');return null;}
@@ -1008,7 +1041,7 @@
 
   window.ClubHubCloud={
     configured,bootstrap,loadInitialState,queueStateSave,pullLatest,startPolling,
-    role,canEdit,canAdmin,assignedTeam,currentTeam,coachTeam,hasDualCoachAccess,visibleTeamList,getClubConfiguration,listLoginClubs,listLoginTeams,createInvite,requestParentAccess,listPendingParentRequests,listTeamMembers,listClubCoaches,listClubAccessAccounts,removeClubCoach,listPublishedClubResults,listParentPlayerLinks,saveParentPlayerLinks,listPlayerAccountLinks,listMatchAvailability,saveMatchAvailability,listSelkentTeamDirectory,syncSelkentTeamDirectory,getCoachMatchNote,saveCoachMatchNote,listAnnouncements,createAnnouncement,markAnnouncementRead,deleteAnnouncement,listMatchAttendance,saveMatchAttendance,getAvailabilitySettings,setAvailabilityDeadline,sendAvailabilityReminder,listNotifications,markNotificationRead,notifyFixtureChange,notifySelectedSquad,notifyMatchReport,notifyMatchReopened,listPlayerAppearanceStats,recordAuditEvent,listAuditHistory,listSeasonArchives,getSeasonArchive,archiveCurrentSeason,rolloverClubSeason,resetParentPin,setAccessPin,approveParent,removeTeamMember,syncTeamDirectory,switchAdminTeam,getClubOverview,signOut,handleAuthCallback,listMessageContacts,listClubMessages,sendClubMessage,markClubMessagesRead,getClubComplianceStatus,setDisputeReviewers,setClubSafeguardingContacts,getConcernRouting,raiseClubConcern,listGeneralDisputes,listDisputeMessages,upsertU11SafeguardingInfo,exportU11SafeguardingPack,listSafeguardingExportAudit,requestClubCancellation,cancelClubCancellation,
+    role,canEdit,canAdmin,assignedTeam,currentTeam,coachTeam,hasDualCoachAccess,visibleTeamList,getClubConfiguration,listLoginClubs,listLoginTeams,listCurrentClubLoginTeams,createInvite,requestParentAccess,listPendingParentRequests,listTeamMembers,listClubCoaches,listClubAccessAccounts,removeClubCoach,listPublishedClubResults,listParentPlayerLinks,saveParentPlayerLinks,listPlayerAccountLinks,listMatchAvailability,saveMatchAvailability,listSelkentTeamDirectory,syncSelkentTeamDirectory,getCoachMatchNote,saveCoachMatchNote,listAnnouncements,createAnnouncement,markAnnouncementRead,deleteAnnouncement,listMatchAttendance,saveMatchAttendance,getAvailabilitySettings,setAvailabilityDeadline,sendAvailabilityReminder,listNotifications,markNotificationRead,notifyFixtureChange,notifySelectedSquad,notifyMatchReport,notifyMatchReopened,listPlayerAppearanceStats,recordAuditEvent,listAuditHistory,listSeasonArchives,getSeasonArchive,archiveCurrentSeason,rolloverClubSeason,resetParentPin,setAccessPin,approveParentRequest,removeTeamMember,syncTeamDirectory,switchAdminTeam,switchParentTeam,getClubOverview,signOut,handleAuthCallback,listMessageContacts,listClubMessages,sendClubMessage,markClubMessagesRead,getClubComplianceStatus,setDisputeReviewers,setClubSafeguardingContacts,getConcernRouting,raiseClubConcern,listGeneralDisputes,listDisputeMessages,upsertU11SafeguardingInfo,exportU11SafeguardingPack,listSafeguardingExportAudit,requestClubCancellation,cancelClubCancellation,
     updateCloudPanel,
     get context(){return context;},get configuration(){return clubConfiguration;},get session(){return session;},get revision(){return activeRevision;},get testMode(){return testModeActive();}
   };

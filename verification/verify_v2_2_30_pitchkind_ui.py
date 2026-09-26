@@ -28,24 +28,25 @@ design_system=txt('app/src/main/assets/app-design-system.css')
 scraper=txt('scripts/scrape.py')
 scraper_tests=txt('tests/test_selkent_scrape.py')
 backend_contract=txt('LIVE_BACKEND_CONTRACT_v2_2_24.txt')
+family_contract=txt('LIVE_BACKEND_CONTRACT_v2_2_31.txt')
 
-check('versionCode 2234','versionCode 2234' in gradle)
-check('versionName 2.2.34',"versionName '2.2.34'" in gradle)
+check('versionCode 2235','versionCode 2235' in gradle)
+check('versionName 2.2.35',"versionName '2.2.35'" in gradle)
 check('applicationId preserved',"applicationId 'com.grassrootsclubhub.universal'" in gradle)
-check('native marker version','GrassrootsClubHub/2.2.34' in main)
+check('native marker version','GrassrootsClubHub/2.2.35' in main)
 check('auth scheme preserved','"grassrootsclubhub".equalsIgnoreCase' in main and 'android:scheme="grassrootsclubhub"' in txt('app/src/main/AndroidManifest.xml'))
 check('ClubHubNative preserved','"ClubHubNative"' in main)
 check('static feed host preserved','raw.githubusercontent.com' in main and 'Grassroots-Club-Hub/main/data/directory.json' in main and 'Grassroots-Club-Hub/main/data/results.json' in main)
 check('Android app label PitchKind','>PitchKind<' in strings)
 check('HTML title PitchKind','<title>PitchKind</title>' in index)
-check('About version 2.2.34','App version 2.2.34' in index)
+check('About version 2.2.35','App version 2.2.35' in index)
 check('manifest name PitchKind',manifest.get('name')=='PitchKind' and manifest.get('short_name')=='PitchKind')
-check('manifest version 2.2.34',manifest.get('version')=='2.2.34')
-check('v2.2.34 fresh native assets and visible build marker',
-      main.count('file:///android_asset/index.html?build=2234') == 2
+check('manifest version 2.2.35',manifest.get('version')=='2.2.35')
+check('v2.2.35 fresh native assets and visible build marker',
+      main.count('file:///android_asset/index.html?build=2235') == 2
       and 's.setCacheMode(WebSettings.LOAD_NO_CACHE)' in main
-      and 'pitchkind-v2234-ui' in sw
-      and 'App version 2.2.34 · Build 2234' in index)
+      and 'pitchkind-v2235-ui' in sw
+      and 'App version 2.2.35 · Build 2235' in index)
 check('v1.4 marker','approved-app-ui-2026-09-21-v1.4-pitchkind' in cloud and 'approved-app-ui-2026-09-21-v1.4-pitchkind' in txt('app/src/main/assets/app-design-system.css'))
 
 hashes={
@@ -138,9 +139,9 @@ check(
 )
 
 check(
-    'v2.2.34 native User-Agent constant',
+    'v2.2.35 native User-Agent constant',
     'private static final String NATIVE_USER_AGENT' in main
-    and 'GrassrootsClubHub/2.2.34' in main
+    and 'GrassrootsClubHub/2.2.35' in main
     and 'c.setRequestProperty("User-Agent", NATIVE_USER_AGENT);' in main,
 )
 
@@ -211,12 +212,12 @@ check(
 )
 
 check(
-    'v2.2.34 workflow and artifact gate',
-    'Android APK v2.2.34 PitchKind' in apk_workflow
+    'v2.2.35 workflow and artifact gate',
+    'Android APK v2.2.35 PitchKind' in apk_workflow
     and 'verify_v2_2_30_pitchkind_ui.py' in apk_workflow
-    and 'App version 2.2.34' in apk_workflow
-    and 'PitchKind-v2.2.34-debug.apk' in apk_workflow
-    and 'GrassrootsClubHub/2.2.34' in apk_workflow,
+    and 'App version 2.2.35' in apk_workflow
+    and 'PitchKind-v2.2.35-debug.apk' in apk_workflow
+    and 'GrassrootsClubHub/2.2.35' in apk_workflow,
 )
 
 
@@ -389,7 +390,7 @@ check(
     and 'Competition TBC' in app,
 )
 check(
-    'v2.2.34 popup keeps actions with their details and frees the bottom bar',
+    'v2.2.35 popup keeps actions with their details and frees the bottom bar',
     '<h3 id="next-match-opponent">Upcoming match details</h3>' in index
     and "set('next-match-opponent','Upcoming match details')" in app
     and re.search(r'class="next-match-grid next-fixture-time-only".*?id="next-match-when".*?id="next-match-calendar"',index)
@@ -693,15 +694,16 @@ check(
     and 'list_pending_parent_requests' in cloud
     and 'pendingRequests' in app
     and 'pending-parent-details' in app
-    and '<b>Child name</b>${esc(req.child_name' in app
+    and '<b>Child name supplied</b>${esc(req.child_name' in app
     and '<b>Email</b>${esc(req.parent_email' in app,
 )
 check(
-    'coach explicitly allocates player after parent approval',
-    'data-link-parent-player' in app
-    and 'async function approveParent(userId)' in app
-    and 'saveParentPlayerLinks' not in app[app.find('async function approveParent(userId)'):app.find('async function resetParentPin')]
-    and 'The name is identification only. After approval, use Link player' in index,
+    'staff explicitly select an active squad player before atomic approval',
+    'data-review-parent-request-id' in app
+    and 'input type="radio" name="parent-request-player"' in app
+    and 'window.ClubHubCloud.approveParentRequest(requestId,selected)' in app
+    and "rpc('approve_parent_request',{p_request_id:req,p_player_name:player})" in cloud
+    and "rpc('approve_parent',{" not in cloud,
 )
 check(
     'live parent self-signup backend contract is recorded',
@@ -745,11 +747,12 @@ check('parent request coach notification backend is recorded',
     and 'title = Parent access request' in backend_contract)
 check('Club Admin team preview can review pending parent access',
     'id="team-access-settings" data-staff-settings' in index
-    and "const canApprove=pendingRow&&['admin','coach','assistant_coach'].includes(currentRole)" in app
-    and "!preview&&pendingRow" not in app)
+    and "if(!['admin','coach','assistant_coach'].includes(currentRole))return toast('Staff access is required to review parent requests.')" in app
+    and 'data-review-parent-request-id' in app)
 check('parent approval client allows authorised access staff',
-    "if(!['admin','coach','assistant_coach'].includes(currentRole))return toast('Staff access is required to approve parents.')" in app
-    and 'Approve parent' in app)
+    'async function approveParentRequest(requestId,playerName)' in cloud
+    and "rpc('approve_parent_request',{p_request_id:req,p_player_name:player})" in cloud
+    and 'async function submitParentRequestReview(e)' in app)
 check('coach-only player controls stay coach-only',
     'playerAccountsAllowedForAge(ageGroupNumber())&&isCoach()' in app
     and '!preview&&parent&&isCoach()' in app)
@@ -924,7 +927,7 @@ check('v2.2.29 WhatsApp caption carries HTTPS Maps link and key matchday fields'
 check('v2.2.29 share snapshot requires confirmed matchday details',
     'Confirm kick-off, venue and kit before sharing matchday info' in app
     and 'if(!confirmed||!d.time||!d.groundName||!d.address)' in app)
-check('v2.2.34 native share uses void bridge, image plus caption and visible failure feedback',
+check('v2.2.35 native share uses void bridge, image plus caption and visible failure feedback',
     'void shareMatchCard(String dataUrl, String caption)' in main
     and 'Intent.EXTRA_TEXT' in main
     and 'share.setClipData(android.content.ClipData.newUri' in main
@@ -932,7 +935,7 @@ check('v2.2.34 native share uses void bridge, image plus caption and visible fai
     and 'bytes.length > 12_000_000' in main
     and 'Could not prepare matchday sharing' in main
     and 'Could not open sharing' in main)
-check('v2.2.34 JS invokes native share without relying on return conversion',
+check('v2.2.35 JS invokes native share without relying on return conversion',
     'ClubHubNative?.shareMatchCard' in app
     and 'window.ClubHubNative.shareMatchCard(dataUrl,caption);' in app
     and 'const ok=window.ClubHubNative.shareMatchCard' not in app
@@ -943,19 +946,19 @@ check('v2.2.29 matchday helper regression test is wired into CI',
     (root/'tests/test_matchday_share.js').exists()
     and 'node tests/test_matchday_share.js' in apk_workflow)
 
-check('v2.2.34 verified badge clips opaque source corners in UI',
+check('v2.2.35 verified badge clips opaque source corners in UI',
     '.verified-club-badge{object-fit:contain;border-radius:50%;clip-path:circle(50%);overflow:hidden}' in styles)
-check('v2.2.34 share canvas uses origin-safe native asset data for bundled badges',
+check('v2.2.35 share canvas uses origin-safe native asset data for bundled badges',
     'async function loadShareBadgeImage' in app
     and 'ClubHubNative?.assetDataUrl' in app
     and 'String assetDataUrl(String assetName)' in main
     and 'Base64.NO_WRAP' in main)
-check('v2.2.34 verified badge is circularly clipped on shared canvas',
+check('v2.2.35 verified badge is circularly clipped on shared canvas',
     'ctx.arc(x,y,94,0,Math.PI*2);ctx.clip();ctx.drawImage' in app)
-check('v2.2.34 entire matchday share path surfaces JavaScript preparation errors',
+check('v2.2.35 entire matchday share path surfaces JavaScript preparation errors',
     "console.error('matchday share failed',e)" in app
     and 'Could not prepare matchday share. Please try again.' in app)
-check('v2.2.34 JavaScript no longer depends on bridge return conversion',
+check('v2.2.35 JavaScript no longer depends on bridge return conversion',
     'const ok=window.ClubHubNative.shareMatchCard' not in app
     and 'window.ClubHubNative.shareMatchCard(dataUrl,caption);' in app)
 
@@ -972,19 +975,40 @@ check('team labels render spaces and white against a dark surface',
     "function matchTeamLabel(name='')" in app
     and "esc(matchTeamLabel(teamName))" in app
     and '.next-fixture-modal .next-fixture-versus{background:#173b26' in styles)
-check('v2.2.34 matches fixture shows calendar within date and Maps on map',
+check('v2.2.35 matches fixture shows calendar within date and Maps on map',
     re.search(r'id="matches-next-fixture".*?class="fixture-date-with-calendar".*?id="matches-next-when".*?id="matches-next-calendar"',index,re.S)
     and re.search(r'id="matches-next-map-preview".*?<iframe.*?<a class="map-link hidden" id="matches-next-map"',index,re.S)
     and 'id="matches-next-kit-toggle"' not in index
     and 'id="next-match-kit-choice"' in index
     and re.search(r'id="next-match-when".*?id="next-match-calendar"',index,re.S))
-check('v2.2.34 matches team names and actions remain readable',
+check('v2.2.35 matches team names and actions remain readable',
     "set('matches-next-opponent',matchTeamLabel(f.opponent||'TBC'))" in app
     and '.matches-next-fixture .match-team-side .club-detail-link{color:#fff' in styles
     and '.matches-next-actions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px' in styles
     and '@media(max-width:560px){.matches-next-actions{grid-template-columns:repeat(2,minmax(0,1fr))}' in styles
     and 'esc(matchTeamLabel(m.opponent))' in app
     and 'esc(matchTeamLabel(r.team))' in app)
+check('v2.2.35 family request approval is atomic and staff-selected',
+    "rpc('approve_parent_request',{p_request_id:req,p_player_name:player})" in cloud
+    and "rpc('approve_parent',{" not in cloud
+    and 'data-review-parent-request-id' in app
+    and 'input type="radio" name="parent-request-player"' in app
+    and 'saveParentPlayerLinks' not in app[app.find('async function submitParentRequestReview'):app.find('async function openParentLinkDialog')]
+    and '20260924164120 retire_legacy_parent_approval_rpc' in family_contract)
+check('v2.2.35 parent teams are refreshed and selected only from authorised rows',
+    "if(context.profile.role==='parent'){" in cloud
+    and 'visibleTeams=linked' in cloud
+    and 'if(!Array.isArray(linked))' in cloud
+    and "if(!team)throw new Error('This team is not linked to your parent account')" in cloud
+    and "if(!found&&own)found=visibleTeams.find(t=>t.id===own.id)||(role()==='parent'?null:own)" in cloud
+    and 'const keep=select.value||current?.id' in app)
+check('v2.2.35 family UI never presents squad choices to parent',
+    'id="parent-add-child-dialog"' in index
+    and 'id="parent-add-child-name" type="text"' in index
+    and 'listCurrentClubLoginTeams' in cloud
+    and 'activePlayers()' not in app[app.find('async function openParentAddChildDialog'):app.find('async function submitParentAddChild')]
+    and (root/'tests/test_parent_family_access.js').exists()
+    and 'node tests/test_parent_family_access.js' in apk_workflow)
 
 print(f'\n{passed} passed; {len(fail)} failed')
 if fail:

@@ -536,7 +536,7 @@
 <details class="panel settings-accordion" id="team-access-settings" data-staff-settings>
             <summary><span>Team access</span><span class="settings-chevron">⌄</span></summary>
             <div class="settings-accordion-body">
-              <p class="muted">Parents sign up themselves with email and password, choose this club and team, then type their child’s name. The name is identification only. After approval, use Link player to allocate the correct squad player.</p>
+              <p class="muted">Parents sign up with email and password, choose the club/team, then type their child’s name. Staff review each request and deliberately select the correct active squad player before approving it. Siblings are approved one request at a time.</p>
               <div class="team-access-invite-block parent-self-signup-note"><strong>Parent access is request-based</strong><span>Parents do not need an invite code. They use Parent Sign Up on the login screen.</span></div>
               <div class="team-access-invite-block" id="team-player-invite-section">
                 <label>Player profile<select id="team-player-invite-player"><option value="">Choose player…</option></select></label>
@@ -632,7 +632,12 @@
             <div class="settings-accordion-body">
               <div class="panel-heading"><span class="account-role-badge" id="account-role-badge">Club Admin</span></div>
               <p class="muted" id="access-summary">Account access details.</p>
-              <button type="button" class="secondary-button setup-save" id="admin-account-mode-switch" data-admin-only>Switch to Coach view</button>
+             <div class="parent-family-account hidden" id="parent-family-account">
+               <div class="panel-heading"><div><h3>Children & teams</h3><p class="muted" id="parent-family-team-note">Linked team access.</p></div></div>
+               <label>Current team<select id="parent-family-team-select"></select></label>
+               <div class="parent-family-actions"><button type="button" class="secondary-button" id="parent-family-team-switch">Switch team</button><button type="button" class="primary-button" id="parent-family-add-child">Add child or team</button></div>
+             </div>
+             <button type="button" class="secondary-button setup-save" id="admin-account-mode-switch" data-admin-only>Switch to Coach view</button>
             </div>
           </details>
 
@@ -641,7 +646,7 @@
             <div class="gch-about-copy">
               <strong>PitchKind</strong>
               <span>ORGANISE | CONNECT | PLAY</span>
-              <small>App version 2.2.34 · Build 2234</small>
+              <small>App version 2.2.35 · Build 2235</small>
             </div>
           </section>
         </div>
@@ -746,6 +751,27 @@
       <div class="modal-actions"><button type="button" class="primary-button" data-close-dialog>Done</button></div>
     </div>
   </dialog>
+
+  <dialog id="parent-request-review-dialog" class="modal parent-link-modal">
+   <form method="dialog" id="parent-request-review-form">
+     <div class="modal-heading"><div><p class="kicker">Parent access request</p><h3>Verify child</h3></div><button type="button" class="icon-button small" data-close-dialog aria-label="Close">×</button></div>
+     <p class="muted">The parent’s typed name is identification only. Select the correct active squad player yourself before approval.</p>
+     <input type="hidden" id="parent-request-review-id" />
+     <div class="parent-request-summary"><span><b>Parent</b><strong id="parent-request-review-parent">Parent</strong></span><span><b>Submitted child name</b><strong id="parent-request-review-child">—</strong></span><span><b>Email</b><strong id="parent-request-review-email">—</strong></span></div>
+     <fieldset class="parent-request-player-fieldset"><legend>Choose the correct player</legend><div class="parent-link-player-list" id="parent-request-player-list"></div></fieldset>
+     <div class="modal-actions"><button type="button" class="secondary-button" data-close-dialog>Cancel</button><button type="submit" class="primary-button">Approve & link</button></div>
+   </form>
+ </dialog>
+
+ <dialog id="parent-add-child-dialog" class="modal parent-link-modal">
+   <form method="dialog" id="parent-add-child-form">
+     <div class="modal-heading"><div><p class="kicker">Parent account</p><h3>Add child or team</h3></div><button type="button" class="icon-button small" data-close-dialog aria-label="Close">×</button></div>
+     <p class="muted">Choose the team and type your child’s name. Player/squad names are never shown here. Club staff will verify the request.</p>
+     <label>Team<select id="parent-add-child-team"><option value="">Choose team…</option></select></label>
+     <label>Child’s name<input id="parent-add-child-name" type="text" maxlength="80" autocomplete="off" placeholder="Type child’s name" /></label>
+     <div class="modal-actions"><button type="button" class="secondary-button" data-close-dialog>Cancel</button><button type="submit" class="primary-button">Send request</button></div>
+   </form>
+ </dialog>
 
   <dialog id="parent-link-dialog" class="modal parent-link-modal">
     <form method="dialog" id="parent-link-form">

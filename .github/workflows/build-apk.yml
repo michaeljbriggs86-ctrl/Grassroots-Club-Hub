@@ -1,4 +1,4 @@
-name: Android APK v2.2.34 PitchKind
+name: Android APK v2.2.35 PitchKind
 
 on:
   workflow_dispatch:
@@ -34,6 +34,7 @@ jobs:
           node --check app/src/main/assets/static-feed-overlay.js
           node tests/test_fixture_ground_parser.js
           node tests/test_matchday_share.js
+          node tests/test_parent_family_access.js
 
       - name: Set up Java 17
         uses: actions/setup-java@v4
@@ -111,7 +112,7 @@ jobs:
           python verification/verify_club_logo_quality.py --asset "$RUNNER_TEMP/shooters-hill-logo.png"
           test "$(sha256sum "$RUNNER_TEMP/shooters-hill-logo.png" | awk '{print $1}')" = "ea3b232a45b197da47d76ffc4bc38440eef9a096a9510af5a988aabc3df71bce"
           unzip -p "$APK" assets/index.html | grep -q '<title>PitchKind</title>'
-          unzip -p "$APK" assets/index.html | grep -q 'App version 2.2.34'
+          unzip -p "$APK" assets/index.html | grep -q 'App version 2.2.35'
           unzip -p "$APK" assets/app.js > "$RUNNER_TEMP/pitchkind-apk-app.js"
           unzip -p "$APK" assets/cloud.js > "$RUNNER_TEMP/pitchkind-apk-cloud.js"
           unzip -p "$APK" assets/styles.css > "$RUNNER_TEMP/pitchkind-apk-styles.css"
@@ -161,7 +162,13 @@ jobs:
           unzip -p "$APK" assets/index.html | grep -Fq 'id="matches-next-details">Match details'
           grep -Fq "function reviewParentAccessNotification(notificationId)" "$RUNNER_TEMP/pitchkind-apk-app.js"
           grep -Fq "data-review-parent-request" "$RUNNER_TEMP/pitchkind-apk-app.js"
-          grep -Fq "Approve parent" "$RUNNER_TEMP/pitchkind-apk-app.js"
+          grep -Fq "approve_parent_request" "$RUNNER_TEMP/pitchkind-apk-cloud.js"
+          grep -Fq "switchParentTeam" "$RUNNER_TEMP/pitchkind-apk-cloud.js"
+          grep -Fq "data-review-parent-request-id" "$RUNNER_TEMP/pitchkind-apk-app.js"
+          unzip -p "$APK" assets/index.html | grep -Fq 'id="parent-request-review-dialog"'
+          unzip -p "$APK" assets/index.html | grep -Fq 'id="parent-family-account"'
+          unzip -p "$APK" assets/index.html | grep -Fq 'id="parent-add-child-dialog"'
+          ! grep -Fq "rpc('approve_parent'," "$RUNNER_TEMP/pitchkind-apk-cloud.js"
           grep -Fq 'v2.2.11 — full-screen Match played flow' "$RUNNER_TEMP/pitchkind-apk-styles.css"
           grep -Fq 'v2.2.18 — explicit squad pages, tactics-first layout and settings cleanup' "$RUNNER_TEMP/pitchkind-apk-styles.css"
           grep -Fq 'v2.2.24 — pending parent review alignment and approval UX' "$RUNNER_TEMP/pitchkind-apk-styles.css"
@@ -174,7 +181,7 @@ jobs:
           rm -rf "$DEX_DIR"
           mkdir -p "$DEX_DIR"
           unzip -qq "$APK" 'classes*.dex' -d "$DEX_DIR"
-          grep -aR -Fq 'GrassrootsClubHub/2.2.34' "$DEX_DIR"
+          grep -aR -Fq 'GrassrootsClubHub/2.2.35' "$DEX_DIR"
           grep -aR -Fq 'assetDataUrl' "$DEX_DIR"
           grep -aR -Fq 'Could not prepare matchday sharing' "$DEX_DIR"
           grep -aR -Fq 'PitchKind matchday info' "$DEX_DIR"
@@ -182,15 +189,15 @@ jobs:
           ! unzip -p "$APK" assets/index.html | grep -q 'CONNECT • ORGANISE • GROW THE GAME'
           ! unzip -p "$APK" assets/index.html | grep -q 'More Than A Game'
           mkdir -p dist
-          cp "$APK" dist/PitchKind-v2.2.34-debug.apk
-          sha256sum dist/PitchKind-v2.2.34-debug.apk > dist/PitchKind-v2.2.34-debug.apk.sha256
+          cp "$APK" dist/PitchKind-v2.2.35-debug.apk
+          sha256sum dist/PitchKind-v2.2.35-debug.apk > dist/PitchKind-v2.2.35-debug.apk.sha256
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: PitchKind-v2.2.34-debug
+          name: PitchKind-v2.2.35-debug
           path: |
-            dist/PitchKind-v2.2.34-debug.apk
-            dist/PitchKind-v2.2.34-debug.apk.sha256
+            dist/PitchKind-v2.2.35-debug.apk
+            dist/PitchKind-v2.2.35-debug.apk.sha256
           if-no-files-found: error
           retention-days: 14
