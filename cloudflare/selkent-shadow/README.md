@@ -62,10 +62,29 @@ contains `shadow/latest.json` with matching `canonical_feed_last_updated`,
 `resultsTable/4249` and each known fixture week. Do not treat a successful
 local test or a pushed commit as proof that the production cron ran.
 
+## Verify private R2 snapshots
+
+Push the verifier source to start **Verify private Selkent shadow snapshot**
+once, or run it manually under GitHub Actions. It uses the existing Cloudflare
+repository secrets to download `shadow/latest.json` to the job's temporary
+directory with `wrangler r2 object get --remote`, checks that it was collected
+within two hours, checks every named payload and its count, and compares exact
+targets to `data/results.json` when their feed timestamps match. The job prints
+only counts and timestamps; it does not upload the private HTML as an artifact.
+On Sundays a public feed may update after the private snapshot, so a newer feed
+defers the exact target-list comparison without hiding a stale or incomplete
+snapshot. The job fails if any required structural or freshness check fails.
+
+It also runs at :45 after the regular six-hour private collector and at :50
+each hour on Sunday 08:00–19:59 UTC. GitHub scheduled workflows may start
+later than their cron time. A successful scheduled verification demonstrates
+that a fresh private snapshot existed at that time; it does not establish
+parser parity with the public feed or switch website data sources.
+
 ## Graduation gates
 
-1. Capture multiple successful scheduled runs and inspect failures or
-   provider blocking without changing the live feed.
+1. Capture multiple successful scheduled collections and snapshot verification
+   runs; inspect failures or provider blocking without changing the live feed.
 2. Port the verified Python parsers and public-age privacy checks to the
    Cloudflare pipeline. Compare normalized fixture, result and standings
    output against the GitHub feed across all age groups and real changes.
