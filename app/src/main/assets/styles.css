@@ -876,6 +876,14 @@ html[data-theme="dark"] .league-table th,
 html[data-theme="dark"] .league-table td{color:#e6efe9!important;border-color:#2f3d33!important}
 html[data-theme="dark"] .competition-games-table thead,
 html[data-theme="dark"] .league-table thead{background:#111914!important}
+html[data-theme="dark"] .friendly-section{background:linear-gradient(135deg,#17241b,#121b15)!important;border-color:#344239!important;color:#f2f7f3!important}
+html[data-theme="dark"] .competition-games-table th{background:#1e2a22!important;color:#e6efe9!important}
+html[data-theme="dark"] .competition-games-table tr.result-W td{background:#16351f!important}
+html[data-theme="dark"] .competition-games-table tr.result-D td{background:#26302a!important}
+html[data-theme="dark"] .competition-games-table tr.result-L td{background:#3a1d1a!important}
+html[data-theme="dark"] .competition-games-table tr.status-postponed td{background:#372f16!important}
+html[data-theme="dark"] .competition-games-table tr.status-abandoned td{background:#372319!important}
+html[data-theme="dark"] .competition-games-table tr.status-scheduled td{background:#202a23!important}
 
 /* Universal Core v1 */
 :root{--club-secondary:#fff}.club-logo-wrap.platform-club-placeholder{background:#fff;border-color:rgba(255,255,255,.82)}.club-logo-wrap.platform-club-placeholder::after,.club-logo-wrap.generic-club-mark::after{content:none!important}.quick-test-club-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}@media(max-width:430px){.quick-test-club-grid{grid-template-columns:1fr}}
