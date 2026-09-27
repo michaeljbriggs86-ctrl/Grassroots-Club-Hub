@@ -165,12 +165,12 @@
             <button type="button" class="secondary-button compact hidden" id="matchday-notify-squad">Notify selected squad</button>
             <button type="button" class="primary-button compact" id="matchday-open-tactics">Open squad & tactics</button>
           </div>
-          <div class="matchday-dashboard-note">
-            <div class="panel-heading"><div><strong>Private coaching note</strong><span class="helper">Coaching staff only</span></div></div>
+          <details class="matchday-dashboard-note">
+            <summary>Private coaching note</summary>
             <textarea id="matchday-dashboard-note-input" rows="3" maxlength="4000" placeholder="Match plan, reminders or coaching focus..."></textarea>
             <p class="coach-note-readonly hidden" id="matchday-dashboard-note-readonly"></p>
             <button type="button" class="secondary-button compact" id="save-matchday-dashboard-note">Save note</button>
-          </div>
+          </details>
         </section>
 
         <details class="panel home-season-details" id="home-player-stats">
@@ -249,8 +249,7 @@
           <div class="panel-heading"><div><p class="kicker">Next fixture</p><h3 id="matches-next-opponent">TBC</h3></div></div>
           <div class="match-versus next-fixture-versus" id="matches-next-versus"></div>
           <div class="next-match-grid matches-fixture-time-row"><div class="fixture-date-with-calendar"><div class="fixture-date-copy"><span>Date / time</span><strong id="matches-next-when">Date / kick-off TBC</strong></div><button type="button" class="text-button compact hidden" id="matches-next-calendar">Add to calendar</button></div><div><span>Competition</span><strong id="matches-next-venue">Venue TBC</strong></div></div>
-          <div class="match-venue-card next-fixture-venue"><div><span>Venue</span><strong id="matches-next-ground">Ground TBC</strong><small id="matches-next-address">Address TBC</small></div></div>
-          <div class="fixture-map-preview hidden" id="matches-next-map-preview"><iframe id="matches-next-map-frame" title="Next fixture venue map" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe><a class="map-link hidden" id="matches-next-map" href="#" aria-label="Open next fixture venue in Maps">Open in Maps</a></div>
+          <div class="match-venue-card next-fixture-venue"><div><span>Venue</span><strong id="matches-next-ground">Ground TBC</strong><small id="matches-next-address">Address TBC</small></div><a class="map-link hidden" id="matches-next-map" href="#" aria-label="Open next fixture venue in Maps">Open in Maps</a></div>
           <div class="kit-clash-warning hidden" id="matches-next-kit-warning"></div>
           <div class="next-match-kits hidden"><span>Match details</span><strong id="matches-next-kits">Kit colours and away details will appear when confirmed.</strong></div>
           <div class="next-match-links matches-next-actions"><button type="button" class="secondary-button compact" id="matches-next-details">Match details</button><button type="button" class="secondary-button compact hidden" id="matches-next-share">Save matchday image</button><button type="button" class="secondary-button compact hidden" id="matches-next-copy">Copy match details</button><button type="button" class="primary-button compact match-played-action hidden" id="matches-next-played" data-requires-edit>Match played</button></div>

@@ -1205,7 +1205,22 @@ function saveSelkentSettings(){
 function furtherFixtureCardHtml(f,index){
   const d=resolvedFixture(f),confirmed=fixtureDetailsConfirmed(f),ctx=fixtureOverviewContext(d),warning=kitWarningHtml(ctx),toggle=kitToggleHtml(f,ctx),mapFrame=confirmed&&ctx.mapEmbedHref?`<div class="fixture-map-preview further-fixture-map"><iframe title="${esc(f.opponent||'Fixture')} venue map" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="${esc(ctx.mapEmbedHref)}"></iframe></div>`:'';
   const ground=confirmed?ctx.ground:'Awaiting confirmation',address=confirmed?ctx.address:'Club staff will confirm the venue.';
-  return `<article class="further-fixture-card"><div class="further-fixture-head"><div><span class="synced-fixture-date">${f.date?formatDate(f.date):'Date TBC'}${confirmed&&d.time?' · '+esc(d.time):''}</span><strong>${esc(fixtureCompetitionLabel(f))}</strong></div></div><div class="match-versus">${matchTeamSideHtml('Home',ctx.homeTeam,ctx.homeKit)}<div class="match-versus-mark">V</div>${matchTeamSideHtml('Away',ctx.awayTeam,ctx.awayKit)}</div>${toggle}<div class="match-venue-card"><div><span>Venue</span><strong>${esc(ground)}</strong><small>${esc(address)}</small></div>${confirmed&&ctx.mapHref?`<a class="map-link" href="${esc(ctx.mapHref)}">Open in Maps</a>`:''}</div>${mapFrame}${warning}</article>`;
+  return `<article class="further-fixture-card">
+    <div class="further-fixture-head"><div>
+      <span class="synced-fixture-date">${f.date?formatDate(f.date):'Date TBC'}${confirmed&&d.time?' · '+esc(d.time):''}</span>
+      <strong>${esc(ctx.homeTeam)} v ${esc(ctx.awayTeam)}</strong>
+      <small>${esc(fixtureCompetitionLabel(f))} · ${esc(ground)}</small>
+    </div></div>
+    <div class="further-fixture-quick">
+      <details class="further-fixture-details"><summary>Match details</summary><div class="further-fixture-body">
+        <div class="match-versus">${matchTeamSideHtml('Home',ctx.homeTeam,ctx.homeKit)}<div class="match-versus-mark">V</div>${matchTeamSideHtml('Away',ctx.awayTeam,ctx.awayKit)}</div>
+        ${toggle}<div class="match-venue-card"><div><span>Venue</span><strong>${esc(ground)}</strong><small>${esc(address)}</small></div></div>
+        ${mapFrame}
+      </div></details>
+      ${confirmed&&ctx.mapHref?`<a class="map-link" href="${esc(ctx.mapHref)}">Open in Maps</a>`:''}
+    </div>
+    ${warning}
+  </article>`;
 }
 
 function renderSelkentFixtures(){
