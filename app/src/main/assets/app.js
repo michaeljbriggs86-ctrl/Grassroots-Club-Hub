@@ -1934,7 +1934,7 @@ async function refreshMatchAvailability(quiet=true){
     ]);
     __parentPlayerLinks=links||[];
   }catch{if(!quiet)toast('Availability could not be refreshed');return;}
-  const count=document.getElementById('match-availability-count');if(count)count.textContent=`${__availabilityRows.length} repl${__availabilityRows.length===1?'y':'ies'}`;
+  const count=document.getElementById('match-availability-count');if(count)count.textContent=`${__availabilityRows.length} update${__availabilityRows.length===1?'':'s'}`;
   if(['parent','player'].includes(currentRole)){
     const select=document.getElementById('availability-player'),ownId=window.ClubHubCloud?.session?.user?.id||'';
     const mineLinks=currentRole==='player'?links:links.filter(x=>x.parent_user_id===ownId);
@@ -1943,10 +1943,12 @@ async function refreshMatchAvailability(quiet=true){
     document.querySelectorAll('[data-availability-status]').forEach(b=>{b.classList.toggle('selected',b.dataset.availabilityStatus===current?.status);b.disabled=!mineLinks.length;});
   }
   if(isCoach()||isAdminTeamPreviewMode()){
+    const canChange=isCoach()&&!!window.ClubHubCloud?.canEdit?.();
     const byStatus={available:[],unsure:[],unavailable:[]};__availabilityRows.forEach(r=>(byStatus[r.status]||byStatus.unsure).push(r));
     const responded=new Set(__availabilityRows.map(r=>selkentNorm(r.player_name))),awaiting=activePlayers().filter(p=>!responded.has(selkentNorm(p.name)));
-    const render=(label,key)=>`<details class="availability-summary-group ${key}" data-availability-group="${key}"><summary>${label} · ${byStatus[key].length}</summary><div>${byStatus[key].map(r=>{const p=activePlayers().find(x=>x.name===r.player_name);return `<span>${p?miniJerseyHTML(p.number,p.role,'compact'):''}${esc(r.player_name||'Player')}</span>`;}).join('')||'<em>None</em>'}</div></details>`;
-    const awaitingHtml=`<details class="availability-summary-group awaiting" data-availability-group="awaiting"><summary>Awaiting response · ${awaiting.length}</summary><div>${awaiting.map(p=>`<span>${miniJerseyHTML(p.number,p.role,'compact')}${esc(p.name)}</span>`).join('')||'<em>None</em>'}</div></details>`;
+    const playerRow=(p,status,source)=>`<div class="availability-player-row"><span>${miniJerseyHTML(p.number,p.role,'compact')}<span>${esc(p.name)}${source==='coach'?'<small>Coach update</small>':''}</span></span>${canChange?`<select data-coach-availability-player="${esc(p.name)}" aria-label="Availability for ${esc(p.name)}"><option value="" ${status?'':'selected'} disabled>Awaiting reply</option><option value="available" ${status==='available'?'selected':''}>Available</option><option value="unsure" ${status==='unsure'?'selected':''}>Unsure</option><option value="unavailable" ${status==='unavailable'?'selected':''}>Unavailable</option></select>`:''}</div>`;
+    const render=(label,key)=>`<details class="availability-summary-group ${key}" data-availability-group="${key}"><summary>${label} · ${byStatus[key].length}</summary><div>${byStatus[key].map(r=>{const p=activePlayers().find(x=>selkentNorm(x.name)===selkentNorm(r.player_name));return p?playerRow(p,r.status,r.response_source):'';}).join('')||'<em>None</em>'}</div></details>`;
+    const awaitingHtml=`<details class="availability-summary-group awaiting" data-availability-group="awaiting"><summary>Awaiting response · ${awaiting.length}</summary><div>${awaiting.map(p=>playerRow(p,'','')).join('')||'<em>None</em>'}</div></details>`;
     if(coachSummary){const open=new Set([...coachSummary.querySelectorAll('details[open]')].map(el=>el.dataset.availabilityGroup));coachSummary.innerHTML=render('Available','available')+render('Unsure','unsure')+render('Unavailable','unavailable')+awaitingHtml;coachSummary.querySelectorAll('details').forEach(el=>{el.open=open.has(el.dataset.availabilityGroup);});}
     maybeAutoPrepareMatchdayFromAvailability();renderTacticsBoard();
   }
@@ -1955,6 +1957,19 @@ async function refreshMatchAvailability(quiet=true){
 async function saveParentAvailability(status){
   if(!['parent','player'].includes(currentRole)||!__availabilityFixture)return;const player=document.getElementById('availability-player')?.value||'';if(!player)return toast('No player is linked to this account');
   try{await window.ClubHubCloud.saveMatchAvailability({fixtureKey:__availabilityFixture,playerName:player,status});toast('Availability saved');await refreshMatchAvailability(false);}catch(err){alert(err.message||err);}
+}
+async function saveCoachAvailability(select){
+  if(!isCoach()||!window.ClubHubCloud?.canEdit?.()||!__availabilityFixture)return;
+  const player=activePlayers().find(p=>p.name===select.dataset.coachAvailabilityPlayer);
+  if(!player)return toast('Player is no longer in the active squad');
+  const status=select.value;if(!['available','unsure','unavailable'].includes(status))return;
+  const before=__availabilityRows.find(r=>selkentNorm(r.player_name)===selkentNorm(player.name))?.status||'awaiting';
+  select.disabled=true;
+  try{
+    await window.ClubHubCloud.saveCoachMatchAvailability({fixtureKey:__availabilityFixture,playerName:player.name,status});
+    auditEvent('availability_updated','player',player.name,`Updated ${player.name} availability: ${before} → ${status}`,before,status);
+    toast('Player availability updated');await refreshMatchAvailability(false);
+  }catch(err){select.disabled=false;toast(err.message||'Could not update availability');await refreshMatchAvailability(true);}
 }
 
 async function sendAvailabilityReminder(){if(!requireCoach()||!__availabilityFixture)return;try{const sent=await window.ClubHubCloud.sendAvailabilityReminder(__availabilityFixture);toast(sent?`Reminder sent to ${sent} account${sent===1?'':'s'}`:'Everyone linked has responded');await refreshNotifications(false);}catch(err){alert(err.message||err);}}
@@ -4020,6 +4035,7 @@ document.getElementById('tactics-formation')?.addEventListener('change',e=>{if(!
 document.getElementById('fixture-report-issue')?.addEventListener('click',()=>setFixtureAcknowledgement('issue'));
 document.querySelectorAll('[data-availability-status]').forEach(b=>b.addEventListener('click',()=>saveParentAvailability(b.dataset.availabilityStatus)));
 document.getElementById('availability-player')?.addEventListener('change',()=>{if(currentRole!=='parent')return;const name=document.getElementById('availability-player')?.value||'';const row=__availabilityRows.find(r=>selkentNorm(r.player_name)===selkentNorm(name));document.querySelectorAll('[data-availability-status]').forEach(b=>b.classList.toggle('selected',b.dataset.availabilityStatus===row?.status));});
+document.getElementById('coach-availability-summary')?.addEventListener('change',e=>{const select=e.target.closest('[data-coach-availability-player]');if(select)saveCoachAvailability(select);});
 document.getElementById('admin-access-filter')?.addEventListener('change',renderAdminAccessManagement);
 document.getElementById('announcement-audience')?.addEventListener('change',populateAnnouncementTargets);
 document.getElementById('announcement-send')?.addEventListener('click',publishAnnouncement);

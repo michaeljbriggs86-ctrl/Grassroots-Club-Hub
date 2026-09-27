@@ -618,7 +618,7 @@
   async function listMatchAvailability(fixtureKey){
     if(testModeActive())return [];
     if(!activeTeam||!fixtureKey)return [];
-    const q=`/rest/v1/match_availability?select=id,team_id,fixture_key,player_name,status,updated_at&team_id=eq.${encodeURIComponent(activeTeam.id)}&fixture_key=eq.${encodeURIComponent(fixtureKey)}&order=updated_at.desc`;
+    const q=`/rest/v1/match_availability?select=id,team_id,fixture_key,player_name,status,response_source,updated_at&team_id=eq.${encodeURIComponent(activeTeam.id)}&fixture_key=eq.${encodeURIComponent(fixtureKey)}&order=updated_at.desc`;
     const {data}=await request(q);return Array.isArray(data)?data:[];
   }
   async function saveMatchAvailability({fixtureKey,playerName,status}={}){
@@ -628,6 +628,15 @@
     const name=String(playerName||'').trim().slice(0,80);if(!name)throw new Error('No linked player was selected');
     const links=r==='player'?await listPlayerAccountLinks(session.user.id):await listParentPlayerLinks(session.user.id);
     if(!links.some(x=>x.player_name===name))throw new Error('This player profile is not linked to this account');
+    const payload={team_id:activeTeam.id,fixture_key:String(fixtureKey),parent_user_id:session.user.id,player_name:name,status,updated_at:new Date().toISOString()};
+    const {data}=await request('/rest/v1/match_availability?on_conflict=team_id,fixture_key,player_name',{method:'POST',body:payload,headers:{Prefer:'resolution=merge-duplicates,return=representation'}});
+    return Array.isArray(data)?data[0]:data;
+  }
+  async function saveCoachMatchAvailability({fixtureKey,playerName,status}={}){
+    if(!canEdit())throw new Error('Coach access required');
+    if(!activeTeam||!session?.user?.id)throw new Error('Team session is not ready');
+    if(!fixtureKey||!['available','unavailable','unsure'].includes(status))throw new Error('Choose a player status');
+    const name=String(playerName||'').trim().slice(0,80);if(!name)throw new Error('Choose a player');
     const payload={team_id:activeTeam.id,fixture_key:String(fixtureKey),parent_user_id:session.user.id,player_name:name,status,updated_at:new Date().toISOString()};
     const {data}=await request('/rest/v1/match_availability?on_conflict=team_id,fixture_key,player_name',{method:'POST',body:payload,headers:{Prefer:'resolution=merge-duplicates,return=representation'}});
     return Array.isArray(data)?data[0]:data;
@@ -1049,7 +1058,7 @@
 
   window.ClubHubCloud={
     configured,bootstrap,loadInitialState,queueStateSave,pullLatest,startPolling,
-    role,canEdit,canAdmin,assignedTeam,currentTeam,coachTeam,hasDualCoachAccess,visibleTeamList,getClubConfiguration,listLoginClubs,listLoginTeams,listCurrentClubLoginTeams,createInvite,requestParentAccess,listPendingParentRequests,listTeamMembers,listClubCoaches,listClubAccessAccounts,removeClubCoach,listPublishedClubResults,listParentPlayerLinks,saveParentPlayerLinks,listPlayerAccountLinks,listMatchAvailability,saveMatchAvailability,listSelkentTeamDirectory,syncSelkentTeamDirectory,getCoachMatchNote,saveCoachMatchNote,listAnnouncements,createAnnouncement,markAnnouncementRead,deleteAnnouncement,listMatchAttendance,saveMatchAttendance,getAvailabilitySettings,setAvailabilityDeadline,sendAvailabilityReminder,listNotifications,markNotificationRead,notifyFixtureChange,notifySelectedSquad,notifyMatchReport,notifyMatchReopened,listPlayerAppearanceStats,recordAuditEvent,listAuditHistory,listSeasonArchives,getSeasonArchive,archiveCurrentSeason,rolloverClubSeason,resetParentPin,setAccessPin,approveParentRequest,removeTeamMember,syncTeamDirectory,switchAdminTeam,switchParentTeam,getClubOverview,signOut,handleAuthCallback,listMessageContacts,listClubMessages,sendClubMessage,markClubMessagesRead,getClubComplianceStatus,setDisputeReviewers,setClubSafeguardingContacts,getConcernRouting,raiseClubConcern,listGeneralDisputes,listDisputeMessages,upsertU11SafeguardingInfo,exportU11SafeguardingPack,listSafeguardingExportAudit,requestClubCancellation,cancelClubCancellation,
+    role,canEdit,canAdmin,assignedTeam,currentTeam,coachTeam,hasDualCoachAccess,visibleTeamList,getClubConfiguration,listLoginClubs,listLoginTeams,listCurrentClubLoginTeams,createInvite,requestParentAccess,listPendingParentRequests,listTeamMembers,listClubCoaches,listClubAccessAccounts,removeClubCoach,listPublishedClubResults,listParentPlayerLinks,saveParentPlayerLinks,listPlayerAccountLinks,listMatchAvailability,saveMatchAvailability,saveCoachMatchAvailability,listSelkentTeamDirectory,syncSelkentTeamDirectory,getCoachMatchNote,saveCoachMatchNote,listAnnouncements,createAnnouncement,markAnnouncementRead,deleteAnnouncement,listMatchAttendance,saveMatchAttendance,getAvailabilitySettings,setAvailabilityDeadline,sendAvailabilityReminder,listNotifications,markNotificationRead,notifyFixtureChange,notifySelectedSquad,notifyMatchReport,notifyMatchReopened,listPlayerAppearanceStats,recordAuditEvent,listAuditHistory,listSeasonArchives,getSeasonArchive,archiveCurrentSeason,rolloverClubSeason,resetParentPin,setAccessPin,approveParentRequest,removeTeamMember,syncTeamDirectory,switchAdminTeam,switchParentTeam,getClubOverview,signOut,handleAuthCallback,listMessageContacts,listClubMessages,sendClubMessage,markClubMessagesRead,getClubComplianceStatus,setDisputeReviewers,setClubSafeguardingContacts,getConcernRouting,raiseClubConcern,listGeneralDisputes,listDisputeMessages,upsertU11SafeguardingInfo,exportU11SafeguardingPack,listSafeguardingExportAudit,requestClubCancellation,cancelClubCancellation,
     updateCloudPanel,
     get context(){return context;},get configuration(){return clubConfiguration;},get session(){return session;},get revision(){return activeRevision;},get testMode(){return testModeActive();}
   };
