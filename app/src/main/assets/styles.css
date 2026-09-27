@@ -1489,6 +1489,13 @@ html[data-theme="dark"] .further-fixture-head small{color:#b9c7be}
 .admin-fixture-row .admin-fixture-main small,.admin-fixture-row .admin-fixture-date span{color:#56685c}
 .admin-fixture-row .fixture-ack-pill{align-self:flex-start}
 .admin-health-group,.admin-age-group,.admin-dashboard-summary .admin-stat{color:#14271b}
+.admin-recent-results-panel{margin-bottom:14px}
+.admin-recent-results-list{display:grid;gap:7px}
+.admin-recent-result{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:3px 12px;padding:9px 11px;border:1px solid #dce8df;border-radius:12px;background:#fff;color:#14271b}
+.admin-recent-result>span{grid-column:1/-1;font-size:10px;font-weight:850;color:#385643}
+.admin-recent-result>strong{min-width:0;font-size:12px;line-height:1.35;overflow-wrap:anywhere}
+.admin-recent-result b{color:#075d31;white-space:nowrap}
+.admin-recent-result small{font-size:10px;font-weight:750;color:#49604e;text-align:right}
 @media(max-width:560px){
   .admin-fixture-centre{padding:12px}
   .admin-fixture-row{grid-template-columns:74px minmax(0,1fr);gap:8px;padding:9px}
@@ -1497,6 +1504,7 @@ html[data-theme="dark"] .further-fixture-head small{color:#b9c7be}
   .admin-team-row-stats{flex-wrap:wrap;justify-content:flex-end;max-width:140px;line-height:1.2}
 }
 html[data-theme="dark"] .admin-fixture-centre,
+html[data-theme="dark"] .admin-recent-result,
 html[data-theme="dark"] .admin-health-group,
 html[data-theme="dark"] .admin-age-group,
 html[data-theme="dark"] .admin-dashboard-summary .admin-stat,
@@ -1521,6 +1529,9 @@ html[data-theme="dark"] .admin-access-filter select{background:#101713!important
 html[data-theme="dark"] .admin-team-row-stats b,
 html[data-theme="dark"] .admin-team-row-title strong,
 html[data-theme="dark"] .admin-age-group>summary strong{color:#f2f7f3!important}
+html[data-theme="dark"] .admin-recent-result>span,
+html[data-theme="dark"] .admin-recent-result small{color:#c0d0c3!important}
+html[data-theme="dark"] .admin-recent-result b{color:#a7eab2!important}
 
 /* Club Admin dark mode: cover the nested controls and badges left pale by base styles. */
 html[data-theme="dark"] body.admin-club-mode .admin-age-group[open]>summary,

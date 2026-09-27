@@ -438,7 +438,8 @@
         <section class="club-results-panel hidden" id="club-results-panel">
           <section class="panel club-results-browser">
             <div class="panel-heading"><div><p class="kicker">Results browser</p><h3>Club results</h3></div></div>
-            <p class="muted">Choose an age group to browse results. Club Admin sees the full internal played-match history; Coach views show only results published by Selkent.</p>
+            <p class="muted">Club Admin sees team-recorded matches and Selkent's published league results. Coach views show published results for their assigned team.</p>
+            <p class="muted" id="club-results-source-status" role="status"></p>
             <label class="club-results-age-label">Age group<select id="club-results-age"></select></label>
             <div id="club-results-list" class="club-results-list"></div>
             <div class="club-results-pager">
@@ -459,10 +460,17 @@
               <article class="admin-stat"><span>Teams</span><strong id="admin-team-count">0</strong></article>
               <article class="admin-stat"><span>Coaching staff</span><strong id="admin-coach-count">0</strong></article>
               <article class="admin-stat"><span>Fixtures</span><strong id="admin-fixtures-count">0</strong></article>
+              <article class="admin-stat"><span>Results</span><strong id="admin-results-count">0</strong></article>
               <article class="admin-stat"><span>Squad alerts</span><strong id="admin-squad-alert-count">0</strong></article>
               <article class="admin-stat"><span>Attention</span><strong id="admin-alert-count">0</strong></article>
             </div>
             <p class="muted admin-overview-meta" id="admin-overview-meta"></p>
+          </section>
+
+          <section class="panel admin-recent-results-panel">
+            <div class="panel-heading"><div><p class="kicker">Recent matches</p><h3>Latest club results</h3></div></div>
+            <p class="muted" id="admin-results-source-status" role="status"></p>
+            <div class="admin-recent-results-list" id="admin-recent-results"></div>
           </section>
 
           <section class="panel admin-announcement-centre">
