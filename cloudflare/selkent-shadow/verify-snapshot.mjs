@@ -24,7 +24,12 @@ export function verifySnapshot(snapshot, currentFeed, now = Date.now()) {
   const collectedAt = timestamp(snapshot.collected_at, 'collected_at', now);
   const scheduledAt = timestamp(snapshot.scheduled_at, 'scheduled_at', now);
   timestamp(snapshot.canonical_feed_last_updated, 'canonical_feed_last_updated', now);
-  if (now - collectedAt > MAX_AGE_MS) throw new Error('Private shadow snapshot is stale');
+  if (now - collectedAt > MAX_AGE_MS) {
+    // Safe diagnostic metadata only; the snapshot's provider HTML stays private.
+    throw new Error(`Private shadow snapshot is stale: collected_at=${snapshot.collected_at}, ` +
+      `scheduled_at=${snapshot.scheduled_at}, age_minutes=${Math.floor((now - collectedAt) / 60_000)}, ` +
+      `max_age_minutes=${MAX_AGE_MS / 60_000}`);
+  }
   if (collectedAt + MAX_CLOCK_SKEW_MS < scheduledAt) {
     throw new Error('Private shadow snapshot predates its scheduled event');
   }

@@ -51,7 +51,15 @@ test('fails on a missing provider payload even if the count claim is unchanged',
 test('fails on a stale private snapshot', () => {
   const value = snapshot();
   value.collected_at = '2026-09-27T12:59:00Z';
-  assert.throws(() => verifySnapshot(value, FEED, NOW), /snapshot is stale/);
+  assert.throws(() => verifySnapshot(value, FEED, NOW), error => {
+    assert.match(error.message, /snapshot is stale/);
+    assert.match(error.message, /collected_at=2026-09-27T12:59:00Z/);
+    assert.match(error.message, /scheduled_at=2026-09-27T14:30:00Z/);
+    assert.match(error.message, /age_minutes=121/);
+    assert.match(error.message, /max_age_minutes=120/);
+    assert.ok(!error.message.includes('fixtureContainer'));
+    return true;
+  });
 });
 
 test('does not compare target sets against a newer Sunday feed', () => {

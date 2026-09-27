@@ -74,6 +74,9 @@ only counts and timestamps; it does not upload the private HTML as an artifact.
 On Sundays a public feed may update after the private snapshot, so a newer feed
 defers the exact target-list comparison without hiding a stale or incomplete
 snapshot. The job fails if any required structural or freshness check fails.
+For a stale snapshot the failure prints only the collection and scheduled
+timestamps and its age in minutes, so the failure can be compared with the
+Worker's Cron Events without exposing provider HTML.
 
 It also runs at :45 after the regular six-hour private collector and at :50
 each hour on Sunday 08:00–19:59 UTC. GitHub scheduled workflows may start
