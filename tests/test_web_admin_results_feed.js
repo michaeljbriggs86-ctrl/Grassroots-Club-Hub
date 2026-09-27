@@ -11,9 +11,9 @@ const internalAdminClubResults = new Function(`${internalBody}\nreturn internalA
 const elements = new Map(['admin-recent-results','admin-results-count','admin-results-breakdown','admin-results-source-status'].map(id => [id,{innerHTML:'',textContent:''}]));
 const document = {getElementById:id => elements.get(id)};
 const helpers = src.slice(src.indexOf('function verifiedClubResultsFeed(feed){'), src.indexOf('function nextWeekendDates(){'));
-const {verifiedClubResultsFeed,publishedClubTeamData,clubResultRows,renderAdminRecentResults} = new Function(
+const {verifiedClubResultsFeed,publishedClubTeamData,clubResultRows,coachClubResultRows,renderAdminRecentResults} = new Function(
   'normalizeTeamKey','internalAdminClubResults','document','esc','formatDate','matchTeamLabel',
-  `${helpers}\nreturn {verifiedClubResultsFeed,publishedClubTeamData,clubResultRows,renderAdminRecentResults};`
+  `${helpers}\nreturn {verifiedClubResultsFeed,publishedClubTeamData,clubResultRows,coachClubResultRows,renderAdminRecentResults};`
 )(normalizeTeamKey,internalAdminClubResults,document,s=>String(s),(s=>s),(s=>s));
 
 const teams = [
@@ -38,6 +38,10 @@ assert.equal(publishedClubTeamData(teams[0],feed).results.length,1,'same name in
 assert.equal(publishedClubTeamData(teams[2],feed).results.length,0,'under-12 public scores are excluded even if malformed feed data appears');
 assert.equal(clubResultRows([], [teams[1]], feed).length,1,'a coach sees only its assigned team');
 assert.equal(clubResultRows([{team:teams[2],state:overview[2].state}],[teams[2]],feed,true).length,1,'an assigned U9 coach sees its own recorded result');
+const coachRows=coachClubResultRows(teams[2],overview[2].state,feed,teams);
+assert.equal(coachRows.length,3,'a U9 coach sees club published U12+ results and its own recorded U9 result');
+assert.equal(coachRows.filter(r=>r.source==='selkent-static').length,2);
+assert.equal(coachRows.filter(r=>r.source==='internal').length,1,'other teams private U9 results are not exposed');
 const rows=clubResultRows(overview,teams,feed,true);
 assert.equal(rows.length,3,'published results, one private U9 result, and no duplicate U12 team record');
 assert.equal(rows.filter(r=>r.source==='selkent-static').length,2);
@@ -60,6 +64,7 @@ const browser=new Function('document','window','resultForNamedTeam','resultClass
 )(browserDocument,{ClubHubCloud:{visibleTeamList:()=>teams}},()=> 'W',()=> 'result-W',s=>String(s),s=>s,s=>s,()=>true,()=>true,new Function(`${helpers}\nreturn clubResultCompetitionKind;`)());
 browser.setRows(rows);browser.show();
 assert.equal(ageSelect.value,'all','Club Results opens on the complete club view');
+assert.match(ageSelect.innerHTML,/Under 14s/,'coach results can filter ages present in club published rows');
 assert.equal(competitionSelect.value,'league','Club Results defaults to league');
 assert.match(list.innerHTML,/Shooters Hill AFC Cannons/);
 assert.match(list.innerHTML,/Shooters Hill AFC Valiants|Junior Reds Sabres/);

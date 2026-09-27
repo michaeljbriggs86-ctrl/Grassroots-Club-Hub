@@ -3241,6 +3241,10 @@ function clubResultRows(overview=[],teams=[],feed=null,includeInternal=false){
   const internal=internalAdminClubResults(overview).filter(r=>!publishedKeys.has(clubResultIdentity(r,teams)));
   return [...published,...internal].sort((a,b)=>String(b.date).localeCompare(String(a.date))||Number(a.ageGroup)-Number(b.ageGroup));
 }
+function coachClubResultRows(own,ownState,feed,clubTeams=configuredClubTeams()){
+  const teams=[...(clubTeams||[]),...(own?[own]:[])].filter(t=>Number(String(t.ageGroup||'').match(/\d+/)?.[0]||0)>=12);
+  return clubResultRows(own?[{team:own,state:ownState}]:[],teams,feed,true);
+}
 function clubResultCompetitionKind(result={}){
   const name=String(result.competition||'').toLowerCase();
   if(/friend/.test(name))return 'friendly';
@@ -3754,7 +3758,7 @@ function internalAdminClubResults(rows=[]){
 function renderClubResultsBrowser(){
   const list=document.getElementById('club-results-list'),ageSel=document.getElementById('club-results-age'),competitionSel=document.getElementById('club-results-competition'),pageEl=document.getElementById('club-results-page');if(!list||!ageSel)return;
   if(currentView==='club'&&__clubTab==='results')document.getElementById('admin-club-overview')?.classList.add('hidden');
-  const ages=[...new Set((window.ClubHubCloud?.visibleTeamList?.()||[]).map(t=>Number(String(t.ageGroup||'').replace(/\D/g,''))).filter(Boolean))].sort((a,b)=>a-b);if(!ages.length)ages.push(8,9,10,11,12,13,14,15);
+  const ages=[...new Set([...(window.ClubHubCloud?.visibleTeamList?.()||[]).map(t=>Number(String(t.ageGroup||'').replace(/\D/g,''))),...__clubResultsRows.map(r=>Number(r.ageGroup))].filter(Boolean))].sort((a,b)=>a-b);if(!ages.length)ages.push(8,9,10,11,12,13,14,15);
   const prev=ageSel.value||String(__clubResultsAge);ageSel.innerHTML='<option value="all">All age groups</option>'+ages.map(a=>`<option value="${a}">Under ${a}s</option>`).join('');__clubResultsAge=prev==='all'||ages.includes(Number(prev))?prev:'all';ageSel.value=String(__clubResultsAge);
   if(competitionSel)competitionSel.value=__clubResultsCompetition;
   const filtered=__clubResultsRows.filter(r=>(__clubResultsAge==='all'||Number(r.ageGroup)===Number(__clubResultsAge))&&(__clubResultsCompetition==='all'||clubResultCompetitionKind(r)===__clubResultsCompetition));const pages=Math.max(1,Math.ceil(filtered.length/CLUB_RESULTS_PAGE_SIZE));__clubResultsPage=Math.max(0,Math.min(__clubResultsPage,pages-1));const rows=filtered.slice(__clubResultsPage*CLUB_RESULTS_PAGE_SIZE,(__clubResultsPage+1)*CLUB_RESULTS_PAGE_SIZE);
@@ -3776,8 +3780,7 @@ async function refreshClubResults(quiet=false){
       const feed=verifiedClubResultsFeed(await loadAdminPublishedFeed(!quiet));
       const status=document.getElementById('club-results-source-status');if(status)status.textContent=feed?'':'Selkent feed unavailable · showing team-recorded matches only';
       const own=isAdminCoachMode()?dualCoachTeam():window.ClubHubCloud.currentTeam?.();
-      const visibleTeams=own?[own]:[];
-      __clubResultsRows=clubResultRows(own?[{team:own,state}]:[],visibleTeams,feed,true);
+      __clubResultsRows=coachClubResultRows(own,state,feed);
     }
     renderClubResultsBrowser();
   }catch(err){list.innerHTML='<div class="empty-state compact-empty">Results are temporarily unavailable.</div>';}
