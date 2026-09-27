@@ -3203,7 +3203,7 @@ async function refreshAdminClubOverview(quiet=false){
   const panel=document.getElementById('admin-club-overview');if(!panel)return;
   const show=CLOUD_MODE&&isAdmin();panel.classList.toggle('hidden',!show);if(!show)return;
   if(quiet&&Date.now()-__adminOverviewStamp<15000)return;__adminOverviewStamp=Date.now();
-  const meta=document.getElementById('admin-overview-meta');if(meta)meta.textContent='Loading club data…';
+  const meta=document.getElementById('admin-overview-meta');if(meta){meta.textContent='Loading club data…';meta.classList.remove('hidden');}
   try{
     const directoryPromise=window.ClubHubStaticSelkent?.loadDirectory?window.ClubHubStaticSelkent.loadDirectory(!quiet).catch(()=>null):null;
     const [rows,coaches,accessRows,rawFeed,directory]=await Promise.all([window.ClubHubCloud.getClubOverview(),window.ClubHubCloud.listClubCoaches().catch(()=>[]),window.ClubHubCloud.listClubAccessAccounts().catch(()=>[]),loadAdminPublishedFeed(!quiet),directoryPromise]);
@@ -3214,7 +3214,7 @@ async function refreshAdminClubOverview(quiet=false){
     __adminCoachRows.forEach(c=>{if(!c.team_id)return;const a=coachesByTeam.get(c.team_id)||[];a.push(c);coachesByTeam.set(c.team_id,a);});
     const allFixtures=buildAdminFixtureRows(rows,__adminPublishedFeed),fixtureCounts=new Map();
     allFixtures.forEach(f=>fixtureCounts.set(f.team.id,(fixtureCounts.get(f.team.id)||0)+1));
-    let squadAlerts=0;const alerts=[];
+    const alerts=[];
     const leagueAges=publishedLeagueAges().map(x=>String(x).toUpperCase());
     const ageSort=r=>Number(String(r.team?.ageGroup||'').replace(/\D/g,''))||999;
     rows.forEach(r=>{
@@ -3222,8 +3222,8 @@ async function refreshAdminClubOverview(quiet=false){
       const age=Number(String(r.team?.ageGroup||'').replace(/\D/g,''))||14;const fmt=FOOTBALL_FORMATS[age]||FOOTBALL_FORMATS[14];const squad=(st.squad||[]).filter(p=>p&&p.name).length;const teamCoaches=coachesByTeam.get(r.team.id)||[];
       if(!teamCoaches.length)alerts.push({team:r.team,text:'No coaching staff assigned',kind:'high'});
       if(!squad)alerts.push({team:r.team,text:'No squad registered',kind:'medium'});
-      if(squad>=fmt.registered){alerts.push({team:r.team,text:`Squad at ${fmt.registered}-player limit`,kind:'medium'});squadAlerts++;}
-      else if(squad>=Math.max(fmt.registered-1,1)){alerts.push({team:r.team,text:`Squad nearly full (${squad}/${fmt.registered})`,kind:'low'});squadAlerts++;}
+      if(squad>=fmt.registered)alerts.push({team:r.team,text:`Squad at ${fmt.registered}-player limit`,kind:'medium'});
+      else if(squad>=Math.max(fmt.registered-1,1))alerts.push({team:r.team,text:`Squad nearly full (${squad}/${fmt.registered})`,kind:'low'});
       const nextFixture=allFixtures.find(f=>f.team.id===r.team.id&&f.source==='Selkent');
       if(nextFixture){const ack=nextFixture.ack||{status:'awaiting'};if(ack.status==='changed')alerts.push({team:r.team,text:'Fixture changed · coach must reconfirm',kind:'high'});else if(ack.status==='issue')alerts.push({team:r.team,text:'Fixture issue reported by coach',kind:'high'});else if(ack.status==='awaiting')alerts.push({team:r.team,text:'Upcoming fixture awaiting coach confirmation',kind:'low'});}
     });
@@ -3231,7 +3231,7 @@ async function refreshAdminClubOverview(quiet=false){
     const noStaff=alerts.filter(a=>a.text==='No coaching staff assigned'),fixtureAlerts=alerts.filter(a=>/fixture/i.test(a.text)),squadHealth=alerts.filter(a=>/Squad/.test(a.text));
     const totalHealth=noStaff.length+fixtureAlerts.length+squadHealth.length+pendingParents.length;
     const setText=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=String(v)};
-    setText('admin-team-count',rows.length);setText('admin-coach-count',__adminCoachRows.length);setText('admin-fixtures-count',allFixtures.length);setText('admin-squad-alert-count',squadAlerts);setText('admin-alert-count',totalHealth);
+    setText('admin-team-count',rows.length);setText('admin-fixtures-count',allFixtures.length);setText('admin-alert-count',totalHealth);
     const attention=document.getElementById('admin-attention-list');
     if(attention){const teamLinks=items=>items.slice(0,6).map(a=>`<button type="button" class="health-team-link" data-admin-open-team="${a.team.id}">${esc(a.team.ageGroup)} ${esc(matchTeamLabel(a.team.teamName))}</button>`).join('');const pendingLinks=pendingParents.slice(0,6).map(p=>{const t=(window.ClubHubCloud?.visibleTeamList?.()||[]).find(x=>x.id===p.team_id);return `<span class="health-team-link static">${esc(p.full_name||'Parent')}${t?' · '+esc(matchTeamLabel(t.ageGroup+' '+t.teamName)):''}</span>`;}).join('');attention.innerHTML=totalHealth?`<div class="admin-attention-heading"><strong>Needs attention</strong><span>${totalHealth}</span></div><div class="admin-health-groups"><article class="admin-health-group ${noStaff.length?'warn':''}"><span>Coaching coverage</span><strong>${noStaff.length}</strong><small>${noStaff.length?'team'+(noStaff.length===1?'':'s')+' without staff':'All teams covered'}</small><div>${teamLinks(noStaff)}</div></article><article class="admin-health-group ${fixtureAlerts.length?'warn':''}"><span>Fixture confirmation</span><strong>${fixtureAlerts.length}</strong><small>${fixtureAlerts.length?'need action':'All clear'}</small><div>${teamLinks(fixtureAlerts)}</div></article><article class="admin-health-group ${squadHealth.length?'warn':''}"><span>Squad capacity</span><strong>${squadHealth.length}</strong><small>${squadHealth.length?'near/full limits':'No capacity warnings'}</small><div>${teamLinks(squadHealth)}</div></article><article class="admin-health-group ${pendingParents.length?'warn':''}"><span>Parent approvals</span><strong>${pendingParents.length}</strong><small>${pendingParents.length?'waiting for approval':'None waiting'}</small><div>${pendingLinks}</div></article></div>`:'<div class="admin-health-good">✓ No current club health warnings</div>';}
     const activeId=window.ClubHubCloud.currentTeam?.()?.id;
@@ -3249,9 +3249,9 @@ async function refreshAdminClubOverview(quiet=false){
     const ageSelect=document.getElementById('admin-home-age-select');
     if(ageSelect){const previous=ageSelect.value;ageSelect.innerHTML='<option value="">Choose an age group</option>'+groups.map(([age,items])=>`<option value="${esc(age)}">${esc(age)} · ${items.length} team${items.length===1?'':'s'}</option>`).join('');ageSelect.value=groups.some(([age])=>age===previous)?previous:'';}
     if(grid)grid.innerHTML=groups.map(([age,items])=>`<div class="panel admin-team-age-list ${ageSelect?.value===age?'':'hidden'}" data-admin-age="${esc(age)}">${items.map(cardHtml).join('')}</div>`).join('')||'<div class="empty-state">No club teams available.</div>';
-    if(meta)meta.textContent=`${rows.length} teams · ${__adminCoachRows.length} coaching staff · team views are read-only for Club Admin.`;
+    if(meta){meta.textContent='';meta.classList.add('hidden');}
     populateAdminCoachInviteTeams();
-  }catch(err){if(meta)meta.textContent='Club overview is temporarily unavailable.';}
+  }catch(err){if(meta){meta.textContent='Club overview is temporarily unavailable.';meta.classList.remove('hidden');}}
 }
 
 let __teamMembersStamp=0;
