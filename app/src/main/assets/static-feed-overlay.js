@@ -277,8 +277,8 @@
     const table=findStandingTable(ageEntry);
     if(!table)throw new Error(`No static standings found for ${state?.division?.name||'current division'}`);
     const rows=adaptStandingRows(table);
-    if(!rows.length)throw new Error(`Static standings for ${table.division_name||'current division'} contain no teams`);
     state.selkent.table=rows;
+    state.selkent.tableStatus=rows.length?'':`Selkent has not published standings for ${table.division_name||'this division'} yet.`;
     state.selkent.tableSource=TABLE_SOURCE;
     state.selkent.tableProviderDivisionId=table.provider_division_id??null;
     state.selkent.tableSourceDisclaimer=table.source_disclaimer||'';
@@ -440,14 +440,19 @@
       await window.syncProviderClubTeams(true);
       await applyStaticDivision(true,false);
       await window.refreshPublishedLeagueAges(true);
-      if(typeof window.leagueTableEnabled!=='function'||window.leagueTableEnabled())await applyStaticStandings(true,false);else{state.selkent.table=[];state.selkent.tableSource=TABLE_SOURCE;}
-
       try{
         await applyStaticFixtures(true,false);
       }catch(_){
         /* Migration-only safety fallback. A validated static fixture feed is authoritative. */
         try{const fixtureData=await liveFixtureFallback();state.selkent.fixtures=fixtureData.fixtures||[];state.selkent.fixtureSource='selkent-live-fallback';state.selkent.lastFixtureScan=new Date().toISOString();}catch(__){/* keep last-known-good fixtures */}
       }
+
+      if(typeof window.leagueTableEnabled!=='function'||window.leagueTableEnabled()){
+        try{await applyStaticStandings(true,false);}catch(err){
+          state.selkent.table=[];
+          state.selkent.tableStatus=`Standings unavailable: ${err.message||err}`;
+        }
+      }else{state.selkent.table=[];state.selkent.tableSource=TABLE_SOURCE;state.selkent.tableStatus='';}
 
       if(typeof window.leagueTableEnabled!=='function'||window.leagueTableEnabled()){
         try{const live=await liveResultFallback();state.selkent.results=live.results||[];if(typeof window.syncOwnLeagueMatchesFromSelkent==='function')window.syncOwnLeagueMatchesFromSelkent(state.selkent.results);}catch(_){/* keep last-known-good published results */}
@@ -499,10 +504,10 @@
     const remote=(state?.selkent?.tableSource===TABLE_SOURCE&&Array.isArray(state.selkent.table))?state.selkent.table:[];
     const self=norm(state?.division?.teamName||state?.meta?.teamName||'');
     const rows=remote.map(r=>`<tr class="${norm(r.team)===self?'our-team-row':''}"><td class="pos">${r.sourceOrder??'—'}</td><td class="team-cell">${typeof window.esc==='function'?window.esc(r.team):String(r.team||'')}</td><td>${r.p}</td><td>${r.w}</td><td>${r.d}</td><td>${r.l}</td><td>${r.gf}</td><td>${r.ga}</td><td>${r.gd>0?'+':''}${r.gd}</td><td class="pts">${r.pts}</td></tr>`).join('');
-    document.querySelectorAll('[data-league-table-body]').forEach(tb=>tb.innerHTML=rows||'<tr><td colspan="10" class="table-empty">Standings feed unavailable</td></tr>');
+    document.querySelectorAll('[data-league-table-body]').forEach(tb=>tb.innerHTML=rows||'<tr><td colspan="10" class="table-empty">Standings not published for this division</td></tr>');
     document.querySelectorAll('[data-league-table-title]').forEach(el=>el.textContent=state?.division?.name||'League table');
     document.querySelectorAll('.league-table thead th:first-child').forEach(el=>el.textContent=remote.length?'Row':'#');
-    document.querySelectorAll('[data-league-table-meta]').forEach(el=>el.textContent=remote.length?`Selkent source order · ${remote.length} teams · tied-team order is not an official position`:'Validated static standings have not been loaded for this division.');
+    document.querySelectorAll('[data-league-table-meta]').forEach(el=>el.textContent=remote.length?`Selkent source order · ${remote.length} teams · tied-team order is not an official position`:(state?.selkent?.tableStatus||'Standings have not been published for this division.'));
   };
 
   async function primeStaticFeeds(){
@@ -512,7 +517,9 @@
       await applyStaticDivision(true,false);
       await window.refreshPublishedLeagueAges(true);
       await applyStaticFixtures(true,false);
-      if(typeof window.leagueTableEnabled!=='function'||window.leagueTableEnabled())await applyStaticStandings(true,false);else{state.selkent.table=[];state.selkent.tableSource=TABLE_SOURCE;}
+      if(typeof window.leagueTableEnabled!=='function'||window.leagueTableEnabled()){
+        try{await applyStaticStandings(true,false);}catch(err){state.selkent.table=[];state.selkent.tableStatus=`Standings unavailable: ${err.message||err}`;}
+      }else{state.selkent.table=[];state.selkent.tableSource=TABLE_SOURCE;state.selkent.tableStatus='';}
       persistWithoutRender();if(typeof window.renderAll==='function')window.renderAll();
     }catch(_){/* retain last-known-good app state; normal sync can retry */}
   }
