@@ -26,6 +26,7 @@ ASSETS = (
     "icon-192.png", "icon-512.png", "icon-maskable-512.png",
     "football-login-adult.jpg", "football-login-player.jpg",
     "football-login-club.jpg", "football-pitch-hero.jpg",
+    "football-pitch-hero-illustration.png",
 )
 
 
