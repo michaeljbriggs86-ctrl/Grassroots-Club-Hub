@@ -3074,6 +3074,13 @@ function clearDetailData(type){
   saveState();toast('Stored detail data cleared');
 }
 let __adminOverviewStamp=0,__adminOverviewRows=[],__adminCoachRows=[];
+let __adminPublishedFeed=null;
+async function loadAdminPublishedFeed(){
+  const load=window.ClubHubStaticSelkent?.loadResults;
+  if(typeof load!=='function')return null;
+  try{__adminPublishedFeed=await load();return __adminPublishedFeed;}
+  catch(_){return __adminPublishedFeed;}
+}
 function nextWeekendDates(){
   const now=new Date();now.setHours(0,0,0,0);const day=now.getDay();
   const addSat=(6-day+7)%7;const sat=new Date(now);sat.setDate(now.getDate()+addSat);const sun=new Date(sat);sun.setDate(sat.getDate()+1);
@@ -3082,7 +3089,7 @@ function nextWeekendDates(){
 function fixtureTimeMinutes(t=''){const m=String(t).match(/(\d{1,2})[:.](\d{2})/);return m?Number(m[1])*60+Number(m[2]):null;}
 function renderAdminWeekend(rows){
   const box=document.getElementById('admin-weekend-list'),meta=document.getElementById('admin-weekend-meta');if(!box)return;
-  const [sat,sun]=nextWeekendDates();const all=buildAdminFixtureRows(rows).filter(f=>f.source!=='TBC'&&[sat,sun].includes(f.date));
+  const [sat,sun]=nextWeekendDates();const all=buildAdminFixtureRows(rows,__adminPublishedFeed).filter(f=>[sat,sun].includes(f.date));
   const home=all.filter(f=>String(f.venue||'').toUpperCase()==='H');const conflicts=new Set();
   for(let i=0;i<home.length;i++)for(let j=i+1;j<home.length;j++){if(home[i].date!==home[j].date)continue;const a=fixtureTimeMinutes(home[i].time),b=fixtureTimeMinutes(home[j].time);if(a!==null&&b!==null&&Math.abs(a-b)<=45){conflicts.add(`${home[i].team.id}|${home[i].date}`);conflicts.add(`${home[j].team.id}|${home[j].date}`);}}
   if(meta)meta.textContent=`${formatDate(sat)}–${formatDate(sun)} · ${all.length} fixture${all.length===1?'':'s'}`;
@@ -3094,28 +3101,30 @@ async function refreshAdminClubOverview(quiet=false){
   if(quiet&&Date.now()-__adminOverviewStamp<15000)return;__adminOverviewStamp=Date.now();
   const meta=document.getElementById('admin-overview-meta');if(meta)meta.textContent='Loading club data…';
   try{
-    const [rows,coaches,accessRows]=await Promise.all([window.ClubHubCloud.getClubOverview(),window.ClubHubCloud.listClubCoaches().catch(()=>[]),window.ClubHubCloud.listClubAccessAccounts().catch(()=>[])]);
+    const [rows,coaches,accessRows]=await Promise.all([window.ClubHubCloud.getClubOverview(),window.ClubHubCloud.listClubCoaches().catch(()=>[]),window.ClubHubCloud.listClubAccessAccounts().catch(()=>[]),loadAdminPublishedFeed()]);
     __adminOverviewRows=rows||[];__adminCoachRows=coaches||[];renderAdminWeekend(__adminOverviewRows);
     const coachesByTeam=new Map();
     __adminCoachRows.forEach(c=>{if(!c.team_id)return;const a=coachesByTeam.get(c.team_id)||[];a.push(c);coachesByTeam.set(c.team_id,a);});
-    let fixtures=0,squadAlerts=0;const alerts=[];
+    const allFixtures=buildAdminFixtureRows(rows,__adminPublishedFeed),fixtureCounts=new Map();
+    allFixtures.forEach(f=>fixtureCounts.set(f.team.id,(fixtureCounts.get(f.team.id)||0)+1));
+    let squadAlerts=0;const alerts=[];
     const leagueAges=publishedLeagueAges().map(x=>String(x).toUpperCase());
     const ageSort=r=>Number(String(r.team?.ageGroup||'').replace(/\D/g,''))||999;
     rows.forEach(r=>{
-      const st=r.state||{};fixtures+=Number(st.selkent?.fixtures?.length||0);
+      const st=r.state||{};
       const age=Number(String(r.team?.ageGroup||'').replace(/\D/g,''))||14;const fmt=FOOTBALL_FORMATS[age]||FOOTBALL_FORMATS[14];const squad=(st.squad||[]).filter(p=>p&&p.name).length;const teamCoaches=coachesByTeam.get(r.team.id)||[];
       if(!teamCoaches.length)alerts.push({team:r.team,text:'No coaching staff assigned',kind:'high'});
       if(!squad)alerts.push({team:r.team,text:'No squad registered',kind:'medium'});
       if(squad>=fmt.registered){alerts.push({team:r.team,text:`Squad at ${fmt.registered}-player limit`,kind:'medium'});squadAlerts++;}
       else if(squad>=Math.max(fmt.registered-1,1)){alerts.push({team:r.team,text:`Squad nearly full (${squad}/${fmt.registered})`,kind:'low'});squadAlerts++;}
-      const nextFixture=(Array.isArray(st.selkent?.fixtures)?st.selkent.fixtures:[]).filter(f=>!f.date||f.date>=new Date().toISOString().slice(0,10)).sort((a,b)=>(a.date||'9999').localeCompare(b.date||'9999'))[0];
-      if(nextFixture){const ack=fixtureAckState(st,nextFixture);if(ack.status==='changed')alerts.push({team:r.team,text:'Fixture changed · coach must reconfirm',kind:'high'});else if(ack.status==='issue')alerts.push({team:r.team,text:'Fixture issue reported by coach',kind:'high'});else if(ack.status==='awaiting')alerts.push({team:r.team,text:'Upcoming fixture awaiting coach confirmation',kind:'low'});}
+      const nextFixture=allFixtures.find(f=>f.team.id===r.team.id&&f.source==='Selkent');
+      if(nextFixture){const ack=nextFixture.ack||{status:'awaiting'};if(ack.status==='changed')alerts.push({team:r.team,text:'Fixture changed · coach must reconfirm',kind:'high'});else if(ack.status==='issue')alerts.push({team:r.team,text:'Fixture issue reported by coach',kind:'high'});else if(ack.status==='awaiting')alerts.push({team:r.team,text:'Upcoming fixture awaiting coach confirmation',kind:'low'});}
     });
     const pendingParents=(accessRows||[]).filter(r=>r.role==='pending_parent');
     const noStaff=alerts.filter(a=>a.text==='No coaching staff assigned'),fixtureAlerts=alerts.filter(a=>/fixture/i.test(a.text)),squadHealth=alerts.filter(a=>/Squad/.test(a.text));
     const totalHealth=noStaff.length+fixtureAlerts.length+squadHealth.length+pendingParents.length;
     const setText=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=String(v)};
-    setText('admin-team-count',rows.length);setText('admin-coach-count',__adminCoachRows.length);setText('admin-fixtures-count',fixtures);setText('admin-squad-alert-count',squadAlerts);setText('admin-alert-count',totalHealth);
+    setText('admin-team-count',rows.length);setText('admin-coach-count',__adminCoachRows.length);setText('admin-fixtures-count',allFixtures.length);setText('admin-squad-alert-count',squadAlerts);setText('admin-alert-count',totalHealth);
     const attention=document.getElementById('admin-attention-list');
     if(attention){const teamLinks=items=>items.slice(0,6).map(a=>`<button type="button" class="health-team-link" data-admin-open-team="${a.team.id}">${esc(a.team.ageGroup)} ${esc(matchTeamLabel(a.team.teamName))}</button>`).join('');const pendingLinks=pendingParents.slice(0,6).map(p=>{const t=(window.ClubHubCloud?.visibleTeamList?.()||[]).find(x=>x.id===p.team_id);return `<span class="health-team-link static">${esc(p.full_name||'Parent')}${t?' · '+esc(matchTeamLabel(t.ageGroup+' '+t.teamName)):''}</span>`;}).join('');attention.innerHTML=totalHealth?`<div class="admin-attention-heading"><strong>Needs attention</strong><span>${totalHealth}</span></div><div class="admin-health-groups"><article class="admin-health-group ${noStaff.length?'warn':''}"><span>Coaching coverage</span><strong>${noStaff.length}</strong><small>${noStaff.length?'team'+(noStaff.length===1?'':'s')+' without staff':'All teams covered'}</small><div>${teamLinks(noStaff)}</div></article><article class="admin-health-group ${fixtureAlerts.length?'warn':''}"><span>Fixture confirmation</span><strong>${fixtureAlerts.length}</strong><small>${fixtureAlerts.length?'need action':'All clear'}</small><div>${teamLinks(fixtureAlerts)}</div></article><article class="admin-health-group ${squadHealth.length?'warn':''}"><span>Squad capacity</span><strong>${squadHealth.length}</strong><small>${squadHealth.length?'near/full limits':'No capacity warnings'}</small><div>${teamLinks(squadHealth)}</div></article><article class="admin-health-group ${pendingParents.length?'warn':''}"><span>Parent approvals</span><strong>${pendingParents.length}</strong><small>${pendingParents.length?'waiting for approval':'None waiting'}</small><div>${pendingLinks}</div></article></div>`:'<div class="admin-health-good">✓ No current club health warnings</div>';}
     const activeId=window.ClubHubCloud.currentTeam?.()?.id;
@@ -3125,7 +3134,7 @@ async function refreshAdminClubOverview(quiet=false){
       const rawDiv=st.division?.name||r.team.division||'';const divAge=Number(String(rawDiv).match(/(?:Under\s*|U\s*)(\d{1,2})/i)?.[1]||0);const div=(divAge&&ageNo&&divAge!==ageNo)?'Division TBC':(rawDiv||'Division TBC');
       const mode=teamLeague?'League':'No-league';const fmt=FOOTBALL_FORMATS[ageNo]||FOOTBALL_FORMATS[14];const squad=(st.squad||[]).filter(p=>p&&p.name).length;
       const staff=(coachesByTeam.get(r.team.id)||[]).map(c=>`${c.full_name||'Staff'}${c.role==='club_admin'?' (Admin Coach)':c.role==='assistant_coach'?' (Assistant)':''}`);const coach=staff.length?staff.join(', '):'No coaching staff assigned';const capacity=squad>=fmt.registered?'full':squad>=fmt.registered-1?'near':'';
-      return `<article class="admin-team-row ${r.team.id===activeId?'active-team':''}" data-admin-open-team="${r.team.id}" role="button" tabindex="0"><div class="admin-team-row-main"><div class="admin-team-row-title"><strong>${esc(matchTeamLabel(r.team.teamName))}</strong><em class="competition-mode-pill ${mode==='League'?'league':'no-league'}">${mode}</em></div><span>${esc(div)} · ${esc(coach)}</span></div><div class="admin-team-row-stats"><span class="squad-capacity ${capacity}"><b>${squad}/${fmt.registered}</b> squad</span><span><b>${played}</b> P</span><span><b>${st.selkent?.fixtures?.length||0}</b> F</span></div><span class="admin-row-chevron">›</span></article>`;
+      return `<article class="admin-team-row ${r.team.id===activeId?'active-team':''}" data-admin-open-team="${r.team.id}" role="button" tabindex="0"><div class="admin-team-row-main"><div class="admin-team-row-title"><strong>${esc(matchTeamLabel(r.team.teamName))}</strong><em class="competition-mode-pill ${mode==='League'?'league':'no-league'}">${mode}</em></div><span>${esc(div)} · ${esc(coach)}</span></div><div class="admin-team-row-stats"><span class="squad-capacity ${capacity}"><b>${squad}/${fmt.registered}</b> squad</span><span><b>${played}</b> played</span><span><b>${fixtureCounts.get(r.team.id)||0}</b> fixtures</span></div><span class="admin-row-chevron">›</span></article>`;
     };
     const grouped=new Map();
     [...rows].sort((a,b)=>ageSort(a)-ageSort(b)||String(a.team?.teamName||'').localeCompare(String(b.team?.teamName||''))).forEach(r=>{const key=r.team?.ageGroup||'Other';if(!grouped.has(key))grouped.set(key,[]);grouped.get(key).push(r);});
@@ -3284,23 +3293,72 @@ async function fetchAdminDirectoryDetail(teamName){
   const key=selkentNorm(teamName);if(!key)return null;if(__adminDirectoryCache.has(key))return __adminDirectoryCache.get(key);
   try{const r=await fetch(`${SELKENT_DIRECTORY_API}?team=${encodeURIComponent(teamName)}`,{cache:'no-store'});if(!r.ok)throw new Error();const d=await r.json();const detail={clubName:d.club_name||teamName,colours:d.club_colours||'TBC',groundName:d.home_ground?.name||'TBC',address:d.home_ground?.address||'TBC'};__adminDirectoryCache.set(key,detail);return detail;}catch{__adminDirectoryCache.set(key,null);return null;}
 }
-function buildAdminFixtureRows(rows){
+function buildAdminFixtureRows(rows,feed=null){
   const now=new Date().toISOString().slice(0,10),out=[];
-  (rows||[]).forEach(r=>{const st=r.state||{},team=r.team||{};const fixtures=Array.isArray(st.selkent?.fixtures)?st.selkent.fixtures:[];const scheduled=(st.matches||[]).filter(m=>['scheduled','postponed'].includes(matchStatus(m))&&(!m.date||m.date>=now));
-    fixtures.forEach(f=>out.push({team,source:'Selkent',date:f.date||'',time:f.time||'',opponent:f.opponent||'TBC',venue:f.venue||'',competition:f.competition||'Division',kitColours:f.kitColours||'',groundName:f.groundName||'',address:f.address||'',ack:fixtureAckState(st,f)}));
-    scheduled.forEach(m=>{const dup=out.some(x=>x.team.id===team.id&&x.date===m.date&&normalizeTeamKey(x.opponent)===normalizeTeamKey(m.opponent));if(!dup)out.push({team,source:'Team',date:m.date||'',time:m.time||'',opponent:m.opponent||'TBC',venue:m.venue||'',competition:m.competition||m.type||'Match',status:matchStatus(m)});});
-    if(!fixtures.length&&!scheduled.length)out.push({team,source:'TBC',date:'',time:'',opponent:'TBC',venue:'',competition:'Division fixture'});
-  });
+  for(const r of rows||[]){
+    const st=r.state||{},team=r.team||{};
+    const age=String(team.ageGroup||'').toUpperCase(),name=selkentNorm(team.leagueName||'');
+    const division=selkentNorm(st.division?.name||team.division||'');
+    const ageEntry=feed?.age_groups?.find(x=>String(x.age_group||'').toUpperCase()===age);
+    const published=Array.isArray(ageEntry?.fixtures)?ageEntry.fixtures:null;
+    const matches=published?published.filter(f=>{
+      if(!f.date||f.date<now||!name)return false;
+      if(division&&selkentNorm(f.division_name||'')!==division)return false;
+      const home=selkentNorm(f.home),away=selkentNorm(f.away);
+      return (home===name)!==(away===name);
+    }).map(f=>{
+      const home=selkentNorm(f.home)===name;
+      const original={date:f.date,time:'',opponent:home?f.away:f.home,venue:home?'H':'A',providerTeamIds:f.provider_team_ids||[]};
+      original.competition=Array.isArray(ageEntry.standings)?'League':'Division';
+      return {team,source:'Selkent',...original,ack:fixtureAckState(st,original)};
+    }):(Array.isArray(st.selkent?.fixtures)?st.selkent.fixtures:[]).filter(f=>!f.date||f.date>=now).map(f=>({
+      team,source:'Selkent',date:f.date||'',time:f.time||'',opponent:f.opponent||'',venue:f.venue||'',competition:f.competition||'Division',
+      kitColours:f.kitColours||'',groundName:f.groundName||'',address:f.address||'',ack:fixtureAckState(st,f)
+    }));
+    const seen=new Set();
+    matches.forEach(f=>{const key=`${f.date}|${selkentNorm(f.opponent)}`;if(!seen.has(key)){seen.add(key);out.push(f);}});
+    (st.matches||[]).filter(m=>['scheduled','postponed'].includes(matchStatus(m))&&(!m.date||m.date>=now)).forEach(m=>{
+      const duplicate=out.some(x=>x.team.id===team.id&&x.date===m.date&&selkentNorm(x.opponent)===selkentNorm(m.opponent));
+      if(!duplicate)out.push({team,source:'Team',date:m.date||'',time:m.time||'',opponent:m.opponent||'',venue:m.venue||'',competition:m.competition||m.type||'Match',status:matchStatus(m)});
+    });
+  }
   return out.sort((a,b)=>(a.date||'9999-99-99').localeCompare(b.date||'9999-99-99')||(Number(String(a.team.ageGroup||'').replace(/\D/g,''))||99)-(Number(String(b.team.ageGroup||'').replace(/\D/g,''))||99)||String(a.team.teamName||'').localeCompare(String(b.team.teamName||'')));
 }
 function renderAdminFixtures(){
-  const list=document.getElementById('admin-fixture-list');if(!list)return;populateAdminFixtureAgeFilter();const age=document.getElementById('admin-fixtures-age')?.value||'all';const rows=__adminFixtureRows.filter(r=>age==='all'||Number(String(r.team.ageGroup||'').replace(/\D/g,''))===Number(age));
+  const list=document.getElementById('admin-fixture-list');if(!list)return;
+  populateAdminFixtureAgeFilter();
+  const age=document.getElementById('admin-fixtures-age')?.value||'all';
+  const teams=__adminOverviewRows.filter(r=>age==='all'||Number(String(r.team.ageGroup||'').replace(/\D/g,''))===Number(age));
+  const rows=__adminFixtureRows.filter(f=>age==='all'||Number(String(f.team.ageGroup||'').replace(/\D/g,''))===Number(age));
+  const activeIds=new Set(rows.map(f=>f.team.id)),missing=teams.length-activeIds.size;
+  const summary=document.getElementById('admin-fixture-summary');
+  if(summary)summary.textContent=`${rows.length} upcoming fixture${rows.length===1?'':'s'} across ${activeIds.size} team${activeIds.size===1?'':'s'}`+(missing>0?` · ${missing} team${missing===1?'':'s'} without a published fixture`:'')+(!__adminPublishedFeed?' · Showing saved fixtures; live feed unavailable':'');
   const ownGround='East Wickham Primary Academy · Wickham Street, DA16 3BP';
-  list.innerHTML=rows.map(f=>{if(f.source==='TBC')return `<article class="admin-fixture-row tbc"><div class="admin-fixture-date"><strong>TBC</strong><span>${esc(f.team.ageGroup)}</span></div><div class="admin-fixture-main"><strong>${esc(matchTeamLabel(f.team.teamName))} · Opponent TBC</strong><span>Fixture details TBC</span><small>Kick-off, venue, kit colours and address TBC</small></div><span class="fixture-source-pill">TBC</span></article>`;const detail=__adminDirectoryCache.get(selkentNorm(f.opponent))||{};const colours=f.kitColours||detail?.colours||'TBC';const away=String(f.venue||'').toUpperCase()==='A';const venue=away?'Away':String(f.venue||'').toUpperCase()==='H'?'Home':'Venue TBC';const ground=away?[f.groundName||detail?.groundName,f.address||detail?.address].filter(Boolean).join(' · '):String(f.venue||'').toUpperCase()==='H'?ownGround:'Ground TBC';const clash=/\bgreen\b/i.test(colours);const map=away?mapsHref(f.groundName||detail?.groundName,f.address||detail?.address):mapsHref(f.groundName,f.address);const ack=f.ack||{status:'awaiting',label:'Awaiting confirmation'};return `<article class="admin-fixture-row"><div class="admin-fixture-date"><strong>${f.date?formatDate(f.date):'TBC'}</strong><span>${f.time?esc(f.time):'Kick-off TBC'}</span></div><div class="admin-fixture-main"><strong>${esc(f.team.ageGroup)} ${esc(matchTeamLabel(f.team.teamName))} <b>${venue==='Away'?'@':'v'}</b> ${esc(matchTeamLabel(f.opponent))}</strong><span>${esc(f.competition||'Fixture')} · ${venue}${clash?' · ⚠ Possible green kit clash':''}</span><small>${esc(ground||'Ground TBC')}</small><small>${esc(matchTeamLabel(f.opponent))} kit: ${esc(colours)}</small>${map?`<a class="map-link compact" href="${esc(map)}">Open in Maps</a>`:''}<span class="fixture-ack-pill ${ack.status}">${esc(ack.label)}</span></div><span class="fixture-source-pill ${f.source==='Selkent'?'selkent':''}">${esc(f.source)}</span></article>`;}).join('')||'<div class="empty-state">No fixtures match this filter.</div>';
+  list.innerHTML=rows.map(f=>{
+    const detail=__adminDirectoryCache.get(selkentNorm(f.opponent))||{};
+    const colours=f.kitColours||detail.colours||'';
+    const away=String(f.venue||'').toUpperCase()==='A';
+    const venue=away?'Away':String(f.venue||'').toUpperCase()==='H'?'Home':'Venue unconfirmed';
+    const ground=away?[f.groundName||detail.groundName,f.address||detail.address].filter(x=>x&&x!=='TBC').join(' · '):String(f.venue||'').toUpperCase()==='H'?ownGround:'';
+    const clash=/\bgreen\b/i.test(colours);
+    const map=away?mapsHref(f.groundName||detail.groundName,f.address||detail.address):mapsHref(f.groundName,f.address);
+    const ack=f.ack;
+    return `<article class="admin-fixture-row"><div class="admin-fixture-date"><strong>${f.date?formatDate(f.date):'Date TBC'}</strong><span>${f.time?esc(f.time):'Kick-off unconfirmed'}</span></div><div class="admin-fixture-main"><strong>${esc(f.team.ageGroup)} ${esc(matchTeamLabel(f.team.teamName))} <b>${away?'@':'v'}</b> ${esc(matchTeamLabel(f.opponent||'Opponent unconfirmed'))}</strong><span>${esc(f.competition||'Fixture')} · ${venue}${f.status==='postponed'?' · Postponed':''}${clash?' · ⚠ Possible kit clash':''}</span>${ground?`<small>${esc(ground)}</small>`:''}${colours&&colours!=='TBC'?`<small>Opponent kit: ${esc(colours)}</small>`:''}${map?`<a class="map-link compact" href="${esc(map)}">Open in Maps</a>`:''}${ack?`<span class="fixture-ack-pill ${esc(ack.status)}">${esc(ack.label)}</span>`:''}</div><span class="fixture-source-pill ${f.source==='Selkent'?'selkent':''}">${esc(f.source)}</span></article>`;
+  }).join('')||'<div class="empty-state compact-empty">No published fixtures or scheduled team matches for this selection.</div>';
 }
 async function refreshAdminFixtures(quiet=false){
-  if(!CLOUD_MODE||!isAdmin())return;const list=document.getElementById('admin-fixture-list');if(!list)return;if(quiet&&Date.now()-__adminFixtureStamp<15000){renderAdminFixtures();return;}__adminFixtureStamp=Date.now();if(!quiet)list.innerHTML='<div class="empty-state compact-empty">Loading club fixtures…</div>';
-  try{const rows=__adminOverviewRows.length?__adminOverviewRows:await window.ClubHubCloud.getClubOverview();__adminOverviewRows=rows;__adminFixtureRows=buildAdminFixtureRows(rows);renderAdminFixtures();const names=[...new Set(__adminFixtureRows.filter(f=>f.opponent&&f.opponent!=='TBC').map(f=>f.opponent))].slice(0,20);await Promise.all(names.map(fetchAdminDirectoryDetail));renderAdminFixtures();}catch(err){list.innerHTML=`<div class="empty-state compact-empty">Could not load fixtures: ${esc(err.message||err)}</div>`;}
+  if(!CLOUD_MODE||!isAdmin())return;
+  const list=document.getElementById('admin-fixture-list');if(!list)return;
+  if(quiet&&Date.now()-__adminFixtureStamp<15000){renderAdminFixtures();return;}
+  __adminFixtureStamp=Date.now();if(!quiet)list.innerHTML='<div class="empty-state compact-empty">Loading club fixtures…</div>';
+  try{
+    const [rows]=await Promise.all([window.ClubHubCloud.getClubOverview(),loadAdminPublishedFeed()]);
+    __adminOverviewRows=rows;
+    __adminFixtureRows=buildAdminFixtureRows(rows,__adminPublishedFeed);
+    renderAdminFixtures();
+    const names=[...new Set(__adminFixtureRows.filter(f=>f.opponent).map(f=>f.opponent))].slice(0,20);
+    await Promise.all(names.map(fetchAdminDirectoryDetail));renderAdminFixtures();
+  }catch(err){list.innerHTML=`<div class="empty-state compact-empty">Could not load fixtures: ${esc(err.message||err)}</div>`;}
 }
 let __staffInviteTeamId='';
 function clearStaffInviteOutput(){
