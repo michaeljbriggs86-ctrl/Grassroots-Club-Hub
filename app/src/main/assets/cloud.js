@@ -30,6 +30,8 @@
   let saveTimer = null;
   let saving = false;
   let pendingState = null;
+  let unsyncedState = false;
+  let confirmingState = false;
   let pollTimer = null;
   let hooks = {};
   const TEST_TEAM={id:'debug-u9-green',club_id:'debug-club',name:'Green',age_group:9,division:'U9 Development',season:'2026/27',selkent_label:'Under 9s Green',league_name:'Demo Juniors FC Green',active:true};
@@ -427,7 +429,7 @@
       return {team:oldShapeTeam(t),state:row.state||{},revision:Number(row.revision||0),updatedAt:row.updated_at||''};
     });
   }
-  async function saveTeamStateNow(nextState,{force=false}={}){
+  async function saveTeamStateNow(nextState,{force=false,preserveOnConflict=false}={}){
     if(!configured()||!session||!activeTeam||!canEdit())return null;
     if(saving){pendingState=nextState;return null;}
     saving=true;emitStatus('Saving…','working');
@@ -437,18 +439,20 @@
       if(row){activeRevision=Number(row.revision);lastRemoteUpdatedAt=row.updated_at||lastRemoteUpdatedAt;}
       // Read back the server-normalized state. For U7-U11 this removes name-keyed performance data.
       const saved=await fetchTeamState(activeTeam.id);
-      if(saved?.state&&hooks.onRemoteState)hooks.onRemoteState(saved.state,{reason:'save-normalized'});
+      unsyncedState=false;
+      if(saved?.state&&!pendingState&&!confirmingState&&hooks.onRemoteState)hooks.onRemoteState(saved.state,{reason:'save-normalized'});
       emitStatus('Cloud synced','ok');return row;
     }catch(err){
       if(String(err.message||'').includes('STALE_STATE')){
-        emitStatus('Newer cloud changes found — reloading','warn');
+        emitStatus('Newer cloud changes found — local edits need retrying','warn');
         const row=await fetchTeamState(activeTeam.id);
-        if(row?.state&&hooks.onRemoteState)hooks.onRemoteState(row.state,{reason:'conflict'});
+        if(!preserveOnConflict&&!pendingState&&!confirmingState&&row?.state&&hooks.onRemoteState)hooks.onRemoteState(row.state,{reason:'conflict'});
       }else emitStatus('Sync failed: '+(err.message||err),'error');
+      if(preserveOnConflict)unsyncedState=true;
       throw err;
     }finally{
       saving=false;
-      if(pendingState){const p=pendingState;pendingState=null;setTimeout(()=>saveTeamStateNow(p).catch(()=>{}),50);}
+      if(pendingState){const p=pendingState;pendingState=null;queueStateSave(p);}
     }
   }
   function queueStateSave(nextState){
@@ -457,8 +461,20 @@
     clearTimeout(saveTimer);
     saveTimer=setTimeout(()=>{const p=pendingState;pendingState=null;if(p)saveTeamStateNow(p).catch(()=>{});},700);
   }
+  async function confirmStateSave(nextState){
+    if(!configured()||!session||!activeTeam||!canEdit())return null;
+    const snapshot=JSON.parse(JSON.stringify(nextState));
+    confirmingState=true;
+    try{
+      clearTimeout(saveTimer);pendingState=null;
+      // An earlier queued save may still be reading back its normalized state.
+      while(saving)await new Promise(resolve=>setTimeout(resolve,40));
+      return await saveTeamStateNow(snapshot,{preserveOnConflict:true});
+    }finally{confirmingState=false;}
+  }
   async function pullLatest({quiet=false}={}){
     if(!configured()||!session||!activeTeam)return null;
+    if(saving||pendingState||confirmingState||unsyncedState)return null;
     if(!quiet)emitStatus('Checking cloud…','working');
     try{
       const before=activeRevision;
@@ -1057,7 +1073,7 @@
   }
 
   window.ClubHubCloud={
-    configured,bootstrap,loadInitialState,queueStateSave,pullLatest,startPolling,
+    configured,bootstrap,loadInitialState,queueStateSave,confirmStateSave,pullLatest,startPolling,
     role,canEdit,canAdmin,assignedTeam,currentTeam,coachTeam,hasDualCoachAccess,visibleTeamList,getClubConfiguration,listLoginClubs,listLoginTeams,listCurrentClubLoginTeams,createInvite,requestParentAccess,listPendingParentRequests,listTeamMembers,listClubCoaches,listClubAccessAccounts,removeClubCoach,listPublishedClubResults,listParentPlayerLinks,saveParentPlayerLinks,listPlayerAccountLinks,listMatchAvailability,saveMatchAvailability,saveCoachMatchAvailability,listSelkentTeamDirectory,syncSelkentTeamDirectory,getCoachMatchNote,saveCoachMatchNote,listAnnouncements,createAnnouncement,markAnnouncementRead,deleteAnnouncement,listMatchAttendance,saveMatchAttendance,getAvailabilitySettings,setAvailabilityDeadline,sendAvailabilityReminder,listNotifications,markNotificationRead,notifyFixtureChange,notifySelectedSquad,notifyMatchReport,notifyMatchReopened,listPlayerAppearanceStats,recordAuditEvent,listAuditHistory,listSeasonArchives,getSeasonArchive,archiveCurrentSeason,rolloverClubSeason,resetParentPin,setAccessPin,approveParentRequest,removeTeamMember,syncTeamDirectory,switchAdminTeam,switchParentTeam,getClubOverview,signOut,handleAuthCallback,listMessageContacts,listClubMessages,sendClubMessage,markClubMessagesRead,getClubComplianceStatus,setDisputeReviewers,setClubSafeguardingContacts,getConcernRouting,raiseClubConcern,listGeneralDisputes,listDisputeMessages,upsertU11SafeguardingInfo,exportU11SafeguardingPack,listSafeguardingExportAudit,requestClubCancellation,cancelClubCancellation,
     updateCloudPanel,
     get context(){return context;},get configuration(){return clubConfiguration;},get session(){return session;},get revision(){return activeRevision;},get testMode(){return testModeActive();}

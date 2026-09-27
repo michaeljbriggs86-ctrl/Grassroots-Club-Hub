@@ -1533,6 +1533,20 @@ html[data-theme="dark"] .admin-recent-result>span,
 html[data-theme="dark"] .admin-recent-result small{color:#c0d0c3!important}
 html[data-theme="dark"] .admin-recent-result b{color:#a7eab2!important}
 
+/* Club Admin browse and communications: short forms remain readable on phones. */
+.admin-home-age-label{display:grid;gap:6px;margin:8px 0 12px;max-width:420px}
+.admin-home-age-label select{width:100%;min-height:44px}
+.admin-team-age-list{display:grid;gap:0;padding:6px 12px;margin:0}
+.club-results-filters{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.club-results-filters .club-results-age-label{min-width:0}
+.communications-tabs{display:flex;gap:8px;overflow-x:auto;padding:2px 0 12px;margin-bottom:8px}
+.communications-tabs button{white-space:nowrap;min-height:40px}
+.communications-tabs button.active{background:#185b31;color:#fff;border-color:#185b31}
+.communications-notifications-panel .notification-list{max-height:none}
+html[data-theme="dark"] .admin-team-age-list{background:#151d18!important;border-color:#344239!important;color:#f2f7f3!important}
+html[data-theme="dark"] .communications-tabs button.active{background:#2b8245!important;color:#fff!important;border-color:#78bd88!important}
+@media(max-width:560px){.club-results-filters{grid-template-columns:1fr;gap:0}}
+
 /* Club Admin dark mode: cover the nested controls and badges left pale by base styles. */
 html[data-theme="dark"] body.admin-club-mode .admin-age-group[open]>summary,
 html[data-theme="dark"] body.admin-club-mode .admin-team-row:active,

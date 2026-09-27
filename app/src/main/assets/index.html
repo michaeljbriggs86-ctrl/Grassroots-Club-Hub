@@ -63,7 +63,7 @@
       <button type="button" class="top-nav-tab nav-item hidden" data-nav="club-fixtures" data-admin-global-nav>Fixtures</button>
       <button type="button" class="top-nav-tab nav-item hidden" data-nav="club-results" data-results-global-nav>Results</button>
       <button type="button" class="top-nav-tab nav-item hidden" data-nav="club-coaches" data-admin-global-nav>Coaches</button>
-      <button type="button" class="top-nav-tab nav-item hidden" data-nav="inbox">Inbox<span class="notification-badge hidden" id="global-inbox-badge">0</span></button>
+      <button type="button" class="top-nav-tab nav-item hidden" data-nav="inbox"><span id="communications-nav-label">Inbox</span><span class="notification-badge hidden" id="global-inbox-badge">0</span></button>
       <button type="button" class="top-nav-tab nav-item" data-nav="more">Settings</button>
     </nav>
 
@@ -418,9 +418,31 @@
 
       <section id="view-inbox" class="view" data-view="inbox">
         <div class="section-title-row"><div><p class="kicker">Private club messaging</p><h2>Inbox</h2></div><button type="button" class="secondary-button compact" id="refresh-club-inbox">Refresh <span class="notification-badge hidden" id="club-inbox-badge">0</span></button></div>
+        <nav class="communications-tabs hidden" id="communications-tabs" aria-label="Communications sections"><button type="button" class="secondary-button compact active" data-communications-tab="inbox">Inbox</button><button type="button" class="secondary-button compact" data-communications-tab="notifications">Notifications</button><button type="button" class="secondary-button compact" data-communications-tab="notices">Club notices</button></nav>
+        <div id="communications-inbox-panel">
         <section class="panel"><div class="panel-heading"><div><h3>Messages</h3><p class="muted" id="club-inbox-help">Messages leave the active inbox 60 days after they are sent.</p></div></div><div class="onboard-grid"><label>Conversation<select id="inbox-contact-select"><option value="">Choose…</option></select></label><label>Subject<input id="inbox-subject" maxlength="120"/></label><label class="onboard-field-wide">Message<textarea id="inbox-message-body" rows="4" maxlength="4000"></textarea></label></div><p class="helper" id="inbox-compose-hint"></p><button type="button" class="primary-button" id="send-inbox-message">Send</button><div class="inbox-thread" id="inbox-thread"></div></section>
         <section class="panel concern-panel"><div class="panel-heading"><div><p class="kicker">Complaint / concern</p><h3>Raise an issue</h3></div></div><label>Category<select id="concern-category"><option value="general">General dispute / complaint</option><option value="safeguarding">Safeguarding concern about a child</option></select></label><label>Subject<input id="concern-subject" maxlength="120"/></label><label>Details<textarea id="concern-body" rows="4" maxlength="4000"></textarea></label><p class="muted">Safeguarding concern content is not stored. If Safeguarding is selected, the app records only that you raised a concern and directs you to external safeguarding contacts.</p><button type="button" class="secondary-button" id="submit-concern">Continue</button><div class="provider-summary" id="concern-result"></div></section>
         <section class="panel hidden" id="dispute-reviewer-panel"><div class="panel-heading"><div><p class="kicker">Restricted role</p><h3>Dispute Reviewer</h3><p class="muted">Only assigned reviewers can open retained dispute material. Access is audited.</p></div></div><div id="reviewer-dispute-list"><div class="empty-state compact-empty">No open disputes loaded.</div></div><label>Retained message thread ID<input id="reviewer-thread-id" placeholder="Thread UUID"/></label><button type="button" class="secondary-button" id="load-retained-thread">Open retained thread</button><div id="reviewer-retained-thread" class="inbox-thread"></div></section>
+        </div>
+        <section class="panel hidden communications-notifications-panel" id="communications-notifications-panel"><div class="panel-heading"><div><p class="kicker">Notifications</p><h3>Updates</h3></div><button type="button" class="secondary-button compact" id="communications-mark-all">Mark all read</button></div><div class="notification-list" id="communications-notifications-list"></div></section>
+        <div class="hidden" id="communications-notices-panel">
+          <section class="panel admin-announcement-centre">
+            <div class="panel-heading"><div><p class="kicker">Notifications</p><h3>Club notices</h3><p class="muted">Broadcast a read-only notification to the relevant members.</p></div></div>
+            <div class="announcement-compose-grid">
+              <label>Title<input id="announcement-title" type="text" maxlength="120" placeholder="e.g. Training cancelled" /></label>
+              <label>Audience<select id="announcement-audience"><option value="whole_club">Whole club</option><option value="coaches">All coaching staff</option><option value="parents">All parents</option><option value="age_group">One age group</option><option value="team">One team</option></select></label>
+              <label class="hidden" id="announcement-age-wrap">Age group<select id="announcement-age"></select></label>
+              <label class="hidden" id="announcement-team-wrap">Team<select id="announcement-team"></select></label>
+              <label class="announcement-body-label">Message<textarea id="announcement-body" rows="3" maxlength="4000" placeholder="Write the club notice…"></textarea></label>
+              <label class="checkbox-line"><input id="announcement-important" type="checkbox" /> Important</label>
+              <label class="checkbox-line"><input id="announcement-pinned" type="checkbox" /> Pin to top</label>
+              <button type="button" class="primary-button" id="announcement-send">Publish notice</button>
+            </div>
+            <div class="admin-announcements-list" id="admin-announcements-list"></div>
+          </section>
+
+        </div>
+
       </section>
 
       <section id="view-club" class="view" data-view="club">
@@ -438,9 +460,9 @@
         <section class="club-results-panel hidden" id="club-results-panel">
           <section class="panel club-results-browser">
             <div class="panel-heading"><div><p class="kicker">Results browser</p><h3>Club results</h3></div></div>
-            <p class="muted">Club Admin sees team-recorded matches and Selkent's published league results. Coach views show published results for their assigned team.</p>
+            <p class="muted">Published Selkent league results and completed team-recorded matches for your club or assigned team.</p>
             <p class="muted" id="club-results-source-status" role="status"></p>
-            <label class="club-results-age-label">Age group<select id="club-results-age"></select></label>
+            <div class="club-results-filters"><label class="club-results-age-label">Age group<select id="club-results-age"></select></label><label class="club-results-age-label">Competition<select id="club-results-competition"><option value="league">League</option><option value="friendly">Friendly</option><option value="cup">Cup / tournament</option><option value="other">Other</option><option value="all">All competitions</option></select></label></div>
             <div id="club-results-list" class="club-results-list"></div>
             <div class="club-results-pager">
               <button type="button" class="secondary-button compact" id="club-results-prev">← Previous</button>
@@ -454,7 +476,7 @@
           <section class="panel admin-dashboard-summary">
             <div class="admin-dashboard-head">
               <div><p class="kicker">Club at a glance</p><h3>2026/27 overview</h3></div>
-              
+
             </div>
             <div class="admin-overview-stats">
               <article class="admin-stat"><span>Teams</span><strong id="admin-team-count">0</strong></article>
@@ -473,23 +495,9 @@
             <div class="admin-recent-results-list" id="admin-recent-results"></div>
           </section>
 
-          <section class="panel admin-announcement-centre">
-            <div class="panel-heading"><div><p class="kicker">Notifications</p><h3>Club notices</h3><p class="muted">Broadcast a read-only notification to the relevant members.</p></div></div>
-            <div class="announcement-compose-grid">
-              <label>Title<input id="announcement-title" type="text" maxlength="120" placeholder="e.g. Training cancelled" /></label>
-              <label>Audience<select id="announcement-audience"><option value="whole_club">Whole club</option><option value="coaches">All coaching staff</option><option value="parents">All parents</option><option value="age_group">One age group</option><option value="team">One team</option></select></label>
-              <label class="hidden" id="announcement-age-wrap">Age group<select id="announcement-age"></select></label>
-              <label class="hidden" id="announcement-team-wrap">Team<select id="announcement-team"></select></label>
-              <label class="announcement-body-label">Message<textarea id="announcement-body" rows="3" maxlength="4000" placeholder="Write the club notice…"></textarea></label>
-              <label class="checkbox-line"><input id="announcement-important" type="checkbox" /> Important</label>
-              <label class="checkbox-line"><input id="announcement-pinned" type="checkbox" /> Pin to top</label>
-              <button type="button" class="primary-button" id="announcement-send">Publish notice</button>
-            </div>
-            <div class="admin-announcements-list" id="admin-announcements-list"></div>
-          </section>
-
           <section class="admin-team-overview-panel">
-            <div class="admin-section-heading"><div><p class="kicker">Teams</p><h3>Browse by age group</h3></div><span class="admin-section-hint">Tap an age group, then a team</span></div>
+            <div class="admin-section-heading"><div><p class="kicker">Teams</p><h3>Browse by age group</h3></div></div>
+            <label class="admin-filter-label admin-home-age-label">Age group<select id="admin-home-age-select"><option value="">Choose an age group</option></select></label>
             <div class="admin-team-grid admin-age-group-list" id="admin-team-grid"></div>
           </section>
 

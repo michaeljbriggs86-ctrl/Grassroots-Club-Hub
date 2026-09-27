@@ -37,6 +37,7 @@ assert.equal(publishedClubTeamData(teams[0],feed).standing.rows[0].played,1);
 assert.equal(publishedClubTeamData(teams[0],feed).results.length,1,'same name in another division must not match');
 assert.equal(publishedClubTeamData(teams[2],feed).results.length,0,'under-12 public scores are excluded even if malformed feed data appears');
 assert.equal(clubResultRows([], [teams[1]], feed).length,1,'a coach sees only its assigned team');
+assert.equal(clubResultRows([{team:teams[2],state:overview[2].state}],[teams[2]],feed,true).length,1,'an assigned U9 coach sees its own recorded result');
 const rows=clubResultRows(overview,teams,feed,true);
 assert.equal(rows.length,3,'published results, one private U9 result, and no duplicate U12 team record');
 assert.equal(rows.filter(r=>r.source==='selkent-static').length,2);
@@ -48,17 +49,33 @@ assert.equal(elements.get('admin-results-count').textContent,'3');
 assert.match(elements.get('admin-recent-results').innerHTML,/Selkent published/);
 assert.match(elements.get('admin-recent-results').innerHTML,/Team recorded/);
 assert.ok(html.includes('id="admin-recent-results"')&&html.includes('id="club-results-list"'));
-const list={innerHTML:''},ageSelect={value:'',innerHTML:''},page={textContent:''},previous={},next={};
-const browserElements={'club-results-list':list,'club-results-age':ageSelect,'club-results-page':page,'club-results-prev':previous,'club-results-next':next};
+const list={innerHTML:''},ageSelect={value:'',innerHTML:''},competitionSelect={value:'league'},page={textContent:''},previous={},next={};
+const browserElements={'club-results-list':list,'club-results-age':ageSelect,'club-results-competition':competitionSelect,'club-results-page':page,'club-results-prev':previous,'club-results-next':next};
 const browserDocument={getElementById:id=>browserElements[id]||null};
 const browserBody=src.slice(src.indexOf('function renderClubResultsBrowser(){'),src.indexOf('async function refreshClubResults(quiet=false){'));
-const browser=new Function('document','window','resultForNamedTeam','resultClass','esc','matchTeamLabel','formatDate','isAdmin','isClubOverviewMode',
-  `let __clubResultsRows=[],__clubResultsAge='all',__clubResultsPage=0;const CLUB_RESULTS_PAGE_SIZE=6;const currentView='home',__clubTab='overview';${browserBody}\nreturn {show:renderClubResultsBrowser,setRows:rows=>{__clubResultsRows=rows}};`
-)(browserDocument,{ClubHubCloud:{visibleTeamList:()=>teams}},()=> 'W',()=> 'result-W',s=>String(s),s=>s,s=>s,()=>true,()=>true);
+const browser=new Function('document','window','resultForNamedTeam','resultClass','esc','matchTeamLabel','formatDate','isAdmin','isClubOverviewMode','clubResultCompetitionKind',
+  `let __clubResultsRows=[],__clubResultsAge='all',__clubResultsCompetition='league',__clubResultsPage=0;const CLUB_RESULTS_PAGE_SIZE=6;const currentView='home',__clubTab='overview';${browserBody}\nreturn {show:renderClubResultsBrowser,setRows:rows=>{__clubResultsRows=rows},setCompetition:value=>{__clubResultsCompetition=value}};`
+)(browserDocument,{ClubHubCloud:{visibleTeamList:()=>teams}},()=> 'W',()=> 'result-W',s=>String(s),s=>s,s=>s,()=>true,()=>true,new Function(`${helpers}\nreturn clubResultCompetitionKind;`)());
 browser.setRows(rows);browser.show();
 assert.equal(ageSelect.value,'all','Club Results opens on the complete club view');
+assert.equal(competitionSelect.value,'league','Club Results defaults to league');
 assert.match(list.innerHTML,/Shooters Hill AFC Cannons/);
 assert.match(list.innerHTML,/Shooters Hill AFC Valiants|Junior Reds Sabres/);
 ageSelect.value='12';browser.show();
 assert.doesNotMatch(list.innerHTML,/Junior Reds Sabres/,'the age selector still filters after the club-wide default');
+browser.setRows([...rows,{home:'Valiants',away:'Friendly Rivals',hg:2,ag:1,date:'2026-09-20',competition:'Friendly',teamName:'Valiants',ageGroup:9},{home:'Cup Rivals',away:'Valiants',hg:0,ag:1,date:'2026-09-21',competition:'Challenge Cup',teamName:'Valiants',ageGroup:9}]);
+ageSelect.value='all';browser.show();
+assert.doesNotMatch(list.innerHTML,/Friendly Rivals|Cup Rivals/,'league is the default result category');
+browser.setCompetition('friendly');browser.show();assert.match(list.innerHTML,/Friendly Rivals/);assert.doesNotMatch(list.innerHTML,/Cup Rivals/);
+browser.setCompetition('cup');browser.show();assert.match(list.innerHTML,/Cup Rivals/);assert.doesNotMatch(list.innerHTML,/Friendly Rivals/);
+assert.ok(html.includes('id="club-results-competition"'));
+const leagueFixture={date:'2099-09-27',opponent:'Junior Reds Sabres',venue:'A'};
+const fixtureFns=src.slice(src.indexOf('function fixtureLinkedMatch(f={}){'),src.indexOf('function nextPublishedFixture(){'));
+const fixtureState={matches:[{date:'2099-09-27',opponent:'Junior Reds Sabres',venue:'A',status:'played',gf:5,ga:4}],selkent:{fixtures:[leagueFixture,{date:'2099-10-04',opponent:'Phoenix Sports Panthers',venue:'H'}],results:[]},division:{teamName:'Shooters Hill AFC Valiants'}};
+const {fixtureIsReported,nextFixture}=new Function('state','normalizeTeamKey','matchStatus',`${fixtureFns}\nreturn {fixtureIsReported,nextFixture:()=>upcomingFixtures()[0]};`)(fixtureState,normalizeTeamKey,m=>m.status||'played');
+assert.equal(fixtureIsReported(leagueFixture),true,'a saved result closes its linked public fixture');
+assert.equal(nextFixture().opponent,'Phoenix Sports Panthers','the next match advances after the completed fixture');
+const directory={leagues:[{age_group:'U9',division_name:'Under 9D Navy',teams:['Shooters Hill AFC Valiants']},{age_group:'U12',division_name:'Under 12C Orange',teams:['Shooters Hill AFC Cannons']}]};
+const directoryClubDivision=new Function('normalizeTeamKey',`${helpers}\nreturn directoryClubDivision;`)(normalizeTeamKey);
+assert.equal(directoryClubDivision({...teams[2],division:''},directory),'Under 9D Navy','missing database divisions resolve from the club directory');
 console.log('Club Admin results feed, overview count and U9 privacy checks passed');
