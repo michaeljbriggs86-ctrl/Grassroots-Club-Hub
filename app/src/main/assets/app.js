@@ -1778,16 +1778,80 @@ function applyAccessMode(){
   renderMatches();
   renderTournamentEvents();
   renderSquad();
+  syncMobileNavigation();
 }
 
+function closeMobileMore(restoreFocus=false){
+  const sheet=document.getElementById('mobile-more-sheet');
+  if(!sheet||sheet.hidden)return;
+  sheet.hidden=true;
+  document.getElementById('mobile-more-scrim').hidden=true;
+  const more=document.querySelector('[data-mobile-tab="more"]');
+  more?.setAttribute('aria-expanded','false');
+  document.body.classList.remove('mobile-more-open');
+  if(restoreFocus)more?.focus();
+}
+function syncMobileNavigation(selectedView=currentView){
+  const nav=document.getElementById('mobile-primary-nav');
+  if(!nav)return;
+  const club=isClubOverviewMode();
+  const selected=club&&selectedView==='club'&&__clubTab==='coaches'?'club-coaches':selectedView;
+  const primary=club?[['Club','club'],['Fixtures','club-fixtures'],['Results','club-results']]:[['Home','home'],['Matches','matches'],['Squad','squad']];
+  nav.querySelectorAll('[data-mobile-tab]').forEach(button=>{
+    if(button.dataset.mobileTab!=='more'){
+      const [label,target]=primary[Number(button.dataset.mobileTab)];
+      button.dataset.mobileTarget=target;
+      button.querySelector('span').textContent=label;
+    }
+    const key=button.dataset.mobileTab==='more'?'more':button.dataset.mobileTarget;
+    const active=key===selected||(key==='more'&&!primary.some(([,target])=>target===selected));
+    if(active)button.setAttribute('aria-current','page');
+    else button.removeAttribute('aria-current');
+  });
+  const allowed={
+    league:!club&&isPublishedLeagueTeam(),
+    awards:!club&&featureEnabled('awards'),
+    'club-results':!club&&(['coach','assistant_coach'].includes(currentRole)||isAdminCoachMode()),
+    'club-coaches':club,
+    inbox:['admin','coach','assistant_coach','parent'].includes(currentRole),
+    more:true,
+  };
+  document.querySelectorAll('[data-mobile-menu-target]').forEach(button=>{
+    const target=button.dataset.mobileMenuTarget;
+    button.hidden=!allowed[target];
+    if(target==='inbox')button.firstChild.textContent=club?'Communications ':'Inbox ';
+  });
+}
+function openMobileMore(){
+  syncMobileNavigation();
+  const sheet=document.getElementById('mobile-more-sheet');
+  if(!sheet)return;
+  sheet.hidden=false;
+  document.getElementById('mobile-more-scrim').hidden=false;
+  document.querySelector('[data-mobile-tab="more"]')?.setAttribute('aria-expanded','true');
+  document.body.classList.add('mobile-more-open');
+  sheet.querySelector('.mobile-more-link:not([hidden])')?.focus();
+}
+function navigateMobileAwards(){
+  if(!featureEnabled('awards')||isClubOverviewMode())return;
+  navigate('home',false);
+  const section=document.querySelector('#view-home [data-feature-panel="awards"]');
+  if(!section||section.classList.contains('hidden'))return;
+  let parent=section.parentElement;
+  while(parent&&parent.id!=='view-home'){
+    if(parent.tagName==='DETAILS')parent.open=true;
+    parent=parent.parentElement;
+  }
+  requestAnimationFrame(()=>section.scrollIntoView({behavior:'smooth',block:'start'}));
+}
 function navigate(view,scroll=true){
   if(view==='club-fixtures'&&isClubOverviewMode()){
     if(currentView!=='club')navigate('club',false);
-    openAdminClubList('fixtures');return;
+    openAdminClubList('fixtures');syncMobileNavigation('club-fixtures');return;
   }
   if(view==='club-results'&&isClubOverviewMode()){
     if(currentView!=='club')navigate('club',false);
-    openAdminClubList('results');return;
+    openAdminClubList('results');syncMobileNavigation('club-results');return;
   }
   const requested=view;
   if(view==='more'){const h=document.querySelector('#view-more .section-title-row h2'),k=document.querySelector('#view-more .section-title-row .kicker');if(h)h.textContent=isClubOverviewMode()?'Club settings':'Settings';if(k)k.textContent=isClubOverviewMode()?'Club administration':'Team & app';}
@@ -1823,6 +1887,7 @@ function navigate(view,scroll=true){
     setClubTab(__clubTab);
   }
   applyAccessMode();
+  syncMobileNavigation(requested);
   applyMiniResultVisibility();
   const navBar=document.getElementById('top-nav-tabs');
   const activeTab=navBar?.querySelector('.nav-item.active:not(.hidden)');
@@ -3620,7 +3685,7 @@ function populateInboxContacts(){
   sel.value=__inboxSelected;
 }
 function updateInboxBadges(count){
-  ['club-inbox-badge','global-inbox-badge'].forEach(id=>{const badge=document.getElementById(id);if(badge){badge.textContent=String(count);badge.classList.toggle('hidden',count===0);}});
+  ['club-inbox-badge','global-inbox-badge','mobile-inbox-badge'].forEach(id=>{const badge=document.getElementById(id);if(badge){badge.textContent=String(count);badge.classList.toggle('hidden',count===0);}});
 }
 function renderInbox(){
   const box=document.getElementById('inbox-thread'),hint=document.getElementById('inbox-compose-hint');if(!box)return;
@@ -4126,6 +4191,22 @@ function toast(msg){
 
 // Events
 document.addEventListener('click',e=>{
+  const mobileTab=e.target.closest('[data-mobile-tab]');
+  if(mobileTab){
+    if(mobileTab.dataset.mobileTab==='more'){
+      document.getElementById('mobile-more-sheet')?.hidden?openMobileMore():closeMobileMore(true);
+    }else{closeMobileMore();navigate(mobileTab.dataset.mobileTarget);}
+    return;
+  }
+  const mobileMenu=e.target.closest('[data-mobile-menu-target]');
+  if(mobileMenu){
+    const target=mobileMenu.dataset.mobileMenuTarget;
+    closeMobileMore();
+    if(target==='awards')navigateMobileAwards();
+    else navigate(target);
+    return;
+  }
+  if(e.target.closest('#mobile-more-scrim,#mobile-more-close')){closeMobileMore(true);return;}
   const nav=e.target.closest('[data-nav]');
   if(nav){ navigate(nav.dataset.nav); return; }
   const summary=e.target.closest('[data-admin-summary]');
@@ -4172,6 +4253,14 @@ document.addEventListener('click',e=>{
   const delNotice=e.target.closest('[data-delete-announcement]');if(delNotice){deleteAnnouncement(delNotice.dataset.deleteAnnouncement);return;}
   const reviewParentRequest=e.target.closest('[data-review-parent-request]');if(reviewParentRequest){reviewParentAccessNotification(reviewParentRequest.dataset.reviewParentRequest);return;}
   const readNotification=e.target.closest('[data-read-notification]');if(readNotification){markAppNotificationRead(readNotification.dataset.readNotification);return;}
+});
+document.getElementById('mobile-more-sheet')?.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){e.preventDefault();closeMobileMore(true);return;}
+  if(e.key!=='Tab')return;
+  const visible=[...e.currentTarget.querySelectorAll('button:not([hidden])')];
+  const first=visible[0],last=visible[visible.length-1];
+  if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}
+  else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}
 });
 document.getElementById('appearance-theme')?.addEventListener('change',e=>applyTheme(e.target.value));
 document.getElementById('notification-bell')?.addEventListener('click',openNotifications);
