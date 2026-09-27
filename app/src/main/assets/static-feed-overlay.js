@@ -4,10 +4,7 @@
  * Static authorities:
  *   directory/division membership -> data/directory.json
  *   fixtures (all ages)           -> data/results.json schema v2
- *   U12+ standings                  -> data/results.json schema v2
- *
- * Temporary live Selkent fallback remains ONLY for:
- *   published match results
+ *   U12+ standings and published results -> data/results.json schema v2
  */
 (function(){
   'use strict';
@@ -19,6 +16,7 @@
   const DIRECTORY_SOURCE='github-static-directory-v1';
   const TABLE_SOURCE='github-static-results-v2';
   const FIXTURE_SOURCE='github-static-fixtures-v2';
+  const RESULT_SOURCE='github-static-results-v2';
 
   const original={
     syncProviderClubTeams: typeof window.syncProviderClubTeams==='function'?window.syncProviderClubTeams:null,
@@ -75,7 +73,8 @@
     if(!force&&memoryCache[slot])return memoryCache[slot];
     try{
       if(typeof window.nativeHttp!=='function')throw new Error('Native HTTP bridge unavailable');
-      const response=await window.nativeHttp(url,'GET','');
+      const requestUrl=force?`${url}${url.includes('?')?'&':'?'}v=${Date.now()}`:url;
+      const response=await window.nativeHttp(requestUrl,'GET','');
       const data=validator(safeJsonParse(response.body,'Static Selkent feed'));
       memoryCache[slot]=data;writeCached(key,data);return data;
     }catch(err){
@@ -260,6 +259,32 @@
     }));
   }
 
+  function adaptPublishedResults(ageEntry,table){
+    if(!Array.isArray(ageEntry?.published_results))throw new Error('Static feed has no verified published results');
+    return ageEntry.published_results
+      .filter(row=>Number(row.provider_division_id)===Number(table.provider_division_id))
+      .map(row=>({date:String(row.date||''),home:String(row.home||''),away:String(row.away||''),
+        homeGoals:Number(row.homeGoals),awayGoals:Number(row.awayGoals),
+        source:'selkent-static',raw:`${row.home} ${row.homeGoals} - ${row.awayGoals} ${row.away}`}));
+  }
+
+  async function applyStaticPublishedResults(force=false){
+    const results=await loadResults(force),ageEntry=findResultsAge(results);
+    if(!ageEntry)throw new Error(`No ${ageCode()} entry in static Selkent results feed`);
+    if(ageEntry.published_results_status==='not_publicly_published'){
+      state.selkent.results=[];state.selkent.resultSource=RESULT_SOURCE;persistWithoutRender();return[];
+    }
+    const table=findStandingTable(ageEntry);
+    if(!table)throw new Error(`No static results division found for ${state?.division?.name||'current division'}`);
+    const rows=adaptPublishedResults(ageEntry,table);
+    state.selkent.results=rows;
+    state.selkent.resultSource=RESULT_SOURCE;
+    state.selkent.resultsGeneratedAt=results.last_updated||'';
+    if(typeof window.syncOwnLeagueMatchesFromSelkent==='function')window.syncOwnLeagueMatchesFromSelkent(rows,'selkent-static');
+    persistWithoutRender();
+    return rows;
+  }
+
   async function applyStaticStandings(silent=true,force=false){
     state.selkent=state.selkent||{};
     if(typeof window.leagueTableEnabled==='function'&&!window.leagueTableEnabled()){
@@ -348,15 +373,6 @@
     return parsed||{fixtures:[],teams:[]};
   }
 
-  async function liveResultFallback(){
-    if(typeof window.leagueTableEnabled==='function'&&!window.leagueTableEnabled())return{results:[],teams:[]};
-    const sk=state.selkent||{};
-    const choices=[state?.meta?.ageGroup,state?.division?.name].filter(Boolean);
-    const page=await window.fetchSelkentSelected(sk.resultsUrl||STARTER_DATA?.selkent?.resultsUrl,choices);
-    const parsed=original.parseSelkentHtml?original.parseSelkentHtml(page.html,page.url):window.parseSelkentHtml(page.html,page.url);
-    return{results:Array.isArray(parsed?.results)?parsed.results:[],teams:Array.isArray(parsed?.teams)?parsed.teams:[]};
-  }
-
   window.syncProviderClubTeams=async function(silent=true){
     if(!isSelkentProvider()&&original.syncProviderClubTeams)return original.syncProviderClubTeams(silent);
     try{
@@ -405,6 +421,7 @@
   window.syncSelkentLeagueTable=async function(silent=false){
     const btn=document.getElementById('sync-league-table');if(btn)btn.disabled=true;
     try{
+      await loadResults(true);
       await window.refreshPublishedLeagueAges(true);
       if(typeof window.leagueTableEnabled==='function'&&!window.leagueTableEnabled()){
         state.selkent.table=[];state.selkent.results=[];persistWithoutRender();
@@ -413,11 +430,7 @@
       }
       await applyStaticDivision(true,false);
       await applyStaticStandings(true,false);
-      try{
-        const live=await liveResultFallback();
-        state.selkent.results=live.results;
-        if(typeof window.syncOwnLeagueMatchesFromSelkent==='function')window.syncOwnLeagueMatchesFromSelkent(live.results);
-      }catch(_){/* published-result fallback is allowed to fail independently of static standings */}
+      await applyStaticPublishedResults(false);
       state.selkent.lastSync=new Date().toISOString();
       state.selkent.status='Standings loaded from validated static Selkent feed';
       saveAndRender();
@@ -437,6 +450,7 @@
     if(dot)dot.className='sync-dot busy';if(status)status.textContent='Syncing Selkent feeds…';
     if(!silent&&typeof window.toast==='function')window.toast('Syncing with Selkent…');
     try{
+      await loadResults(true);
       await window.syncProviderClubTeams(true);
       await applyStaticDivision(true,false);
       await window.refreshPublishedLeagueAges(true);
@@ -455,7 +469,7 @@
       }else{state.selkent.table=[];state.selkent.tableSource=TABLE_SOURCE;state.selkent.tableStatus='';}
 
       if(typeof window.leagueTableEnabled!=='function'||window.leagueTableEnabled()){
-        try{const live=await liveResultFallback();state.selkent.results=live.results||[];if(typeof window.syncOwnLeagueMatchesFromSelkent==='function')window.syncOwnLeagueMatchesFromSelkent(state.selkent.results);}catch(_){/* keep last-known-good published results */}
+        try{await applyStaticPublishedResults(false);}catch(_){/* keep last-known-good published results */}
       }else state.selkent.results=[];
 
       state.selkent.lastSync=new Date().toISOString();
@@ -519,6 +533,7 @@
       await applyStaticFixtures(true,false);
       if(typeof window.leagueTableEnabled!=='function'||window.leagueTableEnabled()){
         try{await applyStaticStandings(true,false);}catch(err){state.selkent.table=[];state.selkent.tableStatus=`Standings unavailable: ${err.message||err}`;}
+        try{await applyStaticPublishedResults(false);}catch(_){/* retain last-known-good published results */}
       }else{state.selkent.table=[];state.selkent.tableSource=TABLE_SOURCE;state.selkent.tableStatus='';}
       persistWithoutRender();if(typeof window.renderAll==='function')window.renderAll();
     }catch(_){/* retain last-known-good app state; normal sync can retry */}
@@ -527,7 +542,7 @@
   window.ClubHubStaticSelkent={
     DIRECTORY_URL:STATIC_DIRECTORY_URL,
     RESULTS_URL:STATIC_RESULTS_URL,
-    loadDirectory,loadResults,applyStaticDivision,applyStaticFixtures,applyStaticStandings,prime:primeStaticFeeds
+    loadDirectory,loadResults,applyStaticDivision,applyStaticFixtures,applyStaticStandings,applyStaticPublishedResults,prime:primeStaticFeeds
   };
 
   /* Start before the existing delayed automatic Selkent sync fires. */

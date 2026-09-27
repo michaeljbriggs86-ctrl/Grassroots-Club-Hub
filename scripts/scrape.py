@@ -18,11 +18,11 @@ Current verification boundary:
 - Populated fixture markup is verified for h2.subHead / .panel-title / .fixtureRow payloads.
 - Standings table shape is verified against real Selkent payloads and tested
   with an explicitly synthetic non-zero fixture.
-- Published result-row markup is NOT yet verified against a real non-empty
-  result payload.
+- Published result rows are verified against a real 2026-09-27 Selkent payload:
+  Results panel > dated panel > .row with two .resultTeam and one .resultScore.
 
-This script intentionally stops publication for unknown populated fixture shapes
-or published-result markup that has not yet been verified.
+This script intentionally stops publication for unknown populated fixture or
+result shapes.
 """
 
 from __future__ import annotations
@@ -60,7 +60,7 @@ class UnverifiedFixtureMarkupError(SelkentFeedError):
 
 
 class UnverifiedPublishedResultsMarkupError(SelkentFeedError):
-    """Raised when published result rows appear before parser verification."""
+    """Raised when a populated result row does not match verified markup."""
 
 
 def _sleep_between_requests() -> None:
@@ -509,37 +509,81 @@ def merge_fixture_rows(*groups: list[dict[str, Any]]) -> list[dict[str, Any]]:
     )
 
 
-def has_unparsed_published_results(html: str) -> bool:
-    """
-    Detect whether a resultsTable payload now contains actual match-result
-    content in its Results panel.
+def parse_published_results(html: str) -> list[dict[str, Any]]:
+    """Parse only scored matches from Selkent's verified Results panel.
 
-    The empty Results panel has been observed in real Selkent payloads.
-    We intentionally do not guess the result-row structure.
+    Real 2026-09-27 shape: #results-{division} .panel.panel-static, with a
+    dd/mm/yy (Week n) heading and .panel-body > .row containing two
+    .resultTeam cells around one .resultScore cell. Empty and '-' scores are
+    unplayed matches and must not be published as results.
     """
     soup = BeautifulSoup(html, "html.parser")
     results_panel = soup.select_one('div[id^="results-"]')
-
     if results_panel is None:
         raise SelkentFeedError("resultsTable response has no Results panel")
+    rows: list[dict[str, Any]] = []
+    panels = results_panel.select(".panel.panel-static")
 
-    # Work on a detached copy so heading/button text does not count as a result.
+    for panel in panels:
+        heading = panel.select_one(".panel-heading")
+        date_match = re.search(
+            r"\b(\d{1,2})/(\d{1,2})/(\d{2,4})\b",
+            heading.get_text(" ", strip=True) if heading else "",
+        )
+        if not date_match:
+            raise UnverifiedPublishedResultsMarkupError(
+                "Results panel has an unsupported date heading"
+            )
+        day, month, year = map(int, date_match.groups())
+        if year < 100:
+            year += 2000
+        try:
+            date = datetime(year, month, day).date().isoformat()
+        except ValueError as exc:
+            raise UnverifiedPublishedResultsMarkupError(
+                "Results panel contains an invalid date"
+            ) from exc
+
+        body = panel.select_one(".panel-body")
+        if body is None:
+            raise UnverifiedPublishedResultsMarkupError(
+                "Dated Results panel has no body"
+            )
+        for row in body.select(".row"):
+            teams = row.select(".resultTeam")
+            scores = row.select(".resultScore")
+            if len(teams) != 2 or len(scores) != 1:
+                raise UnverifiedPublishedResultsMarkupError(
+                    "Results row has unsupported team/score cells"
+                )
+            score_text = _normalise_text(scores[0].get_text(" ", strip=True))
+            if score_text in ("", "-"):
+                continue
+            score_match = re.fullmatch(r"(\d{1,2})\s*-\s*(\d{1,2})", score_text)
+            home = _normalise_text(teams[0].get_text(" ", strip=True))
+            away = _normalise_text(teams[1].get_text(" ", strip=True))
+            if not score_match or not home or not away:
+                raise UnverifiedPublishedResultsMarkupError(
+                    f"Results row has unsupported score or team: {score_text!r}"
+                )
+            rows.append({
+                "date": date,
+                "home": home,
+                "away": away,
+                "homeGoals": int(score_match.group(1)),
+                "awayGoals": int(score_match.group(2)),
+            })
+
+    # Heading and Print button are the only content in an empty Results panel.
     copy = BeautifulSoup(str(results_panel), "html.parser")
     copy_panel = copy.select_one('div[id^="results-"]')
-
-    if copy_panel is None:
-        raise SelkentFeedError("Unable to inspect Results panel")
-
-    for heading in copy_panel.find_all(["h1", "h2", "h3", "h4", "button"]):
-        heading.decompose()
-
-    meaningful_text = _normalise_text(copy_panel.get_text(" ", strip=True))
-    meaningful_tags = copy_panel.find_all(
-        ["table", "tr", "li"],
-        recursive=True,
-    )
-
-    return bool(meaningful_text or meaningful_tags)
+    for element in copy_panel.find_all(["h1", "h2", "h3", "h4", "button"]):
+        element.decompose()
+    if not panels and _normalise_text(copy_panel.get_text(" ", strip=True)):
+        raise UnverifiedPublishedResultsMarkupError(
+            "Results panel is populated with an unknown markup shape"
+        )
+    return rows
 
 
 def collect_fixtures(
@@ -613,18 +657,18 @@ def collect_standings(
         divisions = parse_results_divisions(age_html)
 
         age_standings: list[dict[str, Any]] = []
+        age_results: list[dict[str, Any]] = []
 
         for division in divisions:
             division_id = division["provider_division_id"]
             table_html = fetch_json(f"resultsTable/{division_id}")
 
-            if has_unparsed_published_results(table_html):
-                raise UnverifiedPublishedResultsMarkupError(
-                    "A real published Selkent result row is now present, but "
-                    "published-result markup has not yet been verified. "
-                    f"Publication stopped at division {division_id} "
-                    f"({division['division_name']})."
-                )
+            division_results = parse_published_results(table_html)
+            age_results.extend({
+                **row,
+                "provider_division_id": division_id,
+                "division_name": division["division_name"],
+            } for row in division_results)
 
             try:
                 parsed = parse_standings_html(table_html)
@@ -646,7 +690,8 @@ def collect_standings(
             "age_group": age_label,
             "format_type": format_type,
             "standings": age_standings,
-            "published_results_status": "pending_verified_nonempty_sample",
+            "published_results": age_results,
+            "published_results_status": "verified_scored_rows_v1",
         }
 
         _sleep_between_requests()
@@ -697,6 +742,7 @@ def build_payload() -> dict[str, Any]:
         if standings_data is not None:
             entry["results_format_type"] = standings_data["format_type"]
             entry["standings"] = standings_data["standings"]
+            entry["published_results"] = standings_data["published_results"]
             entry["published_results_status"] = standings_data[
                 "published_results_status"
             ]
@@ -704,6 +750,7 @@ def build_payload() -> dict[str, Any]:
             # Explicitly distinguish "not publicly published by Selkent"
             # from an empty public results list.
             entry["standings"] = None
+            entry["published_results"] = None
             entry["published_results_status"] = "not_publicly_published"
 
         age_groups.append(entry)
@@ -728,7 +775,7 @@ def build_payload() -> dict[str, Any]:
             },
             "published_results": {
                 "scope": "Selkent-public Results age groups only",
-                "parser_status": "awaiting_verified_nonempty_result_sample",
+                "parser_status": "verified_scored_rows_v1",
             },
         },
         "age_groups": age_groups,
@@ -738,8 +785,8 @@ def build_payload() -> dict[str, Any]:
                 "from this public feed."
             ),
             (
-                "Unknown fixture shapes and non-empty published-result payloads "
-                "fail closed until their real markup has been verified."
+                "Unknown fixture/result shapes fail closed rather than "
+                "publish guessed data."
             ),
             (
                 "Standings preserve Selkent display sequence as row_order; "

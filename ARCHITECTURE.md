@@ -136,11 +136,16 @@ Selkent → scripts/scrape.py → data/results.json
 
 Scope: U12+ only.
 
-Status: **PLANNED** for static cutover.
+Status: **BUILT IN SOURCE; PENDING LIVE FEED/DEVICE VERIFICATION** for static cutover.
 
-Age/division discovery and empty-result states have been tested; real populated
-result-row markup still requires capture and verification. U7-U11 public results
-must never be published.
+The 2026-09-27 live Under12X A Navy result panel showed a dated panel with
+`.resultTeam`, `.resultScore`, `.resultTeam` rows and a 9–1 published score.
+`scripts/scrape.py` now parses only numeric scores in that verified shape,
+ignoring blank or dash scores. Unknown populated shapes abort the atomic feed
+build. The Android adapter reads division-filtered results from the static feed
+and refreshes it on manual sync. This source change does not establish that a
+new feed has been published or that an installed device has accepted the result.
+U7–U11 public results must never be published.
 
 ## 2.5 Private club-entered results, player, roster and safeguarding data
 
@@ -362,7 +367,7 @@ claim about its continuing state must be rechecked against the database.
 | Club/team directory | Weekly |
 | Club logo metadata/assets | Weekly reconciliation; immediate on verified club-admin replacement |
 | Fixtures | Every six hours (current public-feed workflow) |
-| Published U12+ results | Every six hours when provider-verified parsing is available; static result cutover remains PLANNED |
+| Published U12+ results | Every six hours after the verified parser and static adapter are pushed and the feed runs successfully; source built, live publication pending |
 | U12+ standings | Every six hours (current public-feed workflow) |
 | Private club-entered results | Immediate user action |
 | Player/safeguarding data | Immediate user action |

@@ -15,7 +15,9 @@ from scrape import (
     SelkentFeedError,
     UnverifiedFixtureMarkupError,
     collect_fixtures,
-    has_unparsed_published_results,
+    collect_standings,
+    parse_published_results,
+    UnverifiedPublishedResultsMarkupError,
     merge_fixture_rows,
     parse_divisions,
     parse_fixture_week_ids,
@@ -288,19 +290,71 @@ class GeneralizedSelkentFeedTests(unittest.TestCase):
         </div>
         """
 
-        self.assertFalse(has_unparsed_published_results(html))
+        self.assertEqual(parse_published_results(html), [])
 
-    def test_nonempty_results_panel_is_detected(self):
+    def test_real_published_result_shape_ignores_unplayed_matches(self):
         html = """
-        <div class="row">
-          <div id="results-4253">
-            <h3>Results</h3>
-            <div>Fictional Athletic 2 - 1 Example Borough</div>
+        <div id="results-4242" class="col-xs-12 col-md-6">
+          <h3>Results<span class="pull-right"><button>Print</button></span></h3>
+          <div class="panel panel-static">
+            <div class="panel-heading">27/09/26 (Week 2)</div>
+            <div class="panel-body">
+              <div class="row">
+                <div class="col-xs-5 resultTeam">Cray Wanderers Spartans</div>
+                <div class="col-xs-2 resultScore"></div>
+                <div class="col-xs-5 resultTeam">Ebbsfleet United Blue</div>
+              </div>
+              <div class="row">
+                <div class="col-xs-5 resultTeam">Dartford FC White</div>
+                <div class="col-xs-2 resultScore"> - </div>
+                <div class="col-xs-5 resultTeam">Ballon Dor FC</div>
+              </div>
+              <div class="row">
+                <div class="col-xs-5 resultTeam">Parkwood Rangers Rebels</div>
+                <div class="col-xs-2 resultScore">9 - 1</div>
+                <div class="col-xs-5 resultTeam">Eversley Rangers</div>
+              </div>
+            </div>
           </div>
         </div>
         """
+        self.assertEqual(parse_published_results(html), [{
+            "date": "2026-09-27", "home": "Parkwood Rangers Rebels",
+            "away": "Eversley Rangers", "homeGoals": 9, "awayGoals": 1,
+        }])
 
-        self.assertTrue(has_unparsed_published_results(html))
+    def test_unknown_populated_results_still_fail_closed(self):
+        html = '<div id="results-4253"><h3>Results</h3><div>Home 2 - 1 Away</div></div>'
+        with self.assertRaises(UnverifiedPublishedResultsMarkupError):
+            parse_published_results(html)
+
+    def test_unverified_score_status_still_fails_closed(self):
+        html = '''<div id="results-4253"><div class="panel panel-static">
+          <div class="panel-heading">27/09/26 (Week 2)</div><div class="panel-body">
+          <div class="row"><div class="resultTeam">Home</div>
+          <div class="resultScore">Awarded</div><div class="resultTeam">Away</div>
+          </div></div></div></div>'''
+        with self.assertRaises(UnverifiedPublishedResultsMarkupError):
+            parse_published_results(html)
+
+    def test_collect_standings_includes_only_scored_public_division_results(self):
+        divisions = '<a class="tabDivision" data-division-id="4242" aria-controls="Under12X A Navy">A</a>'
+        table = '''<div id="results-4242"><h3>Results</h3>
+          <div class="panel panel-static"><div class="panel-heading">27/09/26 (Week 2)</div>
+          <div class="panel-body"><div class="row">
+          <div class="resultTeam">Parkwood Rangers Rebels</div>
+          <div class="resultScore">9 - 1</div>
+          <div class="resultTeam">Eversley Rangers</div>
+          </div></div></div></div>'''
+        with patch.object(scrape, 'fetch_json', side_effect=[divisions, table]), \
+             patch.object(scrape, 'parse_standings_html', return_value={'rows': []}), \
+             patch.object(scrape, '_sleep_between_requests', return_value=None):
+            result = collect_standings({6: {'age_group': 'U12X', 'format_type': '9'}})
+        self.assertEqual(result[6]['published_results'], [{
+            'date': '2026-09-27', 'home': 'Parkwood Rangers Rebels',
+            'away': 'Eversley Rangers', 'homeGoals': 9, 'awayGoals': 1,
+            'provider_division_id': 4242, 'division_name': 'Under12X A Navy',
+        }])
 
 
 if __name__ == "__main__":
