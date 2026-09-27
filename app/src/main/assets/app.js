@@ -1727,7 +1727,6 @@ function applyAccessMode(){
   document.querySelectorAll('[data-admin-history]').forEach(el=>el.classList.toggle('hidden',!adminClub));
   document.querySelectorAll('[data-staff-settings]').forEach(el=>el.classList.toggle('hidden',!['admin','coach','assistant_coach'].includes(currentRole)));
   const teamAccessPanel=document.getElementById('team-access-settings');if(teamAccessPanel)teamAccessPanel.classList.toggle('hidden',!['admin','coach','assistant_coach'].includes(currentRole)||(isAdmin()&&isClubOverviewMode()));
-  document.querySelectorAll('[data-admin-season-panel]').forEach(el=>el.classList.toggle('hidden',!adminClub));
   const topNav=document.getElementById('top-nav-tabs');
   if(topNav)topNav.classList.remove('hidden');
   const inboxAllowed=['admin','coach','assistant_coach','parent'].includes(currentRole);document.querySelector('[data-nav="inbox"]')?.classList.toggle('hidden',!inboxAllowed);const communicationsLabel=document.getElementById('communications-nav-label');if(communicationsLabel)communicationsLabel.textContent=adminClub?'Communications':'Inbox';if(currentRole==='player'&&currentView==='inbox')navigate('home',false);
@@ -3710,7 +3709,6 @@ function setClubTab(tab='overview'){
   document.getElementById('club-fixtures-panel')?.classList.toggle('hidden',tab!=='fixtures'||!admin);
   document.getElementById('club-results-panel')?.classList.toggle('hidden',tab!=='results');
   document.getElementById('club-coaches-panel')?.classList.toggle('hidden',tab!=='coaches'||!admin);
-  document.getElementById('admin-season-management-panel')?.classList.toggle('hidden',tab!=='overview'||!admin);
   document.querySelectorAll('[data-admin-club-tab]').forEach(b=>b.classList.toggle('hidden',!admin));
   document.querySelectorAll('[data-club-tab]').forEach(b=>b.classList.toggle('active',b.dataset.clubTab===tab));
   const title=document.getElementById('club-view-title'),kick=document.getElementById('club-view-kicker');const names={overview:'Club Overview',fixtures:'Fixture Centre',results:'Club Results',coaches:'Coach Overview'};if(title)title.textContent=names[tab]||'Club';if(kick)kick.textContent=admin?'Club administration':isAdminCoachMode()?`Coach · ${dualCoachTeam()?.ageGroup||''} ${dualCoachTeam()?.teamName||''}`.trim():roleLabel();

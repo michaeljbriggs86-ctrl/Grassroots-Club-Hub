@@ -508,17 +508,6 @@
           </section>
         </section>
 
-        <section class="panel admin-season-management" id="admin-season-management-panel" data-admin-season-panel>
-          <div class="panel-heading"><div><p class="kicker">Season control</p><h3>Archive & rollover</h3></div><span class="age-rule">Club Admin</span></div>
-          <p class="muted">Archive the current season before starting the next one. Squads and account links carry forward; current-season matches, awards and attendance reset only after a confirmed rollover.</p>
-          <div class="season-management-actions">
-            <button type="button" class="secondary-button" id="archive-current-season">Archive current season</button>
-            <label>New season<input id="rollover-season-name" type="text" placeholder="2027/28" maxlength="12" /></label>
-            <button type="button" class="primary-button" id="rollover-season">Start new season</button>
-          </div>
-          <p class="helper">U8–U14 move up one age group. U15 remains U15 while the app scope is capped at U15.</p>
-        </section>
-
         <section class="club-admin-panel hidden" id="club-coaches-panel">
           <section class="panel admin-coach-centre">
             <div class="panel-heading"><div><p class="kicker">Club staff</p><h3>Coaching Staff</h3></div></div>
@@ -547,6 +536,7 @@
           <button type="button" data-scroll-to="team-access-settings" data-staff-settings>Team access</button>
           <button type="button" data-scroll-to="rules-procedures-settings" data-staff-settings>Rules</button>
           <button type="button" data-scroll-to="club-admin-access-settings" data-admin-settings-only>Club Admin</button>
+          <button type="button" data-scroll-to="admin-season-management-panel" data-admin-settings-only>Season</button>
           <button type="button" data-scroll-to="season-history-settings" data-staff-history>History</button>
           <button type="button" data-scroll-to="appearance-settings">Appearance</button>
           <button type="button" data-scroll-to="access-panel">My account</button>
@@ -611,6 +601,8 @@
             </div>
           </details>
 
+<div class="settings-group-heading hidden" data-admin-settings-only><span>Club administration</span><small>Access, season and compliance</small></div>
+
 <details class="panel settings-accordion hidden" id="club-admin-access-settings" data-admin-settings-only>
             <summary><span>Club Admin access</span><span class="settings-chevron">⌄</span></summary>
             <div class="settings-accordion-body">
@@ -620,6 +612,19 @@
                 <label class="assignment-output-label">Club Admin invite code<input id="club-admin-invite-code" type="text" readonly placeholder="Create an invite above" /></label>
                 <button type="button" class="secondary-button setup-save" id="copy-club-admin-invite">Copy invite code</button>
               </div>
+            </div>
+          </details>
+
+<details class="panel settings-accordion hidden" id="admin-season-management-panel" data-admin-settings-only>
+            <summary><span>Season control</span><span class="settings-chevron">⌄</span></summary>
+            <div class="settings-accordion-body">
+              <p class="muted">Archive the current season before starting the next one. Squads and account links carry forward; current-season matches, awards and attendance reset only after a confirmed rollover.</p>
+              <div class="season-management-actions">
+                <button type="button" class="secondary-button" id="archive-current-season">Archive current season</button>
+                <label>New season<input id="rollover-season-name" type="text" placeholder="2027/28" maxlength="12" /></label>
+                <button type="button" class="primary-button" id="rollover-season">Start new season</button>
+              </div>
+              <p class="helper">U8–U14 move up one age group. U15 remains U15 while the app scope is capped at U15.</p>
             </div>
           </details>
 
