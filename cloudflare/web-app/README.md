@@ -67,10 +67,11 @@ reviewed Cray Wanderers asset, the route is:
 
 `https://test.pitchkind.com/__pilot_badges/250/78dc32848d6919bcfe7c8b2aa6e93e766fd1c5d7d26fd166fdb8450345d11570`
 
-This first stage does not change `logo_url` in the directory or the badge shown
-by the website. Check that the workflow uploaded the exact file and that this
-route returns the expected image while signed into Cloudflare Access before
-switching the website's badge URLs to R2. Keep Access on the whole Worker;
+The protected browser pilot uses this route when rendering a `pilot_verified`
+club badge from the canonical directory. The directory's `logo_url` retains its
+original provenance URL; the Android client continues its existing behavior.
+The browser requires the current club ID and reviewed SHA-256, and falls back
+to the placeholder if loading fails. Keep Access on the whole Worker;
 the route additionally requires the exact pilot hostname. SVGs are held for a
 separate active-content and browser-render review. A private pilot badge is
 not a public-use rights clearance.

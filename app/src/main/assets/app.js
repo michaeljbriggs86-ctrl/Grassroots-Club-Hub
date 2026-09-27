@@ -1485,7 +1485,14 @@ function verifiedTeamBadgeUrl(teamName=''){
   }
   const d=state.selkent?.directoryDetails?.[selkentNorm(teamName)]||{};
   if(d.logoStatus==='pilot_verified'){
-    return d.pilotLogoUrl&&Number(d.clubId)===Number(d.logoClubId)&&pilotVerifiedBadgeScopeAllowed()?d.pilotLogoUrl:'';
+    if(!d.pilotLogoUrl||Number(d.clubId)!==Number(d.logoClubId)||!pilotVerifiedBadgeScopeAllowed())return '';
+    // The protected browser pilot reads reviewed bytes from private R2.
+    if(!window.ClubHubNative){
+      const id=Number(d.clubId),hash=String(d.pilotLogoSha256||'').toLowerCase();
+      return Number.isSafeInteger(id)&&id>0&&/^[a-f0-9]{64}$/.test(hash)
+        ?`/__pilot_badges/${id}/${hash}`:'';
+    }
+    return d.pilotLogoUrl;
   }
   return d.logoUrl&&(d.logoVerified===true||pilotBadgeOverrideAllowed(d.clubId))?d.logoUrl:'';
 }

@@ -32,6 +32,7 @@ Object.assign(original.clubs.find(c => c.club_id === 250), { logo_status: cray.l
 const crayTeam = original.team_club_links.find(t => Number(t.club_id) === 250).team_name;
 overlay.attachDirectoryBadges(original);
 assert.equal(app.verifiedTeamBadgeUrl(crayTeam), cray.logo_url);
+assert.equal(state.selkent.directoryDetails[norm(crayTeam)].pilotLogoSha256, cray.logo_sha256);
 
 // A second approval enters through directory data with the same installed app code.
 const second = structuredClone(original);
@@ -74,7 +75,8 @@ assert.equal(app.verifiedTeamBadgeUrl(secondTeam), secondUrl);
 // host or Android release build may inherit its exception.
 window.ClubHubNative = undefined;
 window.location = { protocol: 'https:', hostname: 'test.pitchkind.com' };
-assert.equal(app.verifiedTeamBadgeUrl(secondTeam), secondUrl);
+assert.equal(app.verifiedTeamBadgeUrl(crayTeam), `/__pilot_badges/250/${cray.logo_sha256}`);
+assert.equal(app.verifiedTeamBadgeUrl(secondTeam), `/__pilot_badges/261/${'a'.repeat(64)}`);
 window.location.hostname = 'pitchkind.com';
 assert.equal(app.verifiedTeamBadgeUrl(secondTeam), '');
 window.location.hostname = 'test.pitchkind.com';
@@ -82,6 +84,12 @@ window.location.protocol = 'http:';
 assert.equal(app.verifiedTeamBadgeUrl(secondTeam), '');
 window.location.protocol = 'https:';
 window.ClubHubNative = { isDebugBuild: () => false };
+assert.equal(app.verifiedTeamBadgeUrl(secondTeam), '');
+window.ClubHubNative = { isDebugBuild: () => true };
+
+// Missing or invalid hashes cannot send the browser to the original image host.
+window.ClubHubNative = undefined;
+state.selkent.directoryDetails[norm(secondTeam)].pilotLogoSha256 = 'bad';
 assert.equal(app.verifiedTeamBadgeUrl(secondTeam), '');
 window.ClubHubNative = { isDebugBuild: () => true };
 

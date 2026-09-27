@@ -102,7 +102,7 @@
       if(detail?.logoStatus==='pilot_verified'){
         const id=links.get(key),club=clubs.get(id);
         if(!club||!usable(club)||Number(detail.clubId)!==id){
-          details[key]={...detail,logoUrl:'',logoVerified:false,logoStatus:'',pilotLogoUrl:'',logoClubId:null};
+          details[key]={...detail,logoUrl:'',logoVerified:false,logoStatus:'',pilotLogoUrl:'',pilotLogoSha256:'',logoClubId:null};
         }
       }
     }
@@ -112,7 +112,7 @@
       const current=details[key]||{};
       details[key]={...current,clubId:id,clubName:club.club_name,
         logoUrl:club.logo_url,logoStatus:'pilot_verified',logoVerified:false,
-        pilotLogoUrl:club.logo_url,logoClubId:id};
+        pilotLogoUrl:club.logo_url,pilotLogoSha256:club.logo_sha256.toLowerCase(),logoClubId:id};
     }
     return directory;
   }
