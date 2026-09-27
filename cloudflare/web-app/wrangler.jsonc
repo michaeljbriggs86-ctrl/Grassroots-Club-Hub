@@ -5,9 +5,12 @@
   "main": "./src/index.js",
   "workers_dev": false,
   "preview_urls": false,
+  "r2_buckets": [
+    { "binding": "PILOT_BADGES", "bucket_name": "pitchkind-pilot-badges" }
+  ],
   "assets": {
     "directory": "./dist",
     "binding": "ASSETS",
-    "run_worker_first": ["/__health"]
+    "run_worker_first": ["/__health", "/__pilot_badges/*"]
   }
 }

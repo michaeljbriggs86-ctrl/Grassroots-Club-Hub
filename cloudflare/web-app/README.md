@@ -50,6 +50,31 @@ must continue protecting the entire Worker; response headers do not grant or
 restrict app roles. Cloudflare Web Analytics and any additional WAF rules are
 account-level settings and are not enabled by this source change.
 
+## Private pilot badge storage
+
+The `stage-pilot-badges-r2.yml` workflow creates the **private**
+`pitchkind-pilot-badges` R2 bucket if needed, downloads only entries already
+listed in `verification/pilot_verified_badges.json`, checks the exact reviewed
+SHA-256 and image MIME, uploads under immutable `club_id/hash` keys, and checks
+the stored bytes by reading them back. It then deploys this Worker with the
+`PILOT_BADGES` R2 binding. The bucket has no public domain or development URL.
+
+Within the Cloudflare Access-protected `test.pitchkind.com` pilot, the route
+`/__pilot_badges/<club_id>/<sha256>` serves a stored image only if the packaged
+canonical directory still marks that exact ID and hash `pilot_verified`.
+Revoking the directory record makes the route return 404. For the currently
+reviewed Cray Wanderers asset, the route is:
+
+`https://test.pitchkind.com/__pilot_badges/250/78dc32848d6919bcfe7c8b2aa6e93e766fd1c5d7d26fd166fdb8450345d11570`
+
+This first stage does not change `logo_url` in the directory or the badge shown
+by the website. Check that the workflow uploaded the exact file and that this
+route returns the expected image while signed into Cloudflare Access before
+switching the website's badge URLs to R2. Keep Access on the whole Worker;
+the route additionally requires the exact pilot hostname. SVGs are held for a
+separate active-content and browser-render review. A private pilot badge is
+not a public-use rights clearance.
+
 ## Connect the existing Cloudflare Worker
 
 The failed 2026-09-26 `grassroots-club-hub.production` build ran Wrangler at
