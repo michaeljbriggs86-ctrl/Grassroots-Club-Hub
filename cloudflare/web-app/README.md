@@ -32,6 +32,24 @@ verification file, Supabase service key, untracked source or private player
 data belongs in `dist/`. The Supabase publishable key is in the client as
 before and is not an administrator key.
 
+## Cloudflare pilot diagnostics
+
+The Worker serves the existing static app and feeds. Within the Cloudflare
+Access-protected pilot, `GET /__health` reports whether the packaged public
+directory (nine-day threshold) and fixture feed (18-hour threshold) are fresh.
+It responds with HTTP 503 when a feed is stale, malformed or unavailable, and
+uses `Cache-Control: no-store`. The feed files remain the sole public source of
+truth; the diagnostic never scrapes Selkent or handles private club data.
+Inspect `last_updated` in the response when fixtures seem out of date, then
+investigate the existing GitHub feed workflows. Do not treat a 200 from this
+route as proof that the browser UI or Supabase flows work.
+
+The built `_headers` file applies `noindex`, `nosniff`, a no-referrer policy
+and frame blocking to static responses on the private pilot. Cloudflare Access
+must continue protecting the entire Worker; response headers do not grant or
+restrict app roles. Cloudflare Web Analytics and any additional WAF rules are
+account-level settings and are not enabled by this source change.
+
 ## Connect the existing Cloudflare Worker
 
 The failed 2026-09-26 `grassroots-club-hub.production` build ran Wrangler at

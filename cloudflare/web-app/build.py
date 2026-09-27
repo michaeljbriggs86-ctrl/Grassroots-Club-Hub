@@ -76,6 +76,7 @@ def build() -> None:
         encoding="utf-8",
     )
     shutil.copyfile(HERE / "service-worker.js", DIST / "service-worker.js")
+    shutil.copyfile(HERE / "_headers", DIST / "_headers")
     (DIST / "data").mkdir()
     for name in ("directory.json", "results.json"):
         shutil.copyfile(ROOT / "data" / name, DIST / "data" / name)
