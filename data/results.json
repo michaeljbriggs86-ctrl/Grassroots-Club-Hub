@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "provider": "Selkent",
-  "last_updated": "2026-09-27T19:23:51.784180+00:00",
+  "last_updated": "2026-09-27T19:50:04.247695+00:00",
   "fixture_agegroup_discovery_source": "selkent_divisions_all",
   "coverage": {
     "fixtures": {
@@ -14928,7 +14928,7 @@
       "standings": [
         {
           "division_name": "Under 16A",
-          "updated_at_text": "27/09/26 16:59:46",
+          "updated_at_text": "27/09/26 20:34:02",
           "source_order_authoritative_for_ties": false,
           "source_disclaimer": "Note: Table does not yet take account of rules for determining winner if teams on equal points",
           "rows": [
@@ -14960,6 +14960,19 @@
             },
             {
               "row_order": 3,
+              "provider_team_id": 662,
+              "provider_division_id": 4286,
+              "team_name": "Ebbsfleet United White",
+              "played": 1,
+              "won": 1,
+              "drawn": 0,
+              "lost": 0,
+              "gf": 7,
+              "ga": 2,
+              "points": 2
+            },
+            {
+              "row_order": 4,
               "provider_team_id": 467,
               "provider_division_id": 4286,
               "team_name": "Athenlay FC",
@@ -14972,7 +14985,7 @@
               "points": 1
             },
             {
-              "row_order": 4,
+              "row_order": 5,
               "provider_team_id": 981,
               "provider_division_id": 4286,
               "team_name": "Welling United Blue",
@@ -14985,7 +14998,7 @@
               "points": 1
             },
             {
-              "row_order": 5,
+              "row_order": 6,
               "provider_team_id": 616,
               "provider_division_id": 4286,
               "team_name": "Cray Wanderers Lions",
@@ -14998,7 +15011,7 @@
               "points": 0
             },
             {
-              "row_order": 6,
+              "row_order": 7,
               "provider_team_id": 550,
               "provider_division_id": 4286,
               "team_name": "Dartford Royals Blue",
@@ -15011,29 +15024,16 @@
               "points": 0
             },
             {
-              "row_order": 7,
+              "row_order": 8,
               "provider_team_id": 539,
               "provider_division_id": 4286,
               "team_name": "Dynamo Youth",
-              "played": 0,
+              "played": 1,
               "won": 0,
               "drawn": 0,
-              "lost": 0,
-              "gf": 0,
-              "ga": 0,
-              "points": 0
-            },
-            {
-              "row_order": 8,
-              "provider_team_id": 662,
-              "provider_division_id": 4286,
-              "team_name": "Ebbsfleet United White",
-              "played": 0,
-              "won": 0,
-              "drawn": 0,
-              "lost": 0,
-              "gf": 0,
-              "ga": 0,
+              "lost": 1,
+              "gf": 2,
+              "ga": 7,
               "points": 0
             },
             {
@@ -15660,6 +15660,15 @@
           "away": "Dartford Royals Blue",
           "homeGoals": 5,
           "awayGoals": 1,
+          "provider_division_id": 4286,
+          "division_name": "Under 16A"
+        },
+        {
+          "date": "2026-09-27",
+          "home": "Ebbsfleet United White",
+          "away": "Dynamo Youth",
+          "homeGoals": 7,
+          "awayGoals": 2,
           "provider_division_id": 4286,
           "division_name": "Under 16A"
         },
