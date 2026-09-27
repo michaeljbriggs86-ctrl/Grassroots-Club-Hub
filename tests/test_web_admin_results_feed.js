@@ -8,7 +8,7 @@ const html = fs.readFileSync(path.join(root, 'app/src/main/assets/index.html'), 
 const normalizeTeamKey = s => String(s || '').toLowerCase().replace(/&/g, 'and').replace(/[^a-z0-9]+/g, ' ').trim().replace(/\s+/g, ' ');
 const internalBody = src.slice(src.indexOf('function internalAdminClubResults(rows=[]){'), src.indexOf('function renderClubResultsBrowser(){'));
 const internalAdminClubResults = new Function(`${internalBody}\nreturn internalAdminClubResults;`)();
-const elements = new Map(['admin-recent-results','admin-results-count','admin-results-source-status'].map(id => [id,{innerHTML:'',textContent:''}]));
+const elements = new Map(['admin-recent-results','admin-results-count','admin-results-breakdown','admin-results-source-status'].map(id => [id,{innerHTML:'',textContent:''}]));
 const document = {getElementById:id => elements.get(id)};
 const helpers = src.slice(src.indexOf('function verifiedClubResultsFeed(feed){'), src.indexOf('function nextWeekendDates(){'));
 const {verifiedClubResultsFeed,publishedClubTeamData,clubResultRows,renderAdminRecentResults} = new Function(
@@ -46,6 +46,8 @@ assert.equal(clubResultRows(overview,teams,null,true).length,2,'club records rem
 assert.equal(verifiedClubResultsFeed({...feed,coverage:{published_results:{parser_status:'awaiting_verified_nonempty_result_sample'}}}),null);
 renderAdminRecentResults(rows,true);
 assert.equal(elements.get('admin-results-count').textContent,'3');
+assert.equal(elements.get('admin-results-breakdown').textContent,'2 Selkent published · 1 team recorded');
+assert.match(html,/Completed matches<\/span><strong id="admin-results-count"/);
 assert.match(elements.get('admin-recent-results').innerHTML,/Selkent published/);
 assert.match(elements.get('admin-recent-results').innerHTML,/Team recorded/);
 assert.ok(html.includes('id="admin-recent-results"')&&html.includes('id="club-results-list"'));

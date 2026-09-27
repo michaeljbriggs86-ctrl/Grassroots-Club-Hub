@@ -3178,8 +3178,9 @@ function clubResultCompetitionKind(result={}){
   return 'other';
 }
 function renderAdminRecentResults(rows=[],feedAvailable=true){
-  const box=document.getElementById('admin-recent-results'),count=document.getElementById('admin-results-count'),status=document.getElementById('admin-results-source-status');
+  const box=document.getElementById('admin-recent-results'),count=document.getElementById('admin-results-count'),breakdown=document.getElementById('admin-results-breakdown'),status=document.getElementById('admin-results-source-status');
   if(count)count.textContent=String(rows.length);
+  if(breakdown)breakdown.textContent=`${rows.filter(r=>r.source==='selkent-static').length} Selkent published · ${rows.filter(r=>r.source==='internal').length} team recorded`;
   if(status)status.textContent=feedAvailable?'':'Selkent feed unavailable · showing team-recorded matches only';
   if(!box)return;
   box.innerHTML=rows.slice(0,3).map(r=>`<div class="admin-recent-result"><span>U${esc(r.ageGroup)} · ${formatDate(r.date)||esc(r.date)}</span><strong>${esc(matchTeamLabel(r.home))} <b>${r.hg}–${r.ag}</b> ${esc(matchTeamLabel(r.away))}</strong><small>${r.source==='selkent-static'?'Selkent published':'Team recorded'}</small></div>`).join('')||'<div class="empty-state compact-empty">No club results recorded yet.</div>';
