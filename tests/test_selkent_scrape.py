@@ -328,6 +328,22 @@ class GeneralizedSelkentFeedTests(unittest.TestCase):
         with self.assertRaises(UnverifiedPublishedResultsMarkupError):
             parse_published_results(html)
 
+    def test_verified_abandoned_match_is_omitted_without_hiding_scored_match(self):
+        # Observed in Selkent's public resultsTable/4273 on 2026-09-27.
+        html = '''<div id="results-4273"><div class="panel panel-static">
+          <div class="panel-heading">27/09/26 (Week 2)</div><div class="panel-body">
+          <div class="row"><div class="resultTeam">Baldon Sports Tigers</div>
+          <div class="resultScore">Abandoned</div>
+          <div class="resultTeam">Phoenix Sports Cobras</div></div>
+          <div class="row"><div class="resultTeam">Metrogas FC Black</div>
+          <div class="resultScore">6 - 3</div>
+          <div class="resultTeam">Crayford Arrows Black</div></div>
+          </div></div></div>'''
+        self.assertEqual(parse_published_results(html), [{
+            'date': '2026-09-27', 'home': 'Metrogas FC Black',
+            'away': 'Crayford Arrows Black', 'homeGoals': 6, 'awayGoals': 3,
+        }])
+
     def test_unverified_score_status_still_fails_closed(self):
         html = '''<div id="results-4253"><div class="panel panel-static">
           <div class="panel-heading">27/09/26 (Week 2)</div><div class="panel-body">

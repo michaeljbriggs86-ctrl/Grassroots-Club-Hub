@@ -4,6 +4,8 @@ on:
   push:
     paths:
       - '.github/workflows/scrape-selkent.yml'
+      - 'scripts/scrape.py'
+      - 'tests/test_selkent_scrape.py'
   schedule:
     # Refresh public Selkent feed data every six hours so newly published
     # fixtures become available to the app promptly across all age groups.

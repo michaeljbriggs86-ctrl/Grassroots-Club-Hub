@@ -557,7 +557,10 @@ def parse_published_results(html: str) -> list[dict[str, Any]]:
                     "Results row has unsupported team/score cells"
                 )
             score_text = _normalise_text(scores[0].get_text(" ", strip=True))
-            if score_text in ("", "-"):
+            # Verified public resultsTable/4273 on 2026-09-27 uses this
+            # literal status for an unscored abandoned match. It is not a
+            # result; other unfamiliar score/status text still fails closed.
+            if score_text in ("", "-", "Abandoned"):
                 continue
             score_match = re.fullmatch(r"(\d{1,2})\s*-\s*(\d{1,2})", score_text)
             home = _normalise_text(teams[0].get_text(" ", strip=True))
