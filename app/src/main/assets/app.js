@@ -1376,7 +1376,7 @@ function fixtureAckState(st=state,f=nextPublishedFixture()){
   if(!f)return {status:'none',label:'No fixture published',detail:'',note:'',changes:[]};
   const sk=st.selkent||{},ack=sk.fixtureAcknowledgement||{},track=sk.fixtureTracking||{};
   const fp=fixtureFingerprint(f),key=fixtureStableKey(f);
-  if(track.changed&&ack.fingerprint!==fp)return {status:'changed',label:'Fixture changed — reconfirm',detail:fixtureChangeText(track),note:'',changes:track.changes||[]};
+  if(track.changed&&track.key===key&&ack.fingerprint!==fp)return {status:'changed',label:'Fixture changed — reconfirm',detail:fixtureChangeText(track),note:'',changes:track.changes||[]};
   if(ack.fingerprint===fp&&ack.status==='confirmed')return {status:'confirmed',label:'Fixture confirmed',detail:ack.at?`Confirmed ${new Date(ack.at).toLocaleString('en-GB',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})}`:'Confirmed',note:ack.note||'',changes:[]};
   if(ack.fingerprint===fp&&ack.status==='issue')return {status:'issue',label:'Issue reported',detail:ack.note||'The coaching staff flagged an issue with this fixture.',note:ack.note||'',changes:[]};
   return {status:'awaiting',label:'Awaiting confirmation',detail:'Confirm the fixture once the coach has checked the details.',note:'',changes:[]};
@@ -3409,6 +3409,17 @@ async function fetchAdminDirectoryDetail(teamName){
   const key=selkentNorm(teamName);if(!key)return null;if(__adminDirectoryCache.has(key))return __adminDirectoryCache.get(key);
   try{const r=await fetch(`${SELKENT_DIRECTORY_API}?team=${encodeURIComponent(teamName)}`,{cache:'no-store'});if(!r.ok)throw new Error();const d=await r.json();const detail={clubName:d.club_name||teamName,colours:d.club_colours||'TBC',groundName:d.home_ground?.name||'TBC',address:d.home_ground?.address||'TBC'};__adminDirectoryCache.set(key,detail);return detail;}catch{__adminDirectoryCache.set(key,null);return null;}
 }
+function adminFixtureHasResult(st,team,fixture,feed){
+  const opponent=normalizeTeamKey(fixture.opponent),date=fixture.date;
+  if(!opponent||!date)return false;
+  const played=(st.matches||[]).some(m=>m.date===date&&normalizeTeamKey(m.opponent)===opponent&&matchStatus(m)==='played'&&(!m.venue||!fixture.venue||String(m.venue).toUpperCase()===String(fixture.venue).toUpperCase()));
+  if(played)return true;
+  const names=[team.leagueName,team.selkentName,team.teamName].map(normalizeTeamKey).filter(Boolean);
+  return publishedClubTeamData(team,verifiedClubResultsFeed(feed)).results.some(r=>r.date===date&&(
+    (names.includes(normalizeTeamKey(r.home))&&normalizeTeamKey(r.away)===opponent&&fixture.venue!=='A')||
+    (names.includes(normalizeTeamKey(r.away))&&normalizeTeamKey(r.home)===opponent&&fixture.venue!=='H')
+  ));
+}
 function buildAdminFixtureRows(rows,feed=null){
   const now=new Date().toISOString().slice(0,10),out=[];
   for(const r of rows||[]){
@@ -3445,7 +3456,7 @@ function buildAdminFixtureRows(rows,feed=null){
         ack:confirmed?{status:'confirmed',label:'Fixture confirmed'}:ack};
     });
     const seen=new Set();
-    matches.forEach(f=>{const key=`${f.date}|${selkentNorm(f.opponent)}`;if(!seen.has(key)){seen.add(key);out.push(f);}});
+    matches.forEach(f=>{const key=`${f.date}|${selkentNorm(f.opponent)}`;if(!seen.has(key)&&!adminFixtureHasResult(st,team,f,feed)){seen.add(key);out.push(f);}});
     (st.matches||[]).filter(m=>['scheduled','postponed'].includes(matchStatus(m))&&(!m.date||m.date>=now)).forEach(m=>{
       const duplicate=out.some(x=>x.team.id===team.id&&x.date===m.date&&selkentNorm(x.opponent)===selkentNorm(m.opponent));
       if(!duplicate)out.push({team,source:'Team',date:m.date||'',time:m.time||'',opponent:m.opponent||'',venue:m.venue||'',competition:m.competition||m.type||'Match',status:matchStatus(m)});

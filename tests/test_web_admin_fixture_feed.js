@@ -4,17 +4,20 @@ const path = require('node:path');
 
 const root = path.resolve(__dirname, '..');
 const src = fs.readFileSync(path.join(root, 'app/src/main/assets/app.js'), 'utf8');
-const body = src.slice(src.indexOf('function buildAdminFixtureRows(rows,feed=null){'), src.indexOf('function renderAdminFixtures(){'));
+const body = src.slice(src.indexOf('function adminFixtureHasResult(st,team,fixture,feed){'), src.indexOf('function renderAdminFixtures(){'));
 const norm = s => String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
 const stableKey = f => [norm(f.opponent||'tbc'),String(f.venue||'').toUpperCase(),norm(f.competition||'fixture')].join('|');
 const key = f => [f.date,stableKey(f)].join('|');
-const build = new Function('selkentNorm', 'fixtureAckState', 'fixtureKitSelectionKey', 'fixtureStableKey', 'matchStatus', `${body}\nreturn buildAdminFixtureRows;`)(
+const build = new Function('selkentNorm', 'normalizeTeamKey', 'fixtureAckState', 'fixtureKitSelectionKey', 'fixtureStableKey', 'matchStatus', 'publishedClubTeamData', 'verifiedClubResultsFeed', `${body}\nreturn buildAdminFixtureRows;`)(
+  norm,
   norm,
   (st, f) => st.selkent?.fixtureAcknowledgement?.status === 'confirmed' && st.selkent.fixtureAcknowledgement.key === key(f)
     ? {status: 'confirmed', label: 'Fixture confirmed'} : {status: 'awaiting', label: 'Awaiting confirmation'},
   key,
   stableKey,
-  m => m.status || 'scheduled'
+  m => m.status || 'scheduled',
+  (team, feed) => ({results:feed?.age_groups?.find(group => group.age_group === team.ageGroup)?.published_results || []}),
+  feed => feed?.coverage?.published_results?.parser_status === 'verified_scored_rows_v1' ? feed : null
 );
 
 const teams = [
@@ -54,16 +57,25 @@ assert.equal(adminConfirmed.groundName, 'Oak Field', 'Club Admin sees the coach 
 assert.equal(adminConfirmed.address, '1 Oak Road', 'Club Admin sees the coach confirmed address');
 assert.equal(adminConfirmed.ack.status, 'confirmed', 'confirmation is read from the team override, including when the single acknowledgement points elsewhere');
 teams[0].state.selkent.fixtureOverrides = {};
+teams[0].state.matches.push({date:'2099-10-01',opponent:'Dartford Royals',venue:'A',status:'played',gf:5,ga:4});
+assert.equal(build(teams,feed).some(x=>x.team.id==='u12-lions'&&x.opponent==='Dartford Royals'&&x.venue==='A'),false,'a team recorded result removes its matching away fixture');
+assert.equal(build(teams,feed).some(x=>x.team.id==='u14-lions'),true,'the other age group remains upcoming');
+teams[0].state.matches=teams[0].state.matches.filter(m=>m.status!=='played');
+const scoredFeed={coverage:{published_results:{parser_status:'verified_scored_rows_v1'}},age_groups:[{age_group:'U12',fixtures:feed.age_groups[0].fixtures,published_results:[{date:'2099-10-01',home:'Dartford Royals',away:'Shooters Hill AFC Lions',homeGoals:2,awayGoals:3}]}]};
+assert.equal(build([teams[0]],scoredFeed).some(x=>x.opponent==='Dartford Royals'&&x.venue==='A'),false,'an official published result also removes its matching fixture');
+assert.equal(build([teams[0]],feed).some(x=>x.opponent==='Dartford Royals'&&x.venue==='A'),true,'unverified or missing published scores do not hide fixtures');
+const ackBody=src.slice(src.indexOf('function fixtureAckState(st=state,f=nextPublishedFixture()){'),src.indexOf('function setFixtureAcknowledgement(status){'));
+const fixtureAck=new Function('fixtureFingerprint','fixtureStableKey','fixtureChangeText',`${ackBody}\nreturn fixtureAckState;`)(f=>key(f),stableKey,()=> 'changed');
+const stale={selkent:{fixtureTracking:{key:stableKey({opponent:'Other Club',venue:'A',competition:'League'}),changed:true},fixtureAcknowledgement:{}}};
+assert.equal(fixtureAck(stale,{opponent:'Dartford Royals',venue:'A',competition:'League',date:'2099-10-01'}).status,'awaiting','change tracking for another fixture cannot force reconfirmation');
+assert.equal(fixtureAck(stale,{opponent:'Other Club',venue:'A',competition:'League',date:'2099-10-01'}).status,'changed','the actual changed fixture still requires reconfirmation');
 
-const realFeed = JSON.parse(fs.readFileSync(path.join(root, 'data/results.json'), 'utf8'));
-const real = build(teams, realFeed);
-if (new Date().toISOString().slice(0, 10) <= '2026-09-27') {
-  assert.ok(real.some(x => x.team.id === 'u12-lions' && /Dartford Royals/i.test(x.opponent)), 'the bundled U12 feed matches its actual team and division');
-  assert.ok(real.some(x => x.team.id === 'u14-lions' && /South Darenth/i.test(x.opponent)), 'the same team name matches the independent U14 feed');
-  const valiantFixture={date:'2026-09-27',opponent:'Junior Reds Sabres',venue:'A',competition:'Division'};
-  const valiantTeam={team:{id:'u9-valiants',ageGroup:'U9',teamName:'Valiants',leagueName:'Shooters Hill AFC Valiants',division:'Under 9D Navy'},state:{matches:[],selkent:{fixtures:[valiantFixture],fixtureOverrides:{[key(valiantFixture)]:{time:'09:30',groundName:'Confirmed Ground',address:'Confirmed Address',confirmedAt:'2026-09-26T10:00:00Z'}}}}};
-  const valiantRow=build([valiantTeam],realFeed).find(x=>x.opponent==='Junior Reds Sabres');
-  assert.equal(valiantRow?.ack.status,'confirmed','the actual U9 feed joins to the saved Valiants confirmation');
-  assert.equal(valiantRow?.time,'09:30');
-}
+const valiantFixture={date:'2099-09-27',opponent:'Junior Reds Sabres',venue:'A',competition:'Division'};
+const valiantTeam={team:{id:'u9-valiants',ageGroup:'U9',teamName:'Valiants',leagueName:'Shooters Hill AFC Valiants',division:'Under 9D Navy'},state:{matches:[],selkent:{fixtures:[valiantFixture],fixtureOverrides:{[key(valiantFixture)]:{time:'09:30',groundName:'Confirmed Ground',address:'Confirmed Address',confirmedAt:'2099-09-26T10:00:00Z'}}}}};
+const valiantFeed={age_groups:[{age_group:'U9',fixtures:[{date:'2099-09-27',division_name:'Under 9D Navy',home:'Junior Reds Sabres',away:'Shooters Hill AFC Valiants'}]}]};
+const valiantRow=build([valiantTeam],valiantFeed).find(x=>x.opponent==='Junior Reds Sabres');
+assert.equal(valiantRow?.ack.status,'confirmed','the U9 feed joins to the saved Valiants confirmation');
+assert.equal(valiantRow?.time,'09:30');
+valiantTeam.state.matches.push({date:'2099-09-27',opponent:'Junior Reds Sabres',venue:'A',status:'played',gf:5,ga:4});
+assert.equal(build([valiantTeam],valiantFeed).length,0,'Valiants recorded result removes the fixture from the admin list');
 console.log('Club Admin fixture feed checks passed');
