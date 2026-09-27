@@ -1253,3 +1253,70 @@ html[data-theme="dark"] .parent-family-account{border-color:#344239!important}ht
 .selkent-task-guide a{color:var(--green);font-weight:850}
 html[data-theme="dark"] .selkent-task-guide,html[data-theme="dark"] .selkent-task-guide>div{border-color:#344239}
 html[data-theme="dark"] .selkent-task-guide a,html[data-theme="dark"] .selkent-task-guide>summary::after{color:#98e3a3}
+
+/* The supplied club badge has opaque black corners outside its circular crest. */
+img[src$="shooters-hill-logo.png"]{clip-path:circle(50.5% at 50% 50%)}
+
+/* Keep authenticated match, squad and club surfaces legible in dark mode. */
+html[data-theme="dark"] .league-summary-card,
+html[data-theme="dark"] .friendly-count-card,
+html[data-theme="dark"] .selkent-sync-settings,
+html[data-theme="dark"] .admin-dashboard-summary,
+html[data-theme="dark"] .admin-dashboard-summary .admin-stat,
+html[data-theme="dark"] .admin-fixture-row,
+html[data-theme="dark"] .admin-fixture-row.tbc,
+html[data-theme="dark"] .inbox-thread,
+html[data-theme="dark"] .inbox-message,
+html[data-theme="dark"] .award-type-row,
+html[data-theme="dark"] .coach-note-readonly,
+html[data-theme="dark"] .tournament-summary-grid span,
+html[data-theme="dark"] .archive-stat-grid span,
+html[data-theme="dark"] .parent-request-summary span{
+  background:#151d18!important;
+  border-color:#344239!important;
+  color:#f2f7f3!important;
+}
+html[data-theme="dark"] .inbox-message.mine{background:#193322!important;border-color:#2f5038!important}
+html[data-theme="dark"] .admin-management-panel[open]>summary{background:#17211b!important;border-color:#344239!important}
+html[data-theme="dark"] .league-table tr.our-team-row td{background:#193322!important}
+html[data-theme="dark"] .league-table tr.our-team-row .team-cell,
+html[data-theme="dark"] .league-table tr.our-team-row .pts,
+html[data-theme="dark"] .admin-dashboard-summary .admin-stat strong{color:#a7eab2!important}
+html[data-theme="dark"] .league-slot,
+html[data-theme="dark"] .synced-fixture-venue,
+html[data-theme="dark"] .player-edit,
+html[data-theme="dark"] .programme-status.played,
+html[data-theme="dark"] .programme-status.not-played{
+  background:#203027!important;
+  border-color:#344239!important;
+  color:#d8e7dc!important;
+}
+html[data-theme="dark"] .locked-team-note{background:#193322!important;border-color:#2f5038!important;color:#a7eab2!important}
+html[data-theme="dark"] .kit-clash-warning,
+html[data-theme="dark"] .programme-status.postponed{background:#3a1d1a!important;border-color:#63302c!important;color:#f0aaa2!important}
+html[data-theme="dark"] .match-card.result-W,
+html[data-theme="dark"] .club-result-row.result-W,
+html[data-theme="dark"] .imported-result-row.result-W{background:#16351f!important;border-color:#376249!important}
+html[data-theme="dark"] .match-card.result-D,
+html[data-theme="dark"] .club-result-row.result-D,
+html[data-theme="dark"] .imported-result-row.result-D{background:#26302a!important;border-color:#45534a!important}
+html[data-theme="dark"] .match-card.result-L,
+html[data-theme="dark"] .club-result-row.result-L,
+html[data-theme="dark"] .imported-result-row.result-L{background:#3a1d1a!important;border-color:#70423d!important}
+html[data-theme="dark"] .club-result-row.result-W .club-result-score strong{color:#a7eab2!important}
+html[data-theme="dark"] .club-result-row.result-L .club-result-score strong{color:#f0aaa2!important}
+html[data-theme="dark"] .next-match-status,
+html[data-theme="dark"] .default-award-badge,
+html[data-theme="dark"] .admin-health-good{background:#193322!important;color:#a7eab2!important;border-color:#2f5038!important}
+html[data-theme="dark"] .admin-attention-heading span{background:#372f16!important;color:#f2d780!important}
+html[data-theme="dark"] .admin-attention-row,
+html[data-theme="dark"] .admin-access-stat,
+html[data-theme="dark"] .admin-access-filter select,
+html[data-theme="dark"] .matchday-squad-head b,
+html[data-theme="dark"] .admin-ui-mode-switch,
+html[data-theme="dark"] .squad-view-tabs,
+html[data-theme="dark"] .club-view-tabs{
+  background:#203027!important;
+  border-color:#344239!important;
+  color:#d8e7dc!important;
+}
