@@ -584,7 +584,8 @@
 <details class="panel settings-accordion" id="rules-procedures-settings" data-staff-settings>
             <summary><span>Rules &amp; procedures</span><span class="settings-chevron">⌄</span></summary>
             <div class="settings-accordion-body">
-              <p class="muted">Team settings below are for PitchKind. Selkent's official match card and fixture updates are completed on the league system.</p>
+              <p class="muted" id="rules-procedures-intro">Team settings below are for PitchKind. Selkent's official match card and fixture updates are completed on the league system.</p>
+              <label class="admin-filter-label hidden" id="club-rule-age-field">Age group<select id="club-rule-age" onchange="renderUniversalClubConfiguration()"><option value="">Choose age group</option></select></label>
               <div id="universal-config-rules" class="universal-config-rules"></div>
               <div class="procedure-list">
                 <article><strong>Fixture details · handbook p. 74</strong><span>The Club Fixture Secretary enters home details or acknowledges away details on Selkent's website by the Tuesday before the fixture. The home club gives officials and opposition ground access, kick-off and kit colours at least five clear days before the match; the away club confirms receipt and its kit colours.</span></article>

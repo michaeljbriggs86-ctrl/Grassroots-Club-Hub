@@ -1521,3 +1521,31 @@ html[data-theme="dark"] .admin-access-filter select{background:#101713!important
 html[data-theme="dark"] .admin-team-row-stats b,
 html[data-theme="dark"] .admin-team-row-title strong,
 html[data-theme="dark"] .admin-age-group>summary strong{color:#f2f7f3!important}
+
+/* Club Admin dark mode: cover the nested controls and badges left pale by base styles. */
+html[data-theme="dark"] body.admin-club-mode .admin-age-group[open]>summary,
+html[data-theme="dark"] body.admin-club-mode .admin-team-row:active,
+html[data-theme="dark"] body.admin-club-mode .admin-team-row.active-team,
+html[data-theme="dark"] body.admin-club-mode .admin-coach-invite,
+html[data-theme="dark"] body.admin-club-mode .admin-attention-row,
+html[data-theme="dark"] body.admin-club-mode .admin-access-stat,
+html[data-theme="dark"] body.admin-club-mode .fixture-source-pill,
+html[data-theme="dark"] body.admin-club-mode .admin-management-panel[open]>summary{
+  background:#1c2b20!important;border-color:#344239!important;color:#f2f7f3!important;
+}
+html[data-theme="dark"] body.admin-club-mode .fixture-source-pill.selkent,
+html[data-theme="dark"] body.admin-club-mode .fixture-ack-pill.confirmed,
+html[data-theme="dark"] body.admin-club-mode .health-team-link{
+  background:#193322!important;border-color:#345e40!important;color:#a7eab2!important;
+}
+html[data-theme="dark"] body.admin-club-mode .admin-filter-label select,
+html[data-theme="dark"] body.admin-club-mode .admin-coach-invite select,
+html[data-theme="dark"] body.admin-club-mode .admin-invite-output input,
+html[data-theme="dark"] body.admin-club-mode .inbox-contact-bar select,
+html[data-theme="dark"] body.admin-club-mode .inbox-compose input,
+html[data-theme="dark"] body.admin-club-mode .inbox-compose textarea,
+html[data-theme="dark"] body.admin-club-mode .club-results-age-label select{
+  background:#101713!important;border-color:#344239!important;color:#f2f7f3!important;
+}
+html[data-theme="dark"] body.admin-club-mode .admin-attention-row span,
+html[data-theme="dark"] body.admin-club-mode .admin-age-group>summary span{color:#c0d0c3!important}

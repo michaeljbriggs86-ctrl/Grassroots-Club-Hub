@@ -2088,7 +2088,19 @@ async function reviewParentAccessNotification(notificationId){
 function renderUniversalClubConfiguration(){
   const rulesEl=document.getElementById('universal-config-rules');if(!rulesEl)return;
   document.getElementById('rules-procedures-settings')?.classList.toggle('hidden',providerType()!=='selkent');
-  const age=ageGroupNumber();document.getElementById('selkent-mini-playing-time')?.classList.toggle('hidden',age<8||age>11);
+  const clubWide=isClubOverviewMode(),select=document.getElementById('club-rule-age'),field=document.getElementById('club-rule-age-field');
+  field?.classList.toggle('hidden',!clubWide);
+  const intro=document.getElementById('rules-procedures-intro');
+  if(intro)intro.textContent=clubWide?'Club-wide Selkent procedures are below. Choose an age group to see its playing format and limits.':"Team settings below are for PitchKind. Selkent's official match card and fixture updates are completed on the league system.";
+  if(clubWide&&select){
+    const previous=select.value;
+    const ages=[...new Set((window.ClubHubCloud?.visibleTeamList?.()||[]).map(t=>Number(String(t.ageGroup||'').replace(/\D/g,''))).filter(Boolean))].sort((a,b)=>a-b);
+    select.innerHTML='<option value="">Choose age group</option>'+ages.map(a=>`<option value="${a}">Under ${a}s</option>`).join('');
+    select.value=ages.includes(Number(previous))&&previous?previous:'';
+  }
+  const age=clubWide?Number(select?.value||0):ageGroupNumber();
+  document.getElementById('selkent-mini-playing-time')?.classList.toggle('hidden',age<8||age>11);
+  if(clubWide&&!age){rulesEl.innerHTML='<p class="helper">Choose an age group above to see the relevant match format and limits.</p>';return;}
   const r=competitionRuleForAge(age);if(!r){rulesEl.innerHTML='<p class="helper">No age-specific matchday rule is configured for this team yet.</p>';return;}
   const resultsText=age<=11?'Scores and tables are limited to coaching staff and club admins; parents and players do not see them':r.results_published?'Published results are available for this age group':'Scores are not publicly published for this age group';
   const minimum=selkentMinimumPlayers(r.format);
@@ -3308,13 +3320,26 @@ function buildAdminFixtureRows(rows,feed=null){
       return (home===name)!==(away===name);
     }).map(f=>{
       const home=selkentNorm(f.home)===name;
-      const original={date:f.date,time:'',opponent:home?f.away:f.home,venue:home?'H':'A',providerTeamIds:f.provider_team_ids||[]};
-      original.competition=Array.isArray(ageEntry.standings)?'League':'Division';
-      return {team,source:'Selkent',...original,ack:fixtureAckState(st,original)};
-    }):(Array.isArray(st.selkent?.fixtures)?st.selkent.fixtures:[]).filter(f=>!f.date||f.date>=now).map(f=>({
-      team,source:'Selkent',date:f.date||'',time:f.time||'',opponent:f.opponent||'',venue:f.venue||'',competition:f.competition||'Division',
-      kitColours:f.kitColours||'',groundName:f.groundName||'',address:f.address||'',ack:fixtureAckState(st,f)
-    }));
+      const opponent=home?f.away:f.home,venue=home?'H':'A';
+      const saved=(st.selkent?.fixtures||[]).find(x=>x.date===f.date&&selkentNorm(x.opponent)===selkentNorm(opponent)&&String(x.venue||'').toUpperCase()===venue);
+      const original={date:f.date,time:saved?.time||'',opponent,venue,competition:saved?.competition||(Array.isArray(ageEntry.standings)?'League':'Division'),providerTeamIds:f.provider_team_ids||[],kitColours:saved?.kitColours||'',groundName:saved?.groundName||'',address:saved?.address||''};
+      const override=st.selkent?.fixtureOverrides?.[fixtureKitSelectionKey(original)]||{};
+      const ack=fixtureAckState(st,original);
+      const alertedFixture=st.selkent?.fixtureAcknowledgement?.key===fixtureStableKey(original);
+      const confirmed=!!override.confirmedAt&&!(alertedFixture&&['issue','changed'].includes(ack.status));
+      return {team,source:'Selkent',...original,
+        time:confirmed?override.time||'':original.time,
+        groundName:confirmed?override.groundName||'':original.groundName,
+        address:confirmed?override.address||'':original.address,
+        ack:confirmed?{status:'confirmed',label:'Fixture confirmed'}:ack};
+    }):(Array.isArray(st.selkent?.fixtures)?st.selkent.fixtures:[]).filter(f=>!f.date||f.date>=now).map(f=>{
+      const override=st.selkent?.fixtureOverrides?.[fixtureKitSelectionKey(f)]||{};
+      const ack=fixtureAckState(st,f),alertedFixture=st.selkent?.fixtureAcknowledgement?.key===fixtureStableKey(f);
+      const confirmed=!!override.confirmedAt&&!(alertedFixture&&['issue','changed'].includes(ack.status));
+      return {team,source:'Selkent',date:f.date||'',time:confirmed?override.time||'':f.time||'',opponent:f.opponent||'',venue:f.venue||'',competition:f.competition||'Division',
+        kitColours:f.kitColours||'',groundName:confirmed?override.groundName||'':f.groundName||'',address:confirmed?override.address||'':f.address||'',
+        ack:confirmed?{status:'confirmed',label:'Fixture confirmed'}:ack};
+    });
     const seen=new Set();
     matches.forEach(f=>{const key=`${f.date}|${selkentNorm(f.opponent)}`;if(!seen.has(key)){seen.add(key);out.push(f);}});
     (st.matches||[]).filter(m=>['scheduled','postponed'].includes(matchStatus(m))&&(!m.date||m.date>=now)).forEach(m=>{
