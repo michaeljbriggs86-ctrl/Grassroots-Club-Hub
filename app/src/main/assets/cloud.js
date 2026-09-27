@@ -455,6 +455,7 @@
     try{
       const data=await rpc('save_team_state',{p_team_id:activeTeam.id,p_state:nextState,p_expected_revision:force?-2:activeRevision});
       const row=Array.isArray(data)?data[0]:data;
+      if(!row&&preserveOnConflict)throw new Error('The cloud did not confirm this match save.');
       if(row){activeRevision=Number(row.revision);lastRemoteUpdatedAt=row.updated_at||lastRemoteUpdatedAt;}
       // Read back the server-normalized state. For U7-U11 this removes name-keyed performance data.
       const saved=await fetchTeamState(activeTeam.id);
@@ -481,16 +482,30 @@
     saveTimer=setTimeout(()=>{const p=pendingState;pendingState=null;if(p)saveTeamStateNow(p).catch(()=>{});},700);
   }
   async function confirmStateSave(nextState){
-    if(!configured()||!activeTeam||!canEdit())return null;
+    // A local match report must stay protected from background pulls until a write is confirmed.
+    unsyncedState=true;
+    if(!configured()||!activeTeam||!canEdit()){
+      throw new Error('This team is not available for editing. Your match is still on this device; reopen your team before saving.');
+    }
     if(!session)throw new Error('Your session has expired. Sign in again before saving; your edits remain on this page.');
+    const teamId=activeTeam.id;
     const snapshot=JSON.parse(JSON.stringify(nextState));
     confirmingState=true;
     try{
       clearTimeout(saveTimer);pendingState=null;
       // An earlier queued save may still be reading back its normalized state.
       while(saving)await new Promise(resolve=>setTimeout(resolve,40));
-      return await saveTeamStateNow(snapshot,{preserveOnConflict:true});
-    }finally{confirmingState=false;}
+      if(!activeTeam||activeTeam.id!==teamId||!canEdit()){
+        throw new Error('The active team changed while saving. Your match is still on this device; reopen the correct team and save again.');
+      }
+      const saved=await saveTeamStateNow(snapshot,{preserveOnConflict:true});
+      if(!saved){
+        unsyncedState=true;
+        throw new Error('The cloud did not confirm this match save. Your match is still on this device; tap Save again.');
+      }
+      return saved;
+    }catch(err){unsyncedState=true;throw err;}
+    finally{confirmingState=false;}
   }
   async function pullLatest({quiet=false}={}){
     if(!configured()||!session||!activeTeam)return null;
