@@ -1336,7 +1336,7 @@ function fixtureSnapshot(f={}){
   return {opponent:f.opponent||'',date:f.date||'',time:f.time||'',venue:f.venue||'',groundName:f.groundName||'',address:f.address||'',kitColours:f.kitColours||'',competition:f.competition||''};
 }
 function fixtureChangeList(before={},after={}){
-  const fields=[['opponent','Opponent'],['date','Date'],['time','Kick-off'],['venue','Home / away'],['groundName','Ground'],['address','Address'],['kitColours','Opposition colours']];
+  const fields=[['date','Date'],['time','Kick-off'],['venue','Home / away']];
   const fmt=(k,v)=>k==='date'&&v?formatDate(v):k==='venue'?(v==='A'?'Away':v==='H'?'Home':v||'TBC'):(v||'TBC');
   return fields.filter(([k])=>String(before?.[k]||'')!==String(after?.[k]||'')).map(([k,label])=>({field:k,label,before:fmt(k,before?.[k]),after:fmt(k,after?.[k])}));
 }
@@ -1344,9 +1344,7 @@ function likelySameFixture(before={},after={}){
   if(!before||!after)return false;
   const sameComp=selkentNorm(before.competition||'fixture')===selkentNorm(after.competition||'fixture');
   const sameOpp=selkentNorm(before.opponent||'')&&selkentNorm(before.opponent||'')===selkentNorm(after.opponent||'');
-  const sameDate=before.date&&after.date&&before.date===after.date;
-  const sameGround=(selkentNorm(before.groundName||'')&&selkentNorm(before.groundName||'')===selkentNorm(after.groundName||''))||(selkentNorm(before.address||'')&&selkentNorm(before.address||'')===selkentNorm(after.address||''));
-  return sameComp&&(sameOpp||sameDate||sameGround);
+  return !!(sameComp&&sameOpp);
 }
 function updateFixtureTracking(previousFixture,nextFixture){
   state.selkent=state.selkent||{};
@@ -1354,7 +1352,7 @@ function updateFixtureTracking(previousFixture,nextFixture){
   const key=nextFixture?fixtureStableKey(nextFixture):'';
   const fingerprint=nextFixture?fixtureFingerprint(nextFixture):'';
   const summary=nextFixture?fixtureSummary(nextFixture):'';
-  const before=old.snapshot&&Object.keys(old.snapshot).length?old.snapshot:fixtureSnapshot(previousFixture||{});
+  const before=old.snapshot&&previousFixture&&old.snapshot.date===previousFixture.date&&likelySameFixture(old.snapshot,previousFixture)?old.snapshot:fixtureSnapshot(previousFixture||{});
   const after=fixtureSnapshot(nextFixture||{});
   const same=nextFixture&&previousFixture&&likelySameFixture(previousFixture,nextFixture);
   const changes=same?fixtureChangeList(before,after):[];
@@ -1376,7 +1374,8 @@ function fixtureAckState(st=state,f=nextPublishedFixture()){
   if(!f)return {status:'none',label:'No fixture published',detail:'',note:'',changes:[]};
   const sk=st.selkent||{},ack=sk.fixtureAcknowledgement||{},track=sk.fixtureTracking||{};
   const fp=fixtureFingerprint(f),key=fixtureStableKey(f);
-  if(track.changed&&track.key===key&&ack.fingerprint!==fp)return {status:'changed',label:'Fixture changed — reconfirm',detail:fixtureChangeText(track),note:'',changes:track.changes||[]};
+  const publishedChanges=Array.isArray(track.changes)&&track.changes.some(c=>['date','time','venue'].includes(c.field))&&!track.changes.some(c=>c.field==='opponent');
+  if(track.changed&&track.key===key&&publishedChanges&&ack.fingerprint!==fp)return {status:'changed',label:'Fixture changed — reconfirm',detail:fixtureChangeText(track),note:'',changes:track.changes||[]};
   if(ack.fingerprint===fp&&ack.status==='confirmed')return {status:'confirmed',label:'Fixture confirmed',detail:ack.at?`Confirmed ${new Date(ack.at).toLocaleString('en-GB',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})}`:'Confirmed',note:ack.note||'',changes:[]};
   if(ack.fingerprint===fp&&ack.status==='issue')return {status:'issue',label:'Issue reported',detail:ack.note||'The coaching staff flagged an issue with this fixture.',note:ack.note||'',changes:[]};
   return {status:'awaiting',label:'Awaiting confirmation',detail:'Confirm the fixture once the coach has checked the details.',note:'',changes:[]};

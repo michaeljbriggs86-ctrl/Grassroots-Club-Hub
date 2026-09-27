@@ -66,9 +66,21 @@ assert.equal(build([teams[0]],scoredFeed).some(x=>x.opponent==='Dartford Royals'
 assert.equal(build([teams[0]],feed).some(x=>x.opponent==='Dartford Royals'&&x.venue==='A'),true,'unverified or missing published scores do not hide fixtures');
 const ackBody=src.slice(src.indexOf('function fixtureAckState(st=state,f=nextPublishedFixture()){'),src.indexOf('function setFixtureAcknowledgement(status){'));
 const fixtureAck=new Function('fixtureFingerprint','fixtureStableKey','fixtureChangeText',`${ackBody}\nreturn fixtureAckState;`)(f=>key(f),stableKey,()=> 'changed');
-const stale={selkent:{fixtureTracking:{key:stableKey({opponent:'Other Club',venue:'A',competition:'League'}),changed:true},fixtureAcknowledgement:{}}};
+const stale={selkent:{fixtureTracking:{key:stableKey({opponent:'Other Club',venue:'A',competition:'League'}),changed:true,changes:[{field:'date',before:'1 Oct',after:'2 Oct'}]},fixtureAcknowledgement:{}}};
 assert.equal(fixtureAck(stale,{opponent:'Dartford Royals',venue:'A',competition:'League',date:'2099-10-01'}).status,'awaiting','change tracking for another fixture cannot force reconfirmation');
 assert.equal(fixtureAck(stale,{opponent:'Other Club',venue:'A',competition:'League',date:'2099-10-01'}).status,'changed','the actual changed fixture still requires reconfirmation');
+stale.selkent.fixtureTracking.changes=[{field:'opponent',before:'Junior Reds Sabres',after:'Phoenix Sports Panthers'},{field:'date',before:'27 Sep',after:'4 Oct'}];
+assert.equal(fixtureAck(stale,{opponent:'Other Club',venue:'A',competition:'League',date:'2099-10-01'}).status,'awaiting','a replacement opponent is a new fixture, not a changed one');
+stale.selkent.fixtureTracking.changes=[{field:'kitColours',before:'Green',after:'Blue'}];
+assert.equal(fixtureAck(stale,{opponent:'Other Club',venue:'A',competition:'League',date:'2099-10-01'}).status,'awaiting','directory kit enrichment is not a published fixture change');
+const identityBody=src.slice(src.indexOf('function fixtureChangeList(before={},after={}){'),src.indexOf('function updateFixtureTracking(previousFixture,nextFixture){'));
+const {likelySameFixture,fixtureChangeList}=new Function('selkentNorm','formatDate',`${identityBody}\nreturn {likelySameFixture,fixtureChangeList};`)(norm,s=>s);
+const junior={opponent:'Junior Reds Sabres',date:'2026-09-27',venue:'H',competition:'Division',groundName:'East Wickham Primary Academy'};
+const phoenix={opponent:'Phoenix Sports Panthers',date:'2026-10-04',venue:'H',competition:'Division',groundName:'East Wickham Primary Academy'};
+assert.equal(likelySameFixture(junior,phoenix),false,'sharing the same home ground does not make two matches the same fixture');
+assert.equal(likelySameFixture(junior,{...junior,date:'2026-10-04'}),true,'a published match rescheduled against the same opponent remains identifiable');
+assert.deepEqual(fixtureChangeList(junior,{...junior,groundName:'New Ground',kitColours:'Blue'}),[],'directory ground and kit changes do not trigger fixture warnings');
+assert.deepEqual(fixtureChangeList(junior,{...junior,date:'2026-10-04'}).map(x=>x.field),['date'],'a published date change is flagged');
 
 const valiantFixture={date:'2099-09-27',opponent:'Junior Reds Sabres',venue:'A',competition:'Division'};
 const valiantTeam={team:{id:'u9-valiants',ageGroup:'U9',teamName:'Valiants',leagueName:'Shooters Hill AFC Valiants',division:'Under 9D Navy'},state:{matches:[],selkent:{fixtures:[valiantFixture],fixtureOverrides:{[key(valiantFixture)]:{time:'09:30',groundName:'Confirmed Ground',address:'Confirmed Address',confirmedAt:'2099-09-26T10:00:00Z'}}}}};
