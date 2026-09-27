@@ -1780,7 +1780,12 @@ function navigate(view,scroll=true){
   let activeKey=requested;
   if(view==='club') activeKey=__clubTab==='overview'?'club':__clubTab==='fixtures'?'club-fixtures':__clubTab==='results'?'club-results':'club-coaches';
   if(view==='more')activeKey='more';
-  document.querySelectorAll('.top-nav-tabs .nav-item').forEach(b=>b.classList.toggle('active',b.dataset.nav===activeKey));
+  document.querySelectorAll('.top-nav-tabs .nav-item').forEach(b=>{
+    const active=b.dataset.nav===activeKey;
+    b.classList.toggle('active',active);
+    if(active)b.setAttribute('aria-current','page');
+    else b.removeAttribute('aria-current');
+  });
   document.getElementById('top-nav-tabs')?.classList.remove('hidden');
   if(view==='add' && !document.getElementById('match-id').value) setDefaultDate();
   if(view==='club'&&CLOUD_MODE){
@@ -1791,6 +1796,12 @@ function navigate(view,scroll=true){
   }
   applyAccessMode();
   applyMiniResultVisibility();
+  const navBar=document.getElementById('top-nav-tabs');
+  const activeTab=navBar?.querySelector('.nav-item.active:not(.hidden)');
+  if(activeTab){
+    const bar=navBar.getBoundingClientRect(),tab=activeTab.getBoundingClientRect();
+    navBar.scrollTo({left:navBar.scrollLeft+tab.left-bar.left-(bar.width-tab.width)/2,behavior:'smooth'});
+  }
   if(view==='inbox')refreshInbox(false);
   if(scroll) window.scrollTo({top:0,behavior:'smooth'});
 }
@@ -2368,7 +2379,7 @@ function renderAwardFields(containerId,matchId=null){
     const rows=state.awards.filter(x=>x.matchId===matchId);box.innerHTML=rows.map(a=>`<div class="readonly-detail-row"><span>${esc(a.type||'Award')}</span><strong>${esc(a.player||'—')}</strong></div>`).join('')||'<div class="empty-state compact-empty">No player awards recorded.</div>';return;
   }
   const opts=playerOptionsHtml();
-  box.innerHTML=configuredAwardTypes().map(type=>`<label>${esc(type)}<select data-award-type="${esc(type)}">${opts}</select></label>`).join('')||'<div class="empty-state compact-empty">Add an award type under More → Match details.</div>';
+  box.innerHTML=configuredAwardTypes().map(type=>`<label>${esc(type)}<select data-award-type="${esc(type)}">${opts}</select></label>`).join('')||'<div class="empty-state compact-empty">Add an award type under Settings → Features.</div>';
   if(matchId){box.querySelectorAll('select[data-award-type]').forEach(el=>{const a=state.awards.find(x=>x.matchId===matchId&&x.type===el.dataset.awardType);el.value=a?.player||'';});}
 }
 function saveAwardFields(containerId,match){
@@ -3859,6 +3870,17 @@ function toast(msg){
 document.addEventListener('click',e=>{
   const nav=e.target.closest('[data-nav]');
   if(nav){ navigate(nav.dataset.nav); return; }
+  const sectionJump=e.target.closest('.screen-section-nav [data-scroll-to]');
+  if(sectionJump){
+    const target=document.getElementById(sectionJump.dataset.scrollTo);
+    if(target&&!target.classList.contains('hidden')&&sectionJump.closest('.view.active')?.contains(target)){
+      if(target.tagName==='DETAILS')target.open=true;
+      target.setAttribute('tabindex','-1');
+      target.focus({preventScroll:true});
+      target.scrollIntoView({behavior:'smooth',block:'start'});
+    }
+    return;
+  }
   if(e.target.closest('[data-action="quick-add"]')){ if(!requireCoach()) return; resetMatchForm(); navigate('add'); return; }
   const details=e.target.closest('[data-details-match]'); if(details){ openMatchDetails(details.dataset.detailsMatch); return; }
   const reportReview=e.target.closest('[data-match-report-review]');if(reportReview){openMatchReportReview(reportReview.dataset.matchReportReview);return;}

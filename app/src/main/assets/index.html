@@ -64,7 +64,7 @@
       <button type="button" class="top-nav-tab nav-item hidden" data-nav="club-results" data-results-global-nav>Results</button>
       <button type="button" class="top-nav-tab nav-item hidden" data-nav="club-coaches" data-admin-global-nav>Coaches</button>
       <button type="button" class="top-nav-tab nav-item hidden" data-nav="inbox">Inbox<span class="notification-badge hidden" id="global-inbox-badge">0</span></button>
-      <button type="button" class="top-nav-tab nav-item" data-nav="more">More</button>
+      <button type="button" class="top-nav-tab nav-item" data-nav="more">Settings</button>
     </nav>
 
     <main id="app" class="content" aria-live="polite">
@@ -226,6 +226,15 @@
           <button type="button" class="primary-button compact" data-action="quick-add" data-requires-edit>+ Add match</button>
         </div>
 
+        <nav class="screen-section-nav matches-section-nav" aria-label="Jump to match section">
+          <button type="button" data-scroll-to="matches-next-fixture">Next match</button>
+          <button type="button" data-scroll-to="selkent-fixtures-panel">Fixtures</button>
+          <button type="button" data-scroll-to="league-match-section">Results</button>
+          <button type="button" data-scroll-to="friendly-match-section">Friendlies</button>
+          <button type="button" data-scroll-to="competition-games-section">Cups</button>
+          <button type="button" data-scroll-to="tournament-events-section">Tournaments</button>
+        </nav>
+
         <section class="panel next-match-card matches-next-fixture" id="matches-next-fixture">
           <div class="panel-heading"><div><p class="kicker">Next fixture</p><h3 id="matches-next-opponent">TBC</h3></div></div>
           <div class="match-versus next-fixture-versus" id="matches-next-versus"></div>
@@ -237,7 +246,7 @@
           <div class="next-match-links matches-next-actions"><button type="button" class="secondary-button compact" id="matches-next-details">Match details</button><button type="button" class="secondary-button compact hidden" id="matches-next-share">Save matchday image</button><button type="button" class="secondary-button compact hidden" id="matches-next-copy">Copy match details</button><button type="button" class="primary-button compact match-played-action hidden" id="matches-next-played" data-requires-edit>Match played</button></div>
         </section>
 
-        <details class="panel league-programme" open>
+        <details class="panel league-programme" id="league-programme-panel">
           <summary>
             <div><span class="kicker">League programme</span><strong id="league-programme-title">11 opponents · 2 meetings each</strong></div>
             <span id="league-programme-progress">0 / 22</span>
@@ -253,8 +262,9 @@
 
 
 
-        <div class="filter-bar single-filter">
-          <input id="match-search" type="search" placeholder="Search opponent..." />
+        <div class="filter-bar single-filter matches-record-search">
+          <label for="match-search">Search recorded matches</label>
+          <input id="match-search" type="search" placeholder="Opponent name" />
         </div>
 
         <section class="match-section" id="league-match-section">
@@ -270,7 +280,7 @@
         <section class="match-section competition-games-section" id="competition-games-section">
           <div class="match-section-heading"><div><p class="kicker">Knockout & group competitions</p><h3>Cup, Vase & Shield</h3></div></div>
           <div class="competition-game-grid">
-            <details class="panel competition-games-panel" id="cup-games-panel" open><summary><div><strong>Challenge Cup</strong><small>Fixtures and results</small></div><div class="competition-summary-actions"><span class="match-section-count" id="cup-games-count">0</span></div></summary><div class="competition-table-scroll"><table class="competition-games-table"><thead><tr><th>Date</th><th>Round</th><th>Opponent</th><th>H/A</th><th>Status / result</th></tr></thead><tbody id="cup-games-body"></tbody></table></div></details>
+            <details class="panel competition-games-panel" id="cup-games-panel"><summary><div><strong>Challenge Cup</strong><small>Fixtures and results</small></div><div class="competition-summary-actions"><span class="match-section-count" id="cup-games-count">0</span></div></summary><div class="competition-table-scroll"><table class="competition-games-table"><thead><tr><th>Date</th><th>Round</th><th>Opponent</th><th>H/A</th><th>Status / result</th></tr></thead><tbody id="cup-games-body"></tbody></table></div></details>
             <details class="panel competition-games-panel" id="vase-games-panel"><summary><div><strong>Challenge Vase</strong><small>Fixtures and results</small></div><div class="competition-summary-actions"><span class="match-section-count" id="vase-games-count">0</span></div></summary><div class="competition-table-scroll"><table class="competition-games-table"><thead><tr><th>Date</th><th>Round</th><th>Opponent</th><th>H/A</th><th>Status / result</th></tr></thead><tbody id="vase-games-body"></tbody></table></div></details>
             <details class="panel competition-games-panel" id="shield-games-panel"><summary><div><strong>Shield</strong><small>Fixtures and results</small></div><div class="competition-summary-actions"><span class="match-section-count" id="shield-games-count">0</span></div></summary><div class="competition-table-scroll"><table class="competition-games-table"><thead><tr><th>Date</th><th>Round</th><th>Opponent</th><th>H/A</th><th>Status / result</th></tr></thead><tbody id="shield-games-body"></tbody></table></div></details>
           </div>
@@ -509,6 +519,15 @@
 
       <section id="view-more" class="view" data-view="more">
         <div class="section-title-row"><div><p class="kicker">Team &amp; app</p><h2>Settings</h2></div></div>
+        <nav class="screen-section-nav settings-section-nav" aria-label="Jump to settings section">
+          <button type="button" data-scroll-to="match-detail-settings" data-requires-edit data-coach-ui-only>Features</button>
+          <button type="button" data-scroll-to="team-access-settings" data-staff-settings>Team access</button>
+          <button type="button" data-scroll-to="rules-procedures-settings" data-staff-settings>Rules</button>
+          <button type="button" data-scroll-to="club-admin-access-settings" data-admin-settings-only>Club Admin</button>
+          <button type="button" data-scroll-to="season-history-settings" data-staff-history>History</button>
+          <button type="button" data-scroll-to="appearance-settings">Appearance</button>
+          <button type="button" data-scroll-to="access-panel">My account</button>
+        </nav>
         <div class="settings-accordion-list">
 
 <div class="settings-group-heading" data-coach-ui-only><span>Team</span><small>Tools and access for this team</small></div>
@@ -741,7 +760,7 @@
       <section class="detail-feature-section" id="detail-awards-section" data-detail-feature="awards"><h3>Player awards</h3><div class="form-grid" id="detail-award-fields"></div></section>
       <section class="detail-feature-section match-attendance-section hidden" id="match-attendance-section"><div class="panel-heading"><div><h3>Attendance</h3><span class="helper" id="match-attendance-helper">Attendance status</span></div></div><div id="match-attendance-list" class="match-attendance-list"></div></section>
       <section class="detail-feature-section secure-coach-note hidden" id="coach-note-section"><div class="panel-heading"><div><h3>Coaching notes</h3><span class="helper">Coaching staff only · not visible to parents</span></div></div><textarea id="coach-match-note" rows="4" maxlength="4000" placeholder="Private coaching observations, follow-up points or development notes..."></textarea><p class="coach-note-readonly hidden" id="coach-note-readonly"></p></section>
-      <div class="empty-detail-options hidden" id="empty-detail-options">All match detail options are switched off. Enable the options you want under More → Match detail options.</div>
+      <div class="empty-detail-options hidden" id="empty-detail-options">All match detail options are switched off. Enable the options you want under Settings → Features.</div>
       <div class="modal-actions match-report-actions">
         <button type="button" class="secondary-button hidden" id="match-report-back">Back</button>
         <button type="button" class="danger-button hidden" id="delete-match-detail" data-delete-match="">Delete match</button>
