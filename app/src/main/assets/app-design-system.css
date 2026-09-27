@@ -530,9 +530,9 @@ svg,canvas,video{max-width:100%}
   .club-logo-wrap:not(.platform-club-placeholder){border-radius:50%!important}
 }
 
-/* Compact primary navigation on phones; wider screens retain the top tabs. */
+/* Compact primary navigation on phones, including unfolded foldable displays. */
 .mobile-nav-sprite,.mobile-primary-nav,.mobile-more-scrim,.mobile-more-sheet{display:none}
-@media(max-width:599px){
+@media(max-width:900px){
   #top-nav-tabs{display:none!important}
   .mobile-nav-sprite{position:absolute;width:0;height:0;overflow:hidden}
   .mobile-primary-nav{
