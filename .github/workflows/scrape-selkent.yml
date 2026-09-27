@@ -10,7 +10,15 @@ on:
     # Refresh public Selkent feed data every six hours so newly published
     # fixtures become available to the app promptly across all age groups.
     - cron: '0 */6 * * *'
+    # Sunday match results change throughout the day. Offset these checks
+    # from the private Worker's :00/:30 runs to spread provider traffic.
+    # GitHub Actions cron times are UTC (08:10–19:40).
+    - cron: '10,40 8-19 * * SUN'
   workflow_dispatch:
+
+concurrency:
+  group: scrape-selkent-public
+  cancel-in-progress: false
 
 jobs:
   scrape:
