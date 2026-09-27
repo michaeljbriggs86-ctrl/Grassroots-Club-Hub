@@ -21,6 +21,7 @@
     (/^(?:#)(?:.*&)?(?:access_token|error|error_code)=/.test(location.hash)?location.href:'');
   let initialAuthCallbackHandled = false;
   let session = null;
+  let sessionRefresh = null;
   let context = null;
   let clubConfiguration = null;
   let visibleTeams = [];
@@ -79,9 +80,22 @@
     return h;
   }
   async function request(path,{method='GET',body=null,token=true,headers={}}={}){
-    const res=await fetch(base()+path,{method,headers:{...authHeaders(token?session?.access_token:null),...headers},body:body==null?undefined:JSON.stringify(body)});
-    const text=await res.text();
-    let data=null;try{data=text?JSON.parse(text):null;}catch{data=text;}
+    if(token && !await ensureFreshSession())throw new Error('Your session has expired. Sign in again before saving; your edits remain on this page.');
+    const send=async()=>{
+      const usedToken=token?session?.access_token:null;
+      const res=await fetch(base()+path,{method,headers:{...authHeaders(usedToken),...headers},body:body==null?undefined:JSON.stringify(body)});
+      const text=await res.text();
+      let data=null;try{data=text?JSON.parse(text):null;}catch{data=text;}
+      return {res,text,data,usedToken};
+    };
+    let {res,text,data,usedToken}=await send();
+    if(token && res.status===401 && /(?:jwt|token).{0,30}expir|expir.{0,30}(?:jwt|token)/i.test(String(data?.message||data?.msg||data?.error_description||text||''))){
+      // A rejected authorization never applied the write; refresh and retry it once.
+      const latest=loadSession();
+      if(latest?.access_token && latest.access_token!==usedToken)session=latest;
+      else if(!await refreshSession())throw new Error('Your session has expired. Sign in again before saving; your edits remain on this page.');
+      ({res,text,data}=await send());
+    }
     if(!res.ok){
       const msg=(data&&typeof data==='object'&&(data.msg||data.message||data.error_description||data.hint||data.details||data.error))||text||('HTTP '+res.status);
       const err=new Error(msg);err.status=res.status;err.data=data;throw err;
@@ -89,16 +103,21 @@
     return {data,headers:res.headers,status:res.status};
   }
   async function refreshSession(){
+    if(sessionRefresh)return sessionRefresh;
     if(!session?.refresh_token)return false;
-    try{
-      const res=await fetch(base()+'/auth/v1/token?grant_type=refresh_token',{method:'POST',headers:authHeaders(),body:JSON.stringify({refresh_token:session.refresh_token})});
-      const data=await res.json();
-      if(!res.ok||!data.access_token)throw new Error(data?.msg||data?.error_description||'Session refresh failed');
-      data.expires_at=Math.floor(Date.now()/1000)+(data.expires_in||3600);
-      saveSession(data);return true;
-    }catch{saveSession(null);return false;}
+    sessionRefresh=(async()=>{
+      try{
+        const res=await fetch(base()+'/auth/v1/token?grant_type=refresh_token',{method:'POST',headers:authHeaders(),body:JSON.stringify({refresh_token:session.refresh_token})});
+        const data=await res.json();
+        if(!res.ok||!data.access_token){if(res.status===400||res.status===401)saveSession(null);return false;}
+        data.expires_at=Math.floor(Date.now()/1000)+(data.expires_in||3600);
+        saveSession(data);return true;
+      }catch{return false;}
+    })();
+    try{return await sessionRefresh;}finally{sessionRefresh=null;}
   }
   async function ensureFreshSession(){
+    if(sessionRefresh)return await sessionRefresh;
     session=loadSession();
     if(!session?.access_token)return false;
     const exp=Number(session.expires_at||0);
@@ -462,7 +481,8 @@
     saveTimer=setTimeout(()=>{const p=pendingState;pendingState=null;if(p)saveTeamStateNow(p).catch(()=>{});},700);
   }
   async function confirmStateSave(nextState){
-    if(!configured()||!session||!activeTeam||!canEdit())return null;
+    if(!configured()||!activeTeam||!canEdit())return null;
+    if(!session)throw new Error('Your session has expired. Sign in again before saving; your edits remain on this page.');
     const snapshot=JSON.parse(JSON.stringify(nextState));
     confirmingState=true;
     try{
