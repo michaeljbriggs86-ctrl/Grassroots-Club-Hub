@@ -1,0 +1,75 @@
+# Selkent Cloudflare shadow collector
+
+This is the first, isolated stage of moving public Selkent collection to
+Cloudflare. It does **not** publish a feed or change the PitchKind website.
+`scripts/scrape.py` and `data/results.json` remain the public authority.
+
+Every six hours, 15 minutes after the GitHub feed schedule, the Worker reads
+the current validated public `data/results.json` and fetches the listed public
+fixture weeks and U12+ results tables from Selkent. The current feed names 45
+fixture endpoints and 53 results-table endpoints. It checks the response
+contracts and writes all returned HTML together to one private R2 object,
+`shadow/latest.json`, **only after all targets succeed**. On any error it
+leaves the previous object untouched and the scheduled event fails. It does
+not fetch private match reports or U7–U11 result tables.
+
+The source feed is used only as the pilot's list of known public endpoints;
+new age groups, fixture weeks or divisions are discovered by the existing
+GitHub scraper. The R2 snapshot is unparsed evidence, not an app-facing JSON
+source. Do not attach a public R2 domain or route to this bucket. The Worker
+returns 404 if someone attaches a hostname accidentally.
+
+## Deploy from GitHub Actions (works from a Termux source checkout)
+
+Add repository secrets `CLOUDFLARE_ACCOUNT_ID` and `CLOUDFLARE_API_TOKEN`
+under GitHub Settings > Secrets and variables > Actions. Scope the Cloudflare
+token to this account with Workers Scripts Edit and Workers R2 Storage Edit.
+From the GitHub Actions tab, run **Deploy private Selkent shadow collector**
+manually. Its Linux job reruns the tests and Wrangler dry run, creates the
+private R2 bucket if missing, then deploys the scheduled Worker. Source push
+alone does not trigger deployment. Do not put token values in this repository.
+
+## Alternative: authenticated Cloudflare shell
+
+From the repository root, run:
+
+```sh
+node --test cloudflare/selkent-shadow/tests/shadow.test.mjs
+cd cloudflare/selkent-shadow
+npx wrangler deploy --dry-run
+npx wrangler r2 bucket create pitchkind-selkent-shadow
+npx wrangler deploy
+```
+
+Use `npx wrangler login` first if this shell is not authenticated to Mike's
+Cloudflare account. If the bucket already exists in that account, skip the
+create command. Wrangler must be connected to the account that owns the paid
+Worker plan. No API token or R2 credential belongs in Git.
+
+`wrangler.jsonc` has no public `workers.dev` URL or custom route. The cron is
+`15 */6 * * *` in UTC; allow for Cloudflare's cron propagation delay after
+deployment. Inspect the Worker's Cron Events and logs for
+`selkent-shadow-collected` and the target count. Confirm the private bucket
+contains `shadow/latest.json` with matching `canonical_feed_last_updated`,
+98 targets (at the initial September 27 feed), and payloads for
+`resultsTable/4249` and each known fixture week. Do not treat a successful
+local test or a pushed commit as proof that the production cron ran.
+
+## Graduation gates
+
+1. Capture multiple successful scheduled runs and inspect failures or
+   provider blocking without changing the live feed.
+2. Port the verified Python parsers and public-age privacy checks to the
+   Cloudflare pipeline. Compare normalized fixture, result and standings
+   output against the GitHub feed across all age groups and real changes.
+3. Only after parity, publish one validated schema-v2 JSON object atomically
+   to R2; serve it at `/data/results.json` through the existing Access-protected
+   website Worker with explicit caching. Keep the GitHub feed as a monitored
+   fallback during the migration, never as a second writer to the same R2 key.
+4. Once the live website and recurring runs have been checked, update the
+   source-of-truth register and retire the superseded publication schedule.
+
+The complete paid-plan run is below the 10,000-subrequest allowance, but the
+scheduled Worker still has a 15-minute wall-time ceiling. If real runs approach
+that limit, split collection into retryable Cloudflare Workflow steps before
+expanding this pilot to feed publication.
