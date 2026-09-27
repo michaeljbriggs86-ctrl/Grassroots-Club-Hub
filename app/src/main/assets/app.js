@@ -3259,6 +3259,15 @@ function clubResultCompetitionKind(result={}){
   if(/league|division/.test(name)||result.source==='selkent-static')return 'league';
   return 'other';
 }
+function clubResultTeamBadgeHtml(teamName=''){
+  const key=normalizeTeamKey(teamName),approved=verifiedTeamBadgeUrl(teamName),own=clubSettings();
+  const ownClubTeam=!!key&&configuredClubTeams().some(t=>normalizeTeamKey(t.leagueName)===key);
+  const ownBadge=ownClubTeam&&(own.logo_url||own.logo_asset||
+    (normalizeTeamKey(own.display_name)==='shooters hill afc'?'shooters-hill-logo.png':''));
+  const url=approved||ownBadge||'pitchkind-wt_mark.svg';
+  const kind=approved||ownBadge?'verified-club-badge':'club-placeholder-badge';
+  return `<img class="club-identity-badge ${kind}" src="${esc(url)}" alt="" aria-hidden="true" loading="lazy" decoding="async" />`;
+}
 function renderAdminRecentResults(rows=[],feedAvailable=true){
   const box=document.getElementById('admin-recent-results'),count=document.getElementById('admin-results-count'),breakdown=document.getElementById('admin-results-breakdown'),status=document.getElementById('admin-results-source-status');
   if(count)count.textContent=String(rows.length);
@@ -3769,7 +3778,7 @@ function renderClubResultsBrowser(){
   const prev=ageSel.value||String(__clubResultsAge);ageSel.innerHTML='<option value="all">All age groups</option>'+ages.map(a=>`<option value="${a}">Under ${a}s</option>`).join('');__clubResultsAge=prev==='all'||ages.includes(Number(prev))?prev:'all';ageSel.value=String(__clubResultsAge);
   if(competitionSel)competitionSel.value=__clubResultsCompetition;
   const filtered=__clubResultsRows.filter(r=>(__clubResultsAge==='all'||Number(r.ageGroup)===Number(__clubResultsAge))&&(__clubResultsCompetition==='all'||clubResultCompetitionKind(r)===__clubResultsCompetition));const pages=Math.max(1,Math.ceil(filtered.length/CLUB_RESULTS_PAGE_SIZE));__clubResultsPage=Math.max(0,Math.min(__clubResultsPage,pages-1));const rows=filtered.slice(__clubResultsPage*CLUB_RESULTS_PAGE_SIZE,(__clubResultsPage+1)*CLUB_RESULTS_PAGE_SIZE);
-  list.innerHTML=rows.map(r=>{const rr=resultForNamedTeam(r.home,r.away,r.hg,r.ag,r.teamName);const comp=r.competition?` · ${esc(String(r.competition).replace(/_/g,' '))}`:'';const source=r.source==='selkent-static'?' · Selkent published':r.source==='internal'?' · Team recorded':'';return `<article class="club-result-row ${resultClass(rr)}"><div class="club-result-meta"><span>U${esc(r.ageGroup)} · ${esc(matchTeamLabel(r.teamName))}${comp}${source}</span><small>${formatDate(r.date)||esc(r.date)||'Date TBC'}</small></div><div class="club-result-score"><span>${esc(matchTeamLabel(r.home))}</span><strong>${r.hg}–${r.ag}</strong><span>${esc(matchTeamLabel(r.away))}</span></div></article>`;}).join('')||'<div class="empty-state"><strong>No results in this filter</strong>Choose another competition or age group, or record the completed match in the team profile.</div>';
+  list.innerHTML=rows.map(r=>{const rr=resultForNamedTeam(r.home,r.away,r.hg,r.ag,r.teamName);const comp=r.competition?` · ${esc(String(r.competition).replace(/_/g,' '))}`:'';const source=r.source==='selkent-static'?' · Selkent published':r.source==='internal'?' · Team recorded':'';return `<article class="club-result-row ${resultClass(rr)}"><div class="club-result-meta"><span>U${esc(r.ageGroup)} · ${esc(matchTeamLabel(r.teamName))}${comp}${source}</span><small>${formatDate(r.date)||esc(r.date)||'Date TBC'}</small></div><div class="club-result-score"><div class="club-result-team home">${clubResultTeamBadgeHtml(r.home)}<span class="club-result-team-name">${esc(matchTeamLabel(r.home))}</span></div><strong>${r.hg}–${r.ag}</strong><div class="club-result-team away"><span class="club-result-team-name">${esc(matchTeamLabel(r.away))}</span>${clubResultTeamBadgeHtml(r.away)}</div></div></article>`;}).join('')||'<div class="empty-state"><strong>No results in this filter</strong>Choose another competition or age group, or record the completed match in the team profile.</div>';
   if(pageEl)pageEl.textContent=filtered.length?`${__clubResultsPage+1} of ${pages}`:'0 of 0';const p=document.getElementById('club-results-prev'),n=document.getElementById('club-results-next');if(p)p.disabled=__clubResultsPage<=0;if(n)n.disabled=__clubResultsPage>=pages-1;
 }
 async function refreshClubResults(quiet=false){
@@ -3778,13 +3787,15 @@ async function refreshClubResults(quiet=false){
   const adminInternal=isAdmin()&&isClubOverviewMode();
   if(!quiet)list.innerHTML=`<div class="empty-state compact-empty">Loading ${adminInternal?'club results':'published results'}…</div>`;
   try{
+    const directoryPromise=window.ClubHubStaticSelkent?.loadDirectory?.(!quiet)?.catch(()=>null)||Promise.resolve(null);
     if(adminInternal){
-      const [overview,rawFeed]=await Promise.all([window.ClubHubCloud.getClubOverview(),loadAdminPublishedFeed(!quiet)]);
+      const [overview,rawFeed]=await Promise.all([window.ClubHubCloud.getClubOverview(),loadAdminPublishedFeed(!quiet),directoryPromise]);
       const feed=verifiedClubResultsFeed(rawFeed);
       const status=document.getElementById('club-results-source-status');if(status)status.textContent=feed?'':'Selkent feed unavailable · showing team-recorded matches only';
       __clubResultsRows=clubResultRows(overview,overview.map(r=>r.team),feed,true);
     }else{
-      const feed=verifiedClubResultsFeed(await loadAdminPublishedFeed(!quiet));
+      const [rawFeed]=await Promise.all([loadAdminPublishedFeed(!quiet),directoryPromise]);
+      const feed=verifiedClubResultsFeed(rawFeed);
       const status=document.getElementById('club-results-source-status');if(status)status.textContent=feed?'':'Selkent feed unavailable · showing team-recorded matches only';
       const own=isAdminCoachMode()?dualCoachTeam():window.ClubHubCloud.currentTeam?.();
       __clubResultsRows=coachClubResultRows(own,state,feed);

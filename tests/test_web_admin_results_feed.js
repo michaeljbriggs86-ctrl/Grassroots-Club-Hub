@@ -59,15 +59,24 @@ const list={innerHTML:''},ageSelect={value:'',innerHTML:''},competitionSelect={v
 const browserElements={'club-results-list':list,'club-results-age':ageSelect,'club-results-competition':competitionSelect,'club-results-page':page,'club-results-prev':previous,'club-results-next':next};
 const browserDocument={getElementById:id=>browserElements[id]||null};
 const browserBody=src.slice(src.indexOf('function renderClubResultsBrowser(){'),src.indexOf('async function refreshClubResults(quiet=false){'));
-const browser=new Function('document','window','resultForNamedTeam','resultClass','esc','matchTeamLabel','formatDate','isAdmin','isClubOverviewMode','clubResultCompetitionKind',
+const badgeBody=src.slice(src.indexOf('function clubResultTeamBadgeHtml(teamName='),src.indexOf('function renderAdminRecentResults(',src.indexOf('function clubResultTeamBadgeHtml(teamName=')));
+const resultBadge=new Function('normalizeTeamKey','verifiedTeamBadgeUrl','clubSettings','configuredClubTeams','esc',`${badgeBody}\nreturn clubResultTeamBadgeHtml;`)(
+  normalizeTeamKey,name=>name==='Cray Wanderers Ambers'?'/__pilot_badges/250/reviewed':'',
+  ()=>({display_name:'Shooters Hill AFC',logo_url:'shooters-hill-logo.png'}),()=>[...teams,{leagueName:'Shooters Hill AFC Archers'}],s=>String(s)
+);
+assert.match(resultBadge('Cray Wanderers Ambers'),/\/__pilot_badges\/250\/reviewed/,'approved opponent badges use the reviewed URL');
+assert.match(resultBadge('Shooters Hill AFC Archers'),/shooters-hill-logo\.png/,'other teams at this club use its configured crest');
+assert.match(resultBadge('Junior Reds Sabres'),/pitchkind-wt_mark\.svg/,'an unapproved opponent uses the PitchKind placeholder');
+const browser=new Function('document','window','resultForNamedTeam','resultClass','esc','matchTeamLabel','formatDate','isAdmin','isClubOverviewMode','clubResultCompetitionKind','clubResultTeamBadgeHtml',
   `let __clubResultsRows=[],__clubResultsAge='all',__clubResultsCompetition='league',__clubResultsPage=0;const CLUB_RESULTS_PAGE_SIZE=6;const currentView='home',__clubTab='overview';${browserBody}\nreturn {show:renderClubResultsBrowser,setRows:rows=>{__clubResultsRows=rows},setCompetition:value=>{__clubResultsCompetition=value}};`
-)(browserDocument,{ClubHubCloud:{visibleTeamList:()=>teams}},()=> 'W',()=> 'result-W',s=>String(s),s=>s,s=>s,()=>true,()=>true,new Function(`${helpers}\nreturn clubResultCompetitionKind;`)());
+)(browserDocument,{ClubHubCloud:{visibleTeamList:()=>teams}},()=> 'W',()=> 'result-W',s=>String(s),s=>s,s=>s,()=>true,()=>true,new Function(`${helpers}\nreturn clubResultCompetitionKind;`)(),resultBadge);
 browser.setRows(rows);browser.show();
 assert.equal(ageSelect.value,'all','Club Results opens on the complete club view');
 assert.match(ageSelect.innerHTML,/Under 14s/,'coach results can filter ages present in club published rows');
 assert.equal(competitionSelect.value,'league','Club Results defaults to league');
 assert.match(list.innerHTML,/Shooters Hill AFC Cannons/);
 assert.match(list.innerHTML,/Shooters Hill AFC Valiants|Junior Reds Sabres/);
+assert.equal((list.innerHTML.match(/class="club-identity-badge/g)||[]).length,rows.length*2,'each result shows a badge beside both teams');
 ageSelect.value='12';browser.show();
 assert.doesNotMatch(list.innerHTML,/Junior Reds Sabres/,'the age selector still filters after the club-wide default');
 browser.setRows([...rows,{home:'Valiants',away:'Friendly Rivals',hg:2,ag:1,date:'2026-09-20',competition:'Friendly',teamName:'Valiants',ageGroup:9},{home:'Cup Rivals',away:'Valiants',hg:0,ag:1,date:'2026-09-21',competition:'Challenge Cup',teamName:'Valiants',ageGroup:9}]);
