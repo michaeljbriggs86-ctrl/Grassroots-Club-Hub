@@ -1,6 +1,9 @@
 name: Scrape Selkent Results
 
 on:
+  push:
+    paths:
+      - '.github/workflows/scrape-selkent.yml'
   schedule:
     # Refresh public Selkent feed data every six hours so newly published
     # fixtures become available to the app promptly across all age groups.
@@ -21,7 +24,7 @@ jobs:
           python-version: '3.11'
 
       - name: Install dependencies
-        run: pip install requests beautifulsoup4
+        run: pip install requests beautifulsoup4 pillow
 
       - name: Run parser tests
         run: python -m unittest discover -s tests -p "test_*.py" -v
