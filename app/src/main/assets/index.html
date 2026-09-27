@@ -60,7 +60,6 @@
       <button type="button" class="top-nav-tab nav-item hidden" id="league-nav-item" data-nav="league" data-team-nav data-league-nav>League</button>
       <button type="button" class="top-nav-tab nav-item" data-nav="squad" data-team-nav>Squad</button>
       <button type="button" class="top-nav-tab nav-item hidden" id="club-global-tab" data-nav="club" data-admin-club-root>Club</button>
-      <button type="button" class="top-nav-tab nav-item hidden" data-nav="club-fixtures" data-admin-global-nav>Fixtures</button>
       <button type="button" class="top-nav-tab nav-item hidden" data-nav="club-results" data-results-global-nav>Results</button>
       <button type="button" class="top-nav-tab nav-item hidden" data-nav="club-coaches" data-admin-global-nav>Coaches</button>
       <button type="button" class="top-nav-tab nav-item hidden" data-nav="inbox"><span id="communications-nav-label">Inbox</span><span class="notification-badge hidden" id="global-inbox-badge">0</span></button>
@@ -448,19 +447,19 @@
       <section id="view-club" class="view" data-view="club">
         <div class="section-title-row"><div><p class="kicker" id="club-view-kicker">Club administration</p><h2 id="club-view-title">Club Overview</h2></div></div>
 
-        <section class="club-admin-panel hidden" id="club-fixtures-panel">
+        <div id="club-fixtures-slot"><section class="club-admin-panel hidden" id="club-fixtures-panel">
           <section class="panel admin-fixture-centre">
             <div class="panel-heading"><div><p class="kicker">Club-wide schedule</p><h3>Fixture Centre</h3><p class="muted">Published Selkent fixtures and matches entered by your teams. Kick-off and ground details appear when confirmed.</p></div></div>
             <label class="admin-filter-label">Age group<select id="admin-fixtures-age"><option value="all">All age groups</option></select></label>
             <p class="admin-fixture-summary" id="admin-fixture-summary" role="status"></p>
             <div class="admin-fixture-list" id="admin-fixture-list"></div>
           </section>
-        </section>
+        </section></div>
 
-        <section class="club-results-panel hidden" id="club-results-panel">
+        <div id="club-results-slot"><section class="club-results-panel hidden" id="club-results-panel">
           <section class="panel club-results-browser">
             <div class="panel-heading"><div><p class="kicker">Results browser</p><h3>Club results</h3></div></div>
-            <p class="muted">Published Selkent league results and completed team-recorded matches for your club or assigned team.</p>
+            <p class="muted">Published Selkent league results and completed team-recorded matches for your club or assigned team. League games appear first; choose All competitions to see the full completed-match total.</p>
             <p class="muted" id="club-results-source-status" role="status"></p>
             <div class="club-results-filters"><label class="club-results-age-label">Age group<select id="club-results-age"></select></label><label class="club-results-age-label">Competition<select id="club-results-competition"><option value="league">League</option><option value="friendly">Friendly</option><option value="cup">Cup / tournament</option><option value="other">Other</option><option value="all">All competitions</option></select></label></div>
             <div id="club-results-list" class="club-results-list"></div>
@@ -470,7 +469,7 @@
               <button type="button" class="secondary-button compact" id="club-results-next">Next →</button>
             </div>
           </section>
-        </section>
+        </section></div>
 
         <section class="admin-club-overview" id="admin-club-overview">
           <section class="panel admin-dashboard-summary">
@@ -478,10 +477,10 @@
               <h3>Club at a glance</h3>
             </div>
             <div class="admin-overview-stats">
-              <article class="admin-stat"><span>Teams</span><strong id="admin-team-count">0</strong></article>
-              <article class="admin-stat"><span>Upcoming fixtures</span><strong id="admin-fixtures-count">0</strong></article>
-              <article class="admin-stat"><span>Completed matches</span><strong id="admin-results-count">0</strong><small id="admin-results-breakdown">0 Selkent published · 0 team recorded</small></article>
-              <article class="admin-stat"><span>Needs action</span><strong id="admin-alert-count">0</strong></article>
+              <button type="button" class="admin-stat" data-admin-summary="teams" aria-label="Browse club teams"><span>Teams</span><strong id="admin-team-count">0</strong></button>
+              <button type="button" class="admin-stat" data-admin-summary="fixtures" aria-haspopup="dialog" aria-controls="admin-fixtures-dialog"><span>Upcoming fixtures</span><strong id="admin-fixtures-count">0</strong></button>
+              <button type="button" class="admin-stat" data-admin-summary="results" aria-haspopup="dialog" aria-controls="admin-results-dialog"><span>Completed matches</span><strong id="admin-results-count">0</strong><small id="admin-results-breakdown">0 Selkent published · 0 team recorded</small></button>
+              <button type="button" class="admin-stat" data-admin-summary="attention" aria-label="View club items needing action"><span>Needs action</span><strong id="admin-alert-count">0</strong></button>
             </div>
             <p class="muted admin-overview-meta hidden" id="admin-overview-meta" role="status"></p>
           </section>
@@ -503,7 +502,7 @@
             <div class="admin-weekend-list" id="admin-weekend-list"></div>
           </section>
 
-          <section class="panel admin-attention-panel">
+          <section class="panel admin-attention-panel" id="admin-attention-panel" tabindex="-1">
             <div class="admin-attention-list" id="admin-attention-list"></div>
           </section>
         </section>
@@ -705,6 +704,20 @@
       </section>
     </main>
   </div>
+
+  <dialog id="admin-fixtures-dialog" class="modal club-list-modal" aria-labelledby="admin-fixtures-dialog-title">
+    <div class="club-list-modal-shell">
+      <div class="modal-heading"><h3 id="admin-fixtures-dialog-title">Upcoming fixtures</h3><button type="button" class="icon-button small" data-close-dialog aria-label="Close">×</button></div>
+      <div id="admin-fixtures-dialog-content"></div>
+    </div>
+  </dialog>
+
+  <dialog id="admin-results-dialog" class="modal club-list-modal" aria-labelledby="admin-results-dialog-title">
+    <div class="club-list-modal-shell">
+      <div class="modal-heading"><h3 id="admin-results-dialog-title">Completed matches</h3><button type="button" class="icon-button small" data-close-dialog aria-label="Close">×</button></div>
+      <div id="admin-results-dialog-content"></div>
+    </div>
+  </dialog>
 
   <dialog id="next-fixture-dialog" class="modal next-fixture-modal" aria-labelledby="next-match-opponent">
     <div class="next-fixture-detail-shell">

@@ -340,6 +340,15 @@ button.division-result-cell{cursor:pointer}
 .admin-dashboard-summary .admin-stat span{font-size:9.5px;text-transform:uppercase;letter-spacing:.04em}
 .admin-dashboard-summary .admin-stat strong{font-size:24px;line-height:1.05}
 .admin-dashboard-summary .admin-stat small{font-size:10px;line-height:1.3;color:var(--muted)}
+.admin-dashboard-summary button.admin-stat{font:inherit;color:inherit;text-align:left;cursor:pointer;justify-content:center;transition:border-color .15s,transform .15s}
+.admin-dashboard-summary button.admin-stat:hover{border-color:var(--green);transform:translateY(-1px)}
+.admin-dashboard-summary button.admin-stat:focus-visible{outline:3px solid var(--green);outline-offset:2px}
+.club-list-modal{width:min(94vw,760px);max-height:calc(100dvh - 24px)}
+.club-list-modal-shell{max-height:calc(100dvh - 24px);overflow-y:auto;padding:18px;overscroll-behavior:contain}
+.club-list-modal-shell>.modal-heading{position:sticky;top:-18px;z-index:1;margin:-18px -18px 14px;padding:16px 18px;background:var(--white);border-bottom:1px solid #dce8df}
+.club-list-modal .admin-fixture-centre,.club-list-modal .club-results-browser{margin:0;padding:0;border:0;box-shadow:none}
+.club-list-modal .admin-fixture-centre>.panel-heading,.club-list-modal .club-results-browser>.panel-heading{display:none}
+#admin-home-age-select,#admin-attention-panel{scroll-margin-top:calc(var(--android-inset-top,0px) + 85px)}
 .admin-team-overview-panel{margin-bottom:14px}
 .admin-section-heading{padding:4px 2px 10px}
 .admin-section-hint{font-size:10px;color:var(--muted);font-weight:800;text-align:right}
