@@ -13,6 +13,13 @@ contracts and writes all returned HTML together to one private R2 object,
 leaves the previous object untouched and the scheduled event fails. It does
 not fetch private match reports or U7–U11 result tables.
 
+On Sundays it also checks at :00 and :30 from 08:00 through 19:30 UTC. That is
+09:00–20:30 during British Summer Time and 08:00–19:30 during GMT. The normal
+six-hour check still runs at :15, so the schedules do not collide. These
+additional private snapshots help validate live match-day changes; they do
+not refresh the app or change the six-hour GitHub public feed. Wait for real
+provider results and verified parser parity before increasing public updates.
+
 The source feed is used only as the pilot's list of known public endpoints;
 new age groups, fixture weeks or divisions are discovered by the existing
 GitHub scraper. The R2 snapshot is unparsed evidence, not an app-facing JSON
@@ -46,8 +53,8 @@ Cloudflare account. If the bucket already exists in that account, skip the
 create command. Wrangler must be connected to the account that owns the paid
 Worker plan. No API token or R2 credential belongs in Git.
 
-`wrangler.jsonc` has no public `workers.dev` URL or custom route. The cron is
-`15 */6 * * *` in UTC; allow for Cloudflare's cron propagation delay after
+`wrangler.jsonc` has no public `workers.dev` URL or custom route. The crons are
+`15 */6 * * *` and `0,30 8-19 * * SUN` in UTC; allow for propagation after
 deployment. Inspect the Worker's Cron Events and logs for
 `selkent-shadow-collected` and the target count. Confirm the private bucket
 contains `shadow/latest.json` with matching `canonical_feed_last_updated`,
