@@ -12,6 +12,8 @@ on:
       - 'cloudflare/selkent-shadow/compare_fixture_preview.mjs'
       - 'cloudflare/selkent-shadow/tests/compare_fixture_preview.test.mjs'
       - 'cloudflare/selkent-shadow/src/fixtures.mjs'
+      - 'cloudflare/selkent-shadow/src/published-results.mjs'
+      - 'cloudflare/selkent-shadow/tests/published-results.spec.mjs'
   schedule:
     # Check the private collector after its :15 six-hour run (UTC).
     - cron: '45 */6 * * *'

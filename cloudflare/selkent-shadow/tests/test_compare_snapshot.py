@@ -50,6 +50,41 @@ def examples():
 
 
 class ShadowParityTests(unittest.TestCase):
+    def test_worker_results_match_python_on_same_private_capture(self):
+        snapshot, feed = examples()
+        soup = BeautifulSoup(snapshot["payloads"]["resultsTable/990001"], "html.parser")
+        soup.select_one("#results-990001").append(BeautifulSoup('''
+          <div class="panel panel-static"><div class="panel-heading">27/09/26 (Week 2)</div>
+          <div class="panel-body"><div class="row">
+            <div class="resultTeam">Home &amp; Sons</div>
+            <div class="resultScore">2 - 1</div>
+            <div class="resultTeam">Away</div>
+          </div></div></div>''', "html.parser"))
+        snapshot["payloads"]["resultsTable/990001"] = str(soup)
+        snapshot["published_results_preview"] = {"12": [{
+            "date": "2026-09-27", "home": "Home & Sons", "away": "Away",
+            "homeGoals": 2, "awayGoals": 1,
+            "provider_division_id": 990001,
+            "division_name": feed["age_groups"][1]["standings"][0]["division_name"],
+        }]}
+        feed["last_updated"] = "2026-09-28T00:45:00Z"
+        summary = compare.compare_worker_results_preview(snapshot, feed)
+        self.assertEqual(summary["status"], "exact")
+        self.assertEqual(summary["published_results"], 1)
+        self.assertNotIn("Home & Sons", str(summary))
+        snapshot["published_results_preview"]["12"] = []
+        summary = compare.compare_worker_results_preview(snapshot, feed)
+        self.assertEqual(summary["status"], "drift")
+        self.assertEqual(summary["different_age_groups"], 1)
+        snapshot["published_results_preview"]["2"] = []
+        with self.assertRaisesRegex(ValueError, "unsafe"):
+            compare.compare_worker_results_preview(snapshot, feed)
+
+    def test_old_snapshot_has_no_worker_results_preview(self):
+        snapshot, feed = examples()
+        self.assertEqual(compare.compare_worker_results_preview(snapshot, feed)["status"],
+                         "pending_new_collection")
+
     def test_worker_and_python_parsers_match_on_same_private_capture(self):
         snapshot, feed = examples()
         snapshot["fixture_preview"] = {

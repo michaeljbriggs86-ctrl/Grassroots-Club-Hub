@@ -107,13 +107,21 @@ Worker's fixture output to the public feed when both refer to the same feed
 version. A push before the first new Worker collection reports
 `pending_new_collection`; `exact` requires the deployed Worker to collect a
 new snapshot and then the comparison to run. Fixture drift is reported by age
-group without printing team names or provider HTML. Standings and scored
-results still depend on the existing Python parser and are not yet ported.
+group without printing team names or provider HTML.
 The verifier additionally compares the Worker fixture preview to Python's
 output from the **same private snapshot**. This check does not depend on the
 public feed's earlier capture time; any parser disagreement fails the check
 without logging fixture details. A drift against the public feed can still
 occur when Selkent changes fixtures between the public and private captures.
+
+The Worker now also normalizes only published, scored U12+ Results panels and
+stores `published_results_preview` inside the private snapshot. Empty scores,
+unplayed matches and verified abandoned status are omitted. Unknown scores
+and unsupported markup abort the private collection before R2 overwrite.
+The verifier compares Worker results with Python results from those very same
+private pages, reporting only counts. U7–U11 results are never requested or
+included in the preview. Standings still rely on the Python parser and remain
+the next porting stage. The website continues to use the GitHub feed.
 
 ## Graduation gates
 

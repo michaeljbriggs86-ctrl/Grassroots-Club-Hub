@@ -5,6 +5,7 @@ import worker, { collectShadow as collectShadowRaw, FEED_URL, targetsFromFeed } 
 
 const collectShadow = options => collectShadowRaw({ ...options,
   normalizeFixtures: async () => ({ 3: { fixtures: [], fixture_parse_status: 'verified_empty_multiweek_v2' } }),
+  normalizeResults: async () => ({ 6: [] }),
 });
 
 const NOW = Date.parse('2026-09-27T15:00:00Z');
@@ -49,6 +50,7 @@ test('collects a complete private snapshot without requesting U9 results', async
   const snapshot = JSON.parse(writes[0][1]);
   assert.equal(snapshot.target_count, 5);
   assert.ok(snapshot.fixture_preview[3]);
+  assert.deepEqual(snapshot.published_results_preview[6], []);
   assert.ok(snapshot.payloads['resultsTable/4249']);
   assert.ok(seen.every(url => !url.includes('resultsTable/3')));
   assert.equal(writes[0][2].httpMetadata.contentType, 'application/json');
@@ -61,7 +63,19 @@ test('a fixture parser failure leaves the previous private snapshot intact', asy
   await assert.rejects(() => collectShadowRaw({
     bucket: { async put() { writes++; } }, fetcher, now: NOW, paceMs: 0,
     normalizeFixtures: async () => { throw new Error('Unsupported private fixture row'); },
+    normalizeResults: async () => ({ 6: [] }),
   }), /Unsupported private fixture row/);
+  assert.equal(writes, 0);
+});
+
+test('an unsupported public result leaves the previous private snapshot intact', async () => {
+  const { fetcher } = fakeProvider();
+  let writes = 0;
+  await assert.rejects(() => collectShadowRaw({
+    bucket: { async put() { writes++; } }, fetcher, now: NOW, paceMs: 0,
+    normalizeFixtures: async () => ({ 3: { fixtures: [] } }),
+    normalizeResults: async () => { throw new Error('Unsupported private result score'); },
+  }), /Unsupported private result score/);
   assert.equal(writes, 0);
 });
 

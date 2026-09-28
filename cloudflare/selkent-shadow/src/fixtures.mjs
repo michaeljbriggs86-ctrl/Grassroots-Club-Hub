@@ -18,7 +18,7 @@ function decodeEntities(value) {
   });
 }
 
-const normalize = value => decodeEntities(value).replace(/\s+/gu, ' ').trim();
+export const normalize = value => decodeEntities(value).replace(/\s+/gu, ' ').trim();
 const folded = value => normalize(value).toLowerCase();
 
 export async function parseFixtureWeeks(html) {
