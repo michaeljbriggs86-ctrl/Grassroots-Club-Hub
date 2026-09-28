@@ -397,13 +397,8 @@
           </section>
           <section class="squad-view-page hidden" id="squad-tactics-page" data-squad-view="1" role="tabpanel" aria-labelledby="squad-tactics-tab">
             <div class="panel tactics-panel">
-              <div class="panel-heading tactics-heading"><div><p class="kicker">Matchday setup</p><h3>Tactics board</h3><p class="muted" id="tactics-help">Drag players to position them. Tap two players to swap.</p></div><button type="button" class="secondary-button compact" id="reset-tactics" data-requires-edit>Reset</button></div>
-              <label class="formation-control">Formation<select id="tactics-formation" aria-label="Formation"></select></label>
-              <div class="tactics-pitch" id="tactics-pitch" aria-label="Football tactics board">
-                <span class="pitch-halfway"></span><span class="pitch-circle"></span><span class="pitch-box pitch-box-top"></span><span class="pitch-box pitch-box-bottom"></span>
-              </div>
-              <div class="tactics-bench-wrap"><div class="panel-heading"><h3>Substitutes</h3><span class="helper" id="tactics-matchday-limit"></span></div><div class="tactics-bench" id="tactics-bench"></div></div>
-              <details class="matchday-squad-picker tactics-squad-options" id="matchday-squad-picker">
+              <div class="panel-heading tactics-heading"><div><p class="kicker">Next fixture</p><h3>Matchday plan</h3><p class="muted" id="tactics-help">Choose your players, then arrange them on the pitch. Tap two players to swap.</p></div></div>
+              <details class="matchday-squad-picker tactics-squad-options" id="matchday-squad-picker" open>
                 <summary class="matchday-squad-summary"><div><strong id="matchday-squad-title">Matchday squad</strong><span id="matchday-squad-fixture">Current setup</span></div><b id="matchday-squad-count">0 / 0</b></summary>
                 <div class="tactics-squad-options-body">
                   <small id="matchday-readiness-summary"></small>
@@ -411,6 +406,12 @@
                   <div class="matchday-squad-options" id="matchday-squad-options"></div>
                 </div>
               </details>
+              <div class="panel-heading tactics-heading"><h3>Formation and positions</h3><button type="button" class="secondary-button compact" id="reset-tactics" data-requires-edit>Reset positions</button></div>
+              <label class="formation-control">Formation<select id="tactics-formation" aria-label="Formation"></select></label>
+              <div class="tactics-pitch" id="tactics-pitch" aria-label="Football tactics board">
+                <span class="pitch-halfway"></span><span class="pitch-circle"></span><span class="pitch-box pitch-box-top"></span><span class="pitch-box pitch-box-bottom"></span>
+              </div>
+              <div class="tactics-bench-wrap"><div class="panel-heading"><h3>Substitutes</h3><span class="helper" id="tactics-matchday-limit"></span></div><div class="tactics-bench" id="tactics-bench"></div></div>
             </div>
           </section>
         </div>
