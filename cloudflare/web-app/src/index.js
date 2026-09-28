@@ -1,4 +1,5 @@
 import { pilotBadge } from './pilot-badges.js';
+import { badgeReview } from './badge-review.js';
 
 // The existing static assets remain the authority for public directory and fixtures.
 // This diagnostic only reports their freshness within the protected pilot site.
@@ -11,6 +12,7 @@ export default {
   async fetch(request, env) {
     const url = new URL(request.url);
     if (url.pathname.startsWith('/__pilot_badges/')) return pilotBadge(request, env);
+    if (url.pathname === '/__badge_review') return badgeReview(request, env);
     if (url.pathname !== '/__health') return env.ASSETS.fetch(request);
     const headers = {
       'Content-Type': 'application/json; charset=utf-8',

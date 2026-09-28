@@ -11,6 +11,6 @@
   "assets": {
     "directory": "./dist",
     "binding": "ASSETS",
-    "run_worker_first": ["/__health", "/__pilot_badges/*"]
+    "run_worker_first": ["/__health", "/__pilot_badges/*", "/__badge_review"]
   }
 }

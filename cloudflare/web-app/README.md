@@ -76,6 +76,15 @@ the route additionally requires the exact pilot hostname. SVGs are held for a
 separate active-content and browser-render review. A private pilot badge is
 not a public-use rights clearance.
 
+Review an approved badge without changing the test account's club at
+`https://test.pitchkind.com/__badge_review?club=447`. This protected page
+lists only clubs approved in the packaged directory, loads each image through
+the exact private R2 route above, and shows the current hero treatment plus
+20 / 28 px result and 56 / 60 px match sizes. It offers phone/foldable widths
+and light/dark cards. The cards are visual examples and contain no match scores.
+The page rejects unknown or held club IDs, cannot show on another hostname,
+and does not confer public use rights.
+
 ## Connect the existing Cloudflare Worker
 
 The failed 2026-09-26 `grassroots-club-hub.production` build ran Wrangler at
