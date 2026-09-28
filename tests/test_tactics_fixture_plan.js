@@ -10,8 +10,10 @@ const reset=source.slice(source.indexOf('function resetTactics(){'),source.index
 assert.ok(start>0&&end>start&&reset.startsWith('function resetTactics(){'));
 const players=Array.from({length:8},(_,i)=>({number:i+1,name:`Player ${i+1}`}));
 let fixture={id:'first'};
+let limited=true;
 const state={selkent:{},tactics:{lineup:[],positions:{},formationByFixture:{},matchdaySelections:{},matchdayAutoPrepared:{}}};
 const context={state,fixture,footballFormat:()=>({onPitch:5,matchday:7}),activePlayers:()=>players,
+  requiresMatchdaySelection:()=>limited,
   nextPublishedFixture:()=>fixture,fixtureStableKey:f=>f.id,requireCoach:()=>true,isCoach:()=>true,
   featureEnabled:()=>true,document:{querySelectorAll:()=>[]},auditEvent:()=>{},toast:()=>{},saveState:()=>{context.rememberTacticsPlan();}};
 vm.createContext(context);vm.runInContext(source.slice(start,end)+reset,context);
@@ -36,6 +38,12 @@ state.tactics.matchdaySelections.first=[];context.ensureTacticsState();
 assert.deepEqual(ids(),[],'an intentionally empty selection stays empty');
 fixture={id:'legacy'};state.tactics.matchdaySelections.legacy=players.slice(0,7).map(p=>`p${p.number}`);context.ensureTacticsState();
 assert.deepEqual(ids(),[],'old automatic roster order is not presented as a coach selection');
+limited=false;fixture={id:'first'};context.ensureTacticsState();
+assert.deepEqual(ids(),players.map(p=>`p${p.number}`),'rolling substitutions use the full active roster');
+assert.equal(state.tactics.matchdaySelections.first,undefined,'old fixture selection no longer limits a rolling squad');
+assert.equal(state.tactics.lineup.length,players.length,'bench includes all players beyond the on-pitch format');
+context.resetTactics();
+assert.equal(state.tactics.lineup.length,players.length,'reset positions preserves the rolling squad');
 assert.ok(html.indexOf('id="matchday-squad-picker"')<html.indexOf('id="tactics-pitch"'),'squad picker appears before pitch');
 assert.match(html,/id="reset-tactics"[^>]*>Reset positions/);
 console.log('Tactics fixture plan checks passed');

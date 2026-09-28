@@ -8,11 +8,12 @@ const html=fs.readFileSync(path.join(root,'app/src/main/assets/index.html'),'utf
 const css=fs.readFileSync(path.join(root,'app/src/main/assets/styles.css'),'utf8');
 const start=app.indexOf('function renderSquadMatchPrep(){'),end=app.indexOf('function renderSquad(){',start);
 assert.ok(start>0&&end>start);
-const ids=['squad-match-prep','squad-match-prep-title','squad-match-prep-date','squad-prep-selected','squad-prep-available'];
+const ids=['squad-match-prep','squad-match-prep-title','squad-match-prep-date','squad-prep-count-label','squad-prep-selected','squad-prep-available','squad-open-plan'];
 const nodes=Object.fromEntries(ids.map(id=>[id,{textContent:'',hidden:false,classList:{toggle(name,hidden){this.hidden=hidden;}}}]));
 const state={tactics:{matchdaySelections:{first:['p1','p2']}}};
-let fixture={id:'first',opponent:'Phoenix Sports Panthers',date:'2026-10-04'},coach=true,availabilityKey='first';
+let fixture={id:'first',opponent:'Phoenix Sports Panthers',date:'2026-10-04'},coach=true,availabilityKey='first',limited=true;
 const context={state,document:{getElementById:id=>nodes[id]},isCoach:()=>coach,featureEnabled:()=>true,
+  requiresMatchdaySelection:()=>limited,activePlayers:()=>Array.from({length:8}),
   ensureTacticsState:()=>{},nextPublishedFixture:()=>fixture,currentTacticsFixtureKey:()=>fixture?.id||'general',
   footballFormat:()=>({matchday:7}),matchTeamLabel:x=>x,formatDate:x=>x,fixtureStableKey:f=>f.id,
   availabilityCounts:()=>({available:5}),get __availabilityFixture(){return availabilityKey;}};
@@ -21,7 +22,12 @@ context.renderSquadMatchPrep();
 assert.equal(nodes['squad-match-prep'].classList.hidden,false);
 assert.equal(nodes['squad-match-prep-title'].textContent,'Next: Phoenix Sports Panthers');
 assert.equal(nodes['squad-prep-selected'].textContent,'2 / 7');
+assert.equal(nodes['squad-prep-count-label'].textContent,'Selected players');
 assert.equal(nodes['squad-prep-available'].textContent,'5 available');
+limited=false;context.renderSquadMatchPrep();
+assert.equal(nodes['squad-prep-selected'].textContent,'8 players');
+assert.equal(nodes['squad-prep-count-label'].textContent,'Active squad');
+assert.equal(nodes['squad-open-plan'].textContent,'Set formation & positions');
 availabilityKey='other';context.renderSquadMatchPrep();
 assert.equal(nodes['squad-prep-available'].textContent,'Awaiting replies','stale availability is not shown for a new fixture');
 coach=false;context.renderSquadMatchPrep();
