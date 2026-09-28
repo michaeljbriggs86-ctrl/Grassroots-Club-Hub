@@ -27,6 +27,7 @@ ASSETS = (
     "football-login-adult.jpg", "football-login-player.jpg",
     "football-login-club.jpg", "football-pitch-hero.jpg",
     "football-pitch-hero-illustration.png",
+    "cray-valley-547-silhouette-mask.png",
 )
 
 
