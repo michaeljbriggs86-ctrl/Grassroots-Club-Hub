@@ -33,6 +33,62 @@ def _parse(parser, html: str, category: str):
         raise ValueError(f"Private {category} markup failed: {type(exc).__name__}") from None
 
 
+def _fixture_age(payloads: dict, age: dict):
+    age_id = age["agegroup_id"]
+    base_html = payloads[f"fixturespage/{age_id}"]
+    discovered_weeks = _parse(parse_fixture_week_ids, base_html, "fixture tabs")
+    week_ids = age["fixture_week_ids"]
+    if week_ids:
+        week_rows = []
+        for week_id in week_ids:
+            html = payloads[f"fixturespage/{age_id}/{week_id}"]
+            rows, _ = _parse(parse_fixtures, html, "fixture")
+            week_rows.append(rows)
+        fixtures = merge_fixture_rows(*week_rows)
+        status = ("verified_multiweek_fixture_rows_v2" if fixtures
+                  else "verified_empty_multiweek_v2")
+    else:
+        fixtures, status = _parse(parse_fixtures, base_html, "fixture")
+    return discovered_weeks, fixtures, status
+
+
+def compare_worker_fixture_preview(snapshot: dict, feed: dict) -> dict:
+    """Compare both parsers against the same private pages, regardless of feed age."""
+    if snapshot.get("schema") != "pitchkind-selkent-shadow-v1" or (
+        feed.get("schema_version") != 2 or feed.get("provider") != "Selkent"
+    ):
+        raise ValueError("Unrecognized private snapshot or public feed schema")
+    preview = snapshot.get("fixture_preview")
+    if preview is None:
+        return {"event": "selkent-worker-python-fixtures", "status": "pending_new_collection"}
+    if not isinstance(preview, dict) or set(preview) != {
+        str(age["agegroup_id"]) for age in feed["age_groups"]
+    }:
+        raise ValueError("Incomplete private Worker fixture preview")
+
+    differences = Counter()
+    count = 0
+    for age in feed["age_groups"]:
+        discovered, fixtures, status = _fixture_age(snapshot["payloads"], age)
+        parsed = preview[str(age["agegroup_id"])]
+        if not isinstance(parsed, dict) or not isinstance(parsed.get("fixtures"), list):
+            raise ValueError("Malformed private Worker fixture preview")
+        count += len(fixtures)
+        if parsed.get("discovered_week_ids") != discovered:
+            differences["week_lists"] += 1
+        if parsed["fixtures"] != fixtures:
+            differences["fixture_age_groups"] += 1
+        if parsed.get("fixture_parse_status") != status:
+            differences["statuses"] += 1
+    return {
+        "event": "selkent-worker-python-fixtures",
+        "status": "drift" if differences else "exact",
+        "age_groups": len(feed["age_groups"]),
+        "fixtures": count,
+        "different_age_group_counts": dict(differences),
+    }
+
+
 def compare_snapshot(snapshot: dict, feed: dict) -> dict:
     if snapshot.get("schema") != "pitchkind-selkent-shadow-v1":
         raise ValueError("Unrecognized private snapshot schema")
@@ -44,7 +100,6 @@ def compare_snapshot(snapshot: dict, feed: dict) -> dict:
     same_feed_version = snapshot["canonical_feed_last_updated"] == feed["last_updated"]
 
     for age in feed["age_groups"]:
-        age_id = age["agegroup_id"]
         age_code = "".join(age["age_group"].upper().split())
         restricted = age_code in RESTRICTED
         standings = age.get("standings")
@@ -56,24 +111,9 @@ def compare_snapshot(snapshot: dict, feed: dict) -> dict:
             if age.get("published_results") is not None:
                 raise ValueError("Public results exist without standings")
 
-        base_key = f"fixturespage/{age_id}"
-        base_html = payloads[base_key]
-        discovered_weeks = _parse(parse_fixture_week_ids, base_html, "fixture tabs")
-        week_ids = age["fixture_week_ids"]
-        if discovered_weeks != week_ids:
+        discovered_weeks, fixtures, fixture_status = _fixture_age(payloads, age)
+        if discovered_weeks != age["fixture_week_ids"]:
             differences["fixture_week_lists"] += 1
-
-        if week_ids:
-            week_rows = []
-            for week_id in week_ids:
-                html = payloads[f"fixturespage/{age_id}/{week_id}"]
-                rows, _ = _parse(parse_fixtures, html, "fixture")
-                week_rows.append(rows)
-            fixtures = merge_fixture_rows(*week_rows)
-            fixture_status = ("verified_multiweek_fixture_rows_v2" if fixtures
-                              else "verified_empty_multiweek_v2")
-        else:
-            fixtures, fixture_status = _parse(parse_fixtures, base_html, "fixture")
         counts["fixtures"] += len(fixtures)
         if same_feed_version and fixtures != age["fixtures"]:
             differences["fixture_age_groups"] += 1
@@ -125,3 +165,7 @@ if __name__ == "__main__":
     with open(sys.argv[2], encoding="utf8") as public_file:
         feed = json.load(public_file)
     print(json.dumps(compare_snapshot(snapshot, feed), sort_keys=True))
+    parser_parity = compare_worker_fixture_preview(snapshot, feed)
+    print(json.dumps(parser_parity, sort_keys=True))
+    if parser_parity["status"] == "drift":
+        raise SystemExit("Worker fixture parser differs from Python on the same private snapshot")

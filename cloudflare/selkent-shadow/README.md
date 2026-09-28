@@ -109,6 +109,11 @@ version. A push before the first new Worker collection reports
 new snapshot and then the comparison to run. Fixture drift is reported by age
 group without printing team names or provider HTML. Standings and scored
 results still depend on the existing Python parser and are not yet ported.
+The verifier additionally compares the Worker fixture preview to Python's
+output from the **same private snapshot**. This check does not depend on the
+public feed's earlier capture time; any parser disagreement fails the check
+without logging fixture details. A drift against the public feed can still
+occur when Selkent changes fixtures between the public and private captures.
 
 ## Graduation gates
 

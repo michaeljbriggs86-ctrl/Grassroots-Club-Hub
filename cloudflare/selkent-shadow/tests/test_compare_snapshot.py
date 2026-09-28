@@ -50,6 +50,35 @@ def examples():
 
 
 class ShadowParityTests(unittest.TestCase):
+    def test_worker_and_python_parsers_match_on_same_private_capture(self):
+        snapshot, feed = examples()
+        snapshot["fixture_preview"] = {
+            "2": {"discovered_week_ids": [2],
+                  "fixtures": feed["age_groups"][0]["fixtures"],
+                  "fixture_parse_status": "verified_multiweek_fixture_rows_v2"},
+            "12": {"discovered_week_ids": [], "fixtures": [],
+                   "fixture_parse_status": "verified_empty"},
+        }
+        # Even when the earlier public capture differs, these two parsers
+        # should agree on the same R2 HTML snapshot.
+        feed["age_groups"][0]["fixtures"] = []
+        feed["last_updated"] = "2026-09-28T00:45:00Z"
+        summary = compare.compare_worker_fixture_preview(snapshot, feed)
+        self.assertEqual(summary["status"], "exact")
+        self.assertEqual(summary["fixtures"], 1)
+        self.assertNotIn("Example Home", str(summary))
+
+        snapshot["fixture_preview"]["2"]["fixtures"] = []
+        summary = compare.compare_worker_fixture_preview(snapshot, feed)
+        self.assertEqual(summary["status"], "drift")
+        self.assertEqual(summary["different_age_group_counts"], {"fixture_age_groups": 1})
+        self.assertNotIn("Example Home", str(summary))
+
+    def test_older_capture_has_no_worker_preview(self):
+        snapshot, feed = examples()
+        self.assertEqual(compare.compare_worker_fixture_preview(snapshot, feed)["status"],
+                         "pending_new_collection")
+
     def test_exact_parity_on_synthetic_fixtures_and_standings(self):
         snapshot, feed = examples()
         summary = compare.compare_snapshot(snapshot, feed)
