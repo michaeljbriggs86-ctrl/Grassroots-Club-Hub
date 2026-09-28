@@ -84,6 +84,16 @@ later than their cron time. A successful scheduled verification demonstrates
 that a fresh private snapshot existed at that time; it does not establish
 parser parity with the public feed or switch website data sources.
 
+The verifier also runs a read-only parser comparison against the current public
+feed. It reuses the proven Python fixture, standings and scored-result parsers,
+prints counts and how many age groups differ in each section, and never
+publishes or uploads private HTML. `exact` means the two captures matched;
+`drift` reports a difference that can occur when Selkent changes data in the
+minutes between public and private collection. A different canonical feed
+version defers the comparison. Unknown markup or a restricted age group's
+results fail the check. This comparison is a migration gate, not an automatic
+source switch.
+
 ## Graduation gates
 
 1. Capture multiple successful scheduled collections and snapshot verification

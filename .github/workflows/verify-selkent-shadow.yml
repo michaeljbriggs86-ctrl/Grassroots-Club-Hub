@@ -7,6 +7,8 @@ on:
       - '.github/workflows/verify-selkent-shadow.yml'
       - 'cloudflare/selkent-shadow/verify-snapshot.mjs'
       - 'cloudflare/selkent-shadow/tests/verify-snapshot.test.mjs'
+      - 'cloudflare/selkent-shadow/compare_snapshot.py'
+      - 'cloudflare/selkent-shadow/tests/test_compare_snapshot.py'
   schedule:
     # Check the private collector after its :15 six-hour run (UTC).
     - cron: '45 */6 * * *'
@@ -32,6 +34,13 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Test private comparison parsers
+        run: |
+          python -m pip install requests beautifulsoup4
+          python -m unittest discover -s cloudflare/selkent-shadow/tests -p 'test_compare_snapshot.py' -v
       - name: Check Cloudflare credentials
         run: |
           test -n "$CLOUDFLARE_API_TOKEN" || { echo 'Set CLOUDFLARE_API_TOKEN repository secret'; exit 1; }
@@ -47,4 +56,8 @@ jobs:
       - name: Check freshness, completeness and public feed targets
         run: |
           node cloudflare/selkent-shadow/verify-snapshot.mjs \
+            "$RUNNER_TEMP/selkent-shadow-latest.json" data/results.json
+      - name: Compare normalized private and public data
+        run: |
+          python cloudflare/selkent-shadow/compare_snapshot.py \
             "$RUNNER_TEMP/selkent-shadow-latest.json" data/results.json
