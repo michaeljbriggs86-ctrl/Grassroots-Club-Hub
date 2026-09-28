@@ -98,6 +98,18 @@ version defers the comparison. Unknown markup or a restricted age group's
 results fail the check. This comparison is a migration gate, not an automatic
 source switch.
 
+The Worker now also normalizes fixture pages with Cloudflare's HTMLRewriter
+and stores `fixture_preview` in the same private R2 snapshot. This preview
+contains fixture lists and discovered week IDs for each age group; it is never
+served publicly. If fixture markup is unsupported, the collector fails before
+overwriting the previous snapshot. The verification workflow compares the
+Worker's fixture output to the public feed when both refer to the same feed
+version. A push before the first new Worker collection reports
+`pending_new_collection`; `exact` requires the deployed Worker to collect a
+new snapshot and then the comparison to run. Fixture drift is reported by age
+group without printing team names or provider HTML. Standings and scored
+results still depend on the existing Python parser and are not yet ported.
+
 ## Graduation gates
 
 1. Capture multiple successful scheduled collections and snapshot verification

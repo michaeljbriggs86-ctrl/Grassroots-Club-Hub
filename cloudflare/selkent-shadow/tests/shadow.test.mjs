@@ -1,7 +1,11 @@
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import test from 'node:test';
-import worker, { collectShadow, FEED_URL, targetsFromFeed } from '../src/index.mjs';
+import worker, { collectShadow as collectShadowRaw, FEED_URL, targetsFromFeed } from '../src/index.mjs';
+
+const collectShadow = options => collectShadowRaw({ ...options,
+  normalizeFixtures: async () => ({ 3: { fixtures: [], fixture_parse_status: 'verified_empty_multiweek_v2' } }),
+});
 
 const NOW = Date.parse('2026-09-27T15:00:00Z');
 const miniFeed = {
@@ -44,10 +48,21 @@ test('collects a complete private snapshot without requesting U9 results', async
   assert.equal(writes[0][0], 'shadow/latest.json');
   const snapshot = JSON.parse(writes[0][1]);
   assert.equal(snapshot.target_count, 5);
+  assert.ok(snapshot.fixture_preview[3]);
   assert.ok(snapshot.payloads['resultsTable/4249']);
   assert.ok(seen.every(url => !url.includes('resultsTable/3')));
   assert.equal(writes[0][2].httpMetadata.contentType, 'application/json');
   assert.equal(worker.fetch().status, 404);
+});
+
+test('a fixture parser failure leaves the previous private snapshot intact', async () => {
+  const { fetcher } = fakeProvider();
+  let writes = 0;
+  await assert.rejects(() => collectShadowRaw({
+    bucket: { async put() { writes++; } }, fetcher, now: NOW, paceMs: 0,
+    normalizeFixtures: async () => { throw new Error('Unsupported private fixture row'); },
+  }), /Unsupported private fixture row/);
+  assert.equal(writes, 0);
 });
 
 test('one failed provider request leaves the previous R2 snapshot untouched', async () => {

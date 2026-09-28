@@ -30,6 +30,8 @@ jobs:
         run: |
           node --test cloudflare/selkent-shadow/tests/shadow.test.mjs
           cd cloudflare/selkent-shadow
+          npm install --no-package-lock
+          npm run test:runtime
           npx --yes wrangler@4.142.0 deploy --dry-run
       - name: Create private R2 bucket if needed
         working-directory: cloudflare/selkent-shadow

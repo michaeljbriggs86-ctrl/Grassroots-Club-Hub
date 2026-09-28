@@ -9,6 +9,9 @@ on:
       - 'cloudflare/selkent-shadow/tests/verify-snapshot.test.mjs'
       - 'cloudflare/selkent-shadow/compare_snapshot.py'
       - 'cloudflare/selkent-shadow/tests/test_compare_snapshot.py'
+      - 'cloudflare/selkent-shadow/compare_fixture_preview.mjs'
+      - 'cloudflare/selkent-shadow/tests/compare_fixture_preview.test.mjs'
+      - 'cloudflare/selkent-shadow/src/fixtures.mjs'
   schedule:
     # Check the private collector after its :15 six-hour run (UTC).
     - cron: '45 */6 * * *'
@@ -46,7 +49,7 @@ jobs:
           test -n "$CLOUDFLARE_API_TOKEN" || { echo 'Set CLOUDFLARE_API_TOKEN repository secret'; exit 1; }
           test -n "$CLOUDFLARE_ACCOUNT_ID" || { echo 'Set CLOUDFLARE_ACCOUNT_ID repository secret'; exit 1; }
       - name: Test snapshot verifier
-        run: node --test cloudflare/selkent-shadow/tests/verify-snapshot.test.mjs
+        run: node --test cloudflare/selkent-shadow/tests/verify-snapshot.test.mjs cloudflare/selkent-shadow/tests/compare_fixture_preview.test.mjs
       - name: Read private remote snapshot
         working-directory: cloudflare/selkent-shadow
         run: |
@@ -61,4 +64,8 @@ jobs:
       - name: Compare normalized private and public data
         run: |
           python cloudflare/selkent-shadow/compare_snapshot.py \
+            "$RUNNER_TEMP/selkent-shadow-latest.json" data/results.json
+      - name: Compare Worker-normalized private fixtures and public feed
+        run: |
+          node cloudflare/selkent-shadow/compare_fixture_preview.mjs \
             "$RUNNER_TEMP/selkent-shadow-latest.json" data/results.json
