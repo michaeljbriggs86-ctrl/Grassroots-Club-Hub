@@ -2061,7 +2061,7 @@ async function refreshMatchAvailability(quiet=true){
     const render=(label,key)=>`<details class="availability-summary-group ${key}" data-availability-group="${key}"><summary>${label} · ${byStatus[key].length}</summary><div>${byStatus[key].map(r=>{const p=activePlayers().find(x=>selkentNorm(x.name)===selkentNorm(r.player_name));return p?playerRow(p,r.status,r.response_source):'';}).join('')||'<em>None</em>'}</div></details>`;
     const awaitingHtml=`<details class="availability-summary-group awaiting" data-availability-group="awaiting"><summary>Awaiting response · ${awaiting.length}</summary><div>${awaiting.map(p=>playerRow(p,'','')).join('')||'<em>None</em>'}</div></details>`;
     if(coachSummary){const open=new Set([...coachSummary.querySelectorAll('details[open]')].map(el=>el.dataset.availabilityGroup));coachSummary.innerHTML=render('Available','available')+render('Unsure','unsure')+render('Unavailable','unavailable')+awaitingHtml;coachSummary.querySelectorAll('details').forEach(el=>{el.open=open.has(el.dataset.availabilityGroup);});}
-    renderTacticsBoard();renderSquadMatchPrep();
+    renderTacticsBoard();
   }
   renderMatchdayDashboard();
 }
@@ -3064,23 +3064,11 @@ function selectTacticsPlayer(id){if(!isCoach())return;if(!__tacticsSelected){__t
 function enableTacticsDrag(node,id,pitch){node.addEventListener('pointerdown',e=>{if(!isCoach())return;let moved=false;node.setPointerCapture(e.pointerId);const move=ev=>{moved=true;const r=pitch.getBoundingClientRect();const x=Math.max(7,Math.min(93,(ev.clientX-r.left)/r.width*100)),y=Math.max(5,Math.min(95,(ev.clientY-r.top)/r.height*100));state.tactics.positions[id]={x,y};node.style.left=x+'%';node.style.top=y+'%';};const up=()=>{node.removeEventListener('pointermove',move);node.removeEventListener('pointerup',up);if(moved){__tacticsSelected=null;rememberTacticsPlan();persistLocalState();if(CLOUD_MODE)window.ClubHubCloud?.queueStateSave?.(state);}};node.addEventListener('pointermove',move);node.addEventListener('pointerup',up);});}
 function resetTactics(){if(!requireCoach())return;ensureTacticsState();const key=currentTacticsFixtureKey(),selected=[...state.tactics.lineup];applyFormationTemplate(true);auditEvent('tactics_reset','tactics',key,'Reset player positions',null,{formation:state.tactics.formation,selected});toast('Player positions reset');}
 
-function renderSquadMatchPrep(){
-  const panel=document.getElementById('squad-match-prep');if(!panel)return;
-  const visible=isCoach()&&featureEnabled('tactics');panel.classList.toggle('hidden',!visible);if(!visible)return;
-  ensureTacticsState();const next=nextPublishedFixture(),key=currentTacticsFixtureKey(),selected=state.tactics.matchdaySelections[key]||[],format=footballFormat(),limited=requiresMatchdaySelection();
-  document.getElementById('squad-match-prep-title').textContent=next?`Next: ${matchTeamLabel(next.opponent||'Opponent TBC')}`:'General matchday setup';
-  document.getElementById('squad-match-prep-date').textContent=next?(next.date?formatDate(next.date):'Date TBC'):'No upcoming fixture published';
-  document.getElementById('squad-prep-count-label').textContent=limited?'Selected players':'Active squad';
-  document.getElementById('squad-prep-selected').textContent=limited?`${selected.length} / ${format.matchday}`:`${activePlayers().length} players`;
-  document.getElementById('squad-open-plan').textContent=limited?'Choose players & formation':'Set formation & positions';
-  const ready=next&&__availabilityFixture===fixtureStableKey(next),counts=ready?availabilityCounts():null;
-  document.getElementById('squad-prep-available').textContent=next?(ready?`${counts.available||0} available`:'Awaiting replies'):'No fixture yet';
-}
 function renderSquad(){
   const squad=rosterPlayers(),f=footballFormat();document.getElementById('squad-count').textContent=squad.length;const space=Math.max(0,f.registered-squad.length);const sc=document.getElementById('squad-space-count');if(sc)sc.textContent=`${space} registration space${space===1?'':'s'} remaining`;
   const summary=document.getElementById('squad-format-summary');if(summary)summary.innerHTML=`<span>${f.format}</span><span>${f.onPitch} on pitch</span><span>Max registered ${f.registered}</span><span>Matchday ${f.matchday}</span>`;
   document.getElementById('squad-list').innerHTML=squad.map((p,i)=>{const action=isCoach()?`<button class="player-edit" data-edit-player="${p.number}">Edit</button>`:'';const role=p.role==='goalkeeper'?'Goalkeeper':'Outfield';const status=p.status==='inactive'?' · Inactive':'';const ownPlayer=currentRole!=='player'||selkentNorm(window.ClubHubCloud?.context?.profile?.full_name||'')===selkentNorm(p.name);const profile=playerAccountsAllowedForAge(ageGroupNumber())&&ownPlayer?` data-player-profile="${esc(p.name)}" title="Open player profile"`:'';return `<article class="player-card player-profile-card"${profile}>${jerseyHTML(p)}<div><div class="player-name">${esc(p.name)}</div><div class="player-sub">${role}${status}</div></div>${action}</article>`;}).join('')||'<div class="empty-state"><strong>No players yet</strong>Add players to build the squad.</div>';
-  renderSquadMatchPrep();if(featureEnabled('tactics'))renderTacticsBoard();else setSquadPage(0);
+  if(featureEnabled('tactics'))renderTacticsBoard();else setSquadPage(0);
 }
 
 function renderPlayerSelects(){
@@ -4423,7 +4411,6 @@ for(const kind of ['fixtures','results']){
 
 document.getElementById('squad-list-tab')?.addEventListener('click',()=>setSquadPage(0));
 document.getElementById('squad-tactics-tab')?.addEventListener('click',()=>setSquadPage(1));
-document.getElementById('squad-open-plan')?.addEventListener('click',()=>setSquadPage(1));
 // Squad and Tactics are explicit pages; horizontal swipe navigation is intentionally disabled.
 document.getElementById('reset-tactics')?.addEventListener('click',resetTactics);
 document.getElementById('select-all-available')?.addEventListener('click',selectAllAvailablePlayers);

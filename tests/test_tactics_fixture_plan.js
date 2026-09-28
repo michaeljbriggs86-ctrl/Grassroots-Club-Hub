@@ -6,7 +6,7 @@ const source=fs.readFileSync(path.join(__dirname,'../app/src/main/assets/app.js'
 const html=fs.readFileSync(path.join(__dirname,'../app/src/main/assets/index.html'),'utf8');
 const start=source.indexOf('let __tacticsSelected=null;');
 const end=source.indexOf('function renderMatchdaySquadPicker(){',start);
-const reset=source.slice(source.indexOf('function resetTactics(){'),source.indexOf('\nfunction renderSquadMatchPrep(){'));
+const reset=source.slice(source.indexOf('function resetTactics(){'),source.indexOf('\nfunction renderSquad(){'));
 assert.ok(start>0&&end>start&&reset.startsWith('function resetTactics(){'));
 const players=Array.from({length:8},(_,i)=>({number:i+1,name:`Player ${i+1}`}));
 let fixture={id:'first'};
