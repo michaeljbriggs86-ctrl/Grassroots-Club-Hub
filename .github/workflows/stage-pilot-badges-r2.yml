@@ -14,6 +14,7 @@ on:
       - 'cloudflare/web-app/wrangler.jsonc'
       - 'cloudflare/web-app/service-worker.js'
       - 'app/src/main/assets/app.js'
+      - 'app/src/main/assets/app-design-system.css'
       - 'app/src/main/assets/static-feed-overlay.js'
 
 permissions:

@@ -493,22 +493,22 @@ svg,canvas,video{max-width:100%}
 @media(max-width:374px){.auth-brand{min-height:88px!important}.auth-brand .auth-brand-lockup,.auth-brand>img{width:min(330px,88vw)!important;max-height:84px!important}}
 @media(min-width:600px){.auth-brand .auth-brand-lockup,.auth-brand>img{width:min(410px,70vw)!important}}
 
-/* v2.2.20 — verified club badge hero formatting */
-/* Verified club badges are artwork, not white-tile UI icons. Keep the neutral
-   tile only for the PitchKind missing-badge placeholder. */
+/* Verified club badges retain their original outline in the hero. The image
+   itself fits the slot; no circular frame may cut off a shield or wordmark.
+   Keep the neutral tile only for the PitchKind missing-badge placeholder. */
 .club-logo-wrap:not(.platform-club-placeholder){
-  border-radius:50%!important;
+  border-radius:0!important;
   background:transparent!important;
   border:0!important;
   box-shadow:none!important;
-  overflow:hidden!important;
+  overflow:visible!important;
 }
 .club-logo-wrap:not(.platform-club-placeholder) .club-logo{
   width:100%!important;
   height:100%!important;
   object-fit:contain!important;
-  border-radius:50%!important;
-  clip-path:circle(49.4% at 50% 50%)!important;
+  border-radius:0!important;
+  clip-path:none!important;
   filter:drop-shadow(0 5px 10px rgba(0,0,0,.24))!important;
 }
 .club-logo-wrap.platform-club-placeholder{
@@ -526,10 +526,6 @@ svg,canvas,video{max-width:100%}
   clip-path:none!important;
   filter:none!important;
 }
-@media(max-width:520px){
-  .club-logo-wrap:not(.platform-club-placeholder){border-radius:50%!important}
-}
-
 /* Compact primary navigation on phones, including unfolded foldable displays. */
 .mobile-nav-sprite,.mobile-primary-nav,.mobile-more-scrim,.mobile-more-sheet{display:none}
 @media(max-width:900px){
