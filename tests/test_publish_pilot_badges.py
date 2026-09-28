@@ -20,6 +20,8 @@ class BadgePublisherTest(unittest.TestCase):
         self.manifest = json.loads((ROOT / 'verification/pilot_verified_badges.json').read_text())
 
     def test_add_second_badge_and_revoke_first_without_other_directory_changes(self):
+        # Exercise this transition starting with one approved badge.
+        self.manifest['badges'] = [self.manifest['badges'][0]]
         initial = copy.deepcopy(self.directory)
         # Exercise admission from an unbadged copy even when the live feed
         # already contains this approved pilot badge.
@@ -56,6 +58,19 @@ class BadgePublisherTest(unittest.TestCase):
         self.assertEqual(self.directory['leagues'], initial['leagues'])
         self.assertEqual(self.directory['team_club_links'], initial['team_club_links'])
 
+    def test_current_manifest_applies_only_to_exact_club_ids(self):
+        original = copy.deepcopy(self.directory)
+        _, ids = module.update_directory(self.directory, self.manifest)
+        self.assertEqual(ids, [250, 447])
+        for before, after in zip(original['clubs'], self.directory['clubs']):
+            if before['club_id'] not in ids:
+                self.assertEqual(before, after)
+        for badge in self.manifest['badges']:
+            club = next(c for c in self.directory['clubs']
+                        if c['club_id'] == badge['club_id'])
+            for field in module.BADGE_FIELDS:
+                self.assertEqual(club[field], badge[field])
+
     def test_fails_closed_for_mismatched_name_and_unreviewed_status(self):
         for changed in ({'club_name': 'Another Club'}, {'logo_status': 'ready_for_second_review'}):
             with self.subTest(changed=changed):
@@ -65,6 +80,8 @@ class BadgePublisherTest(unittest.TestCase):
                     module.update_directory(copy.deepcopy(self.directory), candidate)
 
     def test_hosted_asset_must_still_match_reviewed_hash(self):
+        # This response fixture covers only the first source and digest.
+        self.manifest['badges'] = [self.manifest['badges'][0]]
         class Response:
             headers = {'Content-Type': 'image/png'}
             url = self.manifest['badges'][0]['logo_url']

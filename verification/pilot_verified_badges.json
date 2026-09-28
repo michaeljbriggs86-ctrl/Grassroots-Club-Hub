@@ -12,6 +12,17 @@
       "logo_sha256": "78dc32848d6919bcfe7c8b2aa6e93e766fd1c5d7d26fd166fdb8450345d11570",
       "rights_status": "legal_basis_not_reviewed",
       "review_basis": "Official club crest history and current official image; Selkent club ID 250; exact bytes 1080x1080, 167521 bytes, SHA-256 recorded here."
+    },
+    {
+      "club_id": 447,
+      "club_name": "Samuel Montagu",
+      "logo_url": "https://smyc.co.uk/wp-content/uploads/2023/12/SMFC-Logo-3-1-e1705423065112.png",
+      "logo_status": "pilot_verified",
+      "logo_source": "official_site_image",
+      "logo_updated_at": "2026-09-28",
+      "logo_sha256": "fe2f3b412e1c2edd9d5c6feb50cb5c03ede03d26559d2e75bd0ec10aff25fb00",
+      "rights_status": "legal_basis_not_reviewed",
+      "review_basis": "ChatGPT/Codex protected-pilot review 2026-09-28; Selkent club ID 447 and Samuel Montagu Youth Centre's football-club crest corroborated; original 984x1140 PNG exact bytes SHA-256; hero 390/720 px and results 20/28 px plus match cards 56/60 px visually screened. Rights review pending; no public use."
     }
   ]
 }

@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-09-27T22:13:42.765892+00:00",
+  "last_updated": "2026-09-28T10:08:50.361116+00:00",
   "clubs": [
     {
       "club_id": 514,
@@ -400,7 +400,12 @@
     },
     {
       "club_id": 447,
-      "club_name": "Samuel Montagu"
+      "club_name": "Samuel Montagu",
+      "logo_url": "https://smyc.co.uk/wp-content/uploads/2023/12/SMFC-Logo-3-1-e1705423065112.png",
+      "logo_status": "pilot_verified",
+      "logo_source": "official_site_image",
+      "logo_updated_at": "2026-09-28",
+      "logo_sha256": "fe2f3b412e1c2edd9d5c6feb50cb5c03ede03d26559d2e75bd0ec10aff25fb00"
     },
     {
       "club_id": 538,
@@ -7636,5 +7641,5 @@
     }
   ],
   "note": "Panel parsing confirmed against all five format categories (mini-soccer, 9-a-side, X-category, 11-a-side, Senior) as of Sept 2026. Club/team linking is heuristic (name-prefix match) - see ambiguous_club_matches in diagnostics for anything flagged as uncertain.",
-  "pilot_badges_revision": "ae4f8a7deab6590a62f60e1c786733f2b71716234e24fd6ced4f0e264690b03b"
+  "pilot_badges_revision": "973128edcef51b0db0bdb42c4d9e2560b2632764450503ceea66e600c5a7b36f"
 }
