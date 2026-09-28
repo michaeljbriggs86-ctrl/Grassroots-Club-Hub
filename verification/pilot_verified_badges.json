@@ -23,6 +23,17 @@
       "logo_sha256": "fe2f3b412e1c2edd9d5c6feb50cb5c03ede03d26559d2e75bd0ec10aff25fb00",
       "rights_status": "legal_basis_not_reviewed",
       "review_basis": "ChatGPT/Codex protected-pilot review 2026-09-28; Selkent club ID 447 and Samuel Montagu Youth Centre's football-club crest corroborated; original 984x1140 PNG exact bytes SHA-256; hero 390/720 px and results 20/28 px plus match cards 56/60 px visually screened. Rights review pending; no public use."
+    },
+    {
+      "club_id": 547,
+      "club_name": "Cray Valley (PM) FC",
+      "logo_url": "https://images.pitchero.com/club_logos/76256/OqKQ53StSIqCY660jRDr_Badge%20Vase.png",
+      "logo_status": "pilot_verified",
+      "logo_source": "official_site_image",
+      "logo_updated_at": "2026-09-28",
+      "logo_sha256": "6d4a43ae988bf8215799a76c2c9e38891c833b2e2d00039e2751ae649ad700ef",
+      "rights_status": "legal_basis_not_reviewed",
+      "review_basis": "ChatGPT/Codex protected-pilot review 2026-09-28; Selkent club ID 547 and official Cray Valley (PM) FC website use the same crest. Original 720x720 PNG exact hosted bytes SHA-256; full-outline hero at 390/720 px, results at 20/28 px and match slots at 56/60 px screened. The original opaque white square is retained and accepted for this protected pilot. Rights review pending; no public use."
     }
   ]
 }

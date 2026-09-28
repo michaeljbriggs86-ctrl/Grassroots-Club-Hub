@@ -61,7 +61,7 @@ class BadgePublisherTest(unittest.TestCase):
     def test_current_manifest_applies_only_to_exact_club_ids(self):
         original = copy.deepcopy(self.directory)
         _, ids = module.update_directory(self.directory, self.manifest)
-        self.assertEqual(ids, [250, 447])
+        self.assertEqual(ids, [250, 447, 547])
         for before, after in zip(original['clubs'], self.directory['clubs']):
             if before['club_id'] not in ids:
                 self.assertEqual(before, after)
