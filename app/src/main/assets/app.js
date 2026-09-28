@@ -2988,6 +2988,23 @@ function jerseyHTML(player){
 }
 let __tacticsSelected=null;
 function tacticsPlayerId(p){return `p${Number(p.number)}`;}
+function updateTacticsPlayerReferences(originalNumber,nextNumber=null){
+  const t=state.tactics;if(!t)return;
+  const oldId=`p${Number(originalNumber)}`,newId=nextNumber===null?null:`p${Number(nextNumber)}`;
+  if(oldId===newId)return;
+  const remap=ids=>Array.isArray(ids)?[...new Set(ids.map(id=>id===oldId?newId:id).filter(Boolean))]:ids;
+  const remapPositions=positions=>{
+    if(!positions||!Object.prototype.hasOwnProperty.call(positions,oldId))return;
+    if(newId)positions[newId]=positions[oldId];
+    delete positions[oldId];
+  };
+  t.lineup=remap(t.lineup)||[];
+  Object.keys(t.lineupByFixture||{}).forEach(key=>{t.lineupByFixture[key]=remap(t.lineupByFixture[key]);});
+  Object.keys(t.matchdaySelections||{}).forEach(key=>{t.matchdaySelections[key]=remap(t.matchdaySelections[key]);});
+  remapPositions(t.positions);
+  Object.values(t.positionsByFixture||{}).forEach(remapPositions);
+  if(__tacticsSelected===oldId)__tacticsSelected=null;
+}
 const TACTICS_FORMATIONS={
   5:{'1-2-1 Diamond':[[50,91],[50,70],[27,47],[73,47],[50,18]],'2-1-1':[[50,91],[30,70],[70,70],[50,44],[50,18]],'1-1-2':[[50,91],[50,70],[50,48],[30,19],[70,19]]},
   7:{'2-3-1':[[50,92],[30,72],[70,72],[20,46],[50,48],[80,46],[50,18]],'3-2-1':[[50,92],[18,72],[50,74],[82,72],[35,45],[65,45],[50,18]],'2-2-2':[[50,92],[30,72],[70,72],[30,47],[70,47],[32,19],[68,19]]},
@@ -4150,7 +4167,7 @@ function removePlayerFromSquad(){
   const player=state.squad.find(p=>p.number===original);if(!player)return;
   if(!confirm(`Remove ${player.name} from the current squad? Historical goals, assists, bookings and awards will be kept.`))return;
   state.squad=state.squad.filter(p=>p.number!==original);
-  if(state.tactics){const id=`p${original}`;state.tactics.lineup=(state.tactics.lineup||[]).filter(x=>x!==id);delete state.tactics.positions?.[id];}
+  updateTacticsPlayerReferences(original);
   saveState();auditEvent('player_removed','squad',String(original),`Removed ${player.name} from squad`,player,null);
   document.getElementById('player-dialog').close();
   toast(`${player.name} removed from squad`);
@@ -4168,7 +4185,7 @@ function savePlayer(e){
   const collision=state.squad.find(p=>p.number===number&&p.number!==original&&p.name);
   if(collision){ alert(`Shirt #${number} is already assigned to ${collision.name}.`); return; }
   const beforePlayer=original?state.squad.find(p=>p.number===original)||null:null;
-  if(original){ state.squad=state.squad.filter(p=>p.number!==original); if(state.tactics&&original!==number){const oldId=`p${original}`,newId=`p${number}`;state.tactics.lineup=(state.tactics.lineup||[]).map(x=>x===oldId?newId:x);if(state.tactics.positions?.[oldId]){state.tactics.positions[newId]=state.tactics.positions[oldId];delete state.tactics.positions[oldId];}} }
+  if(original){state.squad=state.squad.filter(p=>p.number!==original);if(original!==number)updateTacticsPlayerReferences(original,number);}
   const savedPlayer={number,name,status,role:role==='goalkeeper'?'goalkeeper':'outfield'};state.squad.push(savedPlayer);
   saveState();auditEvent(beforePlayer?'player_edited':'player_added','squad',String(number),`${beforePlayer?'Updated':'Added'} ${name} in squad`,beforePlayer,savedPlayer);
   document.getElementById('player-dialog').close();
