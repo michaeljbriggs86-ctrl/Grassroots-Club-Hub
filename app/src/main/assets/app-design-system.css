@@ -399,7 +399,7 @@ body.auth-open #activation-gate{
 @media(max-width:680px){
   .record-card{grid-template-columns:1fr!important;gap:14px!important}
   .record-footer{grid-column:auto!important;grid-template-columns:repeat(2,minmax(0,1fr))!important}
-  .running-count-grid,.form-grid.two,.next-match-grid,.filter-bar,.score-entry,.dashboard-grid,.club-result-score{grid-template-columns:1fr!important}
+  .running-count-grid,.form-grid.two,.next-match-grid,.filter-bar,.score-entry,.dashboard-grid{grid-template-columns:1fr!important}
   .match-card{grid-template-columns:auto minmax(0,1fr)!important}
   .match-score{grid-column:2!important;text-align:left!important}
   .match-actions{grid-column:1/-1!important;justify-content:flex-start!important;flex-wrap:wrap!important}

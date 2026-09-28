@@ -3756,14 +3756,20 @@ async function sendInboxMessage(){
 }
 function openCoachInbox(userId){__inboxSelected=String(userId||'');__communicationsTab='inbox';navigate('inbox',false);setTimeout(()=>refreshInbox(false),0);}
 let __clubResultsStamp=0,__clubResultsRows=[],__clubResultsAge='all',__clubResultsCompetition='league',__clubResultsPage=0;const CLUB_RESULTS_PAGE_SIZE=6;
+function fullClubResultTeamName(team={}){
+  const short=String(team.teamName||team.name||'').trim(),league=String(team.leagueName||'').trim(),club=String(clubSettings().display_name||'').trim();
+  if(league&&normalizeTeamKey(league)!==normalizeTeamKey(short))return league;
+  if(club&&short&&!normalizeTeamKey(short).startsWith(normalizeTeamKey(club)+' '))return `${club} ${short}`;
+  return league||short;
+}
 function internalAdminClubResults(rows=[]){
   const out=[],seen=new Set();
   (rows||[]).forEach(entry=>{
-    const team=entry?.team||{},st=entry?.state||{},age=Number(String(team.ageGroup||'').replace(/\D/g,''))||0,teamName=team.teamName||team.name||'';
+    const team=entry?.team||{},st=entry?.state||{},age=Number(String(team.ageGroup||'').replace(/\D/g,''))||0,teamName=team.teamName||team.name||'',ownName=fullClubResultTeamName(team);
     (Array.isArray(st.matches)?st.matches:[]).forEach(m=>{
       if(String(m?.status||'played').toLowerCase()!=='played'||!m?.opponent)return;
       const away=String(m.venue||'').toUpperCase()==='A';
-      const gf=Number(m.gf||0),ga=Number(m.ga||0),home=away?String(m.opponent):String(teamName),awayName=away?String(teamName):String(m.opponent);
+      const gf=Number(m.gf||0),ga=Number(m.ga||0),home=away?String(m.opponent):ownName,awayName=away?ownName:String(m.opponent);
       const key=[team.id||teamName,m.id||'',m.date||'',home,awayName,gf,ga].join('|').toLowerCase();
       if(seen.has(key))return;seen.add(key);
       out.push({home,away:awayName,hg:away?ga:gf,ag:away?gf:ga,date:m.date||'',competition:m.competition||m.type||'',teamName,ageGroup:age,source:'internal'});

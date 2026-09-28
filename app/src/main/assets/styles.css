@@ -1588,7 +1588,7 @@ html[data-theme="dark"] body.admin-club-mode .admin-age-group>summary span{color
 /* Result cards: compact badges beside both team names. */
 .club-result-score>.club-result-team{display:flex;align-items:center;gap:7px;min-width:0;text-align:left}
 .club-result-score>.club-result-team.away{justify-content:flex-end;text-align:right}
-.club-result-score .club-result-team-name{min-width:0;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px;font-weight:850}
+.club-result-score .club-result-team-name{min-width:0;overflow-wrap:anywhere;white-space:normal;line-height:1.2;font-size:11px;font-weight:850}
 .club-result-score .club-result-team.home .club-result-team-name{text-align:left}
 .club-result-score .club-result-team.away .club-result-team-name{text-align:right}
 .club-result-score .club-result-team .club-identity-badge{width:28px;height:28px;max-width:28px;max-height:28px;flex:0 0 28px;border-radius:6px}
