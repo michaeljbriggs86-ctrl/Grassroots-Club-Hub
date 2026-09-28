@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "provider": "Selkent",
-  "last_updated": "2026-09-28T00:05:22.632574+00:00",
+  "last_updated": "2026-09-28T06:05:30.489268+00:00",
   "fixture_agegroup_discovery_source": "selkent_divisions_all",
   "coverage": {
     "fixtures": {
@@ -11378,7 +11378,7 @@
         },
         {
           "division_name": "Under 16C Silver",
-          "updated_at_text": "27/09/26 14:51:14",
+          "updated_at_text": "28/09/26 06:06:47",
           "source_order_authoritative_for_ties": false,
           "source_disclaimer": "Note: Table does not yet take account of rules for determining winner if teams on equal points",
           "rows": [
@@ -11410,6 +11410,19 @@
             },
             {
               "row_order": 3,
+              "provider_team_id": 499,
+              "provider_division_id": 4379,
+              "team_name": "Mayow Park Rangers FC White",
+              "played": 1,
+              "won": 1,
+              "drawn": 0,
+              "lost": 0,
+              "gf": 11,
+              "ga": 1,
+              "points": 2
+            },
+            {
+              "row_order": 4,
               "provider_team_id": 186,
               "provider_division_id": 4379,
               "team_name": "South Darenth Purples",
@@ -11422,7 +11435,7 @@
               "points": 2
             },
             {
-              "row_order": 4,
+              "row_order": 5,
               "provider_team_id": 468,
               "provider_division_id": 4379,
               "team_name": "Athenlay RYE",
@@ -11435,7 +11448,7 @@
               "points": 0
             },
             {
-              "row_order": 5,
+              "row_order": 6,
               "provider_team_id": 551,
               "provider_division_id": 4379,
               "team_name": "Dartford Royals white",
@@ -11448,7 +11461,7 @@
               "points": 0
             },
             {
-              "row_order": 6,
+              "row_order": 7,
               "provider_team_id": 278,
               "provider_division_id": 4379,
               "team_name": "Dulwich Village White",
@@ -11461,7 +11474,7 @@
               "points": 0
             },
             {
-              "row_order": 7,
+              "row_order": 8,
               "provider_team_id": 861,
               "provider_division_id": 4379,
               "team_name": "Falconwood FC Black",
@@ -11474,7 +11487,7 @@
               "points": 0
             },
             {
-              "row_order": 8,
+              "row_order": 9,
               "provider_team_id": 501,
               "provider_division_id": 4379,
               "team_name": "Kent United FC",
@@ -11487,29 +11500,16 @@
               "points": 0
             },
             {
-              "row_order": 9,
-              "provider_team_id": 499,
-              "provider_division_id": 4379,
-              "team_name": "Mayow Park Rangers FC White",
-              "played": 0,
-              "won": 0,
-              "drawn": 0,
-              "lost": 0,
-              "gf": 0,
-              "ga": 0,
-              "points": 0
-            },
-            {
               "row_order": 10,
               "provider_team_id": 2067,
               "provider_division_id": 4379,
               "team_name": "Woolwich Wanderers FC",
-              "played": 0,
+              "played": 1,
               "won": 0,
               "drawn": 0,
-              "lost": 0,
-              "gf": 0,
-              "ga": 0,
+              "lost": 1,
+              "gf": 1,
+              "ga": 11,
               "points": 0
             }
           ],
@@ -11693,6 +11693,15 @@
           "home": "Kingsdale Orange",
           "away": "Kent United FC",
           "homeGoals": 2,
+          "awayGoals": 1,
+          "provider_division_id": 4379,
+          "division_name": "Under 16C Silver"
+        },
+        {
+          "date": "2026-09-27",
+          "home": "Mayow Park Rangers FC White",
+          "away": "Woolwich Wanderers FC",
+          "homeGoals": 11,
           "awayGoals": 1,
           "provider_division_id": 4379,
           "division_name": "Under 16C Silver"
