@@ -74,6 +74,10 @@ only counts and timestamps; it does not upload the private HTML as an artifact.
 On Sundays a public feed may update after the private snapshot, so a newer feed
 defers the exact target-list comparison without hiding a stale or incomplete
 snapshot. The job fails if any required structural or freshness check fails.
+Scheduled runs require a collection no more than two hours old. Push and
+manual runs allow seven hours because the collector normally runs every six
+hours; this permits an on-demand parser comparison between collection times
+without relaxing the scheduled freshness gate.
 For a stale snapshot the failure prints only the collection and scheduled
 timestamps and its age in minutes, so the failure can be compared with the
 Worker's Cron Events without exposing provider HTML.

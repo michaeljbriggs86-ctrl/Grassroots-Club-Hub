@@ -2,7 +2,6 @@ import { readFile } from 'node:fs/promises';
 import { pathToFileURL } from 'node:url';
 import { targetsFromFeed } from './src/index.mjs';
 
-const MAX_AGE_MS = 2 * 60 * 60_000;
 const MAX_CLOCK_SKEW_MS = 5 * 60_000;
 const MAX_TARGETS = 400;
 const MAX_HTML_LENGTH = 256_000;
@@ -15,7 +14,10 @@ function timestamp(value, name, now) {
   return parsed;
 }
 
-export function verifySnapshot(snapshot, currentFeed, now = Date.now()) {
+export function verifySnapshot(snapshot, currentFeed, now = Date.now(), maxAgeMinutes = 120) {
+  if (![120, 420].includes(maxAgeMinutes)) {
+    throw new Error('Unsupported private snapshot freshness limit');
+  }
   if (snapshot?.schema !== 'pitchkind-selkent-shadow-v1' ||
       !snapshot.payloads || typeof snapshot.payloads !== 'object' ||
       Array.isArray(snapshot.payloads)) {
@@ -24,11 +26,11 @@ export function verifySnapshot(snapshot, currentFeed, now = Date.now()) {
   const collectedAt = timestamp(snapshot.collected_at, 'collected_at', now);
   const scheduledAt = timestamp(snapshot.scheduled_at, 'scheduled_at', now);
   timestamp(snapshot.canonical_feed_last_updated, 'canonical_feed_last_updated', now);
-  if (now - collectedAt > MAX_AGE_MS) {
+  if (now - collectedAt > maxAgeMinutes * 60_000) {
     // Safe diagnostic metadata only; the snapshot's provider HTML stays private.
     throw new Error(`Private shadow snapshot is stale: collected_at=${snapshot.collected_at}, ` +
       `scheduled_at=${snapshot.scheduled_at}, age_minutes=${Math.floor((now - collectedAt) / 60_000)}, ` +
-      `max_age_minutes=${MAX_AGE_MS / 60_000}`);
+      `max_age_minutes=${maxAgeMinutes}`);
   }
   if (collectedAt + MAX_CLOCK_SKEW_MS < scheduledAt) {
     throw new Error('Private shadow snapshot predates its scheduled event');
@@ -90,13 +92,14 @@ export function verifySnapshot(snapshot, currentFeed, now = Date.now()) {
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
-  if (process.argv.length !== 4) {
-    throw new Error('Usage: node verify-snapshot.mjs SNAPSHOT_PATH PUBLIC_FEED_PATH');
+  if (process.argv.length !== 4 && process.argv.length !== 5) {
+    throw new Error('Usage: node verify-snapshot.mjs SNAPSHOT_PATH PUBLIC_FEED_PATH [120|420]');
   }
   const [snapshot, feed] = await Promise.all([
     readFile(process.argv[2], 'utf8').then(JSON.parse),
     readFile(process.argv[3], 'utf8').then(JSON.parse),
   ]);
   // Never print private HTML or store the raw snapshot as a CI artifact.
-  console.log(JSON.stringify(verifySnapshot(snapshot, feed)));
+  console.log(JSON.stringify(verifySnapshot(snapshot, feed, Date.now(),
+    process.argv[4] === undefined ? 120 : Number(process.argv[4]))));
 }

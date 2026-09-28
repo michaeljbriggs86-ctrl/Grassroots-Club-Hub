@@ -62,6 +62,15 @@ test('fails on a stale private snapshot', () => {
   });
 });
 
+test('allows an on-demand comparison between six-hour collections', () => {
+  const value = snapshot();
+  value.collected_at = '2026-09-27T11:00:00Z';
+  value.scheduled_at = '2026-09-27T10:59:00Z';
+  assert.throws(() => verifySnapshot(value, FEED, NOW), /snapshot is stale/);
+  assert.equal(verifySnapshot(value, FEED, NOW, 420).feed_target_match, 'verified');
+  assert.throws(() => verifySnapshot(value, FEED, NOW, 421), /Unsupported/);
+});
+
 test('does not compare target sets against a newer Sunday feed', () => {
   const newerFeed = { ...FEED, last_updated: '2026-09-27T14:50:00Z' };
   assert.equal(verifySnapshot(snapshot(), newerFeed, NOW).feed_target_match,

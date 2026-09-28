@@ -56,7 +56,8 @@ jobs:
       - name: Check freshness, completeness and public feed targets
         run: |
           node cloudflare/selkent-shadow/verify-snapshot.mjs \
-            "$RUNNER_TEMP/selkent-shadow-latest.json" data/results.json
+            "$RUNNER_TEMP/selkent-shadow-latest.json" data/results.json \
+            "${{ github.event_name == 'schedule' && '120' || '420' }}"
       - name: Compare normalized private and public data
         run: |
           python cloudflare/selkent-shadow/compare_snapshot.py \
