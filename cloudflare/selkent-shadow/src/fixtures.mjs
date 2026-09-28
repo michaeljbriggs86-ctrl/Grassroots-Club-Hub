@@ -1,5 +1,24 @@
 // Private fixture normalization in the Workers runtime. Never served to visitors.
-const normalize = value => value.replace(/\s+/gu, ' ').trim();
+import { namedEntities } from './html-entities.mjs';
+
+function decodeEntities(value) {
+  return value.replace(/&(#(?:[xX][\da-fA-F]+|\d+);?|[a-zA-Z][a-zA-Z\d]{0,31};?)/gu, (reference, name) => {
+    if (name[0] === '#') {
+      const hex = name[1]?.toLowerCase() === 'x';
+      const code = Number.parseInt(name.slice(hex ? 2 : 1), hex ? 16 : 10);
+      return code > 0 && code <= 0x10ffff && !(code >= 0xd800 && code <= 0xdfff)
+        ? String.fromCodePoint(code) : '\ufffd';
+    }
+    for (let length = name.length; length > 0; length--) {
+      if (Object.hasOwn(namedEntities, name.slice(0, length))) {
+        return namedEntities[name.slice(0, length)] + name.slice(length);
+      }
+    }
+    return reference;
+  });
+}
+
+const normalize = value => decodeEntities(value).replace(/\s+/gu, ' ').trim();
 const folded = value => normalize(value).toLowerCase();
 
 export async function parseFixtureWeeks(html) {

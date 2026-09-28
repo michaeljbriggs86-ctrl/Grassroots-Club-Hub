@@ -5,8 +5,7 @@
     "test:runtime": "vitest run"
   },
   "devDependencies": {
-    "@cloudflare/vitest-plugin": "^1.2.8",
-    "vitest": "^4.1.0",
-    "wrangler": "4.142.0"
+    "@cloudflare/vitest-plugin": "1.2.8",
+    "vitest": "4.1.11"
   }
 }
