@@ -497,6 +497,7 @@ def main() -> int:
     parser.add_argument("--timeout", type=int, default=DEFAULT_TIMEOUT)
     parser.add_argument("--min-short-edge", type=int, default=DEFAULT_MIN_SHORT_EDGE)
     parser.add_argument("--max-clubs", type=int, default=0, help="0 = all catalogue rows")
+    parser.add_argument("--club-ids", default="", help="Comma-separated club IDs, in review priority order")
     parser.add_argument("--browser-fallback", action="store_true")
     args = parser.parse_args()
 
@@ -504,6 +505,15 @@ def main() -> int:
     clubs = catalogue.get("clubs")
     if not isinstance(clubs, list):
         raise SystemExit("catalog must contain a clubs array")
+    if args.club_ids:
+        selected = [part.strip() for part in args.club_ids.split(",")]
+        if not all(part.isdigit() for part in selected) or len(set(selected)) != len(selected):
+            raise SystemExit("--club-ids must contain distinct numeric IDs")
+        by_id = {str(club["club_id"]): club for club in clubs}
+        unknown = [part for part in selected if part not in by_id]
+        if unknown:
+            raise SystemExit(f"Unknown badge club IDs: {', '.join(unknown)}")
+        clubs = [by_id[part] for part in selected]
     if args.max_clubs > 0:
         clubs = clubs[:args.max_clubs]
 

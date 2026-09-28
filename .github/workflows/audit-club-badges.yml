@@ -1,8 +1,21 @@
 name: Audit PitchKind club badges
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - data/results.json
+      - verification/club_badge_catalogue_seed_v25.json
+      - scripts/priority_badge_audit.py
+      - scripts/badge_catalogue_audit.py
+      - .github/workflows/audit-club-badges.yml
   workflow_dispatch:
     inputs:
+      priority_only:
+        description: "Audit the pilot club's upcoming opponents and recent published results first"
+        required: false
+        default: true
+        type: boolean
       max_clubs:
         description: "Limit catalogue rows for a trial run; 0 means all"
         required: false
@@ -24,6 +37,11 @@ jobs:
   audit:
     runs-on: ubuntu-24.04
     timeout-minutes: 45
+    env:
+      PRIORITY_ONLY: ${{ github.event_name == 'push' || inputs.priority_only }}
+      WORKERS: ${{ inputs.workers || '12' }}
+      MAX_CLUBS: ${{ inputs.max_clubs || '0' }}
+      BROWSER_FALLBACK: ${{ inputs.browser_fallback || github.event_name == 'push' }}
     steps:
       - uses: actions/checkout@v4
 
@@ -35,27 +53,47 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           python -m pip install requests beautifulsoup4 pillow playwright
-          if [ "${{ inputs.browser_fallback }}" = "true" ]; then
+          if [ "$BROWSER_FALLBACK" = "true" ]; then
             python -m playwright install --with-deps chromium
           fi
 
       - name: Run badge audit unit tests
-        run: python -m unittest tests/test_badge_catalogue_audit.py -v
+        run: python -m unittest tests/test_badge_catalogue_audit.py tests/test_priority_badge_audit.py -v
+
+      - name: Build current badge review queue
+        if: ${{ env.PRIORITY_ONLY == 'true' }}
+        run: |
+          python scripts/priority_badge_audit.py \
+            --output priority-queue.json > priority-ids.txt
+          cat priority-queue.json
 
       - name: Run bulk acquisition audit
         shell: bash
         run: |
           set -euo pipefail
           EXTRA=()
-          if [ "${{ inputs.browser_fallback }}" = "true" ]; then
+          if [ "$BROWSER_FALLBACK" = "true" ]; then
             EXTRA+=(--browser-fallback)
+          fi
+          if [ "$PRIORITY_ONLY" = "true" ]; then
+            IDS="$(cat priority-ids.txt)"
+            if [ -z "$IDS" ]; then
+              echo 'No new club badges in current fixtures or results'
+              mkdir -p badge-audit-output
+              cp priority-queue.json badge-audit-output/priority-queue.json
+              exit 0
+            fi
+            EXTRA+=(--club-ids "$IDS")
           fi
           python scripts/badge_catalogue_audit.py \
             --catalog verification/club_badge_catalogue_seed_v25.json \
             --output-dir badge-audit-output \
-            --workers "${{ inputs.workers }}" \
-            --max-clubs "${{ inputs.max_clubs }}" \
+            --workers "$WORKERS" \
+            --max-clubs "$MAX_CLUBS" \
             "${EXTRA[@]}"
+          if [ "$PRIORITY_ONLY" = "true" ]; then
+            cp priority-queue.json badge-audit-output/priority-queue.json
+          fi
 
       - name: Upload review artifact
         uses: actions/upload-artifact@v4
