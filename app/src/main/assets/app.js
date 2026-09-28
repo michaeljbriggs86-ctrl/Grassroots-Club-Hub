@@ -3231,7 +3231,7 @@ function publishedClubResults(teams=[],feed=null){
     for(const result of publishedClubTeamData(team,feed).results){
       const key=[result.date,normalizeTeamKey(result.home),normalizeTeamKey(result.away)].join('|');
       if(seen.has(key))continue;seen.add(key);
-      out.push({home:result.home,away:result.away,hg:Number(result.homeGoals),ag:Number(result.awayGoals),date:result.date||'',competition:'League',teamName:team.teamName||team.leagueName||'',ageGroup:Number(String(team.ageGroup||'').match(/\d+/)?.[0]||0),source:'selkent-static'});
+      out.push({home:result.home,away:result.away,hg:Number(result.homeGoals),ag:Number(result.awayGoals),date:result.date||'',competition:'League',divisionName:result.division_name||'',teamName:team.teamName||team.leagueName||'',ageGroup:Number(String(team.ageGroup||'').match(/\d+/)?.[0]||0),source:'selkent-static'});
     }
   }
   return out;
@@ -3772,7 +3772,7 @@ function internalAdminClubResults(rows=[]){
       const gf=Number(m.gf||0),ga=Number(m.ga||0),home=away?String(m.opponent):ownName,awayName=away?ownName:String(m.opponent);
       const key=[team.id||teamName,m.id||'',m.date||'',home,awayName,gf,ga].join('|').toLowerCase();
       if(seen.has(key))return;seen.add(key);
-      out.push({home,away:awayName,hg:away?ga:gf,ag:away?gf:ga,date:m.date||'',competition:m.competition||m.type||'',teamName,ageGroup:age,source:'internal'});
+      out.push({home,away:awayName,hg:away?ga:gf,ag:away?gf:ga,date:m.date||'',competition:m.competition||m.type||'',divisionName:team.division||'',teamName,ageGroup:age,source:'internal'});
     });
   });
   return out;
@@ -3784,7 +3784,7 @@ function renderClubResultsBrowser(){
   const prev=ageSel.value||String(__clubResultsAge);ageSel.innerHTML='<option value="all">All age groups</option>'+ages.map(a=>`<option value="${a}">Under ${a}s</option>`).join('');__clubResultsAge=prev==='all'||ages.includes(Number(prev))?prev:'all';ageSel.value=String(__clubResultsAge);
   if(competitionSel)competitionSel.value=__clubResultsCompetition;
   const filtered=__clubResultsRows.filter(r=>(__clubResultsAge==='all'||Number(r.ageGroup)===Number(__clubResultsAge))&&(__clubResultsCompetition==='all'||clubResultCompetitionKind(r)===__clubResultsCompetition));const pages=Math.max(1,Math.ceil(filtered.length/CLUB_RESULTS_PAGE_SIZE));__clubResultsPage=Math.max(0,Math.min(__clubResultsPage,pages-1));const rows=filtered.slice(__clubResultsPage*CLUB_RESULTS_PAGE_SIZE,(__clubResultsPage+1)*CLUB_RESULTS_PAGE_SIZE);
-  list.innerHTML=rows.map(r=>{const rr=resultForNamedTeam(r.home,r.away,r.hg,r.ag,r.teamName);const comp=r.competition?` · ${esc(String(r.competition).replace(/_/g,' '))}`:'';const source=r.source==='selkent-static'?' · Selkent published':r.source==='internal'?' · Team recorded':'';return `<article class="club-result-row ${resultClass(rr)}"><div class="club-result-meta"><span>U${esc(r.ageGroup)} · ${esc(matchTeamLabel(r.teamName))}${comp}${source}</span><small>${formatDate(r.date)||esc(r.date)||'Date TBC'}</small></div><div class="club-result-score"><div class="club-result-team home" title="${esc(matchTeamLabel(r.home))}">${clubResultTeamBadgeHtml(r.home)}<span class="club-result-team-name">${esc(matchTeamLabel(r.home))}</span></div><strong>${r.hg}–${r.ag}</strong><div class="club-result-team away" title="${esc(matchTeamLabel(r.away))}"><span class="club-result-team-name">${esc(matchTeamLabel(r.away))}</span>${clubResultTeamBadgeHtml(r.away)}</div></div></article>`;}).join('')||'<div class="empty-state"><strong>No results in this filter</strong>Choose another competition or age group, or record the completed match in the team profile.</div>';
+  list.innerHTML=rows.map(r=>{const rr=resultForNamedTeam(r.home,r.away,r.hg,r.ag,r.teamName);const kind=clubResultCompetitionKind(r),label=kind==='league'?(r.divisionName||'League'):(r.competition||({cup:'Cup',friendly:'Friendly'}[kind]||'Other'));return `<article class="club-result-row ${resultClass(rr)}"><div class="club-result-meta"><span>U${esc(r.ageGroup)} · ${esc(String(label).replace(/_/g,' '))}</span><small>${formatDate(r.date)||esc(r.date)||'Date TBC'}</small></div><div class="club-result-score"><div class="club-result-team home" title="${esc(matchTeamLabel(r.home))}">${clubResultTeamBadgeHtml(r.home)}<span class="club-result-team-name">${esc(matchTeamLabel(r.home))}</span></div><strong>${r.hg}–${r.ag}</strong><div class="club-result-team away" title="${esc(matchTeamLabel(r.away))}"><span class="club-result-team-name">${esc(matchTeamLabel(r.away))}</span>${clubResultTeamBadgeHtml(r.away)}</div></div></article>`;}).join('')||'<div class="empty-state"><strong>No results in this filter</strong>Choose another competition or age group, or record the completed match in the team profile.</div>';
   if(pageEl)pageEl.textContent=filtered.length?`${__clubResultsPage+1} of ${pages}`:'0 of 0';const p=document.getElementById('club-results-prev'),n=document.getElementById('club-results-next');if(p)p.disabled=__clubResultsPage<=0;if(n)n.disabled=__clubResultsPage>=pages-1;
 }
 async function refreshClubResults(quiet=false){
