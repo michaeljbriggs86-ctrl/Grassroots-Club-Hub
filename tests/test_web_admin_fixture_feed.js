@@ -94,17 +94,22 @@ assert.equal(build([valiantTeam],valiantFeed).length,0,'Valiants recorded result
 const renderBody=src.slice(src.indexOf('function renderAdminFixtures(){'),src.indexOf('async function refreshAdminFixtures(',src.indexOf('function renderAdminFixtures(){')));
 const list={innerHTML:''},summary={textContent:''},ageSelect={value:'all'};
 const homeTeam={id:'u12-lions',ageGroup:'U12',teamName:'Lions'};
-const render=new Function('document','populateAdminFixtureAgeFilter','__adminOverviewRows','__adminFixtureRows','__adminPublishedFeed','__adminDirectoryCache','selkentNorm','formatDate','matchTeamLabel','mapsHref','esc','clubListingHtml','fullClubResultTeamName',`${renderBody}\nreturn renderAdminFixtures;`)(
+const fixtureRows=[{team:homeTeam,source:'Selkent',date:'2099-10-01',time:'10:30',opponent:'Dartford Royals',venue:'H',competition:'Division',groundName:'Oak Field',address:'1 Oak Road',ack:{status:'confirmed',label:'Fixture confirmed'}}];
+const render=new Function('document','populateAdminFixtureAgeFilter','__adminOverviewRows','__adminFixtureRows','__adminPublishedFeed','__adminDirectoryCache','selkentNorm','formatDate','matchTeamLabel','esc','clubResultTeamBadgeHtml','fullClubResultTeamName',`${renderBody}\nreturn renderAdminFixtures;`)(
   {getElementById:id=>({'admin-fixture-list':list,'admin-fixtures-age':ageSelect,'admin-fixture-summary':summary})[id]},
   ()=>{},[{team:homeTeam}],
-  [{team:homeTeam,source:'Selkent',date:'2099-10-01',time:'10:30',opponent:'Dartford Royals',venue:'H',competition:'Division',groundName:'Oak Field',address:'1 Oak Road',ack:{status:'confirmed',label:'Fixture confirmed'}}],
-  {age_groups:[]},new Map(),norm,s=>s,s=>s,()=>'',s=>s,s=>`<span class="club-listing"><img alt="" src="badge.svg">${s}</span>`,team=>`Shooters Hill AFC ${team.teamName}`
+  fixtureRows,
+  {age_groups:[]},new Map(),norm,s=>s,s=>s,s=>s,s=>`<img alt="" src="badge.svg" data-team="${s}">`,team=>`Shooters Hill AFC ${team.teamName}`
 );
 render();
 assert.equal((list.innerHTML.match(/badge\.svg/g)||[]).length,2,'Admin fixtures show a badge beside both clubs');
-assert.match(list.innerHTML,/Oak Field · 1 Oak Road/,'Admin row shows the coach confirmed home ground and address');
-assert.doesNotMatch(list.innerHTML,/East Wickham Primary Academy/,'the default home venue cannot overwrite confirmed details');
+assert.doesNotMatch(list.innerHTML,/Oak Field|1 Oak Road|East Wickham Primary Academy/,'venue and address are absent from the card');
 assert.match(list.innerHTML,/admin-fixture-matchup.*<b>v<\/b>/,'clubs share one matchup row');
-assert.match(list.innerHTML,/League · Home/,'division fixtures display as league fixtures');
+assert.match(list.innerHTML,/>League</,'division fixtures display as league fixtures');
+assert.match(list.innerHTML,/club-result-team home[^>]*>.*Shooters Hill AFC Lions.*<b>v<\/b>.*club-result-team away[^>]*>.*Dartford Royals.*badge\.svg/s,'home name and badge are left, away name and badge are right');
+assert.doesNotMatch(list.innerHTML,/League · Home|League · Away|Venue unconfirmed/,'venue labels are absent');
 assert.doesNotMatch(list.innerHTML,/Open in Maps|fixture-source-pill|>Selkent</,'redundant links and source labels are omitted');
+fixtureRows[0].venue='A';
+render();
+assert.match(list.innerHTML,/club-result-team home[^>]*>.*Dartford Royals.*<b>v<\/b>.*club-result-team away[^>]*>.*Shooters Hill AFC Lions.*badge\.svg/s,'an away fixture puts the opponent and its badge on the left');
 console.log('Club Admin fixture feed checks passed');
