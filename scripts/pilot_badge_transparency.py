@@ -2,7 +2,7 @@
 import io
 
 import numpy as np
-from PIL import Image
+from PIL import Image, ImageFilter
 from scipy import ndimage
 
 
@@ -39,4 +39,30 @@ def transparent_png(original_bytes):
     image = Image.fromarray(arr, 'RGBA')
     out = io.BytesIO()
     image.save(out, format='PNG', optimize=True)
+    return out.getvalue()
+
+
+def transparent_blue_exterior_png(original_bytes):
+    """Remove only the blue field connected to the outside of a round crest."""
+    original = Image.open(io.BytesIO(original_bytes))
+    if original.width < 512 or original.height < 512:
+        raise ValueError('original badge is below the reviewed resolution gate')
+    arr = np.array(original.convert('RGBA'))
+    red, green, blue = (arr[..., channel].astype(np.int16) for channel in range(3))
+    possible = (blue > red * 1.30) & (blue > green * 1.30) & (blue > 75)
+    border = np.zeros(possible.shape, bool)
+    border[[0, -1], :] = True
+    border[:, [0, -1]] = True
+    exterior = ndimage.binary_propagation(border & possible, mask=possible,
+                                          structure=np.ones((3, 3)))
+    fraction = exterior.mean()
+    if not 0.02 < fraction < 0.45 or exterior[original.height // 2, original.width // 2]:
+        raise ValueError('blue exterior mask does not isolate the crest')
+    alpha = np.where(exterior, 0, 255).astype(np.uint8)
+    softened = np.asarray(Image.fromarray(alpha, 'L').filter(ImageFilter.GaussianBlur(.55)))
+    edge = ndimage.binary_dilation(exterior, iterations=2)
+    arr[exterior, 3] = 0
+    arr[edge & ~exterior, 3] = np.minimum(arr[edge & ~exterior, 3], softened[edge & ~exterior])
+    out = io.BytesIO()
+    Image.fromarray(arr, 'RGBA').save(out, format='PNG', optimize=True)
     return out.getvalue()

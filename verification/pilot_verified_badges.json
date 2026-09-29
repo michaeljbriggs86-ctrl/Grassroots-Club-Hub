@@ -114,6 +114,20 @@
       "review_basis": "Mike approved the visible artwork in the upload inbox. Selkent club ID 330 and the current Sutton Athletic club site show this crest. Exact 1000x1000 PNG and SHA-256 were checked against the review packet and re-fetched on 2026-09-29. Transparent exterior screened at 48/128 px on pale and dark green. Protected-page acceptance and public rights review remain open."
     },
     {
+      "club_id": 333,
+      "club_name": "Teviot Rangers",
+      "logo_url": "https://test.pitchkind.com/__pilot_badges/333/c5be33828c03a4443c9131b6a1ca6f93519a1d3f0336b336089b8d4936cc725a",
+      "logo_status": "pilot_verified",
+      "logo_source": "official_source_transparency_derivative_private",
+      "logo_updated_at": "2026-09-30",
+      "logo_sha256": "c5be33828c03a4443c9131b6a1ca6f93519a1d3f0336b336089b8d4936cc725a",
+      "original_source_url": "https://images.pitchero.com/club_logos/86809/JlCeLp4ZTaZ1CSdfKJTQ_Screenshot%202026-06-12%20at%2013.20.04.png",
+      "original_sha256": "9d9ae5290e9ab499485d9afd4544e12cb1fc760fe0707e53d9dd1f9944ce3a90",
+      "derivation": "outer_blue_background_transparency_only",
+      "rights_status": "protected_pilot_only_public_rights_not_reviewed",
+      "review_basis": "Mike approved the upload-inbox artwork. Selkent club 333 is Teviot Rangers; its current club-controlled Pitchero page uses this exact 1892x1892 PNG as its club logo. The connected exterior blue screenshot field was removed without changing internal colours, lettering or emblem. Exact original and derivative hashes were checked on pale and dark green at 128, 48 and 20 px. Protected-page visual acceptance and public rights remain open."
+    },
+    {
       "club_id": 407,
       "club_name": "Deptford United",
       "logo_url": "https://static.wixstatic.com/media/08079d_7c24cbc902e24cfda21af0bd100aa096~mv2.png",

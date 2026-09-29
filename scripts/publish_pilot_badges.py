@@ -60,7 +60,8 @@ def validated_approvals(directory, manifest):
                         original.password or original.fragment or not re.fullmatch(
                             r'[a-f0-9]{64}', str(badge.get('original_sha256') or ''), re.I) or
                         badge['original_sha256'].lower() == badge['logo_sha256'].lower() or
-                        badge.get('derivation') != 'outer_background_transparency_only'):
+                        badge.get('derivation') not in ('outer_background_transparency_only',
+                                                        'outer_blue_background_transparency_only')):
                     raise ValueError(f"badge {club_id} lacks exact original and derivation provenance")
             if badge['logo_source'] == 'official_source_vector_raster_private':
                 original = urlsplit(str(badge.get('original_source_url') or ''))

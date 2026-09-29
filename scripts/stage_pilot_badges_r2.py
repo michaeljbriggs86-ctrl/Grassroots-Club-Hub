@@ -102,7 +102,7 @@ def upload_badges(badges, get, run):
             if badge.get('logo_source') == 'official_source_transparency_derivative_private':
                 # Fetch the exact official original, repeat the reviewed outer
                 # background edit on Linux, and require the exact approved PNG.
-                from pilot_badge_transparency import transparent_png
+                from pilot_badge_transparency import transparent_blue_exterior_png, transparent_png
                 original = {**badge, 'logo_url': badge['original_source_url'],
                             'logo_sha256': badge['original_sha256']}
                 # Pitchero serves club 271's pinned PNG bytes as image/jpeg.
@@ -110,7 +110,9 @@ def upload_badges(badges, get, run):
                 mislabelled = 'image/jpeg' if badge['club_id'] == 271 else None
                 source, _ = fetch_reviewed(original, get,
                                            expected_mislabelled_type=mislabelled)
-                data = transparent_png(source)
+                data = (transparent_blue_exterior_png(source)
+                        if badge.get('derivation') == 'outer_blue_background_transparency_only'
+                        else transparent_png(source))
                 if hashlib.sha256(data).hexdigest() != badge['logo_sha256'].lower():
                     raise ValueError(f"badge {badge['club_id']} transparency bytes differ from reviewed PNG")
                 kind = 'image/png'

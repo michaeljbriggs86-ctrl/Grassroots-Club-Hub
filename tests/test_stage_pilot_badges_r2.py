@@ -138,6 +138,26 @@ class StageTest(unittest.TestCase):
             stage.fetch_reviewed({**original, 'logo_sha256': '0' * 64}, response,
                                  expected_mislabelled_type='image/jpeg')
 
+    def test_blue_exterior_derivative_uses_pinned_official_bytes(self):
+        source = b'\x89PNG\r\n\x1a\noriginal Teviot bytes'
+        badge = {**self.badge, 'club_id': 333,
+                 'logo_source': 'official_source_transparency_derivative_private',
+                 'derivation': 'outer_blue_background_transparency_only',
+                 'original_source_url': 'https://club.example/original.png',
+                 'original_sha256': hashlib.sha256(source).hexdigest()}
+        commands = []
+        def run(command, *, check):
+            commands.append(command)
+            if 'get' in command:
+                pathlib.Path(command[command.index('--file') + 1]).write_bytes(self.data)
+        with patch('pilot_badge_transparency.transparent_blue_exterior_png', return_value=self.data):
+            stage.upload_badges([badge], lambda *a, **k: Response(source), run)
+        self.assertEqual(len(commands), 2)
+        self.assertIn('put', commands[0])
+        with patch('pilot_badge_transparency.transparent_blue_exterior_png', return_value=b'wrong'):
+            with self.assertRaisesRegex(ValueError, 'transparency bytes differ'):
+                stage.upload_badges([badge], lambda *a, **k: Response(source), run)
+
     def test_vector_derivative_requires_exact_official_source_and_pinned_png(self):
         source = b'<svg xmlns="http://www.w3.org/2000/svg"/>'
         badge = {**self.badge, 'club_id': 240,
