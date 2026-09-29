@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-09-29T19:27:13.471956+00:00",
+  "last_updated": "2026-09-29T19:34:16.337114+00:00",
   "clubs": [
     {
       "club_id": 514,
@@ -80,7 +80,12 @@
     },
     {
       "club_id": 246,
-      "club_name": "Blackheath Wdrs"
+      "club_name": "Blackheath Wdrs",
+      "logo_url": "https://static.wixstatic.com/media/8ec5e4_8d031581c8074147bc698da028dfbdde~mv2.png",
+      "logo_status": "pilot_verified",
+      "logo_source": "official_site_image",
+      "logo_updated_at": "2026-09-29",
+      "logo_sha256": "852f8816cc935f4c1b0df199614742f5c909bffcdf534fcad4f67b46c1d22158"
     },
     {
       "club_id": 533,
@@ -96,15 +101,30 @@
     },
     {
       "club_id": 558,
-      "club_name": "Bridon Ropes"
+      "club_name": "Bridon Ropes",
+      "logo_url": "https://www.bridonropesfc.com/wp-content/webp-express/webp-images/uploads/2025/05/Bridon-Ropes-badge-e1752314675694.png.webp",
+      "logo_status": "pilot_verified",
+      "logo_source": "official_site_image",
+      "logo_updated_at": "2026-09-29",
+      "logo_sha256": "f5b6e7364db5e2b857ba22f89900876462e7136b5b8fc05f01affb8a539ecf2e"
     },
     {
       "club_id": 487,
-      "club_name": "Castle Hill United FC"
+      "club_name": "Castle Hill United FC",
+      "logo_url": "https://images.squarespace-cdn.com/content/v1/667f1b87001a2109b1ecdb04/9e2756a2-7872-465b-b3c7-2798aa78715b/Castle+Hill+United+FC+Badge.png",
+      "logo_status": "pilot_verified",
+      "logo_source": "official_site_image",
+      "logo_updated_at": "2026-09-29",
+      "logo_sha256": "e149f10bd47e9331e51ae9b8753810da6eb20b44e65d6e9e69aa2bbb6d2dbefc"
     },
     {
       "club_id": 248,
-      "club_name": "Chislehurst Wanderers"
+      "club_name": "Chislehurst Wanderers",
+      "logo_url": "https://chislehurst-wanderers.pendle-secure.co.uk/assets/clubs/Chislehurst_Wanderers/1_badge.png",
+      "logo_status": "pilot_verified",
+      "logo_source": "club_branded_kit_shop_image",
+      "logo_updated_at": "2026-09-29",
+      "logo_sha256": "169ebf9319fcf67c5191d1813492f5a36c79c69e293b5935ce1b3094dd1de4f3"
     },
     {
       "club_id": 560,
@@ -362,7 +382,12 @@
     },
     {
       "club_id": 520,
-      "club_name": "Northumberland Heath"
+      "club_name": "Northumberland Heath",
+      "logo_url": "https://images.squarespace-cdn.com/content/v1/6683d403971c5f276cc66fe9/aae30bbf-1f18-4db6-827b-23b645fa19c4/JGSFC-2.png",
+      "logo_status": "pilot_verified",
+      "logo_source": "official_site_image",
+      "logo_updated_at": "2026-09-29",
+      "logo_sha256": "aeb33084d22f2d105122062884036177ba5727cce7e1dd30d95a2af07ce4db1a"
     },
     {
       "club_id": 519,
@@ -522,7 +547,12 @@
     },
     {
       "club_id": 466,
-      "club_name": "Total FC"
+      "club_name": "Total FC",
+      "logo_url": "https://img1.wsimg.com/isteam/ip/1cb1ab83-cd32-4721-aba9-f92fe2a0dd2c/Transparent%20file%20medium-d41e4b7.png/:/rs=w:576,h:600,cg:true,m/cr=w:576,h:600/qt=q:95",
+      "logo_status": "pilot_verified",
+      "logo_source": "official_site_image",
+      "logo_updated_at": "2026-09-29",
+      "logo_sha256": "f9fa36d941dafa9d5a133d0a1ce4fcc22e8ce03e023880d1b6be1591e51eb4b5"
     },
     {
       "club_id": 449,
@@ -7686,5 +7716,5 @@
     }
   ],
   "note": "Panel parsing confirmed against all five format categories (mini-soccer, 9-a-side, X-category, 11-a-side, Senior) as of Sept 2026. Club/team linking is heuristic (name-prefix match) - see ambiguous_club_matches in diagnostics for anything flagged as uncertain.",
-  "pilot_badges_revision": "822faeae04655b076f78e34b65cb85950367535951c38f4390435e1c4a18ff08"
+  "pilot_badges_revision": "66e53d8a48ff79f319107e8d6d28dfb9abb6dbec62816f3a3914d2fe88a1598c"
 }

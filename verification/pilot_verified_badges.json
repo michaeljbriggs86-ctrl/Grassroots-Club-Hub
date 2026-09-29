@@ -3,6 +3,28 @@
   "scope": "private_pilot",
   "badges": [
     {
+      "club_id": 246,
+      "club_name": "Blackheath Wdrs",
+      "logo_url": "https://static.wixstatic.com/media/8ec5e4_8d031581c8074147bc698da028dfbdde~mv2.png",
+      "logo_status": "pilot_verified",
+      "logo_source": "official_site_image",
+      "logo_updated_at": "2026-09-29",
+      "logo_sha256": "852f8816cc935f4c1b0df199614742f5c909bffcdf534fcad4f67b46c1d22158",
+      "rights_status": "protected_pilot_only_public_rights_not_reviewed",
+      "review_basis": "Mike approved the visible artwork in the upload inbox. Selkent club 246 links Blackheath Wanderers Sports Club. Its current junior-football page identifies Selkent teams, and the site uses this same shared sports-club mark. Exact 1523x1337 PNG was re-fetched on 2026-09-29. The common crest, transparent exterior and 48/128 px appearance were reviewed; final protected-page acceptance and public rights remain open."
+    },
+    {
+      "club_id": 248,
+      "club_name": "Chislehurst Wanderers",
+      "logo_url": "https://chislehurst-wanderers.pendle-secure.co.uk/assets/clubs/Chislehurst_Wanderers/1_badge.png",
+      "logo_status": "pilot_verified",
+      "logo_source": "club_branded_kit_shop_image",
+      "logo_updated_at": "2026-09-29",
+      "logo_sha256": "169ebf9319fcf67c5191d1813492f5a36c79c69e293b5935ce1b3094dd1de4f3",
+      "rights_status": "protected_pilot_only_public_rights_not_reviewed",
+      "review_basis": "Mike approved the visible artwork in the upload inbox. Selkent club 248 and the club-branded kit shop identify the same Chislehurst Wanderers FC shield. Exact 708x810 PNG was re-fetched on 2026-09-29. Transparent exterior and 48/128 px appearance were reviewed; final protected-page acceptance and public rights remain open."
+    },
+    {
       "club_id": 250,
       "club_name": "Cray Wanderers",
       "logo_url": "https://www.cray-wanderers.com/wp-content/uploads/2020/10/Cray-Wanderers-FC-Web-Logo.png",
@@ -111,6 +133,28 @@
       "review_basis": "ChatGPT/Codex protected-pilot review 2026-09-28; Selkent club ID 447 and Samuel Montagu Youth Centre's football-club crest corroborated; original 984x1140 PNG exact bytes SHA-256; hero 390/720 px and results 20/28 px plus match cards 56/60 px visually screened. Rights review pending; no public use."
     },
     {
+      "club_id": 466,
+      "club_name": "Total FC",
+      "logo_url": "https://img1.wsimg.com/isteam/ip/1cb1ab83-cd32-4721-aba9-f92fe2a0dd2c/Transparent%20file%20medium-d41e4b7.png/:/rs=w:576,h:600,cg:true,m/cr=w:576,h:600/qt=q:95",
+      "logo_status": "pilot_verified",
+      "logo_source": "official_site_image",
+      "logo_updated_at": "2026-09-29",
+      "logo_sha256": "f9fa36d941dafa9d5a133d0a1ce4fcc22e8ce03e023880d1b6be1591e51eb4b5",
+      "rights_status": "protected_pilot_only_public_rights_not_reviewed",
+      "review_basis": "Mike approved the visible artwork in the upload inbox. Selkent club 466 and the Total Football Club site identify the same club. The club header displays this crest; exact 576x600 PNG was re-fetched on 2026-09-29. Transparent exterior and 48/128 px appearance were reviewed; final protected-page acceptance and public rights remain open."
+    },
+    {
+      "club_id": 487,
+      "club_name": "Castle Hill United FC",
+      "logo_url": "https://images.squarespace-cdn.com/content/v1/667f1b87001a2109b1ecdb04/9e2756a2-7872-465b-b3c7-2798aa78715b/Castle+Hill+United+FC+Badge.png",
+      "logo_status": "pilot_verified",
+      "logo_source": "official_site_image",
+      "logo_updated_at": "2026-09-29",
+      "logo_sha256": "e149f10bd47e9331e51ae9b8753810da6eb20b44e65d6e9e69aa2bbb6d2dbefc",
+      "rights_status": "protected_pilot_only_public_rights_not_reviewed",
+      "review_basis": "Mike approved the visible artwork in the upload inbox. Selkent club 487 and the current Castle Hill United FC youth site identify the same crest. The official site image is an exact 2500x2500 PNG re-fetched on 2026-09-29; its decoded pixels match the older WebP packet candidate, but this PNG hash is the approved original. Transparent exterior and 48/128 px appearance were reviewed; final protected-page acceptance and public rights remain open."
+    },
+    {
       "club_id": 499,
       "club_name": "Shooters Hill AFC",
       "logo_url": "https://test.pitchkind.com/__pilot_badges/499/66bc3e506f8e5a7e3caf252b50515ad0ef9daf08e8b96ed6b57766acd10ea0a0",
@@ -120,6 +164,17 @@
       "logo_sha256": "66bc3e506f8e5a7e3caf252b50515ad0ef9daf08e8b96ed6b57766acd10ea0a0",
       "rights_status": "protected_pilot_only_public_rights_not_reviewed",
       "review_basis": "Secretary-supplied original in the private upload inbox; Selkent club ID 499. Approved for the Access-protected page on 2026-09-28. Exact 3500x3500 RGBA PNG, 470088 bytes, transparent corners, SHA-256 recorded here; hero/card sizes visually screened. Source provenance and approval record remain in the private upload inbox; no public or marketing clearance."
+    },
+    {
+      "club_id": 520,
+      "club_name": "Northumberland Heath",
+      "logo_url": "https://images.squarespace-cdn.com/content/v1/6683d403971c5f276cc66fe9/aae30bbf-1f18-4db6-827b-23b645fa19c4/JGSFC-2.png",
+      "logo_status": "pilot_verified",
+      "logo_source": "official_site_image",
+      "logo_updated_at": "2026-09-29",
+      "logo_sha256": "aeb33084d22f2d105122062884036177ba5727cce7e1dd30d95a2af07ce4db1a",
+      "rights_status": "protected_pilot_only_public_rights_not_reviewed",
+      "review_basis": "Mike approved the visible artwork in the upload inbox. Selkent club 520 links Northumberland Heath FC. Its current club site describes the spiked identity visible in this crest. Exact 2500x2500 PNG was re-fetched on 2026-09-29; its decoded pixels match the older WebP candidate. Transparent exterior and 48/128 px appearance were reviewed; small red lettering has lower contrast on green, so final protected-page acceptance remains open along with public rights."
     },
     {
       "club_id": 547,
@@ -134,6 +189,17 @@
       "derivation": "outer_background_transparency_only",
       "rights_status": "legal_basis_not_reviewed",
       "review_basis": "Mike requested further background cleanup on 2026-09-29 after protected-page inspection. Selkent club ID 547 and the official 720x720 source remain unchanged. The exterior connected white field is made transparent; internal white shield and ribbon, lettering, colours and outlines are preserved byte-for-byte apart from edge alpha. Exact original and derivative hashes recorded here. Protected-page light/dark real-slot acceptance remains open. Rights review pending; no public use."
+    },
+    {
+      "club_id": 558,
+      "club_name": "Bridon Ropes",
+      "logo_url": "https://www.bridonropesfc.com/wp-content/webp-express/webp-images/uploads/2025/05/Bridon-Ropes-badge-e1752314675694.png.webp",
+      "logo_status": "pilot_verified",
+      "logo_source": "official_site_image",
+      "logo_updated_at": "2026-09-29",
+      "logo_sha256": "f5b6e7364db5e2b857ba22f89900876462e7136b5b8fc05f01affb8a539ecf2e",
+      "rights_status": "protected_pilot_only_public_rights_not_reviewed",
+      "review_basis": "Mike approved the visible artwork in the upload inbox. Selkent club 558 and Bridon Ropes FC identify the same rope-wheel crest. The official club states its youth teams use one club badge from 2026/27. Exact 928x962 WebP was re-fetched on 2026-09-29. Transparent exterior and 48/128 px appearance were reviewed; final protected-page acceptance and public rights remain open."
     }
   ]
 }
