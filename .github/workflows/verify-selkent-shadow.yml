@@ -16,6 +16,9 @@ on:
       - 'cloudflare/selkent-shadow/tests/published-results.spec.mjs'
       - 'cloudflare/selkent-shadow/src/standings.mjs'
       - 'cloudflare/selkent-shadow/tests/standings.spec.mjs'
+      - 'cloudflare/selkent-shadow/src/candidate-feed.mjs'
+      - 'cloudflare/selkent-shadow/build-candidate.mjs'
+      - 'cloudflare/selkent-shadow/tests/candidate-feed.test.mjs'
   schedule:
     # Check the private collector after its :15 six-hour run (UTC).
     - cron: '45 */6 * * *'
@@ -53,7 +56,7 @@ jobs:
           test -n "$CLOUDFLARE_API_TOKEN" || { echo 'Set CLOUDFLARE_API_TOKEN repository secret'; exit 1; }
           test -n "$CLOUDFLARE_ACCOUNT_ID" || { echo 'Set CLOUDFLARE_ACCOUNT_ID repository secret'; exit 1; }
       - name: Test snapshot verifier
-        run: node --test cloudflare/selkent-shadow/tests/verify-snapshot.test.mjs cloudflare/selkent-shadow/tests/compare_fixture_preview.test.mjs
+        run: node --test cloudflare/selkent-shadow/tests/verify-snapshot.test.mjs cloudflare/selkent-shadow/tests/compare_fixture_preview.test.mjs cloudflare/selkent-shadow/tests/candidate-feed.test.mjs
       - name: Read private remote snapshot
         working-directory: cloudflare/selkent-shadow
         run: |
@@ -73,3 +76,11 @@ jobs:
         run: |
           node cloudflare/selkent-shadow/compare_fixture_preview.mjs \
             "$RUNNER_TEMP/selkent-shadow-latest.json" data/results.json
+      - name: Build and independently compare private schema-v2 candidate
+        run: |
+          node cloudflare/selkent-shadow/build-candidate.mjs \
+            "$RUNNER_TEMP/selkent-shadow-latest.json" data/results.json \
+            "$RUNNER_TEMP/selkent-candidate.json"
+          python cloudflare/selkent-shadow/compare_snapshot.py \
+            "$RUNNER_TEMP/selkent-shadow-latest.json" data/results.json \
+            "$RUNNER_TEMP/selkent-candidate.json"

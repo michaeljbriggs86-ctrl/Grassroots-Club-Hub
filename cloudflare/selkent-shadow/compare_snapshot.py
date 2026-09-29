@@ -175,6 +175,66 @@ def compare_worker_standings_preview(snapshot: dict, feed: dict) -> dict:
     }
 
 
+def compare_candidate_feed(snapshot: dict, feed: dict, candidate: dict) -> dict:
+    """Independently rebuild a private candidate from the captured HTML."""
+    if snapshot.get("schema") != "pitchkind-selkent-shadow-v1" or (
+        feed.get("schema_version") != 2 or feed.get("provider") != "Selkent"
+    ) or snapshot.get("canonical_feed_last_updated") != feed.get("last_updated"):
+        raise ValueError("Candidate source versions do not match")
+    if candidate.get("schema_version") != 2 or candidate.get("provider") != "Selkent":
+        raise ValueError("Invalid private candidate contract")
+
+    expected = dict(feed)
+    expected["last_updated"] = snapshot["collected_at"]
+    expected_ages = []
+    for age in feed["age_groups"]:
+        discovered, fixtures, fixture_status = _fixture_age(snapshot["payloads"], age)
+        if discovered != age["fixture_week_ids"]:
+            raise ValueError("Private candidate cannot cover a new fixture week")
+        entry = dict(age)
+        entry.update(fixtures=fixtures, fixture_week_ids=discovered,
+                     fixture_parse_status=fixture_status)
+        if age["standings"] is None:
+            if ("".join(age["age_group"].upper().split()) in RESTRICTED and
+                    (age["published_results"] is not None or
+                     age["published_results_status"] != "not_publicly_published")):
+                raise ValueError("Restricted candidate age group contains results")
+        else:
+            if "".join(age["age_group"].upper().split()) in RESTRICTED:
+                raise ValueError("Restricted candidate age group contains standings")
+            tables = []
+            results = []
+            for current in age["standings"]:
+                division_id = current["provider_division_id"]
+                html = snapshot["payloads"][f"resultsTable/{division_id}"]
+                table = _parse(parse_standings_html, html, "standings")
+                table["provider_division_id"] = division_id
+                if not table.get("division_name"):
+                    table["division_name"] = current["division_name"]
+                tables.append(table)
+                parsed_results = _parse(parse_published_results, html, "published results")
+                results.extend({**row, "provider_division_id": division_id,
+                                "division_name": current["division_name"]}
+                               for row in parsed_results)
+            entry.update(standings=tables, published_results=results,
+                         published_results_status="verified_scored_rows_v1")
+        expected_ages.append(entry)
+    expected["age_groups"] = expected_ages
+    differences = sum(candidate.get("age_groups", [])[index] != age
+                      for index, age in enumerate(expected_ages)) if (
+                          len(candidate.get("age_groups", [])) == len(expected_ages)
+                      ) else len(expected_ages)
+    root_matches = all(candidate.get(key) == value for key, value in expected.items()
+                       if key != "age_groups") and set(candidate) == set(expected)
+    return {
+        "event": "selkent-private-candidate-python-parity",
+        "status": "exact" if root_matches and differences == 0 else "drift",
+        "age_groups": len(expected_ages),
+        "different_age_groups": differences,
+        "root_matches": root_matches,
+    }
+
+
 def compare_snapshot(snapshot: dict, feed: dict) -> dict:
     if snapshot.get("schema") != "pitchkind-selkent-shadow-v1":
         raise ValueError("Unrecognized private snapshot schema")
@@ -244,8 +304,8 @@ def compare_snapshot(snapshot: dict, feed: dict) -> dict:
 
 
 if __name__ == "__main__":
-    if len(sys.argv) != 3:
-        raise SystemExit("Usage: compare_snapshot.py SNAPSHOT_PATH PUBLIC_FEED_PATH")
+    if len(sys.argv) not in (3, 4):
+        raise SystemExit("Usage: compare_snapshot.py SNAPSHOT_PATH PUBLIC_FEED_PATH [CANDIDATE_PATH]")
     with open(sys.argv[1], encoding="utf8") as private_file:
         snapshot = json.load(private_file)
     with open(sys.argv[2], encoding="utf8") as public_file:
@@ -260,3 +320,10 @@ if __name__ == "__main__":
     if (parser_parity["status"] == "drift" or results_parity["status"] == "drift"
             or standings_parity["status"] == "drift"):
         raise SystemExit("Worker parser differs from Python on the same private snapshot")
+    if len(sys.argv) == 4:
+        with open(sys.argv[3], encoding="utf8") as candidate_file:
+            candidate = json.load(candidate_file)
+        candidate_parity = compare_candidate_feed(snapshot, feed, candidate)
+        print(json.dumps(candidate_parity, sort_keys=True))
+        if candidate_parity["status"] != "exact":
+            raise SystemExit("Private publication candidate differs from Python")

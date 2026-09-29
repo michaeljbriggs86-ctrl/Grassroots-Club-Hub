@@ -145,6 +145,18 @@ class ShadowParityTests(unittest.TestCase):
                          len(feed["age_groups"][1]["standings"][0]["rows"]))
         self.assertNotIn("Example Home", str(summary))
 
+    def test_private_candidate_matches_python_on_same_pages(self):
+        snapshot, feed = examples()
+        candidate = dict(feed)
+        candidate["last_updated"] = snapshot["collected_at"]
+        candidate["age_groups"] = [dict(age) for age in feed["age_groups"]]
+        summary = compare.compare_candidate_feed(snapshot, feed, candidate)
+        self.assertEqual(summary["status"], "exact")
+        candidate["age_groups"][0]["fixtures"] = []
+        self.assertEqual(compare.compare_candidate_feed(snapshot, feed, candidate)
+                         ["status"], "drift")
+        self.assertNotIn("Example Home", str(summary))
+
     def test_drift_is_counted_without_printing_match_details(self):
         snapshot, feed = examples()
         feed["age_groups"][0]["fixtures"] = []

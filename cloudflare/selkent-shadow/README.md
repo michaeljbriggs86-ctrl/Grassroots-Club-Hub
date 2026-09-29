@@ -130,6 +130,16 @@ values before writing the snapshot. The verifier compares the Worker tables
 with the Python parser from the same private pages. An older snapshot reports
 `pending_new_collection` until the newly deployed Worker captures one.
 
+The verifier can now assemble a **private schema-v2 publication candidate**
+from the Worker's normalized snapshot and compare it independently with the
+Python parsers on the same captured pages. It rejects a new fixture week until
+that week's page is collected, and it rejects restricted-age results. The
+candidate exists only in the GitHub runner's temporary directory; it is not
+an artifact, R2 publication, or website data source. In the verification log,
+`selkent-private-candidate-python-parity` must report `exact` before the
+R2 publication stage is considered. The existing GitHub feed remains the
+public authority.
+
 ## Graduation gates
 
 1. Capture multiple successful scheduled collections and snapshot verification
