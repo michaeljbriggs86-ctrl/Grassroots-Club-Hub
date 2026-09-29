@@ -17,13 +17,13 @@ function extract(file, start, end) {
 
 const state = { selkent: { clubUrl: 'https://www.selkent.org.uk/public/clubs/499', directoryDetails: {} } };
 const window = { ClubHubNative: { isDebugBuild: () => true }, __PITCHKIND_PILOT_RIGHTS: { scope_verified: true, override_status: 'ACTIVE', active_club_ids: [499], permitted_club_ids: [499] } };
-const hero = { src: '', alt: '', onerror: null };
+const hero = { src: '', alt: '', onerror: null, getAttribute(name) { return this[name] || null; } };
 const document = { querySelectorAll: () => [hero] };
 const overlay = vm.createContext({ state, norm, window });
 vm.runInContext(extract('app/src/main/assets/static-feed-overlay.js', '  function attachDirectoryBadges(', '  function loadDirectory('), overlay);
 const app = vm.createContext({ state, window, document, providerType: () => 'selkent', primaryProvider: () => ({ config: { club_url: state.selkent.clubUrl } }),
   clubSettings: () => ({ display_name: 'Shooters Hill AFC' }), isOwnTeamName: () => false,
-  selkentNorm: norm, pilotBadgeOverrideAllowed: () => false });
+  selkentNorm: norm, pilotBadgeOverrideAllowed: () => false, FAILED_BADGE_URLS: new Set() });
 vm.runInContext(extract('app/src/main/assets/app.js', 'function pilotVerifiedBadgeScopeAllowed()', 'function clubIdentityName('), app);
 
 const cray = manifest.badges.find(b => b.club_id === 250);

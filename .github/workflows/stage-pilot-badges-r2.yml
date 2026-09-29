@@ -8,6 +8,7 @@ on:
       - '.github/workflows/stage-pilot-badges-r2.yml'
       - 'verification/pilot_verified_badges.json'
       - 'tests/test_publish_pilot_badges.py'
+      - 'tests/test_pilot_badge_data_delivery.js'
       - 'scripts/stage_pilot_badges_r2.py'
       - 'scripts/pilot_badge_transparency.py'
       - 'cloudflare/web-app/src/pilot-badges.js'
