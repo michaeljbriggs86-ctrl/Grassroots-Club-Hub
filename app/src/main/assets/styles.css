@@ -1599,6 +1599,13 @@ html[data-theme="dark"] body.admin-club-mode .club-results-age-label select{
 html[data-theme="dark"] body.admin-club-mode .admin-attention-row span,
 html[data-theme="dark"] body.admin-club-mode .admin-age-group>summary span{color:#c0d0c3!important}
 
+/* Specific map and edit controls otherwise retain their pale light-theme fill. */
+html[data-theme="dark"] .next-fixture-modal .fixture-map-preview .map-link,
+html[data-theme="dark"] .matches-next-fixture .fixture-map-preview .map-link,
+html[data-theme="dark"] .fixture-edit-button{
+  background:#193322!important;border-color:#345e40!important;color:#a7eab2!important;
+}
+
 /* Result cards: compact badges beside both team names. */
 .club-result-score>.club-result-team{display:flex;align-items:center;gap:7px;min-width:0;text-align:left}
 .club-result-score>.club-result-team.away{justify-content:flex-end;text-align:right}

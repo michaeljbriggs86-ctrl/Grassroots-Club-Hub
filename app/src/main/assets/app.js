@@ -3721,7 +3721,8 @@ function renderAdminFixtures(){
     const colours=f.kitColours||detail.colours||'';
     const away=String(f.venue||'').toUpperCase()==='A';
     const venue=away?'Away':String(f.venue||'').toUpperCase()==='H'?'Home':'Venue unconfirmed';
-    const ground=away?[f.groundName||detail.groundName,f.address||detail.address].filter(x=>x&&x!=='TBC').join(' · '):String(f.venue||'').toUpperCase()==='H'?ownGround:'';
+    const teamGround=[f.groundName,f.address].filter(x=>x&&x!=='TBC').join(' · ');
+    const ground=away?[f.groundName||detail.groundName,f.address||detail.address].filter(x=>x&&x!=='TBC').join(' · '):String(f.venue||'').toUpperCase()==='H'?(teamGround||ownGround):teamGround;
     const clash=/\bgreen\b/i.test(colours);
     const map=away?mapsHref(f.groundName||detail.groundName,f.address||detail.address):mapsHref(f.groundName,f.address);
     const ack=f.ack;
