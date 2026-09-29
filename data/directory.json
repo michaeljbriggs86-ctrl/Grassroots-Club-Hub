@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-09-29T20:02:23.693409+00:00",
+  "last_updated": "2026-09-29T20:19:16.020744+00:00",
   "clubs": [
     {
       "club_id": 514,
@@ -534,7 +534,12 @@
     },
     {
       "club_id": 427,
-      "club_name": "The Bosco FC"
+      "club_name": "The Bosco FC",
+      "logo_url": "https://static.clubplus.co.uk/media//Club%20Badges/Bosco%20FC/1%20badge%20-compressed.png",
+      "logo_status": "pilot_verified",
+      "logo_source": "official_club_kit_shop_image",
+      "logo_updated_at": "2026-09-29",
+      "logo_sha256": "fd453189453abf85bf8d3cb9039bce9c20815de380f61ee8d3abc153896c283e"
     },
     {
       "club_id": 559,
@@ -7711,5 +7716,5 @@
     }
   ],
   "note": "Panel parsing confirmed against all five format categories (mini-soccer, 9-a-side, X-category, 11-a-side, Senior) as of Sept 2026. Club/team linking is heuristic (name-prefix match) - see ambiguous_club_matches in diagnostics for anything flagged as uncertain.",
-  "pilot_badges_revision": "cca8a83e22dfbfa74e97d504b16728a5f8c48f2dae2a10bcf805478032f4c4f0"
+  "pilot_badges_revision": "c3b1460281b9dcecdca27df7fb6e135a6b70b55453fdbebf1d3ea608607479de"
 }
