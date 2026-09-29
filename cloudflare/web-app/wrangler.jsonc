@@ -6,11 +6,15 @@
   "workers_dev": false,
   "preview_urls": false,
   "r2_buckets": [
-    { "binding": "PILOT_BADGES", "bucket_name": "pitchkind-pilot-badges" }
+    { "binding": "PILOT_BADGES", "bucket_name": "pitchkind-pilot-badges" },
+    { "binding": "SELKENT_CANDIDATE", "bucket_name": "pitchkind-selkent-feed-stage" }
   ],
+  "vars": {
+    "SELKENT_CANDIDATE_KEY": "staging/022b20efb1cc5fbc1a912bd685d6bcd9d5a31acd/results.json"
+  },
   "assets": {
     "directory": "./dist",
     "binding": "ASSETS",
-    "run_worker_first": ["/__health", "/__pilot_badges/*", "/__badge_review"]
+    "run_worker_first": ["/__health", "/__pilot_badges/*", "/__badge_review", "/__selkent_candidate"]
   }
 }
