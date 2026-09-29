@@ -1777,7 +1777,7 @@ function applyAccessMode(){
     profileSwitch.classList.toggle('hidden',!show);
     if(show){const own=dualCoachTeam();profileSwitch.textContent=isAdminCoachMode()?'Club Admin':`Coach · ${own?.ageGroup||''} ${matchTeamLabel(own?.teamName||'')}`.trim();}
   }
-  const previewBack=document.getElementById('hero-admin-preview-back');if(previewBack)previewBack.classList.toggle('hidden',!preview);
+  const previewBack=document.getElementById('hero-admin-preview-back');if(previewBack)previewBack.classList.toggle('hidden',!preview);syncHeaderUtilityBar();
   document.body.classList.toggle('team-locked',isTeamLocked());
   document.body.classList.toggle('team-has-league',isPublishedLeagueTeam());
   document.body.classList.toggle('build-parent',IS_PARENT_BUILD);
@@ -2168,8 +2168,9 @@ async function deleteAnnouncement(id){if(!isAdmin()||!confirm('Remove this club 
 
 let __appNotifications=[],__notificationStamp=0;
 function notificationDate(v){try{return new Date(v).toLocaleString('en-GB',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});}catch{return '';} }
+function syncHeaderUtilityBar(){const bar=document.getElementById('app-utility-bar');if(bar)bar.classList.toggle('hidden',![...bar.querySelectorAll('button')].some(button=>!button.classList.contains('hidden')));}
 function renderNotificationCenter(){
-  const bell=document.getElementById('notification-bell'),badge=document.getElementById('notification-badge'),list=document.getElementById('notification-list');const allowed=CLOUD_MODE&&['admin','coach','assistant_coach','parent','player'].includes(currentRole);bell?.classList.toggle('hidden',!allowed);if(!allowed)return;
+  const bell=document.getElementById('notification-bell'),badge=document.getElementById('notification-badge'),list=document.getElementById('notification-list');const allowed=CLOUD_MODE&&['admin','coach','assistant_coach','parent','player'].includes(currentRole);bell?.classList.toggle('hidden',!allowed);syncHeaderUtilityBar();if(!allowed)return;
   const noticeRows=__announcementRows.filter(a=>(!a.expires_at||new Date(a.expires_at).getTime()>Date.now())).map(a=>({source:'announcement',id:a.id,title:a.title,body:a.body,created_at:a.created_at,read_at:a.read_at,important:a.important,type:'club_announcement'}));
   const appRows=__appNotifications.map(n=>({...n,source:'app'}));const rows=[...appRows,...noticeRows].sort((a,b)=>String(b.created_at||'').localeCompare(String(a.created_at||'')));const unread=rows.filter(r=>!r.read_at).length;
   if(badge){badge.textContent=unread>99?'99+':String(unread);badge.classList.toggle('hidden',!unread);}

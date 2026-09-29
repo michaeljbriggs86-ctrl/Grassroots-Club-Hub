@@ -598,14 +598,15 @@ html[data-theme="dark"] .mobile-more-link:active,html[data-theme="dark"] .mobile
 .tactics-fixture .tactics-match-guide{color:var(--muted,#68766d);font-weight:750;line-height:1.35}
 
 @media(max-width:680px){
-  body.match-plan-active .hero{min-height:0!important;padding-top:calc(8px + var(--android-inset-top,0px))!important;padding-bottom:8px!important;border-radius:0 0 12px 12px}
-  body.match-plan-active .hero-art,body.match-plan-active .hero::before{display:none!important}
-  body.match-plan-active .hero-inner{grid-template-columns:44px minmax(0,1fr);gap:8px}
-  body.match-plan-active .club-logo-wrap{width:44px;height:44px;border-radius:10px}
-  body.match-plan-active .hero-copy h1{font-size:20px;line-height:1.1;margin:0}
-  body.match-plan-active .hero-copy .eyebrow,body.match-plan-active .hero-copy .season-line{display:none}
-  body.match-plan-active .hero-profile-actions{margin-top:4px!important}
-  body.match-plan-active .hero-profile-button,body.match-plan-active .hero-notification-button{min-height:34px;padding:5px 9px}
   body.match-plan-active #view-squad>.section-title-row{display:none}
   body.match-plan-active .content{padding-top:8px!important}
 }
+
+/* Account actions sit outside the shared hero on every page. */
+.app-utility-bar{position:static!important;top:auto!important;right:auto!important;z-index:2;max-width:none!important;min-height:52px;display:flex;justify-content:flex-end!important;align-items:center;gap:8px;margin:0!important;padding:5px clamp(14px,3.2vw,24px);background:var(--bg);border-bottom:1px solid var(--gch-line)}
+.app-utility-bar.hidden{display:none!important}
+.app-utility-bar .hero-profile-button,.app-utility-bar .hero-notification-button{min-height:44px;max-width:min(72vw,320px);padding:7px 12px;border:1px solid var(--gch-line);background:var(--white);color:var(--ink);box-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none;white-space:nowrap!important;overflow:hidden;text-overflow:ellipsis}
+.app-utility-bar .hero-notification-button{min-width:44px;padding:0 10px;overflow:visible}
+body.admin-club-mode .hero-copy,body.admin-coach-mode .hero-copy,body.admin-preview-mode .hero-copy{padding-right:0!important}
+html[data-theme="dark"] .app-utility-bar{border-bottom-color:#35443a}
+html[data-theme="dark"] .app-utility-bar .hero-profile-button,html[data-theme="dark"] .app-utility-bar .hero-notification-button{border-color:#35443a}
