@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-09-29T20:19:16.020744+00:00",
+  "last_updated": "2026-09-29T22:40:33.864996+00:00",
   "clubs": [
     {
       "club_id": 514,
@@ -51,7 +51,12 @@
     },
     {
       "club_id": 240,
-      "club_name": "Beacons"
+      "club_name": "Beacons",
+      "logo_url": "https://test.pitchkind.com/__pilot_badges/240/17b3ec7e7fc6fc5fb3df9722c0a17b88811c503b3e41d1d1e24f67816473fa05",
+      "logo_status": "pilot_verified",
+      "logo_source": "official_source_vector_raster_private",
+      "logo_updated_at": "2026-09-29",
+      "logo_sha256": "17b3ec7e7fc6fc5fb3df9722c0a17b88811c503b3e41d1d1e24f67816473fa05"
     },
     {
       "club_id": 242,
@@ -167,7 +172,12 @@
     },
     {
       "club_id": 255,
-      "club_name": "Dartford FC"
+      "club_name": "Dartford FC",
+      "logo_url": "https://test.pitchkind.com/__pilot_badges/255/09562d11799ccc7a317456d3e945d8be0ba667cdb81dad7721b9a0c873601984",
+      "logo_status": "pilot_verified",
+      "logo_source": "official_source_vector_raster_private",
+      "logo_updated_at": "2026-09-29",
+      "logo_sha256": "09562d11799ccc7a317456d3e945d8be0ba667cdb81dad7721b9a0c873601984"
     },
     {
       "club_id": 256,
@@ -378,9 +388,9 @@
     {
       "club_id": 520,
       "club_name": "Northumberland Heath",
-      "logo_url": "https://images.squarespace-cdn.com/content/v1/6683d403971c5f276cc66fe9/aae30bbf-1f18-4db6-827b-23b645fa19c4/JGSFC-2.png",
+      "logo_url": "https://test.pitchkind.com/__pilot_badges/520/aeb33084d22f2d105122062884036177ba5727cce7e1dd30d95a2af07ce4db1a",
       "logo_status": "pilot_verified",
-      "logo_source": "official_site_image",
+      "logo_source": "official_source_snapshot_private",
       "logo_updated_at": "2026-09-29",
       "logo_sha256": "aeb33084d22f2d105122062884036177ba5727cce7e1dd30d95a2af07ce4db1a"
     },
@@ -7716,5 +7726,5 @@
     }
   ],
   "note": "Panel parsing confirmed against all five format categories (mini-soccer, 9-a-side, X-category, 11-a-side, Senior) as of Sept 2026. Club/team linking is heuristic (name-prefix match) - see ambiguous_club_matches in diagnostics for anything flagged as uncertain.",
-  "pilot_badges_revision": "c3b1460281b9dcecdca27df7fb6e135a6b70b55453fdbebf1d3ea608607479de"
+  "pilot_badges_revision": "cc0c8bb6d43a073139f5d43d26f1fb08b9673c8d1c0463fffe9d9437b6bb358f"
 }
