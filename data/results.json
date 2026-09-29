@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "provider": "Selkent",
-  "last_updated": "2026-09-29T12:06:04.535290+00:00",
+  "last_updated": "2026-09-29T20:02:48.090575+00:00",
   "fixture_agegroup_discovery_source": "selkent_divisions_all",
   "coverage": {
     "fixtures": {
@@ -1105,6 +1105,16 @@
           "provider_team_ids": [
             "2134",
             "167"
+          ]
+        },
+        {
+          "date": "2026-10-04",
+          "division_name": "Under 9C Silver",
+          "home": "ShooterBallers FC",
+          "away": "Kekoa Red",
+          "provider_team_ids": [
+            "2146",
+            "990"
           ]
         },
         {
