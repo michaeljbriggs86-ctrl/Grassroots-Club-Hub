@@ -1,11 +1,15 @@
-name: Stage verified Selkent candidate privately in R2
+name: Publish verified Selkent candidate privately in R2
 
 on:
   workflow_dispatch:
+  schedule:
+    - cron: '55 */6 * * *'
   push:
     branches: [main]
     paths:
       - '.github/workflows/stage-selkent-candidate-r2.yml'
+      - 'cloudflare/selkent-shadow/verify-publication.mjs'
+      - 'cloudflare/selkent-shadow/tests/verify-publication.test.mjs'
 
 permissions:
   contents: read
@@ -33,7 +37,8 @@ jobs:
       - name: Test candidate and independent verifier
         run: |
           python -m pip install requests beautifulsoup4
-          node --test cloudflare/selkent-shadow/tests/candidate-feed.test.mjs \
+          node --test cloudflare/selkent-shadow/tests/verify-publication.test.mjs \
+            cloudflare/selkent-shadow/tests/candidate-feed.test.mjs \
             cloudflare/selkent-shadow/tests/verify-snapshot.test.mjs
           python -m unittest discover -s cloudflare/selkent-shadow/tests \
             -p 'test_compare_snapshot.py' -v
@@ -47,13 +52,18 @@ jobs:
             pitchkind-selkent-shadow/shadow/latest.json \
             --remote --file "$RUNNER_TEMP/selkent-shadow-latest.json"
       - name: Verify and build private candidate
+        env:
+          FRESHNESS_LIMIT: ${{ github.event_name == 'schedule' && '120' || '420' }}
         run: |
           node cloudflare/selkent-shadow/verify-snapshot.mjs \
-            "$RUNNER_TEMP/selkent-shadow-latest.json" data/results.json 420
+            "$RUNNER_TEMP/selkent-shadow-latest.json" data/results.json "$FRESHNESS_LIMIT"
           node cloudflare/selkent-shadow/build-candidate.mjs \
             "$RUNNER_TEMP/selkent-shadow-latest.json" data/results.json \
             "$RUNNER_TEMP/selkent-candidate.json"
           python cloudflare/selkent-shadow/compare_snapshot.py \
+            "$RUNNER_TEMP/selkent-shadow-latest.json" data/results.json \
+            "$RUNNER_TEMP/selkent-candidate.json"
+          node cloudflare/selkent-shadow/verify-publication.mjs \
             "$RUNNER_TEMP/selkent-shadow-latest.json" data/results.json \
             "$RUNNER_TEMP/selkent-candidate.json"
       - name: Create private staging bucket if needed
@@ -61,9 +71,27 @@ jobs:
           if ! npx --yes wrangler@4.142.0 r2 bucket info "$BUCKET"; then
             npx --yes wrangler@4.142.0 r2 bucket create "$BUCKET"
           fi
-      - name: Stage candidate and compare R2 readback
+      - name: Read current private publication if present
         run: |
-          object_path="$BUCKET/staging/$GITHUB_SHA/results.json"
+          object_path="$BUCKET/feed/results.json"
+          if npx --yes wrangler@4.142.0 r2 object get "$object_path" \
+              --remote --file "$RUNNER_TEMP/selkent-previous.json" \
+              2>"$RUNNER_TEMP/selkent-read-error.txt"; then
+            node cloudflare/selkent-shadow/verify-publication.mjs \
+              "$RUNNER_TEMP/selkent-shadow-latest.json" data/results.json \
+              "$RUNNER_TEMP/selkent-candidate.json" "$RUNNER_TEMP/selkent-previous.json"
+          else
+            test ! -e "$RUNNER_TEMP/selkent-previous.json"
+            if ! grep -Eiq '404|not found|does not exist' \
+                "$RUNNER_TEMP/selkent-read-error.txt"; then
+              echo 'R2 read failed for a reason other than a missing feed key' >&2
+              exit 1
+            fi
+            echo "No current private publication; first verified write follows"
+          fi
+      - name: Publish candidate and compare R2 readback
+        run: |
+          object_path="$BUCKET/feed/results.json"
           npx --yes wrangler@4.142.0 r2 object put "$object_path" \
             --remote --file "$RUNNER_TEMP/selkent-candidate.json"
           npx --yes wrangler@4.142.0 r2 object get "$object_path" \
@@ -71,4 +99,4 @@ jobs:
           cmp "$RUNNER_TEMP/selkent-candidate.json" \
             "$RUNNER_TEMP/selkent-candidate-readback.json"
           sha256sum "$RUNNER_TEMP/selkent-candidate-readback.json"
-          echo "Private R2 candidate staged and byte-verified for $GITHUB_SHA"
+          echo "Private R2 feed published and byte-verified for $GITHUB_SHA"

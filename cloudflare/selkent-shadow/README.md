@@ -158,3 +158,22 @@ The complete paid-plan run is below the 10,000-subrequest allowance, but the
 scheduled Worker still has a 15-minute wall-time ceiling. If real runs approach
 that limit, split collection into retryable Cloudflare Workflow steps before
 expanding this pilot to feed publication.
+
+## Private publication rehearsal
+
+**Publish verified Selkent candidate privately in R2** runs at :55 every six
+hours, after the shadow collector and public feed schedules. It also runs on a
+workflow change or manually. The scheduled run requires a snapshot collected
+within 120 minutes; on-demand runs allow 420 minutes. It rebuilds the candidate,
+compares it independently against Python, then requires the full candidate to
+match the current GitHub public feed except for its collection timestamp.
+Restricted U7–U11 results fail the gate. This deliberately pauses publication
+when new provider data appears between the two collections, until the current
+public feed and a later private snapshot agree.
+
+After validation it writes a single private R2 object at
+`pitchkind-selkent-feed-stage/feed/results.json`, checks the byte-for-byte
+readback, and refuses to replace a newer object. A failed gate leaves the
+previous object untouched. The private bucket has no public domain; the
+website still reads its packaged GitHub feed. Check repeated scheduled job
+results and exact metadata before routing `/data/results.json` to this key.
