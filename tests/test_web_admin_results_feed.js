@@ -4,6 +4,8 @@ const path = require('node:path');
 
 const root = path.resolve(__dirname, '..');
 const src = fs.readFileSync(path.join(root, 'app/src/main/assets/app.js'), 'utf8');
+const stableBody=src.slice(src.indexOf('function setStableHtml(element,markup){'),src.indexOf('// Club lists share the exact same admission',src.indexOf('function setStableHtml(element,markup){')));
+const setStableHtml=new Function(`${stableBody}\nreturn setStableHtml;`)();
 const html = fs.readFileSync(path.join(root, 'app/src/main/assets/index.html'), 'utf8');
 const designCss = fs.readFileSync(path.join(root, 'app/src/main/assets/app-design-system.css'), 'utf8');
 const normalizeTeamKey = s => String(s || '').toLowerCase().replace(/&/g, 'and').replace(/[^a-z0-9]+/g, ' ').trim().replace(/\s+/g, ' ');
@@ -13,9 +15,9 @@ const elements = new Map(['admin-recent-results','admin-results-count','admin-re
 const document = {getElementById:id => elements.get(id)};
 const helpers = src.slice(src.indexOf('function verifiedClubResultsFeed(feed){'), src.indexOf('function nextWeekendDates(){'));
 const {verifiedClubResultsFeed,publishedClubTeamData,clubResultRows,coachClubResultRows,renderAdminRecentResults} = new Function(
-  'normalizeTeamKey','internalAdminClubResults','document','esc','formatDate','matchTeamLabel','clubListingHtml',
+  'normalizeTeamKey','internalAdminClubResults','document','esc','formatDate','matchTeamLabel','clubListingHtml','setStableHtml',
   `${helpers}\nreturn {verifiedClubResultsFeed,publishedClubTeamData,clubResultRows,coachClubResultRows,renderAdminRecentResults};`
-)(normalizeTeamKey,internalAdminClubResults,document,s=>String(s),(s=>s),(s=>s),(s=>`<span class=\"club-listing\">${s}</span>`));
+)(normalizeTeamKey,internalAdminClubResults,document,s=>String(s),(s=>s),(s=>s),(s=>`<span class=\"club-listing\">${s}</span>`),setStableHtml);
 
 const teams = [
   {id:'12',ageGroup:'U12',teamName:'Cannons',leagueName:'Shooters Hill AFC Cannons',division:'Under 12C Orange'},
@@ -65,22 +67,25 @@ assert.doesNotMatch(recentHtml,/Selkent published|Team recorded|4–1/);
 assert.match(recentHtml,/<div class="admin-recent-team"><span class="club-listing">Shooters Hill AFC Valiants<\/span> <b class="admin-recent-score">4<\/b><\/div>/);
 assert.match(recentHtml,/<div class="admin-recent-team"><span class="club-listing">Junior Reds Sabres<\/span> <b class="admin-recent-score">1<\/b><\/div>/);
 assert.ok(html.includes('id="admin-recent-results"')&&html.includes('id="club-results-list"'));
-const list={innerHTML:''},ageSelect={value:'',innerHTML:''},competitionSelect={value:'league'},page={textContent:''},previous={},next={};
+let resultWrites=0,resultHtml='';
+const list={get innerHTML(){return resultHtml},set innerHTML(value){resultHtml=value;resultWrites++}},ageSelect={value:'',innerHTML:''},competitionSelect={value:'league'},page={textContent:''},previous={},next={};
 const browserElements={'club-results-list':list,'club-results-age':ageSelect,'club-results-competition':competitionSelect,'club-results-page':page,'club-results-prev':previous,'club-results-next':next};
 const browserDocument={getElementById:id=>browserElements[id]||null};
 const browserBody=src.slice(src.indexOf('function renderClubResultsBrowser(){'),src.indexOf('async function refreshClubResults(quiet=false){'));
 const badgeBody=src.slice(src.indexOf('function clubResultTeamBadgeHtml(teamName='),src.indexOf('function renderAdminRecentResults(',src.indexOf('function clubResultTeamBadgeHtml(teamName=')));
-const resultBadge=new Function('normalizeTeamKey','verifiedTeamBadgeUrl','clubSettings','configuredClubTeams','esc',`${badgeBody}\nreturn clubResultTeamBadgeHtml;`)(
+const resultBadge=new Function('normalizeTeamKey','verifiedTeamBadgeUrl','clubSettings','configuredClubTeams','esc','FAILED_BADGE_URLS',`${badgeBody}\nreturn clubResultTeamBadgeHtml;`)(
   normalizeTeamKey,name=>name==='Cray Wanderers Ambers'?'/__pilot_badges/250/reviewed':'',
-  ()=>({display_name:'Shooters Hill AFC',logo_url:'shooters-hill-logo.png'}),()=>[...teams,{leagueName:'Shooters Hill AFC Archers'}],s=>String(s)
+  ()=>({display_name:'Shooters Hill AFC',logo_url:'shooters-hill-logo.png'}),()=>[...teams,{leagueName:'Shooters Hill AFC Archers'}],s=>String(s),new Set()
 );
 assert.match(resultBadge('Cray Wanderers Ambers'),/\/__pilot_badges\/250\/reviewed/,'approved opponent badges use the reviewed URL');
 assert.match(resultBadge('Shooters Hill AFC Archers'),/shooters-hill-logo\.png/,'other teams at this club use its configured crest');
 assert.match(resultBadge('Junior Reds Sabres'),/pitchkind-wt_mark\.svg/,'an unapproved opponent uses the PitchKind placeholder');
-const browser=new Function('document','window','resultForNamedTeam','resultClass','esc','matchTeamLabel','formatDate','isAdmin','isClubOverviewMode','clubResultCompetitionKind','clubResultTeamBadgeHtml',
+const browser=new Function('document','window','resultForNamedTeam','resultClass','esc','matchTeamLabel','formatDate','isAdmin','isClubOverviewMode','clubResultCompetitionKind','clubResultTeamBadgeHtml','setStableHtml',
   `let __clubResultsRows=[],__clubResultsAge='all',__clubResultsCompetition='league',__clubResultsPage=0;const CLUB_RESULTS_PAGE_SIZE=6;const currentView='home',__clubTab='overview';${browserBody}\nreturn {show:renderClubResultsBrowser,setRows:rows=>{__clubResultsRows=rows},setCompetition:value=>{__clubResultsCompetition=value}};`
-)(browserDocument,{ClubHubCloud:{visibleTeamList:()=>teams}},()=> 'W',()=> 'result-W',s=>String(s),s=>s,s=>s,()=>true,()=>true,new Function(`${helpers}\nreturn clubResultCompetitionKind;`)(),resultBadge);
+)(browserDocument,{ClubHubCloud:{visibleTeamList:()=>teams}},()=> 'W',()=> 'result-W',s=>String(s),s=>s,s=>s,()=>true,()=>true,new Function(`${helpers}\nreturn clubResultCompetitionKind;`)(),resultBadge,setStableHtml);
 browser.setRows(rows);browser.show();
+browser.show();
+assert.equal(resultWrites,1,'an unchanged results refresh keeps the badge image elements in place');
 assert.equal(ageSelect.value,'all','Club Results opens on the complete club view');
 assert.match(ageSelect.innerHTML,/Under 14s/,'coach results can filter ages present in club published rows');
 assert.equal(competitionSelect.value,'league','Club Results defaults to league');

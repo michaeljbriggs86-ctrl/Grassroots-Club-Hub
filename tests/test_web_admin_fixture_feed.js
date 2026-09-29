@@ -4,6 +4,8 @@ const path = require('node:path');
 
 const root = path.resolve(__dirname, '..');
 const src = fs.readFileSync(path.join(root, 'app/src/main/assets/app.js'), 'utf8');
+const stableBody=src.slice(src.indexOf('function setStableHtml(element,markup){'),src.indexOf('// Club lists share the exact same admission',src.indexOf('function setStableHtml(element,markup){')));
+const setStableHtml=new Function(`${stableBody}\nreturn setStableHtml;`)();
 const body = src.slice(src.indexOf('function adminFixtureHasResult(st,team,fixture,feed){'), src.indexOf('function renderAdminFixtures(){'));
 const norm = s => String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
 const stableKey = f => [norm(f.opponent||'tbc'),String(f.venue||'').toUpperCase(),norm(f.competition||'fixture')].join('|');
@@ -107,16 +109,19 @@ valiantTeam.state.matches.push({date:'2099-09-27',opponent:'Junior Reds Sabres',
 assert.equal(build([valiantTeam],valiantFeed).length,0,'Valiants recorded result removes the fixture from the admin list');
 
 const renderBody=src.slice(src.indexOf('function renderAdminFixtures(){'),src.indexOf('async function refreshAdminFixtures(',src.indexOf('function renderAdminFixtures(){')));
-const list={innerHTML:''},summary={textContent:''},ageSelect={value:'all'};
+let fixtureWrites=0,fixtureHtml='';
+const list={get innerHTML(){return fixtureHtml},set innerHTML(value){fixtureHtml=value;fixtureWrites++}},summary={textContent:''},ageSelect={value:'all'};
 const homeTeam={id:'u12-lions',ageGroup:'U12',teamName:'Lions'};
 const fixtureRows=[{team:homeTeam,source:'Selkent',date:'2099-10-01',time:'10:30',opponent:'Dartford Royals',venue:'H',competition:'Division',groundName:'Oak Field',address:'1 Oak Road',ack:{status:'confirmed',label:'Fixture confirmed'}}];
-const render=new Function('document','populateAdminFixtureAgeFilter','__adminOverviewRows','__adminFixtureRows','__adminPublishedFeed','__adminDirectoryCache','selkentNorm','formatDate','matchTeamLabel','esc','clubResultTeamBadgeHtml','fullClubResultTeamName','uniqueClubFixtures',`${renderBody}\nreturn renderAdminFixtures;`)(
+const render=new Function('document','populateAdminFixtureAgeFilter','__adminOverviewRows','__adminFixtureRows','__adminPublishedFeed','__adminDirectoryCache','selkentNorm','formatDate','matchTeamLabel','esc','clubResultTeamBadgeHtml','fullClubResultTeamName','uniqueClubFixtures','setStableHtml',`${renderBody}\nreturn renderAdminFixtures;`)(
   {getElementById:id=>({'admin-fixture-list':list,'admin-fixtures-age':ageSelect,'admin-fixture-summary':summary})[id]},
   ()=>{},[{team:homeTeam}],
   fixtureRows,
-  {age_groups:[]},new Map(),norm,s=>s,s=>s,s=>s,s=>`<img alt="" src="badge.svg" data-team="${s}">`,team=>`Shooters Hill AFC ${team.teamName}`,uniqueClubFixtures
+  {age_groups:[]},new Map(),norm,s=>s,s=>s,s=>s,s=>`<img alt="" src="badge.svg" data-team="${s}">`,team=>`Shooters Hill AFC ${team.teamName}`,uniqueClubFixtures,setStableHtml
 );
 render();
+render();
+assert.equal(fixtureWrites,1,'an unchanged fixture refresh keeps the badge image elements in place');
 assert.equal((list.innerHTML.match(/badge\.svg/g)||[]).length,2,'Admin fixtures show a badge beside both clubs');
 assert.doesNotMatch(list.innerHTML,/Oak Field|1 Oak Road|East Wickham Primary Academy/,'venue and address are absent from the card');
 assert.match(list.innerHTML,/admin-fixture-matchup.*<b>v<\/b>/,'clubs share one matchup row');
@@ -126,5 +131,6 @@ assert.doesNotMatch(list.innerHTML,/League · Home|League · Away|Venue unconfir
 assert.doesNotMatch(list.innerHTML,/Open in Maps|fixture-source-pill|>Selkent</,'redundant links and source labels are omitted');
 fixtureRows[0].venue='A';
 render();
+assert.equal(fixtureWrites,2,'a changed fixture still updates the card');
 assert.match(list.innerHTML,/club-result-team home[^>]*>.*Dartford Royals.*<b>v<\/b>.*club-result-team away[^>]*>.*Shooters Hill AFC Lions.*badge\.svg/s,'an away fixture puts the opponent and its badge on the left');
 console.log('Club Admin fixture feed checks passed');

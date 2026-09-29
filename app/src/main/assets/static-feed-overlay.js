@@ -531,7 +531,10 @@
     const remote=(state?.selkent?.tableSource===TABLE_SOURCE&&Array.isArray(state.selkent.table))?state.selkent.table:[];
     const self=norm(state?.division?.teamName||state?.meta?.teamName||'');
     const rows=remote.map(r=>`<tr class="${norm(r.team)===self?'our-team-row':''}"><td class="pos">${r.sourceOrder??'—'}</td><td class="team-cell">${typeof window.clubListingHtml==='function'?window.clubListingHtml(r.team):typeof window.esc==='function'?window.esc(r.team):String(r.team||'')}</td><td>${r.p}</td><td>${r.w}</td><td>${r.d}</td><td>${r.l}</td><td>${r.gf}</td><td>${r.ga}</td><td>${r.gd>0?'+':''}${r.gd}</td><td class="pts">${r.pts}</td></tr>`).join('');
-    document.querySelectorAll('[data-league-table-body]').forEach(tb=>tb.innerHTML=rows||'<tr><td colspan="10" class="table-empty">Standings not published for this division</td></tr>');
+    document.querySelectorAll('[data-league-table-body]').forEach(tb=>{
+      const markup=rows||'<tr><td colspan="10" class="table-empty">Standings not published for this division</td></tr>';
+      if(tb.__pitchkindMarkup!==markup){tb.innerHTML=markup;tb.__pitchkindMarkup=markup;}
+    });
     document.querySelectorAll('[data-league-table-title]').forEach(el=>el.textContent=state?.division?.name||'League table');
     document.querySelectorAll('.league-table thead th:first-child').forEach(el=>el.textContent=remote.length?'Row':'#');
     document.querySelectorAll('[data-league-table-meta]').forEach(el=>el.textContent=remote.length?`Selkent source order · ${remote.length} teams · tied-team order is not an official position`:(state?.selkent?.tableStatus||'Standings have not been published for this division.'));
