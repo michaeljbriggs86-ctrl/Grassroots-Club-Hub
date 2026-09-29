@@ -34,7 +34,7 @@ jobs:
           python-version: '3.11'
 
       - name: Install dependencies
-        run: pip install requests beautifulsoup4 pillow
+        run: pip install requests beautifulsoup4 Pillow==12.3.0 numpy==2.3.5 scipy==1.17.0
 
       - name: Run parser tests
         run: python -m unittest discover -s tests -p "test_*.py" -v
