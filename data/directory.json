@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-09-29T23:34:38.026055+00:00",
+  "last_updated": "2026-09-29T23:52:34.384963+00:00",
   "clubs": [
     {
       "club_id": 514,
@@ -263,7 +263,12 @@
     },
     {
       "club_id": 444,
-      "club_name": "Greenwich Peninsula"
+      "club_name": "Greenwich Peninsula",
+      "logo_url": "https://greenwichpeninsulafc.com/wp-content/uploads/2024/09/Logo.png",
+      "logo_status": "pilot_verified",
+      "logo_source": "official_site_image",
+      "logo_updated_at": "2026-09-30",
+      "logo_sha256": "8f0de7d24a78830efba1003140b517a7d037735a2b948e668f7680b2322ac8fa"
     },
     {
       "club_id": 281,
@@ -7736,5 +7741,5 @@
     }
   ],
   "note": "Panel parsing confirmed against all five format categories (mini-soccer, 9-a-side, X-category, 11-a-side, Senior) as of Sept 2026. Club/team linking is heuristic (name-prefix match) - see ambiguous_club_matches in diagnostics for anything flagged as uncertain.",
-  "pilot_badges_revision": "a7af8e5f8ac356e17ff55f4b69d6ae4443e53ed42b77610c405b7b99755c726d"
+  "pilot_badges_revision": "7e08c9f8be954d8ce3fe8bce694b97d72ed2ee7eb24b2c9617b78128aaf9ccb8"
 }
