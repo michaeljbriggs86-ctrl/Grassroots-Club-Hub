@@ -586,12 +586,16 @@ html[data-theme="dark"] .mobile-more-link:active,html[data-theme="dark"] .mobile
 .tactics-panel .tactics-board-hint{order:1}
 .tactics-panel .tactics-fixture{order:2}
 .tactics-panel .tactics-squad-options{order:3}
-.tactics-panel.needs-matchday-selection .tactics-squad-options{order:-1}
 .tactics-panel .tactics-heading{order:4}
 .tactics-panel .formation-control{order:5}
 .tactics-panel .tactics-bench-wrap{order:6}
 .tactics-panel .tactics-coach-plan{order:7}
 .tactics-board-hint .helper,.tactics-board-hint .tactics-availability-hint{margin:0;font-size:11px;line-height:1.35}
+.tactics-pitch[data-format="3v3"] .pitch-box{display:none}
+.tactics-pitch[data-format="3v3"] .pitch-circle{width:44px;height:44px}
+.tactics-empty{position:absolute;inset:38% 12%;display:grid;place-items:center;text-align:center;padding:12px;border-radius:12px;background:rgba(5,39,17,.78);color:#fff;font-size:13px;font-weight:850;z-index:2}
+.tactics-empty.hidden{display:none}
+.tactics-fixture .tactics-match-guide{color:var(--muted,#68766d);font-weight:750;line-height:1.35}
 
 @media(max-width:680px){
   body.match-plan-active .hero{min-height:0!important;padding-top:calc(8px + var(--android-inset-top,0px))!important;padding-bottom:8px!important;border-radius:0 0 12px 12px}

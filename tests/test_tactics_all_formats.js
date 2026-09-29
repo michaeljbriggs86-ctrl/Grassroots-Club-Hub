@@ -1,0 +1,72 @@
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const path=require('node:path');
+const vm=require('node:vm');
+const root=path.join(__dirname,'../app/src/main/assets');
+const source=fs.readFileSync(path.join(root,'app.js'),'utf8');
+const onboarding=fs.readFileSync(path.join(root,'onboarding.js'),'utf8');
+const rules=source.slice(source.indexOf('const FOOTBALL_FORMATS ='),source.indexOf('function dismissOpeningSplash(){'));
+const formations=source.slice(source.indexOf('const TACTICS_FORMATIONS='),source.indexOf('function currentTacticsFixtureKey(){'));
+let age=7,rule=null;
+const context={ageGroupNumber:()=>age,competitionRuleForAge:()=>rule,Math,Array,Number,String,Object};
+vm.createContext(context);
+vm.runInContext(rules+formations,context);
+
+for(const [currentAge,count,format] of [[7,3,'3v3'],[9,5,'5v5'],[11,7,'7v7'],[13,9,'9v9'],[16,11,'11v11']]){
+  age=currentAge;rule=null;
+  const actual=vm.runInContext('footballFormat()',context);
+  assert.equal(actual.onPitch,count,`U${currentAge} has ${count} players on the board`);
+  assert.equal(actual.format,format);
+  const slots=vm.runInContext('formationSlots(footballFormat().onPitch,defaultFormationName(footballFormat().onPitch))',context);
+  assert.equal(slots.length,count,`U${currentAge} formation has a place for every player`);
+  slots.forEach(([x,y])=>{assert.ok(x>=7&&x<=93);assert.ok(y>=5&&y<=95);});
+}
+rule={format:'7v7',players_on_pitch:7,max_registered:15,matchday_max:12,rolling_substitutions:false};
+assert.equal(vm.runInContext('footballFormat().onPitch',context),7,'the club rule wins over the age fallback');
+assert.equal(vm.runInContext('requiresMatchdaySelection()',context),true,'selection appears when the configured roster exceeds the matchday limit');
+rule.rolling_substitutions=true;
+assert.equal(vm.runInContext('requiresMatchdaySelection()',context),true,'a matchday cap still applies when substitutes can return');
+rule.matchday_max=15;
+assert.equal(vm.runInContext('requiresMatchdaySelection()',context),false,'a rolling team without a smaller matchday cap uses its full roster');
+rule={format:'3v3',players_on_pitch:3,max_registered:10,matchday_max:10,rolling_substitutions:false};
+age=7;
+assert.equal(vm.runInContext('requiresMatchdaySelection()',context),false,'U7 groups are not treated as a substitute bench');
+
+const nodes=Object.fromEntries(['tactics-fixture-name','tactics-fixture-meta','tactics-plan-summary','tactics-match-guide','tactics-rotation','tactics-rotation-label'].map(id=>[id,{textContent:'',firstChild:{textContent:''}}]));
+context.state={tactics:{lineup:['p1','p2','p3','p4','p5','p6']}};
+context.document={getElementById:id=>nodes[id],querySelectorAll:()=>[],activeElement:null};
+context.nextPublishedFixture=()=>null;
+context.tacticsMatchPlan=()=>({});
+context.isCoach=()=>true;
+context.providerType=()=> 'selkent';
+vm.runInContext(source.slice(source.indexOf('function tacticsMatchGuide('),source.indexOf('function renderMatchdaySquadPicker(){')),context);
+vm.runInContext('renderTacticsMatchPlan()',context);
+assert.equal(nodes['tactics-plan-summary'].textContent,'3 in this game · 3 for other games');
+assert.equal(nodes['tactics-rotation-label'].firstChild.textContent,'Next game plan');
+assert.match(nodes['tactics-match-guide'].textContent,/6–10 minute games.*no goalkeepers or substitutes/);
+rule={format:'11v11',players_on_pitch:11,max_registered:18,matchday_max:16,rolling_substitutions:false};
+age=16;
+vm.runInContext('renderTacticsMatchPlan()',context);
+assert.equal(nodes['tactics-rotation-label'].firstChild.textContent,'Substitution plan');
+assert.match(nodes['tactics-match-guide'].textContent,/80 minutes · size 5 ball · standard substitutions/);
+rule={format:'5v5',players_on_pitch:5,max_registered:10,matchday_max:10,rolling_substitutions:true};
+age=9;
+vm.runInContext('renderTacticsMatchPlan()',context);
+assert.equal(nodes['tactics-rotation-label'].firstChild.textContent,'Rotation reminder');
+assert.match(nodes['tactics-match-guide'].textContent,/40 minutes · size 3 ball · rolling substitutions/);
+context.providerType=()=> 'manual';
+vm.runInContext('renderTacticsMatchPlan()',context);
+assert.equal(nodes['tactics-match-guide'].textContent,'5v5 · rolling substitutions','manual leagues do not inherit Selkent match durations');
+
+vm.runInContext(onboarding.slice(onboarding.indexOf('function defaultRule(age){'),onboarding.indexOf('function selectedTeams(){')),context);
+assert.equal(vm.runInContext('defaultRule(7).format',context),'3v3');
+assert.equal(vm.runInContext('defaultRule(7).rolling_substitutions',context),false);
+assert.match(onboarding,/\['3v3','5v5','7v7','9v9','11v11'\]/,'club setup offers all pitch formats');
+
+const html=fs.readFileSync(path.join(root,'index.html'),'utf8');
+const design=fs.readFileSync(path.join(root,'app-design-system.css'),'utf8');
+assert.ok(html.indexOf('id="tactics-pitch"')<html.indexOf('id="matchday-squad-picker"'));
+assert.match(design,/\.tactics-panel \.tactics-pitch\{order:0/);
+assert.match(design,/\.tactics-pitch\[data-format="3v3"\] \.pitch-box\{display:none\}/);
+assert.match(source,/const otherGame=f\.format==='3v3'/,'3v3 uses other game groups rather than substitutes');
+console.log('Tactics all-format checks passed');
