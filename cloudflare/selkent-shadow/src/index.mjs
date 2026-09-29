@@ -2,6 +2,7 @@
 // This Worker has no public route; its R2 bucket must remain private.
 import { fixturePreview } from './fixtures.mjs';
 import { publishedResultsPreview } from './published-results.mjs';
+import { standingsPreview } from './standings.mjs';
 export const FEED_URL = 'https://raw.githubusercontent.com/michaeljbriggs86-ctrl/Grassroots-Club-Hub/main/data/results.json';
 const SELKENT_BASE = 'https://www.selkent.org.uk/public/';
 const RESTRICTED = new Set(['U7', 'U8', 'U8X', 'U9', 'U10', 'U10X', 'U11']);
@@ -98,7 +99,8 @@ function verifyProviderHtml(path, html) {
 export async function collectShadow({ bucket, fetcher = fetch, now = Date.now(),
                                       scheduledAt = now, paceMs = MIN_START_GAP_MS,
                                       normalizeFixtures = fixturePreview,
-                                      normalizeResults = publishedResultsPreview }) {
+                                      normalizeResults = publishedResultsPreview,
+                                      normalizeStandings = standingsPreview }) {
   if (!bucket?.put) throw new Error('Private R2 shadow binding is unavailable');
   const feedResponse = await fetcher(FEED_URL, {
     headers: { Accept: 'application/json' }, signal: AbortSignal.timeout(20_000),
@@ -143,6 +145,7 @@ export async function collectShadow({ bucket, fetcher = fetch, now = Date.now(),
   // Normalize in the Worker, privately; keep the public feed as the authority.
   const fixture_preview = await normalizeFixtures(payloads, feed);
   const published_results_preview = await normalizeResults(payloads, feed);
+  const standings_preview = await normalizeStandings(payloads, feed);
   const snapshot = {
     schema: 'pitchkind-selkent-shadow-v1',
     scheduled_at: new Date(scheduledAt).toISOString(),
@@ -151,6 +154,7 @@ export async function collectShadow({ bucket, fetcher = fetch, now = Date.now(),
     target_count: paths.length,
     fixture_preview,
     published_results_preview,
+    standings_preview,
     payloads,
   };
   // One private overwrite only after every public target succeeds; no app route reads it.

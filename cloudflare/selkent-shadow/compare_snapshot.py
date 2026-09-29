@@ -131,6 +131,50 @@ def compare_worker_results_preview(snapshot: dict, feed: dict) -> dict:
     }
 
 
+def compare_worker_standings_preview(snapshot: dict, feed: dict) -> dict:
+    """Compare U12+ league tables parsed from the same private R2 pages."""
+    if snapshot.get("schema") != "pitchkind-selkent-shadow-v1" or (
+        feed.get("schema_version") != 2 or feed.get("provider") != "Selkent"
+    ):
+        raise ValueError("Unrecognized private snapshot or public feed schema")
+    preview = snapshot.get("standings_preview")
+    if preview is None:
+        return {"event": "selkent-worker-python-standings", "status": "pending_new_collection"}
+    if not isinstance(preview, dict) or set(preview) != {
+        str(age["agegroup_id"]) for age in feed["age_groups"]
+        if age.get("standings") is not None
+    }:
+        raise ValueError("Private Worker standings target list is incomplete or unsafe")
+    differences = 0
+    rows = 0
+    for age in feed["age_groups"]:
+        if age.get("standings") is None:
+            continue
+        if "".join(age["age_group"].upper().split()) in RESTRICTED:
+            raise ValueError("Restricted age group has a standings preview")
+        worker_tables = preview[str(age["agegroup_id"])]
+        if not isinstance(worker_tables, list):
+            raise ValueError("Malformed private Worker standings preview")
+        parsed_tables = []
+        for table in age["standings"]:
+            division_id = table["provider_division_id"]
+            html = snapshot["payloads"][f"resultsTable/{division_id}"]
+            parsed = _parse(parse_standings_html, html, "standings")
+            parsed["provider_division_id"] = division_id
+            if not parsed.get("division_name"):
+                parsed["division_name"] = table["division_name"]
+            parsed_tables.append(parsed)
+        rows += sum(len(table["rows"]) for table in parsed_tables)
+        differences += worker_tables != parsed_tables
+    return {
+        "event": "selkent-worker-python-standings",
+        "status": "drift" if differences else "exact",
+        "age_groups": len(preview),
+        "standings_rows": rows,
+        "different_age_groups": differences,
+    }
+
+
 def compare_snapshot(snapshot: dict, feed: dict) -> dict:
     if snapshot.get("schema") != "pitchkind-selkent-shadow-v1":
         raise ValueError("Unrecognized private snapshot schema")
@@ -211,5 +255,8 @@ if __name__ == "__main__":
     print(json.dumps(parser_parity, sort_keys=True))
     results_parity = compare_worker_results_preview(snapshot, feed)
     print(json.dumps(results_parity, sort_keys=True))
-    if parser_parity["status"] == "drift" or results_parity["status"] == "drift":
+    standings_parity = compare_worker_standings_preview(snapshot, feed)
+    print(json.dumps(standings_parity, sort_keys=True))
+    if (parser_parity["status"] == "drift" or results_parity["status"] == "drift"
+            or standings_parity["status"] == "drift"):
         raise SystemExit("Worker parser differs from Python on the same private snapshot")

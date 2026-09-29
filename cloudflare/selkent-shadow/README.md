@@ -120,8 +120,15 @@ unplayed matches and verified abandoned status are omitted. Unknown scores
 and unsupported markup abort the private collection before R2 overwrite.
 The verifier compares Worker results with Python results from those very same
 private pages, reporting only counts. U7–U11 results are never requested or
-included in the preview. Standings still rely on the Python parser and remain
-the next porting stage. The website continues to use the GitHub feed.
+included in the preview. The website continues to use the GitHub feed.
+
+The Worker also normalizes public U12+ league tables into a private
+`standings_preview`. Source row order is retained as `row_order`, never
+reported as an official league position; tied-team ordering remains
+non-authoritative. It checks the known eight-column header and statistic
+values before writing the snapshot. The verifier compares the Worker tables
+with the Python parser from the same private pages. An older snapshot reports
+`pending_new_collection` until the newly deployed Worker captures one.
 
 ## Graduation gates
 

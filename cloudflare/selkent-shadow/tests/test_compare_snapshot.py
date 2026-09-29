@@ -50,6 +50,28 @@ def examples():
 
 
 class ShadowParityTests(unittest.TestCase):
+    def test_worker_standings_match_python_on_same_private_capture(self):
+        snapshot, feed = examples()
+        parsed_table = compare.parse_standings_html(TABLE)
+        parsed_table["provider_division_id"] = 990001
+        snapshot["standings_preview"] = {"12": [parsed_table]}
+        feed["last_updated"] = "2026-09-28T00:45:00Z"
+        summary = compare.compare_worker_standings_preview(snapshot, feed)
+        self.assertEqual(summary["status"], "exact")
+        self.assertEqual(summary["standings_rows"], 4)
+        self.assertNotIn("Synthetic Albion", str(summary))
+        snapshot["standings_preview"]["12"][0]["rows"] = []
+        self.assertEqual(compare.compare_worker_standings_preview(snapshot, feed)
+                         ["status"], "drift")
+        snapshot["standings_preview"]["2"] = []
+        with self.assertRaisesRegex(ValueError, "unsafe"):
+            compare.compare_worker_standings_preview(snapshot, feed)
+
+    def test_old_snapshot_has_no_worker_standings_preview(self):
+        snapshot, feed = examples()
+        self.assertEqual(compare.compare_worker_standings_preview(snapshot, feed)
+                         ["status"], "pending_new_collection")
+
     def test_worker_results_match_python_on_same_private_capture(self):
         snapshot, feed = examples()
         soup = BeautifulSoup(snapshot["payloads"]["resultsTable/990001"], "html.parser")

@@ -14,6 +14,8 @@ on:
       - 'cloudflare/selkent-shadow/src/fixtures.mjs'
       - 'cloudflare/selkent-shadow/src/published-results.mjs'
       - 'cloudflare/selkent-shadow/tests/published-results.spec.mjs'
+      - 'cloudflare/selkent-shadow/src/standings.mjs'
+      - 'cloudflare/selkent-shadow/tests/standings.spec.mjs'
   schedule:
     # Check the private collector after its :15 six-hour run (UTC).
     - cron: '45 */6 * * *'
