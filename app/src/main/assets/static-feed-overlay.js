@@ -335,15 +335,20 @@
     if(!self)throw new Error('Current team identity is missing');
     const rows=[];
     for(const row of ageEntry.fixtures){
-      if(division&&norm(row?.division_name||'')!==division)continue;
+      const competitionName=String(row?.division_name||'').trim();
+      const isCup=/\bcup\b/i.test(competitionName);
+      if(!isCup&&division&&norm(competitionName)!==division)continue;
       const home=String(row?.home||'').trim(),away=String(row?.away||'').trim();
-      const ownHome=sameTeam(home,self),ownAway=sameTeam(away,self);
+      // Cup ties are outside the league division. Require an exact team name
+      // so a similarly named side cannot be mistaken for the selected team.
+      const ownHome=isCup?norm(home)===norm(self):sameTeam(home,self);
+      const ownAway=isCup?norm(away)===norm(self):sameTeam(away,self);
       if(ownHome===ownAway)continue;
       const opponent=ownHome?away:home;
       if(!opponent)continue;
       rows.push({
         date:String(row?.date||''),time:'',opponent,venue:ownHome?'H':'A',
-        competition:(typeof window.isPublishedLeagueTeam==='function'&&window.isPublishedLeagueTeam())?'League':'Division',
+        competition:isCup?competitionName:((typeof window.isPublishedLeagueTeam==='function'&&window.isPublishedLeagueTeam())?'League':'Division'),
         providerTeamIds:Array.isArray(row?.provider_team_ids)?row.provider_team_ids.map(String):[],
         raw:`${home} v ${away}`,source:'selkent-static'
       });

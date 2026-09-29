@@ -1398,7 +1398,7 @@ function openFixtureMatchReport(f){
   if(!requireCoach())return;if(!f)return toast('No published fixture available');
   let m=fixtureLinkedMatch(f);
   if(!m){
-    const competition=isPublishedLeagueTeam()?'League':'Division';
+    const competition=f.competition||((isPublishedLeagueTeam())?'League':'Division');
     m={id:uid('m'),date:f.date||new Date().toISOString().slice(0,10),opponent:f.opponent||'Opponent',competition,type:competition,tournamentId:null,venue:String(f.venue||'').toUpperCase(),duration:null,stage:'',gf:0,ga:0,status:'scheduled',notes:'',source:'selkent-fixture',providerTeamIds:Array.isArray(f.providerTeamIds)?[...f.providerTeamIds]:[]};
     state.matches.push(m);saveState();auditEvent('fixture_report_started','match',m.id,`Started match report vs ${m.opponent}`,null,m);
   }
@@ -3749,14 +3749,16 @@ function buildAdminFixtureRows(rows,feed=null){
     const published=Array.isArray(ageEntry?.fixtures)?ageEntry.fixtures:null;
     const matches=published?published.filter(f=>{
       if(!f.date||f.date<now||!name)return false;
-      if(division&&selkentNorm(f.division_name||'')!==division)return false;
+      const competitionName=String(f.division_name||'').trim();
+      const isCup=/\bcup\b/i.test(competitionName);
+      if(!isCup&&division&&selkentNorm(competitionName)!==division)return false;
       const home=selkentNorm(f.home),away=selkentNorm(f.away);
       return (home===name)!==(away===name);
     }).map(f=>{
       const home=selkentNorm(f.home)===name;
       const opponent=home?f.away:f.home,venue=home?'H':'A';
       const saved=(st.selkent?.fixtures||[]).find(x=>x.date===f.date&&selkentNorm(x.opponent)===selkentNorm(opponent)&&String(x.venue||'').toUpperCase()===venue);
-      const original={date:f.date,time:saved?.time||'',opponent,venue,competition:saved?.competition||(Array.isArray(ageEntry.standings)?'League':'Division'),providerTeamIds:f.provider_team_ids||[],kitColours:saved?.kitColours||'',groundName:saved?.groundName||'',address:saved?.address||''};
+      const original={date:f.date,time:saved?.time||'',opponent,venue,competition:/\bcup\b/i.test(String(f.division_name||''))?String(f.division_name).trim():(saved?.competition||(Array.isArray(ageEntry.standings)?'League':'Division')),providerTeamIds:f.provider_team_ids||[],kitColours:saved?.kitColours||'',groundName:saved?.groundName||'',address:saved?.address||''};
       const override=st.selkent?.fixtureOverrides?.[fixtureKitSelectionKey(original)]||{};
       const ack=fixtureAckState(st,original);
       const alertedFixture=st.selkent?.fixtureAcknowledgement?.key===fixtureStableKey(original);
