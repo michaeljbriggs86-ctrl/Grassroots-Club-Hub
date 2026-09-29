@@ -14,7 +14,7 @@ let limited=true;
 const state={selkent:{},tactics:{lineup:[],positions:{},formationByFixture:{},matchdaySelections:{},matchdayAutoPrepared:{}}};
 const context={state,fixture,footballFormat:()=>({onPitch:5,matchday:7}),activePlayers:()=>players,
   requiresMatchdaySelection:()=>limited,
-  nextPublishedFixture:()=>fixture,fixtureStableKey:f=>f.id,requireCoach:()=>true,isCoach:()=>true,
+  nextPublishedFixture:()=>fixture,fixtureStableKey:f=>f.id,fixtureResponseKey:f=>f.id,requireCoach:()=>true,isCoach:()=>true,
   featureEnabled:()=>true,document:{querySelectorAll:()=>[]},auditEvent:()=>{},toast:()=>{},saveState:()=>{context.rememberTacticsPlan();}};
 vm.createContext(context);vm.runInContext(source.slice(start,end)+reset,context);
 const ids=()=>Array.from(context.currentMatchdaySelection());

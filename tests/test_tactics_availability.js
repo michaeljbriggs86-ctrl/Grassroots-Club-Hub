@@ -10,7 +10,8 @@ assert.ok(declarations.startsWith('let __availabilityRows=[];')&&functions.start
 let fixture={id:'first'},resolveFirst,resolveSecond;
 const panel={classList:{add(){},remove(){}}};
 const context={
-  CLOUD_MODE:true,currentRole:'admin',nextPublishedFixture:()=>fixture,fixtureStableKey:f=>f.id,
+  CLOUD_MODE:true,currentRole:'admin',nextPublishedFixture:()=>fixture,fixtureStableKey:f=>f.id,fixtureResponseKey:f=>f.id,
+  listFixtureAvailability:f=>context.window.ClubHubCloud.listMatchAvailability(f.id),
   selkentNorm:x=>String(x||'').toLowerCase(),activePlayers:()=>[{name:'Oscar'}],
   document:{getElementById:id=>id==='match-availability-panel'?panel:null},
   isCoach:()=>false,isAdminTeamPreviewMode:()=>false,renderMatchdayDashboard:()=>{},
