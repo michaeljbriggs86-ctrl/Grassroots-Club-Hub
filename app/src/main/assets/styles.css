@@ -1530,10 +1530,10 @@ html[data-theme="dark"] .further-fixture-head small{color:#b9c7be}
 .admin-recent-results-list{display:grid;gap:7px}
 .admin-recent-result{display:grid;grid-template-columns:minmax(0,1fr);gap:4px;padding:9px 11px;border:1px solid #dce8df;border-radius:12px;background:#fff;color:#14271b}
 .admin-recent-result>span{font-size:10px;font-weight:850;color:#385643}
-.admin-recent-team{display:flex;align-items:center;justify-content:flex-start;gap:6px;min-width:0;font-size:12px;font-weight:750;line-height:1.35}
+.admin-recent-team{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:8px;min-width:0;font-size:12px;font-weight:750;line-height:1.35}
 .admin-recent-team .club-listing{min-width:0}
 .admin-recent-team .club-listing-name{overflow-wrap:anywhere}
-.admin-recent-score{flex:none;color:#075d31;white-space:nowrap;font-weight:850}
+.admin-recent-score{justify-self:end;min-width:2ch;text-align:right;color:#075d31;white-space:nowrap;font-weight:850}
 @media(max-width:560px){
   .admin-fixture-centre{padding:12px}
   .admin-fixture-row{grid-template-columns:74px minmax(0,1fr);gap:8px;padding:9px}
