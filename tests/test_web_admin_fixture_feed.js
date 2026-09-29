@@ -94,13 +94,14 @@ assert.equal(build([valiantTeam],valiantFeed).length,0,'Valiants recorded result
 const renderBody=src.slice(src.indexOf('function renderAdminFixtures(){'),src.indexOf('async function refreshAdminFixtures(',src.indexOf('function renderAdminFixtures(){')));
 const list={innerHTML:''},summary={textContent:''},ageSelect={value:'all'};
 const homeTeam={id:'u12-lions',ageGroup:'U12',teamName:'Lions'};
-const render=new Function('document','populateAdminFixtureAgeFilter','__adminOverviewRows','__adminFixtureRows','__adminPublishedFeed','__adminDirectoryCache','selkentNorm','formatDate','matchTeamLabel','mapsHref','esc',`${renderBody}\nreturn renderAdminFixtures;`)(
+const render=new Function('document','populateAdminFixtureAgeFilter','__adminOverviewRows','__adminFixtureRows','__adminPublishedFeed','__adminDirectoryCache','selkentNorm','formatDate','matchTeamLabel','mapsHref','esc','clubListingHtml','fullClubResultTeamName',`${renderBody}\nreturn renderAdminFixtures;`)(
   {getElementById:id=>({'admin-fixture-list':list,'admin-fixtures-age':ageSelect,'admin-fixture-summary':summary})[id]},
   ()=>{},[{team:homeTeam}],
   [{team:homeTeam,source:'Selkent',date:'2099-10-01',time:'10:30',opponent:'Dartford Royals',venue:'H',competition:'League',groundName:'Oak Field',address:'1 Oak Road',ack:{status:'confirmed',label:'Fixture confirmed'}}],
-  {age_groups:[]},new Map(),norm,s=>s,s=>s,()=>'',s=>s
+  {age_groups:[]},new Map(),norm,s=>s,s=>s,()=>'',s=>s,s=>`<span class="club-listing"><img alt="" src="badge.svg">${s}</span>`,team=>`Shooters Hill AFC ${team.teamName}`
 );
 render();
+assert.equal((list.innerHTML.match(/badge\.svg/g)||[]).length,2,'Admin fixtures show a badge beside both clubs');
 assert.match(list.innerHTML,/Oak Field · 1 Oak Road/,'Admin row shows the coach confirmed home ground and address');
 assert.doesNotMatch(list.innerHTML,/East Wickham Primary Academy/,'the default home venue cannot overwrite confirmed details');
 console.log('Club Admin fixture feed checks passed');
