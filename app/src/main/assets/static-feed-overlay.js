@@ -329,6 +329,11 @@
     return x===y||(x.length>8&&y.includes(x))||(y.length>8&&x.includes(y));
   }
 
+  function isSelkentLeagueDivision(name){
+    // All league division titles in the current Selkent directory use these forms.
+    return /^(?:under\s*\d{1,2}x?(?:\s*[a-z](?=\s|$)|\s+(?:division|navy|blue|green|orange|red|silver|yellow|white)(?=\s|$))|senior\s+division\b)/i.test(String(name||'').trim());
+  }
+
   function adaptStaticFixtures(ageEntry){
     if(!ageEntry||!Array.isArray(ageEntry.fixtures))throw new Error(`No ${ageCode()} fixtures array in static Selkent feed`);
     const division=norm(state?.division?.name||''),self=String(state?.division?.teamName||state?.meta?.teamName||'').trim();
@@ -336,19 +341,18 @@
     const rows=[];
     for(const row of ageEntry.fixtures){
       const competitionName=String(row?.division_name||'').trim();
-      const isCup=/\bcup\b/i.test(competitionName);
-      if(!isCup&&division&&norm(competitionName)!==division)continue;
+      const isLeague=!!division&&norm(competitionName)===division;
+      if(!competitionName||(!isLeague&&isSelkentLeagueDivision(competitionName)))continue;
       const home=String(row?.home||'').trim(),away=String(row?.away||'').trim();
-      // Cup ties are outside the league division. Require an exact team name
-      // so a similarly named side cannot be mistaken for the selected team.
-      const ownHome=isCup?norm(home)===norm(self):sameTeam(home,self);
-      const ownAway=isCup?norm(away)===norm(self):sameTeam(away,self);
+      // For other competitions, require the complete provider team name.
+      const ownHome=isLeague?sameTeam(home,self):norm(home)===norm(self);
+      const ownAway=isLeague?sameTeam(away,self):norm(away)===norm(self);
       if(ownHome===ownAway)continue;
       const opponent=ownHome?away:home;
       if(!opponent)continue;
       rows.push({
         date:String(row?.date||''),time:'',opponent,venue:ownHome?'H':'A',
-        competition:isCup?competitionName:((typeof window.isPublishedLeagueTeam==='function'&&window.isPublishedLeagueTeam())?'League':'Division'),
+        competition:isLeague?((typeof window.isPublishedLeagueTeam==='function'&&window.isPublishedLeagueTeam())?'League':'Division'):competitionName,
         providerTeamIds:Array.isArray(row?.provider_team_ids)?row.provider_team_ids.map(String):[],
         raw:`${home} v ${away}`,source:'selkent-static'
       });

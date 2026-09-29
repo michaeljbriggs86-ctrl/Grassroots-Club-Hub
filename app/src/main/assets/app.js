@@ -3740,6 +3740,10 @@ function adminFixtureHasResult(st,team,fixture,feed){
     (names.includes(normalizeTeamKey(r.away))&&normalizeTeamKey(r.home)===opponent&&fixture.venue!=='H')
   ));
 }
+function isSelkentLeagueDivision(name){
+  // All league division titles in the current Selkent directory use these forms.
+  return /^(?:under\s*\d{1,2}x?(?:\s*[a-z](?=\s|$)|\s+(?:division|navy|blue|green|orange|red|silver|yellow|white)(?=\s|$))|senior\s+division\b)/i.test(String(name||'').trim());
+}
 function buildAdminFixtureRows(rows,feed=null){
   const now=new Date().toISOString().slice(0,10),out=[];
   for(const r of rows||[]){
@@ -3751,15 +3755,14 @@ function buildAdminFixtureRows(rows,feed=null){
     const matches=published?published.filter(f=>{
       if(!f.date||f.date<now||!name)return false;
       const competitionName=String(f.division_name||'').trim();
-      const isCup=/\bcup\b/i.test(competitionName);
-      if(!isCup&&division&&selkentNorm(competitionName)!==division)return false;
+      if(!competitionName||(division&&selkentNorm(competitionName)!==division&&isSelkentLeagueDivision(competitionName)))return false;
       const home=selkentNorm(f.home),away=selkentNorm(f.away);
       return (home===name)!==(away===name);
     }).map(f=>{
       const home=selkentNorm(f.home)===name;
       const opponent=home?f.away:f.home,venue=home?'H':'A';
       const saved=(st.selkent?.fixtures||[]).find(x=>x.date===f.date&&selkentNorm(x.opponent)===selkentNorm(opponent)&&String(x.venue||'').toUpperCase()===venue);
-      const original={date:f.date,time:saved?.time||'',opponent,venue,competition:/\bcup\b/i.test(String(f.division_name||''))?String(f.division_name).trim():(saved?.competition||(Array.isArray(ageEntry.standings)?'League':'Division')),providerTeamIds:f.provider_team_ids||[],kitColours:saved?.kitColours||'',groundName:saved?.groundName||'',address:saved?.address||''};
+      const original={date:f.date,time:saved?.time||'',opponent,venue,competition:division&&selkentNorm(f.division_name||'')===division?(saved?.competition||(Array.isArray(ageEntry.standings)?'League':'Division')):String(f.division_name||'').trim(),providerTeamIds:f.provider_team_ids||[],kitColours:saved?.kitColours||'',groundName:saved?.groundName||'',address:saved?.address||''};
       const override=st.selkent?.fixtureOverrides?.[fixtureKitSelectionKey(original)]||{};
       const ack=fixtureAckState(st,original);
       const alertedFixture=st.selkent?.fixtureAcknowledgement?.key===fixtureStableKey(original);
