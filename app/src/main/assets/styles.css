@@ -1094,6 +1094,7 @@ html[data-theme="dark"] .tactics-fixture small{color:#96e3a0}
 .settings-group-heading:first-child{margin-top:0}
 .settings-group-heading span{font-size:12px;font-weight:950;text-transform:uppercase;letter-spacing:.08em;color:var(--green)}
 .settings-group-heading small{font-size:10px;color:var(--muted);text-align:right}
+html[data-theme="dark"] .settings-group-heading span{color:#8ee09a}
 .procedure-list,.rule-summary-list{display:grid;gap:8px;margin-top:12px}
 .procedure-list article,.rule-summary-list>span{display:flex;flex-direction:column;gap:3px;padding:11px 12px;border:1px solid var(--line,#d8e0da);border-radius:12px;background:var(--white)}
 .procedure-list strong,.rule-summary-list strong{font-size:11px}
