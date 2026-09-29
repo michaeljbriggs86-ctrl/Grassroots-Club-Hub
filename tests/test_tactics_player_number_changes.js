@@ -19,6 +19,13 @@ const context={state,document:{getElementById:id=>fields[id]},requireCoach:()=>t
   footballFormat:()=>({registered:10,format:'5v5'}),confirm:()=>true,
   saveState:()=>{},auditEvent:()=>{},toast:()=>{},alert:msg=>{throw Error(msg);}};
 vm.createContext(context);vm.runInContext(helper+editing,context);
+for(const invalid of ['abc','1.5']){
+  fields['player-number'].value=invalid;
+  assert.throws(()=>context.savePlayer({preventDefault(){}}),/whole shirt number/);
+  assert.equal(state.squad[0].number,1,`invalid shirt number ${invalid} must leave the player unchanged`);
+  assert.deepEqual(Array.from(tactics.lineup),['p1','p2']);
+}
+fields['player-number'].value='9';
 context.savePlayer({preventDefault(){}});
 assert.deepEqual(Array.from(tactics.lineup),['p9','p2']);
 assert.deepEqual(Array.from(tactics.lineupByFixture.second),['p2','p9'],'previous fixture order follows the player');

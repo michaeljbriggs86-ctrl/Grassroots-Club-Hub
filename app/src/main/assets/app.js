@@ -4392,7 +4392,7 @@ function savePlayer(e){
   const name=document.getElementById('player-name').value.trim();
   const role=document.getElementById('player-role').value;
   const status=document.getElementById('player-status').value;
-  if(!name || number<1 || number>99){ alert('Enter a player name and shirt number from 1 to 99.'); return; }
+  if(!name || !Number.isInteger(number) || number<1 || number>99){ alert('Enter a player name and whole shirt number from 1 to 99.'); return; }
   const format=footballFormat();if(!original&&state.squad.filter(p=>p&&p.name).length>=format.registered){alert(`${state.meta.ageGroup} is limited to ${format.registered} registered players for ${format.format}.`);return;}
   const collision=state.squad.find(p=>p.number===number&&p.number!==original&&p.name);
   if(collision){ alert(`Shirt #${number} is already assigned to ${collision.name}.`); return; }
