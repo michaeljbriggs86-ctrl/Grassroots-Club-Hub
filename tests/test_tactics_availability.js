@@ -18,7 +18,7 @@ const context={
   CLOUD_MODE:true,currentRole:'admin',nextPublishedFixture:()=>fixture,fixtureStableKey:f=>f.id,fixtureResponseKey:f=>f.id,
   listFixtureAvailability:f=>context.window.ClubHubCloud.listMatchAvailability(f.id),
   selkentNorm:x=>String(x||'').toLowerCase(),activePlayers:()=>[{name:'Oscar'}],
-  document:{getElementById:id=>({'match-availability-panel':panel,'coach-availability-summary':coachSummary,'match-availability-count':count,'availability-player':select})[id]||null,querySelectorAll:()=>[statusButton]},
+  document:{getElementById:id=>({'match-availability-panel':panel,'coach-availability-summary':coachSummary,'match-availability-count':count,'availability-player':select})[id]||null,querySelectorAll:()=>[statusButton]},renderParentHomeMatchInfo:()=>{},
   isCoach:()=>false,isAdminTeamPreviewMode:()=>false,renderMatchdayDashboard:()=>{},
   window:{ClubHubCloud:{session:{user:{id:'admin'}},currentTeam:()=>({id:teamId}),listMatchAvailability:key=>new Promise(resolve=>pending.set(`${teamId}:${key}`,resolve)),listParentPlayerLinks:async()=>[]}}
 };

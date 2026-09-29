@@ -9,10 +9,10 @@ const css=fs.readFileSync('app/src/main/assets/styles.css','utf8');
 const start=app.indexOf("let __parentFamilyKey=''");
 const end=app.indexOf('async function switchParentFamilyTeam(',start);
 assert(start>0&&end>start);
-assert(html.includes('id="parent-home-family"')&&html.includes('id="parent-family-linked-list"'));
+assert(html.includes('id="parent-home-family"')&&html.includes('id="parent-family-linked-list"')&&html.includes('id="parent-home-match-info"'));
 assert.match(css,/\.club-logo-wrap\{overflow:hidden;isolation:isolate\}/);
 
-const nodes=Object.fromEntries(['parent-home-family','parent-home-family-list','parent-family-linked-list'].map(id=>[id,{innerHTML:'',classList:{toggle(){}}}]));
+const nodes=Object.fromEntries(['parent-home-family','parent-home-family-list','parent-family-linked-list','parent-home-match-info'].map(id=>[id,{innerHTML:'',classList:{toggle(){}}}]));
 let team={id:'one',ageGroup:'U9',teamName:'Valiants'};
 let resolveOld;
 const cloud={
@@ -26,15 +26,20 @@ const cloud={
 const context={CLOUD_MODE:true,currentRole:'parent',window:{ClubHubCloud:cloud},
   document:{getElementById:id=>nodes[id]||null},matchTeamLabel:x=>x,
   esc:x=>String(x).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;'),
-  nextPublishedFixture:()=>({date:'2026-10-04'}),formatDate:()=> '4 Oct 26',Date};
+  nextPublishedFixture:()=>({id:'fixture-one',date:'2026-10-04'}),resolvedFixture:f=>({...f,time:'10:00',groundName:'Home ground'}),fixtureDetailsConfirmed:()=>true,fixtureResponseKey:f=>f.id,matchdayArrivalTime:()=> '09:30',selkentNorm:x=>String(x).toLowerCase(),
+  __availabilityFixture:'fixture-one',__availabilityTeamId:'one',__availabilityLoadStatus:'ready',__availabilityRows:[{player_name:'Aavi',status:'available'}],Date};
 vm.runInNewContext(`${app.slice(start,end)}\nthis.family=refreshParentFamilySummary;this.render=renderParentFamilySummary;`,context);
 
 (async()=>{
   await context.family();
   assert.match(nodes['parent-home-family-list'].innerHTML,/Aavi/);
-  assert.match(nodes['parent-home-family-list'].innerHTML,/Match details & availability/);
+  assert.match(nodes['parent-home-match-info'].innerHTML,/Aavi/);
+  assert.match(nodes['parent-home-match-info'].innerHTML,/Available/);
+  assert.match(nodes['parent-home-match-info'].innerHTML,/Kick-off 10:00/);
+  assert.match(nodes['parent-home-match-info'].innerHTML,/Add to calendar/);
   assert.match(nodes['parent-family-linked-list'].innerHTML,/Aavi/);
   assert.doesNotMatch(nodes['parent-home-family-list'].innerHTML,/Other child|Wrong team/);
+  assert.doesNotMatch(nodes['parent-home-match-info'].innerHTML,/Other child|Wrong team/);
 
   cloud.listParentPlayerLinks=()=>new Promise(resolve=>{resolveOld=resolve;});
   const stale=context.family(true);
@@ -45,6 +50,13 @@ vm.runInNewContext(`${app.slice(start,end)}\nthis.family=refreshParentFamilySumm
   await stale;
   assert.match(nodes['parent-home-family-list'].innerHTML,/Second child/);
   assert.doesNotMatch(nodes['parent-home-family-list'].innerHTML,/Aavi/);
+  assert.doesNotMatch(nodes['parent-home-match-info'].innerHTML,/Aavi|Available/,'old team reply must not survive switch');
+
+  cloud.session.user.id='new-parent';
+  context.render();
+  assert.doesNotMatch(nodes['parent-home-family-list'].innerHTML,/Second child/,'old account child must not appear while new links load');
+  assert.match(nodes['parent-home-family-list'].innerHTML,/Checking approved child links/);
+  cloud.session.user.id='parent-1';
 
   cloud.listParentPlayerLinks=async()=>[];
   await context.family(true);

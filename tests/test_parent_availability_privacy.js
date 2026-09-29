@@ -26,7 +26,7 @@ const ctx={CLOUD_MODE:true,currentRole:'parent',nextPublishedFixture:()=>fixture
     {player_name:'Lindi',status:'unsure'}
   ];},selkentNorm:x=>String(x||'').toLowerCase(),
   document:{getElementById:id=>nodes[id]||null,querySelectorAll:()=>buttons},
-  isCoach:()=>false,isAdminTeamPreviewMode:()=>false,renderMatchdayDashboard:()=>{},
+  isCoach:()=>false,isAdminTeamPreviewMode:()=>false,renderMatchdayDashboard:()=>{},renderParentHomeMatchInfo:()=>{},
   window:{ClubHubCloud:cloud},esc:x=>String(x),toast:()=>{}};
 vm.createContext(ctx);vm.runInContext(declarations+app.slice(start,end),ctx);
 
