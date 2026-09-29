@@ -54,6 +54,24 @@ def fetch_reviewed(badge, get, *, expected_mislabelled_type=None):
         return bytes(data), kind
 
 
+def fetch_reviewed_vector(badge, get):
+    """Pin the current official SVG before staging its reviewed local PNG."""
+    with get(badge['original_source_url'], stream=True, timeout=20,
+             headers={'User-Agent': 'PitchKindBadgeQA/1.0', 'Accept': 'image/svg+xml'}) as response:
+        response.raise_for_status()
+        final = urlsplit(response.url)
+        if final.scheme != 'https' or not final.hostname or final.username or final.password:
+            raise ValueError(f"badge {badge['club_id']} vector redirected away from HTTPS")
+        data = bytearray()
+        for chunk in response.iter_content(65536):
+            data.extend(chunk)
+            if len(data) > MAX_IMAGE_BYTES:
+                raise ValueError(f"badge {badge['club_id']} vector exceeds size limit")
+        if (not data or hashlib.sha256(data).hexdigest() != badge['original_sha256'].lower() or
+                response.headers.get('Content-Type', '').split(';')[0].strip().lower() != 'image/svg+xml'):
+            raise ValueError(f"badge {badge['club_id']} official vector changed since review")
+
+
 def approvals(directory, manifest):
     validated_approvals(directory, manifest)
     for badge in manifest['badges']:
@@ -95,6 +113,13 @@ def upload_badges(badges, get, run):
                 data = transparent_png(source)
                 if hashlib.sha256(data).hexdigest() != badge['logo_sha256'].lower():
                     raise ValueError(f"badge {badge['club_id']} transparency bytes differ from reviewed PNG")
+                kind = 'image/png'
+            elif badge.get('logo_source') == 'official_source_vector_raster_private':
+                fetch_reviewed_vector(badge, get)
+                data = (Path('verification/approved_badges') / f"{int(badge['club_id'])}.png").read_bytes()
+                if (len(data) > MAX_IMAGE_BYTES or media_type(data) != 'image/png' or
+                        hashlib.sha256(data).hexdigest() != badge['logo_sha256'].lower()):
+                    raise ValueError(f"badge {badge['club_id']} raster differs from reviewed PNG")
                 kind = 'image/png'
             else:
                 data, kind = fetch_reviewed(badge, get)

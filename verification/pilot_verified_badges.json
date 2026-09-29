@@ -3,6 +3,20 @@
   "scope": "private_pilot",
   "badges": [
     {
+      "club_id": 240,
+      "club_name": "Beacons",
+      "logo_url": "https://test.pitchkind.com/__pilot_badges/240/17b3ec7e7fc6fc5fb3df9722c0a17b88811c503b3e41d1d1e24f67816473fa05",
+      "logo_status": "pilot_verified",
+      "logo_source": "official_source_vector_raster_private",
+      "logo_updated_at": "2026-09-29",
+      "logo_sha256": "17b3ec7e7fc6fc5fb3df9722c0a17b88811c503b3e41d1d1e24f67816473fa05",
+      "original_source_url": "https://www.beaconsfc.com/templates/beacons_fc/images/beacons-fc.svg",
+      "original_sha256": "e61ce00b59f05bd561b2902ebbee7db448706aa3e0dc5a4e2fa418769f4d7897",
+      "derivation": "official_svg_raster_1024px_png",
+      "rights_status": "protected_pilot_only_public_rights_not_reviewed",
+      "review_basis": "Mike approved the visible artwork in the upload inbox. Selkent club 240 links the Beacons FC site, whose current homepage displays the exact shield SVG. The 1024 px transparent PNG is a format rendering of that pinned SVG, with no artwork redraw. It reads as the same shield on pale and dark green at 128, 48 and 20 px. Final protected-page acceptance and public rights remain open."
+    },
+    {
       "club_id": 246,
       "club_name": "Blackheath Wdrs",
       "logo_url": "https://static.wixstatic.com/media/8ec5e4_8d031581c8074147bc698da028dfbdde~mv2.png",
@@ -48,6 +62,20 @@
       "derivation": "outer_background_transparency_only",
       "rights_status": "protected_pilot_only_public_rights_not_reviewed",
       "review_basis": "Mike approved visible artwork on 2026-09-28. Current Crayford Arrows club homepage shows the same shield; full-size source was collected from its club news asset. Selkent club ID 251 and 801x941 source were reviewed. Exact source and transparent derivative hashes checked against the private packet; deep interior preserved. Protected-page light/dark real-slot acceptance remains open."
+    },
+    {
+      "club_id": 255,
+      "club_name": "Dartford FC",
+      "logo_url": "https://test.pitchkind.com/__pilot_badges/255/09562d11799ccc7a317456d3e945d8be0ba667cdb81dad7721b9a0c873601984",
+      "logo_status": "pilot_verified",
+      "logo_source": "official_source_vector_raster_private",
+      "logo_updated_at": "2026-09-29",
+      "logo_sha256": "09562d11799ccc7a317456d3e945d8be0ba667cdb81dad7721b9a0c873601984",
+      "original_source_url": "https://media.touchlinefc.co.uk/hq/2023/03/dartford.svg",
+      "original_sha256": "76a0238a84c4cc90c895f0fc344d24abb0ce84fa6b0af0781587f4d1c73bb03e",
+      "derivation": "official_svg_raster_1024px_png",
+      "rights_status": "protected_pilot_only_public_rights_not_reviewed",
+      "review_basis": "Mike approved the visible artwork in the upload inbox. Selkent club 255 is Dartford FC. Its current official homepage displays the exact full crest SVG. The 1024 px transparent PNG is a format rendering of that pinned SVG, with no artwork redraw. Shield and ribbon retain their silhouette on pale and dark green at 128, 48 and 20 px; fine heraldic lettering is naturally too small at 20 px. Final protected-page acceptance and public rights remain open."
     },
     {
       "club_id": 271,

@@ -47,7 +47,8 @@ def validated_approvals(directory, manifest):
             raise ValueError(f"badge {club_id} has no exact-image SHA-256")
         if not all(badge.get(field) for field in BADGE_FIELDS):
             raise ValueError(f"badge {club_id} is missing provenance metadata")
-        if badge.get('logo_source') in ('club_supplied_private', 'official_source_transparency_derivative_private'):
+        if badge.get('logo_source') in ('club_supplied_private', 'official_source_transparency_derivative_private',
+                                        'official_source_vector_raster_private'):
             if badge['logo_source'] == 'club_supplied_private' and club_id != 499:
                 raise ValueError(f"badge {club_id} is outside the private club-supplied pilot")
             expected = f"https://test.pitchkind.com/__pilot_badges/{club_id}/{badge['logo_sha256'].lower()}"
@@ -61,6 +62,14 @@ def validated_approvals(directory, manifest):
                         badge['original_sha256'].lower() == badge['logo_sha256'].lower() or
                         badge.get('derivation') != 'outer_background_transparency_only'):
                     raise ValueError(f"badge {club_id} lacks exact original and derivation provenance")
+            if badge['logo_source'] == 'official_source_vector_raster_private':
+                original = urlsplit(str(badge.get('original_source_url') or ''))
+                if (original.scheme != 'https' or not original.hostname or original.username or
+                        original.password or original.fragment or not re.fullmatch(
+                            r'[a-f0-9]{64}', str(badge.get('original_sha256') or ''), re.I) or
+                        badge['original_sha256'].lower() == badge['logo_sha256'].lower() or
+                        badge.get('derivation') != 'official_svg_raster_1024px_png'):
+                    raise ValueError(f"badge {club_id} lacks exact vector provenance")
         selected[club_id] = {field: badge[field] for field in BADGE_FIELDS}
     return selected
 
@@ -71,7 +80,8 @@ def verify_hosted_assets(manifest):
     for badge in manifest['badges']:
         # Club-supplied bytes were reviewed locally and must be read back from
         # private R2 by the staging gate. They have no publicly fetchable source.
-        if badge.get('logo_source') in ('club_supplied_private', 'official_source_transparency_derivative_private'):
+        if badge.get('logo_source') in ('club_supplied_private', 'official_source_transparency_derivative_private',
+                                        'official_source_vector_raster_private'):
             continue
         club_id = badge['club_id']
         digest = hashlib.sha256()

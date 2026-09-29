@@ -127,6 +127,30 @@ class StageTest(unittest.TestCase):
             stage.fetch_reviewed({**original, 'logo_sha256': '0' * 64}, response,
                                  expected_mislabelled_type='image/jpeg')
 
+    def test_vector_derivative_requires_exact_official_source_and_pinned_png(self):
+        source = b'<svg xmlns="http://www.w3.org/2000/svg"/>'
+        badge = {**self.badge, 'club_id': 240,
+                 'logo_source': 'official_source_vector_raster_private',
+                 'original_source_url': 'https://club.example/crest.svg',
+                 'original_sha256': hashlib.sha256(source).hexdigest()}
+        class VectorResponse(Response):
+            headers = {'Content-Type': 'image/svg+xml'}
+        commands = []
+        def run(command, *, check):
+            commands.append(command)
+            if 'get' in command:
+                pathlib.Path(command[command.index('--file') + 1]).write_bytes(self.data)
+        with patch('stage_pilot_badges_r2.Path.read_bytes', return_value=self.data):
+            stage.upload_badges([badge], lambda *a, **k: VectorResponse(source), run)
+        self.assertEqual(len(commands), 2)
+        self.assertIn('put', commands[0])
+        with self.assertRaisesRegex(ValueError, 'official vector changed'):
+            stage.fetch_reviewed_vector({**badge, 'original_sha256': '0' * 64},
+                                        lambda *a, **k: VectorResponse(source))
+        with patch('stage_pilot_badges_r2.Path.read_bytes', return_value=self.data + b'wrong'):
+            with self.assertRaisesRegex(ValueError, 'raster differs'):
+                stage.upload_badges([badge], lambda *a, **k: VectorResponse(source), run)
+
 
 if __name__ == '__main__':
     unittest.main()

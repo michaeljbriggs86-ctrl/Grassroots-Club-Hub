@@ -85,7 +85,7 @@ class BadgePublisherTest(unittest.TestCase):
 
     def test_hosted_asset_must_still_match_reviewed_hash(self):
         # This response fixture covers only the first source and digest.
-        self.manifest['badges'] = [self.manifest['badges'][0]]
+        self.manifest['badges'] = [next(b for b in self.manifest['badges'] if b['club_id'] == 250)]
         class Response:
             headers = {'Content-Type': 'image/png'}
             url = self.manifest['badges'][0]['logo_url']
@@ -131,6 +131,17 @@ class BadgePublisherTest(unittest.TestCase):
             next(b for b in missing['badges'] if b['club_id'] == 250).pop(field)
             with self.subTest(field=field), self.assertRaisesRegex(ValueError, 'provenance'):
                 module.validated_approvals(copy.deepcopy(self.directory), missing)
+
+    def test_vector_raster_admission_keeps_exact_source_and_private_route(self):
+        candidate = copy.deepcopy(self.manifest)
+        badge = next(b for b in candidate['badges'] if b['club_id'] == 240)
+        self.assertIn(240, module.validated_approvals(copy.deepcopy(self.directory), candidate))
+        for changed in ({'original_sha256': ''}, {'derivation': 'redrawn'},
+                        {'logo_url': badge['original_source_url']}):
+            altered = copy.deepcopy(candidate)
+            next(b for b in altered['badges'] if b['club_id'] == 240).update(changed)
+            with self.subTest(changed=changed), self.assertRaises(ValueError):
+                module.validated_approvals(copy.deepcopy(self.directory), altered)
 
 
 if __name__ == '__main__':
