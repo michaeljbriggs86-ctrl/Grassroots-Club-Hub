@@ -1652,7 +1652,7 @@ document.addEventListener('error',event=>{
   image.src='pitchkind-wt_mark.svg';
 },true);
 function matchTeamSideHtml(sideLabel,teamName,kit){
-  return `<div class="match-team-side"><span class="match-side-label">${esc(sideLabel)}</span><span class="match-team-badge-slot">${clubIdentityBadgeHtml(teamName,kit)}</span>${clubTeamLink(teamName,'match-team-name')}<div class="match-kit-secondary">${teamKitIconHtml(teamName,kit)}<small>${esc(kitColourDisplayText(kit))}</small></div></div>`;
+  return `<div class="match-team-side"><span class="match-side-label">${esc(sideLabel)}</span><span class="match-team-badge-slot">${clubIdentityBadgeHtml(teamName,kit)}</span>${clubTeamLink(teamName,'match-team-name',false)}<div class="match-kit-secondary">${teamKitIconHtml(teamName,kit)}<small>${esc(kitColourDisplayText(kit))}</small></div></div>`;
 }
 function homeFixtureTeamNames(f={}){const own=ownTeamDisplayName(),away=String(f.venue||'').toUpperCase()==='A';return {home:away?(f.opponent||'Opponent'):own,away:away?own:(f.opponent||'Opponent')};}
 function canConfirmFixtureDetails(){return isCoach()&&(!CLOUD_MODE||!!window.ClubHubCloud?.canEdit?.());}
@@ -1786,7 +1786,7 @@ function renderNextMatch(){
 function renderMatchPageNextFixture(){
   const card=document.getElementById('matches-next-fixture');if(!card)return;const f=nextPublishedFixture(),set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
   if(!f){card.classList.add('no-fixture');set('matches-next-opponent','TBC');set('matches-next-when','Date / kick-off TBC');set('matches-next-venue','Competition TBC');set('matches-next-kits','Kit colours and away details will appear when confirmed.');clearFixtureOverview('matches-next');const cal=document.getElementById('matches-next-calendar');if(cal)cal.classList.add('hidden');const played=document.getElementById('matches-next-played');if(played)played.classList.add('hidden');const share=document.getElementById('matches-next-share');if(share)share.classList.add('hidden');document.getElementById('matches-next-copy')?.classList.add('hidden');return;}
-  const d=resolvedFixture(f),confirmed=fixtureDetailsConfirmed(f);card.classList.remove('no-fixture');document.getElementById('matches-next-opponent').innerHTML=clubListingHtml(f.opponent||'TBC');set('matches-next-when',[f.date?formatDate(f.date):'Date TBC',confirmed&&d.time?`Kick-off ${d.time}`:'Kick-off awaiting confirmation',confirmed&&d.time?`Arrival ${matchdayArrivalTime(d.time)}`:''].filter(Boolean).join(' · '));set('matches-next-venue',fixtureCompetitionLabel(f));renderFixtureOverview('matches-next',d);set('matches-next-kits','Home and away kit details shown above.');const cal=document.getElementById('matches-next-calendar');if(cal)cal.classList.toggle('hidden',!confirmed||!f.date);const played=document.getElementById('matches-next-played');if(played)played.classList.toggle('hidden',!isCoach());const share=document.getElementById('matches-next-share');if(share){share.classList.toggle('hidden',!canConfirmFixtureDetails());share.disabled=false;share.textContent=window.ClubHubNative?.shareMatchCard?'Share matchday info':'Save matchday image';share.title=confirmed?'Share matchday image':'Confirm match details first';}document.getElementById('matches-next-copy')?.classList.toggle('hidden',!confirmed||!canConfirmFixtureDetails());
+  const d=resolvedFixture(f),confirmed=fixtureDetailsConfirmed(f);card.classList.remove('no-fixture');set('matches-next-opponent',matchTeamLabel(f.opponent||'TBC'));set('matches-next-when',[f.date?formatDate(f.date):'Date TBC',confirmed&&d.time?`Kick-off ${d.time}`:'Kick-off awaiting confirmation',confirmed&&d.time?`Arrival ${matchdayArrivalTime(d.time)}`:''].filter(Boolean).join(' · '));set('matches-next-venue',fixtureCompetitionLabel(f));renderFixtureOverview('matches-next',d);set('matches-next-kits','Home and away kit details shown above.');const cal=document.getElementById('matches-next-calendar');if(cal)cal.classList.toggle('hidden',!confirmed||!f.date);const played=document.getElementById('matches-next-played');if(played)played.classList.toggle('hidden',!isCoach());const share=document.getElementById('matches-next-share');if(share){share.classList.toggle('hidden',!canConfirmFixtureDetails());share.disabled=false;share.textContent=window.ClubHubNative?.shareMatchCard?'Share matchday info':'Save matchday image';share.title=confirmed?'Share matchday image':'Confirm match details first';}document.getElementById('matches-next-copy')?.classList.toggle('hidden',!confirmed||!canConfirmFixtureDetails());
 }
 
 function divisionOpponents(){
@@ -2765,7 +2765,7 @@ function openMatchReport(matchId){
   const m=state.matches.find(x=>x.id===matchId);if(!m)return;
   __matchReportMode=true;__matchReportStep=0;__matchReportSteps=matchReportStepDefinitions();
   document.getElementById('match-detail-id').value=m.id;
-  document.getElementById('match-detail-title').innerHTML=`Match played · ${clubListingHtml(m.opponent)}`;
+  document.getElementById('match-detail-title').textContent=`Match played · ${matchTeamLabel(m.opponent)}`;
   document.getElementById('match-detail-summary').innerHTML=`<strong>${formatDate(m.date)}</strong><span>${esc(m.competition||'Match')} · ${String(m.venue||'').toUpperCase()==='H'?'Home':String(m.venue||'').toUpperCase()==='A'?'Away':'Neutral'}</span>`;
   renderMatchOverview(m);
   refreshMatchOverviewDirectory(m);
@@ -2854,7 +2854,7 @@ function setFixtureKitChoice(key,choice){
   const openId=document.getElementById('match-detail-id')?.value||'',m=(state.matches||[]).find(x=>x.id===openId);if(document.getElementById('match-detail-dialog')?.open&&m)renderMatchOverview(m);
   toast(`${choice==='away'?'Away':'Home'} shirt selected`);
 }
-function clubTeamLink(teamName='',extra=''){return `<button type="button" class="club-detail-link ${extra}" data-club-details-team="${esc(teamName)}">${clubListingHtml(teamName)}</button>`;}
+function clubTeamLink(teamName='',extra='',showBadge=true){return `<button type="button" class="club-detail-link ${extra}" data-club-details-team="${esc(teamName)}">${showBadge?clubListingHtml(teamName):esc(matchTeamLabel(teamName))}</button>`;}
 function kitWarningHtml(ctx){if(!ctx?.kitWarning||!(isCoach()||isAdmin()))return'';const review=(isAdmin()||isCoach())?`<button type="button" class="text-button compact" data-club-details-team="${esc(ctx.awayTeam)}">Review shirts</button>`:'';return `<div class="kit-clash-warning"><span>${esc(ctx.kitWarning)}</span>${review}</div>`;}
 
 function matchOverviewContext(m={}){
@@ -2946,7 +2946,7 @@ function clubDetailContext(teamName=''){
 function renderClubDetails(teamName=''){
   const ctx=clubDetailContext(teamName),dlg=document.getElementById('club-detail-dialog');if(!dlg)return;dlg.dataset.teamName=teamName;
   const title=document.getElementById('club-detail-title'),club=document.getElementById('club-detail-club-name'),kits=document.getElementById('club-detail-kits'),ground=document.getElementById('club-detail-ground'),address=document.getElementById('club-detail-address'),map=document.getElementById('club-detail-map'),admin=document.getElementById('club-kit-admin');
-  if(title)title.innerHTML=clubListingHtml(teamName||'Club details');if(club)club.innerHTML=clubListingHtml(teamName||ctx.clubName||'Club',ctx.clubName||teamName);
+  if(title)title.innerHTML=clubListingHtml(teamName||'Club details');if(club){club.textContent=matchTeamLabel(ctx.clubName||teamName);club.classList.toggle('hidden',selkentNorm(ctx.clubName||teamName)===selkentNorm(teamName));}
   if(kits)kits.innerHTML=`<article><span>Home shirt</span>${teamKitIconHtml(ctx.teamName,ctx.profile.home)}<strong>${esc(ctx.profile.home||'TBC')}</strong></article><article><span>Away shirt</span>${teamKitIconHtml(ctx.teamName,ctx.profile.away)}<strong>${esc(knownKit(ctx.profile.away)?ctx.profile.away:'Not recorded')}</strong></article>`;
   if(ground)ground.textContent=ctx.ground;if(address)address.textContent=ctx.address;
   if(map){map.classList.toggle('hidden',!ctx.mapHref);if(ctx.mapHref)map.href=ctx.mapHref;else map.removeAttribute('href');}

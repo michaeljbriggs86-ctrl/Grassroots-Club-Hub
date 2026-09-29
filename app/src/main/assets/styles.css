@@ -1637,4 +1637,5 @@ html[data-theme="dark"] .fixture-edit-button{
 .admin-fixture-main strong .club-listing,.admin-recent-result strong .club-listing,.weekend-fixture-row .club-listing{vertical-align:middle}
 .admin-fixture-main small .club-listing .club-identity-badge{width:18px;height:18px;max-width:18px;max-height:18px;flex-basis:18px}
 .club-detail-link .club-listing{color:inherit}
+.further-fixture-card:has(.further-fixture-details[open]) .further-fixture-head .club-listing .club-identity-badge{display:none}
 @media(max-width:430px){.club-listing{gap:4px}.club-listing .club-identity-badge{width:18px;height:18px;max-width:18px;max-height:18px;flex-basis:18px}}
