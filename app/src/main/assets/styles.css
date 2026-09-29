@@ -1660,3 +1660,15 @@ html[data-theme="dark"] .admin-fixture-matchup>b{color:#a7eab2}
 /* The approved 3500px badge has a 340px transparent inset on each side. */
 img.club-logo[src="/__pilot_badges/499/66bc3e506f8e5a7e3caf252b50515ad0ef9daf08e8b96ed6b57766acd10ea0a0"],
 img.club-identity-badge[src="/__pilot_badges/499/66bc3e506f8e5a7e3caf252b50515ad0ef9daf08e8b96ed6b57766acd10ea0a0"]{transform:scale(1.22);transform-origin:center}
+
+/* Give verified badges readable mobile slots without cropping the crest. */
+@media(max-width:430px){
+  .admin-fixture-matchup .club-identity-badge,
+  .club-result-score .club-result-team .club-identity-badge{
+    width:26px;height:26px;max-width:26px;max-height:26px;flex:0 0 26px
+  }
+  .club-listing .club-identity-badge{
+    width:24px;height:24px;max-width:24px;max-height:24px;flex:0 0 24px
+  }
+  .club-result-score>.club-result-team{overflow:visible}
+}
