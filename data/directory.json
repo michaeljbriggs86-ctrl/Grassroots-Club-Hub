@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-09-29T22:40:33.864996+00:00",
+  "last_updated": "2026-09-29T23:21:28.575720+00:00",
   "clubs": [
     {
       "club_id": 514,
@@ -536,7 +536,12 @@
     },
     {
       "club_id": 333,
-      "club_name": "Teviot Rangers"
+      "club_name": "Teviot Rangers",
+      "logo_url": "https://test.pitchkind.com/__pilot_badges/333/c5be33828c03a4443c9131b6a1ca6f93519a1d3f0336b336089b8d4936cc725a",
+      "logo_status": "pilot_verified",
+      "logo_source": "official_source_transparency_derivative_private",
+      "logo_updated_at": "2026-09-30",
+      "logo_sha256": "c5be33828c03a4443c9131b6a1ca6f93519a1d3f0336b336089b8d4936cc725a"
     },
     {
       "club_id": 505,
@@ -7726,5 +7731,5 @@
     }
   ],
   "note": "Panel parsing confirmed against all five format categories (mini-soccer, 9-a-side, X-category, 11-a-side, Senior) as of Sept 2026. Club/team linking is heuristic (name-prefix match) - see ambiguous_club_matches in diagnostics for anything flagged as uncertain.",
-  "pilot_badges_revision": "cc0c8bb6d43a073139f5d43d26f1fb08b9673c8d1c0463fffe9d9437b6bb358f"
+  "pilot_badges_revision": "7bbd96b1adff8f428d86f865271495830c1440280a01bcecc4612df2363eab82"
 }
