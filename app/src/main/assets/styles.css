@@ -1528,11 +1528,12 @@ html[data-theme="dark"] .further-fixture-head small{color:#b9c7be}
 .admin-health-group,.admin-age-group,.admin-dashboard-summary .admin-stat{color:#14271b}
 .admin-recent-results-panel{margin-bottom:14px}
 .admin-recent-results-list{display:grid;gap:7px}
-.admin-recent-result{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:3px 12px;padding:9px 11px;border:1px solid #dce8df;border-radius:12px;background:#fff;color:#14271b}
-.admin-recent-result>span{grid-column:1/-1;font-size:10px;font-weight:850;color:#385643}
-.admin-recent-result>strong{min-width:0;font-size:12px;line-height:1.35;overflow-wrap:anywhere}
-.admin-recent-result b{color:#075d31;white-space:nowrap}
-.admin-recent-result small{font-size:10px;font-weight:750;color:#49604e;text-align:right}
+.admin-recent-result{display:grid;grid-template-columns:minmax(0,1fr);gap:4px;padding:9px 11px;border:1px solid #dce8df;border-radius:12px;background:#fff;color:#14271b}
+.admin-recent-result>span{font-size:10px;font-weight:850;color:#385643}
+.admin-recent-team{display:flex;align-items:center;justify-content:flex-start;gap:6px;min-width:0;font-size:12px;font-weight:750;line-height:1.35}
+.admin-recent-team .club-listing{min-width:0}
+.admin-recent-team .club-listing-name{overflow-wrap:anywhere}
+.admin-recent-score{flex:none;color:#075d31;white-space:nowrap;font-weight:850}
 @media(max-width:560px){
   .admin-fixture-centre{padding:12px}
   .admin-fixture-row{grid-template-columns:74px minmax(0,1fr);gap:8px;padding:9px}
@@ -1566,9 +1567,8 @@ html[data-theme="dark"] .admin-access-filter select{background:#101713!important
 html[data-theme="dark"] .admin-team-row-stats b,
 html[data-theme="dark"] .admin-team-row-title strong,
 html[data-theme="dark"] .admin-age-group>summary strong{color:#f2f7f3!important}
-html[data-theme="dark"] .admin-recent-result>span,
-html[data-theme="dark"] .admin-recent-result small{color:#c0d0c3!important}
-html[data-theme="dark"] .admin-recent-result b{color:#a7eab2!important}
+html[data-theme="dark"] .admin-recent-result>span{color:#c0d0c3!important}
+html[data-theme="dark"] .admin-recent-score{color:#a7eab2!important}
 
 /* Club Admin browse and communications: short forms remain readable on phones. */
 .admin-home-age-label{display:grid;gap:6px;margin:8px 0 12px;max-width:420px}

@@ -3505,12 +3505,11 @@ function clubResultTeamBadgeHtml(teamName=''){
   return `<img class="club-identity-badge ${kind}" src="${esc(url)}" alt="" aria-hidden="true" loading="lazy" decoding="async" />`;
 }
 function renderAdminRecentResults(rows=[],feedAvailable=true){
-  const box=document.getElementById('admin-recent-results'),count=document.getElementById('admin-results-count'),breakdown=document.getElementById('admin-results-breakdown'),status=document.getElementById('admin-results-source-status');
+  const box=document.getElementById('admin-recent-results'),count=document.getElementById('admin-results-count'),status=document.getElementById('admin-results-source-status');
   if(count)count.textContent=String(rows.length);
-  if(breakdown)breakdown.textContent=`${rows.filter(r=>r.source==='selkent-static').length} Selkent published · ${rows.filter(r=>r.source==='internal').length} team recorded`;
-  if(status)status.textContent=feedAvailable?'':'Selkent feed unavailable · showing team-recorded matches only';
+  if(status)status.textContent=feedAvailable?'':'Some published results are temporarily unavailable.';
   if(!box)return;
-  box.innerHTML=rows.slice(0,3).map(r=>`<div class="admin-recent-result"><span>U${esc(r.ageGroup)} · ${formatDate(r.date)||esc(r.date)}</span><strong>${clubListingHtml(r.home)} <b>${r.hg}–${r.ag}</b> ${clubListingHtml(r.away)}</strong><small>${r.source==='selkent-static'?'Selkent published':'Team recorded'}</small></div>`).join('')||'<div class="empty-state compact-empty">No club results recorded yet.</div>';
+  box.innerHTML=rows.slice(0,3).map(r=>`<div class="admin-recent-result"><span>U${esc(r.ageGroup)} · ${formatDate(r.date)||esc(r.date)}</span><div class="admin-recent-team">${clubListingHtml(r.home)} <b class="admin-recent-score">${esc(r.hg)}</b></div><div class="admin-recent-team">${clubListingHtml(r.away)} <b class="admin-recent-score">${esc(r.ag)}</b></div></div>`).join('')||'<div class="empty-state compact-empty">No club results recorded yet.</div>';
 }
 function nextWeekendDates(){
   const now=new Date();now.setHours(0,0,0,0);const day=now.getDay();

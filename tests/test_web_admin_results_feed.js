@@ -58,10 +58,12 @@ assert.equal(clubResultRows(overview,teams,null,true).length,2,'club records rem
 assert.equal(verifiedClubResultsFeed({...feed,coverage:{published_results:{parser_status:'awaiting_verified_nonempty_result_sample'}}}),null);
 renderAdminRecentResults(rows,true);
 assert.equal(elements.get('admin-results-count').textContent,'3');
-assert.equal(elements.get('admin-results-breakdown').textContent,'2 Selkent published · 1 team recorded');
+assert.doesNotMatch(html,/admin-results-breakdown|Selkent published|team recorded/);
 assert.match(html,/Completed matches<\/span><strong id="admin-results-count"/);
-assert.match(elements.get('admin-recent-results').innerHTML,/Selkent published/);
-assert.match(elements.get('admin-recent-results').innerHTML,/Team recorded/);
+const recentHtml=elements.get('admin-recent-results').innerHTML;
+assert.doesNotMatch(recentHtml,/Selkent published|Team recorded|4–1/);
+assert.match(recentHtml,/<div class="admin-recent-team"><span class="club-listing">Shooters Hill AFC Valiants<\/span> <b class="admin-recent-score">4<\/b><\/div>/);
+assert.match(recentHtml,/<div class="admin-recent-team"><span class="club-listing">Junior Reds Sabres<\/span> <b class="admin-recent-score">1<\/b><\/div>/);
 assert.ok(html.includes('id="admin-recent-results"')&&html.includes('id="club-results-list"'));
 const list={innerHTML:''},ageSelect={value:'',innerHTML:''},competitionSelect={value:'league'},page={textContent:''},previous={},next={};
 const browserElements={'club-results-list':list,'club-results-age':ageSelect,'club-results-competition':competitionSelect,'club-results-page':page,'club-results-prev':previous,'club-results-next':next};
