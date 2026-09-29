@@ -86,7 +86,7 @@ def upload_badges(badges, get, run):
         for badge in badges:
             key = f"{int(badge['club_id'])}/{badge['logo_sha256'].lower()}"
             readback = root / 'r2-readback'
-            if badge.get('logo_source') == 'club_supplied_private':
+            if badge.get('logo_source') in ('club_supplied_private', 'official_source_snapshot_private'):
                 # Secretary-supplied artwork has no public source. It was staged
                 # privately, and CI admits only its exact reviewed bytes.
                 run([*WRANGLER, 'r2', 'object', 'get', f'{BUCKET}/{key}',

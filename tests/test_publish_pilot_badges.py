@@ -143,6 +143,19 @@ class BadgePublisherTest(unittest.TestCase):
             with self.subTest(changed=changed), self.assertRaises(ValueError):
                 module.validated_approvals(copy.deepcopy(self.directory), altered)
 
+    def test_official_snapshot_keeps_pinned_origin_and_private_route(self):
+        candidate = copy.deepcopy(self.manifest)
+        badge = next(b for b in candidate['badges'] if b['club_id'] == 520)
+        self.assertIn(520, module.validated_approvals(copy.deepcopy(self.directory), candidate))
+        with patch('requests.get', side_effect=AssertionError('mutable CDN fetched')):
+            module.verify_hosted_assets({'badges': [badge]})
+        for changed in ({'original_sha256': 'a' * 64}, {'original_source_url': 'http://example.com/logo.png'},
+                        {'logo_url': badge['original_source_url']}):
+            altered = copy.deepcopy(candidate)
+            next(b for b in altered['badges'] if b['club_id'] == 520).update(changed)
+            with self.subTest(changed=changed), self.assertRaises(ValueError):
+                module.validated_approvals(copy.deepcopy(self.directory), altered)
+
 
 if __name__ == '__main__':
     unittest.main()

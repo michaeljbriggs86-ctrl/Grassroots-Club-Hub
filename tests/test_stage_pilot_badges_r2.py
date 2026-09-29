@@ -82,6 +82,17 @@ class StageTest(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'differ from reviewed PNG'):
             stage.upload_badges([badge], lambda *a, **k: self.fail('private fetch'), wrong)
 
+    def test_official_snapshot_reads_exact_approved_r2_png_without_mutable_cdn(self):
+        badge = {**self.badge, 'club_id': 520, 'logo_source': 'official_source_snapshot_private'}
+        commands = []
+        def run(command, *, check):
+            commands.append(command)
+            pathlib.Path(command[command.index('--file') + 1]).write_bytes(self.data)
+        stage.upload_badges([badge], lambda *a, **k: self.fail('mutable CDN fetched'), run)
+        self.assertEqual(len(commands), 1)
+        self.assertIn('get', commands[0])
+        self.assertNotIn('put', commands[0])
+
     def test_private_derivative_fetches_original_and_uploads_exact_reviewed_png(self):
         source = b'\x89PNG\r\n\x1a\noriginal official bytes'
         badge = {**self.badge, 'logo_source': 'official_source_transparency_derivative_private',

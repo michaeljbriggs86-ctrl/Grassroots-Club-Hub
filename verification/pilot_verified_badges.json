@@ -196,13 +196,15 @@
     {
       "club_id": 520,
       "club_name": "Northumberland Heath",
-      "logo_url": "https://images.squarespace-cdn.com/content/v1/6683d403971c5f276cc66fe9/aae30bbf-1f18-4db6-827b-23b645fa19c4/JGSFC-2.png",
+      "logo_url": "https://test.pitchkind.com/__pilot_badges/520/aeb33084d22f2d105122062884036177ba5727cce7e1dd30d95a2af07ce4db1a",
       "logo_status": "pilot_verified",
-      "logo_source": "official_site_image",
+      "logo_source": "official_source_snapshot_private",
       "logo_updated_at": "2026-09-29",
       "logo_sha256": "aeb33084d22f2d105122062884036177ba5727cce7e1dd30d95a2af07ce4db1a",
       "rights_status": "protected_pilot_only_public_rights_not_reviewed",
-      "review_basis": "Mike approved the visible artwork in the upload inbox. Selkent club 520 links Northumberland Heath FC. Its current club site describes the spiked identity visible in this crest. Exact 2500x2500 PNG was re-fetched on 2026-09-29; its decoded pixels match the older WebP candidate. Transparent exterior and 48/128 px appearance were reviewed; small red lettering has lower contrast on green, so final protected-page acceptance remains open along with public rights."
+      "review_basis": "Mike approved the visible artwork in the upload inbox. Selkent club 520 links Northumberland Heath FC. Its current club site describes the spiked identity visible in this crest. Exact 2500x2500 PNG was re-fetched on 2026-09-29; its decoded pixels match the older WebP candidate. Transparent exterior and 48/128 px appearance were reviewed; small red lettering has lower contrast on green, so final protected-page acceptance remains open along with public rights. The official CDN intermittently returns different bytes to CI; the exact previously staged PNG is checked from private R2 instead. The current official URL was rechecked on 2026-09-29 and returned the same reviewed PNG bytes and pixels.",
+      "original_source_url": "https://images.squarespace-cdn.com/content/v1/6683d403971c5f276cc66fe9/aae30bbf-1f18-4db6-827b-23b645fa19c4/JGSFC-2.png",
+      "original_sha256": "aeb33084d22f2d105122062884036177ba5727cce7e1dd30d95a2af07ce4db1a"
     },
     {
       "club_id": 547,
