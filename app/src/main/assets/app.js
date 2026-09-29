@@ -1834,6 +1834,43 @@ function renderParentFamilyControls(){
  const note=document.getElementById('parent-family-team-note');if(note)note.textContent=teams.length>1?`${teams.length} linked teams available on this account.`:'This account currently has one linked team.';
  const btn=document.getElementById('parent-family-team-switch');if(btn)btn.disabled=!select?.value||String(select.value)===String(current?.id||'');
 }
+let __parentFamilyKey='',__parentFamilyLinks=[],__parentFamilyStatus='loading',__parentFamilyLoadedAt=0,__parentFamilyVersion=0;
+function renderParentFamilySummary(){
+  const home=document.getElementById('parent-home-family');
+  const isParent=CLOUD_MODE&&currentRole==='parent';
+  home?.classList.toggle('hidden',!isParent);
+  if(!isParent)return;
+  const team=window.ClubHubCloud?.currentTeam?.(),label=matchTeamLabel([team?.ageGroup,team?.teamName].filter(Boolean).join(' '));
+  const rows=__parentFamilyLinks.map(link=>{
+    const name=String(link.player_name||'').trim();
+    return `<div class="parent-child-row"><span class="parent-child-initial" aria-hidden="true">${esc(name.charAt(0).toUpperCase())}</span><div><strong>${esc(name)}</strong><small>${esc(label)}${link.shirt_number?' · #'+esc(link.shirt_number):''}</small></div></div>`;
+  }).join('');
+  const message=__parentFamilyStatus==='loading'?'Checking approved child links…':__parentFamilyStatus==='error'?'Child links could not be loaded. Refresh to try again.':'No child is linked to this team yet. Ask the coach to check your approved player link, or request another child or team.';
+  const list=document.getElementById('parent-home-family-list'),accountList=document.getElementById('parent-family-linked-list');
+  if(list){
+    const fixture=rows&&nextPublishedFixture();
+    list.innerHTML=rows+(rows&&fixture?`<div class="parent-family-match"><span>Next match · ${esc(formatDate(fixture.date)||'Date to be confirmed')}</span><button type="button" class="text-button compact" id="parent-home-match">Match details & availability</button></div>`:rows?'<p class="parent-family-message">No next match scheduled for this team.</p>':`<p class="parent-family-message">${esc(message)}</p>`);
+  }
+  if(accountList)accountList.innerHTML=rows||`<p class="parent-family-message">${esc(message)}</p>`;
+}
+async function refreshParentFamilySummary(force=false){
+  if(!CLOUD_MODE||currentRole!=='parent'||!window.ClubHubCloud?.listParentPlayerLinks)return;
+  const uid=String(window.ClubHubCloud.session?.user?.id||''),teamId=String(window.ClubHubCloud.currentTeam?.()?.id||''),key=uid+':'+teamId;
+  if(!uid||!teamId)return;
+  if(!force&&key===__parentFamilyKey&&(__parentFamilyStatus==='loading'||(__parentFamilyStatus==='ready'&&Date.now()-__parentFamilyLoadedAt<30000)))return;
+  const version=++__parentFamilyVersion;
+  __parentFamilyKey=key;__parentFamilyLinks=[];__parentFamilyStatus='loading';renderParentFamilySummary();
+  try{
+    const links=await window.ClubHubCloud.listParentPlayerLinks(uid);
+    if(version!==__parentFamilyVersion||currentRole!=='parent'||key!==String(window.ClubHubCloud.session?.user?.id||'')+':'+String(window.ClubHubCloud.currentTeam?.()?.id||''))return;
+    __parentFamilyLinks=(Array.isArray(links)?links:[]).filter(link=>String(link.parent_user_id)===uid&&(!link.team_id||String(link.team_id)===teamId)&&String(link.player_name||'').trim());
+    __parentFamilyStatus='ready';__parentFamilyLoadedAt=Date.now();
+  }catch{
+    if(version!==__parentFamilyVersion)return;
+    __parentFamilyStatus='error';
+  }
+  renderParentFamilySummary();
+}
 async function switchParentFamilyTeam(requestedTeamId){
  if(currentRole!=='parent'||!CLOUD_MODE)return;
  const teamId=typeof requestedTeamId==='string'?requestedTeamId:document.getElementById('parent-family-team-select')?.value||'',current=window.ClubHubCloud?.currentTeam?.();if(!teamId||String(teamId)===String(current?.id||''))return false;
@@ -1913,6 +1950,8 @@ function applyAccessMode(){
   }
   const badge=document.getElementById('account-role-badge');if(badge)badge.textContent=isAdminCoachMode()?'Coach':roleLabel();
   renderParentFamilyControls();
+  renderParentFamilySummary();
+  refreshParentFamilySummary();
   const readOnly=document.getElementById('read-only-card');
   if(readOnly){
     readOnly.classList.toggle('hidden',!readonly);
@@ -2421,7 +2460,7 @@ function renderTeamIdentity(){
   document.getElementById('hero-team-name').textContent=matchTeamLabel(adminClub?adminHero:(meta.teamName||'Team').toUpperCase());
   document.getElementById('hero-season-line').textContent=adminClub?[`${window.ClubHubCloud?.visibleTeamList?.().length||clubTeams().length} active teams`,meta.season].filter(Boolean).join(' · '):[meta.ageGroup,state.division.name,meta.season].filter(Boolean).join(' · ');
   document.getElementById('dashboard-season-kicker').textContent=(meta.season||'Season')+' season';
-  const homeTitle=document.getElementById('home-screen-title');if(homeTitle)homeTitle.textContent='Dashboard';
+  const homeTitle=document.getElementById('home-screen-title');if(homeTitle)homeTitle.textContent=currentRole==='parent'?'Family home':'Dashboard';
   document.getElementById('squad-team-name').textContent=matchTeamLabel(meta.teamName||'Team');
   document.getElementById('matches-division-kicker').textContent=state.division.name||'League';
   document.getElementById('league-summary-name').textContent=state.division.name||'League';
@@ -4621,6 +4660,9 @@ document.getElementById('parent-request-review-form')?.addEventListener('submit'
 document.getElementById('parent-family-team-select')?.addEventListener('change',renderParentFamilyControls);
 document.getElementById('parent-family-team-switch')?.addEventListener('click',switchParentFamilyTeam);
 document.getElementById('parent-family-add-child')?.addEventListener('click',openParentAddChildDialog);
+document.getElementById('parent-home-add-child')?.addEventListener('click',openParentAddChildDialog);
+document.getElementById('parent-home-refresh')?.addEventListener('click',()=>refreshParentFamilySummary(true));
+document.getElementById('parent-home-family-list')?.addEventListener('click',e=>{if(e.target.closest('#parent-home-match'))document.getElementById('next-match-card')?.click();});
 document.getElementById('parent-add-child-form')?.addEventListener('submit',submitParentAddChild);
 document.getElementById('remove-player')?.addEventListener('click',removePlayerFromSquad);
 document.getElementById('match-detail-form').addEventListener('submit',saveMatchDetails);

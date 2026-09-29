@@ -83,6 +83,15 @@
           <div class="club-notices-list" id="home-club-notices-list"></div>
         </section>
 
+        <section class="panel parent-home-family hidden" id="parent-home-family" aria-labelledby="parent-home-family-title">
+          <div class="panel-heading"><div><p class="kicker">Your family</p><h3 id="parent-home-family-title">Linked children</h3></div></div>
+          <div id="parent-home-family-list" aria-live="polite">Loading approved links…</div>
+          <div class="parent-home-family-actions">
+            <button type="button" class="secondary-button compact" id="parent-home-add-child">Add child or team</button>
+            <button type="button" class="text-button compact" id="parent-home-refresh">Refresh links</button>
+          </div>
+        </section>
+
         <section class="home-next-match" id="home-next-match">
           <p class="kicker">Next match</p>
           <button type="button" class="panel next-match-card next-match-summary-card" id="next-match-card" aria-haspopup="dialog" aria-controls="next-fixture-dialog">
@@ -671,6 +680,7 @@
               <p class="muted" id="access-summary">Account access details.</p>
              <div class="parent-family-account hidden" id="parent-family-account">
                <div class="panel-heading"><div><h3>Children & teams</h3><p class="muted" id="parent-family-team-note">Linked team access.</p></div></div>
+               <div class="parent-family-linked-list" id="parent-family-linked-list" aria-live="polite">Loading approved links…</div>
                <label>Current team<select id="parent-family-team-select"></select></label>
                <div class="parent-family-actions"><button type="button" class="secondary-button" id="parent-family-team-switch">Switch team</button><button type="button" class="primary-button" id="parent-family-add-child">Add child or team</button></div>
              </div>
@@ -724,7 +734,7 @@
   <dialog id="context-switch-dialog" class="modal club-list-modal" aria-labelledby="context-switch-title">
     <div class="club-list-modal-shell context-switch-shell">
       <div class="modal-heading"><h3 id="context-switch-title">Switch team or profile</h3><button type="button" class="icon-button small" data-close-dialog aria-label="Close">×</button></div>
-      <p class="muted">Choose an access already linked to this account.</p>
+      <p class="muted">Choose a linked team or profile, or sign in with a different approved account.</p>
       <div id="context-switch-list" class="context-switch-list"></div>
     </div>
   </dialog>
