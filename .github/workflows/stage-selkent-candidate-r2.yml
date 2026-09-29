@@ -81,10 +81,11 @@ jobs:
               "$RUNNER_TEMP/selkent-shadow-latest.json" data/results.json \
               "$RUNNER_TEMP/selkent-candidate.json" "$RUNNER_TEMP/selkent-previous.json"
           else
-            test ! -e "$RUNNER_TEMP/selkent-previous.json"
+            test ! -s "$RUNNER_TEMP/selkent-previous.json"
             if ! grep -Eiq '404|not found|does not exist' \
                 "$RUNNER_TEMP/selkent-read-error.txt"; then
               echo 'R2 read failed for a reason other than a missing feed key' >&2
+              sed -n '1,12p' "$RUNNER_TEMP/selkent-read-error.txt" >&2
               exit 1
             fi
             echo "No current private publication; first verified write follows"
