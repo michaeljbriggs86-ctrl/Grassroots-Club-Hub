@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "provider": "Selkent",
-  "last_updated": "2026-09-29T00:05:23.098306+00:00",
+  "last_updated": "2026-09-29T06:05:54.840285+00:00",
   "fixture_agegroup_discovery_source": "selkent_divisions_all",
   "coverage": {
     "fixtures": {
@@ -2640,20 +2640,20 @@
           "date": "2026-10-04",
           "division_name": "U12 London Cup",
           "home": "Welling United black",
-          "away": "Slade Green Knights Whites",
+          "away": "Redbridge Utd Blue (Non-Selkent)",
           "provider_team_ids": [
             "894",
-            "99"
+            "2251"
           ]
         },
         {
           "date": "2026-10-04",
           "division_name": "U12 London Cup",
           "home": "Welling United Navy",
-          "away": "Redbridge Utd Blue (Non-Selkent)",
+          "away": "Slade Green Knights Whites",
           "provider_team_ids": [
             "953",
-            "2251"
+            "99"
           ]
         },
         {
@@ -13795,21 +13795,21 @@
         {
           "date": "2026-10-04",
           "division_name": "Under 10X D Silver",
-          "home": "Junior Reds Spartans",
-          "away": "Dulwich Hamlet JFC Navy",
+          "home": "Foots Cray Lions Red",
+          "away": "Welling United Green X",
           "provider_team_ids": [
-            "140",
-            "675"
+            "165",
+            "880"
           ]
         },
         {
           "date": "2026-10-04",
           "division_name": "Under 10X D Silver",
-          "home": "Welling United Green X",
-          "away": "Foots Cray Lions Red",
+          "home": "Junior Reds Spartans",
+          "away": "Dulwich Hamlet JFC Navy",
           "provider_team_ids": [
-            "880",
-            "165"
+            "140",
+            "675"
           ]
         }
       ],
