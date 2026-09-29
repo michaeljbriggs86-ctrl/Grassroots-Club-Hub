@@ -106,6 +106,27 @@ class StageTest(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, 'transparency bytes differ'):
                 stage.upload_badges([badge], get, run)
 
+    def test_pinned_pitchero_png_with_jpeg_header(self):
+        source = b'\x89PNG\r\n\x1a\nexact approved original'
+        badge = {**self.badge, 'club_id': 271,
+                 'logo_source': 'official_source_transparency_derivative_private',
+                 'original_source_url': 'https://images.pitchero.com/original.png',
+                 'original_sha256': hashlib.sha256(source).hexdigest()}
+        class Mislabelled(Response):
+            headers = {'Content-Type': 'image/jpeg'}
+        response = lambda *a, **k: Mislabelled(source)
+        original = {**badge, 'logo_url': badge['original_source_url'],
+                    'logo_sha256': badge['original_sha256']}
+        with self.assertRaisesRegex(ValueError, 'inconsistent image MIME'):
+            stage.fetch_reviewed(original, response)
+        with patch('pilot_badge_transparency.transparent_png', return_value=self.data):
+            stage.upload_badges([badge], response, lambda command, **k:
+                pathlib.Path(command[command.index('--file') + 1]).write_bytes(self.data)
+                if 'get' in command else None)
+        with self.assertRaisesRegex(ValueError, 'changed since review'):
+            stage.fetch_reviewed({**original, 'logo_sha256': '0' * 64}, response,
+                                 expected_mislabelled_type='image/jpeg')
+
 
 if __name__ == '__main__':
     unittest.main()

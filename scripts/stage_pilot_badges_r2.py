@@ -32,7 +32,7 @@ def media_type(data):
     raise ValueError('unsupported badge image format')
 
 
-def fetch_reviewed(badge, get):
+def fetch_reviewed(badge, get, *, expected_mislabelled_type=None):
     club_id = badge['club_id']
     with get(badge['logo_url'], stream=True, timeout=20,
              headers={'User-Agent': 'PitchKindBadgeQA/1.0', 'Accept': 'image/*'}) as response:
@@ -48,7 +48,8 @@ def fetch_reviewed(badge, get):
         if not data or hashlib.sha256(data).hexdigest() != badge['logo_sha256'].lower():
             raise ValueError(f'badge {club_id} hosted bytes changed since review')
         kind = media_type(data)
-        if response.headers.get('Content-Type', '').split(';')[0].strip().lower() != kind:
+        declared = response.headers.get('Content-Type', '').split(';')[0].strip().lower()
+        if declared != kind and declared != expected_mislabelled_type:
             raise ValueError(f'badge {club_id} has inconsistent image MIME type')
         return bytes(data), kind
 
@@ -86,7 +87,11 @@ def upload_badges(badges, get, run):
                 from pilot_badge_transparency import transparent_png
                 original = {**badge, 'logo_url': badge['original_source_url'],
                             'logo_sha256': badge['original_sha256']}
-                source, _ = fetch_reviewed(original, get)
+                # Pitchero serves club 271's pinned PNG bytes as image/jpeg.
+                # The exact source hash and file signature are still required.
+                mislabelled = 'image/jpeg' if badge['club_id'] == 271 else None
+                source, _ = fetch_reviewed(original, get,
+                                           expected_mislabelled_type=mislabelled)
                 data = transparent_png(source)
                 if hashlib.sha256(data).hexdigest() != badge['logo_sha256'].lower():
                     raise ValueError(f"badge {badge['club_id']} transparency bytes differ from reviewed PNG")
