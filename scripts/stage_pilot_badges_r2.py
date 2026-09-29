@@ -99,10 +99,12 @@ def upload_badges(badges, get, run):
                 readback.unlink()
                 print(f"Checked private R2 badge club_id={badge['club_id']} sha256={badge['logo_sha256']}")
                 continue
-            if badge.get('logo_source') == 'official_source_transparency_derivative_private':
+            if badge.get('logo_source') in ('official_source_transparency_derivative_private',
+                                            'official_source_trim_derivative_private'):
                 # Fetch the exact official original, repeat the reviewed outer
                 # background edit on Linux, and require the exact approved PNG.
-                from pilot_badge_transparency import transparent_blue_exterior_png, transparent_png
+                from pilot_badge_transparency import (transparent_blue_exterior_png,
+                                                      transparent_png, trim_transparent_padding_png)
                 original = {**badge, 'logo_url': badge['original_source_url'],
                             'logo_sha256': badge['original_sha256']}
                 # Pitchero serves club 271's pinned PNG bytes as image/jpeg.
@@ -110,11 +112,16 @@ def upload_badges(badges, get, run):
                 mislabelled = 'image/jpeg' if badge['club_id'] == 271 else None
                 source, _ = fetch_reviewed(original, get,
                                            expected_mislabelled_type=mislabelled)
-                data = (transparent_blue_exterior_png(source)
-                        if badge.get('derivation') == 'outer_blue_background_transparency_only'
-                        else transparent_png(source))
+                if badge.get('derivation') == 'transparent_padding_trim_2pct':
+                    data = trim_transparent_padding_png(source)
+                elif badge.get('derivation') == 'outer_blue_background_transparency_only':
+                    data = transparent_blue_exterior_png(source)
+                else:
+                    data = transparent_png(source)
                 if hashlib.sha256(data).hexdigest() != badge['logo_sha256'].lower():
-                    raise ValueError(f"badge {badge['club_id']} transparency bytes differ from reviewed PNG")
+                    kind_of_edit = ('trimmed' if badge.get('derivation') == 'transparent_padding_trim_2pct'
+                                    else 'transparency')
+                    raise ValueError(f"badge {badge['club_id']} {kind_of_edit} bytes differ from reviewed PNG")
                 kind = 'image/png'
             elif badge.get('logo_source') == 'official_source_vector_raster_private':
                 fetch_reviewed_vector(badge, get)

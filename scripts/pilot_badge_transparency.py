@@ -66,3 +66,28 @@ def transparent_blue_exterior_png(original_bytes):
     out = io.BytesIO()
     Image.fromarray(arr, 'RGBA').save(out, format='PNG', optimize=True)
     return out.getvalue()
+
+
+def trim_transparent_padding_png(original_bytes):
+    """Remove empty transparent canvas, leaving a small clear crest margin."""
+    original = Image.open(io.BytesIO(original_bytes)).convert('RGBA')
+    if min(original.size) < 512:
+        raise ValueError('original badge is below the reviewed resolution gate')
+    alpha = original.getchannel('A')
+    bounds = alpha.getbbox()
+    if not bounds:
+        raise ValueError('badge has no visible artwork')
+    left, top, right, bottom = bounds
+    if min(right - left, bottom - top) < 512:
+        raise ValueError('visible badge is below the reviewed resolution gate')
+    margin = round(max(right - left, bottom - top) * .02)
+    side = max(right - left, bottom - top) + margin * 2
+    center_x = (left + right) // 2
+    center_y = (top + bottom) // 2
+    box = (center_x - side // 2, center_y - side // 2,
+           center_x - side // 2 + side, center_y - side // 2 + side)
+    if box[0] < 0 or box[1] < 0 or box[2] > original.width or box[3] > original.height:
+        raise ValueError('crest margin exceeds original canvas')
+    out = io.BytesIO()
+    original.crop(box).save(out, format='PNG', optimize=True)
+    return out.getvalue()

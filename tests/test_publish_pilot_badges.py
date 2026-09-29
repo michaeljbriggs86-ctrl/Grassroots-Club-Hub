@@ -132,6 +132,19 @@ class BadgePublisherTest(unittest.TestCase):
             with self.subTest(field=field), self.assertRaisesRegex(ValueError, 'provenance'):
                 module.validated_approvals(copy.deepcopy(self.directory), missing)
 
+    def test_trimmed_punjab_private_badge_keeps_exact_source_and_method(self):
+        badge = next(b for b in self.manifest['badges'] if b['club_id'] == 473)
+        self.assertIn(473, module.validated_approvals(copy.deepcopy(self.directory),
+                                                     copy.deepcopy(self.manifest)))
+        with patch('requests.get', side_effect=AssertionError('private derivative fetched')):
+            module.verify_hosted_assets({'badges': [badge]})
+        for changed in ({'original_sha256': ''}, {'derivation': 'redrawn'},
+                        {'logo_url': badge['original_source_url']}):
+            altered = copy.deepcopy(self.manifest)
+            next(b for b in altered['badges'] if b['club_id'] == 473).update(changed)
+            with self.subTest(changed=changed), self.assertRaises(ValueError):
+                module.validated_approvals(copy.deepcopy(self.directory), altered)
+
     def test_vector_raster_admission_keeps_exact_source_and_private_route(self):
         candidate = copy.deepcopy(self.manifest)
         badge = next(b for b in candidate['badges'] if b['club_id'] == 240)

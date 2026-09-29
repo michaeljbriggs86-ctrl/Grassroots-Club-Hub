@@ -186,6 +186,20 @@
       "review_basis": "Mike approved the visible artwork in the upload inbox. Selkent club 466 and the Total Football Club site identify the same club. The club header displays this crest; exact 576x600 PNG was re-fetched on 2026-09-29. Transparent exterior and 48/128 px appearance were reviewed; final protected-page acceptance and public rights remain open."
     },
     {
+      "club_id": 473,
+      "club_name": "Punjab United",
+      "logo_url": "https://test.pitchkind.com/__pilot_badges/473/27e1b1c1ec7d41d3827497971fa26e2fef851d5f430eb93d85f1b5c47c00b22b",
+      "logo_status": "pilot_verified",
+      "logo_source": "official_source_trim_derivative_private",
+      "logo_updated_at": "2026-09-30",
+      "logo_sha256": "27e1b1c1ec7d41d3827497971fa26e2fef851d5f430eb93d85f1b5c47c00b22b",
+      "original_source_url": "https://static.wixstatic.com/media/a7e4fc_00376add8de74fc78d3ab351b81c258e~mv2.png",
+      "original_sha256": "b53c9b3a51ce81cf8e84733a1e4ff39d8f8a8e89ec197a96104c0f70eeeeba19",
+      "derivation": "transparent_padding_trim_2pct",
+      "rights_status": "protected_pilot_only_public_rights_not_reviewed",
+      "review_basis": "Mike approved visible club badge artwork in the upload inbox. Selkent club 473 links the current Punjab United site, which presents this exact 1217x1217 PNG crest on its homepage and has current youth teams. Only transparent outer canvas was trimmed with a 2% clear margin to fill phone card slots; all visible crest pixels, lettering and colours remain intact. The exact original and 809x809 derivative hashes were reviewed on light and dark green at 128, 48 and 20 px. Protected-page acceptance and public rights review remain open."
+    },
+    {
       "club_id": 487,
       "club_name": "Castle Hill United FC",
       "logo_url": "https://images.squarespace-cdn.com/content/v1/667f1b87001a2109b1ecdb04/9e2756a2-7872-465b-b3c7-2798aa78715b/Castle+Hill+United+FC+Badge.png",

@@ -48,6 +48,7 @@ def validated_approvals(directory, manifest):
         if not all(badge.get(field) for field in BADGE_FIELDS):
             raise ValueError(f"badge {club_id} is missing provenance metadata")
         if badge.get('logo_source') in ('club_supplied_private', 'official_source_transparency_derivative_private',
+                                        'official_source_trim_derivative_private',
                                         'official_source_vector_raster_private', 'official_source_snapshot_private'):
             if badge['logo_source'] == 'club_supplied_private' and club_id != 499:
                 raise ValueError(f"badge {club_id} is outside the private club-supplied pilot")
@@ -63,6 +64,14 @@ def validated_approvals(directory, manifest):
                         badge.get('derivation') not in ('outer_background_transparency_only',
                                                         'outer_blue_background_transparency_only')):
                     raise ValueError(f"badge {club_id} lacks exact original and derivation provenance")
+            if badge['logo_source'] == 'official_source_trim_derivative_private':
+                original = urlsplit(str(badge.get('original_source_url') or ''))
+                if (original.scheme != 'https' or not original.hostname or original.username or
+                        original.password or original.fragment or not re.fullmatch(
+                            r'[a-f0-9]{64}', str(badge.get('original_sha256') or ''), re.I) or
+                        badge['original_sha256'].lower() == badge['logo_sha256'].lower() or
+                        badge.get('derivation') != 'transparent_padding_trim_2pct'):
+                    raise ValueError(f"badge {club_id} lacks exact original and trim provenance")
             if badge['logo_source'] == 'official_source_vector_raster_private':
                 original = urlsplit(str(badge.get('original_source_url') or ''))
                 if (original.scheme != 'https' or not original.hostname or original.username or
@@ -88,6 +97,7 @@ def verify_hosted_assets(manifest):
         # Club-supplied bytes were reviewed locally and must be read back from
         # private R2 by the staging gate. They have no publicly fetchable source.
         if badge.get('logo_source') in ('club_supplied_private', 'official_source_transparency_derivative_private',
+                                        'official_source_trim_derivative_private',
                                         'official_source_vector_raster_private', 'official_source_snapshot_private'):
             continue
         club_id = badge['club_id']
