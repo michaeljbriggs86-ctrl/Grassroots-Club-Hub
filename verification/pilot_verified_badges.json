@@ -164,6 +164,17 @@
       "review_basis": "Mike approved the visible artwork in the upload inbox. Selkent club ID 427 links BOSCO; its football academy page links to the Bosco FC kit shop, which displays this same crest. Exact public PNG from the club kit shop image store is 900x899, 63527 bytes, SHA-256 pinned here. The transparent exterior, circular black edge, white interior, club lettering and distinct silhouette were inspected. Protected-page acceptance and public rights review remain open."
     },
     {
+      "club_id": 444,
+      "club_name": "Greenwich Peninsula",
+      "logo_url": "https://greenwichpeninsulafc.com/wp-content/uploads/2024/09/Logo.png",
+      "logo_status": "pilot_verified",
+      "logo_source": "official_site_image",
+      "logo_updated_at": "2026-09-30",
+      "logo_sha256": "8f0de7d24a78830efba1003140b517a7d037735a2b948e668f7680b2322ac8fa",
+      "rights_status": "protected_pilot_only_public_rights_not_reviewed",
+      "review_basis": "Mike approved upload-inbox artwork. Selkent club 444 links Greenwich Peninsula FC, and the current official youth site uses this exact crest on its homepage. The 677x677 RGBA PNG exact bytes match the earlier private review packet and two fresh source fetches on 2026-09-30. Transparent exterior and full circular outline were checked at 128, 48 and 20 px on green and dark cards. Protected-page visual acceptance and public rights review remain open."
+    },
+    {
       "club_id": 447,
       "club_name": "Samuel Montagu",
       "logo_url": "https://smyc.co.uk/wp-content/uploads/2023/12/SMFC-Logo-3-1-e1705423065112.png",
