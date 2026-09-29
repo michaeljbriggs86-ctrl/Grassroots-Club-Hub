@@ -173,9 +173,9 @@ label{line-height:1.35}
 .match-opponent,.mini-team,.rank-name,.team-member-copy strong,.club-result-score span,.panel p,.helper,.muted{overflow-wrap:anywhere}
 .team-member-copy strong{white-space:normal}
 
-/* Tables may scroll explicitly rather than compress columns to unreadability. */
-.league-table,.table-wrap,.division-table,.responsive-table{display:block;max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
-.league-table table,.table-wrap table,.division-table table,.responsive-table table{min-width:620px}
+/* League tables already scroll in .league-table-scroll; keep their table layout. */
+.table-wrap,.division-table,.responsive-table{display:block;max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.table-wrap table,.division-table table,.responsive-table table{min-width:620px}
 
 /* Navigation remains readable; do not shrink to fit excessive destinations. */
 .bottom-nav{
