@@ -8,7 +8,7 @@ const body = src.slice(src.indexOf('function adminFixtureHasResult(st,team,fixtu
 const norm = s => String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
 const stableKey = f => [norm(f.opponent||'tbc'),String(f.venue||'').toUpperCase(),norm(f.competition||'fixture')].join('|');
 const key = f => [f.date,stableKey(f)].join('|');
-const build = new Function('selkentNorm', 'normalizeTeamKey', 'fixtureAckState', 'fixtureKitSelectionKey', 'fixtureStableKey', 'matchStatus', 'publishedClubTeamData', 'verifiedClubResultsFeed', `${body}\nreturn buildAdminFixtureRows;`)(
+const {build,uniqueClubFixtures} = new Function('selkentNorm', 'normalizeTeamKey', 'fixtureAckState', 'fixtureKitSelectionKey', 'fixtureStableKey', 'matchStatus', 'publishedClubTeamData', 'verifiedClubResultsFeed', `${body}\nreturn {build:buildAdminFixtureRows,uniqueClubFixtures};`)(
   norm,
   norm,
   (st, f) => st.selkent?.fixtureAcknowledgement?.status === 'confirmed' && st.selkent.fixtureAcknowledgement.key === key(f)
@@ -64,6 +64,21 @@ teams[0].state.matches=teams[0].state.matches.filter(m=>m.status!=='played');
 const scoredFeed={coverage:{published_results:{parser_status:'verified_scored_rows_v1'}},age_groups:[{age_group:'U12',fixtures:feed.age_groups[0].fixtures,published_results:[{date:'2099-10-01',home:'Dartford Royals',away:'Shooters Hill AFC Lions',homeGoals:2,awayGoals:3}]}]};
 assert.equal(build([teams[0]],scoredFeed).some(x=>x.opponent==='Dartford Royals'&&x.venue==='A'),false,'an official published result also removes its matching fixture');
 assert.equal(build([teams[0]],feed).some(x=>x.opponent==='Dartford Royals'&&x.venue==='A'),true,'unverified or missing published scores do not hide fixtures');
+const derbyTeams=[
+  {team:{id:'vikings',ageGroup:'U10',teamName:'Vikings',leagueName:'Shooters Hill AFC Vikings',division:'Under 10D'},state:{matches:[]}},
+  {team:{id:'royals',ageGroup:'U10',teamName:'Royals',leagueName:'Shooters Hill AFC Royals',division:'Under 10E'},state:{matches:[]}}
+];
+const derbyFeed={age_groups:[{age_group:'U10',fixtures:[
+  {date:'2099-10-04',division_name:'U10 Selkent Cup Two - Round 1',home:'Shooters Hill AFC Vikings',away:'Shooters Hill AFC Royals'},
+  {date:'2099-10-04',division_name:'U10 Selkent Cup Two - Round 1',home:'Punjab United Red',away:'Shooters Hill AFC Vikings'}
+]}]};
+const derbyRaw=build(derbyTeams,derbyFeed);
+assert.equal(derbyRaw.length,3,'both club teams retain their own entry for the cup tie');
+const derbyShown=uniqueClubFixtures(derbyRaw);
+assert.equal(derbyShown.length,2,'the club fixture display shows a same-club cup tie once alongside other matches');
+assert.equal(derbyShown.find(f=>f.opponent==='Shooters Hill AFC Royals')?.team.id,'vikings','the home team supplies the displayed derby card');
+assert.equal(uniqueClubFixtures(build([...derbyTeams].reverse(),derbyFeed)).length,2,'team order cannot reintroduce the duplicate');
+assert.equal(uniqueClubFixtures(build([derbyTeams[0]],derbyFeed)).length,2,'a single visible team keeps both of its distinct cup fixtures');
 const ackBody=src.slice(src.indexOf('function fixtureAckState(st=state,f=nextPublishedFixture()){'),src.indexOf('function setFixtureAcknowledgement(status){'));
 const fixtureAck=new Function('fixtureFingerprint','fixtureStableKey','fixtureChangeText',`${ackBody}\nreturn fixtureAckState;`)(f=>key(f),stableKey,()=> 'changed');
 const stale={selkent:{fixtureTracking:{key:stableKey({opponent:'Other Club',venue:'A',competition:'League'}),changed:true,changes:[{field:'date',before:'1 Oct',after:'2 Oct'}]},fixtureAcknowledgement:{}}};
@@ -95,11 +110,11 @@ const renderBody=src.slice(src.indexOf('function renderAdminFixtures(){'),src.in
 const list={innerHTML:''},summary={textContent:''},ageSelect={value:'all'};
 const homeTeam={id:'u12-lions',ageGroup:'U12',teamName:'Lions'};
 const fixtureRows=[{team:homeTeam,source:'Selkent',date:'2099-10-01',time:'10:30',opponent:'Dartford Royals',venue:'H',competition:'Division',groundName:'Oak Field',address:'1 Oak Road',ack:{status:'confirmed',label:'Fixture confirmed'}}];
-const render=new Function('document','populateAdminFixtureAgeFilter','__adminOverviewRows','__adminFixtureRows','__adminPublishedFeed','__adminDirectoryCache','selkentNorm','formatDate','matchTeamLabel','esc','clubResultTeamBadgeHtml','fullClubResultTeamName',`${renderBody}\nreturn renderAdminFixtures;`)(
+const render=new Function('document','populateAdminFixtureAgeFilter','__adminOverviewRows','__adminFixtureRows','__adminPublishedFeed','__adminDirectoryCache','selkentNorm','formatDate','matchTeamLabel','esc','clubResultTeamBadgeHtml','fullClubResultTeamName','uniqueClubFixtures',`${renderBody}\nreturn renderAdminFixtures;`)(
   {getElementById:id=>({'admin-fixture-list':list,'admin-fixtures-age':ageSelect,'admin-fixture-summary':summary})[id]},
   ()=>{},[{team:homeTeam}],
   fixtureRows,
-  {age_groups:[]},new Map(),norm,s=>s,s=>s,s=>s,s=>`<img alt="" src="badge.svg" data-team="${s}">`,team=>`Shooters Hill AFC ${team.teamName}`
+  {age_groups:[]},new Map(),norm,s=>s,s=>s,s=>s,s=>`<img alt="" src="badge.svg" data-team="${s}">`,team=>`Shooters Hill AFC ${team.teamName}`,uniqueClubFixtures
 );
 render();
 assert.equal((list.innerHTML.match(/badge\.svg/g)||[]).length,2,'Admin fixtures show a badge beside both clubs');
