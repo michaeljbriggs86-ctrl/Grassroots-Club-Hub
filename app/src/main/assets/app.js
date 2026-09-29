@@ -2084,6 +2084,7 @@ async function refreshSelkentOpponentDirectory(force=false){
 
 let __availabilityRows=[];
 let __availabilityFixture='';
+let __availabilityTeamId='';
 let __availabilityLoadVersion=0;
 let __parentPlayerLinks=[];
 let __appearanceStats=[];
@@ -2138,7 +2139,7 @@ function renderSeasonPlayerStats(){
 
 function availabilityStatusForPlayer(name){
   const fixture=nextPublishedFixture();
-  if(!fixture||__availabilityFixture!==fixtureResponseKey(fixture))return 'no-response';
+  if(!fixture||__availabilityFixture!==fixtureResponseKey(fixture)||__availabilityTeamId!==String(window.ClubHubCloud?.currentTeam?.()?.id||''))return 'no-response';
   const row=__availabilityRows.find(r=>selkentNorm(r.player_name)===selkentNorm(name));
   return row?.status||'no-response';
 }
@@ -2150,8 +2151,16 @@ function availabilityCounts(){
 async function refreshMatchAvailability(quiet=true){
   const panel=document.getElementById('match-availability-panel'),f=nextPublishedFixture();if(!panel)return;
   const requestVersion=++__availabilityLoadVersion;
-  if(!CLOUD_MODE||!f||!['parent','player','coach','assistant_coach','admin'].includes(currentRole)){__availabilityFixture='';__availabilityRows=[];panel.classList.add('hidden');return;}
-  const fixtureKey=fixtureResponseKey(f);if(__availabilityFixture!==fixtureKey)__availabilityRows=[];__availabilityFixture=fixtureKey;panel.classList.remove('hidden');
+  if(!CLOUD_MODE||!f||!['parent','player','coach','assistant_coach','admin'].includes(currentRole)){__availabilityFixture='';__availabilityTeamId='';__availabilityRows=[];panel.classList.add('hidden');return;}
+  const fixtureKey=fixtureResponseKey(f),teamId=String(window.ClubHubCloud?.currentTeam?.()?.id||'');
+  if(__availabilityFixture!==fixtureKey||__availabilityTeamId!==teamId){
+    __availabilityRows=[];__parentPlayerLinks=[];
+    document.getElementById('coach-availability-summary')?.replaceChildren();
+    const count=document.getElementById('match-availability-count');if(count)count.textContent='Loading replies…';
+    const select=document.getElementById('availability-player');if(select){select.innerHTML='<option value="">Loading linked players…</option>';select.disabled=true;}
+    document.querySelectorAll('[data-availability-status]').forEach(b=>{b.classList.remove('selected');b.disabled=true;});
+  }
+  __availabilityFixture=fixtureKey;__availabilityTeamId=teamId;panel.classList.remove('hidden');
   const personalControls=document.getElementById('parent-availability-controls'),coachSummary=document.getElementById('coach-availability-summary');
   personalControls?.classList.toggle('hidden',!['parent','player'].includes(currentRole));coachSummary?.classList.toggle('hidden',!(isCoach()||isAdminTeamPreviewMode()));
   document.getElementById('availability-reminder-send')?.classList.toggle('hidden',!isCoach());
@@ -2162,7 +2171,7 @@ async function refreshMatchAvailability(quiet=true){
       listFixtureAvailability(f),
       currentRole==='player'?window.ClubHubCloud.listPlayerAccountLinks(ownId):window.ClubHubCloud.listParentPlayerLinks(currentRole==='parent'?ownId:null)
     ]);
-    if(requestVersion!==__availabilityLoadVersion||fixtureKey!==fixtureResponseKey(nextPublishedFixture()||{})||fixtureKey!==__availabilityFixture)return;
+    if(requestVersion!==__availabilityLoadVersion||fixtureKey!==fixtureResponseKey(nextPublishedFixture()||{})||fixtureKey!==__availabilityFixture||teamId!==__availabilityTeamId||teamId!==String(window.ClubHubCloud?.currentTeam?.()?.id||''))return;
     __availabilityRows=rows||[];links=loadedLinks||[];
     __parentPlayerLinks=links||[];
   }catch{if(!quiet)toast('Availability could not be refreshed');return;}
