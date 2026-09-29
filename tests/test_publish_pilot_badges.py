@@ -64,7 +64,11 @@ class BadgePublisherTest(unittest.TestCase):
         self.assertEqual(ids, sorted(b['club_id'] for b in self.manifest['badges']))
         for before, after in zip(original['clubs'], self.directory['clubs']):
             if before['club_id'] not in ids:
-                self.assertEqual(before, after)
+                expected = copy.deepcopy(before)
+                if expected.get('logo_status') == 'pilot_verified':
+                    for field in module.BADGE_FIELDS:
+                        expected.pop(field, None)
+                self.assertEqual(expected, after)
         for badge in self.manifest['badges']:
             club = next(c for c in self.directory['clubs']
                         if c['club_id'] == badge['club_id'])
