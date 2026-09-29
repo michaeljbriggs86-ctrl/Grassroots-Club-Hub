@@ -50,17 +50,6 @@
       "review_basis": "Mike approved visible artwork on 2026-09-28. Current Crayford Arrows club homepage shows the same shield; full-size source was collected from its club news asset. Selkent club ID 251 and 801x941 source were reviewed. Exact source and transparent derivative hashes checked against the private packet; deep interior preserved. Protected-page light/dark real-slot acceptance remains open."
     },
     {
-      "club_id": 261,
-      "club_name": "Dulwich Village",
-      "logo_url": "https://static.wixstatic.com/media/939998_d662e53a373a437aacd35fab065733aa~mv2.png/v1/fit/w_2500,h_1330,al_c/939998_d662e53a373a437aacd35fab065733aa~mv2.png",
-      "logo_status": "pilot_verified",
-      "logo_source": "official_site_image",
-      "logo_updated_at": "2026-09-29",
-      "logo_sha256": "f3e5a335cd2ccb6379470b6f81aa79b1257d126fff32c377351519d84bf2eee0",
-      "rights_status": "protected_pilot_only_public_rights_not_reviewed",
-      "review_basis": "Mike approved the visible artwork in the upload inbox. Selkent club ID 261 links the official Dulwich Village FC site; its current homepage uses the same Wix image. Exact 1051x1063 PNG and SHA-256 were checked against the review packet and re-fetched on 2026-09-29. Transparent exterior screened at 48/128 px on pale and dark green. Protected-page acceptance and public rights review remain open."
-    },
-    {
       "club_id": 271,
       "club_name": "FC Elmstead",
       "logo_url": "https://test.pitchkind.com/__pilot_badges/271/80df2d8db1d24c4ee82a7274d9be51175c78336b112aaea02d4a86de5f8e9996",
