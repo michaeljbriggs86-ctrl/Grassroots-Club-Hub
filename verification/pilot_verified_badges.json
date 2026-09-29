@@ -111,6 +111,17 @@
       "review_basis": "Mike approved visible artwork on 2026-09-28. Current Blackheath Rhinos site header uses the original crest media ID, with Selkent club ID 409 and a 636x662 source. Exact source and transparent derivative hashes checked against the private packet; deep interior preserved. Protected-page light/dark real-slot acceptance remains open."
     },
     {
+      "club_id": 427,
+      "club_name": "The Bosco FC",
+      "logo_url": "https://static.clubplus.co.uk/media//Club%20Badges/Bosco%20FC/1%20badge%20-compressed.png",
+      "logo_status": "pilot_verified",
+      "logo_source": "official_club_kit_shop_image",
+      "logo_updated_at": "2026-09-29",
+      "logo_sha256": "fd453189453abf85bf8d3cb9039bce9c20815de380f61ee8d3abc153896c283e",
+      "rights_status": "protected_pilot_only_public_rights_not_reviewed",
+      "review_basis": "Mike approved the visible artwork in the upload inbox. Selkent club ID 427 links BOSCO; its football academy page links to the Bosco FC kit shop, which displays this same crest. Exact public PNG from the club kit shop image store is 900x899, 63527 bytes, SHA-256 pinned here. The transparent exterior, circular black edge, white interior, club lettering and distinct silhouette were inspected. Protected-page acceptance and public rights review remain open."
+    },
+    {
       "club_id": 447,
       "club_name": "Samuel Montagu",
       "logo_url": "https://smyc.co.uk/wp-content/uploads/2023/12/SMFC-Logo-3-1-e1705423065112.png",
