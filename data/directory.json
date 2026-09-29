@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-09-29T19:34:16.337114+00:00",
+  "last_updated": "2026-09-29T20:02:23.693409+00:00",
   "clubs": [
     {
       "club_id": 514,
@@ -192,12 +192,7 @@
     },
     {
       "club_id": 261,
-      "club_name": "Dulwich Village",
-      "logo_url": "https://static.wixstatic.com/media/939998_d662e53a373a437aacd35fab065733aa~mv2.png/v1/fit/w_2500,h_1330,al_c/939998_d662e53a373a437aacd35fab065733aa~mv2.png",
-      "logo_status": "pilot_verified",
-      "logo_source": "official_site_image",
-      "logo_updated_at": "2026-09-29",
-      "logo_sha256": "f3e5a335cd2ccb6379470b6f81aa79b1257d126fff32c377351519d84bf2eee0"
+      "club_name": "Dulwich Village"
     },
     {
       "club_id": 263,
@@ -7716,5 +7711,5 @@
     }
   ],
   "note": "Panel parsing confirmed against all five format categories (mini-soccer, 9-a-side, X-category, 11-a-side, Senior) as of Sept 2026. Club/team linking is heuristic (name-prefix match) - see ambiguous_club_matches in diagnostics for anything flagged as uncertain.",
-  "pilot_badges_revision": "66e53d8a48ff79f319107e8d6d28dfb9abb6dbec62816f3a3914d2fe88a1598c"
+  "pilot_badges_revision": "cca8a83e22dfbfa74e97d504b16728a5f8c48f2dae2a10bcf805478032f4c4f0"
 }
