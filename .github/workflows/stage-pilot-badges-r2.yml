@@ -8,6 +8,7 @@ on:
       - '.github/workflows/stage-pilot-badges-r2.yml'
       - 'verification/pilot_verified_badges.json'
       - 'scripts/stage_pilot_badges_r2.py'
+      - 'scripts/pilot_badge_transparency.py'
       - 'cloudflare/web-app/src/pilot-badges.js'
       - 'cloudflare/web-app/src/badge-review.js'
       - 'cloudflare/web-app/src/index.js'
@@ -38,10 +39,10 @@ jobs:
           node-version: '22'
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: '3.12'
       - name: Test approval and protected route
         run: |
-          python -m pip install requests beautifulsoup4
+          python -m pip install requests beautifulsoup4 Pillow==12.3.0 numpy==2.3.5 scipy==1.17.0
           python -m unittest discover -s tests -p '*pilot_badge*.py' -v
           node --test cloudflare/web-app/tests/pilot-badges.test.mjs
           node --test cloudflare/web-app/tests/badge-review.test.mjs

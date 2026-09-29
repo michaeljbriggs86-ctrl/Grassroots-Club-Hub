@@ -68,8 +68,8 @@ def upload_badges(badges, get, run):
             key = f"{int(badge['club_id'])}/{badge['logo_sha256'].lower()}"
             readback = root / 'r2-readback'
             if badge.get('logo_source') == 'club_supplied_private':
-                # The secretary's original is staged from a private local file,
-                # outside GitHub. CI only admits its already stored exact bytes.
+                # Secretary-supplied artwork has no public source. It was staged
+                # privately, and CI admits only its exact reviewed bytes.
                 run([*WRANGLER, 'r2', 'object', 'get', f'{BUCKET}/{key}',
                      '--remote', '--file', str(readback)], check=True)
                 data = readback.read_bytes()
@@ -80,7 +80,19 @@ def upload_badges(badges, get, run):
                 readback.unlink()
                 print(f"Checked private R2 badge club_id={badge['club_id']} sha256={badge['logo_sha256']}")
                 continue
-            data, kind = fetch_reviewed(badge, get)
+            if badge.get('logo_source') == 'official_source_transparency_derivative_private':
+                # Fetch the exact official original, repeat the reviewed outer
+                # background edit on Linux, and require the exact approved PNG.
+                from pilot_badge_transparency import transparent_png
+                original = {**badge, 'logo_url': badge['original_source_url'],
+                            'logo_sha256': badge['original_sha256']}
+                source, _ = fetch_reviewed(original, get)
+                data = transparent_png(source)
+                if hashlib.sha256(data).hexdigest() != badge['logo_sha256'].lower():
+                    raise ValueError(f"badge {badge['club_id']} transparency bytes differ from reviewed PNG")
+                kind = 'image/png'
+            else:
+                data, kind = fetch_reviewed(badge, get)
             local = root / 'approved-image'
             local.write_bytes(data)
             run([*WRANGLER, 'r2', 'object', 'put', f'{BUCKET}/{key}',

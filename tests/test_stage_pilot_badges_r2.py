@@ -3,6 +3,7 @@ import hashlib
 import pathlib
 import sys
 import unittest
+from unittest.mock import patch
 
 
 ROOT = pathlib.Path(__file__).parents[1]
@@ -80,6 +81,30 @@ class StageTest(unittest.TestCase):
             pathlib.Path(command[command.index('--file') + 1]).write_bytes(self.data + b'changed')
         with self.assertRaisesRegex(ValueError, 'differ from reviewed PNG'):
             stage.upload_badges([badge], lambda *a, **k: self.fail('private fetch'), wrong)
+
+    def test_private_derivative_fetches_original_and_uploads_exact_reviewed_png(self):
+        source = b'\x89PNG\r\n\x1a\noriginal official bytes'
+        badge = {**self.badge, 'logo_source': 'official_source_transparency_derivative_private',
+                 'original_source_url': 'https://club.example/original.png',
+                 'original_sha256': hashlib.sha256(source).hexdigest()}
+        commands = []
+        urls = []
+        def run(command, *, check):
+            commands.append(command)
+            if 'get' in command:
+                pathlib.Path(command[command.index('--file') + 1]).write_bytes(self.data)
+        def get(url, **_):
+            urls.append(url)
+            return Response(source)
+        with patch('pilot_badge_transparency.transparent_png', return_value=self.data):
+            stage.upload_badges([badge], get, run)
+        self.assertEqual(urls, [badge['original_source_url']])
+        self.assertEqual(len(commands), 2)
+        self.assertIn('put', commands[0])
+        self.assertIn('get', commands[1])
+        with patch('pilot_badge_transparency.transparent_png', return_value=b'wrong'):
+            with self.assertRaisesRegex(ValueError, 'transparency bytes differ'):
+                stage.upload_badges([badge], get, run)
 
 
 if __name__ == '__main__':

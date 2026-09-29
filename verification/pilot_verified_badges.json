@@ -14,6 +14,48 @@
       "review_basis": "Official club crest history and current official image; Selkent club ID 250; exact bytes 1080x1080, 167521 bytes, SHA-256 recorded here."
     },
     {
+      "club_id": 251,
+      "club_name": "Crayford Arrows",
+      "logo_url": "https://test.pitchkind.com/__pilot_badges/251/a4534aea2a3bce82f09fb9d9b8be8517eee3926820342ceb523fbf602bd3265d",
+      "logo_status": "pilot_verified",
+      "logo_source": "official_source_transparency_derivative_private",
+      "logo_updated_at": "2026-09-29",
+      "logo_sha256": "a4534aea2a3bce82f09fb9d9b8be8517eee3926820342ceb523fbf602bd3265d",
+      "original_source_url": "https://myclubpro.blob.core.windows.net/images/News/1269/441492/CA_SHIELD-FINAL-01.jpg",
+      "original_sha256": "4352286f061cab9f2d616433a2eb578bb5ebd1c99cc6bcab5cae4bebe0e82007",
+      "derivation": "outer_background_transparency_only",
+      "rights_status": "protected_pilot_only_public_rights_not_reviewed",
+      "review_basis": "Mike approved visible artwork on 2026-09-28. Current Crayford Arrows club homepage shows the same shield; full-size source was collected from its club news asset. Selkent club ID 251 and 801x941 source were reviewed. Exact source and transparent derivative hashes checked against the private packet; deep interior preserved. Protected-page light/dark real-slot acceptance remains open."
+    },
+    {
+      "club_id": 271,
+      "club_name": "FC Elmstead",
+      "logo_url": "https://test.pitchkind.com/__pilot_badges/271/80df2d8db1d24c4ee82a7274d9be51175c78336b112aaea02d4a86de5f8e9996",
+      "logo_status": "pilot_verified",
+      "logo_source": "official_source_transparency_derivative_private",
+      "logo_updated_at": "2026-09-29",
+      "logo_sha256": "80df2d8db1d24c4ee82a7274d9be51175c78336b112aaea02d4a86de5f8e9996",
+      "original_source_url": "https://images.pitchero.com/club_logos/74372/screenshot201808040002202_5b64f619ab4e0.png",
+      "original_sha256": "3a4c1d752b27ff6d9a156e4488d970556a89d4a2fe1471fa97b7388eb05546b5",
+      "derivation": "outer_background_transparency_only",
+      "rights_status": "protected_pilot_only_public_rights_not_reviewed",
+      "review_basis": "Mike approved visible artwork on 2026-09-28. FC Elmstead Pitchero club-logo media is the 720x645 source; club name and colours correspond to Selkent club ID 271. Exact source and transparent derivative hashes checked against the private packet; deep interior preserved. Protected-page light/dark real-slot acceptance remains open."
+    },
+    {
+      "club_id": 409,
+      "club_name": "Blackheath Rhinos",
+      "logo_url": "https://test.pitchkind.com/__pilot_badges/409/b5bd1ce8c8b0c8dc7341317e04a0c2a7f418c93aaaf94a01edabeff624e5c848",
+      "logo_status": "pilot_verified",
+      "logo_source": "official_source_transparency_derivative_private",
+      "logo_updated_at": "2026-09-29",
+      "logo_sha256": "b5bd1ce8c8b0c8dc7341317e04a0c2a7f418c93aaaf94a01edabeff624e5c848",
+      "original_source_url": "https://static.wixstatic.com/media/f133ea_5f23db886d54472ea0d6d5781b5293e4~mv2.jpg",
+      "original_sha256": "739e6a1d92c47474d8bbabd29488ed87f2587153f7264b2277872c37e870b0f4",
+      "derivation": "outer_background_transparency_only",
+      "rights_status": "protected_pilot_only_public_rights_not_reviewed",
+      "review_basis": "Mike approved visible artwork on 2026-09-28. Current Blackheath Rhinos site header uses the original crest media ID, with Selkent club ID 409 and a 636x662 source. Exact source and transparent derivative hashes checked against the private packet; deep interior preserved. Protected-page light/dark real-slot acceptance remains open."
+    },
+    {
       "club_id": 447,
       "club_name": "Samuel Montagu",
       "logo_url": "https://smyc.co.uk/wp-content/uploads/2023/12/SMFC-Logo-3-1-e1705423065112.png",

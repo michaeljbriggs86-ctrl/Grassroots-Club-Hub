@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-09-28T15:16:24.536973+00:00",
+  "last_updated": "2026-09-29T13:52:48.167827+00:00",
   "clubs": [
     {
       "club_id": 514,
@@ -67,7 +67,12 @@
     },
     {
       "club_id": 409,
-      "club_name": "Blackheath Rhinos"
+      "club_name": "Blackheath Rhinos",
+      "logo_url": "https://test.pitchkind.com/__pilot_badges/409/b5bd1ce8c8b0c8dc7341317e04a0c2a7f418c93aaaf94a01edabeff624e5c848",
+      "logo_status": "pilot_verified",
+      "logo_source": "official_source_transparency_derivative_private",
+      "logo_updated_at": "2026-09-29",
+      "logo_sha256": "b5bd1ce8c8b0c8dc7341317e04a0c2a7f418c93aaaf94a01edabeff624e5c848"
     },
     {
       "club_id": 348,
@@ -129,7 +134,12 @@
     },
     {
       "club_id": 251,
-      "club_name": "Crayford Arrows"
+      "club_name": "Crayford Arrows",
+      "logo_url": "https://test.pitchkind.com/__pilot_badges/251/a4534aea2a3bce82f09fb9d9b8be8517eee3926820342ceb523fbf602bd3265d",
+      "logo_status": "pilot_verified",
+      "logo_source": "official_source_transparency_derivative_private",
+      "logo_updated_at": "2026-09-29",
+      "logo_sha256": "a4534aea2a3bce82f09fb9d9b8be8517eee3926820342ceb523fbf602bd3265d"
     },
     {
       "club_id": 561,
@@ -193,7 +203,12 @@
     },
     {
       "club_id": 271,
-      "club_name": "FC Elmstead"
+      "club_name": "FC Elmstead",
+      "logo_url": "https://test.pitchkind.com/__pilot_badges/271/80df2d8db1d24c4ee82a7274d9be51175c78336b112aaea02d4a86de5f8e9996",
+      "logo_status": "pilot_verified",
+      "logo_source": "official_source_transparency_derivative_private",
+      "logo_updated_at": "2026-09-29",
+      "logo_sha256": "80df2d8db1d24c4ee82a7274d9be51175c78336b112aaea02d4a86de5f8e9996"
     },
     {
       "club_id": 395,
@@ -7651,5 +7666,5 @@
     }
   ],
   "note": "Panel parsing confirmed against all five format categories (mini-soccer, 9-a-side, X-category, 11-a-side, Senior) as of Sept 2026. Club/team linking is heuristic (name-prefix match) - see ambiguous_club_matches in diagnostics for anything flagged as uncertain.",
-  "pilot_badges_revision": "5e914e5fce487d6efc78b396c0671df18cf2c69435baea218e1dc6c73016ef1d"
+  "pilot_badges_revision": "b3e2d1f14c5b5942334fe894a29523cef212791619b319c8c09b4cdee26ade1c"
 }

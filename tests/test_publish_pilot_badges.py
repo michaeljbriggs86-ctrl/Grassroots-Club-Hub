@@ -61,7 +61,7 @@ class BadgePublisherTest(unittest.TestCase):
     def test_current_manifest_applies_only_to_exact_club_ids(self):
         original = copy.deepcopy(self.directory)
         _, ids = module.update_directory(self.directory, self.manifest)
-        self.assertEqual(ids, [250, 447, 499, 547])
+        self.assertEqual(ids, sorted(b['club_id'] for b in self.manifest['badges']))
         for before, after in zip(original['clubs'], self.directory['clubs']):
             if before['club_id'] not in ids:
                 self.assertEqual(before, after)
@@ -110,6 +110,23 @@ class BadgePublisherTest(unittest.TestCase):
             next(b for b in candidate['badges'] if b['club_id'] == 499).update(changed)
             with self.assertRaisesRegex(ValueError, 'invalid private-pilot URL'):
                 module.validated_approvals(copy.deepcopy(self.directory), candidate)
+
+    def test_derived_private_source_keeps_original_provenance(self):
+        candidate = copy.deepcopy(self.manifest)
+        badge = candidate['badges'][0]
+        badge.update(logo_source='official_source_transparency_derivative_private',
+                     logo_sha256='b' * 64, original_source_url=badge['logo_url'],
+                     original_sha256='a' * 64,
+                     derivation='outer_background_transparency_only')
+        badge['logo_url'] = f"https://test.pitchkind.com/__pilot_badges/250/{'b' * 64}"
+        self.assertIn(250, module.validated_approvals(copy.deepcopy(self.directory), candidate))
+        with patch('requests.get', side_effect=AssertionError('private derivative fetched')):
+            module.verify_hosted_assets({'badges': [badge]})
+        for field in ('original_source_url', 'original_sha256', 'derivation'):
+            missing = copy.deepcopy(candidate)
+            missing['badges'][0].pop(field)
+            with self.subTest(field=field), self.assertRaisesRegex(ValueError, 'provenance'):
+                module.validated_approvals(copy.deepcopy(self.directory), missing)
 
 
 if __name__ == '__main__':
