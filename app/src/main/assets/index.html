@@ -694,7 +694,7 @@
                <label>Current team<select id="parent-family-team-select"></select></label>
                <div class="parent-family-actions"><button type="button" class="secondary-button" id="parent-family-team-switch">Switch team</button><button type="button" class="primary-button" id="parent-family-add-child">Add child or team</button></div>
              </div>
-             <button type="button" class="secondary-button setup-save" id="admin-account-mode-switch" data-admin-only>Switch to Coach view</button>
+             <button type="button" class="secondary-button setup-save hidden" id="account-context-switch">Switch team or profile</button>
             </div>
           </details>
 
@@ -734,11 +734,18 @@
       <button type="button" class="mobile-more-link" data-mobile-menu-target="more">Settings</button>
       <div class="mobile-more-account" role="group" aria-label="Account and notifications">
         <button type="button" class="mobile-more-link hidden" id="mobile-notification-bell">Notifications <span class="notification-badge hidden" id="mobile-notification-badge">0</span></button>
-        <button type="button" class="mobile-more-link hidden" id="mobile-profile-switch">Coach view</button>
-        <button type="button" class="mobile-more-link hidden" id="mobile-admin-preview-back">Club overview</button>
+        <button type="button" class="mobile-more-link hidden" id="mobile-context-switch">Switch team or profile</button>
       </div>
     </section>
   </div>
+
+  <dialog id="context-switch-dialog" class="modal club-list-modal" aria-labelledby="context-switch-title">
+    <div class="club-list-modal-shell context-switch-shell">
+      <div class="modal-heading"><h3 id="context-switch-title">Switch team or profile</h3><button type="button" class="icon-button small" data-close-dialog aria-label="Close">×</button></div>
+      <p class="muted">Choose an access already linked to this account.</p>
+      <div id="context-switch-list" class="context-switch-list"></div>
+    </div>
+  </dialog>
 
   <dialog id="admin-fixtures-dialog" class="modal club-list-modal" aria-labelledby="admin-fixtures-dialog-title">
     <div class="club-list-modal-shell">

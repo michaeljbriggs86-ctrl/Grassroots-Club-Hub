@@ -523,7 +523,9 @@
     if(!canAdmin())throw new Error('Club Admin access required');
     const team=visibleTeams.find(t=>t.id===teamId);if(!team)throw new Error('Team not found');
     if(pendingState&&canEdit()){const p=pendingState;pendingState=null;await saveTeamStateNow(p).catch(()=>{});}
+    const previousTeam=activeTeam,previousRevision=activeRevision,previousUpdatedAt=lastRemoteUpdatedAt;
     activeTeam=team;localStorage.setItem(ACTIVE_TEAM_KEY,team.id);
+    try{
     const sensitiveMini=Number(team.age_group||0)>=7&&Number(team.age_group||0)<=11;
     if(sensitiveMini)localStorage.removeItem(TEAM_STATE_CACHE_PREFIX+team.id);
     const cached=sensitiveMini?null:cachedTeamState(team.id);
@@ -543,6 +545,12 @@
       hooks.onRemoteState&&hooks.onRemoteState(seed,{reason:canEdit()?'switch-seed':'switch-preview'});
     }
     updateCloudPanel();return oldShapeTeam(team);
+    }catch(err){
+      activeTeam=previousTeam;activeRevision=previousRevision;lastRemoteUpdatedAt=previousUpdatedAt;
+      if(previousTeam)localStorage.setItem(ACTIVE_TEAM_KEY,previousTeam.id);
+      else localStorage.removeItem(ACTIVE_TEAM_KEY);
+      updateCloudPanel();throw err;
+    }
   }
   async function switchParentTeam(teamId){
    if(role()!=='parent')throw new Error('Parent access required');

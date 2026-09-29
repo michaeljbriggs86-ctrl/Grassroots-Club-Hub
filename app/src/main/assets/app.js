@@ -140,6 +140,74 @@ function isAdminTeamPreviewMode(){ return CLOUD_MODE && isAdmin() && adminUiMode
 function isClubOverviewMode(){ return CLOUD_MODE && isAdmin() && adminUiMode==='club'; }
 function dualCoachTeam(){ return CLOUD_MODE ? (window.ClubHubCloud?.coachTeam?.()||null) : null; }
 function hasDualAdminCoach(){ return CLOUD_MODE && isAdmin() && !!dualCoachTeam(); }
+function availableAccountContexts(){
+  if(!CLOUD_MODE)return [];
+  const current=window.ClubHubCloud?.currentTeam?.();
+  const teams=window.ClubHubCloud?.visibleTeamList?.()||[];
+  const label=t=>matchTeamLabel([t.ageGroup,t.teamName].filter(Boolean).join(' '));
+  if(currentRole==='admin'){
+    const own=dualCoachTeam();
+    return [
+      {kind:'club',title:'Club overview',detail:'Club Admin',active:isClubOverviewMode()},
+      ...(own?[{kind:'coach',title:label(own),detail:'Coach · edit your team',active:isAdminCoachMode()}]:[]),
+      ...teams.map(t=>({kind:'preview',teamId:String(t.id),title:label(t),detail:'Club Admin · read only team view',active:isAdminTeamPreviewMode()&&String(current?.id)===String(t.id)}))
+    ];
+  }
+  if(currentRole==='parent')return teams.map(t=>({kind:'parent',teamId:String(t.id),title:label(t),detail:'Parent · linked team',active:String(current?.id)===String(t.id)}));
+  return [];
+}
+function renderAccountContextControls(){
+  const show=availableAccountContexts().length>1;
+  ['mobile-context-switch','account-context-switch'].forEach(id=>document.getElementById(id)?.classList.toggle('hidden',!show));
+}
+function openAccountContextSwitch(){
+  if(!CLOUD_MODE)return;
+  closeMobileMore();
+  const dialog=document.getElementById('context-switch-dialog'),list=document.getElementById('context-switch-list');
+  const choices=availableAccountContexts();
+  if(!dialog||!list||choices.length<2)return;
+  list.replaceChildren();
+  choices.forEach(choice=>{
+    const button=document.createElement('button');button.type='button';button.className='context-switch-choice';
+    button.disabled=choice.active;button.setAttribute('aria-current',choice.active?'true':'false');
+    const title=document.createElement('strong'),detail=document.createElement('small'),status=document.createElement('span');
+    title.textContent=choice.title;detail.textContent=choice.detail;status.textContent=choice.active?'Current':'Open';
+    button.append(title,detail,status);
+    button.addEventListener('click',()=>switchAccountContext(choice,button));list.appendChild(button);
+  });
+  dialog.showModal();
+}
+async function switchAccountContext(choice,button){
+  if(!CLOUD_MODE||!availableAccountContexts().some(c=>c.kind===choice.kind&&c.teamId===choice.teamId&&!c.active))return;
+  const buttons=[...(document.getElementById('context-switch-list')?.querySelectorAll('button')||[])];
+  const disabled=buttons.map(b=>b.disabled);
+  buttons.forEach(b=>b.disabled=true);
+  button.disabled=true;
+  try{
+    if(choice.kind==='club'||choice.kind==='coach'){
+      if(currentRole!=='admin')throw new Error('Club Admin access required');
+      if(!(await setAdminUiMode(choice.kind)))return;
+    }else if(choice.kind==='preview'){
+      if(currentRole!=='admin')throw new Error('Club Admin access required');
+      const team=(window.ClubHubCloud?.visibleTeamList?.()||[]).find(t=>String(t.id)===choice.teamId);
+      if(!team)throw new Error('Team access is no longer available');
+      const previous=adminUiMode;
+      adminUiMode='view';
+      try{
+        if(String(window.ClubHubCloud?.currentTeam?.()?.id)!==choice.teamId)await switchAdminTeamAndLoad(team);
+        localStorage.setItem(ADMIN_UI_MODE_KEY,'view');renderAll();navigate('home',false);
+        toast(`${choice.title} opened read only`);
+      }catch(err){adminUiMode=previous;renderAll();throw err;}
+    }else if(choice.kind==='parent'){
+      if(currentRole!=='parent')throw new Error('Parent access required');
+      const select=document.getElementById('parent-family-team-select');if(select)select.value=choice.teamId;
+      if(!(await switchParentFamilyTeam(choice.teamId)))return;
+      navigate('home',false);
+    }
+    document.getElementById('context-switch-dialog')?.close();
+  }catch(err){toast(err?.message||'Could not switch access');}
+  finally{buttons.forEach((b,i)=>b.disabled=disabled[i]);button.disabled=false;}
+}
 async function setAdminUiMode(mode){
   if(!isAdmin())return;
   const next=mode==='coach'?'coach':mode==='view'?'view':'club';
@@ -155,11 +223,13 @@ async function setAdminUiMode(mode){
     renderAll();
     navigate(next==='club'?'club':'home',false);
     toast(next==='coach'?'Coach profile enabled':next==='view'?'Team preview opened':'Club overview enabled');
+    return true;
   }catch(err){
     adminUiMode=previous;
     localStorage.setItem(ADMIN_UI_MODE_KEY,adminUiMode);
     renderAll();
     toast(err?.message||'Could not switch view');
+    return false;
   }
 }
 
@@ -1739,11 +1809,11 @@ function renderParentFamilyControls(){
  const note=document.getElementById('parent-family-team-note');if(note)note.textContent=teams.length>1?`${teams.length} linked teams available on this account.`:'This account currently has one linked team.';
  const btn=document.getElementById('parent-family-team-switch');if(btn)btn.disabled=!select?.value||String(select.value)===String(current?.id||'');
 }
-async function switchParentFamilyTeam(){
+async function switchParentFamilyTeam(requestedTeamId){
  if(currentRole!=='parent'||!CLOUD_MODE)return;
- const teamId=document.getElementById('parent-family-team-select')?.value||'',current=window.ClubHubCloud?.currentTeam?.();if(!teamId||String(teamId)===String(current?.id||''))return;
+ const teamId=typeof requestedTeamId==='string'?requestedTeamId:document.getElementById('parent-family-team-select')?.value||'',current=window.ClubHubCloud?.currentTeam?.();if(!teamId||String(teamId)===String(current?.id||''))return false;
  const button=document.getElementById('parent-family-team-switch');if(button)button.disabled=true;
- try{await window.ClubHubCloud.switchParentTeam(teamId);const now=window.ClubHubCloud.currentTeam?.();renderAll();resetMatchForm();await syncSelkent(true);toast(`Switched to ${now?.ageGroup||''} ${matchTeamLabel(now?.teamName||'team')}`.trim());}catch(err){alert(err.message||err);}finally{renderParentFamilyControls();}
+ try{await window.ClubHubCloud.switchParentTeam(teamId);const now=window.ClubHubCloud.currentTeam?.();renderAll();resetMatchForm();syncSelkent(true).catch(()=>{});toast(`Switched to ${now?.ageGroup||''} ${matchTeamLabel(now?.teamName||'team')}`.trim());return true;}catch(err){toast(err.message||'Could not switch team');return false;}finally{renderParentFamilyControls();}
 }
 async function openParentAddChildDialog(){
  if(currentRole!=='parent'||!CLOUD_MODE)return;
@@ -1790,16 +1860,14 @@ function applyAccessMode(){
   if(clubModeBtn)clubModeBtn.classList.toggle('active',isClubOverviewMode());
   if(coachModeBtn)coachModeBtn.classList.toggle('active',isAdminCoachMode());
   const modeCopy=document.getElementById('admin-ui-mode-copy');if(modeCopy)modeCopy.textContent=isAdminCoachMode()?'Coach profile':preview?'Club Admin team preview':'Club Admin overview';
-  const accountMode=document.getElementById('admin-account-mode-switch');if(accountMode){const show=hasDualAdminCoach()&&!preview;accountMode.classList.toggle('hidden',!show);if(show){const own=dualCoachTeam();accountMode.textContent=isAdminCoachMode()?'Return to Club Admin':`Open ${own?.ageGroup||''} ${matchTeamLabel(own?.teamName||'team')} Coach View`.trim();}}
+  renderAccountContextControls();
   const profileSwitch=document.getElementById('hero-profile-switch');
   if(profileSwitch){
     const show=hasDualAdminCoach()&&!preview;
     profileSwitch.classList.toggle('hidden',!show);
     if(show){const own=dualCoachTeam();profileSwitch.textContent=isAdminCoachMode()?'Club Admin':`Coach · ${own?.ageGroup||''} ${matchTeamLabel(own?.teamName||'')}`.trim();}
   }
-  const mobileProfileSwitch=document.getElementById('mobile-profile-switch');if(mobileProfileSwitch){mobileProfileSwitch.classList.toggle('hidden',profileSwitch?.classList.contains('hidden')!==false);mobileProfileSwitch.textContent=profileSwitch?.textContent||'Coach view';}
   const previewBack=document.getElementById('hero-admin-preview-back');if(previewBack)previewBack.classList.toggle('hidden',!preview);
-  document.getElementById('mobile-admin-preview-back')?.classList.toggle('hidden',!preview);
   syncHeaderUtilityBar();
   document.body.classList.toggle('team-locked',isTeamLocked());
   document.body.classList.toggle('team-has-league',isPublishedLeagueTeam());
@@ -4521,11 +4589,10 @@ document.getElementById('refresh-club-coaches')?.addEventListener('click',()=>re
 document.getElementById('refresh-coach-club-results')?.addEventListener('click',()=>refreshCoachClubResults(false));
 document.getElementById('admin-mode-club')?.addEventListener('click',()=>setAdminUiMode('club'));
 document.getElementById('admin-mode-coach')?.addEventListener('click',()=>setAdminUiMode('coach'));
-document.getElementById('admin-account-mode-switch')?.addEventListener('click',()=>setAdminUiMode(isAdminCoachMode()?'club':'coach'));
+document.getElementById('account-context-switch')?.addEventListener('click',openAccountContextSwitch);
+document.getElementById('mobile-context-switch')?.addEventListener('click',openAccountContextSwitch);
 document.getElementById('hero-profile-switch')?.addEventListener('click',()=>setAdminUiMode(isAdminCoachMode()?'club':'coach'));
 document.getElementById('hero-admin-preview-back')?.addEventListener('click',()=>setAdminUiMode('club'));
-document.getElementById('mobile-profile-switch')?.addEventListener('click',()=>{closeMobileMore();setAdminUiMode(isAdminCoachMode()?'club':'coach');});
-document.getElementById('mobile-admin-preview-back')?.addEventListener('click',()=>{closeMobileMore();setAdminUiMode('club');});
 document.getElementById('settings-team-name')?.addEventListener('change',()=>{if(!isTeamLocked())applySelectedClubTeamToForm();});
 const refreshClubTeamsBtn=document.getElementById('refresh-club-teams');if(refreshClubTeamsBtn)refreshClubTeamsBtn.addEventListener('click',()=>syncProviderClubTeams(false));
 document.getElementById('save-league-settings')?.addEventListener('click',saveLeagueSettings);
