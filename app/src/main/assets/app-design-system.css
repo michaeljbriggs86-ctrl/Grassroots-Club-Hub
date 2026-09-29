@@ -539,11 +539,13 @@ svg,canvas,video{max-width:100%}
     background:var(--gch-white);border-top:1px solid var(--gch-line);
     box-shadow:0 -4px 16px rgba(6,69,38,.08);
   }
+  .mobile-primary-nav.has-table-tab{grid-template-columns:repeat(5,minmax(0,1fr))}
   .mobile-primary-item{
     min-width:0;min-height:56px;border:0;border-radius:12px;background:transparent;
     color:var(--gch-muted);font-size:12px;font-weight:800;line-height:1.2;
     display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
   }
+  .mobile-primary-item[hidden]{display:none!important}
   .mobile-primary-item[aria-current="page"]{color:var(--gch-green-950);background:var(--gch-soft-green)}
   .mobile-primary-item svg,.mobile-more-close svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
   .mobile-primary-item:focus-visible,.mobile-more-link:focus-visible,.mobile-more-close:focus-visible{outline:2px solid var(--gch-green-700);outline-offset:-2px}

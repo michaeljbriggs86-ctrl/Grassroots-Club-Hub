@@ -1940,10 +1940,14 @@ function syncMobileNavigation(selectedView=currentView){
   const nav=document.getElementById('mobile-primary-nav');
   if(!nav)return;
   const club=isClubOverviewMode();
+  const showTable=!club&&isPublishedLeagueTeam();
+  nav.classList.toggle('has-table-tab',showTable);
   const selected=club&&selectedView==='club'&&__clubTab==='coaches'?'club-coaches':selectedView;
-  const primary=club?[['Club','club'],['Fixtures','club-fixtures'],['Results','club-results']]:[['Home','home'],['Matches','matches'],['Squad','squad']];
+  const primary=club?[['Club','club'],['Fixtures','club-fixtures'],['Results','club-results']]:[['Home','home'],['Matches','matches'],['Squad','squad'],['Table','league']];
   nav.querySelectorAll('[data-mobile-tab]').forEach(button=>{
+    if(button.dataset.mobileTab==='3'&&!showTable){button.hidden=true;button.removeAttribute('aria-current');return;}
     if(button.dataset.mobileTab!=='more'){
+      if(button.dataset.mobileTab==='3')button.hidden=false;
       const [label,target]=primary[Number(button.dataset.mobileTab)];
       button.dataset.mobileTarget=target;
       button.querySelector('span').textContent=label;
@@ -1954,7 +1958,7 @@ function syncMobileNavigation(selectedView=currentView){
     else button.removeAttribute('aria-current');
   });
   const allowed={
-    league:!club&&isPublishedLeagueTeam(),
+    league:showTable,
     awards:!club&&featureEnabled('awards'),
     'club-results':!club&&(['coach','assistant_coach'].includes(currentRole)||isAdminCoachMode()),
     'club-coaches':club,

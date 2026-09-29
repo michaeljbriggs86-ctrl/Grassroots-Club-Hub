@@ -95,6 +95,20 @@
           </button>
         </section>
 
+        <section class="panel league-table-panel hidden" id="league-table-panel">
+          <div class="panel-heading league-table-heading">
+            <div><p class="kicker">Standings</p><h3 data-league-table-title>League table</h3></div>
+            <span class="age-rule">U12+</span>
+          </div>
+          <div class="league-table-scroll">
+            <table class="league-table">
+              <thead><tr><th>#</th><th>Team</th><th>P</th><th>W</th><th>D</th><th>L</th><th>GF</th><th>GA</th><th>GD</th><th>Pts</th></tr></thead>
+              <tbody data-league-table-body></tbody>
+            </table>
+          </div>
+          <p class="table-meta" data-league-table-meta></p>
+        </section>
+
         <details class="panel home-season-details" id="home-season-record">
           <summary><strong>Season record</strong><span>League progress and match totals</span></summary>
           <div class="home-season-details-body">
@@ -178,20 +192,6 @@
         <details class="panel home-season-details" id="home-player-stats">
           <summary><strong>Player &amp; team stats</strong><span>Form, awards and player contribution</span></summary>
           <div class="home-season-details-body">
-        <section class="panel league-table-panel hidden" id="league-table-panel">
-          <div class="panel-heading league-table-heading">
-            <div><p class="kicker">Standings</p><h3 data-league-table-title>League table</h3></div>
-            <span class="age-rule">U12+</span>
-          </div>
-          <div class="league-table-scroll">
-            <table class="league-table">
-              <thead><tr><th>#</th><th>Team</th><th>P</th><th>W</th><th>D</th><th>L</th><th>GF</th><th>GA</th><th>GD</th><th>Pts</th></tr></thead>
-              <tbody data-league-table-body></tbody>
-            </table>
-          </div>
-          <p class="table-meta" data-league-table-meta></p>
-        </section>
-
         <div class="dashboard-grid">
           <section class="panel">
             <div class="panel-heading"><h3>Overall recent form</h3><button class="text-button" data-nav="matches">All matches</button></div>
@@ -711,6 +711,7 @@
     <svg class="mobile-nav-sprite" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
       <symbol id="mobile-icon-home" viewBox="0 0 24 24"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1Z"/></symbol>
       <symbol id="mobile-icon-calendar" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4m10-4v4M3 10h18"/></symbol>
+      <symbol id="mobile-icon-table" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M3 15h18M9 10v10"/></symbol>
       <symbol id="mobile-icon-team" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 20v-2a6 6 0 0 1 12 0v2Zm14-14a3 3 0 0 1 0 6m1 4a5 5 0 0 1 3 4"/></symbol>
       <symbol id="mobile-icon-menu" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></symbol>
       <symbol id="mobile-icon-close" viewBox="0 0 24 24"><path d="M5 5l14 14M19 5 5 19"/></symbol>
@@ -718,6 +719,7 @@
     <nav class="mobile-primary-nav" id="mobile-primary-nav" aria-label="Primary navigation">
       <button type="button" class="mobile-primary-item" data-mobile-tab="0" aria-current="page"><svg aria-hidden="true"><use href="#mobile-icon-home"/></svg><span>Home</span></button>
       <button type="button" class="mobile-primary-item" data-mobile-tab="1"><svg aria-hidden="true"><use href="#mobile-icon-calendar"/></svg><span>Matches</span></button>
+      <button type="button" class="mobile-primary-item" data-mobile-tab="3" hidden><svg aria-hidden="true"><use href="#mobile-icon-table"/></svg><span>Table</span></button>
       <button type="button" class="mobile-primary-item" data-mobile-tab="2"><svg aria-hidden="true"><use href="#mobile-icon-team"/></svg><span>Squad</span></button>
       <button type="button" class="mobile-primary-item" data-mobile-tab="more" aria-haspopup="dialog" aria-expanded="false" aria-controls="mobile-more-sheet"><svg aria-hidden="true"><use href="#mobile-icon-menu"/></svg><span>More</span></button>
     </nav>
