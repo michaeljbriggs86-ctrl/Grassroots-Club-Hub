@@ -29,7 +29,17 @@ test('direct review shows the actual approved badge at hero and card sizes', asy
   assert.match(html, /review-stage foldable dark/);
   assert.doesNotMatch(html, /Total FC|c{64}/);
   assert.doesNotMatch(html, /https:\/\/smyc.co.uk/);
-  assert.match(html, /max-width:86px!important/);
+  assert.match(html, /overflow:visible!important/);
+  assert.match(html, /object-fit:contain!important/);
+  assert.match(html, /class="club-logo"[^>]+width="86" height="86"/);
+  assert.match(html, /\.review-stage\.foldable \.hero \.club-logo-wrap\{width:86px;height:86px\}/);
+});
+
+test('phone review fits the whole crest inside its badge slot', async () => {
+  const html = await (await badgeReview(new Request(base + '?club=447&size=phone'), env)).text();
+  assert.match(html, /\.review-stage\.phone \.hero \.club-logo-wrap\{width:64px;height:64px\}/);
+  assert.match(html, /\.review-stage \.hero img\.club-logo\{[^}]+object-fit:contain!important;object-position:center;clip-path:none!important/);
+  assert.doesNotMatch(html, /\.review-stage \.hero \.club-logo-wrap\{[^}]+overflow:hidden/);
 });
 
 test('unavailable approved image shows a preparing response instead of broken images', async () => {
