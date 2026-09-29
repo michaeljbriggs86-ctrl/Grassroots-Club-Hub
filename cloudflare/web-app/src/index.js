@@ -1,6 +1,7 @@
 import { pilotBadge } from './pilot-badges.js';
 import { badgeReview } from './badge-review.js';
 import { selkentCandidate } from './selkent-candidate.js';
+import { selkentFeed } from './selkent-feed.js';
 
 // The existing static assets remain the authority for public directory and fixtures.
 // This diagnostic only reports their freshness within the protected pilot site.
@@ -15,6 +16,7 @@ export default {
     if (url.pathname.startsWith('/__pilot_badges/')) return pilotBadge(request, env);
     if (url.pathname === '/__badge_review') return badgeReview(request, env);
     if (url.pathname === '/__selkent_candidate') return selkentCandidate(request, env);
+    if (url.pathname === '/data/results.json') return selkentFeed(request, env);
     if (url.pathname !== '/__health') return env.ASSETS.fetch(request);
     const headers = {
       'Content-Type': 'application/json; charset=utf-8',
