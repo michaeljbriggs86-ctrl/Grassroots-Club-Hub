@@ -1,6 +1,6 @@
 // Browser pilot: cache reviewed same-origin application files only.
 // Never intercept Supabase responses, Selkent feeds, or private API calls.
-const CACHE = 'pitchkind-web-tactics-roster-ids-20260928';
+const CACHE = 'pitchkind-web-badge-cutout-20260929';
 const STATIC = [
   './', './index.html', './manifest.json', './cloud-config.js', './cloud.js',
   './onboarding.js', './onboarding.css', './app.js', './static-feed-overlay.js',
@@ -12,7 +12,6 @@ const STATIC = [
   './icon-maskable-512.png', './football-login-adult.jpg',
   './football-login-player.jpg', './football-login-club.jpg',
   './football-pitch-hero.jpg', './football-pitch-hero-illustration.png',
-  './cray-valley-547-silhouette-mask.png'
 ];
 const ALLOWED = new Set(STATIC.map(path => new URL(path, self.registration.scope).pathname));
 self.addEventListener('install', event => event.waitUntil(

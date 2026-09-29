@@ -526,17 +526,6 @@ svg,canvas,video{max-width:100%}
   clip-path:none!important;
   filter:none!important;
 }
-/* Preserve the exact reviewed Cray Valley crest while hiding only its outer
-   white canvas. The mask is tied to the immutable reviewed R2 image hash;
-   whites inside the shield and motto remain visible. */
-img[src="/__pilot_badges/547/6d4a43ae988bf8215799a76c2c9e38891c833b2e2d00039e2751ae649ad700ef"]{
-  -webkit-mask-image:url('/cray-valley-547-silhouette-mask.png');
-  mask-image:url('/cray-valley-547-silhouette-mask.png');
-  -webkit-mask-size:100% 100%;
-  mask-size:100% 100%;
-  -webkit-mask-repeat:no-repeat;
-  mask-repeat:no-repeat;
-}
 /* Compact primary navigation on phones, including unfolded foldable displays. */
 .mobile-nav-sprite,.mobile-primary-nav,.mobile-more-scrim,.mobile-more-sheet{display:none}
 @media(max-width:900px){
