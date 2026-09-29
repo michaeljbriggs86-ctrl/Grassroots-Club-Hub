@@ -28,6 +28,17 @@
       "review_basis": "Mike approved visible artwork on 2026-09-28. Current Crayford Arrows club homepage shows the same shield; full-size source was collected from its club news asset. Selkent club ID 251 and 801x941 source were reviewed. Exact source and transparent derivative hashes checked against the private packet; deep interior preserved. Protected-page light/dark real-slot acceptance remains open."
     },
     {
+      "club_id": 261,
+      "club_name": "Dulwich Village",
+      "logo_url": "https://static.wixstatic.com/media/939998_d662e53a373a437aacd35fab065733aa~mv2.png/v1/fit/w_2500,h_1330,al_c/939998_d662e53a373a437aacd35fab065733aa~mv2.png",
+      "logo_status": "pilot_verified",
+      "logo_source": "official_site_image",
+      "logo_updated_at": "2026-09-29",
+      "logo_sha256": "f3e5a335cd2ccb6379470b6f81aa79b1257d126fff32c377351519d84bf2eee0",
+      "rights_status": "protected_pilot_only_public_rights_not_reviewed",
+      "review_basis": "Mike approved the visible artwork in the upload inbox. Selkent club ID 261 links the official Dulwich Village FC site; its current homepage uses the same Wix image. Exact 1051x1063 PNG and SHA-256 were checked against the review packet and re-fetched on 2026-09-29. Transparent exterior screened at 48/128 px on pale and dark green. Protected-page acceptance and public rights review remain open."
+    },
+    {
       "club_id": 271,
       "club_name": "FC Elmstead",
       "logo_url": "https://test.pitchkind.com/__pilot_badges/271/80df2d8db1d24c4ee82a7274d9be51175c78336b112aaea02d4a86de5f8e9996",
@@ -40,6 +51,39 @@
       "derivation": "outer_background_transparency_only",
       "rights_status": "protected_pilot_only_public_rights_not_reviewed",
       "review_basis": "Mike approved visible artwork on 2026-09-28. FC Elmstead Pitchero club-logo media is the 720x645 source; club name and colours correspond to Selkent club ID 271. Exact source and transparent derivative hashes checked against the private packet; deep interior preserved. Protected-page light/dark real-slot acceptance remains open."
+    },
+    {
+      "club_id": 272,
+      "club_name": "Sutton Dynamo FC",
+      "logo_url": "https://www.fc-sutton-dynamo.co.uk/img/sutton-dynamo-logo-large.png",
+      "logo_status": "pilot_verified",
+      "logo_source": "official_club_site_image",
+      "logo_updated_at": "2026-09-29",
+      "logo_sha256": "5e59752cfaacf8ffdde44bc0333e892be02a8dfa509c290b662d02ad4071015a",
+      "rights_status": "protected_pilot_only_public_rights_not_reviewed",
+      "review_basis": "Mike approved the visible artwork in the upload inbox. Selkent club ID 272 identifies Sutton Dynamo FC and its current club site displays this exact crest. Exact 715x618 PNG and SHA-256 were checked against the review packet and re-fetched on 2026-09-29. Transparent exterior screened at 48/128 px on pale and dark green. Protected-page acceptance and public rights review remain open."
+    },
+    {
+      "club_id": 330,
+      "club_name": "Sutton Athletic",
+      "logo_url": "https://www.suttonathletic.co.uk/wp-content/uploads/2024/04/Sutton-Athletic-2023.png",
+      "logo_status": "pilot_verified",
+      "logo_source": "official_site_image",
+      "logo_updated_at": "2026-09-29",
+      "logo_sha256": "944781e9f8c3ec36421b4f6bf3ab90685aec823a8675f6351cdacf655f2fe2ba",
+      "rights_status": "protected_pilot_only_public_rights_not_reviewed",
+      "review_basis": "Mike approved the visible artwork in the upload inbox. Selkent club ID 330 and the current Sutton Athletic club site show this crest. Exact 1000x1000 PNG and SHA-256 were checked against the review packet and re-fetched on 2026-09-29. Transparent exterior screened at 48/128 px on pale and dark green. Protected-page acceptance and public rights review remain open."
+    },
+    {
+      "club_id": 407,
+      "club_name": "Deptford United",
+      "logo_url": "https://static.wixstatic.com/media/08079d_7c24cbc902e24cfda21af0bd100aa096~mv2.png",
+      "logo_status": "pilot_verified",
+      "logo_source": "official_site_image",
+      "logo_updated_at": "2026-09-29",
+      "logo_sha256": "0cd492123b2e820766f0eb60db7173a2b1c983363b7d00fb61d1be73f39467e4",
+      "rights_status": "protected_pilot_only_public_rights_not_reviewed",
+      "review_basis": "Mike approved the visible artwork in the upload inbox. Selkent club ID 407 links the current Deptford United FC homepage, which displays a rendition of the same Wix media image. Exact 1746x1746 PNG and SHA-256 were checked against the review packet and re-fetched on 2026-09-29. Transparent exterior screened at 48/128 px on pale and dark green. Protected-page acceptance and public rights review remain open."
     },
     {
       "club_id": 409,

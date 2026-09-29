@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-09-29T15:05:43.094576+00:00",
+  "last_updated": "2026-09-29T19:27:13.471956+00:00",
   "clubs": [
     {
       "club_id": 514,
@@ -155,7 +155,12 @@
     },
     {
       "club_id": 407,
-      "club_name": "Deptford United"
+      "club_name": "Deptford United",
+      "logo_url": "https://static.wixstatic.com/media/08079d_7c24cbc902e24cfda21af0bd100aa096~mv2.png",
+      "logo_status": "pilot_verified",
+      "logo_source": "official_site_image",
+      "logo_updated_at": "2026-09-29",
+      "logo_sha256": "0cd492123b2e820766f0eb60db7173a2b1c983363b7d00fb61d1be73f39467e4"
     },
     {
       "club_id": 258,
@@ -167,7 +172,12 @@
     },
     {
       "club_id": 261,
-      "club_name": "Dulwich Village"
+      "club_name": "Dulwich Village",
+      "logo_url": "https://static.wixstatic.com/media/939998_d662e53a373a437aacd35fab065733aa~mv2.png/v1/fit/w_2500,h_1330,al_c/939998_d662e53a373a437aacd35fab065733aa~mv2.png",
+      "logo_status": "pilot_verified",
+      "logo_source": "official_site_image",
+      "logo_updated_at": "2026-09-29",
+      "logo_sha256": "f3e5a335cd2ccb6379470b6f81aa79b1257d126fff32c377351519d84bf2eee0"
     },
     {
       "club_id": 263,
@@ -470,11 +480,21 @@
     },
     {
       "club_id": 330,
-      "club_name": "Sutton Athletic"
+      "club_name": "Sutton Athletic",
+      "logo_url": "https://www.suttonathletic.co.uk/wp-content/uploads/2024/04/Sutton-Athletic-2023.png",
+      "logo_status": "pilot_verified",
+      "logo_source": "official_site_image",
+      "logo_updated_at": "2026-09-29",
+      "logo_sha256": "944781e9f8c3ec36421b4f6bf3ab90685aec823a8675f6351cdacf655f2fe2ba"
     },
     {
       "club_id": 272,
-      "club_name": "Sutton Dynamo FC"
+      "club_name": "Sutton Dynamo FC",
+      "logo_url": "https://www.fc-sutton-dynamo.co.uk/img/sutton-dynamo-logo-large.png",
+      "logo_status": "pilot_verified",
+      "logo_source": "official_club_site_image",
+      "logo_updated_at": "2026-09-29",
+      "logo_sha256": "5e59752cfaacf8ffdde44bc0333e892be02a8dfa509c290b662d02ad4071015a"
     },
     {
       "club_id": 383,
@@ -7666,5 +7686,5 @@
     }
   ],
   "note": "Panel parsing confirmed against all five format categories (mini-soccer, 9-a-side, X-category, 11-a-side, Senior) as of Sept 2026. Club/team linking is heuristic (name-prefix match) - see ambiguous_club_matches in diagnostics for anything flagged as uncertain.",
-  "pilot_badges_revision": "b84f207adfeee1e8c5bec16050d863754a6d21caf014e30a186b0d092e23caca"
+  "pilot_badges_revision": "822faeae04655b076f78e34b65cb85950367535951c38f4390435e1c4a18ff08"
 }
