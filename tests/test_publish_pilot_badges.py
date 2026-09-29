@@ -61,7 +61,7 @@ class BadgePublisherTest(unittest.TestCase):
     def test_current_manifest_applies_only_to_exact_club_ids(self):
         original = copy.deepcopy(self.directory)
         _, ids = module.update_directory(self.directory, self.manifest)
-        self.assertEqual(ids, [250, 447, 547])
+        self.assertEqual(ids, [250, 447, 499, 547])
         for before, after in zip(original['clubs'], self.directory['clubs']):
             if before['club_id'] not in ids:
                 self.assertEqual(before, after)
@@ -99,6 +99,17 @@ class BadgePublisherTest(unittest.TestCase):
         matching['badges'][0]['logo_sha256'] = hashlib.sha256(approved_bytes).hexdigest()
         with patch('requests.get', return_value=Response([approved_bytes])):
             module.verify_hosted_assets(matching)
+
+    def test_private_source_requires_exact_protected_route_and_no_public_fetch(self):
+        private = next(b for b in self.manifest['badges'] if b['club_id'] == 499)
+        with patch('requests.get', side_effect=AssertionError('private source fetched')):
+            module.verify_hosted_assets({'badges': [private]})
+        for changed in ({'logo_url': 'https://example.com/badge.png'},
+                        {'logo_sha256': 'a' * 64}):
+            candidate = copy.deepcopy(self.manifest)
+            next(b for b in candidate['badges'] if b['club_id'] == 499).update(changed)
+            with self.assertRaisesRegex(ValueError, 'invalid private-pilot URL'):
+                module.validated_approvals(copy.deepcopy(self.directory), candidate)
 
 
 if __name__ == '__main__':

@@ -35,7 +35,7 @@ function applyClubConfiguration(config){
   const meta=document.querySelector('meta[name="theme-color"]');if(meta&&resolvedTheme()!=='dark')meta.content=s.primary_color||'#218a21';document.title=`${s.display_name||'Club'} Team Hub`;
   const desc=document.querySelector('meta[name="description"]');if(desc)desc.content=`Team management hub for ${s.display_name||'your club'}.`;
   const clubEl=document.getElementById('hero-club-name');if(clubEl)clubEl.textContent=(s.display_name||'Club').toUpperCase();
-  const logo=s.logo_url||s.logo_asset||'';document.querySelectorAll('.club-logo').forEach(img=>{img.src=logo||'pitchkind-wt_mark.svg';img.alt=logo?`${s.display_name||'Club'} logo`:'PitchKind placeholder';img.style.display='';});
+  const logo=privatePilotOwnBadgeUrl()||s.logo_url||s.logo_asset||'';document.querySelectorAll('.club-logo').forEach(img=>{img.src=logo||'pitchkind-wt_mark.svg';img.alt=logo?`${s.display_name||'Club'} logo`:'PitchKind placeholder';img.style.display='';});
   const wrap=document.querySelector('.club-logo-wrap');if(wrap){wrap.classList.toggle('platform-club-placeholder',!logo);wrap.classList.remove('generic-club-mark');delete wrap.dataset.short;wrap.setAttribute('aria-label',logo?((s.display_name||'Club')+' logo'):'Club logo unavailable — PitchKind placeholder');}
   configureOpponentEditorForProvider();
   if(typeof state!=='undefined'&&state){state.meta=state.meta||{};state.meta.clubName=s.display_name||state.meta.clubName;state.meta.season=s.current_season||state.meta.season;const p=primaryProvider(),pc=p?.config||{};state.selkent=state.selkent||{};state.selkent.enabled=providerType()==='selkent';if(providerType()==='selkent'){state.selkent.clubUrl=pc.club_url||state.selkent.clubUrl;state.selkent.divisionsUrl=pc.divisions_url||state.selkent.divisionsUrl;state.selkent.fixturesUrl=pc.fixtures_url||state.selkent.fixturesUrl;state.selkent.resultsUrl=pc.results_url||state.selkent.resultsUrl;}else{state.selkent.status='Manual competition provider';state.selkent.fixtures=state.selkent.fixtures||[];state.selkent.results=[];state.selkent.table=[];}}
@@ -1484,8 +1484,26 @@ function pilotVerifiedBadgeScopeAllowed(){
     });
   }catch(_){return false;}
 }
+function privatePilotOwnBadgeUrl(){
+  const badge=window.__PITCHKIND_OWN_PILOT_BADGE;
+  if(!badge||!pilotVerifiedBadgeScopeAllowed()||window.ClubHubNative)return '';
+  const hash=String(badge.logo_sha256||'').toLowerCase();
+  return Number(badge.club_id)===499&&badge.logo_source==='club_supplied_private'&&
+    /^[a-f0-9]{64}$/.test(hash)&&badge.logo_url===`https://test.pitchkind.com/__pilot_badges/499/${hash}`
+    ?`/__pilot_badges/499/${hash}`:'';
+}
+window.applyPilotOwnClubBadge=function(){
+  const logo=privatePilotOwnBadgeUrl();
+  document.querySelectorAll('.club-logo').forEach(img=>{
+    img.onerror=logo?()=>{img.onerror=null;img.src='shooters-hill-logo.png';}:null;
+    img.src=logo||clubSettings().logo_url||clubSettings().logo_asset||'pitchkind-wt_mark.svg';
+    img.alt=logo?'Shooters Hill AFC club badge':(clubSettings().display_name||'Club')+' logo';
+  });
+};
 function verifiedTeamBadgeUrl(teamName=''){
   if(isOwnTeamName(teamName)){
+    const privateBadge=privatePilotOwnBadgeUrl();
+    if(privateBadge)return privateBadge;
     const own=clubSettings(),configured=own.logo_url||own.logo_asset||'';
     if(configured)return configured;
     if(selkentNorm(own.display_name||state.meta?.clubName||'').includes('shooters hill'))return 'shooters-hill-logo.png';

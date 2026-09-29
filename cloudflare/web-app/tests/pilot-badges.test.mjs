@@ -46,3 +46,28 @@ test('revocation and unavailable storage fail closed', async () => {
   })).status, 502);
   assert.equal((await pilotBadge(new Request(path, { method: 'POST' }), env)).status, 405);
 });
+
+test('generic dashboard metadata is accepted only for the exact private PNG', async () => {
+  const png = new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10, 1]);
+  const digest = createHash('sha256').update(png).digest('hex');
+  const url = `https://test.pitchkind.com/__pilot_badges/499/${digest}`;
+  const privateClub = { club_id: 499, logo_status: 'pilot_verified',
+    logo_source: 'club_supplied_private', logo_sha256: digest };
+  const privateEnv = { ASSETS: { fetch: async () => Response.json({
+    pilot_badges_revision: 'current', clubs: [privateClub],
+  }) }, PILOT_BADGES: { get: async () => ({
+    arrayBuffer: async () => png.buffer,
+    httpMetadata: { contentType: 'application/octet-stream' },
+  }) } };
+  const response = await pilotBadge(new Request(url), privateEnv);
+  assert.equal(response.status, 200);
+  assert.equal(response.headers.get('Content-Type'), 'image/png');
+  assert.equal((await pilotBadge(new Request(url), { ...privateEnv,
+    ASSETS: { fetch: async () => Response.json({ pilot_badges_revision: 'current',
+      clubs: [{ ...privateClub, logo_source: 'other' }] }) },
+  })).status, 502);
+  assert.equal((await pilotBadge(new Request(url), { ...privateEnv,
+    PILOT_BADGES: { get: async () => ({ arrayBuffer: async () => new Uint8Array([1]).buffer,
+      httpMetadata: { contentType: 'application/octet-stream' } }) },
+  })).status, 502);
+});

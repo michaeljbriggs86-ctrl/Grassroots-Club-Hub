@@ -25,6 +25,17 @@
       "review_basis": "ChatGPT/Codex protected-pilot review 2026-09-28; Selkent club ID 447 and Samuel Montagu Youth Centre's football-club crest corroborated; original 984x1140 PNG exact bytes SHA-256; hero 390/720 px and results 20/28 px plus match cards 56/60 px visually screened. Rights review pending; no public use."
     },
     {
+      "club_id": 499,
+      "club_name": "Shooters Hill AFC",
+      "logo_url": "https://test.pitchkind.com/__pilot_badges/499/66bc3e506f8e5a7e3caf252b50515ad0ef9daf08e8b96ed6b57766acd10ea0a0",
+      "logo_status": "pilot_verified",
+      "logo_source": "club_supplied_private",
+      "logo_updated_at": "2026-09-28",
+      "logo_sha256": "66bc3e506f8e5a7e3caf252b50515ad0ef9daf08e8b96ed6b57766acd10ea0a0",
+      "rights_status": "protected_pilot_only_public_rights_not_reviewed",
+      "review_basis": "Secretary-supplied original in the private upload inbox; Selkent club ID 499. Approved for the Access-protected page on 2026-09-28. Exact 3500x3500 RGBA PNG, 470088 bytes, transparent corners, SHA-256 recorded here; hero/card sizes visually screened. Source provenance and approval record remain in the private upload inbox; no public or marketing clearance."
+    },
+    {
       "club_id": 547,
       "club_name": "Cray Valley (PM) FC",
       "logo_url": "https://images.pitchero.com/club_logos/76256/OqKQ53StSIqCY660jRDr_Badge%20Vase.png",

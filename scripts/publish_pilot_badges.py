@@ -47,6 +47,12 @@ def validated_approvals(directory, manifest):
             raise ValueError(f"badge {club_id} has no exact-image SHA-256")
         if not all(badge.get(field) for field in BADGE_FIELDS):
             raise ValueError(f"badge {club_id} is missing provenance metadata")
+        if badge.get('logo_source') == 'club_supplied_private':
+            if club_id != 499:
+                raise ValueError(f"badge {club_id} is outside the private club-supplied pilot")
+            expected = f"https://test.pitchkind.com/__pilot_badges/{club_id}/{badge['logo_sha256'].lower()}"
+            if badge['logo_url'] != expected:
+                raise ValueError(f"badge {club_id} has an invalid private-pilot URL")
         selected[club_id] = {field: badge[field] for field in BADGE_FIELDS}
     return selected
 
@@ -55,6 +61,10 @@ def verify_hosted_assets(manifest):
     """Fail publication if an official-hosted image no longer matches its review."""
     import requests
     for badge in manifest['badges']:
+        # Club-supplied bytes were reviewed locally and must be read back from
+        # private R2 by the staging gate. They have no publicly fetchable source.
+        if badge.get('logo_source') == 'club_supplied_private':
+            continue
         club_id = badge['club_id']
         digest = hashlib.sha256()
         size = 0

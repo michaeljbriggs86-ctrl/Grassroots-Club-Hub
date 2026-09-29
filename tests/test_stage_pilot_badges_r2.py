@@ -66,6 +66,21 @@ class StageTest(unittest.TestCase):
             stage.fetch_reviewed({**self.badge, 'logo_sha256': hashlib.sha256(b'<svg/>').hexdigest()},
                                  lambda *a, **k: Response(b'<svg/>'))
 
+    def test_private_badge_is_only_read_back_from_r2(self):
+        badge = {**self.badge, 'logo_source': 'club_supplied_private'}
+        commands = []
+        def run(command, *, check):
+            commands.append(command)
+            pathlib.Path(command[command.index('--file') + 1]).write_bytes(self.data)
+        stage.upload_badges([badge], lambda *a, **k: self.fail('private fetch'), run)
+        self.assertEqual(len(commands), 1)
+        self.assertIn('get', commands[0])
+        self.assertNotIn('put', commands[0])
+        def wrong(command, *, check):
+            pathlib.Path(command[command.index('--file') + 1]).write_bytes(self.data + b'changed')
+        with self.assertRaisesRegex(ValueError, 'differ from reviewed PNG'):
+            stage.upload_badges([badge], lambda *a, **k: self.fail('private fetch'), wrong)
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -65,10 +65,23 @@ def upload_badges(badges, get, run):
     with tempfile.TemporaryDirectory(prefix='pitchkind-badges-') as directory:
         root = Path(directory)
         for badge in badges:
-            data, kind = fetch_reviewed(badge, get)
             key = f"{int(badge['club_id'])}/{badge['logo_sha256'].lower()}"
-            local = root / 'approved-image'
             readback = root / 'r2-readback'
+            if badge.get('logo_source') == 'club_supplied_private':
+                # The secretary's original is staged from a private local file,
+                # outside GitHub. CI only admits its already stored exact bytes.
+                run([*WRANGLER, 'r2', 'object', 'get', f'{BUCKET}/{key}',
+                     '--remote', '--file', str(readback)], check=True)
+                data = readback.read_bytes()
+                if (not data or len(data) > MAX_IMAGE_BYTES or
+                        hashlib.sha256(data).hexdigest() != badge['logo_sha256'].lower() or
+                        media_type(data) != 'image/png'):
+                    raise ValueError(f"badge {badge['club_id']} private R2 bytes differ from reviewed PNG")
+                readback.unlink()
+                print(f"Checked private R2 badge club_id={badge['club_id']} sha256={badge['logo_sha256']}")
+                continue
+            data, kind = fetch_reviewed(badge, get)
+            local = root / 'approved-image'
             local.write_bytes(data)
             run([*WRANGLER, 'r2', 'object', 'put', f'{BUCKET}/{key}',
                  '--remote', '--file', str(local), '--content-type', kind,

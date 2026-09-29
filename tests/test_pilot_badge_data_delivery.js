@@ -16,10 +16,12 @@ function extract(file, start, end) {
 }
 
 const state = { selkent: { clubUrl: 'https://www.selkent.org.uk/public/clubs/499', directoryDetails: {} } };
-const overlay = vm.createContext({ state, norm });
-vm.runInContext(extract('app/src/main/assets/static-feed-overlay.js', '  function attachDirectoryBadges(', '  function loadDirectory('), overlay);
 const window = { ClubHubNative: { isDebugBuild: () => true }, __PITCHKIND_PILOT_RIGHTS: { scope_verified: true, override_status: 'ACTIVE', active_club_ids: [499], permitted_club_ids: [499] } };
-const app = vm.createContext({ state, window, providerType: () => 'selkent', primaryProvider: () => ({ config: { club_url: state.selkent.clubUrl } }),
+const hero = { src: '', alt: '', onerror: null };
+const document = { querySelectorAll: () => [hero] };
+const overlay = vm.createContext({ state, norm, window });
+vm.runInContext(extract('app/src/main/assets/static-feed-overlay.js', '  function attachDirectoryBadges(', '  function loadDirectory('), overlay);
+const app = vm.createContext({ state, window, document, providerType: () => 'selkent', primaryProvider: () => ({ config: { club_url: state.selkent.clubUrl } }),
   clubSettings: () => ({ display_name: 'Shooters Hill AFC' }), isOwnTeamName: () => false,
   selkentNorm: norm, pilotBadgeOverrideAllowed: () => false });
 vm.runInContext(extract('app/src/main/assets/app.js', 'function pilotVerifiedBadgeScopeAllowed()', 'function clubIdentityName('), app);
@@ -33,6 +35,22 @@ const crayTeam = original.team_club_links.find(t => Number(t.club_id) === 250).t
 overlay.attachDirectoryBadges(original);
 assert.equal(app.verifiedTeamBadgeUrl(crayTeam), cray.logo_url);
 assert.equal(state.selkent.directoryDetails[norm(crayTeam)].pilotLogoSha256, cray.logo_sha256);
+const ownTeam = original.team_club_links.find(t => Number(t.club_id) === 499).team_name;
+const ownBadge = manifest.badges.find(b => b.club_id === 499);
+assert(ownBadge && ownBadge.logo_source === 'club_supplied_private');
+window.ClubHubNative = undefined;
+window.location = { protocol: 'https:', hostname: 'test.pitchkind.com' };
+overlay.attachDirectoryBadges(original);
+assert.equal(hero.src, `/__pilot_badges/499/${ownBadge.logo_sha256}`);
+assert.equal(app.privatePilotOwnBadgeUrl(), hero.src);
+app.isOwnTeamName = name => name === ownTeam;
+assert.equal(app.verifiedTeamBadgeUrl(ownTeam), hero.src);
+app.isOwnTeamName = () => false;
+const revokedOwn = structuredClone(original);
+delete revokedOwn.clubs.find(c => c.club_id === 499).logo_status;
+overlay.attachDirectoryBadges(revokedOwn);
+assert.notEqual(hero.src, `/__pilot_badges/499/${ownBadge.logo_sha256}`);
+window.ClubHubNative = { isDebugBuild: () => true };
 
 // A second approval enters through directory data with the same installed app code.
 const second = structuredClone(original);

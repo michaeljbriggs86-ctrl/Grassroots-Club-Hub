@@ -26,13 +26,21 @@ export async function pilotBadge(request, env) {
     }
     const object = await env.PILOT_BADGES.get(`${clubId}/${hash}`);
     if (!object) return new Response('Not found', { status: 404 });
-    const type = object.httpMetadata?.contentType?.toLowerCase();
-    if (!MIME.has(type)) return new Response('Unsupported badge type', { status: 502 });
+    let type = object.httpMetadata?.contentType?.toLowerCase();
     // The key is an identifier, not proof that stored bytes still match review.
     const bytes = await object.arrayBuffer();
     const digest = await crypto.subtle.digest('SHA-256', bytes);
     const actual = [...new Uint8Array(digest)].map(b => b.toString(16).padStart(2, '0')).join('');
     if (actual !== hash) return new Response('Badge hash mismatch', { status: 502 });
+    // Dashboard uploads under a hash-only key may have generic HTTP metadata.
+    // Admit only the reviewed private PNG after the directory and bytes agree.
+    if (!MIME.has(type) && clubId === 499 && club.logo_source === 'club_supplied_private' &&
+        (!type || type === 'application/octet-stream') &&
+        bytes.byteLength >= 8 && new Uint8Array(bytes).subarray(0, 8).every((byte, index) =>
+          byte === [137, 80, 78, 71, 13, 10, 26, 10][index])) {
+      type = 'image/png';
+    }
+    if (!MIME.has(type)) return new Response('Unsupported badge type', { status: 502 });
     return new Response(request.method === 'HEAD' ? null : bytes, {
       headers: {
         'Content-Type': type,

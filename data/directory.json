@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-09-28T10:45:51.100378+00:00",
+  "last_updated": "2026-09-28T15:16:24.536973+00:00",
   "clubs": [
     {
       "club_id": 514,
@@ -422,7 +422,12 @@
     },
     {
       "club_id": 499,
-      "club_name": "Shooters Hill AFC"
+      "club_name": "Shooters Hill AFC",
+      "logo_url": "https://test.pitchkind.com/__pilot_badges/499/66bc3e506f8e5a7e3caf252b50515ad0ef9daf08e8b96ed6b57766acd10ea0a0",
+      "logo_status": "pilot_verified",
+      "logo_source": "club_supplied_private",
+      "logo_updated_at": "2026-09-28",
+      "logo_sha256": "66bc3e506f8e5a7e3caf252b50515ad0ef9daf08e8b96ed6b57766acd10ea0a0"
     },
     {
       "club_id": 403,
@@ -7646,5 +7651,5 @@
     }
   ],
   "note": "Panel parsing confirmed against all five format categories (mini-soccer, 9-a-side, X-category, 11-a-side, Senior) as of Sept 2026. Club/team linking is heuristic (name-prefix match) - see ambiguous_club_matches in diagnostics for anything flagged as uncertain.",
-  "pilot_badges_revision": "cd00194069d49c126a7085ee6b5e9c3373b177012150b3d5f2f64789cd54a831"
+  "pilot_badges_revision": "5e914e5fce487d6efc78b396c0671df18cf2c69435baea218e1dc6c73016ef1d"
 }

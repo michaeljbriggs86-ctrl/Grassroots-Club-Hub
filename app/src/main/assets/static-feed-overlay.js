@@ -88,6 +88,10 @@
     state.selkent=state.selkent||{};
     const details=state.selkent.directoryDetails=state.selkent.directoryDetails||{};
     const clubs=new Map(directory.clubs.map(club=>[Number(club.club_id),club]));
+    const own=clubs.get(499);
+    window.__PITCHKIND_OWN_PILOT_BADGE=own?.logo_status==='pilot_verified'&&
+      own?.logo_source==='club_supplied_private'?own:null;
+    window.applyPilotOwnClubBadge?.();
     const links=new Map();
     for(const link of directory.team_club_links){
       const key=norm(link.team_name),id=Number(link.club_id);
