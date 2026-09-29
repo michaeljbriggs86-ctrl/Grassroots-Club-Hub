@@ -21,7 +21,7 @@ class BadgePublisherTest(unittest.TestCase):
 
     def test_add_second_badge_and_revoke_first_without_other_directory_changes(self):
         # Exercise this transition starting with one approved badge.
-        self.manifest['badges'] = [self.manifest['badges'][0]]
+        self.manifest['badges'] = [next(b for b in self.manifest['badges'] if b['club_id'] == 250)]
         initial = copy.deepcopy(self.directory)
         # Exercise admission from an unbadged copy even when the live feed
         # already contains this approved pilot badge.
@@ -113,7 +113,7 @@ class BadgePublisherTest(unittest.TestCase):
 
     def test_derived_private_source_keeps_original_provenance(self):
         candidate = copy.deepcopy(self.manifest)
-        badge = candidate['badges'][0]
+        badge = next(b for b in candidate['badges'] if b['club_id'] == 250)
         badge.update(logo_source='official_source_transparency_derivative_private',
                      logo_sha256='b' * 64, original_source_url=badge['logo_url'],
                      original_sha256='a' * 64,
@@ -124,7 +124,7 @@ class BadgePublisherTest(unittest.TestCase):
             module.verify_hosted_assets({'badges': [badge]})
         for field in ('original_source_url', 'original_sha256', 'derivation'):
             missing = copy.deepcopy(candidate)
-            missing['badges'][0].pop(field)
+            next(b for b in missing['badges'] if b['club_id'] == 250).pop(field)
             with self.subTest(field=field), self.assertRaisesRegex(ValueError, 'provenance'):
                 module.validated_approvals(copy.deepcopy(self.directory), missing)
 

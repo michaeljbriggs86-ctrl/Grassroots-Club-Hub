@@ -18,7 +18,8 @@ class BadgeManifestTest(unittest.TestCase):
     def setUp(self):
         self.clubs = [{'club_id': 250, 'club_name': 'Cray Wanderers'},
                       {'club_id': 261, 'club_name': 'Dulwich Village'}]
-        self.badge = json.loads((ROOT / 'verification/pilot_verified_badges.json').read_text())['badges'][0]
+        badges = json.loads((ROOT / 'verification/pilot_verified_badges.json').read_text())['badges']
+        self.badge = next(b for b in badges if b['club_id'] == 250)
 
     def attach(self, badges):
         with tempfile.TemporaryDirectory() as folder:

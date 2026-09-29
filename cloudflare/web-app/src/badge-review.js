@@ -41,6 +41,10 @@ export async function badgeReview(request, env) {
       : approved.find(club => Number(club.club_id) === 447) || approved[0];
     if (!selected) return new Response('Badge not approved for pilot', { status: 404 });
     const id = Number(selected.club_id);
+    const key = `${id}/${String(selected.logo_sha256).toLowerCase()}`;
+    if (!env.PILOT_BADGES || !await env.PILOT_BADGES.head(key)) {
+      return new Response('Badge image is still being prepared', { status: 503, headers: HEADERS });
+    }
     const name = escapeHtml(selected.club_name);
     const asset = `/__pilot_badges/${id}/${String(selected.logo_sha256).toLowerCase()}`;
     const size = url.searchParams.get('size') === 'foldable' ? 'foldable' : 'phone';
@@ -58,7 +62,7 @@ body{margin:0;padding:0 0 40px;background:var(--gch-canvas)}
 .review-nav,.review-options{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}.review a{color:var(--gch-green-900);font-weight:800}.review-nav a,.review-options a{border:1px solid var(--gch-line);background:#fff;border-radius:12px;padding:9px 12px;text-decoration:none;min-height:44px;display:inline-flex;align-items:center}
 .review a[aria-current=page],.review-options a[aria-current=page]{background:var(--gch-green-900);color:#fff}
 .review-scroller{max-width:100%;overflow-x:auto;border:1px solid var(--gch-line);border-radius:20px}.review-stage{width:min(390px,100%);margin:auto;background:var(--gch-canvas);padding-bottom:14px}.review-stage.foldable{width:720px;max-width:none}
-.review-stage .hero{width:100%}.review-stage.phone .hero{padding:14px 14px 104px;min-height:150px;border-radius:0 0 20px 20px}.review-stage.phone .hero-art{inset:auto 0 0;width:100%;height:96px;object-position:center 68%}
+.review-stage .hero{width:100%;overflow:hidden}.review-stage .hero-inner{display:grid!important;align-items:center}.review-stage .hero .club-logo-wrap{max-width:86px!important;max-height:86px!important;overflow:hidden!important}.review-stage .hero img.club-logo{display:block;width:100%!important;height:100%!important;max-width:86px!important;max-height:86px!important;object-fit:contain!important}.review-stage .hero-copy{min-width:0;overflow:hidden}.review-stage.phone .hero{padding:14px 14px 104px;min-height:150px;border-radius:0 0 20px 20px}.review-stage.phone .hero-art{inset:auto 0 0;width:100%;height:96px;object-position:center 68%}
 .review-stage.phone .hero::before{inset:auto 0 0;width:100%;height:96px;background:linear-gradient(180deg,var(--gch-green-950),rgba(6,69,38,.7) 24%,rgba(6,69,38,.06) 70%)}
 .review-stage.phone .hero-inner{grid-template-columns:64px minmax(0,1fr)}.review-stage.phone .club-logo-wrap{width:64px;height:64px}
 .review-stage.foldable .hero{min-height:190px;padding:18px 28px 20px;border-radius:0 0 24px 24px}.review-stage.foldable .hero-art,.review-stage.foldable .hero::before{inset:0 0 0 auto;width:60%;height:100%}
