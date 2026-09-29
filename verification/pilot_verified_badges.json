@@ -80,13 +80,16 @@
     {
       "club_id": 547,
       "club_name": "Cray Valley (PM) FC",
-      "logo_url": "https://images.pitchero.com/club_logos/76256/OqKQ53StSIqCY660jRDr_Badge%20Vase.png",
+      "logo_url": "https://test.pitchkind.com/__pilot_badges/547/76c03010a21fc107b81fdc651b58db4dd62814ca29131be33c01b77051615cca",
       "logo_status": "pilot_verified",
-      "logo_source": "official_site_image",
-      "logo_updated_at": "2026-09-28",
-      "logo_sha256": "6d4a43ae988bf8215799a76c2c9e38891c833b2e2d00039e2751ae649ad700ef",
+      "logo_source": "official_source_transparency_derivative_private",
+      "logo_updated_at": "2026-09-29",
+      "logo_sha256": "76c03010a21fc107b81fdc651b58db4dd62814ca29131be33c01b77051615cca",
+      "original_source_url": "https://images.pitchero.com/club_logos/76256/OqKQ53StSIqCY660jRDr_Badge%20Vase.png",
+      "original_sha256": "6d4a43ae988bf8215799a76c2c9e38891c833b2e2d00039e2751ae649ad700ef",
+      "derivation": "outer_background_transparency_only",
       "rights_status": "legal_basis_not_reviewed",
-      "review_basis": "ChatGPT/Codex protected-pilot review 2026-09-28; Selkent club ID 547 and official Cray Valley (PM) FC website use the same crest. Original 720x720 PNG exact hosted bytes SHA-256; full-outline hero at 390/720 px, results at 20/28 px and match slots at 56/60 px screened. The original opaque white square is retained and accepted for this protected pilot. Rights review pending; no public use."
+      "review_basis": "Mike requested further background cleanup on 2026-09-29 after protected-page inspection. Selkent club ID 547 and the official 720x720 source remain unchanged. The exterior connected white field is made transparent; internal white shield and ribbon, lettering, colours and outlines are preserved byte-for-byte apart from edge alpha. Exact original and derivative hashes recorded here. Protected-page light/dark real-slot acceptance remains open. Rights review pending; no public use."
     }
   ]
 }

@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-09-29T13:52:48.167827+00:00",
+  "last_updated": "2026-09-29T15:05:43.094576+00:00",
   "clubs": [
     {
       "club_id": 514,
@@ -117,11 +117,11 @@
     {
       "club_id": 547,
       "club_name": "Cray Valley (PM) FC",
-      "logo_url": "https://images.pitchero.com/club_logos/76256/OqKQ53StSIqCY660jRDr_Badge%20Vase.png",
+      "logo_url": "https://test.pitchkind.com/__pilot_badges/547/76c03010a21fc107b81fdc651b58db4dd62814ca29131be33c01b77051615cca",
       "logo_status": "pilot_verified",
-      "logo_source": "official_site_image",
-      "logo_updated_at": "2026-09-28",
-      "logo_sha256": "6d4a43ae988bf8215799a76c2c9e38891c833b2e2d00039e2751ae649ad700ef"
+      "logo_source": "official_source_transparency_derivative_private",
+      "logo_updated_at": "2026-09-29",
+      "logo_sha256": "76c03010a21fc107b81fdc651b58db4dd62814ca29131be33c01b77051615cca"
     },
     {
       "club_id": 250,
@@ -7666,5 +7666,5 @@
     }
   ],
   "note": "Panel parsing confirmed against all five format categories (mini-soccer, 9-a-side, X-category, 11-a-side, Senior) as of Sept 2026. Club/team linking is heuristic (name-prefix match) - see ambiguous_club_matches in diagnostics for anything flagged as uncertain.",
-  "pilot_badges_revision": "b3e2d1f14c5b5942334fe894a29523cef212791619b319c8c09b4cdee26ade1c"
+  "pilot_badges_revision": "b84f207adfeee1e8c5bec16050d863754a6d21caf014e30a186b0d092e23caca"
 }
