@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "provider": "Selkent",
-  "last_updated": "2026-09-29T06:05:54.840285+00:00",
+  "last_updated": "2026-09-29T12:06:04.535290+00:00",
   "fixture_agegroup_discovery_source": "selkent_divisions_all",
   "coverage": {
     "fixtures": {
@@ -2043,21 +2043,21 @@
         {
           "date": "2026-10-04",
           "division_name": "Under 10D Red",
-          "home": "Stansfeld (Fratres) FC",
-          "away": "Falconwood FC Green",
+          "home": "Slade Green Knights",
+          "away": "Welling United Purple",
           "provider_team_ids": [
-            "2068",
-            "2101"
+            "95",
+            "886"
           ]
         },
         {
           "date": "2026-10-04",
           "division_name": "Under 10D Red",
-          "home": "Welling United Purple",
-          "away": "Slade Green Knights",
+          "home": "Stansfeld (Fratres) FC",
+          "away": "Falconwood FC Green",
           "provider_team_ids": [
-            "886",
-            "95"
+            "2068",
+            "2101"
           ]
         },
         {
@@ -2093,6 +2093,16 @@
         {
           "date": "2026-10-04",
           "division_name": "Under 10D White",
+          "home": "Baldon Sports Panthers",
+          "away": "Welling United Green",
+          "provider_team_ids": [
+            "906",
+            "884"
+          ]
+        },
+        {
+          "date": "2026-10-04",
+          "division_name": "Under 10D White",
           "home": "Blackheath Rhinos Black",
           "away": "Sporting Club Thamesmead Yellow",
           "provider_team_ids": [
@@ -2118,16 +2128,6 @@
           "provider_team_ids": [
             "490",
             "438"
-          ]
-        },
-        {
-          "date": "2026-10-04",
-          "division_name": "Under 10D White",
-          "home": "Welling United Green",
-          "away": "Baldon Sports Panthers",
-          "provider_team_ids": [
-            "884",
-            "906"
           ]
         }
       ],
@@ -3215,7 +3215,7 @@
       "standings": [
         {
           "division_name": "Under 12A Navy",
-          "updated_at_text": "27/09/26 16:42:16",
+          "updated_at_text": "29/09/26 12:10:14",
           "source_order_authoritative_for_ties": false,
           "source_disclaimer": "Note: Table does not yet take account of rules for determining winner if teams on equal points",
           "rows": [
@@ -3260,6 +3260,19 @@
             },
             {
               "row_order": 4,
+              "provider_team_id": 894,
+              "provider_division_id": 4249,
+              "team_name": "Welling United black",
+              "played": 1,
+              "won": 1,
+              "drawn": 0,
+              "lost": 0,
+              "gf": 4,
+              "ga": 1,
+              "points": 2
+            },
+            {
+              "row_order": 5,
               "provider_team_id": 486,
               "provider_division_id": 4249,
               "team_name": "Dartford FC White",
@@ -3272,7 +3285,7 @@
               "points": 1
             },
             {
-              "row_order": 5,
+              "row_order": 6,
               "provider_team_id": 667,
               "provider_division_id": 4249,
               "team_name": "Ebbsfleet United Red",
@@ -3285,20 +3298,20 @@
               "points": 1
             },
             {
-              "row_order": 6,
+              "row_order": 7,
               "provider_team_id": 811,
               "provider_division_id": 4249,
               "team_name": "Ballon Dor FC",
-              "played": 0,
+              "played": 1,
               "won": 0,
               "drawn": 0,
-              "lost": 0,
-              "gf": 0,
-              "ga": 0,
+              "lost": 1,
+              "gf": 1,
+              "ga": 4,
               "points": 0
             },
             {
-              "row_order": 7,
+              "row_order": 8,
               "provider_team_id": 487,
               "provider_division_id": 4249,
               "team_name": "Dartford FC Black",
@@ -3311,7 +3324,7 @@
               "points": 0
             },
             {
-              "row_order": 8,
+              "row_order": 9,
               "provider_team_id": 530,
               "provider_division_id": 4249,
               "team_name": "Sutton Athletic Stripes",
@@ -3324,7 +3337,7 @@
               "points": 0
             },
             {
-              "row_order": 9,
+              "row_order": 10,
               "provider_team_id": 719,
               "provider_division_id": 4249,
               "team_name": "Swanscombe Tigers Yellow",
@@ -3334,19 +3347,6 @@
               "lost": 1,
               "gf": 1,
               "ga": 3,
-              "points": 0
-            },
-            {
-              "row_order": 10,
-              "provider_team_id": 894,
-              "provider_division_id": 4249,
-              "team_name": "Welling United black",
-              "played": 0,
-              "won": 0,
-              "drawn": 0,
-              "lost": 0,
-              "gf": 0,
-              "ga": 0,
               "points": 0
             },
             {
@@ -4965,6 +4965,15 @@
         }
       ],
       "published_results": [
+        {
+          "date": "2026-09-27",
+          "home": "Ballon Dor FC",
+          "away": "Welling United black",
+          "homeGoals": 1,
+          "awayGoals": 4,
+          "provider_division_id": 4249,
+          "division_name": "Under 12A Navy"
+        },
         {
           "date": "2026-09-27",
           "home": "Dartford FC Black",
