@@ -2230,13 +2230,25 @@ async function refreshMatchAvailability(quiet=true){
       currentRole==='player'?window.ClubHubCloud.listPlayerAccountLinks(ownId):window.ClubHubCloud.listParentPlayerLinks(currentRole==='parent'?ownId:null)
     ]);
     if(requestVersion!==__availabilityLoadVersion||fixtureKey!==fixtureResponseKey(nextPublishedFixture()||{})||fixtureKey!==__availabilityFixture||teamId!==__availabilityTeamId||teamId!==String(window.ClubHubCloud?.currentTeam?.()?.id||''))return;
-    __availabilityRows=rows||[];links=loadedLinks||[];
-    __parentPlayerLinks=links||[];
-  }catch{if(!quiet)toast('Availability could not be refreshed');return;}
+    links=loadedLinks||[];
+    if(currentRole==='parent'){
+      links=links.filter(link=>String(link.parent_user_id)===String(ownId)&&(!link.team_id||String(link.team_id)===teamId));
+      const linkedNames=new Set(links.map(link=>selkentNorm(link.player_name)).filter(Boolean));
+      __availabilityRows=(rows||[]).filter(row=>linkedNames.has(selkentNorm(row.player_name)));
+    }else __availabilityRows=rows||[];
+    __parentPlayerLinks=links;
+  }catch{
+    if(requestVersion!==__availabilityLoadVersion)return;
+    __availabilityRows=[];__parentPlayerLinks=[];
+    const count=document.getElementById('match-availability-count');if(count)count.textContent='Availability unavailable';
+    const select=document.getElementById('availability-player');if(select&&['parent','player'].includes(currentRole)){select.innerHTML='<option value="">Could not load linked players</option>';select.disabled=true;}
+    document.querySelectorAll('[data-availability-status]').forEach(b=>{b.classList.remove('selected');b.disabled=true;});
+    if(!quiet)toast('Availability could not be refreshed');return;
+  }
   const count=document.getElementById('match-availability-count');if(count)count.textContent=`${__availabilityRows.length} update${__availabilityRows.length===1?'':'s'}`;
   if(['parent','player'].includes(currentRole)){
     const select=document.getElementById('availability-player'),ownId=window.ClubHubCloud?.session?.user?.id||'';
-    const mineLinks=currentRole==='player'?links:links.filter(x=>x.parent_user_id===ownId);
+    const mineLinks=currentRole==='player'?links:links.filter(x=>String(x.parent_user_id)===String(ownId));
     if(select){const prev=select.value||mineLinks[0]?.player_name||'';select.innerHTML=mineLinks.length?mineLinks.map(l=>`<option value="${esc(l.player_name)}">${esc(l.player_name)}${l.shirt_number?' · #'+l.shirt_number:''}</option>`).join(''):'<option value="">No linked player</option>';select.value=mineLinks.some(l=>l.player_name===prev)?prev:(mineLinks[0]?.player_name||'');select.disabled=currentRole==='player'||mineLinks.length<=1;}
     const current=__availabilityRows.find(r=>selkentNorm(r.player_name)===selkentNorm(select?.value||''));
     document.querySelectorAll('[data-availability-status]').forEach(b=>{b.classList.toggle('selected',b.dataset.availabilityStatus===current?.status);b.disabled=!mineLinks.length;});
