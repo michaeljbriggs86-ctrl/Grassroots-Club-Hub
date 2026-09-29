@@ -572,6 +572,11 @@ img[src="/__pilot_badges/547/6d4a43ae988bf8215799a76c2c9e38891c833b2e2d00039e275
   .mobile-more-link{display:flex;align-items:center;justify-content:space-between;width:100%;min-height:48px;padding:8px 12px;border:0;border-radius:12px;background:transparent;color:var(--gch-ink);font-size:15px;font-weight:750;text-align:left}
   .mobile-more-link[hidden]{display:none!important}
   .mobile-more-link:active,.mobile-more-close:active{background:var(--gch-soft-green)}
+  .mobile-more-account{border-top:1px solid var(--gch-line);margin-top:8px;padding-top:8px}
+  .mobile-more-account:has(.mobile-more-link:not(.hidden)){display:block}
+  .mobile-more-account:not(:has(.mobile-more-link:not(.hidden))){display:none}
+  .mobile-more-account .notification-badge{position:static;margin-left:auto;line-height:18px;border:0}
+  body .app-utility-bar{display:none!important}
   body.mobile-more-open{overflow:hidden}
   body.splash-active .mobile-primary-nav,body:has(dialog[open]) .mobile-primary-nav{display:none}
 }
@@ -580,6 +585,7 @@ html[data-theme="dark"] .mobile-primary-item,html[data-theme="dark"] .mobile-mor
 html[data-theme="dark"] .mobile-primary-item[aria-current="page"]{color:#f2f7f3;background:#203027}
 html[data-theme="dark"] .mobile-more-link{color:#f2f7f3}
 html[data-theme="dark"] .mobile-more-link:active,html[data-theme="dark"] .mobile-more-close:active{background:#203027}
+html[data-theme="dark"] .mobile-more-account{border-top-color:#35443a}
 
 /* Match plan opens on the board; setup controls and coaching detail follow it. */
 .tactics-panel .tactics-pitch{order:0;margin-top:0}

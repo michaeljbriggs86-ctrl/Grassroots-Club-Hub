@@ -2,8 +2,25 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const vm = require('node:vm');
 const path = require('node:path');
-
 const source = fs.readFileSync(path.join(__dirname, '../app/src/main/assets/app.js'), 'utf8');
+const assets = path.join(__dirname, '../app/src/main/assets');
+const html = fs.readFileSync(path.join(assets, 'index.html'), 'utf8');
+const css = fs.readFileSync(path.join(assets, 'app-design-system.css'), 'utf8');
+
+const moreSheet = html.indexOf('id="mobile-more-sheet"');
+const moreEnd = html.indexOf('</section>', moreSheet);
+assert(moreSheet > 0 && moreEnd > moreSheet);
+for (const id of ['mobile-notification-bell', 'mobile-profile-switch', 'mobile-admin-preview-back']) {
+  const button = html.indexOf(`id="${id}"`);
+  assert(button > moreSheet && button < moreEnd, `${id} is available under More`);
+}
+assert.match(css, /@media\(max-width:900px\)[\s\S]*?body \.app-utility-bar\{display:none!important\}/,
+  'the mobile page has no account strip below the hero');
+assert.match(source, /mobile-notification-bell'\)\?\.addEventListener\('click',\(\)=>\{closeMobileMore\(\);openNotifications\(\);\}\)/);
+assert.match(source, /mobile-profile-switch'\)\?\.addEventListener\('click',\(\)=>\{closeMobileMore\(\);setAdminUiMode/);
+assert.match(source, /button:not\(\[hidden\]\):not\(\.hidden\)/,
+  'hidden account actions are skipped by the More focus trap');
+
 const start = source.indexOf('function closeMobileMore(restoreFocus=false){');
 const end = source.indexOf('function navigate(view,scroll=true){', start);
 assert(start >= 0 && end > start, 'mobile navigation functions are present');

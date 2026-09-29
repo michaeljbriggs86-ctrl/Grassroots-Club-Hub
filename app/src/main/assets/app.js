@@ -1777,7 +1777,10 @@ function applyAccessMode(){
     profileSwitch.classList.toggle('hidden',!show);
     if(show){const own=dualCoachTeam();profileSwitch.textContent=isAdminCoachMode()?'Club Admin':`Coach · ${own?.ageGroup||''} ${matchTeamLabel(own?.teamName||'')}`.trim();}
   }
-  const previewBack=document.getElementById('hero-admin-preview-back');if(previewBack)previewBack.classList.toggle('hidden',!preview);syncHeaderUtilityBar();
+  const mobileProfileSwitch=document.getElementById('mobile-profile-switch');if(mobileProfileSwitch){mobileProfileSwitch.classList.toggle('hidden',profileSwitch?.classList.contains('hidden')!==false);mobileProfileSwitch.textContent=profileSwitch?.textContent||'Coach view';}
+  const previewBack=document.getElementById('hero-admin-preview-back');if(previewBack)previewBack.classList.toggle('hidden',!preview);
+  document.getElementById('mobile-admin-preview-back')?.classList.toggle('hidden',!preview);
+  syncHeaderUtilityBar();
   document.body.classList.toggle('team-locked',isTeamLocked());
   document.body.classList.toggle('team-has-league',isPublishedLeagueTeam());
   document.body.classList.toggle('build-parent',IS_PARENT_BUILD);
@@ -2170,10 +2173,11 @@ let __appNotifications=[],__notificationStamp=0;
 function notificationDate(v){try{return new Date(v).toLocaleString('en-GB',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});}catch{return '';} }
 function syncHeaderUtilityBar(){const bar=document.getElementById('app-utility-bar');if(bar)bar.classList.toggle('hidden',![...bar.querySelectorAll('button')].some(button=>!button.classList.contains('hidden')));}
 function renderNotificationCenter(){
-  const bell=document.getElementById('notification-bell'),badge=document.getElementById('notification-badge'),list=document.getElementById('notification-list');const allowed=CLOUD_MODE&&['admin','coach','assistant_coach','parent','player'].includes(currentRole);bell?.classList.toggle('hidden',!allowed);syncHeaderUtilityBar();if(!allowed)return;
+  const bell=document.getElementById('notification-bell'),mobileBell=document.getElementById('mobile-notification-bell'),badge=document.getElementById('notification-badge'),mobileBadge=document.getElementById('mobile-notification-badge'),list=document.getElementById('notification-list');const allowed=CLOUD_MODE&&['admin','coach','assistant_coach','parent','player'].includes(currentRole);bell?.classList.toggle('hidden',!allowed);mobileBell?.classList.toggle('hidden',!allowed);syncHeaderUtilityBar();if(!allowed)return;
   const noticeRows=__announcementRows.filter(a=>(!a.expires_at||new Date(a.expires_at).getTime()>Date.now())).map(a=>({source:'announcement',id:a.id,title:a.title,body:a.body,created_at:a.created_at,read_at:a.read_at,important:a.important,type:'club_announcement'}));
   const appRows=__appNotifications.map(n=>({...n,source:'app'}));const rows=[...appRows,...noticeRows].sort((a,b)=>String(b.created_at||'').localeCompare(String(a.created_at||'')));const unread=rows.filter(r=>!r.read_at).length;
   if(badge){badge.textContent=unread>99?'99+':String(unread);badge.classList.toggle('hidden',!unread);}
+  if(mobileBadge){mobileBadge.textContent=unread>99?'99+':String(unread);mobileBadge.classList.toggle('hidden',!unread);}
   const html=rows.length?rows.map(r=>{const parentReview=r.source==='app'&&r.type==='parent_access_request'&&['admin','coach','assistant_coach'].includes(currentRole);const mark=!r.read_at?`<button type="button" class="text-button compact" ${r.source==='announcement'?`data-read-announcement="${r.id}"`:`data-read-notification="${r.id}"`}>Mark read</button>`:'';const review=parentReview?`<button type="button" class="secondary-button compact notification-review-action" data-review-parent-request="${r.id}">Review request</button>`:'';return `<article class="notification-item ${r.read_at?'read':'unread'} ${r.important?'important':''}"><div class="notification-item-head"><div><strong>${esc(r.title||'Notification')}</strong><small>${r.source==='announcement'?'Club notice':String(r.type||'update').replace(/_/g,' ')}</small></div><time>${notificationDate(r.created_at)}</time></div><p>${esc(r.body||'')}</p>${review||mark?`<div class="notification-item-actions">${review}${mark}</div>`:''}</article>`;}).join(''):'<div class="empty-state compact-empty">No notifications yet.</div>';
   if(list)list.innerHTML=html;
   const adminList=document.getElementById('communications-notifications-list');if(adminList)adminList.innerHTML=html;
@@ -4410,13 +4414,14 @@ document.addEventListener('click',e=>{
 document.getElementById('mobile-more-sheet')?.addEventListener('keydown',e=>{
   if(e.key==='Escape'){e.preventDefault();closeMobileMore(true);return;}
   if(e.key!=='Tab')return;
-  const visible=[...e.currentTarget.querySelectorAll('button:not([hidden])')];
+  const visible=[...e.currentTarget.querySelectorAll('button:not([hidden]):not(.hidden)')];
   const first=visible[0],last=visible[visible.length-1];
   if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}
   else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}
 });
 document.getElementById('appearance-theme')?.addEventListener('change',e=>applyTheme(e.target.value));
 document.getElementById('notification-bell')?.addEventListener('click',openNotifications);
+document.getElementById('mobile-notification-bell')?.addEventListener('click',()=>{closeMobileMore();openNotifications();});
 document.getElementById('communications-mark-all')?.addEventListener('click',markAllNotificationsRead);
 document.querySelectorAll('[data-communications-tab]').forEach(button=>button.addEventListener('click',()=>{setCommunicationsTab(button.dataset.communicationsTab);if(__communicationsTab==='inbox')refreshInbox(false);}));
 document.getElementById('notifications-mark-all')?.addEventListener('click',markAllNotificationsRead);
@@ -4490,6 +4495,8 @@ document.getElementById('admin-mode-coach')?.addEventListener('click',()=>setAdm
 document.getElementById('admin-account-mode-switch')?.addEventListener('click',()=>setAdminUiMode(isAdminCoachMode()?'club':'coach'));
 document.getElementById('hero-profile-switch')?.addEventListener('click',()=>setAdminUiMode(isAdminCoachMode()?'club':'coach'));
 document.getElementById('hero-admin-preview-back')?.addEventListener('click',()=>setAdminUiMode('club'));
+document.getElementById('mobile-profile-switch')?.addEventListener('click',()=>{closeMobileMore();setAdminUiMode(isAdminCoachMode()?'club':'coach');});
+document.getElementById('mobile-admin-preview-back')?.addEventListener('click',()=>{closeMobileMore();setAdminUiMode('club');});
 document.getElementById('settings-team-name')?.addEventListener('change',()=>{if(!isTeamLocked())applySelectedClubTeamToForm();});
 const refreshClubTeamsBtn=document.getElementById('refresh-club-teams');if(refreshClubTeamsBtn)refreshClubTeamsBtn.addEventListener('click',()=>syncProviderClubTeams(false));
 document.getElementById('save-league-settings')?.addEventListener('click',saveLeagueSettings);
