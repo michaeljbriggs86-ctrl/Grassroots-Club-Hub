@@ -10,9 +10,9 @@ const css = fs.readFileSync(path.join(assets, 'app-design-system.css'), 'utf8');
 const moreSheet = html.indexOf('id="mobile-more-sheet"');
 const moreEnd = html.indexOf('</section>', moreSheet);
 assert(moreSheet > 0 && moreEnd > moreSheet);
-assert(html.indexOf('id="league-table-panel"') > html.indexOf('id="home-next-match"'));
-assert(html.indexOf('id="league-table-panel"') < html.indexOf('id="home-season-record"'),
-  'standings appear near the top of Home without opening a details panel');
+assert(!html.includes('id="league-table-panel"'), 'Home has no duplicate standings card');
+assert(html.includes('id="league-quick-table-body"'), 'Table tab retains the standings');
+assert(!html.includes('id="league-quick-opponents"'), 'Table tab has no repeated opponents list');
 assert.match(html, /data-mobile-tab="3" hidden[\s\S]*?<span>Table<\/span>/);
 for (const id of ['mobile-notification-bell', 'mobile-context-switch']) {
   const button = html.indexOf(`id="${id}"`);
