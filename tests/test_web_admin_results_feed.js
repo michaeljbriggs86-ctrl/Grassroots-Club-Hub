@@ -13,9 +13,9 @@ const elements = new Map(['admin-recent-results','admin-results-count','admin-re
 const document = {getElementById:id => elements.get(id)};
 const helpers = src.slice(src.indexOf('function verifiedClubResultsFeed(feed){'), src.indexOf('function nextWeekendDates(){'));
 const {verifiedClubResultsFeed,publishedClubTeamData,clubResultRows,coachClubResultRows,renderAdminRecentResults} = new Function(
-  'normalizeTeamKey','internalAdminClubResults','document','esc','formatDate','matchTeamLabel',
+  'normalizeTeamKey','internalAdminClubResults','document','esc','formatDate','matchTeamLabel','clubListingHtml',
   `${helpers}\nreturn {verifiedClubResultsFeed,publishedClubTeamData,clubResultRows,coachClubResultRows,renderAdminRecentResults};`
-)(normalizeTeamKey,internalAdminClubResults,document,s=>String(s),(s=>s),(s=>s));
+)(normalizeTeamKey,internalAdminClubResults,document,s=>String(s),(s=>s),(s=>s),(s=>`<span class=\"club-listing\">${s}</span>`));
 
 const teams = [
   {id:'12',ageGroup:'U12',teamName:'Cannons',leagueName:'Shooters Hill AFC Cannons',division:'Under 12C Orange'},

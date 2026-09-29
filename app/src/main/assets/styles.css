@@ -1614,3 +1614,14 @@ html[data-theme="dark"] .fixture-edit-button{
 .club-result-score .club-result-team.away .club-result-team-name{text-align:right}
 .club-result-score .club-result-team .club-identity-badge{width:28px;height:28px;max-width:28px;max-height:28px;flex:0 0 28px;border-radius:6px}
 @media(max-width:430px){.club-result-score{grid-template-columns:minmax(0,1fr) 44px minmax(0,1fr);gap:4px}.club-result-score strong{padding:7px 3px;font-size:16px}.club-result-score>.club-result-team{gap:4px;overflow:hidden}.club-result-score .club-result-team .club-identity-badge{width:20px;height:20px;max-width:20px;max-height:20px;flex-basis:20px}}
+
+/* Compact club identity in all named result, fixture and table rows. */
+.club-listing{display:inline-flex;align-items:center;gap:6px;min-width:0;max-width:100%;vertical-align:middle;text-align:left}
+.club-listing-name{min-width:0;overflow-wrap:anywhere}
+.club-listing .club-identity-badge{width:22px;height:22px;max-width:22px;max-height:22px;flex:0 0 22px;border-radius:5px}
+.club-listing .club-placeholder-badge{padding:2px}
+.league-table .team-cell .club-listing{min-width:120px}
+.admin-fixture-main strong .club-listing,.admin-recent-result strong .club-listing,.weekend-fixture-row .club-listing{vertical-align:middle}
+.admin-fixture-main small .club-listing .club-identity-badge{width:18px;height:18px;max-width:18px;max-height:18px;flex-basis:18px}
+.club-detail-link .club-listing{color:inherit}
+@media(max-width:430px){.club-listing{gap:4px}.club-listing .club-identity-badge{width:18px;height:18px;max-width:18px;max-height:18px;flex-basis:18px}}

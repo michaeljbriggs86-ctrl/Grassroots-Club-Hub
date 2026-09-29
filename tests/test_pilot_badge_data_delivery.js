@@ -94,9 +94,26 @@ assert.equal(app.verifiedTeamBadgeUrl(secondTeam), secondUrl);
 window.ClubHubNative = undefined;
 window.location = { protocol: 'https:', hostname: 'test.pitchkind.com' };
 assert.equal(app.verifiedTeamBadgeUrl(crayTeam), `/__pilot_badges/250/${cray.logo_sha256}`);
+app.esc = value => String(value).replace(/[&<>\"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[char]));
+app.matchTeamLabel = name => String(name||'').replace(/_/g,' ').trim();
+vm.runInContext(extract('app/src/main/assets/app.js', 'function clubListingHtml(', 'document.addEventListener(\'error\''), app);
+assert.match(app.clubListingHtml(crayTeam), new RegExp(`/__pilot_badges/250/${cray.logo_sha256}`),'list rows use the protected reviewed badge');
+assert.match(app.clubListingHtml('Unreviewed FC'), /pitchkind-wt_mark\.svg/,'unapproved clubs use the neutral mark');
+const standingsBody = {innerHTML:''};
+const standingsView = vm.createContext({
+  state:{selkent:{tableSource:'github-static-results-v2',table:[{team:crayTeam,sourceOrder:1,p:1,w:1,d:0,l:0,gf:2,ga:0,gd:2,pts:3},{team:'Unreviewed FC',sourceOrder:2,p:1,w:0,d:0,l:1,gf:0,ga:2,gd:-2,pts:0}]},division:{teamName:ownTeam,name:'Under 12A'}},
+  TABLE_SOURCE:'github-static-results-v2',norm,window:{leagueTableEnabled:()=>true,clubListingHtml:app.clubListingHtml},
+  document:{getElementById:()=>({classList:{toggle:()=>{}}}),querySelectorAll:selector=>selector==='[data-league-table-body]'?[standingsBody]:[]}
+});
+vm.runInContext(extract('app/src/main/assets/static-feed-overlay.js', '  window.renderLeagueTable=function(){', '  async function primeStaticFeeds(){'), standingsView);
+standingsView.window.renderLeagueTable();
+assert.match(standingsBody.innerHTML,new RegExp(`/__pilot_badges/250/${cray.logo_sha256}`),'published standings show the admitted club badge');
+assert.match(standingsBody.innerHTML,/Unreviewed FC[\s\S]*pitchkind-wt_mark\.svg|pitchkind-wt_mark\.svg[\s\S]*Unreviewed FC/,'unreviewed standings clubs keep the neutral mark');
+assert.doesNotMatch(app.clubListingHtml('<script>'), /<script>/,'club names are escaped in badge rows');
 assert.equal(app.verifiedTeamBadgeUrl(secondTeam), `/__pilot_badges/261/${'a'.repeat(64)}`);
 window.location.hostname = 'pitchkind.com';
 assert.equal(app.verifiedTeamBadgeUrl(secondTeam), '');
+assert.match(app.clubListingHtml(secondTeam), /pitchkind-wt_mark\.svg/,'a public host cannot use pilot badges in list rows');
 window.location.hostname = 'test.pitchkind.com';
 window.location.protocol = 'http:';
 assert.equal(app.verifiedTeamBadgeUrl(secondTeam), '');
