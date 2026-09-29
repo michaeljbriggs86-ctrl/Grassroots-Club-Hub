@@ -857,7 +857,8 @@
     document.body.classList.add('auth-open');
     document.querySelector('.app-shell')?.classList.add('account-locked');
 
-    if(mode==='signin'){
+    if(mode==='signin'||mode==='parentsignin'){
+      const parentOnly=mode==='parentsignin';
       const body=`
         <div class="auth-fields">
           ${authField({icon:'mail',id:'cloud-email',type:'email',placeholder:'Email address',autocomplete:'username',value:prefillEmail})}
@@ -865,15 +866,16 @@
         </div>
         <button type="button" class="auth-forgot" id="cloud-forgot-password">Forgot password?</button>
         <p class="auth-notice ${message?'':'hidden'}" id="cloud-auth-notice">${escapeHtml(message)}</p><p class="activation-error hidden" id="cloud-auth-error"></p>
-        <button class="auth-primary" id="cloud-auth-submit">Log In <span>→</span></button>
-        <button class="auth-secondary" id="cloud-player-login"><span class="auth-button-icon">${authIcon('user')}</span><span>Player Login</span></button>
+        <button class="auth-primary" id="cloud-auth-submit">${parentOnly?'Sign In as Parent':'Log In'} <span>→</span></button>
+        ${parentOnly?'<button class="auth-link-strong" id="cloud-parent-signin-back">Back to Main Login</button>':`<button class="auth-secondary" id="cloud-parent-login"><span class="auth-button-icon">${authIcon('user')}</span><span>Parent Sign In</span></button><button class="auth-secondary" id="cloud-player-login"><span class="auth-button-icon">${authIcon('user')}</span><span>Player Login</span></button>`}
         <button class="auth-link-strong" id="cloud-parent-signup">Parent Sign Up</button>
-        <button class="auth-link-strong" id="cloud-staff-signup">Staff Sign Up With Invite</button>
-        <div class="auth-divider"></div>
-        <p class="auth-caption">One login page for all adult users — you’ll be redirected to the right account after sign in.</p>`;
-      gate.innerHTML=authMainScreen({screen:'adult',heroNote:'More<br/>Than<br/>A Game',title:'Welcome Back',copy:'Admins, Coaches and Parents sign in with email and password.',body});
+        ${parentOnly?'':'<button class="auth-link-strong" id="cloud-staff-signup">Staff Sign Up With Invite</button>'}`;
+      gate.innerHTML=authMainScreen({screen:'adult',heroNote:parentOnly?'One<br/>Team<br/>Together':'More<br/>Than<br/>A Game',title:parentOnly?'Parent Sign In':'Welcome Back',copy:parentOnly?'Use your approved parent email and password.':'Admins, Coaches and Parents sign in with email and password.',body,back:parentOnly});
       bindPasswordToggle('cloud-password','cloud-password-toggle');
       document.getElementById('cloud-forgot-password')?.addEventListener('click',()=>setGateHtml('forgot'));
+      document.getElementById('cloud-parent-login')?.addEventListener('click',()=>setGateHtml('parentsignin'));
+      document.getElementById('cloud-parent-signin-back')?.addEventListener('click',()=>setGateHtml('signin'));
+      document.getElementById('auth-screen-back')?.addEventListener('click',()=>setGateHtml('signin'));
       document.getElementById('cloud-player-login')?.addEventListener('click',()=>setGateHtml('playerlogin'));
       document.getElementById('cloud-parent-signup')?.addEventListener('click',()=>setGateHtml('parentsignup'));
       document.getElementById('cloud-staff-signup')?.addEventListener('click',()=>setGateHtml('adultsetup'));
@@ -881,8 +883,12 @@
         const email=document.getElementById('cloud-email')?.value?.trim()||'',password=document.getElementById('cloud-password')?.value||'';
         if(!email||!password)return authError('Enter your email and password.');
         const btn=document.getElementById('cloud-auth-submit');if(btn){btn.disabled=true;btn.innerHTML='Signing in…';}
-        try{localStorage.removeItem(TEST_MODE_KEY);setInviteAccessLocked(false);await signIn(email,password);await hydrateSessionUser();context=await getContext();if(!context?.profile)throw new Error('Sign in succeeded, but no club access profile is attached to this account.');if(context.profile.role==='pending'){await resumeParentSignupRequestFromMetadata();}if(context?.profile?.role==='pending_parent'){setGateHtml('approval','Your parent access request has been sent to the coaching staff for verification.');return;}hideGate();window.dispatchEvent(new CustomEvent('clubhub-authenticated',{detail:{source:'signin'}}));}
-        catch(e){const msg=e.message||String(e);if(/confirm|verified/i.test(msg)){localStorage.setItem(VERIFY_EMAIL_KEY,email);setGateHtml('verify','Your email still needs confirming.',email);}else authError(msg);if(btn){btn.disabled=false;btn.innerHTML='Log In <span>→</span>';}}
+        try{localStorage.removeItem(TEST_MODE_KEY);setInviteAccessLocked(false);await signIn(email,password);await hydrateSessionUser();context=await getContext();if(!context?.profile)throw new Error('Sign in succeeded, but no club access profile is attached to this account.');if(context.profile.role==='pending'){await resumeParentSignupRequestFromMetadata();}if(context?.profile?.role==='pending_parent'){setGateHtml('approval','Your parent access request has been sent to the coaching staff for verification.');return;}if(parentOnly&&context.profile.role!=='parent'){
+          const token=session?.access_token||'';if(token){try{await fetch(base()+'/auth/v1/logout',{method:'POST',headers:authHeaders(token)});}catch{}}
+          clearInviteAccess();clearAccountLocalData();
+          throw new Error('This account does not have approved Parent access. Use an approved parent account.');
+        }hideGate();window.dispatchEvent(new CustomEvent('clubhub-authenticated',{detail:{source:parentOnly?'parent-signin':'signin'}}));}
+        catch(e){const msg=e.message||String(e);if(/confirm|verified/i.test(msg)){localStorage.setItem(VERIFY_EMAIL_KEY,email);setGateHtml('verify','Your email still needs confirming.',email);}else authError(msg);if(btn){btn.disabled=false;btn.innerHTML=(parentOnly?'Sign In as Parent':'Log In')+' <span>→</span>';}}
       });return;
     }
 
