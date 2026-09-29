@@ -6,6 +6,7 @@
   const INVITE_KEY = 'grassroots_hub_pending_invite_v1';
   const ACTIVE_TEAM_KEY = 'grassroots_hub_admin_active_team_v1';
   const VERIFY_EMAIL_KEY = 'grassroots_hub_verify_email_v1';
+  const PARENT_SIGNIN_AFTER_LOGOUT_KEY = 'pitchkind_parent_signin_after_logout_v1';
   const TEAM_DIRECTORY_CACHE_KEY = 'grassroots_hub_team_directory_cache_v1';
   const TEAM_STATE_CACHE_PREFIX = 'grassroots_hub_team_state_cache_v1_';
   const INVITE_LOCK_KEY = 'grassroots_hub_invite_lock_v1';
@@ -975,7 +976,7 @@
   function authError(msg){const el=document.getElementById('cloud-auth-error');if(el){el.textContent=msg;el.classList.remove('hidden');}const notice=document.getElementById('cloud-auth-notice');if(notice)notice.classList.add('hidden');}
   function showNotice(msg){const el=document.getElementById('cloud-auth-notice');if(el){el.textContent=msg;el.classList.remove('hidden');}const err=document.getElementById('cloud-auth-error');if(err)err.classList.add('hidden');}
   function hideGate(){document.getElementById('activation-gate')?.classList.add('hidden');document.body.classList.remove('auth-open');document.querySelector('.app-shell')?.classList.remove('account-locked');}
-  async function signOut(event){
+  async function signOut(event,nextMode='signin'){
     try{event?.preventDefault?.();event?.stopPropagation?.();}catch{}
     const btn=event?.currentTarget instanceof HTMLElement?event.currentTarget:null;
     if(btn){btn.setAttribute('disabled','disabled');btn.textContent='Signing out…';}
@@ -1001,11 +1002,15 @@
     localStorage.removeItem(VERIFY_EMAIL_KEY);
     clearAccountLocalData();
     context=null;visibleTeams=[];activeTeam=null;activeRevision=-1;lastRemoteUpdatedAt='';
+    try{
+      if(nextMode==='parentsignin')sessionStorage.setItem(PARENT_SIGNIN_AFTER_LOGOUT_KEY,'1');
+      else sessionStorage.removeItem(PARENT_SIGNIN_AFTER_LOGOUT_KEY);
+    }catch{}
 
     // Lock the existing app immediately so no team data remains visible while
     // the clean reload is being prepared.
     try{document.querySelectorAll('dialog[open]').forEach(d=>d.close());}catch{}
-    setGateHtml('signin');
+    setGateHtml(nextMode==='parentsignin'?'parentsignin':'signin');
     window.dispatchEvent(new CustomEvent('clubhub-signed-out'));
 
     // Reload without any auth callback/query fragments so bootstrap cannot
@@ -1017,6 +1022,7 @@
       }catch{location.reload();}
     },120);
   }
+  function switchToParentSignIn(){return signOut(null,'parentsignin');}
 
   function updateCloudPanel(){
     const panel=document.getElementById('access-panel');if(!panel||!configured()||!context)return;
@@ -1056,7 +1062,13 @@
     }
     if(INITIAL_AUTH_CALLBACK&&!initialAuthCallbackHandled){initialAuthCallbackHandled=true;const callbackType=await handleAuthCallback(INITIAL_AUTH_CALLBACK,{duringBootstrap:true});if(['recovery','parentrequest','error'].includes(callbackType))return null;}
     const valid=await ensureFreshSession();
-    if(!valid){clearAccountLocalData();setGateHtml('signin');return null;}
+    if(!valid){
+      clearAccountLocalData();
+      let parentSignIn=false;
+      try{parentSignIn=sessionStorage.getItem(PARENT_SIGNIN_AFTER_LOGOUT_KEY)==='1';sessionStorage.removeItem(PARENT_SIGNIN_AFTER_LOGOUT_KEY);}catch{}
+      setGateHtml(parentSignIn?'parentsignin':'signin');return null;
+    }
+    try{sessionStorage.removeItem(PARENT_SIGNIN_AFTER_LOGOUT_KEY);}catch{}
     const pendingAdultInvite=localStorage.getItem(INVITE_KEY)||'';
     if(pendingAdultInvite){
       try{await claimInvite(pendingAdultInvite);localStorage.removeItem(INVITE_KEY);}catch(e){setGateHtml('adultsetup','Your email account is signed in, but the invitation could not be applied. Check the invite code and try again.');return null;}
@@ -1123,7 +1135,7 @@
 
   window.ClubHubCloud={
     configured,bootstrap,loadInitialState,queueStateSave,confirmStateSave,pullLatest,startPolling,
-    role,canEdit,canAdmin,assignedTeam,currentTeam,coachTeam,hasDualCoachAccess,visibleTeamList,getClubConfiguration,listLoginClubs,listLoginTeams,listCurrentClubLoginTeams,createInvite,requestParentAccess,listPendingParentRequests,listTeamMembers,listClubCoaches,listClubAccessAccounts,removeClubCoach,listPublishedClubResults,listParentPlayerLinks,saveParentPlayerLinks,listPlayerAccountLinks,listMatchAvailability,saveMatchAvailability,saveCoachMatchAvailability,listSelkentTeamDirectory,syncSelkentTeamDirectory,getCoachMatchNote,saveCoachMatchNote,listAnnouncements,createAnnouncement,markAnnouncementRead,deleteAnnouncement,listMatchAttendance,saveMatchAttendance,getAvailabilitySettings,setAvailabilityDeadline,sendAvailabilityReminder,listNotifications,markNotificationRead,notifyFixtureChange,notifySelectedSquad,notifyMatchReport,notifyMatchReopened,listPlayerAppearanceStats,recordAuditEvent,listAuditHistory,listSeasonArchives,getSeasonArchive,archiveCurrentSeason,rolloverClubSeason,resetParentPin,setAccessPin,approveParentRequest,removeTeamMember,syncTeamDirectory,switchAdminTeam,switchParentTeam,getClubOverview,signOut,handleAuthCallback,listMessageContacts,listClubMessages,sendClubMessage,markClubMessagesRead,getClubComplianceStatus,setDisputeReviewers,setClubSafeguardingContacts,getConcernRouting,raiseClubConcern,listGeneralDisputes,listDisputeMessages,upsertU11SafeguardingInfo,exportU11SafeguardingPack,listSafeguardingExportAudit,requestClubCancellation,cancelClubCancellation,
+    role,canEdit,canAdmin,assignedTeam,currentTeam,coachTeam,hasDualCoachAccess,visibleTeamList,getClubConfiguration,listLoginClubs,listLoginTeams,listCurrentClubLoginTeams,createInvite,requestParentAccess,listPendingParentRequests,listTeamMembers,listClubCoaches,listClubAccessAccounts,removeClubCoach,listPublishedClubResults,listParentPlayerLinks,saveParentPlayerLinks,listPlayerAccountLinks,listMatchAvailability,saveMatchAvailability,saveCoachMatchAvailability,listSelkentTeamDirectory,syncSelkentTeamDirectory,getCoachMatchNote,saveCoachMatchNote,listAnnouncements,createAnnouncement,markAnnouncementRead,deleteAnnouncement,listMatchAttendance,saveMatchAttendance,getAvailabilitySettings,setAvailabilityDeadline,sendAvailabilityReminder,listNotifications,markNotificationRead,notifyFixtureChange,notifySelectedSquad,notifyMatchReport,notifyMatchReopened,listPlayerAppearanceStats,recordAuditEvent,listAuditHistory,listSeasonArchives,getSeasonArchive,archiveCurrentSeason,rolloverClubSeason,resetParentPin,setAccessPin,approveParentRequest,removeTeamMember,syncTeamDirectory,switchAdminTeam,switchParentTeam,getClubOverview,signOut,switchToParentSignIn,handleAuthCallback,listMessageContacts,listClubMessages,sendClubMessage,markClubMessagesRead,getClubComplianceStatus,setDisputeReviewers,setClubSafeguardingContacts,getConcernRouting,raiseClubConcern,listGeneralDisputes,listDisputeMessages,upsertU11SafeguardingInfo,exportU11SafeguardingPack,listSafeguardingExportAudit,requestClubCancellation,cancelClubCancellation,
     updateCloudPanel,
     get context(){return context;},get configuration(){return clubConfiguration;},get session(){return session;},get revision(){return activeRevision;},get testMode(){return testModeActive();}
   };

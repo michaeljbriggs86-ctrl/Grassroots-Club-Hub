@@ -57,5 +57,41 @@ vm.runInNewContext(`${source.slice(start,end)}\nthis.openGate=setGateHtml;`,env)
   await nodes.get('cloud-auth-submit').listeners.click();
   assert.deepEqual(calls,['signIn','openApp'],'the shared adult login still accepts a coach');
   assert.equal(events.at(-1).detail.source,'signin');
+  const logoutStart=source.indexOf('  async function signOut(event,nextMode='),logoutEnd=source.indexOf('  function updateCloudPanel(){',logoutStart);
+  assert(logoutStart>0&&logoutEnd>logoutStart);
+  const intents=new Map(),gateModes=[],logoutCalls=[];
+  const logoutEnv={
+    PARENT_SIGNIN_AFTER_LOGOUT_KEY:'parent-intent',TEST_MODE_KEY:'test',VERIFY_EMAIL_KEY:'verify',
+    HTMLElement:class{},session:{access_token:'staff-token'},context:{profile:{role:'coach'}},visibleTeams:[{id:'team'}],activeTeam:{id:'team'},activeRevision:1,lastRemoteUpdatedAt:'today',
+    saveTimer:null,pendingState:null,saving:false,pollTimer:null,
+    window:{dispatchEvent:e=>logoutCalls.push(e.type)},CustomEvent:class{constructor(type){this.type=type;}},
+    document:{querySelectorAll:()=>[]},
+    localStorage:{removeItem:()=>{}},sessionStorage:{setItem:(k,v)=>intents.set(k,v),getItem:k=>intents.get(k),removeItem:k=>intents.delete(k)},
+    clearTimeout:()=>{},clearInterval:()=>{},setTimeout:fn=>fn(),
+    fetch:async()=>{logoutCalls.push('revoke');return{ok:true};},base:()=> 'https://example.supabase.co',authHeaders:()=>({}),
+    clearInviteAccess:()=>{logoutCalls.push('clearSession');logoutEnv.session=null;},
+    clearAccountLocalData:()=>logoutCalls.push('clearData'),setGateHtml:mode=>gateModes.push(mode),
+    location:{href:'https://example.test/?auth_callback=x#token',replace:url=>logoutCalls.push(url),reload:()=>{}},
+  };
+  vm.runInNewContext(`${source.slice(logoutStart,logoutEnd)}\nthis.openParent=switchToParentSignIn;this.logout=signOut;`,logoutEnv);
+  await logoutEnv.openParent();
+  assert.deepEqual(logoutCalls.slice(0,3),['revoke','clearSession','clearData']);
+  assert.equal(logoutEnv.session,null);assert.equal(logoutEnv.context,null);assert.equal(logoutEnv.activeTeam,null);
+  assert.equal(intents.get('parent-intent'),'1');assert.equal(gateModes.at(-1),'parentsignin');
+  assert(logoutCalls.includes('https://example.test/'));
+
+  const bootStart=source.indexOf('  async function bootstrap(options={}){');
+  const bootStop=source.indexOf('    const pendingAdultInvite=',bootStart);
+  assert(bootStart>0&&bootStop>bootStart);
+  Object.assign(logoutEnv,{
+    hooks:{},configured:()=>true,testModeActive:()=>false,
+    document:{body:{classList:{add(){},remove(){}}},getElementById:()=>null},
+    INITIAL_AUTH_CALLBACK:'',initialAuthCallbackHandled:false,ensureFreshSession:async()=>false,
+  });
+  vm.runInNewContext(`${source.slice(bootStart,bootStop)}return null;\n}\nthis.boot=bootstrap;`,logoutEnv);
+  await logoutEnv.boot();
+  assert.equal(gateModes.at(-1),'parentsignin','a clean reload restores the parent login');
+  assert.equal(intents.has('parent-intent'),false,'the parent route is one use only');
+  await logoutEnv.boot();assert.equal(gateModes.at(-1),'signin','later visits use the normal login');
   console.log('PASS dedicated parent sign-in rejects staff and accepts approved parent');
 })().catch(err=>{console.error(err);process.exitCode=1;});

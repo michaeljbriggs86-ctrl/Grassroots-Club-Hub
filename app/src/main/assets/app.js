@@ -151,14 +151,17 @@ function availableAccountContexts(){
     return [
       {kind:'club',title:'Club overview',detail:'Club Admin',active:isClubOverviewMode()},
       ...(own?[{kind:'coach',title:label(own),detail:'Coach · edit your team',active:isAdminCoachMode()}]:[]),
-      ...teams.map(t=>({kind:'preview',teamId:String(t.id),title:label(t),detail:'Club Admin · read only team view',active:isAdminTeamPreviewMode()&&String(current?.id)===String(t.id)}))
+      ...teams.map(t=>({kind:'preview',teamId:String(t.id),title:label(t),detail:'Club Admin · read only team view',active:isAdminTeamPreviewMode()&&String(current?.id)===String(t.id)})),
+      {kind:'parent-signin',title:'Parent Sign In',detail:'Sign in with an approved parent account',active:false}
     ];
   }
   if(currentRole==='parent')return teams.map(t=>({kind:'parent',teamId:String(t.id),title:label(t),detail:'Parent · linked team',active:String(current?.id)===String(t.id)}));
+  if(currentRole==='coach')return [{kind:'parent-signin',title:'Parent Sign In',detail:'Sign in with an approved parent account',active:false}];
   return [];
 }
 function renderAccountContextControls(){
-  const show=availableAccountContexts().length>1;
+  const choices=availableAccountContexts();
+  const show=choices.length>1||choices.some(choice=>choice.kind==='parent-signin');
   ['mobile-context-switch','account-context-switch'].forEach(id=>document.getElementById(id)?.classList.toggle('hidden',!show));
 }
 function openAccountContextSwitch(){
@@ -166,7 +169,7 @@ function openAccountContextSwitch(){
   closeMobileMore();
   const dialog=document.getElementById('context-switch-dialog'),list=document.getElementById('context-switch-list');
   const choices=availableAccountContexts();
-  if(!dialog||!list||choices.length<2)return;
+  if(!dialog||!list||(choices.length<2&&!choices.some(choice=>choice.kind==='parent-signin')))return;
   list.replaceChildren();
   choices.forEach(choice=>{
     const button=document.createElement('button');button.type='button';button.className='context-switch-choice';
@@ -185,7 +188,10 @@ async function switchAccountContext(choice,button){
   buttons.forEach(b=>b.disabled=true);
   button.disabled=true;
   try{
-    if(choice.kind==='club'||choice.kind==='coach'){
+    if(choice.kind==='parent-signin'){
+      await window.ClubHubCloud.switchToParentSignIn();
+      return;
+    }else if(choice.kind==='club'||choice.kind==='coach'){
       if(currentRole!=='admin')throw new Error('Club Admin access required');
       if(!(await setAdminUiMode(choice.kind)))return;
     }else if(choice.kind==='preview'){

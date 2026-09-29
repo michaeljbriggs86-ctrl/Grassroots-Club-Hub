@@ -16,7 +16,7 @@ let current=teams[0],mode='club',role='admin',own=teams[0];
 const switches=[],notices=[],store=new Map();
 const dialog={close:()=>switches.push('close')};
 const context={CLOUD_MODE:true,currentRole:role,adminUiMode:mode,
-  window:{ClubHubCloud:{currentTeam:()=>current,visibleTeamList:()=>teams,coachTeam:()=>own}},
+  window:{ClubHubCloud:{currentTeam:()=>current,visibleTeamList:()=>teams,coachTeam:()=>own,switchToParentSignIn:async()=>switches.push('parent-signin')}},
   matchTeamLabel:x=>x,isClubOverviewMode:()=>context.adminUiMode==='club',
   dualCoachTeam:()=>own,
   isAdminCoachMode:()=>context.adminUiMode==='coach',isAdminTeamPreviewMode:()=>context.adminUiMode==='view',
@@ -31,7 +31,7 @@ vm.runInNewContext(source.slice(start,end),context);
 
 (async()=>{
   let choices=context.availableAccountContexts();
-  assert.deepEqual(Array.from(choices.map(c=>c.kind)),['club','coach','preview','preview']);
+  assert.deepEqual(Array.from(choices.map(c=>c.kind)),['club','coach','preview','preview','parent-signin']);
   assert.equal(choices[0].active,true);
   assert.equal(choices.find(c=>c.kind==='coach').teamId,undefined);
   const button={disabled:false};
@@ -50,6 +50,8 @@ vm.runInNewContext(source.slice(start,end),context);
   assert.equal(context.adminUiMode,'coach');assert.equal(current,previous);
   assert.equal(switches.filter(x=>x==='close').length,closed);
   assert(notices.includes('offline'));
+  await context.switchAccountContext(context.availableAccountContexts().find(c=>c.kind==='parent-signin'),button);
+  assert(switches.includes('parent-signin'));
 
   context.currentRole='parent';own=null;current=teams[0];
   choices=context.availableAccountContexts();
@@ -59,7 +61,14 @@ vm.runInNewContext(source.slice(start,end),context);
   context.window.ClubHubCloud.visibleTeamList=()=>[teams[0]];
   await context.switchAccountContext({kind:'parent',teamId:'blue'},button);
   assert.equal(switches.filter(x=>x==='parent:blue').length,1);
-  context.currentRole='coach';assert.equal(context.availableAccountContexts().length,0);
+  context.currentRole='coach';choices=context.availableAccountContexts();
+  assert.deepEqual(Array.from(choices.map(c=>c.kind)),['parent-signin']);
+  const visible=[];
+  context.document.getElementById=id=>['mobile-context-switch','account-context-switch'].includes(id)?{classList:{toggle:(name,hidden)=>visible.push([id,name,hidden])}}:id==='context-switch-dialog'?dialog:null;
+  context.renderAccountContextControls();
+  assert(visible.every(([,name,hidden])=>name==='hidden'&&hidden===false),'the More selector stays visible for a Coach with one action');
+  await context.switchAccountContext(choices[0],button);
+  assert.equal(switches.filter(x=>x==='parent-signin').length,2);
   const cloudStart=cloud.indexOf('async function switchAdminTeam(teamId,seedFactory){');
   const cloudEnd=cloud.indexOf('async function switchParentTeam(teamId){',cloudStart);
   assert(cloudStart>=0&&cloudEnd>cloudStart);
