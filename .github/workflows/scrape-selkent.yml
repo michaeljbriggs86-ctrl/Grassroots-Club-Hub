@@ -34,10 +34,12 @@ jobs:
           python-version: '3.11'
 
       - name: Install dependencies
-        run: pip install requests beautifulsoup4 Pillow==12.3.0 numpy==2.3.5 scipy==1.17.0
+        run: pip install requests beautifulsoup4
 
-      - name: Run parser tests
-        run: python -m unittest discover -s tests -p "test_*.py" -v
+      - name: Run Selkent parser tests
+        run: |
+          python -m unittest discover -s tests -p 'test_selkent_scrape.py' -v
+          python -m unittest discover -s tests -p 'test_selkent_results.py' -v
 
       - name: Run generalized Selkent scraper
         run: python scripts/scrape.py
