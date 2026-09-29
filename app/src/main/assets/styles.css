@@ -1060,7 +1060,7 @@ html[data-theme="dark"] .modal-actions{background:linear-gradient(to bottom,rgba
 .formation-control{order:1;display:grid;gap:6px;font-size:12px;font-weight:900}
 .tactics-pitch{order:2;margin-top:0}
 .tactics-bench-wrap{order:3;margin-top:0}
-.tactics-squad-options{order:4;margin:2px 0 0;padding:0;overflow:hidden}
+.tactics-squad-options{order:0;margin:2px 0 0;padding:0;overflow:hidden}
 .tactics-squad-options>summary{list-style:none;display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:13px;cursor:pointer}
 .tactics-squad-options>summary::-webkit-details-marker{display:none}
 .tactics-squad-options>summary>div{display:flex;flex-direction:column;gap:2px;min-width:0}
@@ -1070,6 +1070,13 @@ html[data-theme="dark"] .modal-actions{background:linear-gradient(to bottom,rgba
 .tactics-squad-options-body{border-top:1px solid var(--line,#d8e0da);padding:12px 13px 13px}
 .tactics-squad-options-body>#matchday-readiness-summary{display:block;margin-bottom:9px;color:var(--muted);font-size:10.5px;font-weight:800}
 .tactics-squad-options-body .matchday-squad-head-actions{justify-content:flex-end;margin-bottom:8px}
+.tactics-fixture{display:grid;gap:3px;padding:12px 14px;border:1px solid var(--line,#d8e0da);border-radius:14px;background:var(--white)}
+.tactics-fixture strong{font-size:15px;line-height:1.25}.tactics-fixture span{font-size:12px;color:var(--muted);font-weight:750}.tactics-fixture small{font-size:11px;color:var(--green);font-weight:900}
+.tactics-rotation-help{margin:3px 0 9px;line-height:1.35}.tactics-bench-player small{display:block;padding:3px 6px;border-radius:8px;background:var(--green);color:#fff;font-size:10px;font-weight:900}
+.tactics-coach-plan{order:4;display:grid;gap:11px;border-top:1px solid var(--line,#d8e0da);padding-top:15px}.tactics-coach-plan .panel-heading{margin:0}.tactics-coach-plan .helper{margin:0;line-height:1.35}
+.tactics-plan-fields{display:grid;gap:10px}.tactics-plan-fields label{display:grid;gap:5px;font-size:12px;font-weight:900}.tactics-plan-fields input{box-sizing:border-box;width:100%;min-height:44px;border:1px solid var(--line,#d8e0da);border-radius:11px;background:var(--white);color:var(--ink);font:inherit;font-size:13px;padding:10px 12px}.tactics-plan-fields input::placeholder{color:var(--muted)}.tactics-plan-fields input[readonly]{opacity:.8}
+html[data-theme="dark"] .tactics-fixture,html[data-theme="dark"] .tactics-plan-fields input{background:#101713!important;border-color:#344239!important;color:#f2f7f3!important}
+html[data-theme="dark"] .tactics-fixture small{color:#96e3a0}
 .settings-group-heading{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin:10px 2px 0;padding-top:4px}
 .settings-group-heading:first-child{margin-top:0}
 .settings-group-heading span{font-size:12px;font-weight:950;text-transform:uppercase;letter-spacing:.08em;color:var(--green)}
