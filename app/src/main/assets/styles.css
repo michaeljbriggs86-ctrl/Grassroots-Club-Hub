@@ -1639,3 +1639,16 @@ html[data-theme="dark"] .fixture-edit-button{
 .club-detail-link .club-listing{color:inherit}
 .further-fixture-card:has(.further-fixture-details[open]) .further-fixture-head .club-listing .club-identity-badge{display:none}
 @media(max-width:430px){.club-listing{gap:4px}.club-listing .club-identity-badge{width:18px;height:18px;max-width:18px;max-height:18px;flex-basis:18px}}
+
+
+/* Compact Club Admin fixture cards: one matchup line, details underneath. */
+.admin-fixture-row{display:block;padding:9px 11px}
+.admin-fixture-date{display:flex;flex-direction:row;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:5px}
+.admin-fixture-date span{text-align:right}
+.admin-fixture-main{gap:2px}
+.admin-fixture-matchup{display:flex;align-items:center;gap:5px;min-width:0;width:100%;font-size:12px;font-weight:850;line-height:1.3;white-space:nowrap}
+.admin-fixture-matchup>.club-listing{flex:1 1 0;min-width:0;overflow:hidden;white-space:nowrap}
+.admin-fixture-matchup .club-listing-name{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;overflow-wrap:normal}
+.admin-fixture-matchup>b{flex:none;color:#075d31}
+.admin-fixture-main .fixture-ack-pill{margin-top:3px}
+html[data-theme="dark"] .admin-fixture-matchup>b{color:#a7eab2}
