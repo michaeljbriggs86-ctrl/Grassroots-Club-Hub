@@ -2261,8 +2261,8 @@ function announcementAudienceLabel(a={}){
 }
 function populateAnnouncementTargets(){
   const age=document.getElementById('announcement-age'),team=document.getElementById('announcement-team');const teams=window.ClubHubCloud?.visibleTeamList?.()||[];
-  if(age){const ages=[...new Set(teams.map(t=>Number(String(t.ageGroup||'').replace(/\D/g,''))).filter(Boolean))].sort((a,b)=>a-b);age.innerHTML=ages.map(a=>`<option value="${a}">Under ${a}s</option>`).join('');}
-  if(team)team.innerHTML=teams.map(t=>`<option value="${esc(t.id)}">${esc(t.ageGroup)} ${esc(matchTeamLabel(t.teamName))}</option>`).join('');
+  if(age){const previous=age.value,ages=[...new Set(teams.map(t=>Number(String(t.ageGroup||'').replace(/\D/g,''))).filter(Boolean))].sort((a,b)=>a-b);age.innerHTML='<option value="">Choose age group…</option>'+ages.map(a=>`<option value="${a}">Under ${a}s</option>`).join('');if(ages.includes(Number(previous))&&previous)age.value=previous;}
+  if(team){const previous=team.value;team.innerHTML='<option value="">Choose team…</option>'+teams.map(t=>`<option value="${esc(t.id)}">${esc(t.ageGroup)} ${esc(matchTeamLabel(t.teamName))}</option>`).join('');if(previous&&teams.some(t=>String(t.id)===previous))team.value=previous;}
   const audience=document.getElementById('announcement-audience')?.value||'whole_club';document.getElementById('announcement-age-wrap')?.classList.toggle('hidden',audience!=='age_group');document.getElementById('announcement-team-wrap')?.classList.toggle('hidden',audience!=='team');
 }
 function renderAnnouncements(){
@@ -2277,7 +2277,22 @@ async function refreshAnnouncements(quiet=true){
   if(!CLOUD_MODE||!['admin','coach','assistant_coach','parent'].includes(currentRole))return;if(quiet&&Date.now()-__announcementStamp<15000){renderAnnouncements();return;}__announcementStamp=Date.now();
   try{__announcementRows=await window.ClubHubCloud.listAnnouncements();renderAnnouncements();populateAnnouncementTargets();}catch(err){if(!quiet){const list=document.getElementById('home-club-notices-list');if(list)list.innerHTML='<div class="empty-state compact-empty">Club notices are temporarily unavailable.</div>';}}
 }
-async function publishAnnouncement(){if(!isAdmin())return;const title=document.getElementById('announcement-title')?.value?.trim()||'',body=document.getElementById('announcement-body')?.value?.trim()||'',audience=document.getElementById('announcement-audience')?.value||'whole_club';if(!title||!body)return toast('Add a title and message');try{await window.ClubHubCloud.createAnnouncement({title,body,audience,ageGroup:audience==='age_group'?Number(document.getElementById('announcement-age')?.value||0):null,teamId:audience==='team'?(document.getElementById('announcement-team')?.value||null):null,pinned:!!document.getElementById('announcement-pinned')?.checked,important:!!document.getElementById('announcement-important')?.checked});document.getElementById('announcement-title').value='';document.getElementById('announcement-body').value='';document.getElementById('announcement-pinned').checked=false;document.getElementById('announcement-important').checked=false;toast('Club notice published');await refreshAnnouncements(false);}catch(err){alert(err.message||err);}}
+async function publishAnnouncement(){
+  if(!isAdmin())return;
+  const title=document.getElementById('announcement-title')?.value?.trim()||'',body=document.getElementById('announcement-body')?.value?.trim()||'',audience=document.getElementById('announcement-audience')?.value||'whole_club';
+  if(!title||!body)return toast('Add a title and message');
+  const teams=window.ClubHubCloud?.visibleTeamList?.()||[],teamId=document.getElementById('announcement-team')?.value||'',ageValue=document.getElementById('announcement-age')?.value||'';
+  const ageGroups=new Set(teams.map(t=>Number(String(t.ageGroup||'').replace(/\D/g,''))).filter(Boolean));
+  if(audience==='team'&&!teams.some(t=>String(t.id)===teamId))return toast('Choose a team for this notice');
+  if(audience==='age_group'&&(!ageValue||!ageGroups.has(Number(ageValue))))return toast('Choose an age group for this notice');
+  const button=document.getElementById('announcement-send');if(button){button.disabled=true;button.textContent='Publishing…';}
+  try{
+    await window.ClubHubCloud.createAnnouncement({title,body,audience,ageGroup:audience==='age_group'?Number(ageValue):null,teamId:audience==='team'?teamId:null,pinned:!!document.getElementById('announcement-pinned')?.checked,important:!!document.getElementById('announcement-important')?.checked});
+    document.getElementById('announcement-title').value='';document.getElementById('announcement-body').value='';document.getElementById('announcement-pinned').checked=false;document.getElementById('announcement-important').checked=false;
+    toast('Club notice published');await refreshAnnouncements(false);
+  }catch(err){alert('Could not publish club notice: '+(err.message||err));}
+  finally{if(button){button.disabled=false;button.textContent='Publish notice';}}
+}
 async function markAnnouncementRead(id){try{await window.ClubHubCloud.markAnnouncementRead(id);const row=__announcementRows.find(a=>a.id===id);if(row)row.read_at=new Date().toISOString();renderAnnouncements();}catch(err){toast('Could not update notice');}}
 async function deleteAnnouncement(id){if(!isAdmin()||!confirm('Remove this club announcement?'))return;try{await window.ClubHubCloud.deleteAnnouncement(id);toast('Announcement removed');await refreshAnnouncements(false);}catch(err){alert(err.message||err);}}
 
