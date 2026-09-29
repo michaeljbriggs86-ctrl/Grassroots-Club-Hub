@@ -397,7 +397,10 @@
           </section>
           <section class="squad-view-page hidden" id="squad-tactics-page" data-squad-view="1" role="tabpanel" aria-labelledby="squad-tactics-tab">
             <div class="panel tactics-panel">
-              <div class="panel-heading tactics-heading"><div><p class="kicker">Next fixture</p><h3>Matchday plan</h3><p class="muted" id="tactics-help">Choose your players, then arrange them on the pitch. Tap two players to swap.</p><p class="tactics-availability-hint hidden" id="tactics-availability-hint">Out = unavailable · Unsure = awaiting confirmation. Adjust the lineup if needed.</p></div></div>
+              <div class="tactics-pitch" id="tactics-pitch" aria-label="Football tactics board">
+                <span class="pitch-halfway"></span><span class="pitch-circle"></span><span class="pitch-box pitch-box-top"></span><span class="pitch-box pitch-box-bottom"></span>
+              </div>
+              <div class="tactics-board-hint"><p class="helper" id="tactics-help">Drag to move a player. Tap two to swap.</p><p class="tactics-availability-hint hidden" id="tactics-availability-hint">Out = unavailable · Unsure = awaiting confirmation. Adjust the lineup if needed.</p></div>
               <div class="tactics-fixture" aria-live="polite"><strong id="tactics-fixture-name">General setup</strong><span id="tactics-fixture-meta">No upcoming fixture published</span><small id="tactics-plan-summary">Your squad plan</small></div>
               <details class="matchday-squad-picker tactics-squad-options" id="matchday-squad-picker" open>
                 <summary class="matchday-squad-summary"><div><strong id="matchday-squad-title">Matchday squad</strong><span id="matchday-squad-fixture">Current setup</span></div><b id="matchday-squad-count">0 / 0</b></summary>
@@ -409,9 +412,6 @@
               </details>
               <div class="panel-heading tactics-heading"><h3>Formation and positions</h3><button type="button" class="secondary-button compact" id="reset-tactics" data-requires-edit>Reset positions</button></div>
               <label class="formation-control">Formation<select id="tactics-formation" aria-label="Formation"></select></label>
-              <div class="tactics-pitch" id="tactics-pitch" aria-label="Football tactics board">
-                <span class="pitch-halfway"></span><span class="pitch-circle"></span><span class="pitch-box pitch-box-top"></span><span class="pitch-box pitch-box-bottom"></span>
-              </div>
               <div class="tactics-bench-wrap"><div class="panel-heading"><h3>Rotation order</h3><span class="helper" id="tactics-matchday-limit"></span></div><p class="helper tactics-rotation-help" id="tactics-rotation-help">First player is next on. Tap two players to change the order or swap with the pitch.</p><div class="tactics-bench" id="tactics-bench"></div></div>
               <div class="tactics-coach-plan"><div class="panel-heading"><div><p class="kicker">Coach notes</p><h3>What we are working on</h3></div></div><div class="tactics-plan-fields"><label>One team focus<input id="tactics-focus" data-tactics-plan="focus" maxlength="120" placeholder="e.g. Look up before passing" /></label><label>When we lose the ball<input id="tactics-defending" data-tactics-plan="defending" maxlength="120" placeholder="e.g. Recover together" /></label><label>Rotation reminder<input id="tactics-rotation" data-tactics-plan="rotation" maxlength="120" placeholder="e.g. Give everyone a turn in each half" /></label></div><p class="helper">Saved for this fixture. Keep it short enough to share with the team.</p></div>
             </div>

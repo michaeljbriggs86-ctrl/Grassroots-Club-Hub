@@ -1,0 +1,35 @@
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const path=require('node:path');
+const vm=require('node:vm');
+const source=fs.readFileSync(path.join(__dirname,'../app/src/main/assets/app.js'),'utf8');
+const start=source.indexOf('function enableTacticsDrag('),end=source.indexOf('function resetTactics(){',start);
+assert.ok(start>0&&end>start);
+const listeners=new Map();
+const node={style:{left:'50%',top:'40%'},addEventListener:(t,f)=>listeners.set(t,f),removeEventListener:(t,f)=>{if(listeners.get(t)===f)listeners.delete(t);},setPointerCapture:()=>{}};
+const fire=(type,x,y)=>listeners.get(type)?.({pointerId:1,clientX:x,clientY:y,preventDefault:()=>{}});
+const state={tactics:{positions:{p1:{x:50,y:40}}}};
+let persisted=0,remembered=0,queued=0;const timers=[];
+const context={state,isCoach:()=>true,slotPos:p=>({...p}),__tacticsSelected:null,__tacticsDragInProgress:false,
+  rememberTacticsPlan:()=>{remembered++;},persistLocalState:()=>{persisted++;},CLOUD_MODE:true,
+  window:{ClubHubCloud:{queueStateSave:()=>{queued++;}}},setTimeout:fn=>timers.push(fn),Math};
+vm.createContext(context);vm.runInContext(source.slice(start,end),context);
+context.enableTacticsDrag(node,'p1',{getBoundingClientRect:()=>({left:100,top:100,width:200,height:400})});
+fire('pointerdown',150,200);fire('pointermove',153,202);fire('pointerup',153,202);
+assert.equal(node.style.left,'50%','a small tap does not move the player');
+assert.equal(persisted,0,'a tap does not save a drag');
+fire('pointerdown',150,200);fire('pointermove',170,220);
+assert.equal(node.style.left,'60%','drag follows the finger delta without jumping to its location');
+assert.equal(node.style.top,'45%');
+fire('pointerup',170,220);
+assert.equal(state.tactics.positions.p1.x,60);
+assert.equal(state.tactics.positions.p1.y,45);
+assert.equal(persisted,1);assert.equal(remembered,1);assert.equal(queued,1);
+assert.equal(node.__ignoreNextClick,true,'release suppresses the synthetic tap');
+timers.forEach(fn=>fn());
+node.style.left='60%';node.style.top='45%';
+fire('pointerdown',150,200);fire('pointermove',170,220);fire('pointercancel',170,220);
+assert.equal(node.style.left,'60%','cancel restores the previous position');
+assert.equal(state.tactics.positions.p1.x,60,'cancel does not save');
+assert.equal(persisted,1);
+console.log('Tactics drag checks passed');

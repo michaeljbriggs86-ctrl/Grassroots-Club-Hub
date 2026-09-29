@@ -52,7 +52,9 @@ assert.equal(state.tactics.matchdaySelections.first,undefined,'old fixture selec
 assert.equal(state.tactics.lineup.length,players.length,'bench includes all players beyond the on-pitch format');
 context.resetTactics();
 assert.equal(state.tactics.lineup.length,players.length,'reset positions preserves the rolling squad');
-assert.ok(html.indexOf('id="matchday-squad-picker"')<html.indexOf('id="tactics-pitch"'),'squad picker appears before pitch');
+assert.ok(html.indexOf('id="tactics-pitch"')<html.indexOf('id="matchday-squad-picker"'),'pitch is the first part of the match plan');
+const design=fs.readFileSync(path.join(__dirname,'../app/src/main/assets/app-design-system.css'),'utf8');
+assert.match(design,/\.tactics-panel\.needs-matchday-selection \.tactics-squad-options\{order:-1\}/,'squads requiring selection still see the picker first');
 assert.match(html,/id="reset-tactics"[^>]*>Reset positions/);
 assert.match(html,/id="tactics-focus"/);
 console.log('Tactics fixture plan checks passed');
