@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-09-30T12:00:53.910509+00:00",
+  "last_updated": "2026-09-30T12:33:38.500642+00:00",
   "clubs": [
     {
       "club_id": 514,
@@ -19,7 +19,12 @@
     },
     {
       "club_id": 234,
-      "club_name": "AFC Lewisham"
+      "club_name": "AFC Lewisham",
+      "logo_url": "https://test.pitchkind.com/__pilot_badges/234/48e5355934782820bd01c5b27152265b72a8682ee0a9042614c3c4fb5a00e61a",
+      "logo_status": "pilot_verified",
+      "logo_source": "official_source_transparency_derivative_private",
+      "logo_updated_at": "2026-09-30",
+      "logo_sha256": "48e5355934782820bd01c5b27152265b72a8682ee0a9042614c3c4fb5a00e61a"
     },
     {
       "club_id": 307,
@@ -81,7 +86,12 @@
     },
     {
       "club_id": 348,
-      "club_name": "Blackheath Village"
+      "club_name": "Blackheath Village",
+      "logo_url": "https://test.pitchkind.com/__pilot_badges/348/0df507cb0e7ca48e06c5b03890688e0196805085119df21ca76ea04dcf4da675",
+      "logo_status": "pilot_verified",
+      "logo_source": "official_source_vector_raster_private",
+      "logo_updated_at": "2026-09-30",
+      "logo_sha256": "0df507cb0e7ca48e06c5b03890688e0196805085119df21ca76ea04dcf4da675"
     },
     {
       "club_id": 246,
@@ -7756,5 +7766,5 @@
     }
   ],
   "note": "Panel parsing confirmed against all five format categories (mini-soccer, 9-a-side, X-category, 11-a-side, Senior) as of Sept 2026. Club/team linking is heuristic (name-prefix match) - see ambiguous_club_matches in diagnostics for anything flagged as uncertain.",
-  "pilot_badges_revision": "e4538c8026d136f2586bfbb8997d8ca6be2e4c813f38ec94e0739a6f9c52218c"
+  "pilot_badges_revision": "35737dbb66025990a1269f8dff6600a05215f2af901fdf0cf5e32886171ea279"
 }
