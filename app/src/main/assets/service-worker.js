@@ -1,4 +1,4 @@
-const CACHE = 'pitchkind-confirmed-fixtures-20260930-v3-280a7a7b4354';
+const CACHE = 'pitchkind-dashboard-kickoff-20260930-23679bad8def';
 const ASSETS=['./','./index.html','./styles.css','./app-design-system.css','./cloud.css','./cloud-config.js','./cloud.js','./app.js','./onboarding.js','./onboarding.css','./manifest.json','./pitchkind-wt_logo-primary.svg','./pitchkind-wt_logo-reverse.svg','./pitchkind-wt_mark.svg','./pitchkind-wt_mark-reverse.svg','./pitchkind-wt_app-icon.svg','./shooters-hill-logo.png','./icon-192.png','./icon-512.png','./icon-maskable-512.png','./football-login-adult.jpg','./football-login-player.jpg','./football-login-club.jpg','./football-pitch-hero.jpg','./football-pitch-hero-illustration.png','./static-feed-overlay.js'];
 self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)).then(()=>self.skipWaiting())));
 self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
