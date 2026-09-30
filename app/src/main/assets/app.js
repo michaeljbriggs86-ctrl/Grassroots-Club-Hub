@@ -1304,6 +1304,19 @@ function saveSelkentSettings(){
   saveState();toast('League sync setting saved');
 }
 function furtherFixtureCardHtml(f,index){
+  const group=miniCupGroup(f);
+  if(group){
+    const d=parentCupGroupDetails(f),confirmed=parentMatchdayReady(f),ground=confirmed?d.groundName:'Venue awaiting confirmation';
+    return `<article class="further-fixture-card cup-group-fixture-card">
+      <div class="further-fixture-head"><div>
+        <span class="synced-fixture-date">${esc(formatDate(f.date))}${confirmed?` · Group starts ${esc(d.time)}`:' · Group start awaiting confirmation'}</span>
+        <strong>Cup group matchday</strong>
+        <small>${esc(fixtureCompetitionLabel(f))} · ${esc(ground)}</small>
+      </div></div>
+      <div class="cup-group-opponents"><span>Against ${group.opponents.map(esc).join(' and ')}</span><small>Three games run back to back. The running order can change; follow the coach's arrival instructions.</small></div>
+      ${confirmed?`<div class="match-venue-card"><div><span>Confirmed venue</span><strong>${esc(d.groundName)}</strong><small>${esc(d.address)}</small></div></div>`:''}
+    </article>`;
+  }
   const d=resolvedFixture(f),confirmed=fixtureDetailsConfirmed(f),ctx=fixtureOverviewContext(d),warning=kitWarningHtml(ctx),toggle=kitToggleHtml(f,ctx),mapFrame=confirmed&&ctx.mapEmbedHref?`<div class="fixture-map-preview further-fixture-map"><iframe title="${esc(f.opponent||'Fixture')} venue map" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="${esc(ctx.mapEmbedHref)}"></iframe></div>`:'';
   const ground=confirmed?ctx.ground:'Awaiting confirmation',address=confirmed?ctx.address:'Club staff will confirm the venue.';
   return `<article class="further-fixture-card">
@@ -1323,13 +1336,34 @@ function furtherFixtureCardHtml(f,index){
     ${warning}
   </article>`;
 }
+function groupedUpcomingFixtures(fixtures=upcomingFixtures()){
+  const seen=new Set();
+  return fixtures.filter(f=>{
+    const group=miniCupGroup(f);
+    if(!group)return true;
+    const key=`${group.date}|${selkentNorm(group.competition)}`;
+    if(seen.has(key))return false;
+    seen.add(key);return true;
+  });
+}
+function parentFutureFixtureHtml(f){
+  const group=miniCupGroup(f),confirmed=parentMatchdayReady(f),d=confirmed?(group?parentCupGroupDetails(f):resolvedFixture(f)):null;
+  const when=confirmed?(group?`Group starts ${d.time}`:`Kick-off ${d.time}`):(group?'Group start awaiting confirmation':'Kick-off awaiting confirmation');
+  return `<article class="further-fixture-card parent-future-fixture-card">
+    <div class="further-fixture-head"><div><span class="synced-fixture-date">${esc(formatDate(f.date))} · ${esc(when)}</span>
+      <strong>${group?'Cup group matchday':`Against ${esc(matchTeamLabel(f.opponent||'Opponent TBC'))}`}</strong>
+      <small>${esc(fixtureCompetitionLabel(f))}</small></div></div>
+    ${group?`<div class="cup-group-opponents"><span>Against ${group.opponents.map(esc).join(' and ')}</span><small>Three games run back to back. The running order may change.</small></div>`:''}
+    <div class="match-venue-card"><div><span>Venue</span><strong>${esc(confirmed?d.groundName:'Awaiting confirmation')}</strong>${confirmed?`<small>${esc(d.address)}</small>`:''}</div></div>
+  </article>`;
+}
 
 function renderSelkentFixtures(){
   const list=document.getElementById('selkent-fixtures-list'),count=document.getElementById('selkent-fixtures-count'),meta=document.getElementById('selkent-fixtures-meta');if(!list)return;
-  if(CLOUD_MODE&&currentRole==='parent'){if(count)count.textContent='0';setStableHtml(list,'');if(meta)meta.textContent='';return;}
-  const fixtures=upcomingFixtures(),further=fixtures.slice(1);
+  const parent=CLOUD_MODE&&currentRole==='parent',fixtures=groupedUpcomingFixtures(),further=parent?fixtures:fixtures.slice(1);
+  const heading=document.getElementById('selkent-fixtures-heading');if(heading)heading.textContent=parent?'Upcoming matchdays':'Further fixtures';
   if(count)count.textContent=String(further.length);
-  setStableHtml(list,further.map(furtherFixtureCardHtml).join('')||'<div class="empty-state compact-empty">No additional fixtures released yet.</div>');
+  setStableHtml(list,further.map(parent?parentFutureFixtureHtml:furtherFixtureCardHtml).join('')||`<div class="empty-state compact-empty">${parent?'No upcoming fixtures released yet.':'No additional fixtures released yet.'}</div>`);
   if(meta)meta.textContent='';
 }
 async function syncSelkent(silent=false){
@@ -1708,7 +1742,7 @@ let __fixtureEditingKey='';
 function matchTeamLabel(name=''){return String(name||'').replace(/_/g,' ').replace(/\s+/g,' ').trim();}
 function renderCompactNextMatchTeams(f={}){
   const host=document.getElementById('next-match-home-teams');if(!host)return;
-  const group=CLOUD_MODE&&currentRole==='parent'?miniCupGroup(f):null;
+  const group=miniCupGroup(f);
   host.classList.toggle('cup-group-summary',!!group);
   if(group){setStableHtml(host,`<div class="next-match-summary-team"><strong>${esc(fixtureCompetitionLabel(f))}</strong><span>Against ${group.opponents.map(esc).join(' and ')}</span><small>Three group games run back to back; your team's order may change.</small></div>`);return;}
   const display=resolvedFixture(f),ctx=fixtureOverviewContext(display),names=homeFixtureTeamNames(f);
@@ -1834,7 +1868,7 @@ function renderNextMatch(){
   if(minEl){minEl.textContent=minimum?`Selkent Rule 20(D): ${rule.format} requires at least ${minimum} players to start a competition match.`:'';minEl.classList.toggle('hidden',!minimum);}
   if(!f){card.classList.add('no-fixture');card.disabled=true;const teams=document.getElementById('next-match-home-teams');if(teams)setStableHtml(teams,'<div class="next-match-summary-team"><strong>Fixture TBC</strong></div>');if(dateEl)dateEl.textContent='Date TBC';document.getElementById('next-match-copy')?.classList.add('hidden');renderParentHomeMatchInfo();return;}
   card.classList.remove('no-fixture');card.disabled=false;renderCompactNextMatchTeams(f);if(dateEl)dateEl.textContent=f.date?formatDate(f.date):'Date TBC';
-  const miniGroup=miniCupGroup(f),group=CLOUD_MODE&&currentRole==='parent'?miniGroup:null,groupDetails=group?parentCupGroupDetails(f):null,d=groupDetails||resolvedFixture(f),confirmed=!!groupDetails||fixtureDetailsConfirmed(f),set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};set('next-match-opponent',group?'Cup group details':'Upcoming match details');set('next-match-when',miniGroup?[formatDate(f.date),confirmed&&d.time?`Group starts ${d.time}`:'Group start awaiting confirmation','Your match order may change'].join(' · '):[f.date?formatDate(f.date):'Date TBC',confirmed&&d.time?`Kick-off ${d.time}`:'Kick-off awaiting confirmation',confirmed&&d.time?`Arrival ${matchdayArrivalTime(d.time)}`:''].filter(Boolean).join(' · '));renderFixtureOverview('next-match',d);if(group){setStableHtml(document.getElementById('next-match-versus'),`<div class="cup-group-opponents"><strong>${esc(fixtureCompetitionLabel(f))}</strong><span>Against ${group.opponents.map(esc).join(' and ')}</span><small>Three games run back to back. The running order can change; follow the coach's arrival instructions.</small></div>`);document.getElementById('next-match-kit-warning')?.classList.add('hidden');}/* Competition omitted from this popup for league fixtures. */
+  const miniGroup=miniCupGroup(f),group=miniGroup,groupDetails=group?parentCupGroupDetails(f):null,d=groupDetails||resolvedFixture(f),confirmed=!!groupDetails||fixtureDetailsConfirmed(f),set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};set('next-match-opponent',group?'Cup group details':'Upcoming match details');set('next-match-when',miniGroup?[formatDate(f.date),confirmed&&d.time?`Group starts ${d.time}`:'Group start awaiting confirmation','Your match order may change'].join(' · '):[f.date?formatDate(f.date):'Date TBC',confirmed&&d.time?`Kick-off ${d.time}`:'Kick-off awaiting confirmation',confirmed&&d.time?`Arrival ${matchdayArrivalTime(d.time)}`:''].filter(Boolean).join(' · '));renderFixtureOverview('next-match',d);if(group){setStableHtml(document.getElementById('next-match-versus'),`<div class="cup-group-opponents"><strong>${esc(fixtureCompetitionLabel(f))}</strong><span>Against ${group.opponents.map(esc).join(' and ')}</span><small>Three games run back to back. The running order can change; follow the coach's arrival instructions.</small></div>`);document.getElementById('next-match-kit-warning')?.classList.add('hidden');}/* Competition omitted from this popup for league fixtures. */
   const ground=document.getElementById('next-match-ground'),address=document.getElementById('next-match-address'),map=document.getElementById('next-match-map'),mapWrap=document.getElementById('next-match-map-preview');if(!confirmed){if(ground)ground.textContent='Awaiting confirmation';if(address)address.textContent='Coach will confirm the match venue.';if(map)map.classList.add('hidden');if(mapWrap)mapWrap.classList.add('hidden');}
   const ack=fixtureAckState(),status=document.getElementById('next-match-status');if(status){status.textContent=confirmed?'Details confirmed':ack.status==='changed'?'Fixture changed':'Awaiting details';status.classList.remove('hidden');}
   const cal=document.getElementById('next-match-calendar');if(cal)cal.classList.toggle('hidden',!!miniGroup||!confirmed||!f.date);const edit=document.getElementById('next-match-edit');if(edit)edit.classList.toggle('hidden',!confirmed||!canConfirmFixtureDetails()||__fixtureEditingKey===fixtureKitSelectionKey(f));const share=document.getElementById('next-match-share');if(share){const staff=canConfirmFixtureDetails();share.classList.toggle('hidden',!!miniGroup||!staff);share.disabled=false;share.textContent=window.ClubHubNative?.shareMatchCard?'Share matchday info':'Save matchday image';share.title=confirmed?'Share matchday image':'Confirm match details first';}document.getElementById('next-match-copy')?.classList.toggle('hidden',!!miniGroup||!confirmed||!canConfirmFixtureDetails());renderFixtureConfirmationEditor(f);refreshFixtureOverviewDirectory(f);renderParentHomeMatchInfo();
@@ -1849,7 +1883,7 @@ function renderMatchPageNextFixture(){
   if(training){training.classList.toggle('hidden',!parent);if(parent)training.innerHTML=parentTrainingScheduleHtml();}
   if(parent&&!confirmedForParent)return;
   if(!f){card.classList.add('no-fixture');set('matches-next-opponent','TBC');set('matches-next-when','Date / kick-off TBC');set('matches-next-venue','Competition TBC');set('matches-next-kits','Kit colours and away details will appear when confirmed.');clearFixtureOverview('matches-next');const cal=document.getElementById('matches-next-calendar');if(cal)cal.classList.add('hidden');const played=document.getElementById('matches-next-played');if(played)played.classList.add('hidden');const share=document.getElementById('matches-next-share');if(share)share.classList.add('hidden');document.getElementById('matches-next-copy')?.classList.add('hidden');return;}
-  const miniGroup=miniCupGroup(f),group=parent?miniGroup:null,groupDetails=group?parentCupGroupDetails(f):null,d=groupDetails||resolvedFixture(f),confirmed=!!groupDetails||fixtureDetailsConfirmed(f);card.classList.remove('no-fixture');set('matches-next-opponent',group?'Cup group':matchTeamLabel(f.opponent||'TBC'));set('matches-next-when',miniGroup?[formatDate(f.date),confirmed&&d.time?`Group starts ${d.time}`:'Group start awaiting confirmation','Running order may change'].join(' · '):[f.date?formatDate(f.date):'Date TBC',confirmed&&d.time?`Kick-off ${d.time}`:'Kick-off awaiting confirmation',confirmed&&d.time?`Arrival ${matchdayArrivalTime(d.time)}`:''].filter(Boolean).join(' · '));set('matches-next-venue',fixtureCompetitionLabel(f));renderFixtureOverview('matches-next',d);if(group){setStableHtml(document.getElementById('matches-next-versus'),`<div class="cup-group-opponents"><strong>Against ${group.opponents.map(esc).join(' and ')}</strong><small>Three games run back to back. Your team's first game may change; follow the coach's arrival instructions.</small></div>`);document.getElementById('matches-next-kit-warning')?.classList.add('hidden');}set('matches-next-kits',group?'Group matchday details shown above.':'Home and away kit details shown above.');const cal=document.getElementById('matches-next-calendar');if(cal)cal.classList.toggle('hidden',!!miniGroup||!confirmed||!f.date);const played=document.getElementById('matches-next-played');if(played)played.classList.toggle('hidden',!isCoach());const share=document.getElementById('matches-next-share');if(share){share.classList.toggle('hidden',!!miniGroup||!canConfirmFixtureDetails());share.disabled=false;share.textContent=window.ClubHubNative?.shareMatchCard?'Share matchday info':'Save matchday image';share.title=confirmed?'Share matchday image':'Confirm match details first';}document.getElementById('matches-next-copy')?.classList.toggle('hidden',!!miniGroup||!confirmed||!canConfirmFixtureDetails());
+  const miniGroup=miniCupGroup(f),group=miniGroup,groupDetails=group?parentCupGroupDetails(f):null,d=groupDetails||resolvedFixture(f),confirmed=!!groupDetails||fixtureDetailsConfirmed(f);card.classList.remove('no-fixture');set('matches-next-opponent',group?'Cup group':matchTeamLabel(f.opponent||'TBC'));set('matches-next-when',miniGroup?[formatDate(f.date),confirmed&&d.time?`Group starts ${d.time}`:'Group start awaiting confirmation','Running order may change'].join(' · '):[f.date?formatDate(f.date):'Date TBC',confirmed&&d.time?`Kick-off ${d.time}`:'Kick-off awaiting confirmation',confirmed&&d.time?`Arrival ${matchdayArrivalTime(d.time)}`:''].filter(Boolean).join(' · '));set('matches-next-venue',fixtureCompetitionLabel(f));renderFixtureOverview('matches-next',d);if(group){setStableHtml(document.getElementById('matches-next-versus'),`<div class="cup-group-opponents"><strong>Against ${group.opponents.map(esc).join(' and ')}</strong><small>Three games run back to back. Your team's first game may change; follow the coach's arrival instructions.</small></div>`);document.getElementById('matches-next-kit-warning')?.classList.add('hidden');}set('matches-next-kits',group?'Group matchday details shown above.':'Home and away kit details shown above.');const cal=document.getElementById('matches-next-calendar');if(cal)cal.classList.toggle('hidden',!!miniGroup||!confirmed||!f.date);const played=document.getElementById('matches-next-played');if(played)played.classList.toggle('hidden',!isCoach());const share=document.getElementById('matches-next-share');if(share){share.classList.toggle('hidden',!!miniGroup||!canConfirmFixtureDetails());share.disabled=false;share.textContent=window.ClubHubNative?.shareMatchCard?'Share matchday info':'Save matchday image';share.title=confirmed?'Share matchday image':'Confirm match details first';}document.getElementById('matches-next-copy')?.classList.toggle('hidden',!!miniGroup||!confirmed||!canConfirmFixtureDetails());
 }
 
 function divisionOpponents(){

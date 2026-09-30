@@ -7,7 +7,7 @@ const html=fs.readFileSync('app/src/main/assets/index.html','utf8');
 const css=fs.readFileSync('app/src/main/assets/app-design-system.css','utf8');
 assert(html.indexOf('id="home-next-match"')<html.indexOf('id="home-club-notices"'));
 assert.match(css,/#parent-home-match-info \.parent-home-reply\{display:grid/);
-assert.match(css,/body\.role-parent #view-matches #selkent-fixtures-panel/);
+assert.doesNotMatch(css,/body\.role-parent #view-matches #selkent-fixtures-panel/);
 assert.match(css,/body\.role-parent #view-matches \.match-section/);
 assert.match(css,/body\.role-parent \.home-season-details/);
 assert(html.includes('id="parent-matches-training"'));
@@ -44,13 +44,15 @@ assert.equal(placeholder.hidden,false);
 assert.equal(training.hidden,false);
 assert.match(training.innerHTML,/Next session/);
 const fixtureStart=app.indexOf('function renderSelkentFixtures(){'),fixtureEnd=app.indexOf('async function syncSelkent(',fixtureStart);
-const list={innerHTML:'future fixture'},count={textContent:'4'},meta={textContent:'old'};
+const list={innerHTML:''},count={textContent:'4'},meta={textContent:'old'},heading={textContent:''};
 const fixturesCtx={CLOUD_MODE:true,currentRole:'parent',document:{getElementById:id=>({
-  'selkent-fixtures-list':list,'selkent-fixtures-count':count,'selkent-fixtures-meta':meta
-})[id]},setStableHtml:(node,markup)=>{node.innerHTML=markup;},upcomingFixtures:()=>{throw Error('future fixtures must not be rendered for parents');}};
+  'selkent-fixtures-list':list,'selkent-fixtures-count':count,'selkent-fixtures-meta':meta,'selkent-fixtures-heading':heading
+})[id]},setStableHtml:(node,markup)=>{node.innerHTML=markup;},groupedUpcomingFixtures:()=>[{date:'2099-10-04',opponent:'Opponent'}],
+  parentFutureFixtureHtml:()=>'<article>Future fixture information</article>'};
 vm.runInNewContext(`${app.slice(fixtureStart,fixtureEnd)}\nrenderSelkentFixtures();`,fixturesCtx);
-assert.equal(list.innerHTML,'');
-assert.equal(count.textContent,'0');
+assert.match(list.innerHTML,/Future fixture information/);
+assert.equal(count.textContent,'1');
+assert.equal(heading.textContent,'Upcoming matchdays');
 const historyStart=app.indexOf('function applyMatchFilter(){'),historyEnd=app.indexOf('function ensureTournamentState(){',historyStart);
 const rendered={};
 const historyCtx={CLOUD_MODE:true,currentRole:'parent',state:{matches:[

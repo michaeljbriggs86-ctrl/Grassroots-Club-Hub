@@ -8,6 +8,7 @@ const start=source.indexOf('function furtherFixtureCardHtml(');
 const end=source.indexOf('function renderSelkentFixtures(',start);
 assert.ok(start>=0&&end>start);
 const context={
+  miniCupGroup:()=>null,
   resolvedFixture: f=>f,
   fixtureDetailsConfirmed: f=>f.confirmed,
   fixtureOverviewContext: ()=>({homeTeam:'Home FC',awayTeam:'Away FC',homeKit:'Green',awayKit:'Red',ground:'Community Ground',address:'High Street',mapHref:'https://www.google.com/maps/search/?api=1',mapEmbedHref:'https://www.google.com/maps/embed'}),

@@ -635,7 +635,7 @@ html[data-theme="dark"] .training-later-dates summary{color:#8ee09a}
 #training-session-settings h4{margin:20px 0 10px;font-size:15px}
 #training-session-settings .training-session-row button{width:auto;flex:0 0 auto}
 body.role-parent #view-matches .matches-section-nav,body.role-parent #view-matches #league-programme-panel,
-body.role-parent #view-matches #selkent-fixtures-panel,body.role-parent #view-matches .matches-record-search,
+body.role-parent #view-matches .matches-record-search,
 body.role-parent #view-matches .match-section,body.role-parent .home-season-details,
 body.role-parent #view-league,body.role-parent #view-squad{display:none!important}
 @media(max-width:560px){
