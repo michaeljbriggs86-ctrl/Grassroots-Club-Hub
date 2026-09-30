@@ -105,6 +105,13 @@ const valiantFeed={age_groups:[{age_group:'U9',fixtures:[{date:'2099-09-27',divi
 const valiantRow=build([valiantTeam],valiantFeed).find(x=>x.opponent==='Junior Reds Sabres');
 assert.equal(valiantRow?.ack.status,'confirmed','the U9 feed joins to the saved Valiants confirmation');
 assert.equal(valiantRow?.time,'09:30');
+const mirroredTeam={team:{id:'u8-sample',ageGroup:'U8',teamName:'Sample',leagueName:'Example Sample',division:'Under 8C Silver'},state:{matches:[],selkent:{fixtures:[{date:'2099-10-04',opponent:'Example Opponent',venue:'H',competition:'Division'}],fixtureOverrides:{'2099-10-04|example opponent|H|division':{time:'14:00',groundName:'Example Field · Pitch 8',address:'Example Road',confirmedAt:'2099-10-01T09:00:00Z'}}}}};
+const mirroredFeed={age_groups:[{age_group:'U8',fixtures:[{date:'2099-10-04',division_name:'Under 8C Silver',home:'Example Opponent',away:'Example Sample'},{date:'2099-10-04',division_name:'Under 8C Silver',home:'Example Sample',away:'Example Opponent'}]}]};
+const mirroredRows=build([mirroredTeam],mirroredFeed);
+assert.equal(mirroredRows.length,1,'mirrored public rows remain a single admin card');
+assert.equal(mirroredRows[0].venue,'H','the matching confirmed home entry wins over the unconfirmed reverse entry');
+assert.equal(mirroredRows[0].time,'14:00');
+assert.equal(mirroredRows[0].ack.status,'confirmed');
 valiantTeam.state.matches.push({date:'2099-09-27',opponent:'Junior Reds Sabres',venue:'A',status:'played',gf:5,ga:4});
 assert.equal(build([valiantTeam],valiantFeed).length,0,'Valiants recorded result removes the fixture from the admin list');
 

@@ -1397,7 +1397,7 @@ function fixtureIsReported(f={}){
 }
 function upcomingFixtures(){
   const today=new Date();today.setHours(0,0,0,0);
-  return [...(state.selkent?.fixtures||[])].filter(f=>(!f.date||new Date(f.date+'T12:00:00')>=today)&&!fixtureIsReported(f)).sort((a,b)=>(a.date||'9999-99-99').localeCompare(b.date||'9999-99-99')||(a.time||'99:99').localeCompare(b.time||'99:99'));
+  return [...(state.selkent?.fixtures||[])].filter(f=>(!f.date||new Date(f.date+'T12:00:00')>=today)&&!fixtureIsReported(f)).sort((a,b)=>(a.date||'9999-99-99').localeCompare(b.date||'9999-99-99')||(resolvedFixture(a).time||'99:99').localeCompare(resolvedFixture(b).time||'99:99'));
 }
 function nextPublishedFixture(){return upcomingFixtures()[0]||null;}
 function fixtureCompetitionLabel(f={}){
@@ -1711,7 +1711,7 @@ function saveFixtureConfirmation(){
   if(!groundName||!address)return toast('Select or enter the confirmed venue');
   const key=fixtureKitSelectionKey(f),choice=document.getElementById('next-match-kit-choice')?.value==='away'?'away':'home',ctx=fixtureOverviewContext(f);if(choice==='away'&&!knownKit(ctx.ownProfile?.away))return toast('Away shirt colours are not set');
   state.selkent=state.selkent||{};state.selkent.fixtureOverrides=state.selkent.fixtureOverrides||{};state.selkent.fixtureKitSelections=state.selkent.fixtureKitSelections||{};
-  const before=state.selkent.fixtureOverrides[key]||null,after={time,groundName,address,confirmedAt:new Date().toISOString()};state.selkent.fixtureOverrides[key]=after;state.selkent.fixtureKitSelections[key]=choice;
+  const before=state.selkent.fixtureOverrides[key]||null,after={...before,time,groundName,address,confirmedAt:new Date().toISOString()};state.selkent.fixtureOverrides[key]=after;state.selkent.fixtureKitSelections[key]=choice;
   state.selkent.fixtureAcknowledgement={status:'confirmed',fingerprint:fixtureFingerprint(f),key:fixtureStableKey(f),note:'',at:new Date().toISOString()};if(state.selkent.fixtureTracking){state.selkent.fixtureTracking.changed=false;state.selkent.fixtureTracking.previousSummary='';state.selkent.fixtureTracking.changes=[];}
   saveState();auditEvent('fixture_details_confirmed','fixture',key,`Confirmed ${time} at ${groundName}`,before,{...after,shirt:choice});__fixtureEditingKey='';renderNextMatch();renderMatchPageNextFixture();renderSelkentFixtures();renderMatchdayDashboard();toast('Match details confirmed for parents');
 }
@@ -3959,6 +3959,9 @@ function buildAdminFixtureRows(rows,feed=null){
         ack:confirmed?{status:'confirmed',label:'Fixture confirmed'}:ack};
     });
     const seen=new Set();
+    // Mirrored public rows can share a date/opponent. Keep the confirmed
+    // home/away entry when one exists, without changing its fixture identity.
+    matches.sort((a,b)=>Number(b.ack?.status==='confirmed')-Number(a.ack?.status==='confirmed'));
     matches.forEach(f=>{const key=`${f.date}|${selkentNorm(f.opponent)}`;if(!seen.has(key)&&!adminFixtureHasResult(st,team,f,feed)){seen.add(key);out.push(f);}});
     (st.matches||[]).filter(m=>['scheduled','postponed'].includes(matchStatus(m))&&(!m.date||m.date>=now)).forEach(m=>{
       const duplicate=out.some(x=>x.team.id===team.id&&x.date===m.date&&selkentNorm(x.opponent)===selkentNorm(m.opponent));
