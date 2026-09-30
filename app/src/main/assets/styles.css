@@ -1665,6 +1665,10 @@ html[data-theme="dark"] .admin-fixture-matchup>b{color:#a7eab2}
 img.club-logo[src="/__pilot_badges/499/66bc3e506f8e5a7e3caf252b50515ad0ef9daf08e8b96ed6b57766acd10ea0a0"],
 img.club-identity-badge[src="/__pilot_badges/499/66bc3e506f8e5a7e3caf252b50515ad0ef9daf08e8b96ed6b57766acd10ea0a0"]{transform:scale(1.22);transform-origin:center}
 
+/* Phoenix's approved round crest also sits inside a padded square image. */
+img.club-logo[src="/__pilot_badges/318/53facde723259b51ef991c02e37e33b1a475dc21e2e56e489929df2f9410f77c"],
+img.club-identity-badge[src="/__pilot_badges/318/53facde723259b51ef991c02e37e33b1a475dc21e2e56e489929df2f9410f77c"]{transform:scale(1.22);transform-origin:center}
+
 /* Give verified badges readable mobile slots without cropping the crest. */
 @media(max-width:430px){
   .admin-fixture-matchup .club-identity-badge,
