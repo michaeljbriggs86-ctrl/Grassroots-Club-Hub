@@ -68,8 +68,7 @@ function selkentMinimumPlayers(format){return {'3v3':2,'5v5':4,'7v7':5,'9v9':6,'
 function dismissOpeningSplash(){
   const splash=document.getElementById('app-splash');
   if(!splash)return;
-  splash.classList.add('splash-hide');document.body.classList.remove('splash-active');
-  setTimeout(()=>splash.remove(),520);
+  splash.remove();document.body.classList.remove('splash-active');
 }
 window.addEventListener('DOMContentLoaded',()=>setTimeout(dismissOpeningSplash,1150));
 
