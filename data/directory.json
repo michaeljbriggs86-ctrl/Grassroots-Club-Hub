@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-09-30T09:12:33.215272+00:00",
+  "last_updated": "2026-09-30T12:00:53.910509+00:00",
   "clubs": [
     {
       "club_id": 514,
@@ -273,11 +273,11 @@
     {
       "club_id": 281,
       "club_name": "Guru Nanak Youth",
-      "logo_url": "https://static.wixstatic.com/media/4b2878_e1344ed3a3ae48cd9687a86914d0ff2f~mv2.png",
+      "logo_url": "https://test.pitchkind.com/__pilot_badges/281/69f499f16215e1cd2d98aa88e5888a04728ca803b12f25eba19c9b1cc903f230",
       "logo_status": "pilot_verified",
-      "logo_source": "official_site_image",
+      "logo_source": "official_source_transparency_derivative_private",
       "logo_updated_at": "2026-09-30",
-      "logo_sha256": "2ba916a001ac3d967b428c177a7578f0cced94809275b58f3981ea879d9979d8"
+      "logo_sha256": "69f499f16215e1cd2d98aa88e5888a04728ca803b12f25eba19c9b1cc903f230"
     },
     {
       "club_id": 282,
@@ -7756,5 +7756,5 @@
     }
   ],
   "note": "Panel parsing confirmed against all five format categories (mini-soccer, 9-a-side, X-category, 11-a-side, Senior) as of Sept 2026. Club/team linking is heuristic (name-prefix match) - see ambiguous_club_matches in diagnostics for anything flagged as uncertain.",
-  "pilot_badges_revision": "e6f49726e0d9dab60eaff29a713a46509c6879407d5bbccc8053a61679150e9d"
+  "pilot_badges_revision": "e4538c8026d136f2586bfbb8997d8ca6be2e4c813f38ec94e0739a6f9c52218c"
 }
