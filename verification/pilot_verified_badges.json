@@ -3,6 +3,20 @@
   "scope": "private_pilot",
   "badges": [
     {
+      "club_id": 234,
+      "club_name": "AFC Lewisham",
+      "logo_url": "https://test.pitchkind.com/__pilot_badges/234/48e5355934782820bd01c5b27152265b72a8682ee0a9042614c3c4fb5a00e61a",
+      "logo_status": "pilot_verified",
+      "logo_source": "official_source_transparency_derivative_private",
+      "logo_updated_at": "2026-09-30",
+      "logo_sha256": "48e5355934782820bd01c5b27152265b72a8682ee0a9042614c3c4fb5a00e61a",
+      "original_source_url": "https://static.wixstatic.com/media/6ed648_61c94d62af7840858aa609699e7ab5a1.png",
+      "original_sha256": "eeff1fce244e22a182d1c0d778ec378b6f4d8ade7ec361a56ee75b112134d598",
+      "derivation": "outer_background_transparency_only",
+      "rights_status": "protected_pilot_only_public_rights_not_reviewed",
+      "review_basis": "Selkent club 234 links the current AFC Lewisham official site. Its exact 800x800 PNG shows the current blue and yellow AFC Lewisham shield. The reviewed derivative removes only the connected white exterior; the shield interior and lettering remain. Screened at 128, 48 and 20 px on green and pale cards. Private pilot only; public rights remain unreviewed."
+    },
+    {
       "club_id": 240,
       "club_name": "Beacons",
       "logo_url": "https://test.pitchkind.com/__pilot_badges/240/17b3ec7e7fc6fc5fb3df9722c0a17b88811c503b3e41d1d1e24f67816473fa05",
@@ -165,6 +179,20 @@
       "derivation": "outer_blue_background_transparency_only",
       "rights_status": "protected_pilot_only_public_rights_not_reviewed",
       "review_basis": "Mike approved the upload-inbox artwork. Selkent club 333 is Teviot Rangers; its current club-controlled Pitchero page uses this exact 1892x1892 PNG as its club logo. The connected exterior blue screenshot field was removed without changing internal colours, lettering or emblem. Exact original and derivative hashes were checked on pale and dark green at 128, 48 and 20 px. Protected-page visual acceptance and public rights remain open."
+    },
+    {
+      "club_id": 348,
+      "club_name": "Blackheath Village",
+      "logo_url": "https://test.pitchkind.com/__pilot_badges/348/0df507cb0e7ca48e06c5b03890688e0196805085119df21ca76ea04dcf4da675",
+      "logo_status": "pilot_verified",
+      "logo_source": "official_source_vector_raster_private",
+      "logo_updated_at": "2026-09-30",
+      "logo_sha256": "0df507cb0e7ca48e06c5b03890688e0196805085119df21ca76ea04dcf4da675",
+      "original_source_url": "https://irp.cdn-website.com/919665c1/dms3rep/multi/BVFC_282.svg",
+      "original_sha256": "d2041d4719c220b47a45465c90d1d1536b0dac10973e3d10527b7133e9ab3c55",
+      "derivation": "official_svg_raster_1024px_png",
+      "rights_status": "protected_pilot_only_public_rights_not_reviewed",
+      "review_basis": "The current Blackheath Village FC site uses this exact 167x177 viewBox SVG shield, and Selkent club 348 identifies Blackheath Village. The SVG has path artwork without scripts, external images or imports. A 1024x1085 transparent PNG raster preserves the official artwork and reads clearly at 128, 48 and 20 px on green and pale cards. Private pilot only; public rights remain unreviewed."
     },
     {
       "club_id": 407,
