@@ -78,6 +78,20 @@
           </div>
         </div>
 
+        <section class="home-next-match" id="home-next-match">
+          <p class="kicker" id="home-next-title">Next match</p>
+          <button type="button" class="panel next-match-card next-match-summary-card" id="next-match-card" aria-haspopup="dialog" aria-controls="next-fixture-dialog">
+            <div class="next-match-summary-versus" id="next-match-home-teams" aria-label="Next match teams">
+              <div class="next-match-summary-team"><span class="next-match-summary-visual">—</span><strong>Team TBC</strong></div>
+              <span class="next-match-summary-v">V</span>
+              <div class="next-match-summary-team"><span class="next-match-summary-visual">—</span><strong>Team TBC</strong></div>
+            </div>
+            <time class="next-match-summary-date" id="next-match-home-date">Date TBC</time>
+          </button>
+          <div class="panel parent-home-training hidden" id="parent-home-training"></div>
+          <div class="panel parent-home-match-info hidden" id="parent-home-match-info"></div>
+        </section>
+
         <section class="panel club-notices-panel hidden" id="home-club-notices">
           <div class="panel-heading"><div><p class="kicker">Notifications</p><h3>Club notices</h3></div><span class="notice-unread-badge hidden" id="home-notices-unread">0 unread</span></div>
           <div class="club-notices-list" id="home-club-notices-list"></div>
@@ -90,19 +104,6 @@
             <button type="button" class="secondary-button compact" id="parent-home-add-child">Add child or team</button>
             <button type="button" class="text-button compact" id="parent-home-refresh">Refresh links</button>
           </div>
-        </section>
-
-        <section class="home-next-match" id="home-next-match">
-          <p class="kicker">Next match</p>
-          <button type="button" class="panel next-match-card next-match-summary-card" id="next-match-card" aria-haspopup="dialog" aria-controls="next-fixture-dialog">
-            <div class="next-match-summary-versus" id="next-match-home-teams" aria-label="Next match teams">
-              <div class="next-match-summary-team"><span class="next-match-summary-visual">—</span><strong>Team TBC</strong></div>
-              <span class="next-match-summary-v">V</span>
-              <div class="next-match-summary-team"><span class="next-match-summary-visual">—</span><strong>Team TBC</strong></div>
-            </div>
-            <time class="next-match-summary-date" id="next-match-home-date">Date TBC</time>
-          </button>
-          <div class="panel parent-home-match-info hidden" id="parent-home-match-info"></div>
         </section>
 
         <details class="panel home-season-details" id="home-season-record">
@@ -242,6 +243,8 @@
           <button type="button" data-scroll-to="competition-games-section">Cups</button>
           <button type="button" data-scroll-to="tournament-events-section">Tournaments</button>
         </nav>
+
+        <section class="panel parent-matches-placeholder hidden" id="parent-matches-placeholder">Matchday details will appear when the coach confirms the next fixture. Check Home for training sessions.</section>
 
         <section class="panel next-match-card matches-next-fixture" id="matches-next-fixture">
           <div class="panel-heading"><div><p class="kicker">Next fixture</p><h3 id="matches-next-opponent">TBC</h3></div></div>
@@ -527,6 +530,7 @@
       <section id="view-more" class="view" data-view="more">
         <div class="section-title-row"><div><p class="kicker">Team &amp; app</p><h2>Settings</h2></div></div>
         <nav class="screen-section-nav settings-section-nav" aria-label="Jump to settings section">
+          <button type="button" data-scroll-to="training-session-settings" data-coach-ui-only>Training</button>
           <button type="button" data-scroll-to="match-detail-settings" data-requires-edit data-coach-ui-only>Features</button>
           <button type="button" data-scroll-to="team-access-settings" data-staff-settings>Team access</button>
           <button type="button" data-scroll-to="rules-procedures-settings" data-staff-settings>Rules</button>
@@ -539,6 +543,21 @@
         <div class="settings-accordion-list">
 
 <div class="settings-group-heading" data-coach-ui-only><span>Team</span><small>Tools and access for this team</small></div>
+
+<details class="panel settings-accordion" id="training-session-settings" data-requires-edit data-coach-ui-only>
+            <summary><span>Training sessions</span><span class="settings-chevron">⌄</span></summary>
+            <div class="settings-accordion-body">
+              <p class="muted">Add dated sessions for parents. The next two appear on their Home page until matchday details are confirmed.</p>
+              <div id="training-session-list" class="training-session-list"></div>
+              <form id="training-session-form" class="training-session-form">
+                <label>Date<input id="training-session-date" type="date" required /></label>
+                <label>Start time<input id="training-session-time" type="time" required /></label>
+                <label>Venue<input id="training-session-venue" type="text" maxlength="120" required placeholder="Training ground" /></label>
+                <label class="training-session-note-field">Note (optional)<input id="training-session-note" type="text" maxlength="160" placeholder="e.g. Bring boots and water" /></label>
+                <button type="submit" class="primary-button compact">Add training</button>
+              </form>
+            </div>
+          </details>
 
 <details class="panel settings-accordion" id="match-detail-settings" data-requires-edit data-coach-ui-only>
             <summary><span>Features</span><span class="settings-chevron">⌄</span></summary>

@@ -607,3 +607,26 @@ html[data-theme="dark"] .mobile-more-account{border-top-color:#35443a}
 body.admin-club-mode .hero-copy,body.admin-coach-mode .hero-copy,body.admin-preview-mode .hero-copy{padding-right:0!important}
 html[data-theme="dark"] .app-utility-bar{border-bottom-color:#35443a}
 html[data-theme="dark"] .app-utility-bar .hero-profile-button,html[data-theme="dark"] .app-utility-bar .hero-notification-button{border-color:#35443a}
+
+/* Parent Home keeps one priority activity and gives each child reply its own row. */
+#parent-home-match-info .parent-home-reply{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:12px}
+#parent-home-match-info .parent-home-reply button{width:auto;max-width:100%;justify-self:end}
+.parent-home-training{display:grid;gap:0;padding:14px 16px}
+.parent-training-row{display:grid;gap:4px;padding:12px 0;border-top:1px solid var(--line,#D8E0DA)}
+.parent-training-row:first-child{padding-top:0;border-top:0}
+.parent-training-row strong{font-size:16px}.parent-training-row span,.parent-training-row small{color:var(--muted);font-size:13px}
+.training-session-list{display:grid;gap:7px;margin:10px 0 16px}
+.training-session-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid var(--line,#D8E0DA)}
+.training-session-row>div{display:grid;gap:3px;min-width:0}.training-session-row span{color:var(--muted);overflow-wrap:anywhere;font-size:12px}
+.training-session-form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.training-session-form label{display:grid;gap:5px;min-width:0;font-size:12px;font-weight:800}.training-session-form input{width:100%}
+.training-session-note-field,.training-session-form button{grid-column:1/-1}
+body.role-parent #view-matches .matches-section-nav,body.role-parent #view-matches #league-programme-panel,
+body.role-parent #view-matches #selkent-fixtures-panel,body.role-parent #view-matches .matches-record-search,
+body.role-parent #view-matches #tournament-events-section,
+body.role-parent #view-league .selkent-fixtures-panel{display:none!important}
+@media(max-width:560px){
+  #parent-home-match-info .parent-home-reply{grid-template-columns:minmax(0,1fr)}
+  #parent-home-match-info .parent-home-reply button{width:100%;justify-self:stretch}
+  .training-session-form{grid-template-columns:minmax(0,1fr)}
+}

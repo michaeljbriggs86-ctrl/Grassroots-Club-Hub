@@ -12,7 +12,7 @@ assert(start>0&&end>start);
 assert(html.includes('id="parent-home-family"')&&html.includes('id="parent-family-linked-list"')&&html.includes('id="parent-home-match-info"'));
 assert.match(css,/\.club-logo-wrap\{overflow:hidden;isolation:isolate\}/);
 
-const nodes=Object.fromEntries(['parent-home-family','parent-home-family-list','parent-family-linked-list','parent-home-match-info'].map(id=>[id,{innerHTML:'',classList:{toggle(){}}}]));
+const nodes=Object.fromEntries(['parent-home-family','parent-home-family-list','parent-family-linked-list','parent-home-match-info','parent-home-training','next-match-card','home-next-title'].map(id=>[id,{innerHTML:'',hidden:false,classList:{toggle(_name,hidden){nodes[id].hidden=hidden;}}}]));
 let team={id:'one',ageGroup:'U9',teamName:'Valiants'};
 let resolveOld;
 const cloud={
@@ -24,9 +24,14 @@ const cloud={
   ],
 };
 const context={CLOUD_MODE:true,currentRole:'parent',window:{ClubHubCloud:cloud},
-  document:{getElementById:id=>nodes[id]||null},matchTeamLabel:x=>x,
+  document:{getElementById:id=>nodes[id]||null},matchTeamLabel:x=>x,formatDate:x=>x,
+  state:{trainingSessions:[
+    {id:'training-3',date:'2099-10-15',time:'18:00',venue:'Later pitch',note:''},
+    {id:'training-1',date:'2099-10-01',time:'18:00',venue:'Local pitch',note:'Bring water'},
+    {id:'training-2',date:'2099-10-08',time:'18:00',venue:'Second pitch',note:''},
+  ]},
   esc:x=>String(x).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;'),
-  nextPublishedFixture:()=>({id:'fixture-one',date:'2026-10-04'}),resolvedFixture:f=>({...f,time:'10:00',groundName:'Home ground'}),fixtureDetailsConfirmed:()=>true,fixtureResponseKey:f=>f.id,matchdayArrivalTime:()=> '09:30',selkentNorm:x=>String(x).toLowerCase(),
+  nextPublishedFixture:()=>({id:'fixture-one',date:'2026-10-04'}),resolvedFixture:f=>({...f,time:'10:00',groundName:'Home ground'}),fixtureDetailsConfirmed:()=>true,parentMatchdayReady:()=>true,fixtureResponseKey:f=>f.id,matchdayArrivalTime:()=> '09:30',selkentNorm:x=>String(x).toLowerCase(),
   __availabilityFixture:'fixture-one',__availabilityTeamId:'one',__availabilityLoadStatus:'ready',__availabilityRows:[{player_name:'Aavi',status:'available'}],Date};
 vm.runInNewContext(`${app.slice(start,end)}\nthis.family=refreshParentFamilySummary;this.render=renderParentFamilySummary;`,context);
 
@@ -37,6 +42,8 @@ vm.runInNewContext(`${app.slice(start,end)}\nthis.family=refreshParentFamilySumm
   assert.match(nodes['parent-home-match-info'].innerHTML,/Available/);
   assert.match(nodes['parent-home-match-info'].innerHTML,/Kick-off 10:00/);
   assert.match(nodes['parent-home-match-info'].innerHTML,/Add to calendar/);
+  assert.doesNotMatch(nodes['parent-home-match-info'].innerHTML,/All fixtures|View fixtures/);
+  assert.equal(nodes['parent-home-training'].hidden,true);
   assert.match(nodes['parent-family-linked-list'].innerHTML,/Aavi/);
   assert.doesNotMatch(nodes['parent-home-family-list'].innerHTML,/Other child|Wrong team/);
   assert.doesNotMatch(nodes['parent-home-match-info'].innerHTML,/Other child|Wrong team/);
@@ -64,5 +71,14 @@ vm.runInNewContext(`${app.slice(start,end)}\nthis.family=refreshParentFamilySumm
   cloud.listParentPlayerLinks=async()=>{throw Error('offline');};
   await context.family(true);
   assert.match(nodes['parent-home-family-list'].innerHTML,/could not be loaded/);
+  context.parentMatchdayReady=()=>false;
+  context.render();
+  assert.equal(nodes['next-match-card'].hidden,true,'unconfirmed match is not the parent priority');
+  assert.equal(nodes['parent-home-match-info'].hidden,true);
+  assert.equal(nodes['parent-home-training'].hidden,false);
+  assert.match(nodes['parent-home-training'].innerHTML,/Local pitch|Bring water/);
+  assert.match(nodes['parent-home-training'].innerHTML,/Second pitch/);
+  assert.doesNotMatch(nodes['parent-home-training'].innerHTML,/Later pitch/);
+  assert.equal(nodes['home-next-title'].textContent,'Training sessions');
   console.log('PASS parent home shows only current approved links, handles team switch and empty/error states');
 })().catch(err=>{console.error(err);process.exitCode=1;});
