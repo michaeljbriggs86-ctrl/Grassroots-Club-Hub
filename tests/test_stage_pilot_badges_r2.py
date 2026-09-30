@@ -158,6 +158,26 @@ class StageTest(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, 'transparency bytes differ'):
                 stage.upload_badges([badge], lambda *a, **k: Response(source), run)
 
+    def test_green_exterior_derivative_uses_pinned_official_bytes(self):
+        source = b'\x89PNG\r\n\x1a\noriginal Phoenix bytes'
+        badge = {**self.badge, 'club_id': 318,
+                 'logo_source': 'official_source_transparency_derivative_private',
+                 'derivation': 'outer_green_background_transparency_only',
+                 'original_source_url': 'https://club.example/original.png',
+                 'original_sha256': hashlib.sha256(source).hexdigest()}
+        commands = []
+        def run(command, *, check):
+            commands.append(command)
+            if 'get' in command:
+                pathlib.Path(command[command.index('--file') + 1]).write_bytes(self.data)
+        with patch('pilot_badge_transparency.transparent_green_exterior_png', return_value=self.data):
+            stage.upload_badges([badge], lambda *a, **k: Response(source), run)
+        self.assertEqual(len(commands), 2)
+        self.assertIn('put', commands[0])
+        with patch('pilot_badge_transparency.transparent_green_exterior_png', return_value=b'wrong'):
+            with self.assertRaisesRegex(ValueError, 'transparency bytes differ'):
+                stage.upload_badges([badge], lambda *a, **k: Response(source), run)
+
     def test_trim_derivative_uses_pinned_original_and_checks_result(self):
         source = b'\x89PNG\r\n\x1a\noriginal Punjab bytes'
         badge = {**self.badge, 'club_id': 473,

@@ -103,6 +103,20 @@
       "review_basis": "Mike approved the visible artwork in the upload inbox. Selkent club ID 272 identifies Sutton Dynamo FC and its current club site displays this exact crest. Exact 715x618 PNG and SHA-256 were checked against the review packet and re-fetched on 2026-09-29. Transparent exterior screened at 48/128 px on pale and dark green. Protected-page acceptance and public rights review remain open."
     },
     {
+      "club_id": 318,
+      "club_name": "Phoenix Sports",
+      "logo_url": "https://test.pitchkind.com/__pilot_badges/318/53facde723259b51ef991c02e37e33b1a475dc21e2e56e489929df2f9410f77c",
+      "logo_status": "pilot_verified",
+      "logo_source": "official_source_transparency_derivative_private",
+      "logo_updated_at": "2026-09-30",
+      "logo_sha256": "53facde723259b51ef991c02e37e33b1a475dc21e2e56e489929df2f9410f77c",
+      "original_source_url": "https://static.wixstatic.com/media/9daa79_7343cffe34a5450a8db5a1061b92f61d~mv2.png",
+      "original_sha256": "f8514774dc0d78278f346e329831e507ef701e6b73dff2163a5be3e8a4bc61ce",
+      "derivation": "outer_green_background_transparency_only",
+      "rights_status": "protected_pilot_only_public_rights_not_reviewed",
+      "review_basis": "Mike approved upload-inbox artwork. Selkent club 318 is Phoenix Sports at the same Mayplace ground as the current Phoenix Sports Club youth site. Its official homepage uses this exact 600x600 PNG of the club crest. Only the green square connected to the exterior was made transparent; the enclosed green field, white lettering and phoenix artwork remain unchanged. Original and derivative SHA-256 hashes were pinned and the crest was reviewed at 128, 48 and 20 px on pale, green and dark cards. Protected-page acceptance and public rights review remain open."
+    },
+    {
       "club_id": 330,
       "club_name": "Sutton Athletic",
       "logo_url": "https://www.suttonathletic.co.uk/wp-content/uploads/2024/04/Sutton-Athletic-2023.png",

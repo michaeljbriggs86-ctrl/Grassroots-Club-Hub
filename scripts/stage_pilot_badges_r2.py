@@ -104,6 +104,7 @@ def upload_badges(badges, get, run):
                 # Fetch the exact official original, repeat the reviewed outer
                 # background edit on Linux, and require the exact approved PNG.
                 from pilot_badge_transparency import (transparent_blue_exterior_png,
+                                                      transparent_green_exterior_png,
                                                       transparent_png, trim_transparent_padding_png)
                 original = {**badge, 'logo_url': badge['original_source_url'],
                             'logo_sha256': badge['original_sha256']}
@@ -116,6 +117,8 @@ def upload_badges(badges, get, run):
                     data = trim_transparent_padding_png(source)
                 elif badge.get('derivation') == 'outer_blue_background_transparency_only':
                     data = transparent_blue_exterior_png(source)
+                elif badge.get('derivation') == 'outer_green_background_transparency_only':
+                    data = transparent_green_exterior_png(source)
                 else:
                     data = transparent_png(source)
                 if hashlib.sha256(data).hexdigest() != badge['logo_sha256'].lower():

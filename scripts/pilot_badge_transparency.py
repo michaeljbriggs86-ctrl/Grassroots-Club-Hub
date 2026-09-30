@@ -68,6 +68,32 @@ def transparent_blue_exterior_png(original_bytes):
     return out.getvalue()
 
 
+def transparent_green_exterior_png(original_bytes):
+    """Remove Phoenix's connected green square without changing the round crest."""
+    original = Image.open(io.BytesIO(original_bytes))
+    if min(original.size) < 512:
+        raise ValueError('original badge is below the reviewed resolution gate')
+    arr = np.array(original.convert('RGBA'))
+    red, green, blue = (arr[..., channel].astype(np.int16) for channel in range(3))
+    possible = (green > red * 1.55) & (green > blue * 1.30) & (green > 60)
+    border = np.zeros(possible.shape, bool)
+    border[[0, -1], :] = True
+    border[:, [0, -1]] = True
+    exterior = ndimage.binary_propagation(border & possible, mask=possible,
+                                          structure=np.ones((3, 3)))
+    if (not 0.45 < exterior.mean() < 0.65 or
+            exterior[original.height // 2, original.width // 2]):
+        raise ValueError('green exterior mask does not isolate the crest')
+    alpha = np.where(exterior, 0, 255).astype(np.uint8)
+    softened = np.asarray(Image.fromarray(alpha, 'L').filter(ImageFilter.GaussianBlur(.55)))
+    edge = ndimage.binary_dilation(exterior, iterations=2)
+    arr[exterior, 3] = 0
+    arr[edge & ~exterior, 3] = np.minimum(arr[edge & ~exterior, 3], softened[edge & ~exterior])
+    out = io.BytesIO()
+    Image.fromarray(arr, 'RGBA').save(out, format='PNG', optimize=True)
+    return out.getvalue()
+
+
 def trim_transparent_padding_png(original_bytes):
     """Remove empty transparent canvas, leaving a small clear crest margin."""
     original = Image.open(io.BytesIO(original_bytes)).convert('RGBA')
