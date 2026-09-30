@@ -1750,8 +1750,14 @@ async function loadShareBadgeImage(src=''){
   if(!src)return null;
   let safeSrc=String(src);
   if(!/^data:/i.test(safeSrc)&&!/^https?:/i.test(safeSrc)){
-    if(!/^[a-z0-9][a-z0-9._/-]*$/i.test(safeSrc)||safeSrc.includes('..'))return null;
-    try{safeSrc=window.ClubHubNative?.assetDataUrl?String(window.ClubHubNative.assetDataUrl(safeSrc)||''):safeSrc;}catch(_){safeSrc='';}
+    // Browser pilot badges are authenticated, same-origin root-relative URLs.
+    // Keep them as URLs so the image request uses the signed-in browser session.
+    if(!/^\/?[a-z0-9_][a-z0-9._/-]*$/i.test(safeSrc)||safeSrc.includes('..'))return null;
+    if(safeSrc.startsWith('/')){
+      if(window.ClubHubNative)return null;
+    }else{
+      try{safeSrc=window.ClubHubNative?.assetDataUrl?String(window.ClubHubNative.assetDataUrl(safeSrc)||''):safeSrc;}catch(_){safeSrc='';}
+    }
     if(!safeSrc)return null;
   }
   return new Promise(resolve=>{const img=new Image();let done=false;const finish=v=>{if(done)return;done=true;clearTimeout(timer);resolve(v);};const timer=setTimeout(()=>finish(null),3500);img.onload=()=>finish(img);img.onerror=()=>finish(null);if(/^https?:/i.test(safeSrc))img.crossOrigin='anonymous';img.src=safeSrc;});
