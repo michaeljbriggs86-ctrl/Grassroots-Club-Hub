@@ -2263,10 +2263,11 @@ async function refreshMatchAvailability(quiet=true){
   }catch{
     if(requestVersion!==__availabilityLoadVersion)return;
     __availabilityRows=[];__parentPlayerLinks=[];__availabilityLoadStatus='error';
+    coachSummary?.replaceChildren();
     const count=document.getElementById('match-availability-count');if(count)count.textContent='Availability unavailable';
     const select=document.getElementById('availability-player');if(select&&['parent','player'].includes(currentRole)){select.innerHTML='<option value="">Could not load linked players</option>';select.disabled=true;}
     document.querySelectorAll('[data-availability-status]').forEach(b=>{b.classList.remove('selected');b.disabled=true;});
-    renderParentHomeMatchInfo();if(!quiet)toast('Availability could not be refreshed');return;
+    renderTacticsBoard();renderMatchdayDashboard();renderParentHomeMatchInfo();if(!quiet)toast('Availability could not be refreshed');return;
   }
   const count=document.getElementById('match-availability-count');if(count)count.textContent=`${__availabilityRows.length} update${__availabilityRows.length===1?'':'s'}`;
   if(['parent','player'].includes(currentRole)){
