@@ -63,7 +63,8 @@ def validated_approvals(directory, manifest):
                         badge['original_sha256'].lower() == badge['logo_sha256'].lower() or
                         badge.get('derivation') not in ('outer_background_transparency_only',
                                                         'outer_blue_background_transparency_only',
-                                                        'outer_green_background_transparency_only')):
+                                                        'outer_green_background_transparency_only',
+                                                        'circular_blue_field_cutout')):
                     raise ValueError(f"badge {club_id} lacks exact original and derivation provenance")
             if badge['logo_source'] == 'official_source_trim_derivative_private':
                 original = urlsplit(str(badge.get('original_source_url') or ''))

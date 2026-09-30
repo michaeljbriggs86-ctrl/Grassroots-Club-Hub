@@ -2,8 +2,31 @@
 import io
 
 import numpy as np
-from PIL import Image, ImageFilter
+from PIL import Image, ImageDraw, ImageFilter
 from scipy import ndimage
+
+
+def circular_blue_field_png(original_bytes):
+    """Keep GNG's original blue field and artwork, rounding only its outer edge."""
+    original = Image.open(io.BytesIO(original_bytes))
+    if original.size != (1024, 1055) or original.mode != 'RGB':
+        raise ValueError('GNG original dimensions or mode differ from reviewed artwork')
+    rgb = np.asarray(original)
+    border = np.concatenate((rgb[0], rgb[-1], rgb[:, 0], rgb[:, -1]))
+    if np.max(np.abs(border.astype(np.int16) - (23, 54, 145))) > 8:
+        raise ValueError('GNG blue field differs from reviewed artwork')
+    # Extend only the source's nearly uniform blue border into a square.
+    # Every pixel of the original lettering and crest stays at its exact value.
+    square = np.pad(rgb, ((112, 113), (128, 128), (0, 0)), mode='edge')
+    scale = 4
+    mask = Image.new('L', (1280 * scale, 1280 * scale), 0)
+    ImageDraw.Draw(mask).ellipse((10 * scale, 10 * scale,
+                                  1270 * scale - 1, 1270 * scale - 1), fill=255)
+    alpha = np.asarray(mask.resize((1280, 1280), Image.Resampling.LANCZOS))
+    result = np.dstack((square, alpha))
+    out = io.BytesIO()
+    Image.fromarray(result, 'RGBA').save(out, format='PNG', optimize=True)
+    return out.getvalue()
 
 
 def transparent_png(original_bytes):

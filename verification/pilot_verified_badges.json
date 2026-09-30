@@ -105,13 +105,16 @@
     {
       "club_id": 281,
       "club_name": "Guru Nanak Youth",
-      "logo_url": "https://static.wixstatic.com/media/4b2878_e1344ed3a3ae48cd9687a86914d0ff2f~mv2.png",
+      "logo_url": "https://test.pitchkind.com/__pilot_badges/281/69f499f16215e1cd2d98aa88e5888a04728ca803b12f25eba19c9b1cc903f230",
       "logo_status": "pilot_verified",
-      "logo_source": "official_site_image",
+      "logo_source": "official_source_transparency_derivative_private",
       "logo_updated_at": "2026-09-30",
-      "logo_sha256": "2ba916a001ac3d967b428c177a7578f0cced94809275b58f3981ea879d9979d8",
+      "logo_sha256": "69f499f16215e1cd2d98aa88e5888a04728ca803b12f25eba19c9b1cc903f230",
+      "original_source_url": "https://static.wixstatic.com/media/4b2878_e1344ed3a3ae48cd9687a86914d0ff2f~mv2.png",
+      "original_sha256": "2ba916a001ac3d967b428c177a7578f0cced94809275b58f3981ea879d9979d8",
+      "derivation": "circular_blue_field_cutout",
       "rights_status": "protected_pilot_only_public_rights_not_reviewed",
-      "review_basis": "Mike approved upload-inbox badge artwork. Selkent club 281 is Guru Nanak Youth in Gravesend; the current GNG FC site lists Selkent Youth, and the linked Guru Nanak Sports club describes its youth and senior sides as one football club. The official homepage carries this exact 1024x1055 GNG crest. Its blue field is part of the source artwork, not a removable outer margin. Exact PNG bytes were fetched twice with matching SHA-256 and screened for complete lettering and outline. Protected-page phone and card acceptance and public rights review remain open."
+      "review_basis": "Mike approved upload-inbox badge artwork and requested a circular cutout retaining the blue field and intact crest. Selkent club 281 is Guru Nanak Youth in Gravesend; the official homepage carries this exact 1024x1055 GNG crest. The reviewed derivative extends its uniform blue border into a round field and makes only the outer corners transparent. Every original source pixel is unchanged, and every yellow lettering and crest pixel remains fully opaque. Screened at 230, 128, 48 and 20 px against green. Protected-page acceptance and public rights review remain open."
     },
     {
       "club_id": 288,

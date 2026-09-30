@@ -103,7 +103,7 @@ def upload_badges(badges, get, run):
                                             'official_source_trim_derivative_private'):
                 # Fetch the exact official original, repeat the reviewed outer
                 # background edit on Linux, and require the exact approved PNG.
-                from pilot_badge_transparency import (transparent_blue_exterior_png,
+                from pilot_badge_transparency import (circular_blue_field_png, transparent_blue_exterior_png,
                                                       transparent_green_exterior_png,
                                                       transparent_png, trim_transparent_padding_png)
                 original = {**badge, 'logo_url': badge['original_source_url'],
@@ -115,6 +115,8 @@ def upload_badges(badges, get, run):
                                            expected_mislabelled_type=mislabelled)
                 if badge.get('derivation') == 'transparent_padding_trim_2pct':
                     data = trim_transparent_padding_png(source)
+                elif badge.get('derivation') == 'circular_blue_field_cutout':
+                    data = circular_blue_field_png(source)
                 elif badge.get('derivation') == 'outer_blue_background_transparency_only':
                     data = transparent_blue_exterior_png(source)
                 elif badge.get('derivation') == 'outer_green_background_transparency_only':
