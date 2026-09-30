@@ -11,7 +11,7 @@ assert.match(css,/body\.role-parent #view-matches #selkent-fixtures-panel/);
 assert.match(css,/body\.role-parent #view-matches \.match-section/);
 assert.match(css,/body\.role-parent \.home-season-details/);
 assert(html.includes('id="parent-matches-training"'));
-const start=app.indexOf('function upcomingTrainingSessions(){'),end=app.indexOf('function renderParentHomeMatchInfo(){',start);
+const start=app.indexOf('const TRAINING_WEEKDAYS='),end=app.indexOf('function renderParentHomeMatchInfo(){',start);
 assert(start>0&&end>start);
 const inputs={
   'training-session-date':{value:'2099-10-01'},'training-session-time':{value:'18:00'},

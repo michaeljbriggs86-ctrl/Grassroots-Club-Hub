@@ -612,6 +612,7 @@ html[data-theme="dark"] .app-utility-bar .hero-profile-button,html[data-theme="d
 #parent-home-match-info .parent-home-reply{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:12px}
 #parent-home-match-info .parent-home-reply button{width:auto;max-width:100%;justify-self:end}
 .parent-home-training{display:grid;gap:0;padding:14px 16px}
+.parent-home-training h3{margin:0 0 6px;font-size:17px}
 .parent-training-row{display:grid;gap:4px;padding:12px 0;border-top:1px solid var(--line,#D8E0DA)}
 .parent-training-row:first-child{padding-top:0;border-top:0}
 .parent-training-row strong{font-size:16px}.parent-training-row span,.parent-training-row small{color:var(--muted);font-size:13px}
@@ -619,8 +620,10 @@ html[data-theme="dark"] .app-utility-bar .hero-profile-button,html[data-theme="d
 .training-session-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid var(--line,#D8E0DA)}
 .training-session-row>div{display:grid;gap:3px;min-width:0}.training-session-row span{color:var(--muted);overflow-wrap:anywhere;font-size:12px}
 .training-session-form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-.training-session-form label{display:grid;gap:5px;min-width:0;font-size:12px;font-weight:800}.training-session-form input{width:100%}
+.training-session-form label{display:grid;gap:5px;min-width:0;font-size:12px;font-weight:800}.training-session-form input,.training-session-form select{width:100%}
 .training-session-note-field,.training-session-form button{grid-column:1/-1}
+#training-session-settings h4{margin:20px 0 10px;font-size:15px}
+#training-session-settings .training-session-row button{width:auto;flex:0 0 auto}
 body.role-parent #view-matches .matches-section-nav,body.role-parent #view-matches #league-programme-panel,
 body.role-parent #view-matches #selkent-fixtures-panel,body.role-parent #view-matches .matches-record-search,
 body.role-parent #view-matches .match-section,body.role-parent .home-season-details,

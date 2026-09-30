@@ -244,9 +244,6 @@
           <button type="button" data-scroll-to="tournament-events-section">Tournaments</button>
         </nav>
 
-        <section class="panel parent-matches-placeholder hidden" id="parent-matches-placeholder">Matchday details will appear here when the coach confirms the next fixture.</section>
-        <section class="panel parent-home-training hidden" id="parent-matches-training" aria-label="Upcoming training sessions"></section>
-
         <section class="panel next-match-card matches-next-fixture" id="matches-next-fixture">
           <div class="panel-heading"><div><p class="kicker">Next fixture</p><h3 id="matches-next-opponent">TBC</h3></div></div>
           <div class="match-versus next-fixture-versus" id="matches-next-versus"></div>
@@ -256,6 +253,9 @@
           <div class="next-match-kits hidden"><span>Match details</span><strong id="matches-next-kits">Kit colours and away details will appear when confirmed.</strong></div>
           <div class="next-match-links matches-next-actions"><button type="button" class="secondary-button compact" id="matches-next-details">Match details</button><button type="button" class="secondary-button compact hidden" id="matches-next-share">Save matchday image</button><button type="button" class="secondary-button compact hidden" id="matches-next-copy">Copy match details</button><button type="button" class="primary-button compact match-played-action hidden" id="matches-next-played" data-requires-edit>Match played</button></div>
         </section>
+
+        <section class="panel parent-home-training hidden" id="parent-matches-training" aria-label="Upcoming training sessions"></section>
+        <section class="panel parent-matches-placeholder hidden" id="parent-matches-placeholder">Matchday details will appear here when the coach confirms the next fixture.</section>
 
         <details class="panel league-programme" id="league-programme-panel">
           <summary>
@@ -546,17 +546,31 @@
 <div class="settings-group-heading" data-coach-ui-only><span>Team</span><small>Tools and access for this team</small></div>
 
 <details class="panel settings-accordion" id="training-session-settings" data-requires-edit data-coach-ui-only>
-            <summary><span>Training sessions</span><span class="settings-chevron">⌄</span></summary>
+            <summary><span>Training schedule</span><span class="settings-chevron">⌄</span></summary>
             <div class="settings-accordion-body">
-              <p class="muted">Add dated sessions for parents. The next two appear on their Home page until matchday details are confirmed.</p>
-              <div id="training-session-list" class="training-session-list"></div>
+              <p class="muted">Set a weekly pattern and add one-off sessions. Parents see upcoming training on Schedule; it leads their Home page until matchday is confirmed.</p>
+              <h4>Weekly pattern</h4>
+              <div id="training-weekly-list" class="training-session-list"></div>
+              <form id="training-weekly-form" class="training-session-form">
+                <label>Day<select id="training-weekly-day" required><option value="">Choose day</option><option value="1">Monday</option><option value="2">Tuesday</option><option value="3">Wednesday</option><option value="4">Thursday</option><option value="5">Friday</option><option value="6">Saturday</option><option value="0">Sunday</option></select></label>
+                <label>Start time<input id="training-weekly-time" type="time" required /></label>
+                <label>From<input id="training-weekly-start" type="date" required /></label>
+                <label>Until (optional)<input id="training-weekly-end" type="date" /></label>
+                <label class="training-session-note-field">Venue<input id="training-weekly-venue" type="text" maxlength="120" required placeholder="Training ground" /></label>
+                <label class="training-session-note-field">Note (optional)<input id="training-weekly-note" type="text" maxlength="160" placeholder="e.g. Bring boots and water" /></label>
+                <button type="submit" class="primary-button compact">Add weekly training</button>
+              </form>
+              <h4>One-off session</h4>
               <form id="training-session-form" class="training-session-form">
                 <label>Date<input id="training-session-date" type="date" required /></label>
                 <label>Start time<input id="training-session-time" type="time" required /></label>
                 <label>Venue<input id="training-session-venue" type="text" maxlength="120" required placeholder="Training ground" /></label>
                 <label class="training-session-note-field">Note (optional)<input id="training-session-note" type="text" maxlength="160" placeholder="e.g. Bring boots and water" /></label>
-                <button type="submit" class="primary-button compact">Add training</button>
+                <button type="submit" class="primary-button compact">Add one-off training</button>
               </form>
+              <h4>Upcoming sessions</h4>
+              <div id="training-session-list" class="training-session-list"></div>
+              <div id="training-skipped-list" class="training-session-list"></div>
             </div>
           </details>
 
