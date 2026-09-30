@@ -8,6 +8,9 @@ const css=fs.readFileSync('app/src/main/assets/app-design-system.css','utf8');
 assert(html.indexOf('id="home-next-match"')<html.indexOf('id="home-club-notices"'));
 assert.match(css,/#parent-home-match-info \.parent-home-reply\{display:grid/);
 assert.match(css,/body\.role-parent #view-matches #selkent-fixtures-panel/);
+assert.match(css,/body\.role-parent #view-matches \.match-section/);
+assert.match(css,/body\.role-parent \.home-season-details/);
+assert(html.includes('id="parent-matches-training"'));
 const start=app.indexOf('function upcomingTrainingSessions(){'),end=app.indexOf('function renderParentHomeMatchInfo(){',start);
 assert(start>0&&end>start);
 const inputs={
@@ -30,11 +33,15 @@ assert.equal(ctx.upcoming().length,1);
 const matchStart=app.indexOf('function renderMatchPageNextFixture(){'),matchEnd=app.indexOf('function divisionOpponents(){',matchStart);
 const card={hidden:false,classList:{toggle(_name,value){card.hidden=value;}}};
 const placeholder={hidden:true,classList:{toggle(_name,value){placeholder.hidden=value;}}};
+const training={hidden:true,innerHTML:'',classList:{toggle(_name,value){training.hidden=value;}}};
 const matchCtx={CLOUD_MODE:true,currentRole:'parent',nextPublishedFixture:()=>({date:'2099-10-04'}),parentMatchdayReady:()=>false,
-  document:{getElementById:id=>id==='matches-next-fixture'?card:id==='parent-matches-placeholder'?placeholder:null}};
+  parentTrainingRowsHtml:()=>'<div>Next session</div>',
+  document:{getElementById:id=>id==='matches-next-fixture'?card:id==='parent-matches-placeholder'?placeholder:id==='parent-matches-training'?training:null}};
 vm.runInNewContext(`${app.slice(matchStart,matchEnd)}\nrenderMatchPageNextFixture();`,matchCtx);
 assert.equal(card.hidden,true);
 assert.equal(placeholder.hidden,false);
+assert.equal(training.hidden,false);
+assert.match(training.innerHTML,/Next session/);
 const fixtureStart=app.indexOf('function renderSelkentFixtures(){'),fixtureEnd=app.indexOf('async function syncSelkent(',fixtureStart);
 const list={innerHTML:'future fixture'},count={textContent:'4'},meta={textContent:'old'};
 const fixturesCtx={CLOUD_MODE:true,currentRole:'parent',document:{getElementById:id=>({
@@ -53,8 +60,10 @@ const historyCtx={CLOUD_MODE:true,currentRole:'parent',state:{matches:[
   competitionBucket:()=>false,isPlayedMatch:m=>m.status==='played',
   renderMatchGroup:(id,_count,rows)=>{rendered[id]=rows.map(m=>m.id);},renderCompetitionGameTable:()=>{},renderTournamentEvents:()=>{}};
 vm.runInNewContext(`${app.slice(historyStart,historyEnd)}\napplyMatchFilter();`,historyCtx);
-assert.deepEqual(rendered['league-match-list'],['past']);
+assert.equal(rendered['league-match-list'].length,0,'parents must not see played or scheduled match records');
 historyCtx.currentRole='coach';
 vm.runInNewContext(`${app.slice(historyStart,historyEnd)}\napplyMatchFilter();`,historyCtx);
 assert.deepEqual(rendered['league-match-list'],['later','past']);
-console.log('PASS parent sees training until matchday is confirmed and cannot browse later fixtures');
+assert.match(app,/parent\?\[\['Home','home'\],\['Schedule','matches'\],\['Inbox','inbox'\]/);
+assert.match(app,/currentRole==='parent'&&!\['home','matches','inbox','more'\]\.includes\(view\)/);
+console.log('PASS parent hub shows training or one match, with no match records');

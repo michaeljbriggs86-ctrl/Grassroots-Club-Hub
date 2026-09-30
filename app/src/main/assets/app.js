@@ -1812,6 +1812,8 @@ function renderMatchPageNextFixture(){
   const parent=CLOUD_MODE&&currentRole==='parent',confirmedForParent=parentMatchdayReady(f);
   card.classList.toggle('hidden',parent&&!confirmedForParent);
   document.getElementById('parent-matches-placeholder')?.classList.toggle('hidden',!parent||confirmedForParent);
+  const training=document.getElementById('parent-matches-training');
+  if(training){training.classList.toggle('hidden',!parent||confirmedForParent);if(parent&&!confirmedForParent)training.innerHTML='<h3>Training sessions</h3>'+parentTrainingRowsHtml();}
   if(parent&&!confirmedForParent)return;
   if(!f){card.classList.add('no-fixture');set('matches-next-opponent','TBC');set('matches-next-when','Date / kick-off TBC');set('matches-next-venue','Competition TBC');set('matches-next-kits','Kit colours and away details will appear when confirmed.');clearFixtureOverview('matches-next');const cal=document.getElementById('matches-next-calendar');if(cal)cal.classList.add('hidden');const played=document.getElementById('matches-next-played');if(played)played.classList.add('hidden');const share=document.getElementById('matches-next-share');if(share)share.classList.add('hidden');document.getElementById('matches-next-copy')?.classList.add('hidden');return;}
   const d=resolvedFixture(f),confirmed=fixtureDetailsConfirmed(f);card.classList.remove('no-fixture');set('matches-next-opponent',matchTeamLabel(f.opponent||'TBC'));set('matches-next-when',[f.date?formatDate(f.date):'Date TBC',confirmed&&d.time?`Kick-off ${d.time}`:'Kick-off awaiting confirmation',confirmed&&d.time?`Arrival ${matchdayArrivalTime(d.time)}`:''].filter(Boolean).join(' · '));set('matches-next-venue',fixtureCompetitionLabel(f));renderFixtureOverview('matches-next',d);set('matches-next-kits','Home and away kit details shown above.');const cal=document.getElementById('matches-next-calendar');if(cal)cal.classList.toggle('hidden',!confirmed||!f.date);const played=document.getElementById('matches-next-played');if(played)played.classList.toggle('hidden',!isCoach());const share=document.getElementById('matches-next-share');if(share){share.classList.toggle('hidden',!canConfirmFixtureDetails());share.disabled=false;share.textContent=window.ClubHubNative?.shareMatchCard?'Share matchday info':'Save matchday image';share.title=confirmed?'Share matchday image':'Confirm match details first';}document.getElementById('matches-next-copy')?.classList.toggle('hidden',!confirmed||!canConfirmFixtureDetails());
@@ -1855,6 +1857,10 @@ function upcomingTrainingSessions(){
     return !Number.isNaN(start.getTime())&&start>=now;
   }).sort((a,b)=>(a.date+'T'+a.time).localeCompare(b.date+'T'+b.time));
 }
+function parentTrainingRowsHtml(){
+  const sessions=upcomingTrainingSessions().slice(0,2);
+  return sessions.length?sessions.map(s=>`<div class="parent-training-row"><strong>${esc(formatDate(s.date))} · ${esc(s.time)}</strong><span>${esc(s.venue)}</span>${s.note?`<small>${esc(s.note)}</small>`:''}</div>`).join(''):'<p class="parent-family-message">The coach has not added the next training session yet.</p>';
+}
 function renderTrainingSessionSettings(){
   const list=document.getElementById('training-session-list');if(!list)return;
   const sessions=upcomingTrainingSessions();
@@ -1878,8 +1884,7 @@ function renderParentHomeMatchInfo(){
   if(title)title.textContent=parent?(showMatch?'Matchday':'Training sessions'):'Next match';
   if(!parent)return;
   if(!showMatch){
-    const sessions=upcomingTrainingSessions().slice(0,2);
-    training.innerHTML=sessions.length?sessions.map(s=>`<div class="parent-training-row"><strong>${esc(formatDate(s.date))} · ${esc(s.time)}</strong><span>${esc(s.venue)}</span>${s.note?`<small>${esc(s.note)}</small>`:''}</div>`).join(''):'<p class="parent-family-message">The coach has not added the next training session yet.</p>';
+    training.innerHTML=parentTrainingRowsHtml();
     return;
   }
   const details=resolvedFixture(fixture),teamId=String(window.ClubHubCloud?.currentTeam?.()?.id||''),uid=String(window.ClubHubCloud?.session?.user?.id||'');
@@ -1965,6 +1970,9 @@ function applyAccessMode(){
   const adminClub=isClubOverviewMode();
   const teamNavVisible=!adminClub;
   document.querySelectorAll('[data-team-nav]').forEach(el=>el.classList.toggle('hidden',!teamNavVisible));
+  const parent=CLOUD_MODE&&currentRole==='parent';
+  document.querySelector('[data-nav="squad"]')?.classList.toggle('hidden',parent||!teamNavVisible);
+  const matchesNav=document.querySelector('[data-nav="matches"]');if(matchesNav)matchesNav.textContent=parent?'Schedule':'Matches';
   document.querySelectorAll('[data-coach-ui-only]').forEach(el=>el.classList.toggle('hidden',adminClub||preview||!isCoach()));
   document.querySelectorAll('[data-admin-global-nav]').forEach(el=>el.classList.toggle('hidden',!adminClub));
   document.querySelectorAll('[data-admin-club-root]').forEach(el=>el.classList.toggle('hidden',!adminClub));
@@ -2025,6 +2033,7 @@ function applyAccessMode(){
   if(clubKick)clubKick.textContent=isAdmin()?'Club administration':roleLabel();
   if(coaching&&__clubTab!=='results')__clubTab='results';
   if(['parent','player'].includes(currentRole)&&currentView==='club'){currentView='home';document.body.classList.remove('view-club');document.body.classList.add('view-home');}
+  if(parent&&!['home','matches','inbox','more'].includes(currentView)){navigate('home',false);return;}
   if(currentView==='club')setClubTab(__clubTab);
   renderMatches();
   renderTournamentEvents();
@@ -2046,10 +2055,10 @@ function syncMobileNavigation(selectedView=currentView){
   const nav=document.getElementById('mobile-primary-nav');
   if(!nav)return;
   const club=isClubOverviewMode();
-  const showTable=!club&&isPublishedLeagueTeam();
+  const parent=CLOUD_MODE&&currentRole==='parent',showTable=!club&&!parent&&isPublishedLeagueTeam();
   nav.classList.toggle('has-table-tab',showTable);
   const selected=club&&selectedView==='club'&&__clubTab==='coaches'?'club-coaches':selectedView;
-  const primary=club?[['Club','club'],['Fixtures','club-fixtures'],['Results','club-results']]:[['Home','home'],['Matches','matches'],['Squad','squad'],['Table','league']];
+  const primary=club?[['Club','club'],['Fixtures','club-fixtures'],['Results','club-results']]:parent?[['Home','home'],['Schedule','matches'],['Inbox','inbox'],['Table','league']]:[['Home','home'],['Matches','matches'],['Squad','squad'],['Table','league']];
   nav.querySelectorAll('[data-mobile-tab]').forEach(button=>{
     if(button.dataset.mobileTab==='3'&&!showTable){button.hidden=true;button.removeAttribute('aria-current');return;}
     if(button.dataset.mobileTab!=='more'){
@@ -2057,6 +2066,7 @@ function syncMobileNavigation(selectedView=currentView){
       const [label,target]=primary[Number(button.dataset.mobileTab)];
       button.dataset.mobileTarget=target;
       button.querySelector('span').textContent=label;
+      if(button.dataset.mobileTab==='2')button.querySelector('use')?.setAttribute('href',parent?'#mobile-icon-inbox':'#mobile-icon-team');
     }
     const key=button.dataset.mobileTab==='more'?'more':button.dataset.mobileTarget;
     const active=key===selected||(key==='more'&&!primary.some(([,target])=>target===selected));
@@ -2065,10 +2075,10 @@ function syncMobileNavigation(selectedView=currentView){
   });
   const allowed={
     league:showTable,
-    awards:!club&&featureEnabled('awards'),
+    awards:!club&&!parent&&featureEnabled('awards'),
     'club-results':!club&&(['coach','assistant_coach'].includes(currentRole)||isAdminCoachMode()),
     'club-coaches':club,
-    inbox:['admin','coach','assistant_coach','parent'].includes(currentRole),
+    inbox:!parent&&['admin','coach','assistant_coach'].includes(currentRole),
     more:true,
   };
   document.querySelectorAll('[data-mobile-menu-target]').forEach(button=>{
@@ -2100,6 +2110,7 @@ function navigateMobileAwards(){
   requestAnimationFrame(()=>section.scrollIntoView({behavior:'smooth',block:'start'}));
 }
 function navigate(view,scroll=true){
+  if(CLOUD_MODE&&currentRole==='parent'&&!['home','matches','inbox','more'].includes(view))view='home';
   const requested=view;
   if(view==='more'){const h=document.querySelector('#view-more .section-title-row h2'),k=document.querySelector('#view-more .section-title-row .kicker');if(h)h.textContent=isClubOverviewMode()?'Club settings':'Settings';if(k)k.textContent=isClubOverviewMode()?'Club administration':'Team & app';}
   if(view==='club'&&isAdmin()&&!isClubOverviewMode()){adminUiMode='club';localStorage.setItem(ADMIN_UI_MODE_KEY,'club');}
@@ -2494,14 +2505,13 @@ function renderUniversalClubConfiguration(){
   rulesEl.innerHTML=`<div class="universal-rule-grid"><span><b>${esc(r.format)}</b><small>Format</small></span><span><b>${Number(r.players_on_pitch)}</b><small>On pitch</small></span><span><b>${Number(r.max_registered)}</b><small>Registration setting</small></span><span><b>${Number(r.matchday_max)}</b><small>Matchday setting</small></span></div><div class="rule-summary-list">${minimum?`<span><strong>Minimum team · Rule 20(D), handbook p. 74</strong>${minimum} players for ${esc(r.format)} to start a competition match.</span>`:''}<span><strong>Substitutions</strong>${r.rolling_substitutions?'Rolling substitutions':'Standard substitutions'}</span><span><strong>Results</strong>${esc(resultsText)}</span><span><strong>Player access</strong>${r.player_accounts_allowed?'Available for this age group':'Not available for this age group'}</span></div>`;
 }
 
-function applyMiniResultVisibility(){const restricted=miniResultsRestrictedView();document.querySelectorAll('.home-season-details').forEach(el=>el.classList.toggle('hidden',restricted));document.querySelector('.record-card')?.classList.toggle('hidden',restricted);document.querySelector('.running-count-grid')?.classList.toggle('hidden',restricted);document.querySelector('#recent-form')?.closest('.panel')?.classList.toggle('hidden',restricted);document.getElementById('league-summary-card')?.classList.toggle('hidden',restricted);document.getElementById('season-player-stats')?.classList.toggle('hidden',restricted);['export-json','export-matches','export-goals'].forEach(id=>document.getElementById(id)?.classList.toggle('hidden',ageGroupNumber()<=11));}
+function applyMiniResultVisibility(){const restricted=currentRole==='parent'||miniResultsRestrictedView();document.querySelectorAll('.home-season-details').forEach(el=>el.classList.toggle('hidden',restricted));document.querySelector('.record-card')?.classList.toggle('hidden',restricted);document.querySelector('.running-count-grid')?.classList.toggle('hidden',restricted);document.querySelector('#recent-form')?.closest('.panel')?.classList.toggle('hidden',restricted);document.getElementById('league-summary-card')?.classList.toggle('hidden',restricted);document.getElementById('season-player-stats')?.classList.toggle('hidden',restricted);['export-json','export-matches','export-goals'].forEach(id=>document.getElementById(id)?.classList.toggle('hidden',ageGroupNumber()<=11));}
 
 function renderAll(){
   renderTeamIdentity();
   renderUniversalClubConfiguration();
   if(CLOUD_MODE){refreshAnnouncements(true);refreshNotifications(true);refreshAppearanceStats(true);}
-  renderDashboard();
-  renderSeasonPlayerStats();
+  if(currentRole!=='parent'){renderDashboard();renderSeasonPlayerStats();}
   renderNextMatch();
   renderMatchPageNextFixture();
   refreshMatchAvailability(true);
@@ -2547,7 +2557,8 @@ function renderTeamIdentity(){
   document.getElementById('dashboard-season-kicker').textContent=(meta.season||'Season')+' season';
   const homeTitle=document.getElementById('home-screen-title');if(homeTitle)homeTitle.textContent=currentRole==='parent'?'Family home':'Dashboard';
   document.getElementById('squad-team-name').textContent=matchTeamLabel(meta.teamName||'Team');
-  document.getElementById('matches-division-kicker').textContent=state.division.name||'League';
+  document.getElementById('matches-division-kicker').textContent=currentRole==='parent'?'Your next activity':state.division.name||'League';
+  const matchesTitle=document.querySelector('#view-matches .section-title-row h2');if(matchesTitle)matchesTitle.textContent=currentRole==='parent'?'Schedule':'Matches';
   document.getElementById('league-summary-name').textContent=state.division.name||'League';
   document.getElementById('our-score-label').textContent='Home';
   document.title=adminClub?`${clubSettings().display_name||'Club'} Hub`:`${meta.teamName||'Team'} · ${clubSettings().display_name||'Club'}`;
@@ -2699,6 +2710,7 @@ function renderDivisionResultCell(match){
   const score=homeAwayScoreForMatch(match),r=resultOf(match);return `<button type="button" class="division-result-cell ${r} ${resultClass(r)}" data-match-report-review="${match.id}" title="Open match report">${score.home}–${score.away}</button>`;
 }
 function renderLeagueProgramme(){
+  if(CLOUD_MODE&&currentRole==='parent'){const box=document.getElementById('division-opponents');if(box)box.innerHTML='';return;}
   const opponents=divisionOpponents(),meetings=Number(state.division.meetingsPerOpponent||2),expected=opponents.length*meetings,primaryPred=isPublishedLeagueTeam()?isLeagueMatch:isDivisionMatch;
   const localPlayed=state.matches.filter(m=>primaryPred(m)&&opponents.includes(m.opponent)&&isPlayedMatch(m)).length,played=isPublishedLeagueTeam()?Math.max(localPlayed,Number(remoteLeagueRow()?.p||0)):localPlayed;
   document.getElementById('league-programme-title').textContent=`${opponents.length} opponents · Home / Away`;
@@ -2751,9 +2763,14 @@ function renderCompetitionGameTable(kind,list){
   body.innerHTML=rows.map(competitionGameRow).join('')||'<tr><td colspan="5" class="table-empty">No games available yet</td></tr>';
 }
 function applyMatchFilter(){
+  if(CLOUD_MODE&&currentRole==='parent'){
+    ['league','friendly','other'].forEach(kind=>renderMatchGroup(`${kind}-match-list`,`${kind}-match-count`,[],''));
+    ['cup','vase','shield'].forEach(kind=>renderCompetitionGameTable(kind,[]));
+    renderTournamentEvents();
+    return;
+  }
   const q=(document.getElementById('match-search')?.value||'').trim().toLowerCase();
-  const parent=CLOUD_MODE&&currentRole==='parent';
-  const filterRows=rows=>rows.filter(m=>(!parent||isPlayedMatch(m))&&(!q||String(m.opponent||'').toLowerCase().includes(q))).sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+  const filterRows=rows=>rows.filter(m=>!q||String(m.opponent||'').toLowerCase().includes(q)).sort((a,b)=>(b.date||'').localeCompare(a.date||''));
   const primaryRows=state.matches.filter(isPublishedLeagueTeam()?isLeagueMatch:isDivisionMatch);
   renderMatchGroup('league-match-list','league-match-count',filterRows(primaryRows),isPublishedLeagueTeam()?'No league matches available':'No division results available yet');
   renderMatchGroup('friendly-match-list','friendly-match-count',filterRows(state.matches.filter(isFriendlyMatch)),'No friendlies recorded');
@@ -2771,6 +2788,7 @@ function tournamentStats(t){const games=tournamentGames(t.id).filter(isPlayedMat
 function tournamentFormatLabel(v){return v==='round_robin'?'Round robin':v==='knockout'?'Knockout':v==='festival'?'Festival / mini tournament':'Group + knockout';}
 function renderTournamentEvents(){
   ensureTournamentState();const list=document.getElementById('tournament-event-list'),count=document.getElementById('tournament-event-count');if(!list)return;
+  if(CLOUD_MODE&&currentRole==='parent'){list.innerHTML='';if(count)count.textContent='0';return;}
   const rows=[...state.tournaments].sort((a,b)=>(b.date||'').localeCompare(a.date||''));if(count)count.textContent=String(rows.length);
   list.innerHTML=rows.map(t=>{const st=tournamentStats(t),games=tournamentGames(t.id);const squad=t.playerNames||[];return `<article class="panel tournament-event-card"><div class="tournament-event-head"><div><p class="kicker">${t.date?formatDate(t.date):'Date TBC'} · ${esc(tournamentFormatLabel(t.format))}</p><h3>${esc(t.name)}</h3><p class="muted">${esc(t.location||'Location TBC')} · ${squad.length} player${squad.length===1?'':'s'} in squad</p></div><div class="tournament-event-actions">${isCoach()?`<button type="button" class="text-button compact" data-edit-tournament="${esc(t.id)}">Edit</button><button type="button" class="secondary-button compact" data-add-tournament-game="${esc(t.id)}">+ Game</button>`:''}</div></div><div class="tournament-summary-grid"><span><b>${games.length}</b> games</span><span><b>${st.wins}</b> W</span><span><b>${st.draws}</b> D</span><span><b>${st.losses}</b> L</span><span><b>${st.gf}</b> GF</span><span><b>${st.ga}</b> GA</span></div><div class="tournament-game-list">${games.map(matchCardHTML).join('')||'<div class="empty-state compact-empty">No games added yet.</div>'}</div>${isCoach()?`<button type="button" class="inline-action delete tournament-delete" data-delete-tournament="${esc(t.id)}">Delete tournament</button>`:''}</article>`;}).join('')||'<div class="empty-state"><strong>No tournament events yet.</strong><span>Create one event and keep all of its games together.</span></div>';
 }
@@ -4302,7 +4320,7 @@ function renderCompetitionMode(){
   const league=isPublishedLeagueTeam();
   document.body.classList.toggle('team-has-league',league);
   if(!league&&currentView==='league')navigate('matches',false);
-  const nav=document.getElementById('league-nav-item');if(nav){const show=league&&!isClubOverviewMode();nav.classList.toggle('hidden',!show);nav.setAttribute('aria-hidden',show?'false':'true');}
+  const nav=document.getElementById('league-nav-item');if(nav){const show=league&&!isClubOverviewMode()&&currentRole!=='parent';nav.classList.toggle('hidden',!show);nav.setAttribute('aria-hidden',show?'false':'true');}
   const heading=document.getElementById('primary-record-heading');if(heading)heading.textContent=league?'League record':'Division record';
   const summary=document.getElementById('league-summary-card');if(summary)summary.classList.remove('hidden');
   const summaryKicker=summary?.querySelector('.kicker');if(summaryKicker)summaryKicker.textContent=league?'League':'Division';
@@ -4312,13 +4330,14 @@ function renderCompetitionMode(){
 }
 function renderLeagueQuickView(){
   const view=document.getElementById('view-league');if(!view)return;
-  const league=isPublishedLeagueTeam();view.classList.toggle('hidden',!league);
+  const parent=CLOUD_MODE&&currentRole==='parent',league=isPublishedLeagueTeam();view.classList.toggle('hidden',!league||parent);
+  if(parent){const body=document.getElementById('league-quick-table-body'),fixtures=document.getElementById('league-quick-fixtures');if(body)body.innerHTML='';if(fixtures)fixtures.innerHTML='';return;}
   if(!league)return;
   const title=document.getElementById('league-quick-title');if(title)title.textContent=state.division.name||'League';
   const remote=sanitizeRemoteStandings(state.selkent?.table||[]);const table=remote.length?remote:calculateLeagueTable();
   const body=document.getElementById('league-quick-table-body');if(body)body.innerHTML=table.map((r,i)=>`<tr class="${normalizeTeamKey(r.team)===normalizeTeamKey(state.division.teamName)?'our-team-row':''}"><td>${i+1}</td><td class="team-cell">${clubListingHtml(r.team)}</td><td>${r.p}</td><td>${r.w}</td><td>${r.d}</td><td>${r.l}</td><td>${r.gf}</td><td>${r.ga}</td><td>${r.gd}</td><td>${r.pts}</td></tr>`).join('')||'<tr><td colspan="10" class="table-empty">Table TBC</td></tr>';
   const meta=document.getElementById('league-quick-table-meta');if(meta)meta.textContent=(state.selkent?.table||[]).length?'Official league table':'League table TBC.';
-  const fixtures=CLOUD_MODE&&currentRole==='parent'?[]:[...(state.selkent?.fixtures||[])].sort((a,b)=>(a.date||'9999').localeCompare(b.date||'9999'));
+  const fixtures=[...(state.selkent?.fixtures||[])].sort((a,b)=>(a.date||'9999').localeCompare(b.date||'9999'));
   const fc=document.getElementById('league-quick-fixture-count');if(fc)fc.textContent=String(fixtures.length);
   const fb=document.getElementById('league-quick-fixtures');if(fb)fb.innerHTML=fixtures.slice(0,16).map(f=>{const detail=state.selkent?.directoryDetails?.[selkentNorm(f.opponent)]||{};const map=f.venue==='A'?mapsHref(f.groundName||detail.groundName,f.address||detail.address):mapsHref(f.groundName,f.address);return `<div class="synced-fixture"><span class="synced-fixture-date">${f.date?formatDate(f.date):'TBC'}${f.time?' · '+esc(f.time):''}</span><span class="synced-fixture-opponent">${clubListingHtml(f.opponent)}</span><span class="synced-fixture-venue">${f.venue==='A'?'Away':'Home'}</span>${map?`<a class="map-link compact" href="${esc(map)}">Open in Maps</a>`:''}</div>`;}).join('')||'<div class="empty-state compact-empty">No fixtures released yet.</div>';
 }

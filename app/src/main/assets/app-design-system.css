@@ -623,8 +623,8 @@ html[data-theme="dark"] .app-utility-bar .hero-profile-button,html[data-theme="d
 .training-session-note-field,.training-session-form button{grid-column:1/-1}
 body.role-parent #view-matches .matches-section-nav,body.role-parent #view-matches #league-programme-panel,
 body.role-parent #view-matches #selkent-fixtures-panel,body.role-parent #view-matches .matches-record-search,
-body.role-parent #view-matches #tournament-events-section,
-body.role-parent #view-league .selkent-fixtures-panel{display:none!important}
+body.role-parent #view-matches .match-section,body.role-parent .home-season-details,
+body.role-parent #view-league,body.role-parent #view-squad{display:none!important}
 @media(max-width:560px){
   #parent-home-match-info .parent-home-reply{grid-template-columns:minmax(0,1fr)}
   #parent-home-match-info .parent-home-reply button{width:100%;justify-self:stretch}
