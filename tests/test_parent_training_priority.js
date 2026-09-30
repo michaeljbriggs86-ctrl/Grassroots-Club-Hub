@@ -14,7 +14,7 @@ assert(html.includes('id="parent-matches-training"'));
 const start=app.indexOf('const TRAINING_WEEKDAYS='),end=app.indexOf('function renderParentHomeMatchInfo(){',start);
 assert(start>0&&end>start);
 const inputs={
-  'training-session-date':{value:'2099-10-01'},'training-session-time':{value:'18:00'},
+  'training-session-date':{value:'2099-10-01'},'training-session-time':{value:'18:00'},'training-session-finish':{value:'19:30'},
   'training-session-venue':{value:'Local pitch'},'training-session-note':{value:'Bring water'},
   'training-session-list':{innerHTML:''},
 };
@@ -27,15 +27,16 @@ ctx.add({preventDefault(){},target:{reset(){resets++;}}});
 assert.equal(saves,1);
 assert.equal(resets,1);
 assert.equal(ctx.state.trainingSessions[0].venue,'Local pitch');
+assert.equal(ctx.state.trainingSessions[0].endTime,'19:30');
 ctx.render();
-assert.match(inputs['training-session-list'].innerHTML,/2099-10-01.*18:00/);
+assert.match(inputs['training-session-list'].innerHTML,/2099-10-01.*18:00–19:30/);
 assert.equal(ctx.upcoming().length,1);
 const matchStart=app.indexOf('function renderMatchPageNextFixture(){'),matchEnd=app.indexOf('function divisionOpponents(){',matchStart);
 const card={hidden:false,classList:{toggle(_name,value){card.hidden=value;}}};
 const placeholder={hidden:true,classList:{toggle(_name,value){placeholder.hidden=value;}}};
 const training={hidden:true,innerHTML:'',classList:{toggle(_name,value){training.hidden=value;}}};
 const matchCtx={CLOUD_MODE:true,currentRole:'parent',nextPublishedFixture:()=>({date:'2099-10-04'}),parentMatchdayReady:()=>false,
-  parentTrainingRowsHtml:()=>'<div>Next session</div>',
+  parentTrainingScheduleHtml:()=>'<div>Next session</div>',
   document:{getElementById:id=>id==='matches-next-fixture'?card:id==='parent-matches-placeholder'?placeholder:id==='parent-matches-training'?training:null}};
 vm.runInNewContext(`${app.slice(matchStart,matchEnd)}\nrenderMatchPageNextFixture();`,matchCtx);
 assert.equal(card.hidden,true);

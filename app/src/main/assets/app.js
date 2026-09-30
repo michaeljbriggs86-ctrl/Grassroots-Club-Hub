@@ -421,11 +421,11 @@ function normalizeState(data={}){
     },
     squad: Array.isArray(data.squad) ? squad : starter.squad,
     trainingSessions: (Array.isArray(data.trainingSessions)?data.trainingSessions:[]).filter(s=>s&&/^\d{4}-\d{2}-\d{2}$/.test(String(s.date||''))&&/^\d{2}:\d{2}$/.test(String(s.time||''))&&String(s.venue||'').trim()).slice(0,30).map(s=>({
-      id:String(s.id||uid('tr')),date:String(s.date),time:String(s.time),venue:String(s.venue).trim().slice(0,120),note:String(s.note||'').trim().slice(0,160)
+      id:String(s.id||uid('tr')),date:String(s.date),time:String(s.time),endTime:/^\d{2}:\d{2}$/.test(String(s.endTime||''))&&String(s.endTime)>String(s.time)?String(s.endTime):'',venue:String(s.venue).trim().slice(0,120),note:String(s.note||'').trim().slice(0,160)
     })),
     trainingSchedule: {
       weekly:(Array.isArray(data.trainingSchedule?.weekly)?data.trainingSchedule.weekly:[]).filter(r=>r&&Number.isInteger(Number(r.weekday))&&Number(r.weekday)>=0&&Number(r.weekday)<=6&&/^\d{2}:\d{2}$/.test(String(r.time||''))&&String(r.venue||'').trim()&&/^\d{4}-\d{2}-\d{2}$/.test(String(r.startDate||''))).slice(0,12).map(r=>({
-        id:String(r.id||uid('tw')),weekday:Number(r.weekday),time:String(r.time),venue:String(r.venue).trim().slice(0,120),note:String(r.note||'').trim().slice(0,160),startDate:String(r.startDate),endDate:/^\d{4}-\d{2}-\d{2}$/.test(String(r.endDate||''))?String(r.endDate):''
+        id:String(r.id||uid('tw')),weekday:Number(r.weekday),time:String(r.time),endTime:/^\d{2}:\d{2}$/.test(String(r.endTime||''))&&String(r.endTime)>String(r.time)?String(r.endTime):'',venue:String(r.venue).trim().slice(0,120),note:String(r.note||'').trim().slice(0,160),startDate:String(r.startDate),endDate:/^\d{4}-\d{2}-\d{2}$/.test(String(r.endDate||''))?String(r.endDate):''
       })),
       cancelled:(Array.isArray(data.trainingSchedule?.cancelled)?data.trainingSchedule.cancelled:[]).map(String).filter(v=>/^[^:]{1,80}:\d{4}-\d{2}-\d{2}$/.test(v)).slice(-100)
     },
@@ -1820,7 +1820,7 @@ function renderMatchPageNextFixture(){
   card.classList.toggle('hidden',parent&&!confirmedForParent);
   document.getElementById('parent-matches-placeholder')?.classList.toggle('hidden',!parent||confirmedForParent);
   const training=document.getElementById('parent-matches-training');
-  if(training){training.classList.toggle('hidden',!parent);if(parent)training.innerHTML='<h3>Upcoming training</h3>'+parentTrainingRowsHtml(6);}
+  if(training){training.classList.toggle('hidden',!parent);if(parent)training.innerHTML=parentTrainingScheduleHtml();}
   if(parent&&!confirmedForParent)return;
   if(!f){card.classList.add('no-fixture');set('matches-next-opponent','TBC');set('matches-next-when','Date / kick-off TBC');set('matches-next-venue','Competition TBC');set('matches-next-kits','Kit colours and away details will appear when confirmed.');clearFixtureOverview('matches-next');const cal=document.getElementById('matches-next-calendar');if(cal)cal.classList.add('hidden');const played=document.getElementById('matches-next-played');if(played)played.classList.add('hidden');const share=document.getElementById('matches-next-share');if(share)share.classList.add('hidden');document.getElementById('matches-next-copy')?.classList.add('hidden');return;}
   const d=resolvedFixture(f),confirmed=fixtureDetailsConfirmed(f);card.classList.remove('no-fixture');set('matches-next-opponent',matchTeamLabel(f.opponent||'TBC'));set('matches-next-when',[f.date?formatDate(f.date):'Date TBC',confirmed&&d.time?`Kick-off ${d.time}`:'Kick-off awaiting confirmation',confirmed&&d.time?`Arrival ${matchdayArrivalTime(d.time)}`:''].filter(Boolean).join(' · '));set('matches-next-venue',fixtureCompetitionLabel(f));renderFixtureOverview('matches-next',d);set('matches-next-kits','Home and away kit details shown above.');const cal=document.getElementById('matches-next-calendar');if(cal)cal.classList.toggle('hidden',!confirmed||!f.date);const played=document.getElementById('matches-next-played');if(played)played.classList.toggle('hidden',!isCoach());const share=document.getElementById('matches-next-share');if(share){share.classList.toggle('hidden',!canConfirmFixtureDetails());share.disabled=false;share.textContent=window.ClubHubNative?.shareMatchCard?'Share matchday info':'Save matchday image';share.title=confirmed?'Share matchday image':'Confirm match details first';}document.getElementById('matches-next-copy')?.classList.toggle('hidden',!confirmed||!canConfirmFixtureDetails());
@@ -1862,7 +1862,8 @@ function trainingDateKey(date){return `${date.getFullYear()}-${String(date.getMo
 function upcomingTrainingSessions(limit=24,now=new Date()){
   const sessions=(state.trainingSessions||[]).filter(s=>{
     const start=new Date(`${s.date}T${s.time}:00`);
-    return !Number.isNaN(start.getTime())&&start>=now;
+    const end=s.endTime?new Date(`${s.date}T${s.endTime}:00`):start;
+    return !Number.isNaN(start.getTime())&&end>=now;
   }).map(s=>({...s,kind:'dated'}));
   const horizon=new Date(now);horizon.setDate(horizon.getDate()+56);horizon.setHours(23,59,59,999);
   const cancelled=new Set(state.trainingSchedule?.cancelled||[]);
@@ -1871,42 +1872,55 @@ function upcomingTrainingSessions(limit=24,now=new Date()){
     occurrence.setDate(occurrence.getDate()+(rule.weekday-occurrence.getDay()+7)%7);
     for(let week=0;week<9&&occurrence<=horizon;week++,occurrence.setDate(occurrence.getDate()+7)){
       const date=trainingDateKey(occurrence),start=new Date(`${date}T${rule.time}:00`);
-      if(date<rule.startDate||(rule.endDate&&date>rule.endDate)||start<now||cancelled.has(`${rule.id}:${date}`))continue;
-      sessions.push({id:`${rule.id}:${date}`,ruleId:rule.id,kind:'weekly',date,time:rule.time,venue:rule.venue,note:rule.note});
+      const end=rule.endTime?new Date(`${date}T${rule.endTime}:00`):start;
+      if(date<rule.startDate||(rule.endDate&&date>rule.endDate)||end<now||cancelled.has(`${rule.id}:${date}`))continue;
+      sessions.push({id:`${rule.id}:${date}`,ruleId:rule.id,kind:'weekly',date,time:rule.time,endTime:rule.endTime,venue:rule.venue,note:rule.note});
     }
   }
   return sessions.sort((a,b)=>(a.date+'T'+a.time).localeCompare(b.date+'T'+b.time)).slice(0,limit);
 }
+function trainingRowsHtml(sessions){
+  return sessions.map(s=>`<div class="parent-training-row"><strong>${esc(TRAINING_WEEKDAYS[new Date(`${s.date}T12:00:00`).getDay()].slice(0,3))} ${esc(formatDate(s.date))} · ${esc(s.time)}${s.endTime?`–${esc(s.endTime)}`:''}</strong><span>${esc(s.venue)}</span>${s.note?`<small>${esc(s.note)}</small>`:''}</div>`).join('');
+}
 function parentTrainingRowsHtml(limit=2){
   const sessions=upcomingTrainingSessions(limit);
-  return sessions.length?sessions.map(s=>`<div class="parent-training-row"><strong>${esc(formatDate(s.date))} · ${esc(s.time)}</strong><span>${esc(s.venue)}</span>${s.note?`<small>${esc(s.note)}</small>`:''}</div>`).join(''):'<p class="parent-family-message">The coach has not added the next training session yet.</p>';
+  return sessions.length?trainingRowsHtml(sessions):'<p class="parent-family-message">The coach has not added the next training session yet.</p>';
+}
+function parentTrainingScheduleHtml(now=new Date()){
+  const endOfWeek=new Date(now);endOfWeek.setDate(endOfWeek.getDate()+(7-endOfWeek.getDay())%7);
+  const weekEnd=trainingDateKey(endOfWeek),sessions=upcomingTrainingSessions(24,now);
+  const thisWeek=sessions.filter(s=>s.date<=weekEnd),later=sessions.filter(s=>s.date>weekEnd);
+  return '<h3>Training this week</h3>'+(thisWeek.length?trainingRowsHtml(thisWeek):'<p class="parent-family-message">No more training this week.</p>')+
+    (later.length?`<details class="training-later-dates"><summary>Later training dates <span>(${later.length})</span></summary><div>${trainingRowsHtml(later)}</div></details>`:'');
 }
 function renderTrainingSessionSettings(){
   const list=document.getElementById('training-session-list');if(!list)return;
   const startInput=document.getElementById('training-weekly-start');if(startInput&&!startInput.value)startInput.value=trainingDateKey(new Date());
-  const weekly=document.getElementById('training-weekly-list');if(weekly)weekly.innerHTML=(state.trainingSchedule?.weekly||[]).map(r=>`<div class="training-session-row"><div><strong>${TRAINING_WEEKDAYS[r.weekday]} · ${esc(r.time)}</strong><span>${esc(r.venue)}${r.note?' · '+esc(r.note):''}</span><small>From ${esc(formatDate(r.startDate))}${r.endDate?' to '+esc(formatDate(r.endDate)):''}</small></div><button type="button" class="text-button compact" data-remove-weekly-training="${esc(r.id)}">Remove</button></div>`).join('')||'<p class="parent-family-message">No weekly training pattern set.</p>';
+  const weekly=document.getElementById('training-weekly-list');if(weekly)weekly.innerHTML=(state.trainingSchedule?.weekly||[]).map(r=>`<div class="training-session-row"><div><strong>${TRAINING_WEEKDAYS[r.weekday]} · ${esc(r.time)}${r.endTime?`–${esc(r.endTime)}`:''}</strong><span>${esc(r.venue)}${r.note?' · '+esc(r.note):''}</span><small>From ${esc(formatDate(r.startDate))}${r.endDate?' to '+esc(formatDate(r.endDate)):''}</small></div><button type="button" class="text-button compact" data-remove-weekly-training="${esc(r.id)}">Remove</button></div>`).join('')||'<p class="parent-family-message">No weekly training pattern set.</p>';
   const sessions=upcomingTrainingSessions(12);
-  list.innerHTML=sessions.map(s=>`<div class="training-session-row"><div><strong>${esc(formatDate(s.date))} · ${esc(s.time)}</strong><span>${esc(s.venue)}${s.note?' · '+esc(s.note):''}</span><small>${s.kind==='weekly'?'Weekly session':'One-off session'}</small></div><button type="button" class="text-button compact" ${s.kind==='weekly'?`data-skip-training="${esc(s.id)}" aria-label="Skip training on ${esc(formatDate(s.date))}">Skip date`:`data-remove-training="${esc(s.id)}" aria-label="Remove training on ${esc(formatDate(s.date))}">Remove`}</button></div>`).join('')||'<p class="parent-family-message">No upcoming training sessions added.</p>';
+  list.innerHTML=sessions.map(s=>`<div class="training-session-row"><div><strong>${esc(formatDate(s.date))} · ${esc(s.time)}${s.endTime?`–${esc(s.endTime)}`:''}</strong><span>${esc(s.venue)}${s.note?' · '+esc(s.note):''}</span><small>${s.kind==='weekly'?'Weekly session':'One-off session'}</small></div><button type="button" class="text-button compact" ${s.kind==='weekly'?`data-skip-training="${esc(s.id)}" aria-label="Skip training on ${esc(formatDate(s.date))}">Skip date`:`data-remove-training="${esc(s.id)}" aria-label="Remove training on ${esc(formatDate(s.date))}">Remove`}</button></div>`).join('')||'<p class="parent-family-message">No upcoming training sessions added.</p>';
   const skipped=document.getElementById('training-skipped-list');if(skipped){const rules=new Map((state.trainingSchedule?.weekly||[]).map(r=>[r.id,r]));const today=trainingDateKey(new Date());skipped.innerHTML=(state.trainingSchedule?.cancelled||[]).filter(key=>key.slice(-10)>=today&&rules.has(key.slice(0,-11))).sort().map(key=>`<div class="training-session-row"><span>${esc(formatDate(key.slice(-10)))} · ${TRAINING_WEEKDAYS[rules.get(key.slice(0,-11)).weekday]} skipped</span><button type="button" class="text-button compact" data-restore-training="${esc(key)}">Restore</button></div>`).join('');}
 }
 function addTrainingSession(event){
   event.preventDefault();if(!requireCoach())return;
-  const date=document.getElementById('training-session-date')?.value||'',time=document.getElementById('training-session-time')?.value||'',venue=document.getElementById('training-session-venue')?.value.trim()||'',note=document.getElementById('training-session-note')?.value.trim()||'';
+  const date=document.getElementById('training-session-date')?.value||'',time=document.getElementById('training-session-time')?.value||'',endTime=document.getElementById('training-session-finish')?.value||'',venue=document.getElementById('training-session-venue')?.value.trim()||'',note=document.getElementById('training-session-note')?.value.trim()||'';
   const start=new Date(`${date}T${time}:00`);
   if(!/^\d{4}-\d{2}-\d{2}$/.test(date)||!/^\d{2}:\d{2}$/.test(time)||Number.isNaN(start.getTime())||start<=new Date()||!venue)return toast('Add a future date, time and venue');
+  if(endTime&&(!/^\d{2}:\d{2}$/.test(endTime)||endTime<=time))return toast('Finish time must be after the start time');
   const upcoming=(state.trainingSessions||[]).filter(s=>new Date(`${s.date}T${s.time}:00`)>=new Date());
   if(upcoming.length>=30)return toast('Remove a one-off session before adding another');
   state.trainingSessions=upcoming;
-  state.trainingSessions.push({id:uid('tr'),date,time,venue:venue.slice(0,120),note:note.slice(0,160)});
+  state.trainingSessions.push({id:uid('tr'),date,time,endTime,venue:venue.slice(0,120),note:note.slice(0,160)});
   saveState();event.target.reset();toast('One-off training session added');
 }
 function addWeeklyTraining(event){
   event.preventDefault();if(!requireCoach())return;
-  const weekday=Number(document.getElementById('training-weekly-day')?.value),time=document.getElementById('training-weekly-time')?.value||'',venue=document.getElementById('training-weekly-venue')?.value.trim()||'',note=document.getElementById('training-weekly-note')?.value.trim()||'',startDate=document.getElementById('training-weekly-start')?.value||'',endDate=document.getElementById('training-weekly-end')?.value||'';
+  const weekday=Number(document.getElementById('training-weekly-day')?.value),time=document.getElementById('training-weekly-time')?.value||'',endTime=document.getElementById('training-weekly-finish')?.value||'',venue=document.getElementById('training-weekly-venue')?.value.trim()||'',note=document.getElementById('training-weekly-note')?.value.trim()||'',startDate=document.getElementById('training-weekly-start')?.value||'',endDate=document.getElementById('training-weekly-end')?.value||'';
   if(!Number.isInteger(weekday)||weekday<0||weekday>6||!/^\d{2}:\d{2}$/.test(time)||!venue||!/^\d{4}-\d{2}-\d{2}$/.test(startDate)||(endDate&&(!/^\d{4}-\d{2}-\d{2}$/.test(endDate)||endDate<startDate)))return toast('Check the weekly training day, dates, time and venue');
+  if(endTime&&(!/^\d{2}:\d{2}$/.test(endTime)||endTime<=time))return toast('Finish time must be after the start time');
   state.trainingSchedule=state.trainingSchedule||{weekly:[],cancelled:[]};
   if(state.trainingSchedule.weekly.length>=12)return toast('Remove a weekly pattern before adding another');
-  state.trainingSchedule.weekly.push({id:uid('tw'),weekday,time,venue:venue.slice(0,120),note:note.slice(0,160),startDate,endDate});
+  state.trainingSchedule.weekly.push({id:uid('tw'),weekday,time,endTime,venue:venue.slice(0,120),note:note.slice(0,160),startDate,endDate});
   event.target.reset();saveState();toast('Weekly training schedule saved');
 }
 function renderParentHomeMatchInfo(){

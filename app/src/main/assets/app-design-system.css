@@ -616,6 +616,16 @@ html[data-theme="dark"] .app-utility-bar .hero-profile-button,html[data-theme="d
 .parent-training-row{display:grid;gap:4px;padding:12px 0;border-top:1px solid var(--line,#D8E0DA)}
 .parent-training-row:first-child{padding-top:0;border-top:0}
 .parent-training-row strong{font-size:16px}.parent-training-row span,.parent-training-row small{color:var(--muted);font-size:13px}
+#parent-matches-training{padding:12px 16px}
+#parent-matches-training h3{margin:0 0 4px;font-size:16px}
+#parent-matches-training .parent-training-row{gap:2px;padding:8px 0}
+#parent-matches-training .parent-training-row strong{font-size:14px}
+#parent-matches-training .parent-training-row span,#parent-matches-training .parent-training-row small{font-size:12px}
+.training-later-dates{border-top:1px solid var(--line,#D8E0DA)}
+.training-later-dates summary{cursor:pointer;padding:12px 0;font-weight:700;color:var(--gch-green-700)}
+html[data-theme="dark"] .training-later-dates summary{color:#8ee09a}
+.training-later-dates summary span{font-weight:400;color:var(--muted)}
+.training-later-dates .parent-training-row:first-child{border-top:1px solid var(--line,#D8E0DA)}
 .training-session-list{display:grid;gap:7px;margin:10px 0 16px}
 .training-session-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid var(--line,#D8E0DA)}
 .training-session-row>div{display:grid;gap:3px;min-width:0}.training-session-row span{color:var(--muted);overflow-wrap:anywhere;font-size:12px}

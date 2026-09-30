@@ -554,6 +554,7 @@
               <form id="training-weekly-form" class="training-session-form">
                 <label>Day<select id="training-weekly-day" required><option value="">Choose day</option><option value="1">Monday</option><option value="2">Tuesday</option><option value="3">Wednesday</option><option value="4">Thursday</option><option value="5">Friday</option><option value="6">Saturday</option><option value="0">Sunday</option></select></label>
                 <label>Start time<input id="training-weekly-time" type="time" required /></label>
+                <label>Finish time (optional)<input id="training-weekly-finish" type="time" /></label>
                 <label>From<input id="training-weekly-start" type="date" required /></label>
                 <label>Until (optional)<input id="training-weekly-end" type="date" /></label>
                 <label class="training-session-note-field">Venue<input id="training-weekly-venue" type="text" maxlength="120" required placeholder="Training ground" /></label>
@@ -564,6 +565,7 @@
               <form id="training-session-form" class="training-session-form">
                 <label>Date<input id="training-session-date" type="date" required /></label>
                 <label>Start time<input id="training-session-time" type="time" required /></label>
+                <label>Finish time (optional)<input id="training-session-finish" type="time" /></label>
                 <label>Venue<input id="training-session-venue" type="text" maxlength="120" required placeholder="Training ground" /></label>
                 <label class="training-session-note-field">Note (optional)<input id="training-session-note" type="text" maxlength="160" placeholder="e.g. Bring boots and water" /></label>
                 <button type="submit" class="primary-button compact">Add one-off training</button>
