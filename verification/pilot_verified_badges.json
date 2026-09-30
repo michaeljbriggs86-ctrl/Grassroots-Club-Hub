@@ -336,6 +336,67 @@
       "logo_sha256": "f5b6e7364db5e2b857ba22f89900876462e7136b5b8fc05f01affb8a539ecf2e",
       "rights_status": "protected_pilot_only_public_rights_not_reviewed",
       "review_basis": "Mike approved the visible artwork in the upload inbox. Selkent club 558 and Bridon Ropes FC identify the same rope-wheel crest. The official club states its youth teams use one club badge from 2026/27. Exact 928x962 WebP was re-fetched on 2026-09-29. Transparent exterior and 48/128 px appearance were reviewed; final protected-page acceptance and public rights remain open."
+    },
+    {
+      "club_id": 274,
+      "club_name": "Fleetdown United",
+      "logo_url": "https://fleetdownunitedfc.org.uk/wp-content/uploads/2021/08/cropped-Fleetdown-Football-Club-Logo-1-1.png",
+      "logo_status": "pilot_verified",
+      "logo_source": "official_site_image",
+      "logo_updated_at": "2026-09-30",
+      "logo_sha256": "d1a823f517d0a7622dec072b7be769c622fbb8820623d1081e89c0917c0d7adf",
+      "rights_status": "protected_pilot_only_public_rights_not_reviewed",
+      "review_basis": "Mike approved the visible artwork in the upload inbox. Selkent club 274 and Fleetdown United FC identify the same anchor-and-football crest; the club constitution confirms the official badge. Exact 512x512 PNG was re-fetched on 2026-09-30 and reviewed at hero, card and phone sizes on light and dark surfaces."
+    },
+    {
+      "club_id": 332,
+      "club_name": "Swanscombe Tigers",
+      "logo_url": "https://swanscombetigers.com/wp-content/uploads/2026/07/Swanscombe_Logo-2026_07-1.png",
+      "logo_status": "pilot_verified",
+      "logo_source": "official_site_image",
+      "logo_updated_at": "2026-09-30",
+      "logo_sha256": "f52208313ace5cc02860e57ab888613d48734e275181acb67e567928153a4384",
+      "rights_status": "protected_pilot_only_public_rights_not_reviewed",
+      "review_basis": "Mike approved the visible artwork in the upload inbox. Selkent club 332 and the current Swanscombe Tigers FC site identify the same tiger crest. Exact 2000x2000 PNG was re-fetched on 2026-09-30 and reviewed at hero, card and phone sizes; the original artwork is preserved unchanged."
+    },
+    {
+      "club_id": 505,
+      "club_name": "Thamesmead Tigers FC",
+      "logo_url": "https://test.pitchkind.com/__pilot_badges/505/be716d10f4eedb19bf35c60052e3899f59154d2de83cf8a8b6e22ab5d035c3e3",
+      "logo_status": "pilot_verified",
+      "logo_source": "official_source_transparency_derivative_private",
+      "logo_updated_at": "2026-09-30",
+      "logo_sha256": "be716d10f4eedb19bf35c60052e3899f59154d2de83cf8a8b6e22ab5d035c3e3",
+      "original_source_url": "https://static.wixstatic.com/media/50643f_4c4bad8f038b4c8aaf8e57d03631f343~mv2.png",
+      "original_sha256": "70083dd0655e32dd765f16f168750e09000d97c6c9db6716d6f194563a466d29",
+      "derivation": "outer_background_transparency_only",
+      "rights_status": "protected_pilot_only_public_rights_not_reviewed",
+      "review_basis": "Mike approved the visible artwork in the upload inbox. Selkent club 505 and the current Thamesmead Tigers FC site identify the same shield. Exact 1290x1245 official PNG was re-fetched on 2026-09-30; the connected white exterior alone was made transparent, preserving the shield, lettering, tigers, colours and outlines. Phone-size light and dark previews passed."
+    },
+    {
+      "club_id": 506,
+      "club_name": "IEXEL F.C",
+      "logo_url": "https://iexelfc.co.uk/wp-content/uploads/2026/06/IEXEL-F.C-NEW-LOGO.png",
+      "logo_status": "pilot_verified",
+      "logo_source": "official_site_image",
+      "logo_updated_at": "2026-09-30",
+      "logo_sha256": "3a98b9c5e8930a9cb068dd56204c7e3ae0a4d7a5d120c5f48e241496cbe36b4b",
+      "rights_status": "protected_pilot_only_public_rights_not_reviewed",
+      "review_basis": "Mike approved the visible artwork in the upload inbox. Selkent club 506 and the current IEXEL F.C site identify the same gold crest. Exact 566x611 official PNG was re-fetched on 2026-09-30 and reviewed at hero, card and phone sizes on light and dark surfaces."
+    },
+    {
+      "club_id": 548,
+      "club_name": "Gipsy Hill FC",
+      "logo_url": "https://test.pitchkind.com/__pilot_badges/548/bfdd1c8ee2db0dd45478d2a24dd1b1159fe15af12412dd3d98288ed5ae1826a0",
+      "logo_status": "pilot_verified",
+      "logo_source": "official_source_transparency_derivative_private",
+      "logo_updated_at": "2026-09-30",
+      "logo_sha256": "bfdd1c8ee2db0dd45478d2a24dd1b1159fe15af12412dd3d98288ed5ae1826a0",
+      "original_source_url": "https://primary.jwwb.nl/public/s/u/b/temp-wqxwweoobifrquaevljb/4c2e09da-8a9a-412e-a6b3-3e1d4e64d80b-high-5i3qgu.jpg?enable-io=true&enable=upscale&fit=bounds&width=1200",
+      "original_sha256": "1d4963dbe5f1d36be459ceb7b2eae3f7e4e10e584db12879cd2217233a41a2d2",
+      "derivation": "outer_background_transparency_only",
+      "rights_status": "protected_pilot_only_public_rights_not_reviewed",
+      "review_basis": "Mike approved the visible artwork in the upload inbox. Selkent club 548 and the current Gipsy Hill FC site identify the same crest. Exact 1200x1200 official JPEG was re-fetched on 2026-09-30; only the connected white exterior was made transparent, preserving the circular crest. Phone-size light and dark previews passed."
     }
   ]
 }

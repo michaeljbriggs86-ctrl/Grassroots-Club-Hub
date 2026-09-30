@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-09-30T12:33:38.500642+00:00",
+  "last_updated": "2026-09-30T14:17:41.011024+00:00",
   "clubs": [
     {
       "club_id": 514,
@@ -261,7 +261,12 @@
     },
     {
       "club_id": 274,
-      "club_name": "Fleetdown United"
+      "club_name": "Fleetdown United",
+      "logo_url": "https://fleetdownunitedfc.org.uk/wp-content/uploads/2021/08/cropped-Fleetdown-Football-Club-Logo-1-1.png",
+      "logo_status": "pilot_verified",
+      "logo_source": "official_site_image",
+      "logo_updated_at": "2026-09-30",
+      "logo_sha256": "d1a823f517d0a7622dec072b7be769c622fbb8820623d1081e89c0917c0d7adf"
     },
     {
       "club_id": 275,
@@ -269,7 +274,12 @@
     },
     {
       "club_id": 548,
-      "club_name": "Gipsy Hill FC"
+      "club_name": "Gipsy Hill FC",
+      "logo_url": "https://test.pitchkind.com/__pilot_badges/548/bfdd1c8ee2db0dd45478d2a24dd1b1159fe15af12412dd3d98288ed5ae1826a0",
+      "logo_status": "pilot_verified",
+      "logo_source": "official_source_transparency_derivative_private",
+      "logo_updated_at": "2026-09-30",
+      "logo_sha256": "bfdd1c8ee2db0dd45478d2a24dd1b1159fe15af12412dd3d98288ed5ae1826a0"
     },
     {
       "club_id": 444,
@@ -308,7 +318,12 @@
     },
     {
       "club_id": 506,
-      "club_name": "IEXEL F.C"
+      "club_name": "IEXEL F.C",
+      "logo_url": "https://iexelfc.co.uk/wp-content/uploads/2026/06/IEXEL-F.C-NEW-LOGO.png",
+      "logo_status": "pilot_verified",
+      "logo_source": "official_site_image",
+      "logo_updated_at": "2026-09-30",
+      "logo_sha256": "3a98b9c5e8930a9cb068dd56204c7e3ae0a4d7a5d120c5f48e241496cbe36b4b"
     },
     {
       "club_id": 290,
@@ -567,7 +582,12 @@
     },
     {
       "club_id": 332,
-      "club_name": "Swanscombe Tigers"
+      "club_name": "Swanscombe Tigers",
+      "logo_url": "https://swanscombetigers.com/wp-content/uploads/2026/07/Swanscombe_Logo-2026_07-1.png",
+      "logo_status": "pilot_verified",
+      "logo_source": "official_site_image",
+      "logo_updated_at": "2026-09-30",
+      "logo_sha256": "f52208313ace5cc02860e57ab888613d48734e275181acb67e567928153a4384"
     },
     {
       "club_id": 333,
@@ -580,7 +600,12 @@
     },
     {
       "club_id": 505,
-      "club_name": "Thamesmead Tigers FC"
+      "club_name": "Thamesmead Tigers FC",
+      "logo_url": "https://test.pitchkind.com/__pilot_badges/505/be716d10f4eedb19bf35c60052e3899f59154d2de83cf8a8b6e22ab5d035c3e3",
+      "logo_status": "pilot_verified",
+      "logo_source": "official_source_transparency_derivative_private",
+      "logo_updated_at": "2026-09-30",
+      "logo_sha256": "be716d10f4eedb19bf35c60052e3899f59154d2de83cf8a8b6e22ab5d035c3e3"
     },
     {
       "club_id": 427,
@@ -7766,5 +7791,5 @@
     }
   ],
   "note": "Panel parsing confirmed against all five format categories (mini-soccer, 9-a-side, X-category, 11-a-side, Senior) as of Sept 2026. Club/team linking is heuristic (name-prefix match) - see ambiguous_club_matches in diagnostics for anything flagged as uncertain.",
-  "pilot_badges_revision": "35737dbb66025990a1269f8dff6600a05215f2af901fdf0cf5e32886171ea279"
+  "pilot_badges_revision": "e29394318d71b1d80bef6e7c4a6a31ae082b35d372a3b6690974605090abe3b6"
 }
