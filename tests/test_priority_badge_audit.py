@@ -38,6 +38,13 @@ class PriorityBadgeAuditTests(unittest.TestCase):
         self.assertEqual(got[0]["score"], 3)
         self.assertEqual(got[1]["score"], 2)
 
+    def test_empty_feed_sections_can_be_null(self):
+        catalog = {"clubs": [{"club_id": 499, "club_name": "Shooters Hill AFC"}]}
+        feed = {"age_groups": [{"age_group": "U9", "fixtures": None,
+                                "published_results": None}]}
+        self.assertEqual(priority_rows(catalog, {"team_club_links": []},
+                                       feed, {"badges": []}, 499, date(2026, 9, 30)), [])
+
 
 if __name__ == "__main__":
     unittest.main()

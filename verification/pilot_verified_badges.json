@@ -103,6 +103,28 @@
       "review_basis": "Mike approved the visible artwork in the upload inbox. Selkent club ID 272 identifies Sutton Dynamo FC and its current club site displays this exact crest. Exact 715x618 PNG and SHA-256 were checked against the review packet and re-fetched on 2026-09-29. Transparent exterior screened at 48/128 px on pale and dark green. Protected-page acceptance and public rights review remain open."
     },
     {
+      "club_id": 281,
+      "club_name": "Guru Nanak Youth",
+      "logo_url": "https://static.wixstatic.com/media/4b2878_e1344ed3a3ae48cd9687a86914d0ff2f~mv2.png",
+      "logo_status": "pilot_verified",
+      "logo_source": "official_site_image",
+      "logo_updated_at": "2026-09-30",
+      "logo_sha256": "2ba916a001ac3d967b428c177a7578f0cced94809275b58f3981ea879d9979d8",
+      "rights_status": "protected_pilot_only_public_rights_not_reviewed",
+      "review_basis": "Mike approved upload-inbox badge artwork. Selkent club 281 is Guru Nanak Youth in Gravesend; the current GNG FC site lists Selkent Youth, and the linked Guru Nanak Sports club describes its youth and senior sides as one football club. The official homepage carries this exact 1024x1055 GNG crest. Its blue field is part of the source artwork, not a removable outer margin. Exact PNG bytes were fetched twice with matching SHA-256 and screened for complete lettering and outline. Protected-page phone and card acceptance and public rights review remain open."
+    },
+    {
+      "club_id": 288,
+      "club_name": "Hillyfielders",
+      "logo_url": "https://static.wixstatic.com/media/62ac0b_3e7b69a85ddf4fd5a5536dadfdbab277~mv2.png",
+      "logo_status": "pilot_verified",
+      "logo_source": "official_site_image",
+      "logo_updated_at": "2026-09-30",
+      "logo_sha256": "62c75a50ca0588855877320f93851ee4bc60484eaa07a1b0ea374330e1f5683a",
+      "rights_status": "protected_pilot_only_public_rights_not_reviewed",
+      "review_basis": "Mike approved upload-inbox badge artwork. Selkent club 288 links the current Hillyfielders FC youth site; its homepage header names this exact original HFC_yellow_transparent_edited.png. The 676x845 RGBA PNG shows the full HFC 1999 shield and clear outer field. Exact source bytes were fetched twice with matching SHA-256, and the border, lettering and transparency were inspected. Protected-page phone and card acceptance and public rights review remain open."
+    },
+    {
       "club_id": 318,
       "club_name": "Phoenix Sports",
       "logo_url": "https://test.pitchkind.com/__pilot_badges/318/53facde723259b51ef991c02e37e33b1a475dc21e2e56e489929df2f9410f77c",

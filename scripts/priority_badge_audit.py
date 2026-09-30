@@ -41,8 +41,8 @@ def priority_rows(catalog, directory, feed, admitted, pilot_id, today):
     counts = defaultdict(lambda: {"published": 0, "upcoming": 0, "score": 0})
     seen = set()
     for age in feed["age_groups"]:
-        for kind, matches in (("published", age.get("published_results", [])),
-                              ("upcoming", age.get("fixtures", []))):
+        for kind, matches in (("published", age.get("published_results") or []),
+                              ("upcoming", age.get("fixtures") or [])):
             for match in matches:
                 when = date.fromisoformat(match["date"])
                 if kind == "published" and not today - timedelta(days=30) <= when <= today:
