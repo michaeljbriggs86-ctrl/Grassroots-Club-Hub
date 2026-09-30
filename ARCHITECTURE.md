@@ -1,7 +1,7 @@
 ﻿# PitchKind - Data Architecture Reference
 
 **Document state:** Current governing architecture reference in `00 - CURRENT MASTER`. The GitHub-root copy is a mirror; its presence and byte parity must be checked independently after any Termux push.
-**Last updated:** 2026-09-22
+**Last updated:** 2026-09-30
 **Collaboration rules:** `AI-COLLABORATION-PROTOCOL.md`
 **Product name:** PitchKind (formerly Grassroots Club Hub). Mike authorised the visible PitchKind identity implementation on 2026-09-21. Internal identifiers including `com.grassrootsclubhub.universal`, the `grassrootsclubhub://` scheme, `ClubHubNative`, existing feed/repository paths, localStorage keys and `GCH-PIN` remain unchanged unless separately authorised. Trade-mark clearance is NOT completed.
 **Brand/UI authority:** `APP-UI-DESIGN-GUIDELINES.md` v1.4 governs anything the app shows. `BRAND-GUIDELINES.md` v1.0 is its cross-platform extension; where they conflict on app surfaces, the app guidelines win.
@@ -34,22 +34,25 @@ that conflict with this file must be marked superseded or archived.
 
 ---
 
-# 1. Current evidence-backed status — checked 2026-09-22
+# 1. Current evidence-backed status — checked 2026-09-28 for the rows updated below
 
 The source-of-truth categories in Section 2 remain unchanged. This section supersedes older dated build/fixture snapshots elsewhere in this document when they describe the same release.
 
 | Area | Status | Evidence / boundary |
 |---|---|---|
 | Public Selkent directory and standings | **TESTED feed / BUILT in inspected earlier APKs** | Static directory and U12+ standings integration was inspected in earlier APKs. The current published feed has 15 age groups; no new category of private data is added. |
-| All-age public fixtures | **TESTED feed; static Android path device-tested in v2.2.11** | The 2026-09-22 18:05 UTC `data/results.json` on GitHub main is schema v2, with 1,160 fixture rows across 15 age groups. U9 has 44 rows, `fixture_week_ids: [2,3]`, and `verified_multiweek_fixture_rows_v2`. The provider week IDs are discovered for every age group, fetched and deduplicated. Mike's v2.2.11 on-device Next Match check passed; independent v2.2.15–16 device acceptance is not established. |
-| U12+ published-results static cutover | **PLANNED** | Current feed still declares `awaiting_verified_nonempty_result_sample`. Real populated result rows must be captured and verified before cutover. |
+| All-age public fixtures | **TESTED feed; static Android path device-tested in v2.2.11** | The 2026-09-28 06:05 UTC schema-v2 `data/results.json` on GitHub main has 637 currently parsed fixtures across 15 age groups. The earlier 2026-09-22 1,160-row count was a dated snapshot, not a continuing invariant. Provider week IDs are discovered and rows deduplicated. Later Android/device acceptance is not established by this feed read. |
+| U12+ published results | **TESTED and published in the GitHub feed; signed-in website acceptance OPEN** | The scheduled scrape run `36384599407` pushed feed commit `d30ed54719f5d7b246d206d8e9bbf9fbb9af45aa` with `last_updated` 2026-09-28 06:05:30Z, 217 scored public `published_results` (211 U12+ youth and 6 Senior), 53 standings divisions and 546 rows. U8, U8X, U9, U10, U10X and U11 groups have null public scores/standings; U7 is absent. `cloudflare/web-app/build.py` validates and copies the feed into its site bundle, but a current signed-in served-revision/privacy check is open. |
+| Protected Shooters Hill website pilot | **TESTED source and CI; user-observed pages, revision-specific browser acceptance OPEN** | `test.pitchkind.com` is the active test surface; APK releases are not the current pilot surface. Club ID 499 is the permitted account. A successful Wrangler upload that reports `No targets deployed` does not by itself prove a live routing revision. |
+| Private opponent badges | **TESTED exact-hash R2 staging; signed-in display partially observed** | The pilot manifest currently contains Cray Wanderers 250 and Samuel Montagu 447. CI run `36407934538` read back both exact objects from private R2. Mike observed Cray's crest on a protected card; its network source remains unproven. Samuel's actual protected-page display needs acceptance. Rights clearance remains on hold. |
+| Private Selkent shadow Worker | **TESTED isolated snapshot and parity; non-canonical** | The private R2 snapshot collected 2026-09-28 06:15:49Z passed verifier run `36410917630` at 10:38Z and normalized parity was exact (637 fixtures, 217 results, 546 standings rows). Scheduled checks retain a 120-minute freshness bound; push/manual checks allow 420 minutes to match the six-hour collection cadence. The Worker does not publish or overwrite the GitHub feed. |
 | PitchKind Android v2.2.15 source and CI | **TESTED source / artifact generated; independent BUILT verification pending** | Commit `b42911e566b257ccde2da9d7298a6df75eacdba8`; Actions run `35761515223` succeeded and published artifact `PitchKind-v2.2.15-debug` (ID `10709948783`). Mike's screenshot shows a downloaded APK checksum, but this pass has not directly inspected packaged contents or run installed-device acceptance. Do not infer DEPLOYED/LIVE from CI success. |
 | PitchKind Android v2.2.16 source | **WRITTEN; CI/artifact/device verification not established here** | GitHub main source commit `6389136442bb443aa47527937daa1f04578ac58b` sets versionCode 2216/versionName 2.2.16 and adds further-fixture cards, club/team detail and kit-profile overrides, kit-clash warnings and role-sensitive match programme presentation. A verifier script and APK workflow were updated in source; neither their execution nor a v2.2.16 artifact has been verified in this review. |
 | v2.2.13 Undo match played | **BUILT / TESTED on Mike's device** | The 2026-09-22 handoff entry records a successful installed-device reversal of the accidental Junior Reds result, return to Scheduled, fixture reappearance and removal from active stats. Its `notify_match_reopened` RPC was reported deployed and permission-checked separately. |
 | Club creation/self-service onboarding | **ON HOLD by Mike** | Shooters Hill is the active pilot only. Do not resume multi-club rollout or club-creation feature work without explicit re-authorisation and a source-of-truth check. Existing code is not deleted by this decision. |
 | Public club-logo catalogue | **PLANNED** | Use canonical club ID within the existing directory; do not create a competing club database. |
 | U15 reusable player-code backend | **WRITTEN / NOT DEPLOYED** | Migration/Edge Function source does not establish end-to-end live player access. |
-| GitHub-root `ARCHITECTURE.md` | **ABSENT at this check** | GitHub contents API returned 404 on main. Drive current master is present; the root mirror requires a verified commit/push. |
+| GitHub-root `ARCHITECTURE.md` | **PRESENT; mirror of Drive master** | Before this revision, main's 2026-09-22 mirror was behind the Drive master's 2026-09-26 private-pilot text. Publish this revision to both locations and compare bytes; Drive remains governing even if a mirror becomes stale later. |
 
 The v2.2.12 multi-week implementation was initially blocked by stale CI assertions; commit `b0d056e326314956cd393202e5eede8ddd9cbe75` corrected those gates, and the subsequent v2.2.12 build succeeded. v2.2.13 adds Undo match played; v2.2.14 makes dark mode the default and improves match overview/kit/venue controls; v2.2.15 exposes fixture details before Match played, map previews, home/away-relative scoring and guarded manual-match removal. v2.2.16 source adds extended fixture cards, private club-side kit-profile corrections and a role-sensitive match programme. These are source/CI observations where specified, not blanket installed-device acceptance for v2.2.14–16.
 
@@ -122,7 +125,7 @@ Selkent fixturespage/{agegroup_id} week tabs
 
 Scope: all supported Selkent age groups. Provider `data-week-id` values are authoritative; do not calculate weeks by date or special-case U9. Merge/deduplicate fixture rows by stable provider identity, retaining a name fallback. Unknown populated markup or a failed advertised-week fetch must fail closed and preserve the previous published feed. Public U7–U11 fixture information is allowed, but public scores/results/tables remain prohibited by Section 7.
 
-At the GitHub main feed refresh of 2026-09-22 18:05 UTC, schema-v2 `data/results.json` contains 1,160 fixtures across 15 age groups. U9 contains 44 fixtures across week IDs `[2,3]`, including the 2026-09-27 Junior Reds Sabres v Shooters Hill AFC Valiants and 2026-10-04 Shooters Hill AFC Valiants v Phoenix Sports Panthers rows. The fixture parser/feed is **TESTED**. The Android static fixture path passed the targeted v2.2.11 device check; v2.2.15 packaging/device behaviour is not independently accepted in this update. The temporary live Selkent fixture fallback remains isolated and cannot overwrite static directory/standings state.
+At the GitHub main feed refresh of 2026-09-28 06:05 UTC, schema-v2 `data/results.json` contains 637 parsed fixtures across 15 age groups. This is a new dated snapshot; the older 2026-09-22 count of 1,160 is not a fixed expected count. The fixture parser/feed is **TESTED**. The Android static fixture path passed the targeted v2.2.11 device check; later packaging/device behaviour is not independently accepted in this update. The temporary live Selkent fixture fallback remains isolated and cannot overwrite static directory/standings state.
 
 ---
 
@@ -134,18 +137,20 @@ Intended final authority:
 Selkent → scripts/scrape.py → data/results.json
 ```
 
-Scope: U12+ only.
+Scope: U12+ youth and Senior; U7–U11 results remain private.
 
-Status: **BUILT IN SOURCE; PENDING LIVE FEED/DEVICE VERIFICATION** for static cutover.
+Status: **TESTED populated U12+ parser and published GitHub feed; signed-in website acceptance OPEN**.
 
-The 2026-09-27 live Under12X A Navy result panel showed a dated panel with
-`.resultTeam`, `.resultScore`, `.resultTeam` rows and a 9–1 published score.
-`scripts/scrape.py` now parses only numeric scores in that verified shape,
-ignoring blank or dash scores. Unknown populated shapes abort the atomic feed
-build. The Android adapter reads division-filtered results from the static feed
-and refreshes it on manual sync. This source change does not establish that a
-new feed has been published or that an installed device has accepted the result.
-U7–U11 public results must never be published.
+The real populated Under12X A Navy result panel supplied a dated `.resultTeam`,
+`.resultScore`, `.resultTeam` shape and a 9–1 score. `scripts/scrape.py` accepts
+numeric scores from that verified shape, ignores unplayed/Abandoned rows and
+fails closed on unknown populated shapes. The scheduled GitHub Actions run
+`36384599407` pushed `data/results.json` at commit
+`d30ed54719f5d7b246d206d8e9bbf9fbb9af45aa`; its 2026-09-28 06:05:30Z
+payload contains 217 scored public results (211 U12+ youth and 6 Senior). `cloudflare/web-app/build.py`
+validates and bundles this file for the protected website, but this source/CI
+evidence does not prove the revision currently served to signed-in users.
+U7–U11 results and standings must never appear in public JSON or parent APIs.
 
 ## 2.5 Private club-entered results, player, roster and safeguarding data
 
@@ -228,7 +233,7 @@ The canonical text documents live in the shared Drive current-master folder. Sou
 
 Decision confirmed 2026-09-19.
 
-Club logos are a new public data type, but they must **not** create a second or competing
+Club logos are an intended public data type at release, but they must **not** create a second or competing
 club database. Club identity remains governed by the existing canonical club directory
 and canonical club ID.
 
@@ -288,7 +293,41 @@ Rules:
 - logo collection must respect branding/copyright permissions and must not treat an
   arbitrary web image as verified merely because it matches a club name.
 
-Status on 2026-09-19:
+Private-pilot badge admission (Mike's decision, 2026-09-26):
+
+- During the Shooters Hill protected website pilot, Codex may approve a badge
+  for exact club identity, original bytes and technical/visual quality without
+  waiting for rights clearance. Keep its rights status and exact-image provenance
+  for later review. Pilot admission is not public or marketing approval.
+- Mark such metadata `pilot_verified`, joined to the existing directory by
+  canonical club ID. Show it only when the Shooters Hill private-pilot runtime
+  scope check passes; an API `logo_verified` flag must not make this pilot
+  record visible in a broader build.
+- The website pilot stores exact approved bytes privately in Cloudflare R2
+  (`pitchkind-pilot-badges`), keyed by canonical `club_id` and SHA-256 and served
+  through `test.pitchkind.com/__pilot_badges/{club_id}/{sha256}` under Cloudflare
+  Access and a Shooters Hill-only scope guard. `verification/pilot_verified_badges.json`
+  is an exact-file allowlist, while `data/directory.json` carries joined metadata.
+  The retained first-party `logo_url` is provenance/fallback, not proof of which
+  image a particular protected page loaded. Never copy third-party badge bytes
+  into a public repository for this pilot path.
+- Public/app-store distribution needs a separate rights and asset-publication
+  decision. The private-pilot verification does not imply public clearance.
+- Cray Wanderers 250, SHA-256
+  `78dc32848d6919bcfe7c8b2aa6e93e766fd1c5d7d26fd166fdb8450345d11570`,
+  and Samuel Montagu 447, SHA-256
+  `fe2f3b412e1c2edd9d5c6feb50cb5c03ede03d26559d2e75bd0ec10aff25fb00`,
+  are the two exact entries in the private-pilot manifest checked 2026-09-28.
+  GitHub Actions run `36407934538` uploaded and read back both matching objects.
+  This verifies staging, not the signed-in page source for either displayed badge.
+  Mike observed Cray on a protected match card; Samuel's page acceptance and
+  the Cray card's network source remain open.
+- The Android APK is not the active pilot surface. Any future wider distribution,
+  club expansion, catalogue/CDN launch or rights claim needs its own decision.
+  A neutral PitchKind fallback must remain when no pilot badge is admitted.
+
+Historical status on 2026-09-19 (superseded for the private website pilot by the
+2026-09-28 evidence above):
 
 ```text
 architecture decision: RECORDED
@@ -298,6 +337,30 @@ app auto-population from the future verified logo catalogue: PLANNED
 installed-device verification of fallback behaviour: NOT TESTED for v2.2.11
 DEPLOYED-LIVE: not claimed
 ```
+
+---
+
+## 2.9 Private Selkent shadow collector (non-canonical)
+
+The isolated Cloudflare Worker in `cloudflare/selkent-shadow` reads already public
+Selkent endpoints into private R2 `pitchkind-selkent-shadow/shadow/latest.json`.
+It has no public route and must not write `data/results.json`, `data/directory.json`,
+Supabase club records or the protected site's authoritative feed. The intended
+public authority remains Selkent -> GitHub `scripts/scrape.py` -> validated
+`data/results.json`; club identity remains the canonical Selkent `club_id`.
+
+Its configured cron is `15 */6 * * *` UTC and `0,30 8-19 * * SUN`; the public
+GitHub scrape is every six hours plus `10,40 8-19 * * SUN`. The scheduled
+snapshot verifier checks at `45 */6 * * *` and `50 8-19 * * SUN` with a
+120-minute freshness bound. Push/manual checks use 420 minutes, matching the
+longest regular six-hour gap plus scheduling tolerance. This split is explicit
+in commit `5f108e32ffb581a7aeaa341a724a895ec34cf2fc`; it does not weaken
+the scheduled guard. Run `36410917630` read the private snapshot at 10:38Z,
+verified its 263-minute age within the on-demand bound, then compared the
+normalized snapshot to the public feed exactly: 15 age groups, 637 fixtures,
+217 published results and 546 standings rows. The raw provider HTML stays
+private. A parity check is diagnostic only; publishing from the shadow Worker
+requires a separate architecture and privacy decision.
 
 ---
 
@@ -366,9 +429,10 @@ claim about its continuing state must be rechecked against the database.
 |---|---|
 | Club/team directory | Weekly |
 | Club logo metadata/assets | Weekly reconciliation; immediate on verified club-admin replacement |
-| Fixtures | Every six hours (current public-feed workflow) |
-| Published U12+ results | Every six hours after the verified parser and static adapter are pushed and the feed runs successfully; source built, live publication pending |
-| U12+ standings | Every six hours (current public-feed workflow) |
+| Fixtures | Every six hours; extra public-feed checks at 08:10–19:40 UTC on Sundays |
+| Published U12+ results | Same public GitHub scrape cadence; populated results are published in the static feed |
+| U12+ standings | Same public GitHub scrape cadence |
+| Private Selkent shadow snapshots | 00:15/06:15/12:15/18:15 UTC; extra :00/:30 runs on Sundays 08:00–19:30 UTC; diagnostics only |
 | Private club-entered results | Immediate user action |
 | Player/safeguarding data | Immediate user action |
 
@@ -479,7 +543,7 @@ Same inspected v2.2.2 APK evidence applies.
 
 ## 9.3 Fixtures
 
-The Android app-facing public-fixture authority is the schema-v2 static `data/results.json` feed for all supported ages. Next Match selects the nearest future fixture; the Fixtures list must expose all available future team fixtures without the old eleven-row cap. The v2.2.12 source implements provider week discovery and an uncapped list. The published feed on 2026-09-22 contains 15 age groups, 1,160 fixture rows, and U9 weeks `[2,3]` (44 rows).
+The Android app-facing public-fixture authority is the schema-v2 static `data/results.json` feed for all supported ages. Next Match selects the nearest future fixture; the Fixtures list must expose all available future team fixtures without the old eleven-row cap. The v2.2.12 source implements provider week discovery and an uncapped list. The feed on 2026-09-22 contained 1,160 fixtures; the newer 2026-09-28 feed contains 637. These are dated provider snapshots, not fixed coverage expectations.
 
 Targeted v2.2.11 device acceptance for Next Match passed. v2.2.15 source/CI changes add visible fixture identity and map previews; v2.2.16 source presents further fixtures as full cards with venue/maps and coach-only Match played actions. Installed-device acceptance of these later changes is not verified here. The live Selkent path is a temporary isolated fallback, never a second source of truth for directory or standings.
 
@@ -489,14 +553,12 @@ v2.2.16 source also stores manual home/away kit profiles under the club's `state
 
 ## 9.4 Published results
 
-Status on 2026-09-19:
-
-```text
-PLANNED static cutover
-```
-
-The built 2.2.2 app intentionally retains the live published-results fallback
-until real populated U12+ markup is verified.
+Historical status on 2026-09-19 was PLANNED static cutover. The 2026-09-28
+GitHub feed has 217 parsed/scored public results (211 U12+ youth and 6 Senior) after real populated markup
+verification; see Section 2.4. The older 2.2.2 APK retained a live results
+fallback. The website pilot's exact served revision and role-sensitive page
+privacy still require signed-in acceptance; publication in GitHub alone does
+not establish them.
 
 ## 9.5 No dual-authority overwrite
 
@@ -652,6 +714,10 @@ must not be represented as a final/deployed agreement.
 ---
 
 # Changelog
+
+## 2026-09-30 - Historical result-count correction and mirror review
+
+Independent readback of feed commit `d30ed54719f5d7b246d206d8e9bbf9fbb9af45aa` confirms its 217 scored public rows comprise 211 U12+ youth rows and 6 Senior rows. The 53 standings divisions and 546 rows are unchanged. Corrected the category wording in the dated 2026-09-28 evidence; this does not expand public results to U7–U11 or claim signed-in website acceptance. The GitHub-root mirror is still behind this Drive master until a byte-verified push.
 
 ## 2026-09-22 - v2.2.16 source reconciliation
 
