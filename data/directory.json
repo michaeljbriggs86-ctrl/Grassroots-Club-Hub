@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-09-29T23:52:34.384963+00:00",
+  "last_updated": "2026-09-30T00:12:00.808310+00:00",
   "clubs": [
     {
       "club_id": 514,
@@ -421,7 +421,12 @@
     },
     {
       "club_id": 318,
-      "club_name": "Phoenix Sports"
+      "club_name": "Phoenix Sports",
+      "logo_url": "https://test.pitchkind.com/__pilot_badges/318/53facde723259b51ef991c02e37e33b1a475dc21e2e56e489929df2f9410f77c",
+      "logo_status": "pilot_verified",
+      "logo_source": "official_source_transparency_derivative_private",
+      "logo_updated_at": "2026-09-30",
+      "logo_sha256": "53facde723259b51ef991c02e37e33b1a475dc21e2e56e489929df2f9410f77c"
     },
     {
       "club_id": 565,
@@ -7741,5 +7746,5 @@
     }
   ],
   "note": "Panel parsing confirmed against all five format categories (mini-soccer, 9-a-side, X-category, 11-a-side, Senior) as of Sept 2026. Club/team linking is heuristic (name-prefix match) - see ambiguous_club_matches in diagnostics for anything flagged as uncertain.",
-  "pilot_badges_revision": "7e08c9f8be954d8ce3fe8bce694b97d72ed2ee7eb24b2c9617b78128aaf9ccb8"
+  "pilot_badges_revision": "b35b19db951de74319a804401cba3d3a85950ab1558fe6e66c043f9141b0ca71"
 }
