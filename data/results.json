@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "provider": "Selkent",
-  "last_updated": "2026-10-01T00:06:04.019482+00:00",
+  "last_updated": "2026-10-01T06:07:56.107907+00:00",
   "fixture_agegroup_discovery_source": "selkent_divisions_all",
   "coverage": {
     "fixtures": {
@@ -20107,16 +20107,6 @@
         },
         {
           "date": "2026-10-04",
-          "division_name": "U12X Selkent Cup One - Prelim Round",
-          "home": "Welling United Red",
-          "away": "AFC Lewisham Blue",
-          "provider_team_ids": [
-            "893",
-            "251"
-          ]
-        },
-        {
-          "date": "2026-10-04",
           "division_name": "Under 12X A Silver",
           "home": "Russellers Blues",
           "away": "Dulwich Village Black",
@@ -20363,16 +20353,6 @@
           "provider_team_ids": [
             "1087",
             "519"
-          ]
-        },
-        {
-          "date": "2026-10-11",
-          "division_name": "Under 12X A Silver",
-          "home": "AFC Lewisham Blue",
-          "away": "Samuel Montagu Green",
-          "provider_team_ids": [
-            "251",
-            "310"
           ]
         },
         {
@@ -20781,7 +20761,7 @@
         },
         {
           "division_name": "Under 12X A Silver",
-          "updated_at_text": "27/09/26 15:34:59",
+          "updated_at_text": "01/10/26 06:58:26",
           "source_order_authoritative_for_ties": false,
           "source_disclaimer": "Note: Table does not yet take account of rules for determining winner if teams on equal points",
           "rows": [
@@ -20839,19 +20819,6 @@
             },
             {
               "row_order": 5,
-              "provider_team_id": 251,
-              "provider_division_id": 4243,
-              "team_name": "AFC Lewisham Blue",
-              "played": 0,
-              "won": 0,
-              "drawn": 0,
-              "lost": 0,
-              "gf": 0,
-              "ga": 0,
-              "points": 0
-            },
-            {
-              "row_order": 6,
               "provider_team_id": 235,
               "provider_division_id": 4243,
               "team_name": "Dulwich Village Black",
@@ -20864,7 +20831,7 @@
               "points": 0
             },
             {
-              "row_order": 7,
+              "row_order": 6,
               "provider_team_id": 1080,
               "provider_division_id": 4243,
               "team_name": "Dynamo Youth White",
@@ -20877,7 +20844,7 @@
               "points": 0
             },
             {
-              "row_order": 8,
+              "row_order": 7,
               "provider_team_id": 1087,
               "provider_division_id": 4243,
               "team_name": "Lewisham Borough Cobras",
@@ -20890,7 +20857,7 @@
               "points": 0
             },
             {
-              "row_order": 9,
+              "row_order": 8,
               "provider_team_id": 47,
               "provider_division_id": 4243,
               "team_name": "Russellers Blues",
