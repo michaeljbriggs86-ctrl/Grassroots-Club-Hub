@@ -1,0 +1,13 @@
+const assert = require("node:assert/strict");
+const fs = require("node:fs");
+const app = fs.readFileSync("app/src/main/assets/app.js", "utf8");
+const css = fs.readFileSync("app/src/main/assets/styles.css", "utf8");
+assert.match(app, /canonicalMatchCardFrameworkV13Recovery/);
+assert.match(app, /canonicalUpcomingEventKeyV13/);
+assert.match(app, /canonicalFirstUpcomingEventV13/);
+assert.match(app, /removeOpponentKitRowsV13/);
+assert.match(app, /Badge pending/);
+assert.match(css, /\.canonical-v13-rows/);
+assert.match(css, /\.canonical-v13-badge-fallback/);
+assert.match(css, /\.canonical-v11-teams\{/);
+console.log("PASS V13 recovery contract");

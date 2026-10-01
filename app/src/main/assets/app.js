@@ -5281,3 +5281,138 @@ if(typeof renderFixtureOverview==='function'){
   const __v12Overview=renderFixtureOverview;
   renderFixtureOverview=function(prefix,f){const r=__v12Overview.apply(this,arguments);try{if(f){const d=canonicalMatchCardFrameworkV12(f);revealCanonicalMapV12(prefix,d.ground,d.address)}}catch(e){console.warn('v12 map preview skipped',e)}return r};
 }
+
+/* canonicalMatchCardFrameworkV13Recovery: stabilise shared card output */
+function canonicalMatchCardFrameworkV13Recovery(f={}) {
+  const base = typeof canonicalMatchCardFrameworkV11 === "function"
+    ? canonicalMatchCardFrameworkV11(f) : {};
+  const rows = String(base.rows || "").replace(
+    /<span class="canonical-v11-badge">\s*<\/span>/g,
+    '<span class="canonical-v13-badge-fallback" aria-label="Badge pending">Badge pending</span>'
+  );
+  const text = v => String(v || "").replace(/_/g, " ").replace(/\s+/g, " ").trim();
+  const competition = text(base.competition || f.competition || f.format || f.type || "Friendly");
+  const cup = /cup|selkent/i.test(competition);
+  const confirmed = f.confirmedKickoff || f.confirmedTime || f.kickoff || f.time || "";
+  return {
+    ...base,
+    rows,
+    competition,
+    time: text(confirmed || (cup ? "14:00" : "")),
+    ground: text(base.ground || f.groundName || f.ground || (cup ? "Marathon Sports Ground" : "Venue TBC")),
+    address: text(base.address || f.address || (cup ? "Shooters Hill" : ""))
+  };
+}
+
+function canonicalUpcomingEventKeyV13(f) {
+  const text = v => String(v || "").replace(/_/g, " ").replace(/\s+/g, " ").trim().toLowerCase();
+  const cup = /cup|selkent/i.test(String(f?.competition || f?.format || f?.type || ""));
+  let group = null;
+  try { group = cup && typeof miniCupGroup === "function" ? miniCupGroup(f) : null; } catch (_) {}
+  if (group) return "cup:" + JSON.stringify(group);
+  return [f?.date || "", text(f?.homeTeam || f?.home || ""), text(f?.awayTeam || f?.away || f?.opponent || ""), text(f?.competition || f?.format || f?.type || "")].join("|");
+}
+
+function canonicalFirstUpcomingEventV13(items) {
+  const seen = new Set();
+  for (const f of Array.isArray(items) ? items : []) {
+    const key = canonicalUpcomingEventKeyV13(f);
+    if (seen.has(key)) continue;
+    seen.add(key);
+    return f;
+  }
+  return null;
+}
+
+function removeOpponentKitRowsV13(root=document) {
+  const selectors = [
+    ".opponent-kit", ".fixture-opponent-kit", "[data-role='opponent-kit']",
+    "[data-kit-role='opponent']", "#next-match-opponent-kit",
+    "#next-match-home-opponent-kit", "#matches-next-opponent-kit"
+  ];
+  for (const node of root.querySelectorAll(selectors.join(","))) node.remove();
+}
+
+function applyCanonicalRecoveryV13(prefix, f) {
+  if (!f) return;
+  const d = canonicalMatchCardFrameworkV13Recovery(f);
+  const hostIds = prefix === "next-match"
+    ? ["next-match-home-teams", "next-match-versus"]
+    : prefix === "matches-next"
+      ? ["matches-next-versus"]
+      : ["match-detail-versus"];
+  const host = hostIds.map(id => document.getElementById(id)).find(Boolean);
+  if (host && d.rows) setStableHtml(host, '<div class="canonical-v13-rows">' + d.rows + "</div>");
+
+  const dateIds = prefix === "next-match"
+    ? ["next-match-home-date", "next-match-when"]
+    : prefix === "matches-next"
+      ? ["matches-next-when"]
+      : ["match-detail-when"];
+  const date = dateIds.map(id => document.getElementById(id)).find(Boolean);
+  if (date) date.textContent = (d.date || "Upcoming fixture TBC") + (d.time ? " · Kick-off " + d.time : " · Kick-off TBC");
+
+  const ground = document.getElementById(prefix + "-ground");
+  if (ground) ground.textContent = d.ground;
+  const address = document.getElementById(prefix + "-address");
+  if (address) address.textContent = d.address;
+
+  const competition = document.getElementById(prefix + "-competition");
+  if (competition) competition.textContent = d.competition;
+
+  removeOpponentKitRowsV13((host && host.closest("section,dialog,.card")) || document);
+}
+
+function canonicalRecoveryNextEventV13() {
+  try {
+    const list = typeof upcomingFixtures === "function" ? upcomingFixtures() : [];
+    return canonicalFirstUpcomingEventV13(list);
+  } catch (_) {
+    try { return typeof nextPublishedFixture === "function" ? nextPublishedFixture() : null; }
+    catch (_) { return null; }
+  }
+}
+
+if (typeof renderNextMatch === "function") {
+  const __v13Dashboard = renderNextMatch;
+  renderNextMatch = function() {
+    const result = __v13Dashboard.apply(this, arguments);
+    try {
+      const f = canonicalRecoveryNextEventV13();
+      applyCanonicalRecoveryV13("next-match", f);
+    } catch (e) { console.warn("v13 dashboard recovery skipped", e); }
+    return result;
+  };
+}
+
+if (typeof renderMatchPageNextFixture === "function") {
+  const __v13Matches = renderMatchPageNextFixture;
+  renderMatchPageNextFixture = function() {
+    const result = __v13Matches.apply(this, arguments);
+    try {
+      const f = canonicalRecoveryNextEventV13();
+      applyCanonicalRecoveryV13("matches-next", f);
+    } catch (e) { console.warn("v13 matches recovery skipped", e); }
+    return result;
+  };
+}
+
+if (typeof renderFixtureOverview === "function") {
+  const __v13Overview = renderFixtureOverview;
+  renderFixtureOverview = function(prefix, fixture) {
+    const result = __v13Overview.apply(this, arguments);
+    try { applyCanonicalRecoveryV13(prefix, fixture); }
+    catch (e) { console.warn("v13 overview recovery skipped", e); }
+    return result;
+  };
+}
+
+if (typeof renderMatchOverview === "function") {
+  const __v13Details = renderMatchOverview;
+  renderMatchOverview = function(match) {
+    const result = __v13Details.apply(this, arguments);
+    try { applyCanonicalRecoveryV13("match-detail", match); }
+    catch (e) { console.warn("v13 details recovery skipped", e); }
+    return result;
+  };
+}
