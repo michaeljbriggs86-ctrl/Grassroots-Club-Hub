@@ -1,0 +1,11 @@
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const app=fs.readFileSync('app/src/main/assets/app.js','utf8');
+const css=fs.readFileSync('app/src/main/assets/app-design-system.css','utf8');
+assert.match(app,/function cupGroupFixtureLines\(group\)/);
+assert.ok(app.includes('<span>Shooters Hill</span><strong>v</strong><span>${esc(opponent)}</span>'));
+assert.doesNotMatch(app,/Three games run back to back/);
+assert.doesNotMatch(app,/Your team's first game may change/);
+assert.match(css,/\.cup-group-fixture-lines/);
+assert.match(css,/\.cup-group-fixture-line/);
+console.log('PASS Cup group renders two concise Shooters Hill fixture lines without explanatory copy');

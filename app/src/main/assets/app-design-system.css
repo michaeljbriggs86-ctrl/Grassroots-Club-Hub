@@ -643,3 +643,5 @@ body.role-parent #view-league,body.role-parent #view-squad{display:none!importan
   #parent-home-match-info .parent-home-reply button{width:100%;justify-self:stretch}
   .training-session-form{grid-template-columns:minmax(0,1fr)}
 }
+
+.cup-group-fixture-lines{display:grid;gap:8px;margin-top:10px}.cup-group-fixture-line{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:8px;padding:9px 10px;border:1px solid var(--border);border-radius:10px;background:var(--surface-soft,#f7faf8)}.cup-group-fixture-line span:last-child{text-align:right}.cup-group-fixture-line strong{color:var(--muted);font-size:12px}
