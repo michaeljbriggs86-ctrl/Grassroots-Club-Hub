@@ -397,6 +397,42 @@
       "derivation": "outer_background_transparency_only",
       "rights_status": "protected_pilot_only_public_rights_not_reviewed",
       "review_basis": "Mike approved the visible artwork in the upload inbox. Selkent club 548 and the current Gipsy Hill FC site identify the same crest. Exact 1200x1200 official JPEG was re-fetched on 2026-09-30; only the connected white exterior was made transparent, preserving the circular crest. Phone-size light and dark previews passed."
+    },
+    {
+      "club_id": 416,
+      "club_name": "Metrogas FC",
+      "logo_url": "https://metrogas-fc.playfc.co.uk/rails/active_storage/representations/proxy/eyJfcmFpbHMiOnsiZGF0YSI6MTE1LCJwdXIiOiJibG9iX2lkIn19--dd2e3a82fcd589e64f2b46c91392f031ac18d063/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJqcGciLCJyZXNpemVfdG9fbGltaXQiOlsxMjAwLDEyMDBdfSwicHVyIjoidmFyaWFudCJ9fQ==--9fbdf3a77c954fc5927bedb333bcddd75f79e019/453827737_1270929154264479_5478718229354708966_n.jpg",
+      "logo_status": "pilot_verified",
+      "logo_source": "official_site_image",
+      "logo_updated_at": "2026-09-30",
+      "logo_sha256": "7642441f31d3014f48e707264dc363c84902923f164cf14c21c76c804abf799e",
+      "rights_status": "protected_pilot_only_public_rights_not_reviewed",
+      "review_basis": "Mike approved the visible artwork in the upload inbox. Selkent club 416 identifies Metrogas FC, and the current Selkent entry confirms the active youth club and team pathway; the historic club record confirms the same Metrogas identity. Exact 524x524 JPEG was re-fetched on 2026-09-30 and reviewed at hero, card and phone sizes."
+    },
+    {
+      "club_id": 482,
+      "club_name": "Regans FC",
+      "logo_url": "https://static.wixstatic.com/media/d1dda3_bca4fda11e3648f78b06a44bca088a5f~mv2.png",
+      "logo_status": "pilot_verified",
+      "logo_source": "official_site_image",
+      "logo_updated_at": "2026-09-30",
+      "logo_sha256": "0e960a09762b8fc8b36557d6228a4cbf7c3f0da1a8c2d2ebfafce3992faaec59",
+      "rights_status": "protected_pilot_only_public_rights_not_reviewed",
+      "review_basis": "Mike approved the visible artwork in the upload inbox. Selkent club 482 identifies Regans FC and the current Regans FC site describes the same London youth club established in 2017. Exact 1000x1000 official PNG was re-fetched on 2026-09-30; only the connected white exterior was made transparent, preserving the gold lion and lettering. Phone-size light and dark previews passed."
+    },
+    {
+      "club_id": 508,
+      "club_name": "Corinthian FC",
+      "logo_url": "https://test.pitchkind.com/__pilot_badges/508/3de161e4cd60fb609dbc0d0b2dfff07ef072bbcd4857030a54edd7fd47e8502a",
+      "logo_status": "pilot_verified",
+      "logo_source": "official_source_transparency_derivative_private",
+      "logo_updated_at": "2026-09-30",
+      "logo_sha256": "3de161e4cd60fb609dbc0d0b2dfff07ef072bbcd4857030a54edd7fd47e8502a",
+      "original_source_url": "https://static.wixstatic.com/media/188820_7130d8b954374839ac288b158b68e141~mv2.jpg",
+      "original_sha256": "8c3dfc708f41ffb5b81aae68179e3d642636d5980799ea0fb23100cebedd561c",
+      "derivation": "outer_background_transparency_only",
+      "rights_status": "protected_pilot_only_public_rights_not_reviewed",
+      "review_basis": "Mike approved the visible artwork in the upload inbox. Selkent club 508 identifies Corinthian FC; the Corinthian Sports Club and SCEFL sources confirm the same football club and youth pathway. Exact 645x714 official JPEG was re-fetched on 2026-09-30; only the connected white exterior was made transparent, preserving the crest artwork. Phone-size light and dark previews passed."
     }
   ]
 }

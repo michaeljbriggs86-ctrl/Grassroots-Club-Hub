@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-09-30T14:17:41.011024+00:00",
+  "last_updated": "2026-09-30T14:57:16.905015+00:00",
   "clubs": [
     {
       "club_id": 514,
@@ -147,7 +147,12 @@
     },
     {
       "club_id": 508,
-      "club_name": "Corinthian FC"
+      "club_name": "Corinthian FC",
+      "logo_url": "https://test.pitchkind.com/__pilot_badges/508/3de161e4cd60fb609dbc0d0b2dfff07ef072bbcd4857030a54edd7fd47e8502a",
+      "logo_status": "pilot_verified",
+      "logo_source": "official_source_transparency_derivative_private",
+      "logo_updated_at": "2026-09-30",
+      "logo_sha256": "3de161e4cd60fb609dbc0d0b2dfff07ef072bbcd4857030a54edd7fd47e8502a"
     },
     {
       "club_id": 547,
@@ -399,7 +404,12 @@
     },
     {
       "club_id": 416,
-      "club_name": "Metrogas FC"
+      "club_name": "Metrogas FC",
+      "logo_url": "https://metrogas-fc.playfc.co.uk/rails/active_storage/representations/proxy/eyJfcmFpbHMiOnsiZGF0YSI6MTE1LCJwdXIiOiJibG9iX2lkIn19--dd2e3a82fcd589e64f2b46c91392f031ac18d063/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJqcGciLCJyZXNpemVfdG9fbGltaXQiOlsxMjAwLDEyMDBdfSwicHVyIjoidmFyaWFudCJ9fQ==--9fbdf3a77c954fc5927bedb333bcddd75f79e019/453827737_1270929154264479_5478718229354708966_n.jpg",
+      "logo_status": "pilot_verified",
+      "logo_source": "official_site_image",
+      "logo_updated_at": "2026-09-30",
+      "logo_sha256": "7642441f31d3014f48e707264dc363c84902923f164cf14c21c76c804abf799e"
     },
     {
       "club_id": 398,
@@ -482,7 +492,12 @@
     },
     {
       "club_id": 482,
-      "club_name": "Regans FC"
+      "club_name": "Regans FC",
+      "logo_url": "https://static.wixstatic.com/media/d1dda3_bca4fda11e3648f78b06a44bca088a5f~mv2.png",
+      "logo_status": "pilot_verified",
+      "logo_source": "official_site_image",
+      "logo_updated_at": "2026-09-30",
+      "logo_sha256": "0e960a09762b8fc8b36557d6228a4cbf7c3f0da1a8c2d2ebfafce3992faaec59"
     },
     {
       "club_id": 496,
@@ -7791,5 +7806,5 @@
     }
   ],
   "note": "Panel parsing confirmed against all five format categories (mini-soccer, 9-a-side, X-category, 11-a-side, Senior) as of Sept 2026. Club/team linking is heuristic (name-prefix match) - see ambiguous_club_matches in diagnostics for anything flagged as uncertain.",
-  "pilot_badges_revision": "e29394318d71b1d80bef6e7c4a6a31ae082b35d372a3b6690974605090abe3b6"
+  "pilot_badges_revision": "68cc9680c62d95244685a850b731d56750d06f07681556624c56ebd83fab7581"
 }
