@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "provider": "Selkent",
-  "last_updated": "2026-10-01T12:07:51.610343+00:00",
+  "last_updated": "2026-10-01T18:07:39.243386+00:00",
   "fixture_agegroup_discovery_source": "selkent_divisions_all",
   "coverage": {
     "fixtures": {
@@ -7952,7 +7952,7 @@
         },
         {
           "division_name": "Under 12D Orange",
-          "updated_at_text": "01/10/26 09:46:00",
+          "updated_at_text": "01/10/26 14:02:03",
           "source_order_authoritative_for_ties": false,
           "source_disclaimer": "Note: Table does not yet take account of rules for determining winner if teams on equal points",
           "rows": [
@@ -8004,7 +8004,7 @@
               "won": 1,
               "drawn": 0,
               "lost": 0,
-              "gf": 8,
+              "gf": 9,
               "ga": 0,
               "points": 2
             },
@@ -8070,7 +8070,7 @@
               "drawn": 0,
               "lost": 1,
               "gf": 0,
-              "ga": 8,
+              "ga": 9,
               "points": 0
             },
             {
@@ -8715,7 +8715,7 @@
           "home": "Junior Reds Spartans",
           "away": "South Darenth Blues",
           "homeGoals": 0,
-          "awayGoals": 8,
+          "awayGoals": 9,
           "provider_division_id": 4258,
           "division_name": "Under 12D Orange"
         },
@@ -18669,7 +18669,7 @@
           "date": "2026-10-04",
           "division_name": "Under8X Navy",
           "home": "Dynamo Youth Silver",
-          "away": "ShooterBallers FC Green",
+          "away": "ShooterBallers FC",
           "provider_team_ids": [
             "492",
             "843"
@@ -18728,7 +18728,7 @@
         {
           "date": "2026-10-04",
           "division_name": "Under8X Navy",
-          "home": "ShooterBallers FC Green",
+          "home": "ShooterBallers FC",
           "away": "Dynamo Youth Silver",
           "provider_team_ids": [
             "843",
@@ -19299,7 +19299,7 @@
           "date": "2026-10-11",
           "division_name": "Under8X Navy",
           "home": "Cray Wanderers Lions",
-          "away": "ShooterBallers FC Green",
+          "away": "ShooterBallers FC",
           "provider_team_ids": [
             "568",
             "843"
@@ -19388,7 +19388,7 @@
         {
           "date": "2026-10-11",
           "division_name": "Under8X Navy",
-          "home": "ShooterBallers FC Green",
+          "home": "ShooterBallers FC",
           "away": "Cray Wanderers Lions",
           "provider_team_ids": [
             "843",
