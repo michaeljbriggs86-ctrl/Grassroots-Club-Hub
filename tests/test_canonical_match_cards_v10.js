@@ -1,0 +1,13 @@
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const app=fs.readFileSync('app/src/main/assets/app.js','utf8');
+const css=fs.readFileSync('app/src/main/assets/styles.css','utf8');
+assert.match(app,/function canonicalMatchRowsHtml\(f=\{\}\)/);
+assert.match(app,/function applyCanonicalMatchCard\(prefix,f,containerId\)/);
+assert.match(app,/canonical-match-team-row/);
+assert.match(app,/clubIdentityBadgeHtml\(opponent\)/);
+assert.match(app,/__v10OriginalRenderMatchOverview/);
+assert.match(app,/__v10OriginalOpenNextFixtureDetails/);
+assert.match(css,/\.canonical-match-card-active/);
+assert.match(css,/\.canonical-match-team-row/);
+console.log('PASS canonical League/Cup match-card renderer covers dashboard detail paths');

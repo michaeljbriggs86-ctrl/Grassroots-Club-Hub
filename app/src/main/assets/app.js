@@ -5151,3 +5151,50 @@ renderMatchPageNextFixture=function(){
   try{const f=upcomingFixtures()[0];if(f)cupV7RenderMatchesNext(f);}catch(error){console.warn('Cup match card fallback skipped',error);}
   return result;
 };
+
+
+/* Canonical match cards v10: one team-row format across League and Cup surfaces. */
+function canonicalMatchRowsHtml(f={}){
+  const group=typeof miniCupGroup==='function'?miniCupGroup(f):null;
+  const own=matchTeamLabel(typeof ownTeamDisplayName==='function'?ownTeamDisplayName():'Shooters Hill');
+  const opponents=group?(cupGroupOpponentNames(f,group).length?cupGroupOpponentNames(f,group):['Opponent TBC']):[matchTeamLabel(f.opponent||'Opponent TBC')];
+  return opponents.slice(0,2).map((opponent,index)=>`<div class="canonical-match-fixture-row"><span class="canonical-match-fixture-label">${group?`Fixture ${index+1}`:'Match'}</span><div class="canonical-match-team-row"><span class="canonical-match-team"><span class="canonical-match-badge">${clubIdentityBadgeHtml(own)}</span><strong>${esc(own)}</strong></span><b class="canonical-match-v">v</b><span class="canonical-match-team canonical-match-team-away"><strong>${esc(matchTeamLabel(opponent))}</strong><span class="canonical-match-badge">${clubIdentityBadgeHtml(opponent)}</span></span></div></div>`).join('');
+}
+function canonicalMatchCardData(f={}){
+  const group=typeof miniCupGroup==='function'?miniCupGroup(f):null;
+  const d=group?(typeof parentCupGroupDetails==='function'&&parentCupGroupDetails(f))||{}:(typeof resolvedFixture==='function'&&resolvedFixture(f))||f;
+  const competition=matchTeamLabel(typeof fixtureCompetitionLabel==='function'?fixtureCompetitionLabel(f):(f.competition||'Match'));
+  return {group,d,competition,date:f.date?formatDate(f.date):'Date TBC',time:d.time||f.time||'',ground:d.groundName||d.ground||(group?'Marathon Sports Ground':'Venue TBC'),address:d.address||''};
+}
+function applyCanonicalMatchCard(prefix,f,containerId){
+  if(!f)return;
+  const host=document.getElementById(`${prefix}-versus`);if(!host)return;
+  const data=canonicalMatchCardData(f),card=document.getElementById(containerId)||host.closest('dialog')||host.closest('.next-match-card');
+  setStableHtml(host,`<div class="canonical-match-rows">${canonicalMatchRowsHtml(f)}</div>`);
+  card?.classList.add('canonical-match-card-active');
+  const set=(id,value)=>{const el=document.getElementById(id);if(el)el.textContent=value;};
+  set(`${prefix}-opponent`,data.group?data.competition:matchTeamLabel(f.opponent||'TBC'));
+  set(`${prefix}-when`,`${data.date} · ${data.time?`Kick-off ${data.time}`:'Kick-off TBC'}`);
+  if(prefix==='matches-next')set(`${prefix}-venue`,data.competition);
+  set(`${prefix}-ground`,data.ground);
+  set(`${prefix}-address`,data.address);
+  if(prefix==='next-match')set('next-match-opponent',data.group?data.competition:'Upcoming match details');
+}
+const __v10OriginalRenderFixtureOverview=renderFixtureOverview;
+renderFixtureOverview=function(prefix,f){
+  let result;try{result=__v10OriginalRenderFixtureOverview.apply(this,arguments);}catch(error){console.warn('Canonical fixture overview recovered from legacy error',error);}
+  try{applyCanonicalMatchCard(prefix,f,prefix==='next-match'?'next-fixture-dialog':prefix==='matches-next'?'matches-next-fixture':null);}catch(error){console.warn('Canonical fixture card skipped',error);}
+  return result;
+};
+const __v10OriginalRenderMatchOverview=renderMatchOverview;
+renderMatchOverview=function(m){
+  let result;try{result=__v10OriginalRenderMatchOverview.apply(this,arguments);}catch(error){console.warn('Canonical match overview recovered from legacy error',error);}
+  try{applyCanonicalMatchCard('match-detail',m,'match-detail-dialog');}catch(error){console.warn('Canonical match-detail card skipped',error);}
+  return result;
+};
+const __v10OriginalOpenNextFixtureDetails=openNextFixtureDetails;
+openNextFixtureDetails=function(){
+  let result;try{result=__v10OriginalOpenNextFixtureDetails.apply(this,arguments);}catch(error){console.warn('Canonical next-fixture dialog recovered from legacy error',error);}
+  try{const f=typeof nextPublishedFixture==='function'?nextPublishedFixture():upcomingFixtures()[0];if(f)applyCanonicalMatchCard('next-match',f,'next-fixture-dialog');}catch(error){console.warn('Canonical next-fixture card skipped',error);}
+  return result;
+};
