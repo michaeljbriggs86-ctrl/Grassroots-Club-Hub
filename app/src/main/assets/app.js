@@ -1433,12 +1433,13 @@ function miniCupGroup(f={}){
   }
   return opponents.size===2?{opponents:[...opponents.values()].sort((a,b)=>a.localeCompare(b)),competition:f.competition,date:f.date}:null;
 }
+function cupFixtureDefaults(f={}){
+  return miniCupGroup(f)?{time:'14:00',groundName:'Marathon Sports Ground',address:''}:null;
+}
 function parentCupGroupDetails(f={}){
-  const group=miniCupGroup(f);
-  if(!group)return null;
-  const confirmed=(state.selkent?.fixtures||[]).filter(row=>row.date===f.date&&selkentNorm(row.competition)===selkentNorm(f.competition)&&fixtureDetailsConfirmed(row))
-    .sort((a,b)=>selkentNorm(a.opponent).localeCompare(selkentNorm(b.opponent)))[0];
-  return confirmed?resolvedFixture(confirmed):null;
+  const group=miniCupGroup(f);if(!group)return null;
+  const confirmed=(state.selkent?.fixtures||[]).filter(row=>row.date===f.date&&selkentNorm(row.competition)===selkentNorm(f.competition)&&fixtureDetailsConfirmed(row)).sort((a,b)=>selkentNorm(a.opponent).localeCompare(selkentNorm(b.opponent)))[0];
+  return confirmed?resolvedFixture(confirmed):cupFixtureDefaults(f);
 }
 function fixtureCompetitionLabel(f={}){
   const m=fixtureLinkedMatch(f),competition=String(m?.competition||f.competition||'').trim(),stage=String(m?.stage||f.stage||'').trim();
@@ -1726,10 +1727,8 @@ let __fixtureEditingKey='';
 function matchTeamLabel(name=''){return String(name||'').replace(/_/g,' ').replace(/\s+/g,' ').trim();}
 function renderCompactNextMatchTeams(f={}){
   const host=document.getElementById('next-match-home-teams');if(!host)return;
-  const group=miniCupGroup(f);
-  host.classList.toggle('cup-group-summary',!!group);
-  if(group){setStableHtml(host,`<div class="next-match-summary-team cup-group-fixture-lines"><strong>${esc(fixtureCompetitionLabel(f))}</strong>${cupGroupFixtureLines(group)}</div>`);return;}
-  const display=resolvedFixture(f),ctx=fixtureOverviewContext(display),names=homeFixtureTeamNames(f);
+  const d=miniCupGroup(f)?{...f,...(cupFixtureDefaults(f)||{})}:resolvedFixture(f),ctx=fixtureOverviewContext(d),names=homeFixtureTeamNames(f);
+  host.classList.remove('cup-group-summary');
   setStableHtml(host,`<div class="next-match-summary-team"><span class="next-match-summary-visual">${teamIdentityVisualHtml(names.home,ctx.homeKit)}</span><strong>${esc(matchTeamLabel(names.home))}</strong></div><span class="next-match-summary-v">V</span><div class="next-match-summary-team"><span class="next-match-summary-visual">${teamIdentityVisualHtml(names.away,ctx.awayKit)}</span><strong>${esc(matchTeamLabel(names.away))}</strong></div>`);
 }
 function renderFixtureConfirmationEditor(f={}){
@@ -1846,28 +1845,23 @@ async function shareNextMatchImage(){
 }
 function renderNextMatch(){
   const card=document.getElementById('next-match-card');if(!card)return;const f=nextPublishedFixture(),dateEl=document.getElementById('next-match-home-date');
-  const selkentStaff=(isCoach()||isAdmin())&&providerType()==='selkent';
-  document.getElementById('next-match-selkent-tasks')?.classList.toggle('hidden',!selkentStaff);
-  const minEl=document.getElementById('next-match-selkent-minimum'),rule=competitionRuleForAge(ageGroupNumber()),minimum=selkentMinimumPlayers(rule?.format);
-  if(minEl){minEl.textContent=minimum?`Selkent Rule 20(D): ${rule.format} requires at least ${minimum} players to start a competition match.`:'';minEl.classList.toggle('hidden',!minimum);}
-  if(!f){card.classList.add('no-fixture');card.disabled=true;const teams=document.getElementById('next-match-home-teams');if(teams)setStableHtml(teams,'<div class="next-match-summary-team"><strong>Fixture TBC</strong></div>');if(dateEl)dateEl.textContent='Date TBC';document.getElementById('next-match-copy')?.classList.add('hidden');renderParentHomeMatchInfo();return;}
-  card.classList.remove('no-fixture');card.disabled=false;renderCompactNextMatchTeams(f);const compactTime=resolvedFixture(f).time||f.time||'';if(dateEl)dateEl.textContent=f.date?[formatDate(f.date),compactTime||'Kick-off TBC'].join(' · '):'Date TBC';
-  const miniGroup=miniCupGroup(f),group=miniGroup,groupDetails=group?parentCupGroupDetails(f):null,d=groupDetails||resolvedFixture(f),confirmed=!!groupDetails||fixtureDetailsConfirmed(f),set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};set('next-match-opponent',group?'Cup group details':'Upcoming match details');set('next-match-when',miniGroup?[formatDate(f.date),confirmed&&d.time?`Group starts ${d.time}`:'Group start awaiting confirmation','Your match order may change'].join(' · '):[f.date?formatDate(f.date):'Date TBC',confirmed&&d.time?`Kick-off ${d.time}`:'Kick-off awaiting confirmation',confirmed&&d.time?`Arrival ${matchdayArrivalTime(d.time)}`:''].filter(Boolean).join(' · '));renderFixtureOverview('next-match',d);if(group){setStableHtml(document.getElementById('next-match-versus'),`<div class="cup-group-fixture-lines">${cupGroupFixtureLines(group)}</div>`);document.getElementById('next-match-kit-warning')?.classList.add('hidden');}/* Competition omitted from this popup for league fixtures. */
-  const ground=document.getElementById('next-match-ground'),address=document.getElementById('next-match-address'),map=document.getElementById('next-match-map'),mapWrap=document.getElementById('next-match-map-preview');if(!confirmed){if(ground)ground.textContent='Awaiting confirmation';if(address)address.textContent='Coach will confirm the match venue.';if(map)map.classList.add('hidden');if(mapWrap)mapWrap.classList.add('hidden');}
-  const ack=fixtureAckState(),status=document.getElementById('next-match-status');if(status){status.textContent=confirmed?'Details confirmed':ack.status==='changed'?'Fixture changed':'Awaiting details';status.classList.remove('hidden');}
-  const cal=document.getElementById('next-match-calendar');if(cal)cal.classList.toggle('hidden',!!miniGroup||!confirmed||!f.date);const edit=document.getElementById('next-match-edit');if(edit)edit.classList.toggle('hidden',!confirmed||!canConfirmFixtureDetails()||__fixtureEditingKey===fixtureKitSelectionKey(f));const share=document.getElementById('next-match-share');if(share){const staff=canConfirmFixtureDetails();share.classList.toggle('hidden',!!miniGroup||!staff);share.disabled=false;share.textContent=window.ClubHubNative?.shareMatchCard?'Share matchday info':'Save matchday image';share.title=confirmed?'Share matchday image':'Confirm match details first';}document.getElementById('next-match-copy')?.classList.toggle('hidden',!!miniGroup||!confirmed||!canConfirmFixtureDetails());renderFixtureConfirmationEditor(f);refreshFixtureOverviewDirectory(f);renderParentHomeMatchInfo();
+  if(!f){card.classList.add('no-fixture');card.disabled=true;setStableHtml(document.getElementById('next-match-home-teams'),'<div class="next-match-summary-team"><strong>Fixture TBC</strong></div>');if(dateEl)dateEl.textContent='Date TBC';return;}
+  card.classList.remove('no-fixture');card.disabled=false;renderCompactNextMatchTeams(f);if(dateEl)dateEl.textContent=f.date?formatDate(f.date):'Date TBC';
+  const d=miniCupGroup(f)?{...f,...(cupFixtureDefaults(f)||{})}:resolvedFixture(f),names=homeFixtureTeamNames(f),set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
+  set('next-match-opponent',fixtureCompetitionLabel(f));set('next-match-when',[f.date?formatDate(f.date):'Date TBC',d.time?`Kick-off ${d.time}`:'Kick-off awaiting confirmation'].join(' · '));renderFixtureOverview('next-match',d);
+  setStableHtml(document.getElementById('next-match-versus'),`<div class="match-versus-label">${esc(matchTeamLabel(names.home))} <span>V</span> ${esc(matchTeamLabel(names.away))}</div>`);
+  set('next-match-ground',d.groundName||d.ground||'Marathon Sports Ground');set('next-match-address',d.address||'');
+  document.getElementById('next-match-copy')?.classList.add('hidden');document.getElementById('next-match-share')?.classList.add('hidden');document.getElementById('next-match-calendar')?.classList.add('hidden');
+  renderFixtureConfirmationEditor(f);refreshFixtureOverviewDirectory(f);renderParentHomeMatchInfo();
 }
 
 function renderMatchPageNextFixture(){
   const card=document.getElementById('matches-next-fixture');if(!card)return;const f=nextPublishedFixture(),set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
-  const parent=CLOUD_MODE&&currentRole==='parent',confirmedForParent=parentMatchdayReady(f);
-  card.classList.toggle('hidden',parent&&!confirmedForParent);
-  document.getElementById('parent-matches-placeholder')?.classList.toggle('hidden',!parent||confirmedForParent);
-  const training=document.getElementById('parent-matches-training');
-  if(training){training.classList.toggle('hidden',!parent);if(parent)training.innerHTML=parentTrainingScheduleHtml();}
-  if(parent&&!confirmedForParent)return;
-  if(!f){card.classList.add('no-fixture');set('matches-next-opponent','TBC');set('matches-next-when','Date / kick-off TBC');set('matches-next-venue','Competition TBC');set('matches-next-kits','Kit colours and away details will appear when confirmed.');clearFixtureOverview('matches-next');const cal=document.getElementById('matches-next-calendar');if(cal)cal.classList.add('hidden');const played=document.getElementById('matches-next-played');if(played)played.classList.add('hidden');const share=document.getElementById('matches-next-share');if(share)share.classList.add('hidden');document.getElementById('matches-next-copy')?.classList.add('hidden');return;}
-  const miniGroup=miniCupGroup(f),group=miniGroup,groupDetails=group?parentCupGroupDetails(f):null,d=groupDetails||resolvedFixture(f),confirmed=!!groupDetails||fixtureDetailsConfirmed(f);card.classList.remove('no-fixture');set('matches-next-opponent',group?'Cup group':matchTeamLabel(f.opponent||'TBC'));set('matches-next-when',miniGroup?[formatDate(f.date),confirmed&&d.time?`Group starts ${d.time}`:'Group start awaiting confirmation','Running order may change'].join(' · '):[f.date?formatDate(f.date):'Date TBC',confirmed&&d.time?`Kick-off ${d.time}`:'Kick-off awaiting confirmation',confirmed&&d.time?`Arrival ${matchdayArrivalTime(d.time)}`:''].filter(Boolean).join(' · '));set('matches-next-venue',fixtureCompetitionLabel(f));renderFixtureOverview('matches-next',d);if(group){setStableHtml(document.getElementById('matches-next-versus'),`<div class="cup-group-fixture-lines">${cupGroupFixtureLines(group)}</div>`);document.getElementById('matches-next-kit-warning')?.classList.add('hidden');}set('matches-next-kits',group?'Group matchday details shown above.':'Home and away kit details shown above.');const cal=document.getElementById('matches-next-calendar');if(cal)cal.classList.toggle('hidden',!!miniGroup||!confirmed||!f.date);const played=document.getElementById('matches-next-played');if(played)played.classList.toggle('hidden',!isCoach());const share=document.getElementById('matches-next-share');if(share){share.classList.toggle('hidden',!!miniGroup||!canConfirmFixtureDetails());share.disabled=false;share.textContent=window.ClubHubNative?.shareMatchCard?'Share matchday info':'Save matchday image';share.title=confirmed?'Share matchday image':'Confirm match details first';}document.getElementById('matches-next-copy')?.classList.toggle('hidden',!!miniGroup||!confirmed||!canConfirmFixtureDetails());
+  const parent=CLOUD_MODE&&currentRole==='parent',confirmed=!!f&&!!parentMatchdayReady(f);card.classList.toggle('hidden',parent&&!confirmed);document.getElementById('parent-matches-placeholder')?.classList.toggle('hidden',!parent||confirmed);
+  const training=document.getElementById('parent-matches-training');if(training){training.classList.toggle('hidden',!parent);if(parent)training.innerHTML=parentTrainingScheduleHtml();}if(parent&&!confirmed)return;
+  if(!f){set('matches-next-opponent','TBC');set('matches-next-when','Date / kick-off TBC');set('matches-next-venue','Competition TBC');return;}
+  const d=miniCupGroup(f)?{...f,...(cupFixtureDefaults(f)||{})}:resolvedFixture(f),names=homeFixtureTeamNames(f);card.classList.remove('no-fixture');set('matches-next-opponent',fixtureCompetitionLabel(f));set('matches-next-when',[formatDate(f.date),d.time?`Kick-off ${d.time}`:'Kick-off awaiting confirmation'].join(' · '));set('matches-next-venue',fixtureCompetitionLabel(f));renderFixtureOverview('matches-next',d);setStableHtml(document.getElementById('matches-next-versus'),`<div class="match-versus-label">${esc(matchTeamLabel(names.home))} <span>V</span> ${esc(matchTeamLabel(names.away))}</div>`);set('matches-next-ground',d.groundName||d.ground||'Marathon Sports Ground');set('matches-next-address',d.address||'');set('matches-next-kits','Home and away kit details shown above.');
+  document.getElementById('matches-next-calendar')?.classList.add('hidden');document.getElementById('matches-next-share')?.classList.add('hidden');document.getElementById('matches-next-copy')?.classList.add('hidden');
 }
 
 function divisionOpponents(){
