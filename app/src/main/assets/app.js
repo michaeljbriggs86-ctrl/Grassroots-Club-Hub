@@ -5131,3 +5131,18 @@ if(typeof renderCompactNextMatchTeams==='function'){
     setStableHtml(host,`<div class="cup-next-pair-list">${(opponents.length?opponents:['Opponent TBC']).slice(0,2).map(opponent=>`<div class="cup-next-pair">Shooters Hill <span>v</span> ${esc(opponent)}</div>`).join('')}</div>`);
   };
 }
+
+
+/* Cup group presentation v6: update the Matches-page next-fixture slot too. */
+const cupV6MatchesNextVersus=function(f){
+  const group=miniCupGroup(f);if(!group)return;
+  const host=document.getElementById('matches-next-versus');if(!host)return;
+  const opponents=cupGroupOpponentNames(f,group);
+  setStableHtml(host,`<div class="cup-next-pair-list">${(opponents.length?opponents:['Opponent TBC']).slice(0,2).map(opponent=>`<div class="cup-next-pair">Shooters Hill <span>v</span> ${esc(opponent)}</div>`).join('')}</div>`);
+};
+const __cupV6OriginalRenderMatchPageNextFixture=renderMatchPageNextFixture;
+renderMatchPageNextFixture=function(){
+  const result=__cupV6OriginalRenderMatchPageNextFixture.apply(this,arguments);
+  try{const f=upcomingFixtures()[0];if(f)cupV6MatchesNextVersus(f);}catch(error){console.warn('Cup Matches-page fallback skipped',error);}
+  return result;
+};
