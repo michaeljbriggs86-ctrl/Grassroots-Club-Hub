@@ -647,3 +647,5 @@ body.role-parent #view-league,body.role-parent #view-squad{display:none!importan
 .cup-group-fixture-lines{display:grid;gap:8px;margin-top:10px}.cup-group-fixture-line{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:8px;padding:9px 10px;border:1px solid var(--border);border-radius:10px;background:var(--surface-soft,#f7faf8)}.cup-group-fixture-line span:last-child{text-align:right}.cup-group-fixture-line strong{color:var(--muted);font-size:12px}
 
 .cup-pair-fixture-card .further-fixture-head strong{display:block;margin-top:6px}.cup-pair-v{color:var(--muted);font-size:.85em}
+
+.cup-next-pair-list{display:grid;gap:8px;width:100%}.cup-next-pair{padding:10px 12px;border-radius:12px;background:var(--surface-2);text-align:center;font-weight:700}.cup-next-pair span{color:var(--muted);padding:0 8px}.cup-pair-fixture-card .further-fixture-head strong{display:block;margin-top:6px}.cup-pair-v{color:var(--muted);font-size:.85em}

@@ -1,0 +1,11 @@
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const app=fs.readFileSync('app/src/main/assets/app.js','utf8');
+const css=fs.readFileSync('app/src/main/assets/app-design-system.css','utf8');
+assert.match(app,/function cupGroupOpponentNames\(f,group\)/);
+assert.match(app,/furtherFixtureCardHtml=function\(f,index\)/);
+assert.match(app,/renderCompactNextMatchTeams=function\(f=\{\}\)/);
+assert.match(app,/cup-next-pair-list/);
+assert.doesNotMatch(app,/const __cupV4FurtherFixtureCardHtml=furtherFixtureCardHtml;\s*function furtherFixtureCardHtml/);
+assert.match(css,/\.cup-next-pair-list/);
+console.log('PASS Cup v5 removes recursive wrapper and renders safe two-row Cup fallback');

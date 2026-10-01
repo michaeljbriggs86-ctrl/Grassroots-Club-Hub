@@ -5074,7 +5074,25 @@ bootTracker().catch(err=>console.error('Tracker boot failed',err));
 // Universal Core v1: club configuration, competition rules, provider abstraction and multi-tenant branding.
 
 
-/* Cup group presentation: keep the group-start data but show two plain fixtures. */
+
+/* Cup group presentation v5: no self-wrapping declarations; tolerate sparse rows. */
+function cupGroupOpponentNames(f,group){
+  const raw=[];
+  const add=value=>{
+    if(value==null)return;
+    if(Array.isArray(value)){value.forEach(add);return;}
+    if(typeof value==='object'){
+      add(value.opponent??value.team??value.name??value.label??value.home??value.away);
+      return;
+    }
+    const name=matchTeamLabel(String(value));
+    if(name&&name!=='[object Object]')raw.push(name);
+  };
+  add(group?.opponents);add(group?.teams);add(group?.fixtures);
+  add(f?.opponent);
+  const own=matchTeamLabel(typeof ownTeamDisplayName==='function'?ownTeamDisplayName():'').toLowerCase();
+  return [...new Set(raw.filter(name=>name.toLowerCase()!==own&&name.toLowerCase()!=='tbc'&&name.toLowerCase()!=='awaiting confirmation'))].slice(0,2);
+}
 function cupPairCardHtml(f){
   const d=resolvedFixture(f)||f;
   const date=f.date?formatDate(f.date):'Date TBC';
@@ -5082,7 +5100,8 @@ function cupPairCardHtml(f){
   const opponent=matchTeamLabel(f.opponent||'Opponent TBC');
   return `<article class="further-fixture-card cup-pair-fixture-card"><div class="further-fixture-head"><div><span class="synced-fixture-date">${esc(date)}${time?` · ${esc(time)}`:''}</span><strong>Shooters Hill <span class="cup-pair-v">v</span> ${esc(opponent)}</strong></div></div></article>`;
 }
-function groupedUpcomingFixtures(fixtures=upcomingFixtures()){
+const __cupV5OriginalGroupedUpcomingFixtures=typeof groupedUpcomingFixtures==='function'?groupedUpcomingFixtures:null;
+groupedUpcomingFixtures=function(fixtures=upcomingFixtures()){
   const rows=[],seen=new Set();
   for(const f of fixtures){
     const group=miniCupGroup(f);
@@ -5090,14 +5109,25 @@ function groupedUpcomingFixtures(fixtures=upcomingFixtures()){
     const key=`${group.date||f.date}|${selkentNorm(group.competition||f.competition)}`;
     if(seen.has(key))continue;
     seen.add(key);
-    const opponents=(group.opponents||[f.opponent]).filter(Boolean).slice(0,2);
-    opponents.forEach((opponent,index)=>rows.push({...f,opponent,_cupPair:true,_cupPairIndex:index}));
+    const opponents=cupGroupOpponentNames(f,group);
+    (opponents.length?opponents:['Opponent TBC']).slice(0,2).forEach((opponent,index)=>rows.push({...f,opponent,_cupPair:true,_cupPairIndex:index}));
   }
   return rows;
-}
-const __cupV4FurtherFixtureCardHtml=furtherFixtureCardHtml;
-function furtherFixtureCardHtml(f,index){return f&&f._cupPair?cupPairCardHtml(f):__cupV4FurtherFixtureCardHtml(f,index);}
+};
+const __cupV5OriginalFurtherFixtureCardHtml=furtherFixtureCardHtml;
+furtherFixtureCardHtml=function(f,index){return f&&f._cupPair?cupPairCardHtml(f):__cupV5OriginalFurtherFixtureCardHtml(f,index);};
 if(typeof parentFutureFixtureHtml==='function'){
-  const __cupV4ParentFutureFixtureHtml=parentFutureFixtureHtml;
-  parentFutureFixtureHtml=function(f){return f&&f._cupPair?cupPairCardHtml(f):__cupV4ParentFutureFixtureHtml(f);};
+  const __cupV5OriginalParentFutureFixtureHtml=parentFutureFixtureHtml;
+  parentFutureFixtureHtml=function(f){return f&&f._cupPair?cupPairCardHtml(f):__cupV5OriginalParentFutureFixtureHtml(f);};
+}
+if(typeof renderCompactNextMatchTeams==='function'){
+  const __cupV5OriginalRenderCompactNextMatchTeams=renderCompactNextMatchTeams;
+  renderCompactNextMatchTeams=function(f={}){
+    const group=miniCupGroup(f);
+    if(!group)return __cupV5OriginalRenderCompactNextMatchTeams(f);
+    const host=document.getElementById('next-match-home-teams');if(!host)return;
+    const opponents=cupGroupOpponentNames(f,group);
+    host.classList.remove('cup-group-summary');
+    setStableHtml(host,`<div class="cup-next-pair-list">${(opponents.length?opponents:['Opponent TBC']).slice(0,2).map(opponent=>`<div class="cup-next-pair">Shooters Hill <span>v</span> ${esc(opponent)}</div>`).join('')}</div>`);
+  };
 }
