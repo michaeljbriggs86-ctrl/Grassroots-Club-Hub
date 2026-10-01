@@ -5239,3 +5239,45 @@ const __v11OpenNext=openNextFixtureDetails;
 openNextFixtureDetails=function(){let r;try{r=__v11OpenNext.apply(this,arguments)}catch(e){console.warn('v11 next detail recovered',e)}try{const f=typeof nextPublishedFixture==='function'?nextPublishedFixture():upcomingFixtures()[0];if(f)applyCanonicalMatchCardFrameworkV11('next-match',f,'next-fixture-dialog')}catch(e){console.warn('v11 next card skipped',e)}return r};
 if(typeof renderNextMatch==='function'){const __v11Home=renderNextMatch;renderNextMatch=function(){const r=__v11Home.apply(this,arguments);try{const f=typeof nextPublishedFixture==='function'?nextPublishedFixture():upcomingFixtures()[0];if(f)applyCanonicalMatchCardFrameworkV11('next-match',f,'next-fixture-dialog')}catch(e){console.warn('v11 dashboard card skipped',e)}return r};}
 if(typeof renderMatchPageNextFixture==='function'){const __v11Matches=renderMatchPageNextFixture;renderMatchPageNextFixture=function(){const r=__v11Matches.apply(this,arguments);try{const f=typeof nextPublishedFixture==='function'?nextPublishedFixture():upcomingFixtures()[0];if(f)applyCanonicalMatchCardFrameworkV11('matches-next',f,'matches-next-fixture')}catch(e){console.warn('v11 matches card skipped',e)}return r};}
+
+/* canonicalMatchCardFrameworkV12: dashboard grouping and venue map follow-up */
+function canonicalMatchCardFrameworkV12(f={}){
+  const clean=v=>String(v||'').replace(/_/g,' ').replace(/\s+/g,' ').trim();
+  const cup=/cup|selkent/i.test(String(f.competition||f.format||f.type||''));
+  const group=typeof miniCupGroup==='function'?miniCupGroup(f):null;
+  const d=(group&&typeof parentCupGroupDetails==='function'&&parentCupGroupDetails(f))||f||{};
+  const ground=clean(d.groundName||d.ground||(cup?'Marathon Sports Ground':'Venue TBC'));
+  const address=clean(d.address||f.address||(cup?'Shooters Hill':''));
+  const date=f.date?(typeof formatDate==='function'?formatDate(f.date):f.date):'';
+  const time=d.time||f.time||(cup?'14:00':'');
+  return {ground,address,date,time};
+}
+function revealCanonicalMapV12(prefix,ground,address){
+  const d=canonicalMatchCardFrameworkV12({ground:ground,address:address});
+  const name=(d.ground||'Marathon Sports Ground')+', '+(d.address||'Shooters Hill');
+  const q=encodeURIComponent(name), url='https://www.google.com/maps/search/?api=1&query='+q;
+  const preview=document.getElementById(prefix+'-map-preview'); if(!preview)return;
+  preview.hidden=false; preview.style.display='block';
+  if(!preview.querySelector('iframe')){
+    preview.innerHTML='<div class="canonical-v12-map-wrap"><iframe title="Venue map" loading="lazy" src="https://www.google.com/maps?q='+q+'&output=embed"></iframe><a class="canonical-v12-map-button" target="_blank" rel="noopener" href="'+url+'">Open in Maps</a></div>';
+  }
+  const outer=document.getElementById(prefix+'-map'); if(outer){outer.hidden=false;outer.style.display='block';}
+}
+function applyCanonicalDashboardV12(f){
+  if(!f)return;
+  const host=document.getElementById('next-match-home-teams'); if(!host)return;
+  const d=canonicalMatchCardFrameworkV12(f);
+  const rows=typeof canonicalMatchCardFrameworkV11==='function'?canonicalMatchCardFrameworkV11(f).rows:'';
+  setStableHtml(host,'<div class="canonical-v12-dashboard-rows">'+rows+'</div>');
+  const date=document.getElementById('next-match-home-date');
+  if(date)date.textContent=(d.date||'Upcoming fixture TBC')+(d.time?' · Kick-off '+d.time:'');
+  revealCanonicalMapV12('next-match',d.ground,d.address);
+}
+if(typeof renderNextMatch==='function'){
+  const __v12Home=renderNextMatch;
+  renderNextMatch=function(){const r=__v12Home.apply(this,arguments);try{const f=typeof nextPublishedFixture==='function'?nextPublishedFixture():upcomingFixtures()[0];applyCanonicalDashboardV12(f)}catch(e){console.warn('v12 dashboard summary skipped',e)}return r};
+}
+if(typeof renderFixtureOverview==='function'){
+  const __v12Overview=renderFixtureOverview;
+  renderFixtureOverview=function(prefix,f){const r=__v12Overview.apply(this,arguments);try{if(f){const d=canonicalMatchCardFrameworkV12(f);revealCanonicalMapV12(prefix,d.ground,d.address)}}catch(e){console.warn('v12 map preview skipped',e)}return r};
+}
