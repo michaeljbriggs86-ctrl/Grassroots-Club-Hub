@@ -1685,3 +1685,5 @@ img.club-identity-badge[src="/__pilot_badges/318/53facde723259b51ef991c02e37e33b
   }
   .club-result-score>.club-result-team{overflow:visible}
 }
+
+.further-fixture-head strong{display:flex;align-items:center;gap:6px;flex-wrap:wrap}.further-fixture-head .club-listing .club-identity-badge{display:inline-block!important;width:24px;height:24px;max-width:24px;max-height:24px;flex:0 0 24px}

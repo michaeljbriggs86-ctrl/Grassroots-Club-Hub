@@ -1305,37 +1305,16 @@ function saveSelkentSettings(){
 }
 function cupGroupFixtureLines(group){return group.opponents.map(opponent=>`<div class="cup-group-fixture-line"><span>Shooters Hill</span><strong>v</strong><span>${esc(opponent)}</span></div>`).join('');}
 function furtherFixtureCardHtml(f,index){
-  const group=miniCupGroup(f);
-  if(group){
-    const d=parentCupGroupDetails(f),confirmed=parentMatchdayReady(f),ground=confirmed?d.groundName:'Venue awaiting confirmation';
-    return `<article class="further-fixture-card cup-group-fixture-card">
-      <div class="further-fixture-head"><div>
-        <span class="synced-fixture-date">${esc(formatDate(f.date))}${confirmed?` · Group starts ${esc(d.time)}`:' · Group start awaiting confirmation'}</span>
-        <strong>Cup group matchday</strong>
-        <small>${esc(fixtureCompetitionLabel(f))} · ${esc(ground)}</small>
-      </div></div>
-      <div class="cup-group-fixture-lines">${cupGroupFixtureLines(group)}</div>
-      ${confirmed?`<div class="match-venue-card"><div><span>Confirmed venue</span><strong>${esc(d.groundName)}</strong><small>${esc(d.address)}</small></div></div>`:''}
-    </article>`;
-  }
-  const d=resolvedFixture(f),confirmed=fixtureDetailsConfirmed(f),ctx=fixtureOverviewContext(d),warning=kitWarningHtml(ctx),toggle=kitToggleHtml(f,ctx),mapFrame=confirmed&&ctx.mapEmbedHref?`<div class="fixture-map-preview further-fixture-map"><iframe title="${esc(f.opponent||'Fixture')} venue map" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="${esc(ctx.mapEmbedHref)}"></iframe></div>`:'';
+  const d=resolvedFixture(f),confirmed=fixtureDetailsConfirmed(f),ctx=fixtureOverviewContext(d),warning=kitWarningHtml(ctx),toggle=kitToggleHtml(f,ctx);
   const ground=confirmed?ctx.ground:'Awaiting confirmation',address=confirmed?ctx.address:'Club staff will confirm the venue.';
-  return `<article class="further-fixture-card">
-    <div class="further-fixture-head"><div>
-      <span class="synced-fixture-date">${f.date?formatDate(f.date):'Date TBC'}${confirmed&&d.time?' · '+esc(d.time):''}</span>
-      <strong>${clubListingHtml(ctx.homeTeam)} <span>v</span> ${clubListingHtml(ctx.awayTeam)}</strong>
-      <small>${esc(fixtureCompetitionLabel(f))} · ${esc(ground)}</small>
-    </div></div>
-    <div class="further-fixture-quick">
-      <details class="further-fixture-details"><summary>Match details</summary><div class="further-fixture-body">
-        <div class="match-versus">${matchTeamSideHtml('Home',ctx.homeTeam,ctx.homeKit)}<div class="match-versus-mark">V</div>${matchTeamSideHtml('Away',ctx.awayTeam,ctx.awayKit)}</div>
-        ${toggle}<div class="match-venue-card"><div><span>Venue</span><strong>${esc(ground)}</strong><small>${esc(address)}</small></div></div>
-        ${mapFrame}
-      </div></details>
-      ${confirmed&&ctx.mapHref?`<a class="map-link" href="${esc(ctx.mapHref)}">Open in Maps</a>`:''}
-    </div>
-    ${warning}
-  </article>`;
+  return `<article class="further-fixture-card"><div class="further-fixture-head"><div>
+    <span class="synced-fixture-date">${f.date?formatDate(f.date):'Date TBC'}${confirmed&&d.time?' · '+esc(d.time):''}</span>
+    <strong>${clubListingHtml(ctx.homeTeam)} <span>v</span> ${clubListingHtml(ctx.awayTeam)}</strong>
+    <small>${esc(fixtureCompetitionLabel(f))} · ${esc(ground)}</small>
+  </div></div><div class="further-fixture-quick"><details class="further-fixture-details"><summary>Match details</summary><div class="further-fixture-body">
+    <div class="match-versus">${matchTeamSideHtml('Home',ctx.homeTeam,ctx.homeKit)}<div class="match-versus-mark">V</div>${matchTeamSideHtml('Away',ctx.awayTeam,ctx.awayKit)}</div>
+    ${toggle}<div class="match-venue-card"><div><span>Venue</span><strong>${esc(ground)}</strong><small>${esc(address)}</small></div></div>
+  </div></details></div>${warning}</article>`;
 }
 function groupedUpcomingFixtures(fixtures=upcomingFixtures()){
   const seen=new Set();
@@ -1361,10 +1340,14 @@ function parentFutureFixtureHtml(f){
 
 function renderSelkentFixtures(){
   const list=document.getElementById('selkent-fixtures-list'),count=document.getElementById('selkent-fixtures-count'),meta=document.getElementById('selkent-fixtures-meta');if(!list)return;
-  const parent=CLOUD_MODE&&currentRole==='parent',fixtures=groupedUpcomingFixtures(),further=parent?fixtures:fixtures.slice(1);
-  const heading=document.getElementById('selkent-fixtures-heading');if(heading)heading.textContent=parent?'Upcoming matchdays':'Further fixtures';
-  if(count)count.textContent=String(further.length);
-  setStableHtml(list,further.map(parent?parentFutureFixtureHtml:furtherFixtureCardHtml).join('')||`<div class="empty-state compact-empty">${parent?'No upcoming fixtures released yet.':'No additional fixtures released yet.'}</div>`);
+  const parent=CLOUD_MODE&&currentRole==='parent';
+  const all=typeof groupedUpcomingFixtures==='function'?groupedUpcomingFixtures():upcomingFixtures();
+  const cup=typeof miniCupGroup==='function'?all.filter(f=>miniCupGroup(f)):[];
+  const fixtures=cup.length?cup:all;
+  const visible=fixtures;
+  const heading=document.getElementById('selkent-fixtures-heading');if(heading)heading.textContent=fixtures[0]?fixtureCompetitionLabel(fixtures[0]):'Fixtures';
+  if(count)count.textContent=String(visible.length);
+  setStableHtml(list,visible.map((f,i)=>furtherFixtureCardHtml(f,i)).join('')||'<div class="empty-state compact-empty">No fixtures released yet.</div>');
   if(meta)meta.textContent='';
 }
 async function syncSelkent(silent=false){
