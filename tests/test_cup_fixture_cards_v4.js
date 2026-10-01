@@ -1,0 +1,10 @@
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const app=fs.readFileSync('app/src/main/assets/app.js','utf8');
+const css=fs.readFileSync('app/src/main/assets/app-design-system.css','utf8');
+assert.match(app,/function cupPairCardHtml\(f\)/);
+assert.match(app,/function groupedUpcomingFixtures\(fixtures=upcomingFixtures\(\)\)/);
+assert.match(app,/Shooters Hill <span class="cup-pair-v">v<\/span>/);
+assert.doesNotMatch(app,/Three games run back to back\. The running order/);
+assert.match(css,/\.cup-pair-fixture-card/);
+console.log('PASS Cup group expands to two plain Shooters Hill fixture cards');

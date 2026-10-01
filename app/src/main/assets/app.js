@@ -5072,3 +5072,32 @@ bootTracker().catch(err=>console.error('Tracker boot failed',err));
 // v2.0.35: restored add/edit scheduled match controls, Admin Results isolation and dark-mode contrast fixes.
 
 // Universal Core v1: club configuration, competition rules, provider abstraction and multi-tenant branding.
+
+
+/* Cup group presentation: keep the group-start data but show two plain fixtures. */
+function cupPairCardHtml(f){
+  const d=resolvedFixture(f)||f;
+  const date=f.date?formatDate(f.date):'Date TBC';
+  const time=String(f.time||d.time||'').trim();
+  const opponent=matchTeamLabel(f.opponent||'Opponent TBC');
+  return `<article class="further-fixture-card cup-pair-fixture-card"><div class="further-fixture-head"><div><span class="synced-fixture-date">${esc(date)}${time?` · ${esc(time)}`:''}</span><strong>Shooters Hill <span class="cup-pair-v">v</span> ${esc(opponent)}</strong></div></div></article>`;
+}
+function groupedUpcomingFixtures(fixtures=upcomingFixtures()){
+  const rows=[],seen=new Set();
+  for(const f of fixtures){
+    const group=miniCupGroup(f);
+    if(!group){rows.push(f);continue;}
+    const key=`${group.date||f.date}|${selkentNorm(group.competition||f.competition)}`;
+    if(seen.has(key))continue;
+    seen.add(key);
+    const opponents=(group.opponents||[f.opponent]).filter(Boolean).slice(0,2);
+    opponents.forEach((opponent,index)=>rows.push({...f,opponent,_cupPair:true,_cupPairIndex:index}));
+  }
+  return rows;
+}
+const __cupV4FurtherFixtureCardHtml=furtherFixtureCardHtml;
+function furtherFixtureCardHtml(f,index){return f&&f._cupPair?cupPairCardHtml(f):__cupV4FurtherFixtureCardHtml(f,index);}
+if(typeof parentFutureFixtureHtml==='function'){
+  const __cupV4ParentFutureFixtureHtml=parentFutureFixtureHtml;
+  parentFutureFixtureHtml=function(f){return f&&f._cupPair?cupPairCardHtml(f):__cupV4ParentFutureFixtureHtml(f);};
+}
