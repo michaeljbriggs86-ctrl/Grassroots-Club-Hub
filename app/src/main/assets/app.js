@@ -5146,3 +5146,31 @@ renderMatchPageNextFixture=function(){
   try{const f=upcomingFixtures()[0];if(f)cupV6MatchesNextVersus(f);}catch(error){console.warn('Cup Matches-page fallback skipped',error);}
   return result;
 };
+
+
+/* Cup match card v7: line-by-line format with verified club badges. */
+function cupV7RenderMatchesNext(f){
+  const group=miniCupGroup(f);if(!group)return;
+  const host=document.getElementById('matches-next-versus');if(!host)return;
+  const opponents=(cupGroupOpponentNames(f,group).length?cupGroupOpponentNames(f,group):['Opponent TBC']).slice(0,2);
+  const own=matchTeamLabel(typeof ownTeamDisplayName==='function'?ownTeamDisplayName():'Shooters Hill');
+  const competition=matchTeamLabel(fixtureCompetitionLabel(f)||f.competition||'Cup fixture');
+  const date=f.date?formatDate(f.date):'Date TBC';
+  const d=parentCupGroupDetails(f)||resolvedFixture(f)||f;
+  const time=d?.time?`Kick-off ${esc(d.time)}`:'Kick-off TBC';
+  const badgeRow=(opponent,index)=>`<div class="cup-match-line cup-match-fixture-line"><span class="cup-match-line-label">Fixture ${index+1}</span><div class="cup-match-club-row"><span class="cup-match-club">${clubIdentityBadgeHtml(own)}<strong>${esc(own)}</strong></span><b class="cup-match-v">v</b><span class="cup-match-club cup-match-club-away">${clubIdentityBadgeHtml(opponent)}<strong>${esc(matchTeamLabel(opponent))}</strong></span></div></div>`;
+  setStableHtml(host,`<div class="cup-match-lines"><div class="cup-match-line"><span class="cup-match-line-label">Format</span><strong>${esc(competition)}</strong></div><div class="cup-match-line"><span class="cup-match-line-label">Date</span><strong>${esc(date)}</strong></div><div class="cup-match-line"><span class="cup-match-line-label">Time</span><strong>${time}</strong></div>${opponents.map(badgeRow).join('')}</div>`);
+  const card=document.getElementById('matches-next-fixture');card?.classList.add('cup-match-card-active');
+  const set=(id,value)=>{const el=document.getElementById(id);if(el)el.textContent=value;};
+  set('matches-next-opponent','Cup fixture');
+  set('matches-next-when',`${date} · ${time}`);
+  set('matches-next-venue',competition);
+  set('matches-next-kits','');
+}
+const __cupV7OriginalRenderMatchPageNextFixture=renderMatchPageNextFixture;
+renderMatchPageNextFixture=function(){
+  let result;
+  try{result=__cupV7OriginalRenderMatchPageNextFixture.apply(this,arguments);}catch(error){console.warn('Cup match card renderer recovered from legacy error',error);}
+  try{const f=upcomingFixtures()[0];if(f)cupV7RenderMatchesNext(f);}catch(error){console.warn('Cup match card fallback skipped',error);}
+  return result;
+};

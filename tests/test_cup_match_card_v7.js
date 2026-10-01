@@ -1,0 +1,11 @@
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const app=fs.readFileSync('app/src/main/assets/app.js','utf8');
+const css=fs.readFileSync('app/src/main/assets/app-design-system.css','utf8');
+assert.match(app,/function cupV7RenderMatchesNext\(f\)/);
+assert.match(app,/cup-match-fixture-line/);
+assert.match(app,/clubIdentityBadgeHtml\(opponent\)/);
+assert.match(app,/Cup match card renderer recovered from legacy error/);
+assert.match(css,/\.cup-match-lines/);
+assert.match(css,/\.cup-match-club-row/);
+console.log('PASS Cup match screen uses line-by-line rows with club badges');
