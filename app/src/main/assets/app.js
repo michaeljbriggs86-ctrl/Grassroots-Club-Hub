@@ -5198,3 +5198,44 @@ openNextFixtureDetails=function(){
   try{const f=typeof nextPublishedFixture==='function'?nextPublishedFixture():upcomingFixtures()[0];if(f)applyCanonicalMatchCard('next-match',f,'next-fixture-dialog');}catch(error){console.warn('Canonical next-fixture card skipped',error);}
   return result;
 };
+
+/* canonicalMatchCardFrameworkV11: shared League/Cup/Friendly surface contract */
+function canonicalMatchCardFrameworkV11(f={}){
+  const clean=v=>String(v||'').replace(/_/g,' ').replace(/\s+/g,' ').trim();
+  const team=v=>clean(v||'Team TBC');
+  const isCup=()=>/cup|selkent/i.test(String(f.competition||f.format||f.type||'')) || !!(typeof miniCupGroup==='function'&&miniCupGroup(f));
+  let group=typeof miniCupGroup==='function'?miniCupGroup(f):null;
+  let away=[];
+  if(group&&typeof cupGroupOpponentNames==='function') away=cupGroupOpponentNames(f,group).map(team).filter(Boolean);
+  if(!away.length) away=[team(f.opponent||f.awayTeam||'Opponent TBC')];
+  const own=team(typeof ownTeamDisplayName==='function'?ownTeamDisplayName():(f.homeTeam||'Shooters Hill'));
+  const badge=n=>typeof clubIdentityBadgeHtml==='function'?clubIdentityBadgeHtml(n):'';
+  const rows=away.slice(0, isCup()?2:1).map((a,i)=>`<div class="canonical-v11-fixture"><span class="canonical-v11-label">${isCup()?`Fixture ${i+1}`:'Match'}</span><div class="canonical-v11-teams"><span class="canonical-v11-side"><span class="canonical-v11-badge">${badge(own)}</span><strong>${esc(own)}</strong></span><b class="canonical-v11-v">v</b><span class="canonical-v11-side canonical-v11-away"><strong>${esc(a)}</strong><span class="canonical-v11-badge">${badge(a)}</span></span></div></div>`).join('');
+  const d=(group&&typeof parentCupGroupDetails==='function'&&parentCupGroupDetails(f))||f||{};
+  const competition=clean(typeof fixtureCompetitionLabel==='function'?fixtureCompetitionLabel(f):(f.competition||f.type||'Friendly'))||'Friendly';
+  const date=f.date?formatDate(f.date):'';
+  const time=d.time||f.time||(isCup()?'14:00':'');
+  const ground=clean(d.groundName||d.ground||(isCup()?'Marathon Sports Ground':'Venue TBC'));
+  return {rows,competition,date,time,ground,address:clean(d.address||f.address||'')};
+}
+function applyCanonicalMatchCardFrameworkV11(prefix,f,containerId){
+  if(!f)return;
+  const host=document.getElementById(`${prefix}-versus`); if(!host)return;
+  const d=canonicalMatchCardFrameworkV11(f), card=document.getElementById(containerId)||host.closest('dialog')||host.closest('.next-match-card');
+  setStableHtml(host,`<div class="canonical-v11-rows">${d.rows}</div>`);
+  card?.classList.add('canonical-v11-active');
+  const put=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
+  put(`${prefix}-opponent`,prefix==='matches-next'?d.competition:'');
+  put(`${prefix}-when`,`${d.date||'Date TBC'} · ${d.time?`Kick-off ${d.time}`:'Kick-off TBC'}`);
+  put(`${prefix}-ground`,d.ground); put(`${prefix}-address`,d.address);
+  const cal=document.getElementById(`${prefix}-calendar`); if(cal)cal.hidden=!(d.date&&d.time);
+  const comp=document.getElementById(`${prefix}-competition`); if(comp)comp.textContent=d.competition;
+}
+const __v11FixtureOverview=renderFixtureOverview;
+renderFixtureOverview=function(prefix,f){let r;try{r=__v11FixtureOverview.apply(this,arguments)}catch(e){console.warn('v11 fixture overview recovered',e)}try{applyCanonicalMatchCardFrameworkV11(prefix,f,prefix==='next-match'?'next-fixture-dialog':prefix==='matches-next'?'matches-next-fixture':null)}catch(e){console.warn('v11 fixture card skipped',e)}return r};
+const __v11MatchOverview=renderMatchOverview;
+renderMatchOverview=function(m){let r;try{r=__v11MatchOverview.apply(this,arguments)}catch(e){console.warn('v11 match overview recovered',e)}try{applyCanonicalMatchCardFrameworkV11('match-detail',m,'match-detail-dialog')}catch(e){console.warn('v11 match detail skipped',e)}return r};
+const __v11OpenNext=openNextFixtureDetails;
+openNextFixtureDetails=function(){let r;try{r=__v11OpenNext.apply(this,arguments)}catch(e){console.warn('v11 next detail recovered',e)}try{const f=typeof nextPublishedFixture==='function'?nextPublishedFixture():upcomingFixtures()[0];if(f)applyCanonicalMatchCardFrameworkV11('next-match',f,'next-fixture-dialog')}catch(e){console.warn('v11 next card skipped',e)}return r};
+if(typeof renderNextMatch==='function'){const __v11Home=renderNextMatch;renderNextMatch=function(){const r=__v11Home.apply(this,arguments);try{const f=typeof nextPublishedFixture==='function'?nextPublishedFixture():upcomingFixtures()[0];if(f)applyCanonicalMatchCardFrameworkV11('next-match',f,'next-fixture-dialog')}catch(e){console.warn('v11 dashboard card skipped',e)}return r};}
+if(typeof renderMatchPageNextFixture==='function'){const __v11Matches=renderMatchPageNextFixture;renderMatchPageNextFixture=function(){const r=__v11Matches.apply(this,arguments);try{const f=typeof nextPublishedFixture==='function'?nextPublishedFixture():upcomingFixtures()[0];if(f)applyCanonicalMatchCardFrameworkV11('matches-next',f,'matches-next-fixture')}catch(e){console.warn('v11 matches card skipped',e)}return r};}
