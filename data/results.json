@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "provider": "Selkent",
-  "last_updated": "2026-10-02T06:06:28.946936+00:00",
+  "last_updated": "2026-10-02T12:06:42.638602+00:00",
   "fixture_agegroup_discovery_source": "selkent_divisions_all",
   "coverage": {
     "fixtures": {
@@ -11714,28 +11714,28 @@
       "standings": [
         {
           "division_name": "Under 13A",
-          "updated_at_text": "01/10/26 09:40:45",
+          "updated_at_text": "02/10/26 09:05:54",
           "source_order_authoritative_for_ties": false,
           "source_disclaimer": "Note: Table does not yet take account of rules for determining winner if teams on equal points",
           "rows": [
             {
               "row_order": 1,
-              "provider_team_id": 813,
-              "provider_division_id": 4260,
-              "team_name": "Ballon Dor FC",
-              "played": 0,
-              "won": 0,
-              "drawn": 0,
-              "lost": 0,
-              "gf": 0,
-              "ga": 0,
-              "points": 0
-            },
-            {
-              "row_order": 2,
               "provider_team_id": 41,
               "provider_division_id": 4260,
               "team_name": "Bexley Ballers Football Club",
+              "played": 1,
+              "won": 1,
+              "drawn": 0,
+              "lost": 0,
+              "gf": 2,
+              "ga": 0,
+              "points": 2
+            },
+            {
+              "row_order": 2,
+              "provider_team_id": 813,
+              "provider_division_id": 4260,
+              "team_name": "Ballon Dor FC",
               "played": 0,
               "won": 0,
               "drawn": 0,
@@ -11814,12 +11814,12 @@
               "provider_team_id": 1048,
               "provider_division_id": 4260,
               "team_name": "Omarie Youth Red",
-              "played": 0,
+              "played": 1,
               "won": 0,
               "drawn": 0,
-              "lost": 0,
+              "lost": 1,
               "gf": 0,
-              "ga": 0,
+              "ga": 2,
               "points": 0
             },
             {
@@ -12687,6 +12687,15 @@
         }
       ],
       "published_results": [
+        {
+          "date": "2026-09-27",
+          "home": "Bexley Ballers Football Club",
+          "away": "Omarie Youth Red",
+          "homeGoals": 2,
+          "awayGoals": 0,
+          "provider_division_id": 4260,
+          "division_name": "Under 13A"
+        },
         {
           "date": "2026-09-27",
           "home": "Ballers SE Blue",
