@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "provider": "Selkent",
-  "last_updated": "2026-10-02T12:06:42.638602+00:00",
+  "last_updated": "2026-10-02T18:06:26.254330+00:00",
   "fixture_agegroup_discovery_source": "selkent_divisions_all",
   "coverage": {
     "fixtures": {
@@ -2714,16 +2714,6 @@
         {
           "date": "2026-10-04",
           "division_name": "U10 Selkent Cup One - Round 1",
-          "home": "Cray Wanderers Sharks",
-          "away": "Prolific FC",
-          "provider_team_ids": [
-            "604",
-            "2064"
-          ]
-        },
-        {
-          "date": "2026-10-04",
-          "division_name": "U10 Selkent Cup One - Round 1",
           "home": "Cray Wanderers Tigers",
           "away": "Regans FC Black",
           "provider_team_ids": [
@@ -2859,16 +2849,6 @@
           "provider_team_ids": [
             "147",
             "2240"
-          ]
-        },
-        {
-          "date": "2026-10-04",
-          "division_name": "U10 Selkent Cup One - Round 1",
-          "home": "Prolific FC",
-          "away": "London Kickers FC Red",
-          "provider_team_ids": [
-            "2064",
-            "2113"
           ]
         },
         {
@@ -3529,16 +3509,6 @@
           "provider_team_ids": [
             "441",
             "671"
-          ]
-        },
-        {
-          "date": "2026-10-11",
-          "division_name": "Under 10A Navy",
-          "home": "Prolific FC",
-          "away": "Ebbsfleet United Red",
-          "provider_team_ids": [
-            "2064",
-            "659"
           ]
         },
         {
