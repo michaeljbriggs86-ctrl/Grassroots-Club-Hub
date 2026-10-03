@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "provider": "Selkent",
-  "last_updated": "2026-10-03T06:11:58.444749+00:00",
+  "last_updated": "2026-10-03T14:54:06.385198+00:00",
   "fixture_agegroup_discovery_source": "selkent_divisions_all",
   "coverage": {
     "fixtures": {
@@ -2003,12 +2003,1003 @@
             "650",
             "401"
           ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U8 Friendly",
+          "home": "Cray Wanderers Tigers",
+          "away": "Dulwich Village White",
+          "provider_team_ids": [
+            "573",
+            "225"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U8 Friendly",
+          "home": "Dartford FC Black",
+          "away": "Dulwich Hamlet JFC Pink",
+          "provider_team_ids": [
+            "358",
+            "515"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U8 Friendly",
+          "home": "Gipsy Hill FC Whites",
+          "away": "Sutton Athletic Greens",
+          "provider_team_ids": [
+            "1077",
+            "697"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8A Navy",
+          "home": "Ballon Dor FC",
+          "away": "Hayden Youth Raptors",
+          "provider_team_ids": [
+            "807",
+            "424"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8A Navy",
+          "home": "Boca FC Bears",
+          "away": "ShooterBallers FC Green",
+          "provider_team_ids": [
+            "196",
+            "985"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8A Navy",
+          "home": "Cray Wanderers Cobras",
+          "away": "Parkwood Rangers Panthers",
+          "provider_team_ids": [
+            "574",
+            "142"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8A Navy",
+          "home": "Crayford Arrows White",
+          "away": "Hayden Youth Bulldogs",
+          "provider_team_ids": [
+            "115",
+            "425"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8A Navy",
+          "home": "Hayden Youth Bulldogs",
+          "away": "Crayford Arrows White",
+          "provider_team_ids": [
+            "425",
+            "115"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8A Navy",
+          "home": "Hayden Youth Raptors",
+          "away": "Ballon Dor FC",
+          "provider_team_ids": [
+            "424",
+            "807"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8A Navy",
+          "home": "Parkwood Rangers Panthers",
+          "away": "Cray Wanderers Cobras",
+          "provider_team_ids": [
+            "142",
+            "574"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8A Navy",
+          "home": "ShooterBallers FC Green",
+          "away": "Boca FC Bears",
+          "provider_team_ids": [
+            "985",
+            "196"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8A Silver",
+          "home": "Cray Wanderers Sharks",
+          "away": "Lewisham Project Gold",
+          "provider_team_ids": [
+            "572",
+            "202"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8A Silver",
+          "home": "Dulwich Village Black",
+          "away": "Dynamo Youth",
+          "provider_team_ids": [
+            "223",
+            "533"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8A Silver",
+          "home": "Dynamo Youth",
+          "away": "Dulwich Village Black",
+          "provider_team_ids": [
+            "533",
+            "223"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8A Silver",
+          "home": "Fisher Youth",
+          "away": "Greenwich Peninsula Lions",
+          "provider_team_ids": [
+            "290",
+            "728"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8A Silver",
+          "home": "Greenwich Peninsula Lions",
+          "away": "Fisher Youth",
+          "provider_team_ids": [
+            "728",
+            "290"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8A Silver",
+          "home": "Lewisham Project Gold",
+          "away": "Cray Wanderers Sharks",
+          "provider_team_ids": [
+            "202",
+            "572"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8A Silver",
+          "home": "Metrogas FC Black",
+          "away": "Regans FC Black",
+          "provider_team_ids": [
+            "828",
+            "446"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8A Silver",
+          "home": "Regans FC Black",
+          "away": "Metrogas FC Black",
+          "provider_team_ids": [
+            "446",
+            "828"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8B Navy",
+          "home": "AFC Unity",
+          "away": "Cray Wanderers Lions",
+          "provider_team_ids": [
+            "255",
+            "575"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8B Navy",
+          "home": "Ballers SE",
+          "away": "Fleetdown United orange",
+          "provider_team_ids": [
+            "68",
+            "493"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8B Navy",
+          "home": "Cray Wanderers Lions",
+          "away": "AFC Unity",
+          "provider_team_ids": [
+            "575",
+            "255"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8B Navy",
+          "home": "Crayford Arrows Black",
+          "away": "Sutton Athletic",
+          "provider_team_ids": [
+            "113",
+            "782"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8B Navy",
+          "home": "Fleetdown United orange",
+          "away": "Ballers SE",
+          "provider_team_ids": [
+            "493",
+            "68"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8B Navy",
+          "home": "Metrogas FC Blue",
+          "away": "Welling United Blue",
+          "provider_team_ids": [
+            "830",
+            "876"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8B Navy",
+          "home": "Northumberland Heath",
+          "away": "Welling United Red",
+          "provider_team_ids": [
+            "157",
+            "875"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8B Navy",
+          "home": "Sutton Athletic",
+          "away": "Crayford Arrows Black",
+          "provider_team_ids": [
+            "782",
+            "113"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8B Navy",
+          "home": "Welling United Blue",
+          "away": "Metrogas FC Blue",
+          "provider_team_ids": [
+            "876",
+            "830"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8B Navy",
+          "home": "Welling United Red",
+          "away": "Northumberland Heath",
+          "provider_team_ids": [
+            "875",
+            "157"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8B Red",
+          "home": "Baldon Sports Tigers",
+          "away": "London Legends Gold",
+          "provider_team_ids": [
+            "781",
+            "1014"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8B Red",
+          "home": "Beacons Red",
+          "away": "Foots Cray Lions Yellow",
+          "provider_team_ids": [
+            "925",
+            "709"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8B Red",
+          "home": "Cray Wanderers Wolves",
+          "away": "Erith & Belvedere",
+          "provider_team_ids": [
+            "583",
+            "482"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8B Red",
+          "home": "Erith & Belvedere",
+          "away": "Cray Wanderers Wolves",
+          "provider_team_ids": [
+            "482",
+            "583"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8B Red",
+          "home": "Foots Cray Lions Yellow",
+          "away": "Beacons Red",
+          "provider_team_ids": [
+            "709",
+            "925"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8B Red",
+          "home": "Junior Reds Valiants",
+          "away": "Vikings FC Red",
+          "provider_team_ids": [
+            "265",
+            "554"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8B Red",
+          "home": "London Legends Gold",
+          "away": "Baldon Sports Tigers",
+          "provider_team_ids": [
+            "1014",
+            "781"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8B Red",
+          "home": "Long Lane Lions",
+          "away": "Teviot Rangers Red",
+          "provider_team_ids": [
+            "388",
+            "753"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8B Red",
+          "home": "Teviot Rangers Red",
+          "away": "Long Lane Lions",
+          "provider_team_ids": [
+            "753",
+            "388"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8B Red",
+          "home": "Vikings FC Red",
+          "away": "Junior Reds Valiants",
+          "provider_team_ids": [
+            "554",
+            "265"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8B Silver",
+          "home": "AFC Lewisham Blue",
+          "away": "Russellers Blues",
+          "provider_team_ids": [
+            "248",
+            "28"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8B Silver",
+          "home": "Baldon Sports Lions",
+          "away": "Regans FC Blue",
+          "provider_team_ids": [
+            "780",
+            "447"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8B Silver",
+          "home": "Dulwich Village Orange",
+          "away": "Nepzum Football Club",
+          "provider_team_ids": [
+            "224",
+            "2063"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8B Silver",
+          "home": "Fisher Youth Sharks",
+          "away": "Kekoa Black",
+          "provider_team_ids": [
+            "291",
+            "988"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8B Silver",
+          "home": "Kekoa Black",
+          "away": "Fisher Youth Sharks",
+          "provider_team_ids": [
+            "988",
+            "291"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8B Silver",
+          "home": "London Kickers FC Red",
+          "away": "Long Lane Jaguars",
+          "provider_team_ids": [
+            "2114",
+            "387"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8B Silver",
+          "home": "Long Lane Jaguars",
+          "away": "London Kickers FC Red",
+          "provider_team_ids": [
+            "387",
+            "2114"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8B Silver",
+          "home": "Nepzum Football Club",
+          "away": "Dulwich Village Orange",
+          "provider_team_ids": [
+            "2063",
+            "224"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8B Silver",
+          "home": "Regans FC Blue",
+          "away": "Baldon Sports Lions",
+          "provider_team_ids": [
+            "447",
+            "780"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8B Silver",
+          "home": "Russellers Blues",
+          "away": "AFC Lewisham Blue",
+          "provider_team_ids": [
+            "28",
+            "248"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8C Navy",
+          "home": "Castle Hill United FC",
+          "away": "Sutton Dynamo FC Yellows",
+          "provider_team_ids": [
+            "394",
+            "654"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8C Navy",
+          "home": "Chislehurst Wanderers",
+          "away": "Metrogas FC Red",
+          "provider_team_ids": [
+            "410",
+            "829"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8C Navy",
+          "home": "Cray Wanderers Panthers",
+          "away": "Dartford FC Yellow",
+          "provider_team_ids": [
+            "585",
+            "2076"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8C Navy",
+          "home": "Dartford FC Yellow",
+          "away": "Cray Wanderers Panthers",
+          "provider_team_ids": [
+            "2076",
+            "585"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8C Navy",
+          "home": "Erith Town Selkent",
+          "away": "Fleetdown United black",
+          "provider_team_ids": [
+            "1076",
+            "1031"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8C Navy",
+          "home": "Fleetdown United black",
+          "away": "Erith Town Selkent",
+          "provider_team_ids": [
+            "1031",
+            "1076"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8C Navy",
+          "home": "Foots Cray Lions Black",
+          "away": "Sutton Athletic Stripes",
+          "provider_team_ids": [
+            "285",
+            "2087"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8C Navy",
+          "home": "Metrogas FC Red",
+          "away": "Chislehurst Wanderers",
+          "provider_team_ids": [
+            "829",
+            "410"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8C Navy",
+          "home": "Sutton Athletic Stripes",
+          "away": "Foots Cray Lions Black",
+          "provider_team_ids": [
+            "2087",
+            "285"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8C Navy",
+          "home": "Sutton Dynamo FC Yellows",
+          "away": "Castle Hill United FC",
+          "provider_team_ids": [
+            "654",
+            "394"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8C Silver",
+          "home": "AFC Lewisham White",
+          "away": "Junior Reds Knights",
+          "provider_team_ids": [
+            "247",
+            "2090"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8C Silver",
+          "home": "Athenlay",
+          "away": "Junior Reds Spartans",
+          "provider_team_ids": [
+            "451",
+            "2091"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8C Silver",
+          "home": "Beacons White",
+          "away": "Sporting Club Vista",
+          "provider_team_ids": [
+            "926",
+            "722"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8C Silver",
+          "home": "Blackheath Rhinos Black",
+          "away": "Blackheath Rhinos White",
+          "provider_team_ids": [
+            "846",
+            "847"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8C Silver",
+          "home": "Blackheath Rhinos White",
+          "away": "Blackheath Rhinos Black",
+          "provider_team_ids": [
+            "847",
+            "846"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8C Silver",
+          "home": "Cray Valley (PM) FC Green",
+          "away": "Cray Wanderers Vipers",
+          "provider_team_ids": [
+            "656",
+            "711"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8C Silver",
+          "home": "Cray Wanderers Vipers",
+          "away": "Cray Valley (PM) FC Green",
+          "provider_team_ids": [
+            "711",
+            "656"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8C Silver",
+          "home": "Greenwich Peninsula Tigers",
+          "away": "Shooters Hill AFC Cannons",
+          "provider_team_ids": [
+            "729",
+            "965"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8C Silver",
+          "home": "Junior Reds Knights",
+          "away": "AFC Lewisham White",
+          "provider_team_ids": [
+            "2090",
+            "247"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8C Silver",
+          "home": "Junior Reds Spartans",
+          "away": "Athenlay",
+          "provider_team_ids": [
+            "2091",
+            "451"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8C Silver",
+          "home": "Shooters Hill AFC Cannons",
+          "away": "Greenwich Peninsula Tigers",
+          "provider_team_ids": [
+            "965",
+            "729"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8C Silver",
+          "home": "Sporting Club Vista",
+          "away": "Beacons White",
+          "provider_team_ids": [
+            "722",
+            "926"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8D Navy",
+          "home": "AFC Unity Blue",
+          "away": "Welling United Green",
+          "provider_team_ids": [
+            "2094",
+            "940"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8D Navy",
+          "home": "Crayford Arrows Gold",
+          "away": "IEXEL F.C Gold",
+          "provider_team_ids": [
+            "283",
+            "11"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8D Navy",
+          "home": "Eversley Rangers White",
+          "away": "Swanley Rangers Black",
+          "provider_team_ids": [
+            "673",
+            "790"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8D Navy",
+          "home": "Hayden Youth Coyotes",
+          "away": "Sutton Dynamo FC Blues",
+          "provider_team_ids": [
+            "423",
+            "2139"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8D Navy",
+          "home": "IEXEL F.C Gold",
+          "away": "Crayford Arrows Gold",
+          "provider_team_ids": [
+            "11",
+            "283"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8D Navy",
+          "home": "South Darenth Lions",
+          "away": "Sutton Athletic White",
+          "provider_team_ids": [
+            "2070",
+            "2151"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8D Navy",
+          "home": "Sutton Athletic White",
+          "away": "South Darenth Lions",
+          "provider_team_ids": [
+            "2151",
+            "2070"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8D Navy",
+          "home": "Sutton Dynamo FC Blues",
+          "away": "Hayden Youth Coyotes",
+          "provider_team_ids": [
+            "2139",
+            "423"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8D Navy",
+          "home": "Swanley Rangers Black",
+          "away": "Eversley Rangers White",
+          "provider_team_ids": [
+            "790",
+            "673"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8D Navy",
+          "home": "Welling United Green",
+          "away": "AFC Unity Blue",
+          "provider_team_ids": [
+            "940",
+            "2094"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8D Red",
+          "home": "Baldon Sports Falcons",
+          "away": "Dartford Royals white",
+          "provider_team_ids": [
+            "2099",
+            "326"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8D Red",
+          "home": "Blackheath Rhinos Grey",
+          "away": "Slade Green Knights Green",
+          "provider_team_ids": [
+            "2250",
+            "92"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8D Red",
+          "home": "Dartford Royals white",
+          "away": "Baldon Sports Falcons",
+          "provider_team_ids": [
+            "326",
+            "2099"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8D Red",
+          "home": "Eversley Rangers Red",
+          "away": "Russellers Yellows",
+          "provider_team_ids": [
+            "674",
+            "50"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8D Red",
+          "home": "London Legends Blue",
+          "away": "Teviot Rangers Blue",
+          "provider_team_ids": [
+            "1015",
+            "754"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8D Red",
+          "home": "Russellers Yellows",
+          "away": "Eversley Rangers Red",
+          "provider_team_ids": [
+            "50",
+            "674"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8D Red",
+          "home": "Shooters Hill AFC Green",
+          "away": "Welling United white",
+          "provider_team_ids": [
+            "967",
+            "877"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8D Red",
+          "home": "Slade Green Knights Green",
+          "away": "Blackheath Rhinos Grey",
+          "provider_team_ids": [
+            "92",
+            "2250"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8D Red",
+          "home": "Teviot Rangers Blue",
+          "away": "London Legends Blue",
+          "provider_team_ids": [
+            "754",
+            "1015"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8D Red",
+          "home": "Welling United white",
+          "away": "Shooters Hill AFC Green",
+          "provider_team_ids": [
+            "877",
+            "967"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8D Silver",
+          "home": "Deptford United",
+          "away": "The Bosco FC Dons",
+          "provider_team_ids": [
+            "347",
+            "401"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8D Silver",
+          "home": "Dulwich Hamlet JFC Navy",
+          "away": "Wildcats FS Club Lions",
+          "provider_team_ids": [
+            "514",
+            "650"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8D Silver",
+          "home": "Hillyfielders Hawks",
+          "away": "Kekoa Red",
+          "provider_team_ids": [
+            "632",
+            "991"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8D Silver",
+          "home": "Kekoa Red",
+          "away": "Hillyfielders Hawks",
+          "provider_team_ids": [
+            "991",
+            "632"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8D Silver",
+          "home": "Lewisham Borough Cobras",
+          "away": "Lewisham Project Whites",
+          "provider_team_ids": [
+            "288",
+            "1090"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8D Silver",
+          "home": "Lewisham Project Whites",
+          "away": "Lewisham Borough Cobras",
+          "provider_team_ids": [
+            "1090",
+            "288"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8D Silver",
+          "home": "The Bosco FC Dons",
+          "away": "Deptford United",
+          "provider_team_ids": [
+            "401",
+            "347"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8D Silver",
+          "home": "Wildcats FS Club Lions",
+          "away": "Dulwich Hamlet JFC Navy",
+          "provider_team_ids": [
+            "650",
+            "514"
+          ]
         }
       ],
       "fixture_parse_status": "verified_multiweek_fixture_rows_v2",
       "fixture_week_ids": [
         3,
-        4
+        4,
+        5
       ],
       "standings": null,
       "published_results": null,
@@ -2576,12 +3567,233 @@
             "944",
             "2236"
           ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U9 Friendly",
+          "home": "AFC Lewisham White",
+          "away": "Junior Reds Titans",
+          "provider_team_ids": [
+            "2111",
+            "2241"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 9C Navy",
+          "home": "Blackheath Rhinos Black",
+          "away": "Junior Reds Knights",
+          "provider_team_ids": [
+            "848",
+            "181"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 9C Navy",
+          "home": "Chislehurst Wanderers Lions",
+          "away": "Long Lane Tigers",
+          "provider_team_ids": [
+            "412",
+            "385"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 9C Navy",
+          "home": "Eversley Rangers",
+          "away": "Northumberland Heath",
+          "provider_team_ids": [
+            "676",
+            "159"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 9C Navy",
+          "home": "Hayden Youth Bears",
+          "away": "Metrogas FC White",
+          "provider_team_ids": [
+            "426",
+            "827"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 9C Navy",
+          "home": "Longfield Tigers FC",
+          "away": "Ebbsfleet United Blue",
+          "provider_team_ids": [
+            "2061",
+            "669"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 9C Silver",
+          "home": "Dulwich Hamlet JFC Pink",
+          "away": "The Bosco FC Dons",
+          "provider_team_ids": [
+            "2104",
+            "402"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 9C Silver",
+          "home": "Dynamo Youth Silver",
+          "away": "Palace Knights Yellow",
+          "provider_team_ids": [
+            "2134",
+            "796"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 9C Silver",
+          "home": "KSI Coaching FC White",
+          "away": "Kekoa Red",
+          "provider_team_ids": [
+            "167",
+            "990"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 9C Silver",
+          "home": "ShooterBallers FC",
+          "away": "Chislehurst Wanderers Tigers",
+          "provider_team_ids": [
+            "2146",
+            "411"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 9C Silver",
+          "home": "Wildcats FS Club Lions",
+          "away": "Fisher Youth",
+          "provider_team_ids": [
+            "242",
+            "294"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 9D Navy",
+          "home": "AFC Green Court Dukes",
+          "away": "Phoenix Sports Panthers",
+          "provider_team_ids": [
+            "579",
+            "771"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 9D Navy",
+          "home": "Chislehurst Wanderers Panthers",
+          "away": "Slade Green Knights",
+          "provider_team_ids": [
+            "2072",
+            "93"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 9D Navy",
+          "home": "Eversley Rangers Red",
+          "away": "Dartford Royals Blue",
+          "provider_team_ids": [
+            "2100",
+            "2103"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 9D Navy",
+          "home": "Junior Reds Athletic",
+          "away": "Erith Town Selkent",
+          "provider_team_ids": [
+            "319",
+            "338"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 9D Navy",
+          "home": "Shooters Hill AFC Valiants",
+          "away": "Shooters Hill AFC Gunners",
+          "provider_team_ids": [
+            "972",
+            "968"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 9D Navy",
+          "home": "Welling Sport",
+          "away": "Junior Reds Sabres",
+          "provider_team_ids": [
+            "108",
+            "139"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 9D Silver",
+          "home": "ABC CFC Community",
+          "away": "Deptford United",
+          "provider_team_ids": [
+            "2048",
+            "944"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 9D Silver",
+          "home": "Blackheath Rhinos Grey",
+          "away": "Baldon Sports Tigers",
+          "provider_team_ids": [
+            "2236",
+            "2152"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 9D Silver",
+          "home": "Blackheath Village",
+          "away": "Lewisham Borough Cobras",
+          "provider_team_ids": [
+            "1055",
+            "287"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 9D Silver",
+          "home": "S.E. Eagles FC",
+          "away": "Gipsy Hill FC Whites",
+          "provider_team_ids": [
+            "471",
+            "840"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 9D Silver",
+          "home": "Vikings FC Blue",
+          "away": "Palace Knights White",
+          "provider_team_ids": [
+            "2131",
+            "797"
+          ]
         }
       ],
       "fixture_parse_status": "verified_multiweek_fixture_rows_v2",
       "fixture_week_ids": [
         3,
-        4
+        4,
+        5
       ],
       "standings": null,
       "published_results": null,
@@ -4130,12 +5342,1103 @@
             "884",
             "166"
           ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U10 Friendly",
+          "home": "Gipsy Hill FC Whites",
+          "away": "Shooters Hill AFC Vikings",
+          "provider_team_ids": [
+            "841",
+            "974"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U10 Friendly",
+          "home": "Samuel Montagu Green",
+          "away": "Falconwood FC Green",
+          "provider_team_ids": [
+            "313",
+            "2101"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U10 Friendly",
+          "home": "ST Sports FC City",
+          "away": "Next Level FC Blacks",
+          "provider_team_ids": [
+            "7",
+            "956"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U10 Selkent Cup Two - Round 2",
+          "home": "AFC Gravesend Hearts",
+          "away": "Chislehurst Wanderers",
+          "provider_team_ids": [
+            "62",
+            "414"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U10 Selkent Cup Two - Round 2",
+          "home": "AFC Green Court Knights",
+          "away": "Castle Hill United FC",
+          "provider_team_ids": [
+            "582",
+            "396"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U10 Selkent Cup Two - Round 2",
+          "home": "AFC Unity Blue",
+          "away": "Erith Town Red",
+          "provider_team_ids": [
+            "2092",
+            "339"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U10 Selkent Cup Two - Round 2",
+          "home": "Athenlay",
+          "away": "Dulwich Village Red",
+          "provider_team_ids": [
+            "455",
+            "233"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U10 Selkent Cup Two - Round 2",
+          "home": "Baldon Sports Panthers",
+          "away": "Welling United Green",
+          "provider_team_ids": [
+            "906",
+            "884"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U10 Selkent Cup Two - Round 2",
+          "home": "Ballers SE White",
+          "away": "Woolwich Starlings FC Blue",
+          "provider_team_ids": [
+            "1030",
+            "816"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U10 Selkent Cup Two - Round 2",
+          "home": "Beacons White",
+          "away": "Junior Reds Sabres",
+          "provider_team_ids": [
+            "929",
+            "182"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U10 Selkent Cup Two - Round 2",
+          "home": "Blackheath Rhinos Black",
+          "away": "Wildcats FS Club Lions",
+          "provider_team_ids": [
+            "850",
+            "240"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U10 Selkent Cup Two - Round 2",
+          "home": "Blackheath Rhinos Grey",
+          "away": "Swanscombe Tigers Yellow",
+          "provider_team_ids": [
+            "852",
+            "715"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U10 Selkent Cup Two - Round 2",
+          "home": "Blackheath Rhinos White",
+          "away": "AFC Unity Blue",
+          "provider_team_ids": [
+            "851",
+            "2092"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U10 Selkent Cup Two - Round 2",
+          "home": "Blackheath Rhinos Yellow",
+          "away": "ST Sports FC Blue",
+          "provider_team_ids": [
+            "2237",
+            "8"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U10 Selkent Cup Two - Round 2",
+          "home": "Blackheath Village White",
+          "away": "KSI Coaching FC Navy",
+          "provider_team_ids": [
+            "1054",
+            "170"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U10 Selkent Cup Two - Round 2",
+          "home": "Boca FC",
+          "away": "Mighty Warriors FC Eagles",
+          "provider_team_ids": [
+            "199",
+            "997"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U10 Selkent Cup Two - Round 2",
+          "home": "Castle Hill United FC",
+          "away": "Wildcats FS Club Tigers",
+          "provider_team_ids": [
+            "396",
+            "241"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U10 Selkent Cup Two - Round 2",
+          "home": "Chislehurst Wanderers",
+          "away": "TBD",
+          "provider_team_ids": [
+            "414"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U10 Selkent Cup Two - Round 2",
+          "home": "Cray Wanderers Cobras",
+          "away": "Welling United orange",
+          "provider_team_ids": [
+            "601",
+            "885"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U10 Selkent Cup Two - Round 2",
+          "home": "Cray Wanderers Lions",
+          "away": "Sutton Athletic Stripes",
+          "provider_team_ids": [
+            "602",
+            "778"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U10 Selkent Cup Two - Round 2",
+          "home": "Crayford Arrows Tigers",
+          "away": "Sporting Club Thamesmead Yellow",
+          "provider_team_ids": [
+            "117",
+            "214"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U10 Selkent Cup Two - Round 2",
+          "home": "Dartford FC Black",
+          "away": "Junior Reds Valiants",
+          "provider_team_ids": [
+            "364",
+            "261"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U10 Selkent Cup Two - Round 2",
+          "home": "Dartford Royals blue",
+          "away": "Junior Reds Knights",
+          "provider_team_ids": [
+            "327",
+            "316"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U10 Selkent Cup Two - Round 2",
+          "home": "Deptford United",
+          "away": "Hayden Youth Eagles",
+          "provider_team_ids": [
+            "348",
+            "429"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U10 Selkent Cup Two - Round 2",
+          "home": "Dulwich Hamlet JFC Navy",
+          "away": "Crayford Arrows Tigers",
+          "provider_team_ids": [
+            "703",
+            "117"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U10 Selkent Cup Two - Round 2",
+          "home": "Dulwich Village Red",
+          "away": "Omarie Youth",
+          "provider_team_ids": [
+            "233",
+            "1047"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U10 Selkent Cup Two - Round 2",
+          "home": "Dulwich Village White",
+          "away": "Hillyfielders Hawks",
+          "provider_team_ids": [
+            "230",
+            "634"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U10 Selkent Cup Two - Round 2",
+          "home": "Erith Town Red",
+          "away": "Blackheath Rhinos White",
+          "provider_team_ids": [
+            "339",
+            "851"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U10 Selkent Cup Two - Round 2",
+          "home": "Fleetdown United black",
+          "away": "Cray Wanderers Cobras",
+          "provider_team_ids": [
+            "684",
+            "601"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U10 Selkent Cup Two - Round 2",
+          "home": "Fleetdown United orange",
+          "away": "Long Lane Tigers",
+          "provider_team_ids": [
+            "698",
+            "383"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U10 Selkent Cup Two - Round 2",
+          "home": "Foots Cray Lions Black",
+          "away": "Newpark Football Club",
+          "provider_team_ids": [
+            "156",
+            "559"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U10 Selkent Cup Two - Round 2",
+          "home": "Foots Cray Lions Yellow",
+          "away": "Vikings FC",
+          "provider_team_ids": [
+            "164",
+            "555"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U10 Selkent Cup Two - Round 2",
+          "home": "Greenwich Peninsula Lions",
+          "away": "Russellers Yellows",
+          "provider_team_ids": [
+            "731",
+            "490"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U10 Selkent Cup Two - Round 2",
+          "home": "Greenwich Peninsula Tigers",
+          "away": "TBD",
+          "provider_team_ids": [
+            "2110"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U10 Selkent Cup Two - Round 2",
+          "home": "Hayden Youth Eagles",
+          "away": "Sporting Club Thamesmead Black",
+          "provider_team_ids": [
+            "429",
+            "216"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U10 Selkent Cup Two - Round 2",
+          "home": "Hillyfielders Hawks",
+          "away": "Slade Green Knights",
+          "provider_team_ids": [
+            "634",
+            "95"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U10 Selkent Cup Two - Round 2",
+          "home": "Junior Reds Athletic",
+          "away": "Dartford Royals blue",
+          "provider_team_ids": [
+            "138",
+            "327"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U10 Selkent Cup Two - Round 2",
+          "home": "Junior Reds Knights",
+          "away": "Junior Reds Athletic",
+          "provider_team_ids": [
+            "316",
+            "138"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U10 Selkent Cup Two - Round 2",
+          "home": "Junior Reds Sabres",
+          "away": "Russellers Gold",
+          "provider_team_ids": [
+            "182",
+            "302"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U10 Selkent Cup Two - Round 2",
+          "home": "Junior Reds Spartans",
+          "away": "Blackheath Village White",
+          "provider_team_ids": [
+            "31",
+            "1054"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U10 Selkent Cup Two - Round 2",
+          "home": "Junior Reds Valiants",
+          "away": "The Bosco FC Dons",
+          "provider_team_ids": [
+            "261",
+            "404"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U10 Selkent Cup Two - Round 2",
+          "home": "Junior Reds Warriors",
+          "away": "Foots Cray Lions Yellow",
+          "provider_team_ids": [
+            "2136",
+            "164"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U10 Selkent Cup Two - Round 2",
+          "home": "Kidbrooke Kings Kidbrooke Youth",
+          "away": "Boca FC",
+          "provider_team_ids": [
+            "438",
+            "199"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U10 Selkent Cup Two - Round 2",
+          "home": "KSI Coaching FC Navy",
+          "away": "Junior Reds Spartans",
+          "provider_team_ids": [
+            "170",
+            "31"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U10 Selkent Cup Two - Round 2",
+          "home": "Lewisham Project Whites",
+          "away": "Greenwich Peninsula Tigers",
+          "provider_team_ids": [
+            "205",
+            "2110"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U10 Selkent Cup Two - Round 2",
+          "home": "London Legends Blue",
+          "away": "Baldon Sports Panthers",
+          "provider_team_ids": [
+            "1019",
+            "906"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U10 Selkent Cup Two - Round 2",
+          "home": "Long Lane Tigers",
+          "away": "Sutton Athletic Greens",
+          "provider_team_ids": [
+            "383",
+            "774"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U10 Selkent Cup Two - Round 2",
+          "home": "Mayow Park Rangers FC",
+          "away": "Stansfeld (Fratres) FC",
+          "provider_team_ids": [
+            "496",
+            "2068"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U10 Selkent Cup Two - Round 2",
+          "home": "Mighty Warriors FC Eagles",
+          "away": "Kidbrooke Kings Kidbrooke Youth",
+          "provider_team_ids": [
+            "997",
+            "438"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U10 Selkent Cup Two - Round 2",
+          "home": "Newpark Football Club",
+          "away": "TBD",
+          "provider_team_ids": [
+            "559"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U10 Selkent Cup Two - Round 2",
+          "home": "Northumberland Heath",
+          "away": "Blackheath Rhinos Grey",
+          "provider_team_ids": [
+            "160",
+            "852"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U10 Selkent Cup Two - Round 2",
+          "home": "Omarie Youth",
+          "away": "Athenlay",
+          "provider_team_ids": [
+            "1047",
+            "455"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U10 Selkent Cup Two - Round 2",
+          "home": "Palace Knights Blue",
+          "away": "Blackheath Rhinos Black",
+          "provider_team_ids": [
+            "795",
+            "850"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U10 Selkent Cup Two - Round 2",
+          "home": "Parkwood Rangers Blue",
+          "away": "Punjab United",
+          "provider_team_ids": [
+            "146",
+            "22"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U10 Selkent Cup Two - Round 2",
+          "home": "Punjab United",
+          "away": "ShooterBallers FC",
+          "provider_team_ids": [
+            "22",
+            "984"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U10 Selkent Cup Two - Round 2",
+          "home": "Russellers Gold",
+          "away": "Beacons White",
+          "provider_team_ids": [
+            "302",
+            "929"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U10 Selkent Cup Two - Round 2",
+          "home": "Russellers Yellows",
+          "away": "Welling Sport",
+          "provider_team_ids": [
+            "490",
+            "107"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U10 Selkent Cup Two - Round 2",
+          "home": "ShooterBallers FC",
+          "away": "Parkwood Rangers Blue",
+          "provider_team_ids": [
+            "984",
+            "146"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U10 Selkent Cup Two - Round 2",
+          "home": "Slade Green Knights",
+          "away": "Dulwich Village White",
+          "provider_team_ids": [
+            "95",
+            "230"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U10 Selkent Cup Two - Round 2",
+          "home": "Sporting Club Thamesmead Black",
+          "away": "Deptford United",
+          "provider_team_ids": [
+            "216",
+            "348"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U10 Selkent Cup Two - Round 2",
+          "home": "Sporting Club Thamesmead Blue",
+          "away": "Teviot Rangers Red",
+          "provider_team_ids": [
+            "222",
+            "756"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U10 Selkent Cup Two - Round 2",
+          "home": "Sporting Club Thamesmead Yellow",
+          "away": "Dulwich Hamlet JFC Navy",
+          "provider_team_ids": [
+            "214",
+            "703"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U10 Selkent Cup Two - Round 2",
+          "home": "ST Sports FC Blue",
+          "away": "TBD",
+          "provider_team_ids": [
+            "8"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U10 Selkent Cup Two - Round 2",
+          "home": "Stansfeld (Fratres) FC",
+          "away": "TBD",
+          "provider_team_ids": [
+            "2068"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U10 Selkent Cup Two - Round 2",
+          "home": "Sutton Athletic Greens",
+          "away": "Fleetdown United orange",
+          "provider_team_ids": [
+            "774",
+            "698"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U10 Selkent Cup Two - Round 2",
+          "home": "Sutton Athletic Stripes",
+          "away": "Thamesmead Tigers FC",
+          "provider_team_ids": [
+            "778",
+            "509"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U10 Selkent Cup Two - Round 2",
+          "home": "Swanscombe Tigers Yellow",
+          "away": "Northumberland Heath",
+          "provider_team_ids": [
+            "715",
+            "160"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U10 Selkent Cup Two - Round 2",
+          "home": "TBD",
+          "away": "AFC Gravesend Hearts",
+          "provider_team_ids": [
+            "62"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U10 Selkent Cup Two - Round 2",
+          "home": "TBD",
+          "away": "Blackheath Rhinos Yellow",
+          "provider_team_ids": [
+            "2237"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U10 Selkent Cup Two - Round 2",
+          "home": "TBD",
+          "away": "Foots Cray Lions Black",
+          "provider_team_ids": [
+            "156"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U10 Selkent Cup Two - Round 2",
+          "home": "TBD",
+          "away": "Lewisham Project Whites",
+          "provider_team_ids": [
+            "205"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U10 Selkent Cup Two - Round 2",
+          "home": "TBD",
+          "away": "Mayow Park Rangers FC",
+          "provider_team_ids": [
+            "496"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U10 Selkent Cup Two - Round 2",
+          "home": "Teviot Rangers Red",
+          "away": "Welling United white",
+          "provider_team_ids": [
+            "756",
+            "887"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U10 Selkent Cup Two - Round 2",
+          "home": "Thamesmead Tigers FC",
+          "away": "Cray Wanderers Lions",
+          "provider_team_ids": [
+            "509",
+            "602"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U10 Selkent Cup Two - Round 2",
+          "home": "The Bosco FC Dons",
+          "away": "Dartford FC Black",
+          "provider_team_ids": [
+            "404",
+            "364"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U10 Selkent Cup Two - Round 2",
+          "home": "Vikings FC",
+          "away": "Junior Reds Warriors",
+          "provider_team_ids": [
+            "555",
+            "2136"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U10 Selkent Cup Two - Round 2",
+          "home": "Welling Sport",
+          "away": "Greenwich Peninsula Lions",
+          "provider_team_ids": [
+            "107",
+            "731"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U10 Selkent Cup Two - Round 2",
+          "home": "Welling United Green",
+          "away": "London Legends Blue",
+          "provider_team_ids": [
+            "884",
+            "1019"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U10 Selkent Cup Two - Round 2",
+          "home": "Welling United orange",
+          "away": "Fleetdown United black",
+          "provider_team_ids": [
+            "885",
+            "684"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U10 Selkent Cup Two - Round 2",
+          "home": "Welling United Purple",
+          "away": "Ballers SE White",
+          "provider_team_ids": [
+            "886",
+            "1030"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U10 Selkent Cup Two - Round 2",
+          "home": "Welling United white",
+          "away": "Sporting Club Thamesmead Blue",
+          "provider_team_ids": [
+            "887",
+            "222"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U10 Selkent Cup Two - Round 2",
+          "home": "Wildcats FS Club Lions",
+          "away": "Palace Knights Blue",
+          "provider_team_ids": [
+            "240",
+            "795"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U10 Selkent Cup Two - Round 2",
+          "home": "Wildcats FS Club Tigers",
+          "away": "AFC Green Court Knights",
+          "provider_team_ids": [
+            "241",
+            "582"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U10 Selkent Cup Two - Round 2",
+          "home": "Woolwich Starlings FC Blue",
+          "away": "Welling United Purple",
+          "provider_team_ids": [
+            "816",
+            "886"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 10A Navy",
+          "home": "Baldon Sports Lions",
+          "away": "Next Level FC Reds",
+          "provider_team_ids": [
+            "907",
+            "441"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 10A Navy",
+          "home": "Corinthian FC",
+          "away": "Dartford FC White",
+          "provider_team_ids": [
+            "23",
+            "365"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 10A Navy",
+          "home": "Ebbsfleet United Red",
+          "away": "Cray Wanderers Eagles",
+          "provider_team_ids": [
+            "659",
+            "605"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 10A Navy",
+          "home": "Metrogas FC Lions",
+          "away": "Cray Wanderers Sharks",
+          "provider_team_ids": [
+            "1088",
+            "604"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 10A Silver",
+          "home": "AFC Lewisham Blue",
+          "away": "Cray Wanderers Mavericks",
+          "provider_team_ids": [
+            "2148",
+            "603"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 10A Silver",
+          "home": "Dynamo Youth Blue",
+          "away": "Dulwich Village Black",
+          "provider_team_ids": [
+            "536",
+            "231"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 10A Silver",
+          "home": "Regans FC Black",
+          "away": "Samuel Montagu Yellow",
+          "provider_team_ids": [
+            "453",
+            "163"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 10A Silver",
+          "home": "Russellers Blacks",
+          "away": "Dynamo Youth White",
+          "provider_team_ids": [
+            "300",
+            "541"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 10A Silver",
+          "home": "Sporting Club Vista Blue",
+          "away": "London Legends Gold",
+          "provider_team_ids": [
+            "724",
+            "1018"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 10B Navy",
+          "home": "Ballon Dor FC Blacks",
+          "away": "Erith & Belvedere Selkent",
+          "provider_team_ids": [
+            "322",
+            "484"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 10B Navy",
+          "home": "Dartford FC Yellow",
+          "away": "Metrogas FC Red",
+          "provider_team_ids": [
+            "363",
+            "822"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 10B Navy",
+          "home": "Longfield Tigers FC",
+          "away": "Erith Town Black",
+          "provider_team_ids": [
+            "2062",
+            "374"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 10B Navy",
+          "home": "Parkwood Rangers Titans",
+          "away": "Cray Wanderers Tigers",
+          "provider_team_ids": [
+            "147",
+            "619"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 10B Navy",
+          "home": "Sutton Athletic Whites",
+          "away": "Metrogas FC Blue",
+          "provider_team_ids": [
+            "777",
+            "823"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 10B Silver",
+          "home": "AFC Lewisham White",
+          "away": "Kekoa Navy",
+          "provider_team_ids": [
+            "2240",
+            "987"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 10B Silver",
+          "home": "Ballers SE Blue",
+          "away": "Lewisham Project Gold",
+          "provider_team_ids": [
+            "69",
+            "2122"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 10B Silver",
+          "home": "Ballers SE Yellow",
+          "away": "Old Roan FC White",
+          "provider_team_ids": [
+            "70",
+            "810"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 10B Silver",
+          "home": "Dulwich Village Orange",
+          "away": "Dulwich Hamlet JFC Pink",
+          "provider_team_ids": [
+            "232",
+            "517"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 10B Silver",
+          "home": "London Legends white",
+          "away": "Fisher Youth",
+          "provider_team_ids": [
+            "1020",
+            "948"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 10B Silver",
+          "home": "Metrogas FC Black",
+          "away": "London Kickers FC Red",
+          "provider_team_ids": [
+            "824",
+            "2113"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 10C Orange",
+          "home": "Shooters Hill AFC Royals",
+          "away": "Welling United Blue",
+          "provider_team_ids": [
+            "973",
+            "883"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 10C Orange",
+          "home": "Welling United Red",
+          "away": "Eversley Rangers",
+          "provider_team_ids": [
+            "889",
+            "677"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 10C Silver",
+          "home": "Blue Stars Elite FC",
+          "away": "Palace Knights Yellow",
+          "provider_team_ids": [
+            "834",
+            "793"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 10D Navy",
+          "home": "Punjab United Red",
+          "away": "Swanscombe Tigers Black",
+          "provider_team_ids": [
+            "576",
+            "716"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 10D Silver",
+          "home": "Junior Reds Titans",
+          "away": "Braves Sporting Club",
+          "provider_team_ids": [
+            "2080",
+            "784"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 10D Silver",
+          "home": "Wildcats FS Club Jaguars",
+          "away": "Lewisham Youth",
+          "provider_team_ids": [
+            "1083",
+            "56"
+          ]
         }
       ],
       "fixture_parse_status": "verified_multiweek_fixture_rows_v2",
       "fixture_week_ids": [
         3,
-        4
+        4,
+        5
       ],
       "standings": null,
       "published_results": null,
@@ -4864,12 +7167,363 @@
             "439",
             "171"
           ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U11 Friendly",
+          "home": "Beacons",
+          "away": "L.I.C. FC LIC Stars",
+          "provider_team_ids": [
+            "2088",
+            "44"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 11B",
+          "home": "Ballers SE Blue",
+          "away": "On Target F.C.",
+          "provider_team_ids": [
+            "71",
+            "403"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 11B",
+          "home": "Erith Town Yellow",
+          "away": "Lewisham Borough Vipers",
+          "provider_team_ids": [
+            "699",
+            "286"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 11B",
+          "home": "Kekoa Red",
+          "away": "ST Sports FC United",
+          "provider_team_ids": [
+            "993",
+            "6"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 11B",
+          "home": "KSI Coaching FC White",
+          "away": "Chislehurst Wanderers Lions",
+          "provider_team_ids": [
+            "2108",
+            "415"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 11B",
+          "home": "Metrogas FC Blue",
+          "away": "Ballers SE Yellow",
+          "provider_team_ids": [
+            "819",
+            "72"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 11C Navy",
+          "home": "AFC Gravesend Hearts",
+          "away": "Crayford Arrows White",
+          "provider_team_ids": [
+            "64",
+            "122"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 11C Navy",
+          "home": "Parkwood Rangers Pumas",
+          "away": "Baldon Sports Tigers",
+          "provider_team_ids": [
+            "148",
+            "922"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 11C Navy",
+          "home": "South Darenth Whites",
+          "away": "Riverview FC Rifles",
+          "provider_team_ids": [
+            "191",
+            "350"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 11C Navy",
+          "home": "ST Sports FC Blue",
+          "away": "AFC Unity",
+          "provider_team_ids": [
+            "9",
+            "256"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 11C Navy",
+          "home": "Total FC",
+          "away": "Dartford Royals yellow",
+          "provider_team_ids": [
+            "177",
+            "329"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 11C Silver",
+          "home": "Blackheath Rhinos White",
+          "away": "Cray Valley (PM) FC",
+          "provider_team_ids": [
+            "854",
+            "377"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 11C Silver",
+          "home": "Blackheath Village White",
+          "away": "Blackheath Village Blue",
+          "provider_team_ids": [
+            "81",
+            "79"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 11C Silver",
+          "home": "Deptford United",
+          "away": "Blackheath Rhinos Black",
+          "provider_team_ids": [
+            "942",
+            "853"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 11C Silver",
+          "home": "Mighty Warriors FC Galaxy",
+          "away": "Greenwich Peninsula Pumas",
+          "provider_team_ids": [
+            "998",
+            "2082"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 11C Silver",
+          "home": "Regans FC Black",
+          "away": "Teviot Rangers White",
+          "provider_team_ids": [
+            "2128",
+            "759"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 11D Navy",
+          "home": "AFC Green Court Dukes",
+          "away": "Guru Nanak Youth Yellow",
+          "provider_team_ids": [
+            "586",
+            "502"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 11D Navy",
+          "home": "Crayford Arrows Greens",
+          "away": "Punjab United",
+          "provider_team_ids": [
+            "2106",
+            "24"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 11D Navy",
+          "home": "Slade Green Knights",
+          "away": "Phoenix Sports Tigers",
+          "provider_team_ids": [
+            "97",
+            "773"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 11D Navy",
+          "home": "Sutton Athletic Greens",
+          "away": "AFC Green Court Knights",
+          "provider_team_ids": [
+            "779",
+            "584"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 11D Navy",
+          "home": "Welling United Claret",
+          "away": "Dartford Royals blue",
+          "provider_team_ids": [
+            "891",
+            "328"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 11D Orange",
+          "home": "AFC Gravesend Diamonds",
+          "away": "Swanley Rangers Black",
+          "provider_team_ids": [
+            "2141",
+            "787"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 11D Orange",
+          "home": "Chislehurst Wanderers Tigers",
+          "away": "Erith & Belvedere Selkent",
+          "provider_team_ids": [
+            "2119",
+            "483"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 11D Orange",
+          "home": "Junior Reds Warriors",
+          "away": "Welling Sport",
+          "provider_team_ids": [
+            "264",
+            "106"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 11D Orange",
+          "home": "ShooterBallers FC",
+          "away": "Cray Wanderers Lionesses",
+          "provider_team_ids": [
+            "986",
+            "606"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 11D Orange",
+          "home": "Sutton Athletic Whites",
+          "away": "Erith Town Red",
+          "provider_team_ids": [
+            "776",
+            "340"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 11D Red",
+          "home": "Abbeymead FC",
+          "away": "Teviot Rangers Red",
+          "provider_team_ids": [
+            "104",
+            "752"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 11D Red",
+          "home": "Baldon Sports Lions",
+          "away": "Sporting Club Thamesmead Black",
+          "provider_team_ids": [
+            "2140",
+            "221"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 11D Red",
+          "home": "Junior Reds Athletic",
+          "away": "S.E. Eagles FC",
+          "provider_team_ids": [
+            "183",
+            "473"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 11D Red",
+          "home": "Red Devils",
+          "away": "Woolwich Wanderers FC",
+          "provider_team_ids": [
+            "133",
+            "2065"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 11D Red",
+          "home": "Shooters Hill AFC Jaguars",
+          "away": "Junior Reds Sabres",
+          "provider_team_ids": [
+            "975",
+            "317"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 11D Silver",
+          "home": "Bermondsey Utd FC",
+          "away": "Kidbrooke Kings Kidbrooke Youth",
+          "provider_team_ids": [
+            "2083",
+            "439"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 11D Silver",
+          "home": "KSI Coaching FC Navy",
+          "away": "Junior Reds Titans",
+          "provider_team_ids": [
+            "171",
+            "54"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 11D Silver",
+          "home": "Long Lane Tigers",
+          "away": "Blackheath Rhinos Grey",
+          "provider_team_ids": [
+            "386",
+            "855"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 11D Silver",
+          "home": "The Bosco FC Dons",
+          "away": "Blackheath Rhinos Yellow",
+          "provider_team_ids": [
+            "702",
+            "2238"
+          ]
         }
       ],
       "fixture_parse_status": "verified_multiweek_fixture_rows_v2",
       "fixture_week_ids": [
         3,
-        4
+        4,
+        5
       ],
       "standings": null,
       "published_results": null,
@@ -6198,12 +8852,743 @@
             "785",
             "1065"
           ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U12 Friendly",
+          "home": "Fleetdown United black",
+          "away": "Old Roan FC Gold",
+          "provider_team_ids": [
+            "1001",
+            "812"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U12 Friendly",
+          "home": "Hillyfielders Falcons",
+          "away": "Eversley Rangers",
+          "provider_team_ids": [
+            "637",
+            "679"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U12 Friendly",
+          "home": "Istead United Colts",
+          "away": "Teviot Rangers Gold",
+          "provider_team_ids": [
+            "692",
+            "750"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U12 Friendly",
+          "home": "Long Lane Lions",
+          "away": "Welling United Silver",
+          "provider_team_ids": [
+            "375",
+            "2126"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U12 London Cup",
+          "home": "Fisher Youth",
+          "away": "Winner of Tie 30 (Non-Selkent)",
+          "provider_team_ids": [
+            "292",
+            "2191"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U12 London Cup",
+          "home": "Regans FC Black",
+          "away": "Winner of Tie 26 (Non-Selkent)",
+          "provider_team_ids": [
+            "456",
+            "2196"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U12 London Cup",
+          "home": "Sports Attack (Non-Selkent)",
+          "away": "Winner of Tie 27 (Non-Selkent)",
+          "provider_team_ids": [
+            "2201",
+            "2202"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U12 London Cup",
+          "home": "Winer of Tie 3 (Non-Selkent)",
+          "away": "Winner of Tie 29 (Non-Selkent)",
+          "provider_team_ids": [
+            "2203",
+            "2204"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U12 London Cup",
+          "home": "Winner of Tie 10 (Non-Selkent)",
+          "away": "Balham Ballers (Non-Selkent)",
+          "provider_team_ids": [
+            "2207",
+            "2208"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U12 London Cup",
+          "home": "Winner of Tie 14 (Non-Selkent)",
+          "away": "London Legends Gold",
+          "provider_team_ids": [
+            "2192",
+            "1023"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U12 London Cup",
+          "home": "Winner of Tie 16 (Non-Selkent)",
+          "away": "Winner of Tie 32 (Non-Selkent)",
+          "provider_team_ids": [
+            "2199",
+            "2200"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U12 London Cup",
+          "home": "Winner of Tie 22 (Non-Selkent)",
+          "away": "Cray Valley (PM) FC Black",
+          "provider_team_ids": [
+            "2188",
+            "321"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U12 London Cup",
+          "home": "Winner of Tie 24 (Non-Selkent)",
+          "away": "Winner of Tie 15 (Non-Selkent)",
+          "provider_team_ids": [
+            "2205",
+            "2206"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U12 London Cup",
+          "home": "Winner of Tie 31 (Non-Selkent)",
+          "away": "Winner of Tie 28 (Non-Selkent)",
+          "provider_team_ids": [
+            "2194",
+            "2195"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U12 London Cup",
+          "home": "Winner of Tie 36 (Non-Selkent)",
+          "away": "Winner of Tie 17 (Non-Selkent)",
+          "provider_team_ids": [
+            "2197",
+            "2198"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U12 London Cup",
+          "home": "Winner of Tie 38 (Non-Selkent)",
+          "away": "Iron Raymond FC (Non-Selkent)",
+          "provider_team_ids": [
+            "2209",
+            "2210"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U12 London Cup",
+          "home": "Winner of Tie 6 (Non-Selkent)",
+          "away": "Winner of Tie 9 (Non-Selkent)",
+          "provider_team_ids": [
+            "2189",
+            "2190"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 12A Navy",
+          "home": "Cray Wanderers Panthers",
+          "away": "Ballon Dor FC",
+          "provider_team_ids": [
+            "610",
+            "811"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 12A Navy",
+          "home": "Dartford FC Black",
+          "away": "Swanscombe Tigers Yellow",
+          "provider_team_ids": [
+            "487",
+            "719"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 12A Navy",
+          "home": "Dartford FC White",
+          "away": "Welling United Navy",
+          "provider_team_ids": [
+            "486",
+            "953"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 12A Navy",
+          "home": "Hayden Youth Lions",
+          "away": "Bexley Ballers Football Club",
+          "provider_team_ids": [
+            "1057",
+            "42"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 12A Navy",
+          "home": "Welling United black",
+          "away": "Ebbsfleet United Red",
+          "provider_team_ids": [
+            "894",
+            "667"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 12A Silver",
+          "home": "Dynamo Youth Silver",
+          "away": "SE Dons Football Club",
+          "provider_team_ids": [
+            "537",
+            "527"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 12A Silver",
+          "home": "Eagles & Stars FC",
+          "away": "Dulwich Village Black",
+          "provider_team_ids": [
+            "686",
+            "237"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 12A Silver",
+          "home": "Lewisham Project Gold",
+          "away": "Metrogas FC Red",
+          "provider_team_ids": [
+            "208",
+            "794"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 12B Navy",
+          "home": "Crayford Arrows Red",
+          "away": "Parkwood Rangers Titans",
+          "provider_team_ids": [
+            "124",
+            "150"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 12B Navy",
+          "home": "Ebbsfleet United Black",
+          "away": "Cobham Colts FC",
+          "provider_team_ids": [
+            "666",
+            "2057"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 12B Navy",
+          "home": "Erith Town Black",
+          "away": "ST Sports FC Blue",
+          "provider_team_ids": [
+            "337",
+            "3"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 12B Navy",
+          "home": "South Darenth Purples",
+          "away": "AFC Unity",
+          "provider_team_ids": [
+            "185",
+            "257"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 12B Navy",
+          "home": "Sutton Athletic Whites",
+          "away": "Hayden Youth Tigers",
+          "provider_team_ids": [
+            "694",
+            "1058"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 12B Orange",
+          "home": "AFC Lewisham Blue",
+          "away": "Cray Wanderers Cobras",
+          "provider_team_ids": [
+            "252",
+            "612"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 12B Orange",
+          "home": "Foots Cray Lions Yellow",
+          "away": "On Target F.C. Red",
+          "provider_team_ids": [
+            "65",
+            "405"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 12B Orange",
+          "home": "Hillyfielders Hawks",
+          "away": "Vikings FC Red",
+          "provider_team_ids": [
+            "636",
+            "556"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 12B Orange",
+          "home": "Metrogas FC White",
+          "away": "Erith & Belvedere Selkent",
+          "provider_team_ids": [
+            "792",
+            "481"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 12B Orange",
+          "home": "Sutton Athletic Greens",
+          "away": "Cray Wanderers Wolves",
+          "provider_team_ids": [
+            "695",
+            "609"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 12B Silver",
+          "home": "Dulwich Village Orange",
+          "away": "Greenwich Peninsula Lions",
+          "provider_team_ids": [
+            "238",
+            "732"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 12B Silver",
+          "home": "London Legends red",
+          "away": "Dulwich Village White",
+          "provider_team_ids": [
+            "1024",
+            "239"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 12B Silver",
+          "home": "Russellers Whites",
+          "away": "Dulwich Hamlet JFC Pink",
+          "provider_team_ids": [
+            "49",
+            "521"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 12B Silver",
+          "home": "Sporting Club Vista",
+          "away": "Athenlay FC",
+          "provider_team_ids": [
+            "725",
+            "458"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 12B Silver",
+          "home": "The Bosco FC Dons",
+          "away": "London Kickers FC Red",
+          "provider_team_ids": [
+            "704",
+            "2060"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 12C Navy",
+          "home": "Castle Hill United FC",
+          "away": "Hayden Youth Robins",
+          "provider_team_ids": [
+            "400",
+            "1073"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 12C Navy",
+          "home": "IEXEL F.C Gold",
+          "away": "AFC Green Court Knights",
+          "provider_team_ids": [
+            "14",
+            "589"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 12C Navy",
+          "home": "Punjab United",
+          "away": "Swanscombe Tigers Stripes",
+          "provider_team_ids": [
+            "25",
+            "717"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 12C Navy",
+          "home": "ST Sports FC Girls Warriors",
+          "away": "ST Sports FC Girls Sabres",
+          "provider_team_ids": [
+            "4",
+            "2"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 12C Navy",
+          "home": "Welling United Blue",
+          "away": "Northumberland Heath",
+          "provider_team_ids": [
+            "2127",
+            "161"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 12C Orange",
+          "home": "Cray Wanderers Piranhas",
+          "away": "Avery Hill Athletic",
+          "provider_team_ids": [
+            "611",
+            "512"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 12C Orange",
+          "home": "Long Lane Jaguars",
+          "away": "Welling United Red",
+          "provider_team_ids": [
+            "378",
+            "895"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 12C Orange",
+          "home": "Red Devils",
+          "away": "Crayford Arrows White",
+          "provider_team_ids": [
+            "134",
+            "125"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 12C Orange",
+          "home": "Shooters Hill AFC Cannons",
+          "away": "Baldon Sports Tigers",
+          "provider_team_ids": [
+            "995",
+            "921"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 12C Orange",
+          "home": "Welling United White",
+          "away": "On Target F.C. Blue",
+          "provider_team_ids": [
+            "898",
+            "1056"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 12C Silver",
+          "home": "Beacons White",
+          "away": "AFC Lewisham Yellow",
+          "provider_team_ids": [
+            "932",
+            "2142"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 12C Silver",
+          "home": "Deptford United Falcons",
+          "away": "Junior Reds Athletic",
+          "provider_team_ids": [
+            "945",
+            "192"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 12C Silver",
+          "home": "Dulwich Hamlet JFC Navy",
+          "away": "Blackheath Rhinos Black",
+          "provider_team_ids": [
+            "520",
+            "856"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 12C Silver",
+          "home": "Junior Reds Sabres",
+          "away": "Greenwich Peninsula Jaguars",
+          "provider_team_ids": [
+            "1061",
+            "733"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 12C Silver",
+          "home": "KSI Coaching FC Navy",
+          "away": "Deptford United Flamingoes",
+          "provider_team_ids": [
+            "173",
+            "946"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 12C Silver",
+          "home": "Mayow Park Rangers FC",
+          "away": "Mighty Warriors FC Jupiter",
+          "provider_team_ids": [
+            "494",
+            "2243"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 12D Navy",
+          "home": "AFC Green Court Dukes",
+          "away": "ST Sports FC City",
+          "provider_team_ids": [
+            "587",
+            "5"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 12D Navy",
+          "home": "Guru Nanak Youth",
+          "away": "South Darenth Whites",
+          "provider_team_ids": [
+            "507",
+            "184"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 12D Navy",
+          "home": "Shooters Hill AFC Archers",
+          "away": "Slade Green Knights Whites",
+          "provider_team_ids": [
+            "976",
+            "99"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 12D Navy",
+          "home": "Shooters Hill AFC Lions",
+          "away": "AFC Unity Blue",
+          "provider_team_ids": [
+            "1060",
+            "258"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 12D Navy",
+          "home": "Slade Green Knights Greens",
+          "away": "Dartford Royals yellow",
+          "provider_team_ids": [
+            "98",
+            "332"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 12D Navy",
+          "home": "Welling United Green",
+          "away": "Cray Wanderers Ambers",
+          "provider_team_ids": [
+            "897",
+            "613"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 12D Orange",
+          "home": "Dartford Royals white",
+          "away": "Erith Town Yellow",
+          "provider_team_ids": [
+            "331",
+            "342"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 12D Orange",
+          "home": "Metrogas FC Blue",
+          "away": "Junior Reds Spartans",
+          "provider_team_ids": [
+            "798",
+            "367"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 12D Orange",
+          "home": "SE Dons Football Club Dragons",
+          "away": "Thamesmead Tigers FC",
+          "provider_team_ids": [
+            "542",
+            "511"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 12D Orange",
+          "home": "South Darenth Blues",
+          "away": "Woolwich Starlings FC",
+          "provider_team_ids": [
+            "2107",
+            "817"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 12D Orange",
+          "home": "Vikings FC yellow",
+          "away": "Eversley Rangers White",
+          "provider_team_ids": [
+            "308",
+            "2084"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 12D Silver",
+          "home": "Beacons Red",
+          "away": "Blackheath Village",
+          "provider_team_ids": [
+            "931",
+            "82"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 12D Silver",
+          "home": "EWD Eagles Youth",
+          "away": "Blackheath Rhinos White",
+          "provider_team_ids": [
+            "721",
+            "857"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 12D Silver",
+          "home": "Gipsy Hill FC Whites",
+          "away": "Athenlay RYE",
+          "provider_team_ids": [
+            "1065",
+            "460"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 12D Silver",
+          "home": "Junior Reds Valiants",
+          "away": "Beacons Black",
+          "provider_team_ids": [
+            "245",
+            "933"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 12D Silver",
+          "home": "Lewisham Project Whites",
+          "away": "Residents FC",
+          "provider_team_ids": [
+            "207",
+            "785"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 12D Silver",
+          "home": "Total FC",
+          "away": "Kekoa",
+          "provider_team_ids": [
+            "180",
+            "992"
+          ]
         }
       ],
       "fixture_parse_status": "verified_multiweek_fixture_rows_v2",
       "fixture_week_ids": [
         3,
-        4
+        4,
+        5
       ],
       "results_format_type": "9",
       "standings": [
@@ -9429,12 +12814,423 @@
             "744",
             "566"
           ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U14 Friendly",
+          "home": "Eversley Rangers White",
+          "away": "Erith Town Black",
+          "provider_team_ids": [
+            "681",
+            "353"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U14 Friendly",
+          "home": "London Blazers FC",
+          "away": "Eversley Rangers Red",
+          "provider_team_ids": [
+            "1",
+            "682"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U14 Friendly",
+          "home": "Teviot Rangers WHITE",
+          "away": "SE Dons Football Club Jaguars",
+          "provider_team_ids": [
+            "743",
+            "529"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U14 Selkent Cup One - Prelim Round",
+          "home": "Fisher Youth Sharks",
+          "away": "Welling United Red",
+          "provider_team_ids": [
+            "297",
+            "1006"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 14 A Navy",
+          "home": "Dartford Royals White",
+          "away": "Ebbsfleet United White",
+          "provider_team_ids": [
+            "546",
+            "660"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 14 A Navy",
+          "home": "Foots Cray Lions",
+          "away": "Bexley Ballers Football Club",
+          "provider_team_ids": [
+            "2133",
+            "43"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 14 A Navy",
+          "home": "Northumberland Heath",
+          "away": "Metrogas FC YELLOW",
+          "provider_team_ids": [
+            "323",
+            "801"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 14 A Navy",
+          "home": "SE Dons Football Club Lions",
+          "away": "Swanscombe Tigers Yellow",
+          "provider_team_ids": [
+            "531",
+            "718"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 14 A Silver",
+          "home": "AFC Lewisham Blue",
+          "away": "Regans FC Black",
+          "provider_team_ids": [
+            "254",
+            "461"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 14 A Silver",
+          "home": "Dulwich Village Yellow",
+          "away": "Red Devils",
+          "provider_team_ids": [
+            "268",
+            "135"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 14 A Silver",
+          "home": "On Target F.C.",
+          "away": "Long Lane Pumas",
+          "provider_team_ids": [
+            "407",
+            "1053"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 14 A Silver",
+          "home": "Rotherhithe FC",
+          "away": "Hillyfielders Hawks",
+          "provider_team_ids": [
+            "35",
+            "647"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 14 B Navy",
+          "home": "Crayford Arrows Black",
+          "away": "Swanscombe Tigers Stripes",
+          "provider_team_ids": [
+            "129",
+            "720"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 14 B Navy",
+          "home": "IEXEL F.C Gold",
+          "away": "Baldon Sports Tigers",
+          "provider_team_ids": [
+            "18",
+            "916"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 14 B Navy",
+          "home": "Phoenix Sports Cobras",
+          "away": "Metrogas FC Black",
+          "provider_team_ids": [
+            "769",
+            "802"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 14 B Navy",
+          "home": "Welling United Blue",
+          "away": "Sutton Athletic Greens",
+          "provider_team_ids": [
+            "954",
+            "436"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 14 B silver",
+          "home": "Blackheath Village Red",
+          "away": "Gipsy Hill FC Whites",
+          "provider_team_ids": [
+            "85",
+            "839"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 14 B silver",
+          "home": "London Legends Gold",
+          "away": "Dulwich Village Red",
+          "provider_team_ids": [
+            "1027",
+            "270"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 14 B silver",
+          "home": "Long Lane Lions",
+          "away": "AFC Lewisham White",
+          "provider_team_ids": [
+            "384",
+            "262"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 14 B silver",
+          "home": "Teviot Rangers Gold",
+          "away": "Athenlay RYE",
+          "provider_team_ids": [
+            "746",
+            "465"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 14C Navy",
+          "home": "AFC Gravesend Hearts",
+          "away": "Fleetdown United",
+          "provider_team_ids": [
+            "63",
+            "1003"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 14C Navy",
+          "home": "Guru Nanak Youth",
+          "away": "Riverview FC Spitfires",
+          "provider_team_ids": [
+            "504",
+            "352"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 14C Navy",
+          "home": "North Kent Wolves FC",
+          "away": "Shooters Hill AFC Lions",
+          "provider_team_ids": [
+            "391",
+            "978"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 14C Navy",
+          "home": "South Darenth Purples",
+          "away": "Parkwood Rangers Wolverines",
+          "provider_team_ids": [
+            "188",
+            "152"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 14C Orange",
+          "home": "Blackheath Village Blue",
+          "away": "Welling United white",
+          "provider_team_ids": [
+            "86",
+            "955"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 14C Orange",
+          "home": "Kent United FC Reds",
+          "away": "Baldon Sports Lions",
+          "provider_team_ids": [
+            "505",
+            "915"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 14C Orange",
+          "home": "Russellers",
+          "away": "SE Dons Football Club",
+          "provider_team_ids": [
+            "299",
+            "1069"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 14C Orange",
+          "home": "Teviot Rangers Silver",
+          "away": "Vikings FC Red",
+          "provider_team_ids": [
+            "745",
+            "2129"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 14C Orange",
+          "home": "Total FC",
+          "away": "Bridon Ropes",
+          "provider_team_ids": [
+            "178",
+            "2052"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 14C Silver",
+          "home": "Dulwich Hamlet JFC",
+          "away": "Athenlay FC",
+          "provider_team_ids": [
+            "524",
+            "464"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 14C Silver",
+          "home": "London Legends Blue",
+          "away": "S.E. Eagles FC",
+          "provider_team_ids": [
+            "1028",
+            "475"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 14C Silver",
+          "home": "Thamesmead Tigers FC",
+          "away": "Hillyfielders Falcons",
+          "provider_team_ids": [
+            "510",
+            "642"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 14C Silver",
+          "home": "The Bosco FC Dons",
+          "away": "Mayow Park Rangers FC White",
+          "provider_team_ids": [
+            "705",
+            "497"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 14D Navy",
+          "home": "AFC Green Court Knights",
+          "away": "Dartford Royals Blue",
+          "provider_team_ids": [
+            "594",
+            "545"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 14D Navy",
+          "home": "Hayden Youth Hurricanes",
+          "away": "Slade Green Knights Whites",
+          "provider_team_ids": [
+            "479",
+            "103"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 14D Navy",
+          "home": "Shooters Hill AFC Cannons",
+          "away": "Junior Reds Sabres",
+          "provider_team_ids": [
+            "979",
+            "29"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 14D Navy",
+          "home": "Welling United Black",
+          "away": "Junior Reds Knights",
+          "provider_team_ids": [
+            "952",
+            "1070"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 14D Silver",
+          "home": "Blackheath Rhinos Black",
+          "away": "Erith Town Red",
+          "provider_team_ids": [
+            "862",
+            "344"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 14D Silver",
+          "home": "Blackheath Rhinos White",
+          "away": "Teviot Rangers RED",
+          "provider_team_ids": [
+            "863",
+            "744"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 14D Silver",
+          "home": "Mayow Park Rangers FC Blue",
+          "away": "Cray Wanderers Lions",
+          "provider_team_ids": [
+            "566",
+            "615"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 14D Silver",
+          "home": "Woolwich Wanderers FC",
+          "away": "KSI Coaching FC Navy",
+          "provider_team_ids": [
+            "2095",
+            "175"
+          ]
         }
       ],
       "fixture_parse_status": "verified_multiweek_fixture_rows_v2",
       "fixture_week_ids": [
         3,
-        4
+        4,
+        5
       ],
       "results_format_type": "11",
       "standings": [
@@ -10096,7 +13892,7 @@
         },
         {
           "division_name": "Under 14C Orange",
-          "updated_at_text": "27/09/26 17:17:55",
+          "updated_at_text": "03/10/26 10:36:32",
           "source_order_authoritative_for_ties": false,
           "source_disclaimer": "Note: Table does not yet take account of rules for determining winner if teams on equal points",
           "rows": [
@@ -11683,12 +15479,353 @@
             "1064",
             "735"
           ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U13 Friendly",
+          "home": "Shooters Hill AFC Vipers",
+          "away": "Greenwich Peninsula Pumas",
+          "provider_team_ids": [
+            "977",
+            "735"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 13A",
+          "home": "Ballon Dor FC",
+          "away": "Lewisham Project Gold",
+          "provider_team_ids": [
+            "813",
+            "209"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 13A",
+          "home": "Bexley Ballers Football Club",
+          "away": "Fleetdown United",
+          "provider_team_ids": [
+            "41",
+            "1002"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 13A",
+          "home": "Next Level FC Whites",
+          "away": "Parkwood Rangers Lions",
+          "provider_team_ids": [
+            "961",
+            "151"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 13A",
+          "home": "Omarie Youth Red",
+          "away": "Eagles & Stars FC",
+          "provider_team_ids": [
+            "1048",
+            "687"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 13A",
+          "home": "Sporting Club Vista",
+          "away": "Next Level FC Black",
+          "provider_team_ids": [
+            "2239",
+            "440"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 13B",
+          "home": "Baldon Sports Pumas",
+          "away": "Fisher Youth Sharks",
+          "provider_team_ids": [
+            "920",
+            "296"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 13B",
+          "home": "Chislehurst Wanderers Lions",
+          "away": "Ballers SE Blue",
+          "provider_team_ids": [
+            "416",
+            "73"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 13B",
+          "home": "Dulwich Hamlet JFC Navy",
+          "away": "Hayden Youth Pumas",
+          "provider_team_ids": [
+            "522",
+            "477"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 13B",
+          "home": "On Target F.C.",
+          "away": "Russellers",
+          "provider_team_ids": [
+            "406",
+            "88"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 13B",
+          "home": "Riverview FC",
+          "away": "Blackheath Rhinos Black",
+          "provider_team_ids": [
+            "351",
+            "858"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 13C Navy",
+          "home": "Blackheath Village Blue",
+          "away": "Hayden Youth Panthers",
+          "provider_team_ids": [
+            "84",
+            "476"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 13C Navy",
+          "home": "Crayford Arrows Black",
+          "away": "Erith Town Red",
+          "provider_team_ids": [
+            "126",
+            "700"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 13C Navy",
+          "home": "Crayford Arrows White",
+          "away": "Foots Cray Lions",
+          "provider_team_ids": [
+            "128",
+            "281"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 13C Navy",
+          "home": "Next Level FC Silvers",
+          "away": "Baldon Sports Hawks",
+          "provider_team_ids": [
+            "959",
+            "918"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 13C Navy",
+          "home": "S.E. Lions FC Blues",
+          "away": "Punjab United",
+          "provider_team_ids": [
+            "442",
+            "26"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 13C Silver",
+          "home": "Ballers SE Yellow",
+          "away": "Blackheath Rhinos Blue",
+          "provider_team_ids": [
+            "74",
+            "859"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 13C Silver",
+          "home": "Blue Stars Elite FC",
+          "away": "L.I.C. FC",
+          "provider_team_ids": [
+            "835",
+            "45"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 13C Silver",
+          "home": "Cray Valley (PM) FC Black",
+          "away": "Palace Knights",
+          "provider_team_ids": [
+            "304",
+            "791"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 13C Silver",
+          "home": "Mighty Warriors FC",
+          "away": "Lewisham Borough VIPERS",
+          "provider_team_ids": [
+            "999",
+            "217"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 13D Navy",
+          "home": "AFC Green Court Dukes",
+          "away": "Sutton Dynamo FC",
+          "provider_team_ids": [
+            "592",
+            "672"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 13D Navy",
+          "home": "Dartford Royals white",
+          "away": "Guru Nanak Youth",
+          "provider_team_ids": [
+            "333",
+            "503"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 13D Navy",
+          "home": "Slade Green Knights Green",
+          "away": "Swanley Rangers White",
+          "provider_team_ids": [
+            "100",
+            "788"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 13D Navy",
+          "home": "Welling United Green",
+          "away": "Dartford Royals yellow",
+          "provider_team_ids": [
+            "943",
+            "334"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 13D Orange",
+          "home": "Eversley Rangers",
+          "away": "Abbeymead FC",
+          "provider_team_ids": [
+            "680",
+            "105"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 13D Orange",
+          "home": "EWD Eagles Youth",
+          "away": "Chislehurst Wanderers Tigers",
+          "provider_team_ids": [
+            "1041",
+            "417"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 13D Orange",
+          "home": "Junior Reds Spartans",
+          "away": "Junior Reds Titans",
+          "provider_team_ids": [
+            "34",
+            "30"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 13D Orange",
+          "home": "S.E. Eagles FC Gold",
+          "away": "Teviot Rangers Yellow",
+          "provider_team_ids": [
+            "474",
+            "747"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 13D Orange",
+          "home": "Total FC",
+          "away": "Cray Valley (PM) FC Green",
+          "provider_team_ids": [
+            "176",
+            "1033"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 13D Silver",
+          "home": "Blackheath Rhinos Grey",
+          "away": "Hillyfielders Falcons",
+          "provider_team_ids": [
+            "860",
+            "649"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 13D Silver",
+          "home": "Braves Sporting Club",
+          "away": "KSI Coaching FC Navy",
+          "provider_team_ids": [
+            "783",
+            "174"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 13D Silver",
+          "home": "S.E. Lions FC Gold",
+          "away": "Beacons White",
+          "provider_team_ids": [
+            "443",
+            "2089"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 13D Silver",
+          "home": "Vikings FC Red",
+          "away": "Dulwich Hamlet JFC Pink",
+          "provider_team_ids": [
+            "2130",
+            "523"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 13D Silver",
+          "home": "Woolwich Wanderers FC",
+          "away": "Gipsy Hill FC Whites",
+          "provider_team_ids": [
+            "2066",
+            "1064"
+          ]
         }
       ],
       "fixture_parse_status": "verified_multiweek_fixture_rows_v2",
       "fixture_week_ids": [
         3,
-        4
+        4,
+        5
       ],
       "results_format_type": "9",
       "standings": [
@@ -13545,12 +17682,303 @@
             "980",
             "1072"
           ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U15 Friendly",
+          "home": "Eversley Rangers",
+          "away": "Mighty Warriors FC Mars",
+          "provider_team_ids": [
+            "683",
+            "1000"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 15A",
+          "home": "Dartford FC White",
+          "away": "Teviot Rangers WHITE",
+          "provider_team_ids": [
+            "2077",
+            "742"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 15A",
+          "home": "Dulwich Village White",
+          "away": "Fleetdown United",
+          "provider_team_ids": [
+            "272",
+            "1004"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 15A",
+          "home": "Ebbsfleet United White",
+          "away": "SE Dons Football Club Tigers",
+          "provider_team_ids": [
+            "661",
+            "618"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 15A",
+          "home": "Omarie Youth Red",
+          "away": "Hillyfielders Falcons",
+          "provider_team_ids": [
+            "1049",
+            "641"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 15A",
+          "home": "Samuel Montagu",
+          "away": "Dulwich Village Orange",
+          "provider_team_ids": [
+            "314",
+            "271"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 15B",
+          "home": "Foots Cray Lions",
+          "away": "Lewisham Borough Cobras",
+          "provider_team_ids": [
+            "282",
+            "215"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 15B",
+          "home": "IEXEL F.C Gold",
+          "away": "Phoenix Sports Panthers",
+          "provider_team_ids": [
+            "19",
+            "768"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 15B",
+          "home": "Junior Reds Knights",
+          "away": "Russellers",
+          "provider_team_ids": [
+            "32",
+            "298"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 15B",
+          "home": "Long Lane Tigers",
+          "away": "Athenlay FC",
+          "provider_team_ids": [
+            "376",
+            "466"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 15B",
+          "home": "Shooters Hill AFC Cannons",
+          "away": "Hillyfielders Hawks",
+          "provider_team_ids": [
+            "994",
+            "639"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 15B",
+          "home": "Teviot Rangers RED",
+          "away": "Bridon Ropes",
+          "provider_team_ids": [
+            "741",
+            "2053"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 15C Navy",
+          "home": "Dartford Royals Blue",
+          "away": "Junior Reds Sabres",
+          "provider_team_ids": [
+            "548",
+            "366"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 15C Navy",
+          "home": "Welling United Black",
+          "away": "Beacons White",
+          "provider_team_ids": [
+            "960",
+            "936"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 15C Navy",
+          "home": "Welling United Red",
+          "away": "Parkwood Rangers United",
+          "provider_team_ids": [
+            "964",
+            "153"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 15C Silver",
+          "home": "Baldon Sports Pumas",
+          "away": "Total FC",
+          "provider_team_ids": [
+            "912",
+            "179"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 15C Silver",
+          "home": "Blue Stars Elite FC Stars",
+          "away": "Dulwich Hamlet JFC",
+          "provider_team_ids": [
+            "714",
+            "525"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 15C Silver",
+          "home": "EWD Eagles Youth",
+          "away": "Dulwich Village Blue",
+          "provider_team_ids": [
+            "652",
+            "275"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 15C Silver",
+          "home": "Welling United orange",
+          "away": "Beacons Red",
+          "provider_team_ids": [
+            "966",
+            "935"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 15D Navy",
+          "home": "AFC Green Court Knights",
+          "away": "AFC Green Court Dukes",
+          "provider_team_ids": [
+            "597",
+            "598"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 15D Navy",
+          "home": "Guru Nanak Youth",
+          "away": "Beacons Blue",
+          "provider_team_ids": [
+            "506",
+            "937"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 15D Navy",
+          "home": "IEXEL F.C Black",
+          "away": "Welling United White",
+          "provider_team_ids": [
+            "20",
+            "963"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 15D Navy",
+          "home": "Sutton Athletic Greens",
+          "away": "Crayford Arrows Cannons",
+          "provider_team_ids": [
+            "433",
+            "131"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 15D Navy",
+          "home": "Swanscombe Tigers Yellows",
+          "away": "Dartford Royals white",
+          "provider_team_ids": [
+            "1012",
+            "549"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 15D Silver",
+          "home": "Beacons Black",
+          "away": "Junior Reds Valiants",
+          "provider_team_ids": [
+            "938",
+            "39"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 15D Silver",
+          "home": "Dulwich Village Red",
+          "away": "Lewisham Youth",
+          "provider_team_ids": [
+            "1072",
+            "58"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 15D Silver",
+          "home": "Greenwich Peninsula Jaguars",
+          "away": "Shooters Hill AFC Romans",
+          "provider_team_ids": [
+            "736",
+            "980"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 15D Silver",
+          "home": "Greenwich Peninsula Lions",
+          "away": "Baldon Sports Lions",
+          "provider_team_ids": [
+            "737",
+            "911"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 15D Silver",
+          "home": "The Bosco FC Dons",
+          "away": "Blackheath Rhinos Black",
+          "provider_team_ids": [
+            "706",
+            "864"
+          ]
         }
       ],
       "fixture_parse_status": "verified_multiweek_fixture_rows_v2",
       "fixture_week_ids": [
         3,
-        4
+        4,
+        5
       ],
       "results_format_type": "11",
       "standings": [
@@ -15169,12 +19597,273 @@
             "499",
             "971"
           ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U16 Friendly",
+          "home": "Lewisham Youth",
+          "away": "Vikings FC Red",
+          "provider_team_ids": [
+            "76",
+            "557"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U16 London Cup",
+          "home": "Cray Wanderers Lions",
+          "away": "Fisher Youth (Non-Selkent)",
+          "provider_team_ids": [
+            "616",
+            "2215"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U16 London Cup",
+          "home": "Dulwich Village KYL (Non-Selkent)",
+          "away": "Ebbsfleet United White",
+          "provider_team_ids": [
+            "2230",
+            "662"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U16 London Cup",
+          "home": "Dulwich Village Orange",
+          "away": "Bredhurst Juniors (Non-Selkent)",
+          "provider_team_ids": [
+            "276",
+            "2231"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U16 London Cup",
+          "home": "Woolwich Wanderers FC",
+          "away": "Baldon Sports Blue",
+          "provider_team_ids": [
+            "2067",
+            "913"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 16A",
+          "home": "Dynamo Youth",
+          "away": "Dartford Royals Blue",
+          "provider_team_ids": [
+            "539",
+            "550"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 16A",
+          "home": "Red Devils",
+          "away": "Athenlay FC",
+          "provider_team_ids": [
+            "137",
+            "467"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 16A",
+          "home": "Welling United Blue",
+          "away": "Falconwood FC Grey",
+          "provider_team_ids": [
+            "981",
+            "872"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 16B Navy",
+          "home": "Belvedere Youth",
+          "away": "Barnehurst FC",
+          "provider_team_ids": [
+            "52",
+            "2049"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 16B Navy",
+          "home": "Dartford FC Black",
+          "away": "Foots Cray Lions",
+          "provider_team_ids": [
+            "489",
+            "210"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 16B Navy",
+          "home": "Falconwood FC White",
+          "away": "Welling United white",
+          "provider_team_ids": [
+            "871",
+            "982"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 16B Navy",
+          "home": "Junior Reds Knights",
+          "away": "Cray Valley (PM) FC Black",
+          "provider_team_ids": [
+            "408",
+            "303"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 16B Navy",
+          "home": "Teviot Rangers BLUE",
+          "away": "Samuel Montagu Green",
+          "provider_team_ids": [
+            "740",
+            "315"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 16B Silver",
+          "home": "Lewisham Tigers",
+          "away": "Villacourt Rovers Yellow",
+          "provider_team_ids": [
+            "37",
+            "547"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 16B Silver",
+          "home": "London Legends Gold",
+          "away": "The Bosco FC Dons",
+          "provider_team_ids": [
+            "1029",
+            "707"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 16B Silver",
+          "home": "Newpark Football Club",
+          "away": "Blackheath Village",
+          "provider_team_ids": [
+            "562",
+            "87"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 16B Silver",
+          "home": "S.E. Eagles FC",
+          "away": "Hillyfielders Falcons",
+          "provider_team_ids": [
+            "553",
+            "643"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 16C Navy",
+          "home": "AFC Lewisham White",
+          "away": "Hayden Youth Panthers",
+          "provider_team_ids": [
+            "260",
+            "629"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 16C Navy",
+          "home": "Blackheath Rhinos Black",
+          "away": "Sutton Dynamo FC",
+          "provider_team_ids": [
+            "866",
+            "690"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 16C Navy",
+          "home": "Junior Reds Athletic",
+          "away": "Northumberland Heath",
+          "provider_team_ids": [
+            "1062",
+            "162"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 16C Navy",
+          "home": "Swanley Rangers Black",
+          "away": "Mayow Park Rangers FC Blue",
+          "provider_team_ids": [
+            "789",
+            "564"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 16C Navy",
+          "home": "Total FC",
+          "away": "Junior Reds Valiants",
+          "provider_team_ids": [
+            "836",
+            "38"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 16C Silver",
+          "home": "Athenlay RYE",
+          "away": "Mayow Park Rangers FC White",
+          "provider_team_ids": [
+            "468",
+            "499"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 16C Silver",
+          "home": "Halls AFC",
+          "away": "Dulwich Village White",
+          "provider_team_ids": [
+            "971",
+            "278"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 16C Silver",
+          "home": "Kent United FC",
+          "away": "Falconwood FC Black",
+          "provider_team_ids": [
+            "501",
+            "861"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 16C Silver",
+          "home": "South Darenth Purples",
+          "away": "Dartford Royals white",
+          "provider_team_ids": [
+            "186",
+            "551"
+          ]
         }
       ],
       "fixture_parse_status": "verified_multiweek_fixture_rows_v2",
       "fixture_week_ids": [
         3,
-        4
+        4,
+        5
       ],
       "results_format_type": "11",
       "standings": [
@@ -15319,7 +20008,7 @@
         },
         {
           "division_name": "Under 16B Navy",
-          "updated_at_text": "27/09/26 16:28:46",
+          "updated_at_text": "03/10/26 10:35:22",
           "source_order_authoritative_for_ties": false,
           "source_disclaimer": "Note: Table does not yet take account of rules for determining winner if teams on equal points",
           "rows": [
@@ -15351,6 +20040,19 @@
             },
             {
               "row_order": 3,
+              "provider_team_id": 489,
+              "provider_division_id": 4287,
+              "team_name": "Dartford FC Black",
+              "played": 1,
+              "won": 1,
+              "drawn": 0,
+              "lost": 0,
+              "gf": 2,
+              "ga": 1,
+              "points": 2
+            },
+            {
+              "row_order": 4,
               "provider_team_id": 557,
               "provider_division_id": 4287,
               "team_name": "Vikings FC Red",
@@ -15363,7 +20065,7 @@
               "points": 2
             },
             {
-              "row_order": 4,
+              "row_order": 5,
               "provider_team_id": 982,
               "provider_division_id": 4287,
               "team_name": "Welling United white",
@@ -15376,29 +20078,16 @@
               "points": 2
             },
             {
-              "row_order": 5,
+              "row_order": 6,
               "provider_team_id": 303,
               "provider_division_id": 4287,
               "team_name": "Cray Valley (PM) FC Black",
-              "played": 0,
+              "played": 1,
               "won": 0,
               "drawn": 0,
-              "lost": 0,
-              "gf": 0,
-              "ga": 0,
-              "points": 0
-            },
-            {
-              "row_order": 6,
-              "provider_team_id": 489,
-              "provider_division_id": 4287,
-              "team_name": "Dartford FC Black",
-              "played": 0,
-              "won": 0,
-              "drawn": 0,
-              "lost": 0,
-              "gf": 0,
-              "ga": 0,
+              "lost": 1,
+              "gf": 1,
+              "ga": 2,
               "points": 0
             },
             {
@@ -15935,6 +20624,15 @@
         },
         {
           "date": "2026-09-27",
+          "home": "Cray Valley (PM) FC Black",
+          "away": "Dartford FC Black",
+          "homeGoals": 1,
+          "awayGoals": 2,
+          "provider_division_id": 4287,
+          "division_name": "Under 16B Navy"
+        },
+        {
+          "date": "2026-09-27",
           "home": "Foots Cray Lions",
           "away": "Vikings FC Red",
           "homeGoals": 1,
@@ -16362,12 +21060,143 @@
             "565",
             "132"
           ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 17 Division One",
+          "home": "Athenlay Park",
+          "away": "Dulwich Village White",
+          "provider_team_ids": [
+            "470",
+            "279"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 17 Division One",
+          "home": "Bridon Ropes",
+          "away": "Hillyfielders Hawks",
+          "provider_team_ids": [
+            "2054",
+            "644"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 17 Division One",
+          "home": "Foots Cray Lions Yellow",
+          "away": "AFC Unity Black",
+          "provider_team_ids": [
+            "1086",
+            "371"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 17 Division One",
+          "home": "The Charcoal FC",
+          "away": "Metrogas FC Selkent",
+          "provider_team_ids": [
+            "2056",
+            "803"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 17 Division Three",
+          "home": "Baldon Sports Lions",
+          "away": "Dartford Celtic",
+          "provider_team_ids": [
+            "909",
+            "2058"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 17 Division Three",
+          "home": "Dulwich Village Red",
+          "away": "Welling United Blue",
+          "provider_team_ids": [
+            "280",
+            "1007"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 17 Division Three",
+          "home": "Hayden Youth Hawks",
+          "away": "Junior Reds Titans",
+          "provider_team_ids": [
+            "630",
+            "369"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 17 Division Three",
+          "home": "Punjab United",
+          "away": "Blackheath Rhinos Grey",
+          "provider_team_ids": [
+            "578",
+            "870"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 17 Division Three",
+          "home": "Welling United Silver",
+          "away": "Teviot Rangers Yellow",
+          "provider_team_ids": [
+            "983",
+            "739"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 17 Division Two",
+          "home": "Athenlay FC",
+          "away": "Istead United Colts",
+          "provider_team_ids": [
+            "469",
+            "691"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 17 Division Two",
+          "home": "Crayford Arrows",
+          "away": "Blackheath Rhinos White",
+          "provider_team_ids": [
+            "132",
+            "869"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 17 Division Two",
+          "home": "Newpark Football Club",
+          "away": "Dartford Royals",
+          "provider_team_ids": [
+            "561",
+            "552"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 17 Division Two",
+          "home": "Welling United white",
+          "away": "Mayow Park Rangers FC",
+          "provider_team_ids": [
+            "1063",
+            "565"
+          ]
         }
       ],
       "fixture_parse_status": "verified_multiweek_fixture_rows_v2",
       "fixture_week_ids": [
         3,
-        4
+        4,
+        5
       ],
       "results_format_type": "11",
       "standings": [
@@ -17067,12 +21896,103 @@
             "213",
             "320"
           ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Senior Division One",
+          "home": "Crayford Arrows",
+          "away": "Sutton Athletic",
+          "provider_team_ids": [
+            "2120",
+            "693"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Senior Division One",
+          "home": "Docklands",
+          "away": "FC Elmstead",
+          "provider_team_ids": [
+            "373",
+            "123"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Senior Division One",
+          "home": "Dulwich Village Orange",
+          "away": "Dulwich Village White",
+          "provider_team_ids": [
+            "1042",
+            "1043"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Senior Division One",
+          "home": "Hillyfielders Hawks",
+          "away": "Parkwood Rangers PFA",
+          "provider_team_ids": [
+            "645",
+            "155"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Senior Division Two",
+          "home": "Cray Valley (PM) FC",
+          "away": "Bridon Ropes",
+          "provider_team_ids": [
+            "320",
+            "2055"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Senior Division Two",
+          "home": "EWD Eagles Youth",
+          "away": "Fleetdown United",
+          "provider_team_ids": [
+            "2135",
+            "1032"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Senior Division Two",
+          "home": "Istead United Colts",
+          "away": "Hayden Youth Sharks",
+          "provider_team_ids": [
+            "1009",
+            "631"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Senior Division Two",
+          "home": "Slade Green Knights",
+          "away": "Kingsdale Red",
+          "provider_team_ids": [
+            "102",
+            "213"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Senior Division Two",
+          "home": "Vikings FC",
+          "away": "Junior Reds Titans",
+          "provider_team_ids": [
+            "904",
+            "370"
+          ]
         }
       ],
       "fixture_parse_status": "verified_multiweek_fixture_rows_v2",
       "fixture_week_ids": [
         3,
-        4
+        4,
+        5
       ],
       "results_format_type": "11",
       "standings": [
@@ -18732,12 +23652,663 @@
             "843",
             "568"
           ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U8X Friendly",
+          "home": "Hayden Youth Bulls",
+          "away": "Punjab United",
+          "provider_team_ids": [
+            "421",
+            "577"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8X Blue",
+          "home": "AFC Lewisham Blue",
+          "away": "Chislehurst Wanderers Lions",
+          "provider_team_ids": [
+            "246",
+            "409"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8X Blue",
+          "home": "Chislehurst Wanderers Lions",
+          "away": "AFC Lewisham Blue",
+          "provider_team_ids": [
+            "409",
+            "246"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8X Blue",
+          "home": "Dartford FC Black",
+          "away": "Dulwich Village Orange",
+          "provider_team_ids": [
+            "355",
+            "219"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8X Blue",
+          "home": "Dartford FC White",
+          "away": "New Ash Green JFC Saxons",
+          "provider_team_ids": [
+            "354",
+            "61"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8X Blue",
+          "home": "Dulwich Village Orange",
+          "away": "Dartford FC Black",
+          "provider_team_ids": [
+            "219",
+            "355"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8X Blue",
+          "home": "Erith & Belvedere",
+          "away": "Samuel Montagu Green",
+          "provider_team_ids": [
+            "1038",
+            "309"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8X Blue",
+          "home": "Greenwich Peninsula Jaguars",
+          "away": "Metrogas FC Blue",
+          "provider_team_ids": [
+            "368",
+            "832"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8X Blue",
+          "home": "Metrogas FC Blue",
+          "away": "Greenwich Peninsula Jaguars",
+          "provider_team_ids": [
+            "832",
+            "368"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8X Blue",
+          "home": "New Ash Green JFC Saxons",
+          "away": "Dartford FC White",
+          "provider_team_ids": [
+            "61",
+            "354"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8X Blue",
+          "home": "Samuel Montagu Green",
+          "away": "Erith & Belvedere",
+          "provider_team_ids": [
+            "309",
+            "1038"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8X Green",
+          "home": "AFC Lewisham White",
+          "away": "Metrogas FC White",
+          "provider_team_ids": [
+            "2144",
+            "833"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8X Green",
+          "home": "Boca FC Bears",
+          "away": "Samuel Montagu Yellow",
+          "provider_team_ids": [
+            "194",
+            "1066"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8X Green",
+          "home": "Cray Wanderers Cobras",
+          "away": "Hayden Youth Wolves",
+          "provider_team_ids": [
+            "569",
+            "420"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8X Green",
+          "home": "Fisher Youth",
+          "away": "Long Lane Tigers",
+          "provider_team_ids": [
+            "289",
+            "389"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8X Green",
+          "home": "Hayden Youth Wolves",
+          "away": "Cray Wanderers Cobras",
+          "provider_team_ids": [
+            "420",
+            "569"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8X Green",
+          "home": "Long Lane Tigers",
+          "away": "Fisher Youth",
+          "provider_team_ids": [
+            "389",
+            "289"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8X Green",
+          "home": "Metrogas FC White",
+          "away": "AFC Lewisham White",
+          "provider_team_ids": [
+            "833",
+            "2144"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8X Green",
+          "home": "Samuel Montagu Yellow",
+          "away": "Boca FC Bears",
+          "provider_team_ids": [
+            "1066",
+            "194"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8X Orange",
+          "home": "AFC Unity",
+          "away": "Next Level FC Reds",
+          "provider_team_ids": [
+            "372",
+            "2073"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8X Orange",
+          "home": "Boca FC Grizzlies",
+          "away": "Crayford Arrows Cannons",
+          "provider_team_ids": [
+            "195",
+            "110"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8X Orange",
+          "home": "Castle Hill United FC",
+          "away": "New Ash Green JFC Vikings",
+          "provider_team_ids": [
+            "393",
+            "60"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8X Orange",
+          "home": "Crayford Arrows Cannons",
+          "away": "Boca FC Grizzlies",
+          "provider_team_ids": [
+            "110",
+            "195"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8X Orange",
+          "home": "Guru Nanak Youth",
+          "away": "Northumberland Heath",
+          "provider_team_ids": [
+            "500",
+            "158"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8X Orange",
+          "home": "New Ash Green JFC Vikings",
+          "away": "Castle Hill United FC",
+          "provider_team_ids": [
+            "60",
+            "393"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8X Orange",
+          "home": "Next Level FC Reds",
+          "away": "AFC Unity",
+          "provider_team_ids": [
+            "2073",
+            "372"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8X Orange",
+          "home": "Northumberland Heath",
+          "away": "Guru Nanak Youth",
+          "provider_team_ids": [
+            "158",
+            "500"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8X Red",
+          "home": "AFC Green Court Knights",
+          "away": "Dartford Royals Navy",
+          "provider_team_ids": [
+            "2098",
+            "1074"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8X Red",
+          "home": "Dartford Royals Navy",
+          "away": "AFC Green Court Knights",
+          "provider_team_ids": [
+            "1074",
+            "2098"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8X Red",
+          "home": "Foots Cray Lions Orange",
+          "away": "Welling United Blue",
+          "provider_team_ids": [
+            "381",
+            "874"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8X Red",
+          "home": "Hayden Youth Falcons",
+          "away": "Parkwood Rangers Mavericks",
+          "provider_team_ids": [
+            "422",
+            "1050"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8X Red",
+          "home": "Parkwood Rangers Kings",
+          "away": "ShooterBallers FC Black",
+          "provider_team_ids": [
+            "141",
+            "2138"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8X Red",
+          "home": "Parkwood Rangers Mavericks",
+          "away": "Hayden Youth Falcons",
+          "provider_team_ids": [
+            "1050",
+            "422"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8X Red",
+          "home": "ShooterBallers FC Black",
+          "away": "Parkwood Rangers Kings",
+          "provider_team_ids": [
+            "2138",
+            "141"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8X Red",
+          "home": "Welling United Blue",
+          "away": "Foots Cray Lions Orange",
+          "provider_team_ids": [
+            "874",
+            "381"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8X Silver",
+          "home": "Cray Valley (PM) FC Black",
+          "away": "Dulwich Hamlet JFC Pink",
+          "provider_team_ids": [
+            "306",
+            "2117"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8X Silver",
+          "home": "Dulwich Hamlet JFC Pink",
+          "away": "Cray Valley (PM) FC Black",
+          "provider_team_ids": [
+            "2117",
+            "306"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8X Silver",
+          "home": "Hillyfielders Falcons",
+          "away": "Wildcats FS Club Lions",
+          "provider_team_ids": [
+            "2078",
+            "243"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8X Silver",
+          "home": "Kekoa",
+          "away": "London Legends Gold",
+          "provider_team_ids": [
+            "837",
+            "1013"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8X Silver",
+          "home": "Lewisham Borough Cobras",
+          "away": "Lewisham Project White",
+          "provider_team_ids": [
+            "651",
+            "2244"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8X Silver",
+          "home": "Lewisham Project White",
+          "away": "Lewisham Borough Cobras",
+          "provider_team_ids": [
+            "2244",
+            "651"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8X Silver",
+          "home": "London Legends Gold",
+          "away": "Kekoa",
+          "provider_team_ids": [
+            "1013",
+            "837"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8X Silver",
+          "home": "Long Lane Panthers",
+          "away": "Long Lane Pumas",
+          "provider_team_ids": [
+            "390",
+            "1051"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8X Silver",
+          "home": "Long Lane Pumas",
+          "away": "Long Lane Panthers",
+          "provider_team_ids": [
+            "1051",
+            "390"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8X Silver",
+          "home": "Wildcats FS Club Lions",
+          "away": "Hillyfielders Falcons",
+          "provider_team_ids": [
+            "243",
+            "2078"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8X Yellow",
+          "home": "Beacons Blue",
+          "away": "Teviot Rangers Red",
+          "provider_team_ids": [
+            "923",
+            "1008"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8X Yellow",
+          "home": "Blackheath Rhinos Black",
+          "away": "Slade Green Knights",
+          "provider_team_ids": [
+            "1067",
+            "91"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8X Yellow",
+          "home": "Bridon Ropes",
+          "away": "Cray Wanderers Sharks",
+          "provider_team_ids": [
+            "2050",
+            "570"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8X Yellow",
+          "home": "Chislehurst Wanderers Tigers",
+          "away": "Junior Reds Valiants",
+          "provider_team_ids": [
+            "2118",
+            "318"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8X Yellow",
+          "home": "Cray Wanderers Sharks",
+          "away": "Bridon Ropes",
+          "provider_team_ids": [
+            "570",
+            "2050"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8X Yellow",
+          "home": "Eversley Rangers",
+          "away": "ShooterBallers FC White",
+          "provider_team_ids": [
+            "324",
+            "2248"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8X Yellow",
+          "home": "Junior Reds Valiants",
+          "away": "Chislehurst Wanderers Tigers",
+          "provider_team_ids": [
+            "318",
+            "2118"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8X Yellow",
+          "home": "ShooterBallers FC White",
+          "away": "Eversley Rangers",
+          "provider_team_ids": [
+            "2248",
+            "324"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8X Yellow",
+          "home": "Slade Green Knights",
+          "away": "Blackheath Rhinos Black",
+          "provider_team_ids": [
+            "91",
+            "1067"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 8X Yellow",
+          "home": "Teviot Rangers Red",
+          "away": "Beacons Blue",
+          "provider_team_ids": [
+            "1008",
+            "923"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under8X Navy",
+          "home": "Cray Wanderers Lions",
+          "away": "Lewisham Project Gold",
+          "provider_team_ids": [
+            "568",
+            "201"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under8X Navy",
+          "home": "Cray Wanderers Tigers",
+          "away": "Dynamo Youth White",
+          "provider_team_ids": [
+            "567",
+            "2247"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under8X Navy",
+          "home": "Dulwich Village Black",
+          "away": "Ebbsfleet United Reds",
+          "provider_team_ids": [
+            "218",
+            "658"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under8X Navy",
+          "home": "Dynamo Youth Silver",
+          "away": "Regans FC Silver",
+          "provider_team_ids": [
+            "492",
+            "445"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under8X Navy",
+          "home": "Dynamo Youth White",
+          "away": "Cray Wanderers Tigers",
+          "provider_team_ids": [
+            "2247",
+            "567"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under8X Navy",
+          "home": "Ebbsfleet United Reds",
+          "away": "Dulwich Village Black",
+          "provider_team_ids": [
+            "658",
+            "218"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under8X Navy",
+          "home": "Lewisham Project Gold",
+          "away": "Cray Wanderers Lions",
+          "provider_team_ids": [
+            "201",
+            "568"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under8X Navy",
+          "home": "Metrogas FC Red",
+          "away": "ShooterBallers FC",
+          "provider_team_ids": [
+            "831",
+            "843"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under8X Navy",
+          "home": "Regans FC Silver",
+          "away": "Dynamo Youth Silver",
+          "provider_team_ids": [
+            "445",
+            "492"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under8X Navy",
+          "home": "ShooterBallers FC",
+          "away": "Metrogas FC Red",
+          "provider_team_ids": [
+            "843",
+            "831"
+          ]
         }
       ],
       "fixture_parse_status": "verified_multiweek_fixture_rows_v2",
       "fixture_week_ids": [
         3,
-        4
+        4,
+        5
       ],
       "standings": null,
       "published_results": null,
@@ -19336,12 +24907,383 @@
             "880",
             "140"
           ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U10X Friendly",
+          "home": "Cray Wanderers Sharks",
+          "away": "London Kickers FC",
+          "provider_team_ids": [
+            "595",
+            "2059"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 10X A Navy",
+          "home": "Dynamo Youth Blue",
+          "away": "Welling United black",
+          "provider_team_ids": [
+            "534",
+            "878"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 10X A Navy",
+          "home": "Ebbsfleet United White",
+          "away": "AFC Lewisham Yellow",
+          "provider_team_ids": [
+            "670",
+            "250"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 10X A Navy",
+          "home": "Metrogas FC Red",
+          "away": "Sutton Athletic Stripes",
+          "provider_team_ids": [
+            "826",
+            "809"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 10X A Navy",
+          "home": "ShooterBallers FC Black",
+          "away": "Cray Wanderers Panthers",
+          "provider_team_ids": [
+            "845",
+            "591"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 10X A Silver",
+          "home": "Dynamo Youth White",
+          "away": "Dulwich Village Black",
+          "provider_team_ids": [
+            "535",
+            "226"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 10X A Silver",
+          "home": "Fisher Youth",
+          "away": "AFC Lewisham Blue",
+          "provider_team_ids": [
+            "293",
+            "249"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 10X A Silver",
+          "home": "Regans FC Silver",
+          "away": "Baldon Sports Lions",
+          "provider_team_ids": [
+            "448",
+            "905"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 10X A Silver",
+          "home": "Sporting Club Vista Orange",
+          "away": "Regans FC Blue",
+          "provider_team_ids": [
+            "723",
+            "450"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 10X B Navy",
+          "home": "Boca FC Bears",
+          "away": "Boca FC Grizzlies",
+          "provider_team_ids": [
+            "197",
+            "198"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 10X B Navy",
+          "home": "Dartford FC Black",
+          "away": "Parkwood Rangers Hawks",
+          "provider_team_ids": [
+            "357",
+            "144"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 10X B Navy",
+          "home": "Parkwood Rangers Ravens",
+          "away": "Cray Wanderers Tigers",
+          "provider_team_ids": [
+            "145",
+            "596"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 10X B Navy",
+          "home": "South Darenth Purples",
+          "away": "Hayden Youth Tigers",
+          "provider_team_ids": [
+            "189",
+            "427"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 10X B Navy",
+          "home": "Sutton Athletic Whites",
+          "away": "Crayford Arrows Warriors",
+          "provider_team_ids": [
+            "775",
+            "116"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 10X B Silver",
+          "home": "Ballers SE",
+          "away": "Erith & Belvedere",
+          "provider_team_ids": [
+            "67",
+            "1039"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 10X B Silver",
+          "home": "Cray Wanderers Cobras",
+          "away": "Cray Valley (PM) FC",
+          "provider_team_ids": [
+            "588",
+            "305"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 10X B Silver",
+          "home": "Dulwich Village Orange",
+          "away": "Metrogas FC Black",
+          "provider_team_ids": [
+            "227",
+            "825"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 10X B Silver",
+          "home": "Dulwich Village White",
+          "away": "Teviot Rangers Red",
+          "provider_team_ids": [
+            "229",
+            "755"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 10X B Silver",
+          "home": "London Legends Gold",
+          "away": "Kekoa Black",
+          "provider_team_ids": [
+            "1016",
+            "2105"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 10X C Navy",
+          "home": "Castle Hill United FC",
+          "away": "Welling United Blue X",
+          "provider_team_ids": [
+            "395",
+            "879"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 10X C Navy",
+          "home": "Dartford FC White",
+          "away": "ST Sports FC Athletic",
+          "provider_team_ids": [
+            "356",
+            "349"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 10X C Navy",
+          "home": "Junior Reds Valiants",
+          "away": "Cray Wanderers Piranhas",
+          "provider_team_ids": [
+            "244",
+            "593"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 10X C Navy",
+          "home": "Metrogas FC Blue",
+          "away": "Dartford Royals white",
+          "provider_team_ids": [
+            "842",
+            "1075"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 10X C Navy",
+          "home": "Welling United Red X",
+          "away": "Sutton Dynamo FC",
+          "provider_team_ids": [
+            "881",
+            "655"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 10X C Silver",
+          "home": "Blackheath Village Blue",
+          "away": "Hillyfielders Hawks",
+          "provider_team_ids": [
+            "77",
+            "2253"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 10X C Silver",
+          "home": "Dulwich Village Red",
+          "away": "Cray Wanderers Wolves",
+          "provider_team_ids": [
+            "228",
+            "599"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 10X C Silver",
+          "home": "Greenwich Peninsula Jaguars",
+          "away": "Old Roan FC Navy",
+          "provider_team_ids": [
+            "730",
+            "818"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 10X C Silver",
+          "home": "Lewisham Project Gold",
+          "away": "Beacons Red",
+          "provider_team_ids": [
+            "203",
+            "927"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 10X C Silver",
+          "home": "London Legends Blue",
+          "away": "Blackheath Village Red",
+          "provider_team_ids": [
+            "1017",
+            "78"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 10X D Navy",
+          "home": "Hayden Youth Lions",
+          "away": "Boca FC Polars",
+          "provider_team_ids": [
+            "428",
+            "200"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 10X D Navy",
+          "home": "IEXEL F.C Gold",
+          "away": "Welling United white X",
+          "provider_team_ids": [
+            "12",
+            "882"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 10X D Navy",
+          "home": "South Darenth White",
+          "away": "Cray Wanderers Falcons",
+          "provider_team_ids": [
+            "193",
+            "600"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 10X D Navy",
+          "home": "Teviot Rangers Blue",
+          "away": "AFC Green Court Knights",
+          "provider_team_ids": [
+            "760",
+            "581"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 10X D Silver",
+          "home": "Beacons Blue",
+          "away": "Welling United Green X",
+          "provider_team_ids": [
+            "928",
+            "880"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 10X D Silver",
+          "home": "Chislehurst Wanderers Pumas",
+          "away": "Lewisham Youth",
+          "provider_team_ids": [
+            "413",
+            "75"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 10X D Silver",
+          "home": "Junior Reds Spartans",
+          "away": "Foots Cray Lions Red",
+          "provider_team_ids": [
+            "140",
+            "165"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 10X D Silver",
+          "home": "Lewisham Project White",
+          "away": "Total FC",
+          "provider_team_ids": [
+            "204",
+            "2116"
+          ]
         }
       ],
       "fixture_parse_status": "verified_multiweek_fixture_rows_v2",
       "fixture_week_ids": [
         3,
-        4
+        4,
+        5
       ],
       "standings": null,
       "published_results": null,
@@ -19950,12 +25892,313 @@
             "149",
             "893"
           ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U12X Friendly",
+          "home": "Dartford Royals white",
+          "away": "Samuel Montagu Yellow",
+          "provider_team_ids": [
+            "330",
+            "311"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "U12X London Cup",
+          "home": "FD United Panthers (Non-Selkent)",
+          "away": "Hayden Youth Magpies",
+          "provider_team_ids": [
+            "2193",
+            "431"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 12X A Silver",
+          "home": "Dynamo Youth White",
+          "away": "Dartford FC Black",
+          "provider_team_ids": [
+            "1080",
+            "362"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 12X A Silver",
+          "home": "Regans FC Silver",
+          "away": "Lewisham Borough Cobras",
+          "provider_team_ids": [
+            "2081",
+            "1087"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 12X A Silver",
+          "home": "Russellers Blues",
+          "away": "Erith & Belvedere",
+          "provider_team_ids": [
+            "47",
+            "1040"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 12X A Silver",
+          "home": "Samuel Montagu Green",
+          "away": "Dulwich Village Black",
+          "provider_team_ids": [
+            "310",
+            "235"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 12X B Navy",
+          "home": "Cray Wanderers Lions",
+          "away": "Metrogas FC Black",
+          "provider_team_ids": [
+            "607",
+            "2121"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 12X B Navy",
+          "home": "Ebbsfleet United White",
+          "away": "Fleetdown United orange",
+          "provider_team_ids": [
+            "665",
+            "685"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 12X B Navy",
+          "home": "Metrogas FC White",
+          "away": "Crayford Arrows Black",
+          "provider_team_ids": [
+            "820",
+            "118"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 12X B Navy",
+          "home": "Welling United White",
+          "away": "Cray Wanderers Cobras",
+          "provider_team_ids": [
+            "2245",
+            "608"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 12X B Silver",
+          "home": "AFC Lewisham White",
+          "away": "KSI Coaching FC",
+          "provider_team_ids": [
+            "2123",
+            "172"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 12X B Silver",
+          "home": "Dulwich Hamlet JFC Pink",
+          "away": "London Legends Gold",
+          "provider_team_ids": [
+            "519",
+            "1021"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 12X B Silver",
+          "home": "Dulwich Village Orange",
+          "away": "Hillyfielders Warriors",
+          "provider_team_ids": [
+            "236",
+            "635"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 12X B Silver",
+          "home": "Teviot Rangers Red",
+          "away": "Old Roan FC Blue",
+          "provider_team_ids": [
+            "757",
+            "814"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 12X C Navy",
+          "home": "Crayford Arrows Gold",
+          "away": "Foots Cray Lions Black",
+          "provider_team_ids": [
+            "121",
+            "66"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 12X C Navy",
+          "home": "Hayden Youth Panthers",
+          "away": "Samuel Montagu Blue",
+          "provider_team_ids": [
+            "432",
+            "312"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 12X C Navy",
+          "home": "Junior Reds Valiants",
+          "away": "Swanscombe Tigers Yellow",
+          "provider_team_ids": [
+            "53",
+            "892"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 12X C Navy",
+          "home": "Metrogas FC Red",
+          "away": "ST Sports FC United",
+          "provider_team_ids": [
+            "821",
+            "109"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 12X C Navy",
+          "home": "Newpark Football Club",
+          "away": "Russellers Reds",
+          "provider_team_ids": [
+            "560",
+            "51"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 12X C Navy",
+          "home": "Welling United Blue",
+          "away": "Teviot Rangers Blue",
+          "provider_team_ids": [
+            "888",
+            "758"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 12X C Silver",
+          "home": "Athenlay",
+          "away": "Lewisham Youth Green",
+          "provider_team_ids": [
+            "457",
+            "55"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 12X C Silver",
+          "home": "Dulwich Village White",
+          "away": "London Legends Blue",
+          "provider_team_ids": [
+            "1044",
+            "1022"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 12X C Silver",
+          "home": "Fisher Youth",
+          "away": "Lewisham Project Navy",
+          "provider_team_ids": [
+            "295",
+            "2071"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 12X C Silver",
+          "home": "Lewisham Tigers Greens",
+          "away": "Dulwich Hamlet JFC Navy",
+          "provider_team_ids": [
+            "36",
+            "518"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 12X C Silver",
+          "home": "Lewisham Youth Black",
+          "away": "Dulwich Village Red",
+          "provider_team_ids": [
+            "57",
+            "234"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 12X C Silver",
+          "home": "London Kickers FC",
+          "away": "Blackheath Wdrs",
+          "provider_team_ids": [
+            "2149",
+            "1035"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under12X A Navy",
+          "home": "Ballon Dor FC",
+          "away": "Ebbsfleet United Red",
+          "provider_team_ids": [
+            "808",
+            "664"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under12X A Navy",
+          "home": "Eversley Rangers",
+          "away": "Dartford FC White",
+          "provider_team_ids": [
+            "678",
+            "361"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under12X A Navy",
+          "home": "Sutton Dynamo FC",
+          "away": "Parkwood Rangers Rebels",
+          "provider_team_ids": [
+            "657",
+            "149"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under12X A Navy",
+          "home": "Welling United Red",
+          "away": "Cray Wanderers Spartans",
+          "provider_team_ids": [
+            "893",
+            "712"
+          ]
         }
       ],
       "fixture_parse_status": "verified_multiweek_fixture_rows_v2",
       "fixture_week_ids": [
         3,
-        4
+        4,
+        5
       ],
       "results_format_type": "9",
       "standings": [
@@ -21426,12 +27669,183 @@
             "748",
             "617"
           ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 14X B",
+          "home": "AFC Lewisham",
+          "away": "Hillyfielders Eagles",
+          "provider_team_ids": [
+            "2242",
+            "638"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 14X B",
+          "home": "Athenlay FC",
+          "away": "Dulwich Village Blue",
+          "provider_team_ids": [
+            "462",
+            "274"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 14X B",
+          "home": "London Legends white",
+          "away": "Newpark Football Club",
+          "provider_team_ids": [
+            "1026",
+            "563"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 14X B",
+          "home": "SE Dons Football Club",
+          "away": "Welling United orange",
+          "provider_team_ids": [
+            "526",
+            "902"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 14X B",
+          "home": "Welling United Red",
+          "away": "Phoenix Sports Lions",
+          "provider_team_ids": [
+            "947",
+            "896"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 14X C Navy",
+          "home": "Crayford Arrows Red",
+          "away": "Crayford Arrows Girls Red",
+          "provider_team_ids": [
+            "127",
+            "1059"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 14X C Navy",
+          "home": "New Ash Green JFC Pumas",
+          "away": "Castle Hill United FC",
+          "provider_team_ids": [
+            "59",
+            "398"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 14X C Navy",
+          "home": "Teviot Rangers BLUE",
+          "away": "AFC Green Court Knights",
+          "provider_team_ids": [
+            "749",
+            "590"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 14X C Navy",
+          "home": "Welling United Blue X",
+          "away": "Erith Town Red",
+          "provider_team_ids": [
+            "901",
+            "343"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 14X C Silver",
+          "home": "Athenlay RYE",
+          "away": "SE Dons Football Club Panthers",
+          "provider_team_ids": [
+            "463",
+            "2137"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 14X C Silver",
+          "home": "Baldon Sports Panthers",
+          "away": "Welling United Purple",
+          "provider_team_ids": [
+            "917",
+            "903"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 14X C Silver",
+          "home": "Bermondsey Utd FC",
+          "away": "Mayow Park Rangers FC",
+          "provider_team_ids": [
+            "10",
+            "498"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under 14X C Silver",
+          "home": "Welling United Yellow",
+          "away": "Dulwich Village Red",
+          "provider_team_ids": [
+            "950",
+            "273"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under14X A",
+          "home": "Cray Wanderers Tigers",
+          "away": "Dulwich Village Black",
+          "provider_team_ids": [
+            "617",
+            "267"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under14X A",
+          "home": "Dulwich Village Orange",
+          "away": "London Legends Gold",
+          "provider_team_ids": [
+            "266",
+            "1025"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under14X A",
+          "home": "Ebbsfleet United Red",
+          "away": "Dartford Royals gold",
+          "provider_team_ids": [
+            "668",
+            "335"
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "division_name": "Under14X A",
+          "home": "Stansfeld (Fratres) FC",
+          "away": "Teviot Rangers RED",
+          "provider_team_ids": [
+            "2069",
+            "748"
+          ]
         }
       ],
       "fixture_parse_status": "verified_multiweek_fixture_rows_v2",
       "fixture_week_ids": [
         3,
-        4
+        4,
+        5
       ],
       "results_format_type": "11",
       "standings": [
