@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "provider": "Selkent",
-  "last_updated": "2026-10-03T00:05:23.690306+00:00",
+  "last_updated": "2026-10-03T06:11:58.444749+00:00",
   "fixture_agegroup_discovery_source": "selkent_divisions_all",
   "coverage": {
     "fixtures": {
@@ -3489,6 +3489,16 @@
           "provider_team_ids": [
             "605",
             "1088"
+          ]
+        },
+        {
+          "date": "2026-10-11",
+          "division_name": "Under 10A Navy",
+          "home": "Cray Wanderers Sharks",
+          "away": "Ebbsfleet United Red",
+          "provider_team_ids": [
+            "604",
+            "659"
           ]
         },
         {
