@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "provider": "Selkent",
-  "last_updated": "2026-10-03T14:54:06.385198+00:00",
+  "last_updated": "2026-10-03T21:54:55.555328+00:00",
   "fixture_agegroup_discovery_source": "selkent_divisions_all",
   "coverage": {
     "fixtures": {
@@ -12233,16 +12233,6 @@
           "provider_team_ids": [
             "681",
             "916"
-          ]
-        },
-        {
-          "date": "2026-10-04",
-          "division_name": "Under 14 B Navy",
-          "home": "Sutton Athletic Stripes",
-          "away": "Sutton Athletic Greens",
-          "provider_team_ids": [
-            "435",
-            "436"
           ]
         },
         {
