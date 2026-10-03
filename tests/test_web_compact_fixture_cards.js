@@ -29,6 +29,10 @@ const unconfirmed=context.furtherFixtureCardHtml({confirmed:false,date:'2026-09-
 assert.match(unconfirmed,/Awaiting confirmation/);
 assert.doesNotMatch(unconfirmed,/Open in Maps|google\.com\/maps\/embed/,'unconfirmed venue cannot be shared');
 const html=fs.readFileSync('app/src/main/assets/index.html','utf8');
-assert.match(html,/<div class="match-venue-card next-fixture-venue">[\s\S]*?id="matches-next-map"/,'next match keeps direct Maps link');
+assert.equal((html.match(/id="matches-next-map"/g)||[]).length,1,'Matches keeps exactly one Maps link');
+const matchesMapHost=html.match(/<div class="fixture-map-preview hidden" id="matches-next-map-preview">([\s\S]*?)<\/div>/);
+assert.ok(matchesMapHost,'Matches map preview host exists');
+assert.match(matchesMapHost[1],/id="matches-next-map-frame"/,'Matches map frame is inside the preview host');
+assert.match(matchesMapHost[1],/id="matches-next-map"/,'Matches Maps link is inside the preview host');
 assert.match(html,/<details class="matchday-dashboard-note">/,'optional coach note is collapsed');
 console.log('PASS compact fixture cards retain venue, maps and expanded match details');

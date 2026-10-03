@@ -1698,6 +1698,8 @@ img.club-identity-badge[src="/__pilot_badges/318/53facde723259b51ef991c02e37e33b
 
 .canonical-v12-map-wrap{position:relative;overflow:hidden;border-radius:16px;min-height:180px}.canonical-v12-map-wrap iframe{display:block;width:100%;height:180px;border:0}.canonical-v12-map-button{position:absolute;right:12px;bottom:12px;padding:10px 14px;border-radius:12px;background:#173b25;color:#9ce2a7;font-weight:800;text-decoration:none}.canonical-v12-dashboard-rows{display:grid;gap:12px;text-align:left}
 
+#matches-next-fixture.canonical-v14-cup-group .panel-heading h3{display:none}
+
 /* V13 global contract: never depend on a surface-specific active-card class */
 .canonical-v11-rows,.canonical-v12-dashboard-rows,.canonical-v13-rows{display:grid;gap:12px}
 .canonical-v11-fixture{display:grid;gap:6px}

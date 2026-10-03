@@ -1434,8 +1434,9 @@ function miniCupGroup(f={}){
   return opponents.size===2?{opponents:[...opponents.values()].sort((a,b)=>a.localeCompare(b)),competition:f.competition,date:f.date}:null;
 }
 function cupFixtureDefaults(f={}){
-  return miniCupGroup(f)?{time:'14:00',groundName:'Marathon Sports Ground',address:''}:null;
+  return miniCupGroup(f)?{groundName:'Marathon Sports Ground',address:'Shooters Hill'}:null;
 }
+
 function parentCupGroupDetails(f={}){
   const group=miniCupGroup(f);if(!group)return null;
   const confirmed=(state.selkent?.fixtures||[]).filter(row=>row.date===f.date&&selkentNorm(row.competition)===selkentNorm(f.competition)&&fixtureDetailsConfirmed(row)).sort((a,b)=>selkentNorm(a.opponent).localeCompare(selkentNorm(b.opponent)))[0];
@@ -5154,12 +5155,41 @@ renderMatchPageNextFixture=function(){
 
 
 /* Canonical match cards v10: one team-row format across League and Cup surfaces. */
-function canonicalMatchRowsHtml(f={}){
+function canonicalCardFixtureRows(f={}){
   const group=typeof miniCupGroup==='function'?miniCupGroup(f):null;
-  const own=matchTeamLabel(typeof ownTeamDisplayName==='function'?ownTeamDisplayName():'Shooters Hill');
-  const opponents=group?(cupGroupOpponentNames(f,group).length?cupGroupOpponentNames(f,group):['Opponent TBC']):[matchTeamLabel(f.opponent||'Opponent TBC')];
-  return opponents.slice(0,2).map((opponent,index)=>`<div class="canonical-match-fixture-row"><span class="canonical-match-fixture-label">${group?`Fixture ${index+1}`:'Match'}</span><div class="canonical-match-team-row"><span class="canonical-match-team"><span class="canonical-match-badge">${clubIdentityBadgeHtml(own)}</span><strong>${esc(own)}</strong></span><b class="canonical-match-v">v</b><span class="canonical-match-team canonical-match-team-away"><strong>${esc(matchTeamLabel(opponent))}</strong><span class="canonical-match-badge">${clubIdentityBadgeHtml(opponent)}</span></span></div></div>`).join('');
+  if(!group)return {group:null,rows:[f]};
+  const key=selkentNorm(group.competition||f.competition||''),byOpponent=new Map();
+  for(const row of state.selkent?.fixtures||[]){
+    if(row.date===f.date&&selkentNorm(row.competition||'')===key&&row.opponent){
+      byOpponent.set(selkentNorm(row.opponent),row);
+    }
+  }
+  const rows=[...byOpponent.values()].sort((a,b)=>{
+    const an=homeFixtureTeamNames(a),bn=homeFixtureTeamNames(b);
+    return `${selkentNorm(an.home)}|${selkentNorm(an.away)}`.localeCompare(`${selkentNorm(bn.home)}|${selkentNorm(bn.away)}`);
+  });
+  return {group,rows:rows.slice(0,2)};
 }
+function canonicalCardRowData(f={}){
+  const data=canonicalCardFixtureRows(f),group=data.group,rows=data.rows.length?data.rows:[f];
+  return {group,rows:rows.slice(0,group?2:1).map(row=>{
+    const names=homeFixtureTeamNames(row);
+    return {
+      fixture:row,
+      label:group?'Group game':'Match',
+      home:matchTeamLabel(names.home||'Home TBC'),
+      away:matchTeamLabel(names.away||'Away TBC')
+    };
+  })};
+}
+function canonicalMatchRowsHtml(f={}){
+  const data=canonicalCardRowData(f);
+  return data.rows.map(row=>{
+    const home=row.home,opponent=row.away;
+    return `<div class="canonical-match-fixture-row"><span class="canonical-match-fixture-label">${row.label}</span><div class="canonical-match-team-row"><span class="canonical-match-team"><span class="canonical-match-badge">${clubIdentityBadgeHtml(home)}</span><strong>${esc(home)}</strong></span><b class="canonical-match-v">v</b><span class="canonical-match-team canonical-match-team-away"><strong>${esc(opponent)}</strong><span class="canonical-match-badge">${clubIdentityBadgeHtml(opponent)}</span></span></div></div>`;
+  }).join('');
+}
+
 function canonicalMatchCardData(f={}){
   const group=typeof miniCupGroup==='function'?miniCupGroup(f):null;
   const d=group?(typeof parentCupGroupDetails==='function'&&parentCupGroupDetails(f))||{}:(typeof resolvedFixture==='function'&&resolvedFixture(f))||f;
@@ -5202,22 +5232,18 @@ openNextFixtureDetails=function(){
 /* canonicalMatchCardFrameworkV11: shared League/Cup/Friendly surface contract */
 function canonicalMatchCardFrameworkV11(f={}){
   const clean=v=>String(v||'').replace(/_/g,' ').replace(/\s+/g,' ').trim();
-  const team=v=>clean(v||'Team TBC');
-  const isCup=()=>/cup|selkent/i.test(String(f.competition||f.format||f.type||'')) || !!(typeof miniCupGroup==='function'&&miniCupGroup(f));
-  let group=typeof miniCupGroup==='function'?miniCupGroup(f):null;
-  let away=[];
-  if(group&&typeof cupGroupOpponentNames==='function') away=cupGroupOpponentNames(f,group).map(team).filter(Boolean);
-  if(!away.length) away=[team(f.opponent||f.awayTeam||'Opponent TBC')];
-  const own=team(typeof ownTeamDisplayName==='function'?ownTeamDisplayName():(f.homeTeam||'Shooters Hill'));
+  const data=canonicalCardRowData(f),group=data.group;
   const badge=n=>typeof clubIdentityBadgeHtml==='function'?clubIdentityBadgeHtml(n):'';
-  const rows=away.slice(0, isCup()?2:1).map((a,i)=>`<div class="canonical-v11-fixture"><span class="canonical-v11-label">${isCup()?`Fixture ${i+1}`:'Match'}</span><div class="canonical-v11-teams"><span class="canonical-v11-side"><span class="canonical-v11-badge">${badge(own)}</span><strong>${esc(own)}</strong></span><b class="canonical-v11-v">v</b><span class="canonical-v11-side canonical-v11-away"><strong>${esc(a)}</strong><span class="canonical-v11-badge">${badge(a)}</span></span></div></div>`).join('');
+  const rows=data.rows.map(row=>`<div class="canonical-v11-fixture"><span class="canonical-v11-label">${row.label}</span><div class="canonical-v11-teams"><span class="canonical-v11-side"><span class="canonical-v11-badge">${badge(row.home)}</span><strong>${esc(row.home)}</strong></span><b class="canonical-v11-v">v</b><span class="canonical-v11-side canonical-v11-away"><strong>${esc(row.away)}</strong><span class="canonical-v11-badge">${badge(row.away)}</span></span></div></div>`).join('');
   const d=(group&&typeof parentCupGroupDetails==='function'&&parentCupGroupDetails(f))||f||{};
   const competition=clean(typeof fixtureCompetitionLabel==='function'?fixtureCompetitionLabel(f):(f.competition||f.type||'Friendly'))||'Friendly';
   const date=f.date?formatDate(f.date):'';
-  const time=d.time||f.time||(isCup()?'14:00':'');
-  const ground=clean(d.groundName||d.ground||(isCup()?'Marathon Sports Ground':'Venue TBC'));
-  return {rows,competition,date,time,ground,address:clean(d.address||f.address||'')};
+  const time=d.time||f.time||'';
+  const ground=clean(d.groundName||d.ground||(group?'Marathon Sports Ground':'Venue TBC'));
+  const address=clean(d.address||f.address||(group?'Shooters Hill':''));
+  return {rows,competition,date,time,ground,address};
 }
+
 function applyCanonicalMatchCardFrameworkV11(prefix,f,containerId){
   if(!f)return;
   const host=document.getElementById(`${prefix}-versus`); if(!host)return;
@@ -5243,26 +5269,30 @@ if(typeof renderMatchPageNextFixture==='function'){const __v11Matches=renderMatc
 /* canonicalMatchCardFrameworkV12: dashboard grouping and venue map follow-up */
 function canonicalMatchCardFrameworkV12(f={}){
   const clean=v=>String(v||'').replace(/_/g,' ').replace(/\s+/g,' ').trim();
-  const cup=/cup|selkent/i.test(String(f.competition||f.format||f.type||''));
   const group=typeof miniCupGroup==='function'?miniCupGroup(f):null;
   const d=(group&&typeof parentCupGroupDetails==='function'&&parentCupGroupDetails(f))||f||{};
-  const ground=clean(d.groundName||d.ground||(cup?'Marathon Sports Ground':'Venue TBC'));
-  const address=clean(d.address||f.address||(cup?'Shooters Hill':''));
+  const ground=clean(d.groundName||d.ground||(group?'Marathon Sports Ground':'Venue TBC'));
+  const address=clean(d.address||f.address||(group?'Shooters Hill':''));
   const date=f.date?(typeof formatDate==='function'?formatDate(f.date):f.date):'';
-  const time=d.time||f.time||(cup?'14:00':'');
+  const time=d.time||f.time||'';
   return {ground,address,date,time};
 }
+
 function revealCanonicalMapV12(prefix,ground,address){
-  const d=canonicalMatchCardFrameworkV12({ground:ground,address:address});
-  const name=(d.ground||'Marathon Sports Ground')+', '+(d.address||'Shooters Hill');
-  const q=encodeURIComponent(name), url='https://www.google.com/maps/search/?api=1&query='+q;
-  const preview=document.getElementById(prefix+'-map-preview'); if(!preview)return;
-  preview.hidden=false; preview.style.display='block';
-  if(!preview.querySelector('iframe')){
-    preview.innerHTML='<div class="canonical-v12-map-wrap"><iframe title="Venue map" loading="lazy" src="https://www.google.com/maps?q='+q+'&output=embed"></iframe><a class="canonical-v12-map-button" target="_blank" rel="noopener" href="'+url+'">Open in Maps</a></div>';
+  const preview=document.getElementById(prefix+'-map-preview');if(!preview)return;
+  if(preview.querySelector('iframe'))return;
+  const g=String(ground||'').trim(),a=String(address||'').trim();
+  if(!g||/TBC/i.test(g)){
+    preview.hidden=true;preview.style.display='';
+    const outer=document.getElementById(prefix+'-map');if(outer){outer.hidden=true;outer.style.display='';}
+    return;
   }
-  const outer=document.getElementById(prefix+'-map'); if(outer){outer.hidden=false;outer.style.display='block';}
+  const q=encodeURIComponent([g,a].filter(Boolean).join(', ')),url='https://www.google.com/maps/search/?api=1&query='+q;
+  preview.hidden=false;preview.style.display='block';
+  preview.innerHTML='<div class="canonical-v12-map-wrap"><iframe title="Venue map" loading="lazy" src="https://www.google.com/maps?q='+q+'&output=embed"></iframe><a class="canonical-v12-map-button" target="_blank" rel="noopener" href="'+url+'">Open in Maps</a></div>';
+  const outer=document.getElementById(prefix+'-map');if(outer){outer.hidden=false;outer.style.display='block';}
 }
+
 function applyCanonicalDashboardV12(f){
   if(!f)return;
   const host=document.getElementById('next-match-home-teams'); if(!host)return;
@@ -5286,21 +5316,26 @@ if(typeof renderFixtureOverview==='function'){
 function canonicalMatchCardFrameworkV13Recovery(f={}) {
   const base = typeof canonicalMatchCardFrameworkV11 === "function"
     ? canonicalMatchCardFrameworkV11(f) : {};
+  const canonical = typeof canonicalMatchCardData === "function"
+    ? canonicalMatchCardData(f) : null;
   const rows = String(base.rows || "").replace(
     /<span class="canonical-v11-badge">\s*<\/span>/g,
     '<span class="canonical-v13-badge-fallback" aria-label="Badge pending">Badge pending</span>'
   );
   const text = v => String(v || "").replace(/_/g, " ").replace(/\s+/g, " ").trim();
-  const competition = text(base.competition || f.competition || f.format || f.type || "Friendly");
-  const cup = /cup|selkent/i.test(competition);
-  const confirmed = f.confirmedKickoff || f.confirmedTime || f.kickoff || f.time || "";
+  const competition = text(canonical?.competition || base.competition ||
+    f.competition || f.format || f.type || "Friendly");
+  const group = !!canonical?.group;
   return {
     ...base,
     rows,
     competition,
-    time: text(confirmed || (cup ? "14:00" : "")),
-    ground: text(base.ground || f.groundName || f.ground || (cup ? "Marathon Sports Ground" : "Venue TBC")),
-    address: text(base.address || f.address || (cup ? "Shooters Hill" : ""))
+    group,
+    date: canonical?.date || base.date || "",
+    time: text(canonical?.time || f.confirmedKickoff || f.confirmedTime || f.kickoff || f.time || ""),
+    ground: text(canonical?.ground || base.ground || f.groundName || f.ground ||
+      (group ? "Marathon Sports Ground" : "Venue TBC")),
+    address: text(canonical?.address || f.address || (group ? "Shooters Hill" : ""))
   };
 }
 
@@ -5334,33 +5369,60 @@ function removeOpponentKitRowsV13(root=document) {
 }
 
 function applyCanonicalRecoveryV13(prefix, f) {
-  if (!f) return;
-  const d = canonicalMatchCardFrameworkV13Recovery(f);
-  const hostIds = prefix === "next-match"
-    ? ["next-match-home-teams", "next-match-versus"]
-    : prefix === "matches-next"
+  const matchesCard=prefix==="matches-next"?document.getElementById("matches-next-fixture"):null;
+  if(!f){
+    matchesCard?.classList.remove("canonical-v14-cup-group");
+    if(prefix==="matches-next"){
+      const map=document.getElementById("matches-next-map");
+      if(map){map.classList.add("hidden");map.removeAttribute("href");}
+      if(typeof setMapPreview==="function")setMapPreview("matches-next-map-preview","matches-next-map-frame","");
+    }
+    return;
+  }
+
+  const d=canonicalMatchCardFrameworkV13Recovery(f);
+  const hostIds=prefix==="next-match"
+    ? ["next-match-home-teams","next-match-versus"]
+    : prefix==="matches-next"
       ? ["matches-next-versus"]
       : ["match-detail-versus"];
-  const host = hostIds.map(id => document.getElementById(id)).find(Boolean);
-  if (host && d.rows) setStableHtml(host, '<div class="canonical-v13-rows">' + d.rows + "</div>");
+  const host=hostIds.map(id=>document.getElementById(id)).find(Boolean);
+  const card=(host&&host.closest("section,dialog,.card"))||matchesCard||null;
 
-  const dateIds = prefix === "next-match"
-    ? ["next-match-home-date", "next-match-when"]
-    : prefix === "matches-next"
+  if(prefix==="matches-next")card?.classList.toggle("canonical-v14-cup-group",!!d.group);
+  if(host&&d.rows)setStableHtml(host,'<div class="canonical-v13-rows">'+d.rows+"</div>");
+
+  const dateIds=prefix==="next-match"
+    ? ["next-match-home-date","next-match-when"]
+    : prefix==="matches-next"
       ? ["matches-next-when"]
       : ["match-detail-when"];
-  const date = dateIds.map(id => document.getElementById(id)).find(Boolean);
-  if (date) date.textContent = (d.date || "Upcoming fixture TBC") + (d.time ? " · Kick-off " + d.time : " · Kick-off TBC");
+  const date=dateIds.map(id=>document.getElementById(id)).find(Boolean);
+  const timeLabel=d.group
+    ? (d.time?"Group starts "+d.time:"Group start TBC")
+    : (d.time?"Kick-off "+d.time:"Kick-off TBC");
+  if(date)date.textContent=(d.date||"Upcoming fixture TBC")+" · "+timeLabel;
 
-  const ground = document.getElementById(prefix + "-ground");
-  if (ground) ground.textContent = d.ground;
-  const address = document.getElementById(prefix + "-address");
-  if (address) address.textContent = d.address;
+  const ground=document.getElementById(prefix+"-ground");
+  if(ground)ground.textContent=d.ground;
+  const address=document.getElementById(prefix+"-address");
+  if(address)address.textContent=d.address;
 
-  const competition = document.getElementById(prefix + "-competition");
-  if (competition) competition.textContent = d.competition;
+  if(prefix==="matches-next"){
+    const hasVenue=!!d.ground&&!/TBC/i.test(d.ground);
+    const mapHref=hasVenue&&typeof mapsHref==="function"?mapsHref(d.ground,d.address):"";
+    const map=document.getElementById(prefix+"-map");
+    if(map){
+      map.classList.toggle("hidden",!mapHref);
+      if(mapHref)map.href=mapHref;else map.removeAttribute("href");
+    }
+    if(typeof setMapPreview==="function"){
+      const embedHref=hasVenue&&typeof mapsEmbedHref==="function"?mapsEmbedHref(d.ground,d.address):"";
+      setMapPreview(prefix+"-map-preview",prefix+"-map-frame",embedHref);
+    }
+  }
 
-  removeOpponentKitRowsV13((host && host.closest("section,dialog,.card")) || document);
+  removeOpponentKitRowsV13(card||document);
 }
 
 function canonicalRecoveryNextEventV13() {

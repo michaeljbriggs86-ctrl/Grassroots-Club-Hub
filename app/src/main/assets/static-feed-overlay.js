@@ -351,7 +351,7 @@
       const opponent=ownHome?away:home;
       if(!opponent)continue;
       rows.push({
-        date:String(row?.date||''),time:'',opponent,venue:ownHome?'H':'A',
+        date:String(row?.date||''),time:/^\d{2}:\d{2}$/.test(String(row?.time||'').trim())?String(row.time).trim():'',opponent,venue:ownHome?'H':'A',
         competition:isLeague?((typeof window.isPublishedLeagueTeam==='function'&&window.isPublishedLeagueTeam())?'League':'Division'):competitionName,
         providerTeamIds:Array.isArray(row?.provider_team_ids)?row.provider_team_ids.map(String):[],
         raw:`${home} v ${away}`,source:'selkent-static'
