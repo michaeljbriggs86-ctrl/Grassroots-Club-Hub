@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "provider": "Selkent",
-  "last_updated": "2026-10-04T18:10:56.844078+00:00",
+  "last_updated": "2026-10-04T20:50:19.213949+00:00",
   "fixture_agegroup_discovery_source": "selkent_divisions_all",
   "coverage": {
     "fixtures": {
@@ -21245,7 +21245,7 @@
         },
         {
           "division_name": "Under 16B Silver",
-          "updated_at_text": "04/10/26 17:50:35",
+          "updated_at_text": "04/10/26 19:18:00",
           "source_order_authoritative_for_ties": false,
           "source_disclaimer": "Note: Table does not yet take account of rules for determining winner if teams on equal points",
           "rows": [
@@ -21264,6 +21264,19 @@
             },
             {
               "row_order": 2,
+              "provider_team_id": 643,
+              "provider_division_id": 4288,
+              "team_name": "Hillyfielders Falcons",
+              "played": 2,
+              "won": 2,
+              "drawn": 0,
+              "lost": 0,
+              "gf": 3,
+              "ga": 1,
+              "points": 4
+            },
+            {
+              "row_order": 3,
               "provider_team_id": 562,
               "provider_division_id": 4288,
               "team_name": "Newpark Football Club",
@@ -21276,29 +21289,16 @@
               "points": 4
             },
             {
-              "row_order": 3,
-              "provider_team_id": 643,
-              "provider_division_id": 4288,
-              "team_name": "Hillyfielders Falcons",
-              "played": 1,
-              "won": 1,
-              "drawn": 0,
-              "lost": 0,
-              "gf": 2,
-              "ga": 1,
-              "points": 2
-            },
-            {
               "row_order": 4,
               "provider_team_id": 37,
               "provider_division_id": 4288,
               "team_name": "Lewisham Tigers",
-              "played": 1,
+              "played": 2,
               "won": 1,
               "drawn": 0,
-              "lost": 0,
+              "lost": 1,
               "gf": 3,
-              "ga": 2,
+              "ga": 3,
               "points": 2
             },
             {
@@ -21830,6 +21830,15 @@
           "away": "Villacourt Rovers Yellow",
           "homeGoals": 3,
           "awayGoals": 5,
+          "provider_division_id": 4288,
+          "division_name": "Under 16B Silver"
+        },
+        {
+          "date": "2026-10-04",
+          "home": "Lewisham Tigers",
+          "away": "Hillyfielders Falcons",
+          "homeGoals": 0,
+          "awayGoals": 1,
           "provider_division_id": 4288,
           "division_name": "Under 16B Silver"
         },
