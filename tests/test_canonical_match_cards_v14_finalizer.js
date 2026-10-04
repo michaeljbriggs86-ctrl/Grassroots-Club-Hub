@@ -208,12 +208,12 @@ assert.equal(mh.f.src,meridian,"Romans confirmed legacy map stays visible");
 function finalizerHarness(modelValue){
   let mapCalls=0;
   const card={classList:classes()};
-  const host={innerHTML:"",closest:()=>card};
+  const host={innerHTML:"",classList:classes(),closest:()=>card};
   const date={textContent:""},ground={textContent:""},address={textContent:""};
   const map={classList:classes(["hidden"]),href:"",removeAttribute(n){if(n==="href")this.href="";}};
   const ids={
     "next-match-home-teams":host,"next-match-home-date":date,"next-match-ground":ground,"next-match-address":address,
-    "match-detail-versus":host,"match-detail-when":date,"match-detail-ground":ground,"match-detail-address":address,
+    "match-detail-versus":host,"match-detail-ground":ground,"match-detail-address":address,
     "matches-next-fixture":card,"matches-next-versus":host,"matches-next-when":date,"matches-next-ground":ground,"matches-next-address":address,"matches-next-map":map
   };
   const ctx={

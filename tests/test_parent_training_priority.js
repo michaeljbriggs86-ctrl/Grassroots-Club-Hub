@@ -31,14 +31,14 @@ assert.equal(ctx.state.trainingSessions[0].endTime,'19:30');
 ctx.render();
 assert.match(inputs['training-session-list'].innerHTML,/2099-10-01.*18:00–19:30/);
 assert.equal(ctx.upcoming().length,1);
-const matchStart=app.indexOf('function renderMatchPageNextFixture(){'),matchEnd=app.indexOf('function divisionOpponents(){',matchStart);
+const helperStart=app.indexOf('function syncMatchPlayedActionV141('),renderStart=app.indexOf('function renderMatchPageNextFixture(){'),matchStart=helperStart>=0&&helperStart<renderStart?helperStart:renderStart,matchEnd=app.indexOf('function divisionOpponents(){',renderStart);
 const card={hidden:false,classList:{toggle(_name,value){card.hidden=value;}}};
 const placeholder={hidden:true,classList:{toggle(_name,value){placeholder.hidden=value;}}};
-const training={hidden:true,innerHTML:'',classList:{toggle(_name,value){training.hidden=value;}}};
+const training={hidden:true,innerHTML:'',classList:{toggle(_name,value){training.hidden=value;}}},played={hidden:false,classList:{toggle(_name,value){played.hidden=value;}}};
 const matchCtx={CLOUD_MODE:true,currentRole:'parent',nextPublishedFixture:()=>({date:'2099-10-04'}),parentMatchdayReady:()=>false,
-  parentTrainingScheduleHtml:()=>'<div>Next session</div>',
-  document:{getElementById:id=>id==='matches-next-fixture'?card:id==='parent-matches-placeholder'?placeholder:id==='parent-matches-training'?training:null}};
-vm.runInNewContext(`${app.slice(matchStart,matchEnd)}\nrenderMatchPageNextFixture();`,matchCtx);
+  parentTrainingScheduleHtml:()=>'<div>Next session</div>',isCoach:()=>false,miniCupGroup:()=>null,
+  document:{getElementById:id=>id==='matches-next-fixture'?card:id==='parent-matches-placeholder'?placeholder:id==='parent-matches-training'?training:id==='matches-next-played'?played:null}};
+vm.runInNewContext(`${app.slice(matchStart,matchEnd)}\nrenderMatchPageNextFixture();`,matchCtx);assert.equal(played.hidden,true);
 assert.equal(card.hidden,true);
 assert.equal(placeholder.hidden,false);
 assert.equal(training.hidden,false);
