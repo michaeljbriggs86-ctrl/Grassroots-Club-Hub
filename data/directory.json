@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-09-30T14:57:16.905015+00:00",
+  "last_updated": "2026-10-04T22:14:42.407007+00:00",
   "clubs": [
     {
       "club_id": 514,
@@ -688,7 +688,7 @@
         "Lewisham Project Gold",
         "Metrogas FC Red",
         "Regans FC Silver",
-        "ShooterBallers FC Green"
+        "ShooterBallers FC"
       ],
       "team_count_label": "10 teams"
     },
@@ -996,10 +996,9 @@
         "Long Lane Tigers",
         "Longfield Tigers FC",
         "Metrogas FC White",
-        "Northumberland Heath",
-        "ShooterBallers FC"
+        "Northumberland Heath"
       ],
-      "team_count_label": "12 teams"
+      "team_count_label": "11 teams"
     },
     {
       "age_group": "U9",
@@ -1011,10 +1010,10 @@
         "Dulwich Hamlet JFC Pink",
         "Dynamo Youth Silver",
         "Fisher Youth",
-        "Hillyfielders Hawks",
         "Kekoa Red",
         "KSI Coaching FC White",
         "Palace Knights Yellow",
+        "ShooterBallers FC",
         "The Bosco FC Dons",
         "Wildcats FS Club Lions"
       ],
@@ -1052,13 +1051,12 @@
         "Blackheath Village",
         "Deptford United",
         "Gipsy Hill FC Whites",
-        "KSI Coaching FC Navy",
         "Lewisham Borough Cobras",
         "Palace Knights White",
         "S.E. Eagles FC",
         "Vikings FC Blue"
       ],
-      "team_count_label": "12 teams"
+      "team_count_label": "11 teams"
     },
     {
       "age_group": "U10X",
@@ -1161,11 +1159,12 @@
         "Cray Wanderers Wolves",
         "Dulwich Village Red",
         "Greenwich Peninsula Jaguars",
+        "Hillyfielders Hawks",
         "Lewisham Project Gold",
         "London Legends Blue",
         "Old Roan FC Navy"
       ],
-      "team_count_label": "9 teams"
+      "team_count_label": "10 teams"
     },
     {
       "age_group": "U10X",
@@ -1214,10 +1213,9 @@
         "Ebbsfleet United Red",
         "Ebbsfleet United White",
         "Metrogas FC Lions",
-        "Next Level FC Reds",
-        "Prolific FC"
+        "Next Level FC Reds"
       ],
-      "team_count_label": "10 teams"
+      "team_count_label": "9 teams"
     },
     {
       "age_group": "U10",
@@ -1307,14 +1305,13 @@
         "Cray Wanderers Cobras",
         "Eversley Rangers",
         "Foots Cray Lions Yellow",
-        "Greenwich Peninsula Tigers",
         "Next Level FC Blacks",
         "Russellers Gold",
         "Shooters Hill AFC Royals",
         "Welling United Blue",
         "Welling United Red"
       ],
-      "team_count_label": "11 teams"
+      "team_count_label": "10 teams"
     },
     {
       "age_group": "U10",
@@ -1435,13 +1432,14 @@
         "Deptford United",
         "Dulwich Hamlet JFC Navy",
         "Dulwich Village Red",
+        "Greenwich Peninsula Tigers",
         "Junior Reds Titans",
         "KSI Coaching FC Navy",
         "Lewisham Youth",
         "Wildcats FS Club Jaguars",
         "Wildcats FS Club Tigers"
       ],
-      "team_count_label": "10 teams"
+      "team_count_label": "11 teams"
     },
     {
       "age_group": "U11",
@@ -1594,7 +1592,6 @@
       "agegroup_id": 22,
       "division_name": "Under 12X A Silver",
       "teams": [
-        "AFC Lewisham Blue",
         "Dartford FC Black",
         "Dulwich Village Black",
         "Dynamo Youth White",
@@ -1604,7 +1601,7 @@
         "Russellers Blues",
         "Samuel Montagu Green"
       ],
-      "team_count_label": "9 teams"
+      "team_count_label": "8 teams"
     },
     {
       "age_group": "U12X",
@@ -2257,7 +2254,6 @@
       "agegroup_id": 9,
       "division_name": "Under 15A",
       "teams": [
-        "AFC Lewisham Blue",
         "Dartford FC White",
         "Dulwich Village Orange",
         "Dulwich Village White",
@@ -2270,7 +2266,7 @@
         "SE Dons Football Club Tigers",
         "Teviot Rangers WHITE"
       ],
-      "team_count_label": "12 teams"
+      "team_count_label": "11 teams"
     },
     {
       "age_group": "U15",
@@ -2590,7 +2586,7 @@
       "club_name": "Regans FC"
     },
     {
-      "team_name": "ShooterBallers FC Green",
+      "team_name": "ShooterBallers FC",
       "club_id": 498,
       "club_name": "ShooterBallers FC"
     },
@@ -3455,11 +3451,6 @@
       "club_name": "Northumberland Heath"
     },
     {
-      "team_name": "ShooterBallers FC",
-      "club_id": 498,
-      "club_name": "ShooterBallers FC"
-    },
-    {
       "team_name": "AFC Lewisham White",
       "club_id": 234,
       "club_name": "AFC Lewisham"
@@ -3485,11 +3476,6 @@
       "club_name": "Fisher Youth"
     },
     {
-      "team_name": "Hillyfielders Hawks",
-      "club_id": 288,
-      "club_name": "Hillyfielders"
-    },
-    {
       "team_name": "Kekoa Red",
       "club_id": 465,
       "club_name": "Kekoa"
@@ -3503,6 +3489,11 @@
       "team_name": "Palace Knights Yellow",
       "club_id": 480,
       "club_name": "Palace Knights"
+    },
+    {
+      "team_name": "ShooterBallers FC",
+      "club_id": 498,
+      "club_name": "ShooterBallers FC"
     },
     {
       "team_name": "The Bosco FC Dons",
@@ -3608,11 +3599,6 @@
       "team_name": "Gipsy Hill FC Whites",
       "club_id": 548,
       "club_name": "Gipsy Hill FC"
-    },
-    {
-      "team_name": "KSI Coaching FC Navy",
-      "club_id": 440,
-      "club_name": "KSI Coaching FC"
     },
     {
       "team_name": "Lewisham Borough Cobras",
@@ -3915,6 +3901,11 @@
       "club_name": "Greenwich Peninsula"
     },
     {
+      "team_name": "Hillyfielders Hawks",
+      "club_id": 288,
+      "club_name": "Hillyfielders"
+    },
+    {
       "team_name": "Lewisham Project Gold",
       "club_id": 442,
       "club_name": "Lewisham Project"
@@ -4063,11 +4054,6 @@
       "team_name": "Next Level FC Reds",
       "club_id": 493,
       "club_name": "Next Level FC"
-    },
-    {
-      "team_name": "Prolific FC",
-      "club_id": 565,
-      "club_name": "Prolific FC"
     },
     {
       "team_name": "AFC Lewisham Blue",
@@ -4323,11 +4309,6 @@
       "team_name": "Foots Cray Lions Yellow",
       "club_id": 275,
       "club_name": "Foots Cray Lions"
-    },
-    {
-      "team_name": "Greenwich Peninsula Tigers",
-      "club_id": 444,
-      "club_name": "Greenwich Peninsula"
     },
     {
       "team_name": "Next Level FC Blacks",
@@ -4683,6 +4664,11 @@
       "team_name": "Dulwich Village Red",
       "club_id": 261,
       "club_name": "Dulwich Village"
+    },
+    {
+      "team_name": "Greenwich Peninsula Tigers",
+      "club_id": 444,
+      "club_name": "Greenwich Peninsula"
     },
     {
       "team_name": "Junior Reds Titans",
@@ -5118,11 +5104,6 @@
       "team_name": "Welling United Red",
       "club_id": 254,
       "club_name": "Welling United"
-    },
-    {
-      "team_name": "AFC Lewisham Blue",
-      "club_id": 234,
-      "club_name": "AFC Lewisham"
     },
     {
       "team_name": "Dartford FC Black",
@@ -6993,11 +6974,6 @@
       "team_name": "Woolwich Wanderers FC",
       "club_id": 566,
       "club_name": "Woolwich Wanderers FC"
-    },
-    {
-      "team_name": "AFC Lewisham Blue",
-      "club_id": 234,
-      "club_name": "AFC Lewisham"
     },
     {
       "team_name": "Dartford FC White",
