@@ -1856,8 +1856,15 @@ function renderNextMatch(){
   renderFixtureConfirmationEditor(f);refreshFixtureOverviewDirectory(f);renderParentHomeMatchInfo();
 }
 
+function syncMatchPlayedActionV141(f){
+  const button=document.getElementById('matches-next-played');if(!button)return;
+  let group=null;
+  try{group=f&&typeof miniCupGroup==='function'?miniCupGroup(f):null;}catch(_){}
+  button.classList.toggle('hidden',!f||!isCoach()||!!group);
+}
+
 function renderMatchPageNextFixture(){
-  const card=document.getElementById('matches-next-fixture');if(!card)return;const f=nextPublishedFixture(),set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
+  const card=document.getElementById('matches-next-fixture');if(!card)return;const f=nextPublishedFixture();syncMatchPlayedActionV141(f);const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
   const parent=CLOUD_MODE&&currentRole==='parent',confirmed=!!f&&!!parentMatchdayReady(f);card.classList.toggle('hidden',parent&&!confirmed);document.getElementById('parent-matches-placeholder')?.classList.toggle('hidden',!parent||confirmed);
   const training=document.getElementById('parent-matches-training');if(training){training.classList.toggle('hidden',!parent);if(parent)training.innerHTML=parentTrainingScheduleHtml();}if(parent&&!confirmed)return;
   if(!f){set('matches-next-opponent','TBC');set('matches-next-when','Date / kick-off TBC');set('matches-next-venue','Competition TBC');return;}
@@ -5370,8 +5377,10 @@ function removeOpponentKitRowsV13(root=document) {
 
 function applyCanonicalRecoveryV13(prefix, f) {
   const matchesCard=prefix==="matches-next"?document.getElementById("matches-next-fixture"):null;
+  const dashboardHost=prefix==="next-match"?document.getElementById("next-match-home-teams"):null;
   if(!f){
     matchesCard?.classList.remove("canonical-v14-cup-group");
+    dashboardHost?.classList.remove("canonical-v14-dashboard-host");
     if(prefix==="matches-next"){
       const map=document.getElementById("matches-next-map");
       if(map){map.classList.add("hidden");map.removeAttribute("href");}
@@ -5379,50 +5388,25 @@ function applyCanonicalRecoveryV13(prefix, f) {
     }
     return;
   }
-
   const d=canonicalMatchCardFrameworkV13Recovery(f);
-  const hostIds=prefix==="next-match"
-    ? ["next-match-home-teams","next-match-versus"]
-    : prefix==="matches-next"
-      ? ["matches-next-versus"]
-      : ["match-detail-versus"];
-  const host=hostIds.map(id=>document.getElementById(id)).find(Boolean);
-  const card=(host&&host.closest("section,dialog,.card"))||matchesCard||null;
-
+  const hostIds=prefix==="next-match"?["next-match-home-teams","next-match-versus"]:prefix==="matches-next"?["matches-next-versus"]:["match-detail-versus"];
+  const hosts=hostIds.map(id=>document.getElementById(id)).filter(Boolean);
+  const containers=[...new Set(hosts.map(host=>host.closest("section,dialog,.card")).filter(Boolean))];
+  const card=containers[0]||matchesCard||null;
+  if(prefix==="next-match")dashboardHost?.classList.add("canonical-v14-dashboard-host");
   if(prefix==="matches-next")card?.classList.toggle("canonical-v14-cup-group",!!d.group);
-  if(host&&d.rows)setStableHtml(host,'<div class="canonical-v13-rows">'+d.rows+"</div>");
-
-  const dateIds=prefix==="next-match"
-    ? ["next-match-home-date","next-match-when"]
-    : prefix==="matches-next"
-      ? ["matches-next-when"]
-      : ["match-detail-when"];
-  const date=dateIds.map(id=>document.getElementById(id)).find(Boolean);
-  const timeLabel=d.group
-    ? (d.time?"Group starts "+d.time:"Group start TBC")
-    : (d.time?"Kick-off "+d.time:"Kick-off TBC");
-  if(date)date.textContent=(d.date||"Upcoming fixture TBC")+" · "+timeLabel;
-
-  const ground=document.getElementById(prefix+"-ground");
-  if(ground)ground.textContent=d.ground;
-  const address=document.getElementById(prefix+"-address");
-  if(address)address.textContent=d.address;
-
+  if(d.rows)for(const host of hosts)setStableHtml(host,'<div class="canonical-v13-rows">'+d.rows+"</div>");
+  const dateIds=prefix==="next-match"?["next-match-home-date","next-match-when"]:prefix==="matches-next"?["matches-next-when"]:[];
+  const timeLabel=d.group?(d.time?"Group starts "+d.time:"Group start TBC"):(d.time?"Kick-off "+d.time:"Kick-off TBC");
+  for(const id of dateIds){const date=document.getElementById(id);if(date)date.textContent=(d.date||"Upcoming fixture TBC")+" · "+timeLabel;}
+  const ground=document.getElementById(prefix+"-ground");if(ground)ground.textContent=d.ground;
+  const address=document.getElementById(prefix+"-address");if(address)address.textContent=d.address;
   if(prefix==="matches-next"){
-    const hasVenue=!!d.ground&&!/TBC/i.test(d.ground);
-    const mapHref=hasVenue&&typeof mapsHref==="function"?mapsHref(d.ground,d.address):"";
-    const map=document.getElementById(prefix+"-map");
-    if(map){
-      map.classList.toggle("hidden",!mapHref);
-      if(mapHref)map.href=mapHref;else map.removeAttribute("href");
-    }
-    if(typeof setMapPreview==="function"){
-      const embedHref=hasVenue&&typeof mapsEmbedHref==="function"?mapsEmbedHref(d.ground,d.address):"";
-      setMapPreview(prefix+"-map-preview",prefix+"-map-frame",embedHref);
-    }
+    const hasVenue=!!d.ground&&!/TBC/i.test(d.ground),mapHref=hasVenue&&typeof mapsHref==="function"?mapsHref(d.ground,d.address):"",map=document.getElementById(prefix+"-map");
+    if(map){map.classList.toggle("hidden",!mapHref);if(mapHref)map.href=mapHref;else map.removeAttribute("href");}
+    if(typeof setMapPreview==="function"){const embedHref=hasVenue&&typeof mapsEmbedHref==="function"?mapsEmbedHref(d.ground,d.address):"";setMapPreview(prefix+"-map-preview",prefix+"-map-frame",embedHref);}
   }
-
-  removeOpponentKitRowsV13(card||document);
+  const cleanupRoots=containers.length?containers:(matchesCard?[matchesCard]:[document]);for(const root of cleanupRoots)removeOpponentKitRowsV13(root);
 }
 
 function canonicalRecoveryNextEventV13() {

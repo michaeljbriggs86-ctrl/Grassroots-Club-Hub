@@ -1713,3 +1713,10 @@ img.club-identity-badge[src="/__pilot_badges/318/53facde723259b51ef991c02e37e33b
 .canonical-v11-badge img,.canonical-v11-badge .club-identity-badge{width:36px;height:36px;max-width:36px;max-height:36px;object-fit:contain}
 .canonical-v13-badge-fallback{border:1px dashed currentColor;border-radius:50%;font-size:8px;line-height:1;text-align:center;padding:3px;color:var(--muted);background:transparent}
 .canonical-v12-dashboard-rows{text-align:left}
+
+
+/* V14.1 — canonical Dashboard host uses the same full-width row geometry as other match surfaces */
+#next-match-home-teams.canonical-v14-dashboard-host{display:block;width:100%;min-width:0;}
+#next-match-home-teams.canonical-v14-dashboard-host .canonical-v13-rows,
+#next-match-home-teams.canonical-v14-dashboard-host .canonical-v11-fixture,
+#next-match-home-teams.canonical-v14-dashboard-host .canonical-v11-teams{width:100%;min-width:0;}
