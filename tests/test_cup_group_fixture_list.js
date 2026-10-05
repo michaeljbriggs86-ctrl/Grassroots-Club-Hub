@@ -18,22 +18,24 @@ const elems={
 };
 const ctx={state:{selkent:{fixtures}},CLOUD_MODE:true,currentRole:'parent',ageGroupNumber:()=>9,
   selkentNorm:norm,matchTeamLabel:s=>s,upcomingFixtures:()=>fixtures,
-  fixtureCompetitionLabel:f=>f.competition,formatDate:s=>s,
+  ownTeamDisplayName:()=> 'Shooters Hill AFC Valiants',clubIdentityBadgeHtml:()=>'',canConfirmFixtureDetails:()=>ctx.currentRole==='coach',fixtureCompetitionLabel:f=>f.competition,formatDate:s=>s,
   esc:s=>String(s).replaceAll('&','&amp;').replaceAll('<','&lt;'),
   parentMatchdayReady:()=>false,parentCupGroupDetails:()=>null,
   resolvedFixture:f=>f,fixtureDetailsConfirmed:()=>false,
   document:{getElementById:id=>elems[id]||null},setStableHtml:(el,markup)=>{el.innerHTML=markup;}};
 vm.createContext(ctx);
 vm.runInContext(take('function miniCupGroup(', 'function fixtureCompetitionLabel(')
-  +take('function furtherFixtureCardHtml(', 'async function syncSelkent('),ctx);
+  +take('function cupGroupFixtureLines(', 'async function syncSelkent(')
+  +take('function homeFixtureTeamNames(', 'function canConfirmFixtureDetails()')
+  +take('function canonicalCardFixtureRows(', 'function canonicalMatchCardData('),ctx);
 ctx.renderSelkentFixtures();
 assert.equal(elems['selkent-fixtures-count'].textContent,'2','parent gets league fixture and one Cup event');
 assert.equal(elems['selkent-fixtures-heading'].textContent,'Upcoming matchdays');
 let rendered=elems['selkent-fixtures-list'].innerHTML;
 assert.equal((rendered.match(/Cup group matchday/g)||[]).length,1);
-assert.match(rendered,/Chislehurst Wanderers Panthers and Lewisham Borough Cobras/);
-assert.match(rendered,/Group start awaiting confirmation/);
-assert.match(rendered,/Venue<\/span><strong>Awaiting confirmation/);
+assert.match(rendered,/Chislehurst Wanderers Panthers[\s\S]*Lewisham Borough Cobras/);
+assert.match(rendered,/Group start TBC/);
+assert.match(rendered,/Venue<\/span><strong>Marathon Sports Ground/);
 assert.doesNotMatch(rendered,/Arrive|Open in Maps|3-2|Match played/);
 ctx.currentRole='coach';ctx.renderSelkentFixtures();
 assert.equal(elems['selkent-fixtures-count'].textContent,'1','coach further list merges the Cup rows');

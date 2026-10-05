@@ -14,7 +14,7 @@ const state={selkent:{legacyResponseFixtureKey:''},tactics:{
   lineupByFixture:{},positionsByFixture:{},formationByFixture:{},matchdaySelections:{},matchdayAutoPrepared:{},matchPlanByFixture:{},activeFixtureKey:''
 }};
 let reported=false;
-const context={state,selkentNorm:x=>String(x||'').toLowerCase().trim(),nextPublishedFixture:()=>old,fixtureIsReported:()=>reported,
+const context={state,miniCupGroup:()=>null,selkentNorm:x=>String(x||'').toLowerCase().trim(),nextPublishedFixture:()=>old,fixtureIsReported:()=>reported,
   window:{ClubHubCloud:{listMatchAvailability:async key=>stored.get(key)||[]}}};
 vm.createContext(context);vm.runInContext(keyFunctions+tracking+migration,context);
 

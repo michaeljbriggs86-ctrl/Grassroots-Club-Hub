@@ -8,7 +8,7 @@ const later={...home,date:'2099-10-05',opponent:'Later Opponent',time:'08:00'};
 const earlier={...home,date:'2099-10-03',opponent:'Earlier Opponent',time:''};
 const norm=s=>String(s||'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
 const key=f=>`${f.date}|${norm(f.opponent)}|${f.venue}|${norm(f.competition)}`;
-const context={state:{selkent:{fixtures:[away,home,later],fixtureOverrides:{[key(home)]:{time:'14:00',groundName:'Example Field',address:'Example Road',confirmedAt:'2099-10-01T09:00:00Z'}}}},fixtureKitSelectionKey:key,fixtureIsReported:()=>false};
+const context={CLOUD_MODE:false,currentRole:'coach',ageGroupNumber:()=>9,selkentNorm:norm,matchTeamLabel:x=>x,state:{selkent:{fixtures:[away,home,later],fixtureOverrides:{[key(home)]:{time:'14:00',groundName:'Example Field',address:'Example Road',confirmedAt:'2099-10-01T09:00:00Z'}}}},fixtureKitSelectionKey:key,fixtureIsReported:()=>false};
 vm.runInNewContext(source.slice(source.indexOf('function fixtureOverride(f={}){'),source.indexOf('function pilotKitDefaults(')),context);
 vm.runInNewContext(source.slice(source.indexOf('function upcomingFixtures(){'),source.indexOf('function fixtureCompetitionLabel(')),context);
 assert.equal(context.nextPublishedFixture().venue,'H','the confirmed time selects the correct same-day fixture');

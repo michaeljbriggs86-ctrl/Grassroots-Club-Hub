@@ -12,7 +12,7 @@ const players=Array.from({length:8},(_,i)=>({number:i+1,name:`Player ${i+1}`}));
 let fixture={id:'first'};
 let limited=true;
 const state={selkent:{},tactics:{lineup:[],positions:{},formationByFixture:{},matchdaySelections:{},matchdayAutoPrepared:{}}};
-const context={state,fixture,footballFormat:()=>({onPitch:5,matchday:7}),activePlayers:()=>players,
+const context={state,fixture,legacyResponseKeyForFixture:()=>[],miniCupGroup:()=>null,footballFormat:()=>({onPitch:5,matchday:7}),activePlayers:()=>players,
   requiresMatchdaySelection:()=>limited,
   nextPublishedFixture:()=>fixture,fixtureStableKey:f=>f.id,fixtureResponseKey:f=>f.id,requireCoach:()=>true,isCoach:()=>true,
   featureEnabled:()=>true,document:{querySelectorAll:()=>[]},auditEvent:()=>{},toast:()=>{},saveState:()=>{context.rememberTacticsPlan();}};

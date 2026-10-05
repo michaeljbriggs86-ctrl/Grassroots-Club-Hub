@@ -36,7 +36,7 @@ const card={hidden:false,classList:{toggle(_name,value){card.hidden=value;}}};
 const placeholder={hidden:true,classList:{toggle(_name,value){placeholder.hidden=value;}}};
 const training={hidden:true,innerHTML:'',classList:{toggle(_name,value){training.hidden=value;}}},played={hidden:false,classList:{toggle(_name,value){played.hidden=value;}}};
 const matchCtx={CLOUD_MODE:true,currentRole:'parent',nextPublishedFixture:()=>({date:'2099-10-04'}),parentMatchdayReady:()=>false,
-  parentTrainingScheduleHtml:()=>'<div>Next session</div>',isCoach:()=>false,miniCupGroup:()=>null,
+  parentTrainingScheduleHtml:()=>'<div>Next session</div>',isCoach:()=>false,canConfirmFixtureDetails:()=>false,miniCupGroup:()=>null,
   document:{getElementById:id=>id==='matches-next-fixture'?card:id==='parent-matches-placeholder'?placeholder:id==='parent-matches-training'?training:id==='matches-next-played'?played:null}};
 vm.runInNewContext(`${app.slice(matchStart,matchEnd)}\nrenderMatchPageNextFixture();`,matchCtx);assert.equal(played.hidden,true);
 assert.equal(card.hidden,true);

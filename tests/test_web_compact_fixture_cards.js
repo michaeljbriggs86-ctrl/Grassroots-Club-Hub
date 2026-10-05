@@ -7,7 +7,7 @@ const source=fs.readFileSync('app/src/main/assets/app.js','utf8');
 const start=source.indexOf('function furtherFixtureCardHtml(');
 const end=source.indexOf('function renderSelkentFixtures(',start);
 assert.ok(start>=0&&end>start);
-const context={
+const context={CLOUD_MODE:false,currentRole:'coach',canConfirmFixtureDetails:()=>false,
   miniCupGroup:()=>null,
   resolvedFixture: f=>f,
   fixtureDetailsConfirmed: f=>f.confirmed,

@@ -40,8 +40,8 @@ check('T2 - Dashboard host neutralises legacy grid',()=>{
 
 check('T3 - Match played helper enforces role and Cup boundary',()=>{
   const a=app.indexOf('function syncMatchPlayedActionV141'),b=app.indexOf('\nfunction renderMatchPageNextFixture',a);assert.ok(a>=0&&b>a);
-  const button={classList:classes(['hidden'])};let coach=false,group=false;const ctx={document:{getElementById:id=>id==='matches-next-played'?button:null},isCoach:()=>coach,miniCupGroup:()=>group?{}:null};vm.createContext(ctx);vm.runInContext(app.slice(a,b),ctx);
-  ctx.syncMatchPlayedActionV141(null);assert.equal(button.classList.contains('hidden'),true);coach=true;ctx.syncMatchPlayedActionV141({competition:'League'});assert.equal(button.classList.contains('hidden'),false);coach=false;ctx.syncMatchPlayedActionV141({competition:'League'});assert.equal(button.classList.contains('hidden'),true);coach=true;group=true;ctx.syncMatchPlayedActionV141({competition:'Cup'});assert.equal(button.classList.contains('hidden'),true);
+  const button={classList:classes(['hidden'])};let coach=false,group=false;const ctx={document:{getElementById:id=>id==='matches-next-played'?button:null},isCoach:()=>coach,canConfirmFixtureDetails:()=>coach,miniCupGroup:()=>group?{}:null};vm.createContext(ctx);vm.runInContext(app.slice(a,b),ctx);
+  ctx.syncMatchPlayedActionV141(null);assert.equal(button.classList.contains('hidden'),true);coach=true;ctx.syncMatchPlayedActionV141({competition:'League'});assert.equal(button.classList.contains('hidden'),false);coach=false;ctx.syncMatchPlayedActionV141({competition:'League'});assert.equal(button.classList.contains('hidden'),true);coach=true;group=true;ctx.syncMatchPlayedActionV141({competition:'Cup'});assert.equal(button.classList.contains('hidden'),false);assert.equal(button.textContent,'Record group result');coach=false;ctx.syncMatchPlayedActionV141({competition:'Cup'});assert.equal(button.classList.contains('hidden'),true);
   assert.match(css,/body\.admin-preview-mode \[data-requires-edit\]\{display:none!important\}/);
 });
 

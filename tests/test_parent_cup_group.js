@@ -10,10 +10,13 @@ const second={date:first.date,competition:cup,opponent:'Lewisham Borough Cobras'
 const state={selkent:{fixtures:[first,second],fixtureOverrides:{}}};
 const norm=s=>String(s||'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
 const ctx={state,ageGroupNumber:()=>9,selkentNorm:norm,matchTeamLabel:s=>s,
-  fixtureKitSelectionKey:f=>f.opponent,Date};
+  fixtureKitSelectionKey:f=>f.opponent,ownTeamDisplayName:()=> 'Shooters Hill AFC Valiants',clubIdentityBadgeHtml:()=>'',esc:x=>String(x),Date};
 vm.createContext(ctx);
 vm.runInContext(take('function miniCupGroup(', 'function fixtureCompetitionLabel(')
-  +take('function fixtureOverride(', 'function pilotKitDefaults('),ctx);
+  +take('function fixtureOverride(', 'function pilotKitDefaults(')
+  +take('function homeFixtureTeamNames(', 'function canConfirmFixtureDetails()')
+  +take('function canonicalCardFixtureRows(', 'function canonicalMatchCardData(')
+  +take('function cupGroupFixtureLines(', 'function groupFixtureCardHtmlV15('),ctx);
 assert.deepEqual(Array.from(ctx.miniCupGroup(first).opponents),
   ['Chislehurst Wanderers Panthers','Lewisham Borough Cobras']);
 assert.equal(ctx.parentMatchdayReady(first),false,'training stays primary before coach confirmation');
@@ -44,7 +47,8 @@ vm.runInContext(take('function renderParentHomeMatchInfo(', 'function renderPare
 ctx.renderParentHomeMatchInfo();
 assert.equal(panel.hidden,false);
 assert.match(panel.innerHTML,/Cup group matchday/);
-assert.match(panel.innerHTML,/Against Chislehurst Wanderers Panthers and Lewisham Borough Cobras/);
+assert.match(panel.innerHTML,/Chislehurst Wanderers Panthers[\s\S]*Shooters Hill AFC Valiants[\s\S]*Lewisham Borough Cobras/);
+assert.equal((panel.innerHTML.match(/Group game/g)||[]).length,2);
 assert.match(panel.innerHTML,/Group starts 09:00/);
 assert.match(panel.innerHTML,/order may change/);
 assert.doesNotMatch(panel.innerHTML,/Kick-off|Add to calendar|Arrive 08:30/);

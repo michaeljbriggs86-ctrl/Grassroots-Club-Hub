@@ -106,7 +106,7 @@ assert.ok(html.includes('id="club-results-competition"'));
 const leagueFixture={date:'2099-09-27',opponent:'Junior Reds Sabres',venue:'A'};
 const fixtureFns=src.slice(src.indexOf('function fixtureLinkedMatch(f={}){'),src.indexOf('function nextPublishedFixture(){'));
 const fixtureState={matches:[{date:'2099-09-27',opponent:'Junior Reds Sabres',venue:'A',status:'played',gf:5,ga:4}],selkent:{fixtures:[leagueFixture,{date:'2099-10-04',opponent:'Phoenix Sports Panthers',venue:'H'}],results:[]},division:{teamName:'Shooters Hill AFC Valiants'}};
-const {fixtureIsReported,nextFixture}=new Function('state','normalizeTeamKey','matchStatus',`${fixtureFns}\nreturn {fixtureIsReported,nextFixture:()=>upcomingFixtures()[0]};`)(fixtureState,normalizeTeamKey,m=>m.status||'played');
+const {fixtureIsReported,nextFixture}=new Function('state','normalizeTeamKey','matchStatus',`const CLOUD_MODE=false,currentRole='coach',miniCupGroup=()=>null;${fixtureFns}\nreturn {fixtureIsReported,nextFixture:()=>upcomingFixtures()[0]};`)(fixtureState,normalizeTeamKey,m=>m.status||'played');
 assert.equal(fixtureIsReported(leagueFixture),true,'a saved result closes its linked public fixture');
 assert.equal(nextFixture().opponent,'Phoenix Sports Panthers','the next match advances after the completed fixture');
 const directory={leagues:[{age_group:'U9',division_name:'Under 9D Navy',teams:['Shooters Hill AFC Valiants']},{age_group:'U12',division_name:'Under 12C Orange',teams:['Shooters Hill AFC Cannons']}]};

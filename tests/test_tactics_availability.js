@@ -50,12 +50,12 @@ const run=async()=>{
   coachSummary.innerHTML='Previously available: Oscar';
   const clearsBeforeFailure=cleared,boardsBeforeFailure=boardRenders,dashboardsBeforeFailure=dashboardRenders;
   fail=true;await context.refreshMatchAvailability(false);
-  assert.equal(context.availabilityStatusForPlayer('Oscar'),'no-response','failed refresh must remove the old availability flag');
-  assert.equal(coachSummary.innerHTML,'','failed refresh must remove the old Coach summary');
-  assert.equal(cleared,clearsBeforeFailure+1);
-  assert.equal(boardRenders,boardsBeforeFailure+1,'the pitch must repaint without stale availability flags');
+  assert.equal(context.availabilityStatusForPlayer('Oscar'),'available','failed same-context refresh retains already-loaded replies');
+  assert.equal(coachSummary.innerHTML,'Previously available: Oscar','failed same-context refresh retains the Coach summary');
+  assert.equal(cleared,clearsBeforeFailure);
+  assert.equal(boardRenders,boardsBeforeFailure+1,'the pitch repaints with the retained same-context replies');
   assert.equal(dashboardRenders,dashboardsBeforeFailure+1,'the matchday summary must repaint after failure');
-  assert.equal(count.textContent,'Availability unavailable');
+  assert.equal(count.textContent,'Some replies could not load. Retry.');
   assert.match(app,/tactics-availability-flag/);
   console.log('Tactics availability fixture checks passed');
 };
