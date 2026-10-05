@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "provider": "Selkent",
-  "last_updated": "2026-10-05T06:09:51.159037+00:00",
+  "last_updated": "2026-10-05T12:07:14.706389+00:00",
   "fixture_agegroup_discovery_source": "selkent_divisions_all",
   "coverage": {
     "fixtures": {
@@ -10321,7 +10321,7 @@
         },
         {
           "division_name": "Under 14 B Navy",
-          "updated_at_text": "04/10/26 11:54:48",
+          "updated_at_text": "05/10/26 10:33:12",
           "source_order_authoritative_for_ties": false,
           "source_disclaimer": "Note: Table does not yet take account of rules for determining winner if teams on equal points",
           "rows": [
@@ -18648,7 +18648,7 @@
       "standings": [
         {
           "division_name": "Senior Division One",
-          "updated_at_text": "04/10/26 16:55:01",
+          "updated_at_text": "05/10/26 10:46:32",
           "source_order_authoritative_for_ties": false,
           "source_disclaimer": "Note: Table does not yet take account of rules for determining winner if teams on equal points",
           "rows": [
