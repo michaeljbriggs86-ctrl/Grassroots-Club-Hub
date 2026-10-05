@@ -3,11 +3,13 @@ name: Test Selkent Parsers
 on:
   push:
     paths:
+      - 'app/src/main/assets/app.js'
       - 'scripts/**'
       - 'tests/**'
       - '.github/workflows/test-selkent-parsers.yml'
   pull_request:
     paths:
+      - 'app/src/main/assets/app.js'
       - 'scripts/**'
       - 'tests/**'
       - '.github/workflows/test-selkent-parsers.yml'
@@ -20,6 +22,14 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Run independent parent privacy check
+        run: node tests/test_parent_no_match_records.js
 
       - name: Set up Python
         uses: actions/setup-python@v5
