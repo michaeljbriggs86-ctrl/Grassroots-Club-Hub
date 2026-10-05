@@ -1715,6 +1715,31 @@ img.club-identity-badge[src="/__pilot_badges/318/53facde723259b51ef991c02e37e33b
 .canonical-v12-dashboard-rows{text-align:left}
 
 
+/* V15 cover-screen layout: leave room for full team-name words beside badges. */
+@media(max-width:380px){
+  .canonical-v11-teams,
+  .canonical-v11-active .canonical-v11-teams{gap:6px;}
+  .canonical-v11-side,
+  .canonical-v11-active .canonical-v11-side{gap:4px;}
+  .canonical-v11-side strong,
+  .canonical-v11-active .canonical-v11-side strong{
+    min-width:0;font-size:clamp(13px,4vw,14px);line-height:1.35;word-break:normal;overflow-wrap:anywhere;
+  }
+  .canonical-v11-badge,
+  .canonical-v13-badge-fallback,
+  .canonical-v11-active .canonical-v11-badge{
+    width:30px;height:30px;min-width:30px;flex:0 0 30px;
+  }
+  .canonical-v11-badge img,
+  .canonical-v11-badge .club-identity-badge,
+  .canonical-v11-active .canonical-v11-badge img,
+  .canonical-v11-active .canonical-v11-badge .club-identity-badge{
+    width:30px;height:30px;max-width:30px;max-height:30px;object-fit:contain;
+  }
+  #matches-next-fixture.canonical-v11-active .next-fixture-versus,
+  #next-fixture-dialog.canonical-v11-active .next-fixture-versus{padding:4px;}
+}
+
 /* V14.1 — canonical Dashboard host uses the same full-width row geometry as other match surfaces */
 #next-match-home-teams.canonical-v14-dashboard-host{display:block;width:100%;min-width:0;}
 #next-match-home-teams.canonical-v14-dashboard-host .canonical-v13-rows,
