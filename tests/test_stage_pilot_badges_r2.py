@@ -1,6 +1,7 @@
 """Exact-byte and provenance gates for private badge object storage."""
 import hashlib
 import pathlib
+import subprocess
 import sys
 import unittest
 from unittest.mock import patch
@@ -66,6 +67,53 @@ class StageTest(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'unsupported badge image format'):
             stage.fetch_reviewed({**self.badge, 'logo_sha256': hashlib.sha256(b'<svg/>').hexdigest()},
                                  lambda *a, **k: Response(b'<svg/>'))
+
+    def test_repeat_deploy_checks_stored_bytes_without_fetch_or_put(self):
+        commands = []
+        def run(command, *, check):
+            self.assertTrue(check)
+            commands.append(command)
+            pathlib.Path(command[command.index('--file') + 1]).write_bytes(self.data)
+        stage.upload_badges([self.badge], lambda *a, **k: self.fail('mutable source fetched'),
+                            run, prefer_stored=True)
+        self.assertEqual(len(commands), 1)
+        self.assertIn('get', commands[0])
+        self.assertNotIn('put', commands[0])
+        self.assertIn(f"250/{self.badge['logo_sha256']}", commands[0][6])
+
+    def test_corrupt_stored_object_stops_without_fetch_or_replacement(self):
+        commands = []
+        def run(command, *, check):
+            commands.append(command)
+            pathlib.Path(command[command.index('--file') + 1]).write_bytes(self.data + b'changed')
+        with self.assertRaisesRegex(ValueError, 'stored R2 bytes differ'):
+            stage.upload_badges([self.badge], lambda *a, **k: self.fail('source fallback'),
+                                run, prefer_stored=True)
+        self.assertEqual(len(commands), 1)
+        self.assertNotIn('put', commands[0])
+
+    def test_missing_stored_object_uses_original_exact_source_and_readback_gates(self):
+        commands = []
+        urls = []
+        def run(command, *, check):
+            commands.append(command)
+            if len(commands) == 1:
+                raise subprocess.CalledProcessError(1, command)
+            if 'get' in command:
+                pathlib.Path(command[command.index('--file') + 1]).write_bytes(self.data)
+        def get(url, **kwargs):
+            urls.append(url)
+            return Response(self.data)
+        stage.upload_badges([self.badge], get, run, prefer_stored=True)
+        self.assertEqual(urls, [self.badge['logo_url']])
+        self.assertEqual([c[5] for c in commands], ['get', 'put', 'get'])
+
+    def test_missing_object_still_rejects_changed_public_source(self):
+        def run(command, *, check):
+            raise subprocess.CalledProcessError(1, command)
+        with self.assertRaisesRegex(ValueError, 'changed since review'):
+            stage.upload_badges([self.badge], lambda *a, **k: Response(self.data + b'changed'),
+                                run, prefer_stored=True)
 
     def test_private_badge_is_only_read_back_from_r2(self):
         badge = {**self.badge, 'logo_source': 'club_supplied_private'}

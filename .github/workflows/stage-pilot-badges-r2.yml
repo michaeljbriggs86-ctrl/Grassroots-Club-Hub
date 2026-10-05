@@ -21,6 +21,7 @@ on:
       - 'cloudflare/web-app/wrangler.jsonc'
       - 'cloudflare/web-app/service-worker.js'
       - 'app/src/main/assets/app.js'
+      - 'app/src/main/assets/styles.css'
       - 'app/src/main/assets/app-design-system.css'
       - 'app/src/main/assets/static-feed-overlay.js'
 
@@ -68,10 +69,11 @@ jobs:
             npx --yes wrangler@4.142.0 r2 bucket create pitchkind-pilot-badges
           fi
       - name: Upload exact reviewed bytes and verify R2 readback
-        run: python scripts/stage_pilot_badges_r2.py --upload
+        run: python scripts/stage_pilot_badges_r2.py --upload --prefer-stored
       - name: Publish metadata after verified R2 readback
         run: |
-          python scripts/publish_pilot_badges.py --verify-assets
+          # The preceding gate verified every immutable approved R2 object.
+          python scripts/publish_pilot_badges.py
           python cloudflare/web-app/build.py
           git diff --check
       - name: Deploy protected website Worker with R2 binding

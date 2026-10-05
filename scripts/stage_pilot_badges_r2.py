@@ -80,12 +80,30 @@ def approvals(directory, manifest):
     return manifest['badges']
 
 
-def upload_badges(badges, get, run):
+def upload_badges(badges, get, run, *, prefer_stored=False):
     with tempfile.TemporaryDirectory(prefix='pitchkind-badges-') as directory:
         root = Path(directory)
         for badge in badges:
             key = f"{int(badge['club_id'])}/{badge['logo_sha256'].lower()}"
             readback = root / 'r2-readback'
+            if prefer_stored:
+                # An immutable approved object is sufficient for repeat app
+                # deployments; mutable public artwork need not be fetched again.
+                try:
+                    run([*WRANGLER, 'r2', 'object', 'get', f'{BUCKET}/{key}',
+                         '--remote', '--file', str(readback)], check=True)
+                except subprocess.CalledProcessError:
+                    readback.unlink(missing_ok=True)
+                    # New/missing objects still use the original upload gates.
+                else:
+                    data = readback.read_bytes()
+                    if (not data or len(data) > MAX_IMAGE_BYTES or
+                            hashlib.sha256(data).hexdigest() != badge['logo_sha256'].lower()):
+                        raise ValueError(f"badge {badge['club_id']} stored R2 bytes differ from review")
+                    media_type(data)
+                    readback.unlink()
+                    print(f"Checked stored R2 badge club_id={badge['club_id']} sha256={badge['logo_sha256']}")
+                    continue
             if badge.get('logo_source') in ('club_supplied_private', 'official_source_snapshot_private'):
                 # Secretary-supplied artwork has no public source. It was staged
                 # privately, and CI admits only its exact reviewed bytes.
@@ -154,15 +172,19 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--check', action='store_true', help='validate manifest without network or upload')
     parser.add_argument('--upload', action='store_true', help='fetch, hash, upload, and verify R2 readback')
+    parser.add_argument('--prefer-stored', action='store_true',
+                        help='first verify exact approved R2 objects before fetching public sources')
     args = parser.parse_args()
     if args.check == args.upload:
         parser.error('specify exactly one of --check or --upload')
+    if args.prefer_stored and not args.upload:
+        parser.error('--prefer-stored requires --upload')
     directory = json.loads(Path('data/directory.json').read_text(encoding='utf-8'))
     manifest = json.loads(Path('verification/pilot_verified_badges.json').read_text(encoding='utf-8'))
     badges = approvals(directory, manifest)
     if args.upload:
         import requests
-        upload_badges(badges, requests.get, subprocess.run)
+        upload_badges(badges, requests.get, subprocess.run, prefer_stored=args.prefer_stored)
     else:
         print(f'Validated {len(badges)} reviewed pilot badge record(s); no upload performed')
 
