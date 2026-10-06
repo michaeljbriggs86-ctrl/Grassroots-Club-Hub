@@ -1795,7 +1795,14 @@ function matchTeamSideHtml(sideLabel,teamName,kit){
 }
 function homeFixtureTeamNames(f={}){const own=ownTeamDisplayName(),away=String(f.venue||'').toUpperCase()==='A';return {home:away?(f.opponent||'Opponent'):own,away:away?own:(f.opponent||'Opponent')};}
 function canConfirmFixtureDetails(){return isCoach()&&(!CLOUD_MODE||!!window.ClubHubCloud?.canEdit?.());}
-function groundOptionsForFixture(f={}){const names=homeFixtureTeamNames(f),homeDetail=state.selkent?.directoryDetails?.[selkentNorm(names.home)]||{};return Array.isArray(homeDetail.groundOptions)?homeDetail.groundOptions:[];}
+function groundOptionsForFixture(f={}){
+  const names=homeFixtureTeamNames(f),homeDetail=state.selkent?.directoryDetails?.[selkentNorm(names.home)]||{},grounds=Array.isArray(homeDetail.groundOptions)?homeDetail.groundOptions:[];
+  if(!miniCupGroup(f))return grounds;
+  // Use the same Cup venue as the displayed card, including a confirmed change.
+  const details=parentCupGroupDetails(f)||cupFixtureDefaults(f)||{},cupGround={name:details.groundName||'',address:details.address||''};
+  if(!cupGround.name||!cupGround.address)return grounds;
+  return [cupGround,...grounds.filter(g=>selkentNorm(g.name)!==selkentNorm(cupGround.name)||selkentNorm(g.address)!==selkentNorm(cupGround.address))];
+}
 let __fixtureEditingKey='';
 function matchTeamLabel(name=''){return String(name||'').replace(/_/g,' ').replace(/\s+/g,' ').trim();}
 function renderCompactNextMatchTeams(f={}){
@@ -1811,7 +1818,7 @@ function renderFixtureConfirmationEditor(f={}){
   const grounds=groundOptionsForFixture(f),select=document.getElementById('next-match-ground-select'),time=document.getElementById('next-match-confirm-time'),kit=document.getElementById('next-match-kit-choice');
   if(time)time.value=o.time||'';if(kit)kit.value=fixtureKitChoice(f);
   const manualGround=document.getElementById('next-match-manual-ground'),manualAddress=document.getElementById('next-match-manual-address');if(manualGround)manualGround.value=o.groundName||'';if(manualAddress)manualAddress.value=o.address||'';
-  if(select){select.innerHTML='<option value="">Select ground</option>'+grounds.map((g,i)=>`<option value="${i}">${esc(g.name)} — ${esc(g.address)}</option>`).join('')+'<option value="__other__">Other / manual venue</option>';let selected='';if(o.groundName){const idx=grounds.findIndex(g=>selkentNorm(g.name)===selkentNorm(o.groundName)&&selkentNorm(g.address)===selkentNorm(o.address));selected=idx>=0?String(idx):'__other__';}else if(grounds.length===1)selected='0';select.value=selected;}
+  if(select){select.innerHTML='<option value="">Select ground</option>'+grounds.map((g,i)=>`<option value="${i}">${esc(g.name)} — ${esc(g.address)}</option>`).join('')+'<option value="__other__">Other / manual venue</option>';let selected='';if(o.groundName){const idx=grounds.findIndex(g=>selkentNorm(g.name)===selkentNorm(o.groundName)&&selkentNorm(g.address)===selkentNorm(o.address));selected=idx>=0?String(idx):'__other__';}else if(grounds.length===1||(miniCupGroup(f)&&grounds.length))selected='0';select.value=selected;}
   syncFixtureGroundEditor();
 }
 function syncFixtureGroundEditor(){const select=document.getElementById('next-match-ground-select'),manual=document.getElementById('next-match-manual-ground-fields'),f=nextPublishedFixture(),o=f?fixtureOverride(f):{};if(!select||!manual)return;const isOther=select.value==='__other__';manual.classList.toggle('hidden',!isOther);if(isOther){const g=document.getElementById('next-match-manual-ground'),a=document.getElementById('next-match-manual-address');if(g&&!g.value)g.value=o.groundName||'';if(a&&!a.value)a.value=o.address||'';}}
