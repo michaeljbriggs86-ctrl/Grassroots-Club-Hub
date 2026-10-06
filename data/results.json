@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "provider": "Selkent",
-  "last_updated": "2026-10-05T18:07:44.732237+00:00",
+  "last_updated": "2026-10-06T00:06:18.780400+00:00",
   "fixture_agegroup_discovery_source": "selkent_divisions_all",
   "coverage": {
     "fixtures": {
@@ -20442,6 +20442,376 @@
           "provider_team_ids": [
             "905",
             "116"
+          ]
+        },
+        {
+          "date": "2026-10-11",
+          "division_name": "U10X Selkent Cup One - Round 1",
+          "home": "Boca FC Bears",
+          "away": "Erith & Belvedere",
+          "provider_team_ids": [
+            "197",
+            "1039"
+          ]
+        },
+        {
+          "date": "2026-10-11",
+          "division_name": "U10X Selkent Cup One - Round 1",
+          "home": "Cray Wanderers Panthers",
+          "away": "South Darenth Purples",
+          "provider_team_ids": [
+            "591",
+            "189"
+          ]
+        },
+        {
+          "date": "2026-10-11",
+          "division_name": "U10X Selkent Cup One - Round 1",
+          "home": "Dartford FC Black",
+          "away": "Dulwich Village Orange",
+          "provider_team_ids": [
+            "357",
+            "227"
+          ]
+        },
+        {
+          "date": "2026-10-11",
+          "division_name": "U10X Selkent Cup One - Round 1",
+          "home": "Dulwich Village Black",
+          "away": "Parkwood Rangers Ravens",
+          "provider_team_ids": [
+            "226",
+            "145"
+          ]
+        },
+        {
+          "date": "2026-10-11",
+          "division_name": "U10X Selkent Cup One - Round 1",
+          "home": "Dulwich Village Orange",
+          "away": "Parkwood Rangers Hawks",
+          "provider_team_ids": [
+            "227",
+            "144"
+          ]
+        },
+        {
+          "date": "2026-10-11",
+          "division_name": "U10X Selkent Cup One - Round 1",
+          "home": "Dulwich Village White",
+          "away": "Metrogas FC Red",
+          "provider_team_ids": [
+            "229",
+            "826"
+          ]
+        },
+        {
+          "date": "2026-10-11",
+          "division_name": "U10X Selkent Cup One - Round 1",
+          "home": "Dynamo Youth White",
+          "away": "Teviot Rangers Red",
+          "provider_team_ids": [
+            "535",
+            "755"
+          ]
+        },
+        {
+          "date": "2026-10-11",
+          "division_name": "U10X Selkent Cup One - Round 1",
+          "home": "Ebbsfleet United White",
+          "away": "Hayden Youth Tigers",
+          "provider_team_ids": [
+            "670",
+            "427"
+          ]
+        },
+        {
+          "date": "2026-10-11",
+          "division_name": "U10X Selkent Cup One - Round 1",
+          "home": "Erith & Belvedere",
+          "away": "Boca FC Bears",
+          "provider_team_ids": [
+            "1039",
+            "197"
+          ]
+        },
+        {
+          "date": "2026-10-11",
+          "division_name": "U10X Selkent Cup One - Round 1",
+          "home": "Fisher Youth",
+          "away": "Ebbsfleet United White",
+          "provider_team_ids": [
+            "293",
+            "670"
+          ]
+        },
+        {
+          "date": "2026-10-11",
+          "division_name": "U10X Selkent Cup One - Round 1",
+          "home": "Hayden Youth Tigers",
+          "away": "Fisher Youth",
+          "provider_team_ids": [
+            "427",
+            "293"
+          ]
+        },
+        {
+          "date": "2026-10-11",
+          "division_name": "U10X Selkent Cup One - Round 1",
+          "home": "Metrogas FC Black",
+          "away": "Cray Wanderers Panthers",
+          "provider_team_ids": [
+            "825",
+            "591"
+          ]
+        },
+        {
+          "date": "2026-10-11",
+          "division_name": "U10X Selkent Cup One - Round 1",
+          "home": "Metrogas FC Red",
+          "away": "ShooterBallers FC Black",
+          "provider_team_ids": [
+            "826",
+            "845"
+          ]
+        },
+        {
+          "date": "2026-10-11",
+          "division_name": "U10X Selkent Cup One - Round 1",
+          "home": "Parkwood Rangers Hawks",
+          "away": "Dartford FC Black",
+          "provider_team_ids": [
+            "144",
+            "357"
+          ]
+        },
+        {
+          "date": "2026-10-11",
+          "division_name": "U10X Selkent Cup One - Round 1",
+          "home": "Parkwood Rangers Ravens",
+          "away": "Sporting Club Vista Orange",
+          "provider_team_ids": [
+            "145",
+            "723"
+          ]
+        },
+        {
+          "date": "2026-10-11",
+          "division_name": "U10X Selkent Cup One - Round 1",
+          "home": "ShooterBallers FC Black",
+          "away": "Dulwich Village White",
+          "provider_team_ids": [
+            "845",
+            "229"
+          ]
+        },
+        {
+          "date": "2026-10-11",
+          "division_name": "U10X Selkent Cup One - Round 1",
+          "home": "South Darenth Purples",
+          "away": "Metrogas FC Black",
+          "provider_team_ids": [
+            "189",
+            "825"
+          ]
+        },
+        {
+          "date": "2026-10-11",
+          "division_name": "U10X Selkent Cup One - Round 1",
+          "home": "Sporting Club Vista Orange",
+          "away": "Dulwich Village Black",
+          "provider_team_ids": [
+            "723",
+            "226"
+          ]
+        },
+        {
+          "date": "2026-10-11",
+          "division_name": "U10X Selkent Cup One - Round 1",
+          "home": "Teviot Rangers Red",
+          "away": "Welling United black",
+          "provider_team_ids": [
+            "755",
+            "878"
+          ]
+        },
+        {
+          "date": "2026-10-11",
+          "division_name": "U10X Selkent Cup One - Round 1",
+          "home": "Welling United black",
+          "away": "Dynamo Youth White",
+          "provider_team_ids": [
+            "878",
+            "535"
+          ]
+        },
+        {
+          "date": "2026-10-11",
+          "division_name": "U10X Selkent Cup Two - Round 1",
+          "home": "Beacons Blue",
+          "away": "Total FC",
+          "provider_team_ids": [
+            "928",
+            "2116"
+          ]
+        },
+        {
+          "date": "2026-10-11",
+          "division_name": "U10X Selkent Cup Two - Round 1",
+          "home": "Blackheath Village Blue",
+          "away": "IEXEL F.C Gold",
+          "provider_team_ids": [
+            "77",
+            "12"
+          ]
+        },
+        {
+          "date": "2026-10-11",
+          "division_name": "U10X Selkent Cup Two - Round 1",
+          "home": "Chislehurst Wanderers Pumas",
+          "away": "Hillyfielders Hawks",
+          "provider_team_ids": [
+            "413",
+            "2253"
+          ]
+        },
+        {
+          "date": "2026-10-11",
+          "division_name": "U10X Selkent Cup Two - Round 1",
+          "home": "Cray Wanderers Falcons",
+          "away": "Cray Wanderers Wolves",
+          "provider_team_ids": [
+            "600",
+            "599"
+          ]
+        },
+        {
+          "date": "2026-10-11",
+          "division_name": "U10X Selkent Cup Two - Round 1",
+          "home": "Cray Wanderers Wolves",
+          "away": "Hayden Youth Lions",
+          "provider_team_ids": [
+            "599",
+            "428"
+          ]
+        },
+        {
+          "date": "2026-10-11",
+          "division_name": "U10X Selkent Cup Two - Round 1",
+          "home": "Dartford Royals white",
+          "away": "Teviot Rangers Blue",
+          "provider_team_ids": [
+            "1075",
+            "760"
+          ]
+        },
+        {
+          "date": "2026-10-11",
+          "division_name": "U10X Selkent Cup Two - Round 1",
+          "home": "Dulwich Hamlet JFC Navy",
+          "away": "Dartford Royals white",
+          "provider_team_ids": [
+            "675",
+            "1075"
+          ]
+        },
+        {
+          "date": "2026-10-11",
+          "division_name": "U10X Selkent Cup Two - Round 1",
+          "home": "Dulwich Village Red",
+          "away": "Chislehurst Wanderers Pumas",
+          "provider_team_ids": [
+            "228",
+            "413"
+          ]
+        },
+        {
+          "date": "2026-10-11",
+          "division_name": "U10X Selkent Cup Two - Round 1",
+          "home": "Hayden Youth Lions",
+          "away": "Cray Wanderers Falcons",
+          "provider_team_ids": [
+            "428",
+            "600"
+          ]
+        },
+        {
+          "date": "2026-10-11",
+          "division_name": "U10X Selkent Cup Two - Round 1",
+          "home": "Hillyfielders Hawks",
+          "away": "Dulwich Village Red",
+          "provider_team_ids": [
+            "2253",
+            "228"
+          ]
+        },
+        {
+          "date": "2026-10-11",
+          "division_name": "U10X Selkent Cup Two - Round 1",
+          "home": "IEXEL F.C Gold",
+          "away": "Metrogas FC Blue",
+          "provider_team_ids": [
+            "12",
+            "842"
+          ]
+        },
+        {
+          "date": "2026-10-11",
+          "division_name": "U10X Selkent Cup Two - Round 1",
+          "home": "Junior Reds Valiants",
+          "away": "Old Roan FC Navy",
+          "provider_team_ids": [
+            "244",
+            "818"
+          ]
+        },
+        {
+          "date": "2026-10-11",
+          "division_name": "U10X Selkent Cup Two - Round 1",
+          "home": "Metrogas FC Blue",
+          "away": "Blackheath Village Blue",
+          "provider_team_ids": [
+            "842",
+            "77"
+          ]
+        },
+        {
+          "date": "2026-10-11",
+          "division_name": "U10X Selkent Cup Two - Round 1",
+          "home": "Old Roan FC Navy",
+          "away": "Junior Reds Valiants",
+          "provider_team_ids": [
+            "818",
+            "244"
+          ]
+        },
+        {
+          "date": "2026-10-11",
+          "division_name": "U10X Selkent Cup Two - Round 1",
+          "home": "ST Sports FC Athletic",
+          "away": "Beacons Blue",
+          "provider_team_ids": [
+            "349",
+            "928"
+          ]
+        },
+        {
+          "date": "2026-10-11",
+          "division_name": "U10X Selkent Cup Two - Round 1",
+          "home": "Teviot Rangers Blue",
+          "away": "Dulwich Hamlet JFC Navy",
+          "provider_team_ids": [
+            "760",
+            "675"
+          ]
+        },
+        {
+          "date": "2026-10-11",
+          "division_name": "U10X Selkent Cup Two - Round 1",
+          "home": "Total FC",
+          "away": "ST Sports FC Athletic",
+          "provider_team_ids": [
+            "2116",
+            "349"
           ]
         },
         {
