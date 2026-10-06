@@ -2054,7 +2054,7 @@ function renderParentHomeMatchInfo(){
   if(title)title.textContent=parent?(showMatch?'Matchday':'Training sessions'):'Next match';
   if(!parent)return;
   if(!showMatch){
-    training.innerHTML=parentTrainingRowsHtml();
+    training.innerHTML=parentTrainingScheduleHtml();
     return;
   }
   const details=parentCupGroupDetails(fixture)||resolvedFixture(fixture),teamId=String(window.ClubHubCloud?.currentTeam?.()?.id||''),uid=String(window.ClubHubCloud?.session?.user?.id||'');
