@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "provider": "Selkent",
-  "last_updated": "2026-10-06T12:07:00.350152+00:00",
+  "last_updated": "2026-10-06T18:05:53.955676+00:00",
   "fixture_agegroup_discovery_source": "selkent_divisions_all",
   "coverage": {
     "fixtures": {
@@ -16856,7 +16856,7 @@
         },
         {
           "division_name": "Under 16C Navy",
-          "updated_at_text": "05/10/26 15:53:01",
+          "updated_at_text": "06/10/26 13:14:26",
           "source_order_authoritative_for_ties": false,
           "source_disclaimer": "Note: Table does not yet take account of rules for determining winner if teams on equal points",
           "rows": [
@@ -18656,7 +18656,7 @@
       "standings": [
         {
           "division_name": "Senior Division One",
-          "updated_at_text": "05/10/26 10:46:32",
+          "updated_at_text": "06/10/26 15:40:25",
           "source_order_authoritative_for_ties": false,
           "source_disclaimer": "Note: Table does not yet take account of rules for determining winner if teams on equal points",
           "rows": [
@@ -18675,6 +18675,19 @@
             },
             {
               "row_order": 2,
+              "provider_team_id": 123,
+              "provider_division_id": 4295,
+              "team_name": "FC Elmstead",
+              "played": 2,
+              "won": 1,
+              "drawn": 1,
+              "lost": 0,
+              "gf": 8,
+              "ga": 3,
+              "points": 3
+            },
+            {
+              "row_order": 3,
               "provider_team_id": 155,
               "provider_division_id": 4295,
               "team_name": "Parkwood Rangers PFA",
@@ -18687,7 +18700,7 @@
               "points": 3
             },
             {
-              "row_order": 3,
+              "row_order": 4,
               "provider_team_id": 1043,
               "provider_division_id": 4295,
               "team_name": "Dulwich Village White",
@@ -18700,7 +18713,7 @@
               "points": 2
             },
             {
-              "row_order": 4,
+              "row_order": 5,
               "provider_team_id": 899,
               "provider_division_id": 4295,
               "team_name": "Eversley Rangers White",
@@ -18713,7 +18726,7 @@
               "points": 2
             },
             {
-              "row_order": 5,
+              "row_order": 6,
               "provider_team_id": 2120,
               "provider_division_id": 4295,
               "team_name": "Crayford Arrows",
@@ -18723,19 +18736,6 @@
               "lost": 1,
               "gf": 3,
               "ga": 4,
-              "points": 1
-            },
-            {
-              "row_order": 6,
-              "provider_team_id": 123,
-              "provider_division_id": 4295,
-              "team_name": "FC Elmstead",
-              "played": 1,
-              "won": 0,
-              "drawn": 1,
-              "lost": 0,
-              "gf": 3,
-              "ga": 3,
               "points": 1
             },
             {
@@ -18769,12 +18769,12 @@
               "provider_team_id": 693,
               "provider_division_id": 4295,
               "team_name": "Sutton Athletic",
-              "played": 0,
+              "played": 1,
               "won": 0,
               "drawn": 0,
-              "lost": 0,
+              "lost": 1,
               "gf": 0,
-              "ga": 0,
+              "ga": 5,
               "points": 0
             }
           ],
@@ -18972,6 +18972,15 @@
           "away": "Docklands",
           "homeGoals": 0,
           "awayGoals": 2,
+          "provider_division_id": 4295,
+          "division_name": "Senior Division One"
+        },
+        {
+          "date": "2026-09-27",
+          "home": "FC Elmstead",
+          "away": "Sutton Athletic",
+          "homeGoals": 5,
+          "awayGoals": 0,
           "provider_division_id": 4295,
           "division_name": "Senior Division One"
         },
