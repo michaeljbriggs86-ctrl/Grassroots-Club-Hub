@@ -1757,6 +1757,28 @@ img.club-identity-badge[src="/__pilot_badges/318/53facde723259b51ef991c02e37e33b
   #cup-group-result-dialog .canonical-v11-away{flex-direction:column-reverse;align-items:flex-end;}
 }
 
+/* V15 parent Cup rows: the Schedule and confirmed Home cards use legacy canonical markup. */
+body.role-parent .cup-group-fixture-lines{display:grid;gap:12px;min-width:0;text-align:left;}
+body.role-parent .cup-group-fixture-lines .canonical-match-fixture-row{display:grid;gap:6px;min-width:0;}
+body.role-parent .cup-group-fixture-lines .canonical-match-fixture-label{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:700;}
+body.role-parent .cup-group-fixture-lines .canonical-match-team-row{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:8px;}
+body.role-parent .cup-group-fixture-lines .canonical-match-team{display:flex;align-items:center;gap:6px;min-width:0;}
+body.role-parent .cup-group-fixture-lines .canonical-match-team strong{min-width:0;font-size:15px;line-height:1.35;word-break:normal;overflow-wrap:anywhere;color:var(--ink);}
+body.role-parent .cup-group-fixture-lines .canonical-match-team-away{justify-content:flex-end;text-align:right;}
+body.role-parent .cup-group-fixture-lines .canonical-match-v{color:var(--muted);}
+body.role-parent .cup-group-fixture-lines .canonical-match-badge{display:inline-flex;width:36px;height:36px;min-width:36px;flex:0 0 36px;align-items:center;justify-content:center;}
+body.role-parent .cup-group-fixture-lines .canonical-match-badge img{width:36px;height:36px;max-width:36px;max-height:36px;object-fit:contain;}
+@media(max-width:430px){
+  body.role-parent .cup-group-fixture-lines .canonical-match-team{flex-direction:column;align-items:flex-start;}
+  body.role-parent .cup-group-fixture-lines .canonical-match-team-away{flex-direction:column-reverse;align-items:flex-end;}
+}
+@media(max-width:380px){
+  body.role-parent .cup-group-fixture-lines .canonical-match-team-row{gap:6px;}
+  body.role-parent .cup-group-fixture-lines .canonical-match-team strong{font-size:clamp(13px,4vw,14px);}
+  body.role-parent .cup-group-fixture-lines .canonical-match-badge{width:30px;height:30px;min-width:30px;flex:0 0 30px;}
+  body.role-parent .cup-group-fixture-lines .canonical-match-badge img{width:30px;height:30px;max-width:30px;max-height:30px;}
+}
+
 /* V14.1 — canonical Dashboard host uses the same full-width row geometry as other match surfaces */
 #next-match-home-teams.canonical-v14-dashboard-host{display:block;width:100%;min-width:0;}
 #next-match-home-teams.canonical-v14-dashboard-host .canonical-v13-rows,
