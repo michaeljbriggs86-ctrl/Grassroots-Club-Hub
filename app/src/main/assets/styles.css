@@ -1740,6 +1740,23 @@ img.club-identity-badge[src="/__pilot_badges/318/53facde723259b51ef991c02e37e33b
   #next-fixture-dialog.canonical-v11-active .next-fixture-versus{padding:4px;}
 }
 
+/* V15 Cup result chooser: one compact row and action per game, with reachable scrolling. */
+#cup-group-result-dialog .cup-result-shell{display:grid;grid-template-rows:auto minmax(0,1fr);max-height:inherit;overflow:hidden;}
+#cup-group-result-dialog .cup-result-heading{padding:16px;border-bottom:1px solid var(--line,#D8E0DA);}
+#cup-group-result-dialog .cup-result-heading h3{font-size:17px;min-width:0;flex:1;line-height:1.3;}
+#cup-group-result-dialog .cup-result-heading button{width:auto;min-width:0;min-height:44px;flex:0 0 auto;}
+#cup-group-result-dialog .cup-result-body{min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:16px;display:grid;gap:14px;}
+#cup-group-result-dialog .cup-result-body p{margin:0;overflow-wrap:anywhere;}
+#cup-group-result-dialog .cup-result-games{display:grid;gap:12px;min-width:0;}
+@media(max-width:380px){
+  #cup-group-result-dialog .cup-result-body{padding:12px;}
+  #cup-group-result-dialog .further-fixture-card{padding:8px;}
+}
+@media(max-width:430px){
+  #cup-group-result-dialog .canonical-v11-side{flex-direction:column;align-items:flex-start;}
+  #cup-group-result-dialog .canonical-v11-away{flex-direction:column-reverse;align-items:flex-end;}
+}
+
 /* V14.1 — canonical Dashboard host uses the same full-width row geometry as other match surfaces */
 #next-match-home-teams.canonical-v14-dashboard-host{display:block;width:100%;min-width:0;}
 #next-match-home-teams.canonical-v14-dashboard-host .canonical-v13-rows,

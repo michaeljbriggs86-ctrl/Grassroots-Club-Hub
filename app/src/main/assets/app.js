@@ -1478,10 +1478,10 @@ function openFixtureMatchReport(f){
 function cupGroupResultChooserHtml(f){
   const group=miniCupGroup(f);if(!group||!canConfirmFixtureDetails())return '';
   const details=parentCupGroupDetails(f)||{};
-  return `<div class="panel-heading"><h3>Record group result</h3><button type="button" data-cup-result-close aria-label="Close">Close</button></div>
+  return `<div class="cup-result-shell"><div class="panel-heading cup-result-heading"><h3>Record group result</h3><button type="button" class="secondary-button" data-cup-result-close aria-label="Close">Close</button></div><div class="cup-result-body">
     <p>${esc(group.competition)} · ${esc(formatDate(group.date))} · ${details.time?'Group starts '+esc(details.time):'Group start TBC'}</p>
     <p>${esc(details.groundName||'Venue TBC')}${details.address?' · '+esc(details.address):''}</p>
-    ${group.fixtures.map((row,index)=>{const names=homeFixtureTeamNames(row),reported=fixtureIsReported(row);return `<article class="further-fixture-card"><span>Group game</span><div class="canonical-match-team-row">${clubIdentityBadgeHtml(names.home)}<strong>${esc(matchTeamLabel(names.home))}</strong><b>v</b><strong>${esc(matchTeamLabel(names.away))}</strong>${clubIdentityBadgeHtml(names.away)}</div><button type="button" class="primary-button" data-cup-result-row="${index}" ${reported?'disabled':''}>${reported?'Recorded':'Record result'}</button></article>`;}).join('')}`;
+    <div class="cup-result-games">${group.fixtures.map((row,index)=>{const names=homeFixtureTeamNames(row),reported=fixtureIsReported(row);return `<article class="further-fixture-card"><span class="canonical-v11-label">Group game</span><div class="canonical-v11-teams"><span class="canonical-v11-side"><span class="canonical-v11-badge">${clubIdentityBadgeHtml(names.home)}</span><strong>${esc(matchTeamLabel(names.home))}</strong></span><b class="canonical-v11-v">v</b><span class="canonical-v11-side canonical-v11-away"><strong>${esc(matchTeamLabel(names.away))}</strong><span class="canonical-v11-badge">${clubIdentityBadgeHtml(names.away)}</span></span></div><button type="button" class="primary-button" data-cup-result-row="${index}" ${reported?'disabled':''}>${reported?'Recorded':'Record result'}</button></article>`;}).join('')}</div></div></div>`;
 }
 function selectCupGroupResult(f,index){
   if(!canConfirmFixtureDetails())return;
