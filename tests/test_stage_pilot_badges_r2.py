@@ -81,6 +81,145 @@ class StageTest(unittest.TestCase):
         self.assertNotIn('put', commands[0])
         self.assertIn(f"250/{self.badge['logo_sha256']}", commands[0][6])
 
+    def test_generic_jpeg_type_repaired_using_same_approved_bytes(self):
+        data = b'\xff\xd8\xffapproved Metrogas JPEG'
+        badge = {**self.badge, 'club_id': 416, 'logo_sha256': hashlib.sha256(data).hexdigest()}
+        reads = iter([(data, 'application/octet-stream'), (data, 'image/jpeg')])
+        commands = []
+        def stored_get(key):
+            self.assertEqual(key, f"416/{badge['logo_sha256']}")
+            return next(reads)
+        def run(command, *, check):
+            self.assertTrue(check)
+            commands.append(command)
+            self.assertEqual(pathlib.Path(command[command.index('--file') + 1]).read_bytes(), data)
+        stage.upload_badges([badge], lambda *a, **k: self.fail('mutable source fetched'),
+                            run, prefer_stored=True, stored_get=stored_get)
+        self.assertEqual(len(commands), 1)
+        self.assertEqual(commands[0][5], 'put')
+        self.assertEqual(commands[0][commands[0].index('--content-type') + 1], 'image/jpeg')
+        self.assertEqual(commands[0][commands[0].index('--cache-control') + 1], 'private, no-store')
+
+    def test_correct_stored_mime_has_no_write_or_public_source_fetch(self):
+        stage.upload_badges([self.badge], lambda *a, **k: self.fail('source fetched'),
+                            lambda *a, **k: self.fail('unnecessary write'), prefer_stored=True,
+                            stored_get=lambda key: (self.data, 'image/png'))
+
+    def test_missing_mime_repaired_for_approved_png(self):
+        reads = iter([(self.data, ''), (self.data, 'image/png')])
+        commands = []
+        stage.upload_badges([self.badge], lambda *a, **k: self.fail('source fetched'),
+                            lambda command, **k: commands.append(command), prefer_stored=True,
+                            stored_get=lambda key: next(reads))
+        self.assertEqual(len(commands), 1)
+        self.assertIn('image/png', commands[0])
+
+    def test_corrupt_stored_body_is_not_replaced_even_with_generic_mime(self):
+        with self.assertRaisesRegex(ValueError, 'stored R2 bytes differ'):
+            stage.upload_badges([self.badge], lambda *a, **k: self.fail('source fallback'),
+                                lambda *a, **k: self.fail('corrupt object replaced'),
+                                prefer_stored=True,
+                                stored_get=lambda key: (self.data + b'changed', 'application/octet-stream'))
+
+    def test_conflicting_image_mime_is_not_silently_repaired(self):
+        with self.assertRaisesRegex(ValueError, 'MIME differs'):
+            stage.upload_badges([self.badge], lambda *a, **k: self.fail('source fetched'),
+                                lambda *a, **k: self.fail('conflicting MIME replaced'),
+                                prefer_stored=True, stored_get=lambda key: (self.data, 'image/jpeg'))
+
+    def test_metadata_repair_requires_exact_type_and_body_readback(self):
+        for after in (None, (self.data, 'application/octet-stream'),
+                      (self.data + b'changed', 'image/png')):
+            with self.subTest(after=after), self.assertRaisesRegex(ValueError, 'metadata readback failed'):
+                reads = iter([(self.data, 'application/octet-stream'), after])
+                stage.upload_badges([self.badge], lambda *a, **k: self.fail('source fetched'),
+                                    lambda *a, **k: None, prefer_stored=True,
+                                    stored_get=lambda key: next(reads))
+
+    def test_missing_stored_body_keeps_source_gate_and_checks_new_mime(self):
+        reads = iter([None, (self.data, 'image/png')])
+        commands = []
+        def run(command, *, check):
+            commands.append(command)
+            if 'get' in command:
+                pathlib.Path(command[command.index('--file') + 1]).write_bytes(self.data)
+        stage.upload_badges([self.badge], lambda *a, **k: Response(self.data), run,
+                            prefer_stored=True, stored_get=lambda key: next(reads))
+        self.assertEqual([c[5] for c in commands], ['put', 'get'])
+
+    def test_newly_uploaded_wrong_mime_blocks_success(self):
+        reads = iter([None, (self.data, 'application/octet-stream')])
+        def run(command, *, check):
+            if 'get' in command:
+                pathlib.Path(command[command.index('--file') + 1]).write_bytes(self.data)
+        with self.assertRaisesRegex(ValueError, 'metadata readback failed'):
+            stage.upload_badges([self.badge], lambda *a, **k: Response(self.data), run,
+                                prefer_stored=True, stored_get=lambda key: next(reads))
+
+    def test_private_r2_reader_uses_literal_key_and_no_redirects(self):
+        response = Response(self.data)
+        response.status_code = 200
+        response.headers = {'Content-Type': ' Image/PNG; charset=binary '}
+        calls = []
+        def get(url, **kwargs):
+            calls.append((url, kwargs))
+            return response
+        with patch.dict('os.environ', {'CLOUDFLARE_ACCOUNT_ID': 'a' * 32,
+                                      'CLOUDFLARE_API_TOKEN': 'test-token'}):
+            read = stage.r2_reader(get)
+        key = f"250/{self.badge['logo_sha256']}"
+        self.assertEqual(read(key), (self.data, 'image/png'))
+        self.assertTrue(calls[0][0].endswith('/objects/' + key))
+        self.assertNotIn('%2F', calls[0][0])
+        self.assertFalse(calls[0][1]['allow_redirects'])
+        self.assertEqual(calls[0][1]['headers']['Authorization'], 'Bearer test-token')
+
+    def test_private_r2_reader_only_404_is_missing_and_errors_hide_body(self):
+        with patch.dict('os.environ', {'CLOUDFLARE_ACCOUNT_ID': 'a' * 32,
+                                      'CLOUDFLARE_API_TOKEN': 'test-token'}):
+            for status in (301, 401, 403, 404, 429, 500):
+                response = Response(b'error-body-with-sensitive-details')
+                response.status_code = status
+                read = stage.r2_reader(lambda *a, **k: response)
+                with self.subTest(status=status):
+                    if status == 404:
+                        self.assertIsNone(read(f"250/{self.badge['logo_sha256']}"))
+                    else:
+                        with self.assertRaisesRegex(ValueError, f'HTTP {status}') as caught:
+                            read(f"250/{self.badge['logo_sha256']}")
+                        self.assertNotIn('sensitive', str(caught.exception))
+
+    def test_private_r2_reader_rejects_missing_credentials_bad_keys_and_oversize(self):
+        with patch.dict('os.environ', {'CLOUDFLARE_ACCOUNT_ID': '', 'CLOUDFLARE_API_TOKEN': ''}):
+            with self.assertRaisesRegex(ValueError, 'required'):
+                stage.r2_reader(lambda *a, **k: self.fail('network called'))
+        response = Response(self.data)
+        response.status_code = 200
+        with patch.dict('os.environ', {'CLOUDFLARE_ACCOUNT_ID': 'a' * 32,
+                                      'CLOUDFLARE_API_TOKEN': 'test-token'}):
+            read = stage.r2_reader(lambda *a, **k: response)
+        with self.assertRaisesRegex(ValueError, 'invalid approved'):
+            read('../unapproved')
+        with patch.object(stage, 'MAX_IMAGE_BYTES', 3), self.assertRaisesRegex(ValueError, 'size limit'):
+            read(f"250/{self.badge['logo_sha256']}")
+
+    def test_private_read_error_does_not_fall_back_or_replace(self):
+        def read(key):
+            raise ValueError('private R2 read failed: HTTP 403')
+        with self.assertRaisesRegex(ValueError, 'HTTP 403'):
+            stage.upload_badges([self.badge], lambda *a, **k: self.fail('public fallback'),
+                                lambda *a, **k: self.fail('write after read failure'),
+                                prefer_stored=True, stored_get=read)
+
+    def test_cli_prefer_stored_enables_authenticated_metadata_reader(self):
+        with patch.object(sys, 'argv', ['stage_pilot_badges_r2.py', '--upload', '--prefer-stored']), \
+             patch.dict('os.environ', {'CLOUDFLARE_ACCOUNT_ID': 'a' * 32,
+                                       'CLOUDFLARE_API_TOKEN': 'test-token'}), \
+             patch.object(stage, 'upload_badges') as upload:
+            stage.main()
+        self.assertTrue(upload.call_args.kwargs['prefer_stored'])
+        self.assertTrue(callable(upload.call_args.kwargs['stored_get']))
+
     def test_corrupt_stored_object_stops_without_fetch_or_replacement(self):
         commands = []
         def run(command, *, check):

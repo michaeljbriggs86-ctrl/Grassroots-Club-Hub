@@ -7,7 +7,9 @@ existing pilot manifest is the only admission list. R2 has no public URL.
 import argparse
 import hashlib
 import json
+import os
 from pathlib import Path
+import re
 import subprocess
 import tempfile
 from urllib.parse import urlsplit
@@ -80,7 +82,46 @@ def approvals(directory, manifest):
     return manifest['badges']
 
 
-def upload_badges(badges, get, run, *, prefer_stored=False):
+def r2_reader(get):
+    """Read private bytes and HTTP metadata with the existing CI credentials."""
+    account = os.environ.get('CLOUDFLARE_ACCOUNT_ID', '')
+    token = os.environ.get('CLOUDFLARE_API_TOKEN', '')
+    if not re.fullmatch(r'[0-9a-fA-F]{32}', account) or not token:
+        raise ValueError('Cloudflare account ID and API token are required')
+
+    def read(key):
+        # Approved keys contain a numeric club ID and a lowercase SHA-256.
+        # R2 requires literal slashes in the object-key part of this URL.
+        if not re.fullmatch(r'[0-9]+/[0-9a-f]{64}', key):
+            raise ValueError('invalid approved R2 object key')
+        url = f'https://api.cloudflare.com/client/v4/accounts/{account}/r2/buckets/{BUCKET}/objects/{key}'
+        with get(url, headers={'Authorization': f'Bearer {token}'},
+                 stream=True, timeout=30, allow_redirects=False) as response:
+            if response.status_code == 404:
+                return None
+            if response.status_code != 200:
+                # Do not log request headers, credentials, or error bodies.
+                raise ValueError(f'private R2 read failed: HTTP {response.status_code}')
+            data = bytearray()
+            for chunk in response.iter_content(65536):
+                data.extend(chunk)
+                if len(data) > MAX_IMAGE_BYTES:
+                    raise ValueError('stored R2 badge exceeds image size limit')
+            declared = response.headers.get('Content-Type', '').split(';')[0].strip().lower()
+            return bytes(data), declared
+    return read
+
+
+def checked_stored_kind(badge, data):
+    if (not data or len(data) > MAX_IMAGE_BYTES or
+            hashlib.sha256(data).hexdigest() != badge['logo_sha256'].lower()):
+        raise ValueError(f"badge {badge['club_id']} stored R2 bytes differ from review")
+    return media_type(data)
+
+
+def upload_badges(badges, get, run, *, prefer_stored=False, stored_get=None):
+    if stored_get is not None and not prefer_stored:
+        raise ValueError('stored metadata checks require prefer_stored')
     with tempfile.TemporaryDirectory(prefix='pitchkind-badges-') as directory:
         root = Path(directory)
         for badge in badges:
@@ -89,21 +130,39 @@ def upload_badges(badges, get, run, *, prefer_stored=False):
             if prefer_stored:
                 # An immutable approved object is sufficient for repeat app
                 # deployments; mutable public artwork need not be fetched again.
-                try:
-                    run([*WRANGLER, 'r2', 'object', 'get', f'{BUCKET}/{key}',
-                         '--remote', '--file', str(readback)], check=True)
-                except subprocess.CalledProcessError:
-                    readback.unlink(missing_ok=True)
-                    # New/missing objects still use the original upload gates.
+                if stored_get is not None:
+                    stored = stored_get(key)
                 else:
-                    data = readback.read_bytes()
-                    if (not data or len(data) > MAX_IMAGE_BYTES or
-                            hashlib.sha256(data).hexdigest() != badge['logo_sha256'].lower()):
-                        raise ValueError(f"badge {badge['club_id']} stored R2 bytes differ from review")
-                    media_type(data)
-                    readback.unlink()
+                    try:
+                        run([*WRANGLER, 'r2', 'object', 'get', f'{BUCKET}/{key}',
+                             '--remote', '--file', str(readback)], check=True)
+                    except subprocess.CalledProcessError:
+                        readback.unlink(missing_ok=True)
+                        stored = None
+                    else:
+                        stored = (readback.read_bytes(), None)
+                        readback.unlink()
+                if stored is not None:
+                    data, declared = stored
+                    kind = checked_stored_kind(badge, data)
+                    if stored_get is not None:
+                        if declared in ('', 'application/octet-stream'):
+                            # Dashboard hash-only uploads can lose their image
+                            # type. Repair only the exact already-approved bytes.
+                            local = root / 'approved-image'
+                            local.write_bytes(data)
+                            run([*WRANGLER, 'r2', 'object', 'put', f'{BUCKET}/{key}',
+                                 '--remote', '--file', str(local), '--content-type', kind,
+                                 '--cache-control', 'private, no-store'], check=True)
+                            verified = stored_get(key)
+                            if verified is None or verified != (data, kind):
+                                raise ValueError(f"badge {badge['club_id']} R2 image metadata readback failed")
+                            print(f"Repaired approved R2 image type club_id={badge['club_id']} type={kind}")
+                        elif declared != kind:
+                            raise ValueError(f"badge {badge['club_id']} stored R2 image MIME differs from signature")
                     print(f"Checked stored R2 badge club_id={badge['club_id']} sha256={badge['logo_sha256']}")
                     continue
+                # Only a missing object uses the original source admission gates.
             if badge.get('logo_source') in ('club_supplied_private', 'official_source_snapshot_private'):
                 # Secretary-supplied artwork has no public source. It was staged
                 # privately, and CI admits only its exact reviewed bytes.
@@ -164,6 +223,8 @@ def upload_badges(badges, get, run, *, prefer_stored=False):
                  '--remote', '--file', str(readback)], check=True)
             if readback.read_bytes() != data:
                 raise ValueError(f"badge {badge['club_id']} R2 readback differs from approved bytes")
+            if stored_get is not None and stored_get(key) != (data, kind):
+                raise ValueError(f"badge {badge['club_id']} R2 image metadata readback failed")
             readback.unlink()
             print(f"Stored and checked private R2 badge club_id={badge['club_id']} sha256={badge['logo_sha256']}")
 
@@ -184,7 +245,8 @@ def main():
     badges = approvals(directory, manifest)
     if args.upload:
         import requests
-        upload_badges(badges, requests.get, subprocess.run, prefer_stored=args.prefer_stored)
+        upload_badges(badges, requests.get, subprocess.run, prefer_stored=args.prefer_stored,
+                      stored_get=r2_reader(requests.get) if args.prefer_stored else None)
     else:
         print(f'Validated {len(badges)} reviewed pilot badge record(s); no upload performed')
 

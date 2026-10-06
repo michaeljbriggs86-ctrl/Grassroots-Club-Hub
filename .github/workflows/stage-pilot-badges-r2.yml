@@ -9,6 +9,7 @@ on:
       - 'verification/pilot_verified_badges.json'
       - 'verification/approved_badges/**'
       - 'tests/test_publish_pilot_badges.py'
+      - 'tests/test_stage_pilot_badges_r2.py'
       - 'tests/test_pilot_badge_data_delivery.js'
       - 'scripts/stage_pilot_badges_r2.py'
       - 'scripts/publish_pilot_badges.py'
@@ -68,7 +69,7 @@ jobs:
           if ! npx --yes wrangler@4.142.0 r2 bucket info pitchkind-pilot-badges; then
             npx --yes wrangler@4.142.0 r2 bucket create pitchkind-pilot-badges
           fi
-      - name: Upload exact reviewed bytes and verify R2 readback
+      - name: Verify approved R2 bytes and image types, repairing generic metadata
         run: python scripts/stage_pilot_badges_r2.py --upload --prefer-stored
       - name: Publish metadata after verified R2 readback
         run: |
