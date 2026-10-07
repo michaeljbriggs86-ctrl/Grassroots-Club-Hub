@@ -1946,11 +1946,30 @@ async function shareCardBadge(g,x,y,name,colours){
   g.save();g.translate(x,y);g.scale(.72,.72);
   try{await drawShareClubIdentity(g,0,0,name,colours);}finally{g.restore();}
 }
+let pendingMatchdayWebShare=null,matchdayWebShareBusy=false,matchdaySharePreparing=false;
+async function openMatchdayWebShare(data){
+  if(matchdayWebShareBusy)return toast('Share options are already open');
+  if(navigator.userActivation?.isActive===false)return toast('Match image ready. Tap Share again to choose WhatsApp or another app');
+  matchdayWebShareBusy=true;
+  try{await navigator.share(data);pendingMatchdayWebShare=null;}
+  catch(e){
+    if(e?.name==='AbortError')return;
+    if(e?.name==='NotAllowedError')return toast('Tap Share again to open sharing. If it stays blocked, check your browser sharing permissions');
+    toast('Could not open share options. Please try again');
+  }finally{matchdayWebShareBusy=false;}
+}
 async function shareNextMatchImage(){
+  let ownsPreparation=false;
   try{
-  if(!canConfirmFixtureDetails())return toast('Coach access is required');
-  const f=nextPublishedFixture();if(!f)return toast('No fixture available');const {fixture,group,confirmed,details:d}=matchdayShareFixture(f);if(!confirmed||!matchdayArrivalTime(d.time)||!d.groundName||!d.address){toast(group?'Confirm group start time, venue and kit before sharing matchday info':'Confirm kick-off, venue and kit before sharing matchday info');document.getElementById('next-match-confirm-time')?.focus();return;}
-  const ctx=fixtureOverviewContext(d),names=homeFixtureTeamNames(fixture),arrival=matchdayArrivalTime(d.time),caption=matchdayShareCaption(fixture,d,names,ctx),canvas=document.createElement('canvas');canvas.width=1080;canvas.height=group?1500:1080;const g=canvas.getContext('2d'),family=shareCardFontFamily();
+  if(!canConfirmFixtureDetails()){pendingMatchdayWebShare=null;return toast('Coach access is required');}
+  const f=nextPublishedFixture();if(!f){pendingMatchdayWebShare=null;return toast('No fixture available');}const {fixture,group,confirmed,details:d}=matchdayShareFixture(f);if(!confirmed||!matchdayArrivalTime(d.time)||!d.groundName||!d.address){pendingMatchdayWebShare=null;toast(group?'Confirm group start time, venue and kit before sharing matchday info':'Confirm kick-off, venue and kit before sharing matchday info');document.getElementById('next-match-confirm-time')?.focus();return;}
+  const ctx=fixtureOverviewContext(d),names=homeFixtureTeamNames(fixture),arrival=matchdayArrivalTime(d.time),caption=matchdayShareCaption(fixture,d,names,ctx);
+  const shareKey=JSON.stringify([caption,(group?group.fixtures:[fixture]).map(row=>{const n=homeFixtureTeamNames(row);return typeof verifiedTeamBadgeUrl==='function'?[verifiedTeamBadgeUrl(n.home),verifiedTeamBadgeUrl(n.away)]:[];})]);
+  if(matchdayWebShareBusy)return toast('Share options are already open');
+  if(matchdaySharePreparing)return toast('Preparing match image');
+  if(!window.ClubHubNative&&pendingMatchdayWebShare?.key===shareKey&&Date.now()-pendingMatchdayWebShare.created<60000)return await openMatchdayWebShare(pendingMatchdayWebShare.data);
+  pendingMatchdayWebShare=null;matchdaySharePreparing=true;ownsPreparation=true;
+  const canvas=document.createElement('canvas');canvas.width=1080;canvas.height=group?1500:1080;const g=canvas.getContext('2d'),family=shareCardFontFamily();
   if(document.fonts?.ready)await document.fonts.ready;
   const venueTop=group?1038:706,venueBottom=shareCardTextBlock(g,d.groundName,84,venueTop+76,912,40,2,40,30,600,'left',null,true);
   const addressBottom=shareCardTextBlock(g,d.address,84,venueBottom+34,912,33,group?3:2,29,23,400,'left',null,true),venueHeight=Math.ceil(addressBottom-venueTop+26),kitTop=venueTop+venueHeight+20;
@@ -1994,11 +2013,19 @@ async function shareNextMatchImage(){
     }
     if(window.ClubHubNative?.sharePngDataUrl){window.ClubHubNative.sharePngDataUrl(dataUrl);return toast('Opening share options');}
   }catch(_){return toast('Could not open share options');}
-  const a=document.createElement('a');a.href=dataUrl;a.download=`PitchKind_${String(f.date||'match')}_${safeFileName()}.png`;a.click();toast('Matchday image saved');
+  const fileName=`PitchKind_${String(f.date||'match')}_${safeFileName()}.png`;
+  if(typeof navigator.share==='function'&&typeof navigator.canShare==='function'&&typeof File==='function'){
+    const bytes=Uint8Array.from(atob(dataUrl.split(',')[1]),c=>c.charCodeAt(0)),file=new File([bytes],fileName,{type:'image/png'});
+    if(navigator.canShare({files:[file]})){
+      const data={files:[file],title:'Matchday details',text:caption};pendingMatchdayWebShare={key:shareKey,created:Date.now(),data};
+      return await openMatchdayWebShare(data);
+    }
+  }
+  const a=document.createElement('a');a.href=dataUrl;a.download=fileName;a.click();toast('Image sharing is unavailable in this browser. Match image saved instead');
   }catch(e){
     console.error('matchday share failed',e);
     toast('Could not prepare matchday share. Please try again.');
-  }
+  }finally{if(ownsPreparation)matchdaySharePreparing=false;}
 }
 function renderNextMatch(){
   const card=document.getElementById('next-match-card');if(!card)return;const f=nextPublishedFixture(),dateEl=document.getElementById('next-match-home-date');
