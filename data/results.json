@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "provider": "Selkent",
-  "last_updated": "2026-10-07T12:08:18.607158+00:00",
+  "last_updated": "2026-10-07T18:07:12.423469+00:00",
   "fixture_agegroup_discovery_source": "selkent_divisions_all",
   "coverage": {
     "fixtures": {
@@ -7351,7 +7351,7 @@
         },
         {
           "division_name": "Under 12C Orange",
-          "updated_at_text": "04/10/26 16:34:48",
+          "updated_at_text": "07/10/26 14:12:50",
           "source_order_authoritative_for_ties": false,
           "source_disclaimer": "Note: Table does not yet take account of rules for determining winner if teams on equal points",
           "rows": [
@@ -10459,7 +10459,7 @@
         },
         {
           "division_name": "Under 14 B silver",
-          "updated_at_text": "04/10/26 12:41:09",
+          "updated_at_text": "07/10/26 14:09:05",
           "source_order_authoritative_for_ties": false,
           "source_disclaimer": "Note: Table does not yet take account of rules for determining winner if teams on equal points",
           "rows": [
@@ -10876,7 +10876,7 @@
         },
         {
           "division_name": "Under 14C Silver",
-          "updated_at_text": "27/09/26 17:02:27",
+          "updated_at_text": "07/10/26 14:09:46",
           "source_order_authoritative_for_ties": false,
           "source_disclaimer": "Note: Table does not yet take account of rules for determining winner if teams on equal points",
           "rows": [
@@ -15112,7 +15112,7 @@
         },
         {
           "division_name": "Under 15D Navy",
-          "updated_at_text": "06/10/26 03:28:36",
+          "updated_at_text": "07/10/26 14:07:02",
           "source_order_authoritative_for_ties": false,
           "source_disclaimer": "Note: Table does not yet take account of rules for determining winner if teams on equal points",
           "rows": [
@@ -15277,7 +15277,7 @@
         },
         {
           "division_name": "Under 15D Silver",
-          "updated_at_text": "06/10/26 03:37:03",
+          "updated_at_text": "07/10/26 14:06:07",
           "source_order_authoritative_for_ties": false,
           "source_disclaimer": "Note: Table does not yet take account of rules for determining winner if teams on equal points",
           "rows": [
