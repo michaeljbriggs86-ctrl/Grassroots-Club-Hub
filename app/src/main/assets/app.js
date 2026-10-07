@@ -1811,10 +1811,14 @@ function renderCompactNextMatchTeams(f={}){
   host.classList.remove('cup-group-summary');
   setStableHtml(host,`<div class="next-match-summary-team"><span class="next-match-summary-visual">${teamIdentityVisualHtml(names.home,ctx.homeKit)}</span><strong>${esc(matchTeamLabel(names.home))}</strong></div><span class="next-match-summary-v">V</span><div class="next-match-summary-team"><span class="next-match-summary-visual">${teamIdentityVisualHtml(names.away,ctx.awayKit)}</span><strong>${esc(matchTeamLabel(names.away))}</strong></div>`);
 }
+function syncMatchShareActions(f){
+  const can=!!f&&canConfirmFixtureDetails();
+  for(const id of ['next-match-share','matches-next-share'])document.getElementById(id)?.classList.toggle('hidden',!can);
+}
 function renderFixtureConfirmationEditor(f={}){
   const editor=document.getElementById('next-match-confirmation-editor'),confirmBtn=document.getElementById('fixture-confirm-details'),shareBtn=document.getElementById('next-match-share');if(!editor)return;
   const timeLabel=document.getElementById('next-match-confirm-time-label');if(timeLabel)timeLabel.textContent=miniCupGroup(f)?'Group start time':'Kick-off time';
-  const can=canConfirmFixtureDetails(),o=fixtureOverride(f),editing=can&&(!o.confirmedAt||__fixtureEditingKey===fixtureKitSelectionKey(f));editor.classList.toggle('hidden',!editing);if(confirmBtn){confirmBtn.classList.toggle('hidden',!editing);confirmBtn.textContent=o.confirmedAt?'Save changes':'Confirm fixture details';}if(shareBtn)shareBtn.classList.toggle('hidden',!!miniCupGroup(f)||!can);if(!can||!editing)return;
+  const can=canConfirmFixtureDetails(),o=fixtureOverride(f),editing=can&&(!o.confirmedAt||__fixtureEditingKey===fixtureKitSelectionKey(f));editor.classList.toggle('hidden',!editing);if(confirmBtn){confirmBtn.classList.toggle('hidden',!editing);confirmBtn.textContent=o.confirmedAt?'Save changes':'Confirm fixture details';}syncMatchShareActions(f);if(!can||!editing)return;
   const grounds=groundOptionsForFixture(f),select=document.getElementById('next-match-ground-select'),time=document.getElementById('next-match-confirm-time'),kit=document.getElementById('next-match-kit-choice');
   if(time)time.value=o.time||'';if(kit)kit.value=fixtureKitChoice(f);
   const manualGround=document.getElementById('next-match-manual-ground'),manualAddress=document.getElementById('next-match-manual-address');if(manualGround)manualGround.value=o.groundName||'';if(manualAddress)manualAddress.value=o.address||'';
@@ -1876,16 +1880,24 @@ function shareDateText(date=''){
   const d=new Date(Number(m[1]),Number(m[2])-1,Number(m[3]),12,0,0);
   return new Intl.DateTimeFormat('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'}).format(d);
 }
+function matchdayShareFixture(f){
+  const group=typeof miniCupGroup==='function'?miniCupGroup(f):null;
+  const selected=group?group.fixtures.find(row=>fixtureDetailsConfirmed(row)):f;
+  return {fixture:selected||f,group,confirmed:!!selected&&fixtureDetailsConfirmed(selected),details:selected?resolvedFixture(selected):{}};
+}
 function matchdayShareCaption(f={},d={},names={},ctx={}){
   const arrival=matchdayArrivalTime(d.time),choice=fixtureKitChoice(f),kit=kitColourDisplayText(ctx.ownProfile?.[choice]||ctx.ownProfile?.home||'TBC'),map=mapsShareHref(d.groundName,d.address);
-  const lines=[`${names.home||'Home'} v ${names.away||'Away'}`,shareDateText(f.date),`Kick-off: ${d.time}`,`Arrival: ${arrival}`,`Venue: ${d.groundName}`,d.address||'',`Our kit: ${choice==='away'?'Away':'Home'} - ${kit}`];
+  const group=typeof miniCupGroup==='function'?miniCupGroup(f):null;
+  const games=group?group.fixtures.map(row=>{const n=homeFixtureTeamNames(row);return `${n.home} v ${n.away}`;}):[`${names.home||'Home'} v ${names.away||'Away'}`];
+  const lines=[...(group?[fixtureCompetitionLabel(f)]:[]),...games,shareDateText(f.date),`${group?'Group start':'Kick-off'}: ${d.time}`,`Arrival: ${arrival}`,`Venue: ${d.groundName}`,d.address||'',`Our kit: ${choice==='away'?'Away':'Home'} - ${kit}`];
   if(map)lines.push(`Maps: ${map}`);
   return lines.filter(Boolean).join('\n');
 }
 async function copyNextMatchDetails(){
   if(!canConfirmFixtureDetails())return toast('Coach access is required');
-  const f=nextPublishedFixture();if(!f||!fixtureDetailsConfirmed(f))return toast('Confirm match details before copying');
-  const d=resolvedFixture(f),caption=matchdayShareCaption(f,d,homeFixtureTeamNames(f),fixtureOverviewContext(d));
+  const f=nextPublishedFixture();if(!f)return toast('No fixture available');
+  const {fixture,details:d,confirmed}=matchdayShareFixture(f);if(!confirmed||!d.time||!d.groundName||!d.address)return toast('Confirm match details before copying');
+  const caption=matchdayShareCaption(fixture,d,homeFixtureTeamNames(fixture),fixtureOverviewContext(d));
   try{await navigator.clipboard.writeText(caption);toast('Match details copied for WhatsApp');}
   catch{
     const field=document.createElement('textarea');field.value=caption;field.style.position='fixed';field.style.opacity='0';document.body.appendChild(field);field.select();
@@ -1894,20 +1906,28 @@ async function copyNextMatchDetails(){
 }
 async function shareNextMatchImage(){
   try{
-  const f=nextPublishedFixture();if(!f)return toast('No fixture available');const confirmed=fixtureDetailsConfirmed(f),d=resolvedFixture(f);if(!confirmed||!d.time||!d.groundName||!d.address){toast('Confirm kick-off, venue and kit before sharing matchday info');document.getElementById('next-match-confirm-time')?.focus();return;}
-  const ctx=fixtureOverviewContext(d),names=homeFixtureTeamNames(f),arrival=matchdayArrivalTime(d.time),caption=matchdayShareCaption(f,d,names,ctx),canvas=document.createElement('canvas');canvas.width=1080;canvas.height=1080;const g=canvas.getContext('2d');
-  g.fillStyle='#111715';g.fillRect(0,0,1080,1080);g.fillStyle='#29A64D';g.font='800 34px system-ui,sans-serif';g.fillText('MATCHDAY INFO',72,80);
+  if(!canConfirmFixtureDetails())return toast('Coach access is required');
+  const f=nextPublishedFixture();if(!f)return toast('No fixture available');const {fixture,group,confirmed,details:d}=matchdayShareFixture(f);if(!confirmed||!matchdayArrivalTime(d.time)||!d.groundName||!d.address){toast(group?'Confirm group start time, venue and kit before sharing matchday info':'Confirm kick-off, venue and kit before sharing matchday info');document.getElementById('next-match-confirm-time')?.focus();return;}
+  const ctx=fixtureOverviewContext(d),names=homeFixtureTeamNames(fixture),arrival=matchdayArrivalTime(d.time),caption=matchdayShareCaption(fixture,d,names,ctx),canvas=document.createElement('canvas');canvas.width=1080;canvas.height=group?1500:1080;const g=canvas.getContext('2d');
+  g.fillStyle='#111715';g.fillRect(0,0,1080,canvas.height);g.fillStyle='#29A64D';g.font='800 34px system-ui,sans-serif';g.fillText('MATCHDAY INFO',72,80);
   g.fillStyle='#D8E0DA';g.font='650 27px system-ui,sans-serif';g.fillText(shareDateText(f.date),72,126);
-  await Promise.all([drawShareClubIdentity(g,270,260,names.home,ctx.homeKit),drawShareClubIdentity(g,810,260,names.away,ctx.awayKit)]);
-  g.fillStyle='#29A64D';g.font='900 44px system-ui,sans-serif';g.textAlign='center';g.fillText('V',540,272);
-  g.fillStyle='#FFFFFF';g.font='900 38px system-ui,sans-serif';shareCardWrap(g,names.home,270,395,390,44);shareCardWrap(g,names.away,810,395,390,44);
+  if(group){g.font='650 24px system-ui,sans-serif';g.fillText(fixtureCompetitionLabel(fixture),72,159,936);}
+  const rows=group?group.fixtures:[fixture];
+  for(let i=0;i<rows.length;i++){
+    const row=rows[i],n=homeFixtureTeamNames(row),rowCtx=fixtureOverviewContext(row),offset=i*340+(group?25:0);
+    if(group){g.textAlign='left';g.fillStyle='#A8B8AD';g.font='800 24px system-ui,sans-serif';g.fillText('GROUP GAME',72,165+offset);}
+    await Promise.all([drawShareClubIdentity(g,270,260+offset,n.home,rowCtx.homeKit),drawShareClubIdentity(g,810,260+offset,n.away,rowCtx.awayKit)]);
+    g.fillStyle='#29A64D';g.font='900 44px system-ui,sans-serif';g.textAlign='center';g.fillText('V',540,272+offset);
+    g.fillStyle='#FFFFFF';g.font='900 38px system-ui,sans-serif';shareCardWrap(g,n.home,270,395+offset,390,44);shareCardWrap(g,n.away,810,395+offset,390,44);
+  }
+  if(group)g.translate(0,420);
   g.strokeStyle='#344239';g.lineWidth=2;g.beginPath();g.moveTo(72,470);g.lineTo(1008,470);g.stroke();
-  g.textAlign='left';g.fillStyle='#A8B8AD';g.font='800 24px system-ui,sans-serif';g.fillText('KICK-OFF',72,530);g.fillText('ARRIVAL',570,530);
+  g.textAlign='left';g.fillStyle='#A8B8AD';g.font='800 24px system-ui,sans-serif';g.fillText(group?'GROUP START':'KICK-OFF',72,530);g.fillText('ARRIVAL',570,530);
   g.fillStyle='#FFFFFF';g.font='900 58px system-ui,sans-serif';g.fillText(d.time,72,592);g.fillText(arrival,570,592);
   g.fillStyle='#A8B8AD';g.font='800 24px system-ui,sans-serif';g.fillText('VENUE',72,674);
   g.fillStyle='#FFFFFF';g.font='900 36px system-ui,sans-serif';shareCardWrap(g,d.groundName,72,724,930,42);
   g.fillStyle='#D8E0DA';g.font='600 27px system-ui,sans-serif';shareCardWrap(g,d.address,72,790,930,36);
-  const choice=fixtureKitChoice(f),kit=ctx.ownProfile?.[choice]||ctx.ownProfile?.home||'TBC';drawShareJersey(g,112,900,kit,.42);g.fillStyle='#A8B8AD';g.font='800 22px system-ui,sans-serif';g.fillText('OUR KIT',185,872);g.fillStyle='#FFFFFF';g.font='800 30px system-ui,sans-serif';g.fillText(`${choice==='away'?'Away':'Home'} - ${kitColourDisplayText(kit)}`,185,914);
+  const choice=fixtureKitChoice(fixture),kit=ctx.ownProfile?.[choice]||ctx.ownProfile?.home||'TBC';drawShareJersey(g,112,900,kit,.42);g.fillStyle='#A8B8AD';g.font='800 22px system-ui,sans-serif';g.fillText('OUR KIT',185,872);g.fillStyle='#FFFFFF';g.font='800 30px system-ui,sans-serif';g.fillText(`${choice==='away'?'Away':'Home'} - ${kitColourDisplayText(kit)}`,185,914);
   g.fillStyle='#A8B8AD';g.font='600 23px system-ui,sans-serif';g.fillText('Maps link included in WhatsApp message',72,1000);
   const dataUrl=canvas.toDataURL('image/png');
   try{
@@ -1936,6 +1956,7 @@ function renderNextMatch(){
 }
 
 function syncMatchPlayedActionV141(f){
+  for(const id of ['next-match-share','matches-next-share'])document.getElementById(id)?.classList.toggle('hidden',!f||!canConfirmFixtureDetails());
   const button=document.getElementById('matches-next-played');if(!button)return;
   const group=f?miniCupGroup(f):null;
   button.classList.toggle('hidden',!f||!canConfirmFixtureDetails());
@@ -1947,7 +1968,7 @@ function renderMatchPageNextFixture(){
   const training=document.getElementById('parent-matches-training');if(training){training.classList.toggle('hidden',!parent);if(parent)training.innerHTML=parentTrainingScheduleHtml();}if(parent&&!confirmed)return;
   if(!f){set('matches-next-opponent','TBC');set('matches-next-when','Date / kick-off TBC');set('matches-next-venue','Competition TBC');return;}
   const d=miniCupGroup(f)?{...f,...(cupFixtureDefaults(f)||{})}:resolvedFixture(f),names=homeFixtureTeamNames(f);card.classList.remove('no-fixture');set('matches-next-opponent',fixtureCompetitionLabel(f));set('matches-next-when',[formatDate(f.date),d.time?`Kick-off ${d.time}`:'Kick-off awaiting confirmation'].join(' · '));set('matches-next-venue',fixtureCompetitionLabel(f));renderFixtureOverview('matches-next',d);setStableHtml(document.getElementById('matches-next-versus'),`<div class="match-versus-label">${esc(matchTeamLabel(names.home))} <span>V</span> ${esc(matchTeamLabel(names.away))}</div>`);set('matches-next-ground',d.groundName||d.ground||'Marathon Sports Ground');set('matches-next-address',d.address||'');set('matches-next-kits','Home and away kit details shown above.');
-  document.getElementById('matches-next-calendar')?.classList.add('hidden');document.getElementById('matches-next-share')?.classList.add('hidden');document.getElementById('matches-next-copy')?.classList.add('hidden');
+  document.getElementById('matches-next-calendar')?.classList.add('hidden');document.getElementById('matches-next-copy')?.classList.add('hidden');
 }
 
 function divisionOpponents(){
