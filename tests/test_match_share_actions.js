@@ -23,7 +23,11 @@ function context({staff=true,group=true,confirmed=true,second=false,time='10:00'
  const matches=take('function renderMatchPageNextFixture(', 'function divisionOpponents('),editor=take('function renderFixtureConfirmationEditor(', 'function syncFixtureGroundEditor(');
  assert(matches.includes('syncMatchPlayedActionV141(f)'));assert(take('function syncMatchPlayedActionV141(', 'function renderMatchPageNextFixture(').includes("['next-match-share','matches-next-share']"));assert(!matches.includes("'matches-next-share')?.classList.add('hidden')"));
  assert(editor.includes('syncMatchShareActions(f)'));assert(!editor.includes("shareBtn.classList.toggle('hidden',!!miniCupGroup(f)"));
- for(const id of ['next-match-share','matches-next-share'])assert(html.includes(`id="${id}">Share match</button>`));
+ for(const id of ['next-match-share','matches-next-share']){
+  const button=html.match(new RegExp(`<button[^>]*id="${id}"[^>]*>([\\s\\S]*?)</button>`));assert(button);
+  assert(button[0].includes('aria-label="Share match details"'));assert(button[0].includes('title="Share match details"'));
+  assert(button[1].includes('<svg'));assert(button[1].includes('aria-hidden="true"'));assert(!button[1].includes('Share match'));
+ }
  const cup=context();await cup.c.shareNextMatchImage();const shared=cup.calls.find(x=>x[0]==='native');assert(shared);
  assert.equal(cup.canvas.height,1380);assert.deepEqual(cup.calls.filter(x=>x[0]==='badge').map(x=>x[1]),['Shooters Hill AFC Valiants','Chislehurst Wanderers Panthers','Shooters Hill AFC Valiants','Shooters Hill AFC Valiants','Lewisham Borough Cobras']);
  assert.match(shared[2],/Chislehurst Wanderers Panthers v Shooters Hill AFC Valiants/);assert.match(shared[2],/Shooters Hill AFC Valiants v Lewisham Borough Cobras/);assert.match(shared[2],/U9 Selkent Cup Two - Round 1/);assert.match(shared[2],/Group start: 10:00\nArrival: 09:30/);assert(!shared[2].includes('Kick-off:'));
