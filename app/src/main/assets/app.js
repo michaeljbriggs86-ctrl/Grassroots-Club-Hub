@@ -1321,7 +1321,7 @@ function furtherFixtureCardHtml(f,index){
   </div></div><div class="further-fixture-quick"><details class="further-fixture-details"><summary>Match details</summary><div class="further-fixture-body">
     <div class="match-versus">${matchTeamSideHtml('Home',ctx.homeTeam,ctx.homeKit)}<div class="match-versus-mark">V</div>${matchTeamSideHtml('Away',ctx.awayTeam,ctx.awayKit)}</div>
     ${toggle}<div class="match-venue-card"><div><span>Venue</span><strong>${esc(ground)}</strong><small>${esc(address)}</small></div></div>
-  </div></details></div>${warning}${canConfirmFixtureDetails()?`<button type="button" data-further-match-played="${index}">Match played</button>`:''}</article>`;
+  </div></details></div>${warning}${confirmed&&ctx.mapHref?`<a class="map-link compact" href="${esc(ctx.mapHref)}" target="_blank" rel="noopener">Open in Maps</a>`:''}${canConfirmFixtureDetails()?`<button type="button" data-further-match-played="${index}">Match played</button>`:''}</article>`;
 }
 function groupedUpcomingFixtures(fixtures=upcomingFixtures()){
   const seen=new Set(),events=[];
