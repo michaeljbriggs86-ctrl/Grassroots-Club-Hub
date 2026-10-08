@@ -4078,7 +4078,8 @@ let __adminWeekendShare=null,__adminWeekendShareLoad=0,__adminWeekendSharing=fal
 function adminWeekendShareIdentity(){
   const context=window.ClubHubCloud?.context;
   const club=context?.club?.id||context?.profile?.club_id,user=context?.profile?.user_id;
-  return CLOUD_MODE&&isClubOverviewMode()&&context?.profile?.role==='admin'&&club&&user?`${club}|${user}`:'';
+  // Cloud profiles store club_admin; the app's role() maps that to admin.
+  return CLOUD_MODE&&isClubOverviewMode()&&['admin','club_admin'].includes(context?.profile?.role)&&club&&user?`${club}|${user}`:'';
 }
 function adminWeekendShareReady(){
   const snap=__adminWeekendShare;
