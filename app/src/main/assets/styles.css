@@ -1530,6 +1530,28 @@ html[data-theme="dark"] .further-fixture-head small{color:#b9c7be}
 .admin-fixture-centre .panel-heading .muted{margin:5px 0 0}
 .admin-fixture-centre .admin-filter-label{max-width:260px;margin:10px 0}
 .admin-fixture-summary{margin:6px 0 9px;font-size:12px;font-weight:800;color:#385643;line-height:1.35}
+.weekend-share-heading{flex-wrap:wrap;gap:12px}
+.weekend-share-trigger{min-height:44px;white-space:nowrap;margin-bottom:9px}
+.weekend-share-modal{width:min(680px,calc(100vw - 24px));max-height:calc(100dvh - 24px);padding:0;overflow:hidden}
+.weekend-share-shell{display:flex;flex-direction:column;max-height:calc(100dvh - 26px);padding:16px;gap:12px;min-width:0}
+.weekend-share-shell .modal-heading{margin:0;gap:10px}
+.weekend-share-shell .modal-heading>div{min-width:0}
+.weekend-share-shell h3{font-size:20px;margin:0}
+.weekend-share-shell>p{margin:0;font-size:13px;line-height:1.5}
+.weekend-share-days{display:flex;gap:8px;flex-wrap:wrap}
+.weekend-share-days button,.weekend-share-actions button{min-height:48px}
+.weekend-share-scroll{overflow:auto;overscroll-behavior:contain;min-height:0;flex:1;scroll-behavior:smooth}
+.weekend-share-scroll h4{font-size:15px;margin:0 0 10px;scroll-margin-top:8px}
+.weekend-share-card{border:1px solid var(--line,#D8E0DA);border-radius:16px;padding:16px;margin:0 0 16px;background:var(--white);color:var(--ink);overflow-wrap:anywhere}
+.weekend-share-card h5{font-size:16px;margin:0 0 9px;color:var(--green)}
+.weekend-share-card p{font-size:14px;line-height:1.5;margin:8px 0;white-space:pre-line}
+.weekend-share-actions{display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap;border-top:1px solid var(--line,#D8E0DA);padding-top:12px}
+.weekend-share-shell .icon-button{min-width:44px;min-height:44px;flex-shrink:0}
+#admin-weekend-share-text{width:100%;box-sizing:border-box;white-space:pre-wrap;font:inherit;font-size:14px;resize:vertical;min-height:180px}
+html[data-theme="dark"] .weekend-share-card{background:#18271f;color:#e9f1eb;border-color:#344e3d}
+html[data-theme="dark"] .weekend-share-card h5{color:#93e0a9}
+@media(max-width:420px){.weekend-share-actions{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.weekend-share-actions .text-button{justify-self:start}.weekend-share-actions .primary-button{grid-column:1 / -1}.weekend-share-actions button{font-size:14px;padding:12px}.weekend-share-heading>div{flex-basis:100%}}
+@media(max-height:520px){.weekend-share-shell{display:block;overflow:auto}.weekend-share-shell>*{margin-bottom:12px}.weekend-share-scroll{overflow:visible}.weekend-share-actions{position:sticky;bottom:0;background:var(--white);padding-bottom:8px;margin-bottom:0}}
 .admin-fixture-row{padding:10px 12px;gap:9px;background:#fff;color:#14271b}
 .admin-fixture-row .admin-fixture-main strong{font-size:13px;line-height:1.3}
 .admin-fixture-row .admin-fixture-main span{color:#3e5145}

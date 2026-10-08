@@ -455,6 +455,7 @@
           <section class="panel admin-fixture-centre">
             <label class="admin-filter-label">Age group<select id="admin-fixtures-age"><option value="all">All age groups</option></select></label>
             <p class="admin-fixture-summary" id="admin-fixture-summary" role="status"></p>
+            <button type="button" class="secondary-button weekend-share-trigger" id="admin-fixtures-share" data-admin-settings-only>Share weekend</button>
             <div class="admin-fixture-list" id="admin-fixture-list"></div>
           </section>
         </section></div>
@@ -499,7 +500,7 @@
           </section>
 
           <section class="panel admin-weekend-panel">
-            <div class="panel-heading"><div><p class="kicker">Next weekend</p><h3>Weekend at a glance</h3><p class="muted" id="admin-weekend-meta"></p></div></div>
+            <div class="panel-heading weekend-share-heading"><div><p class="kicker">Next weekend</p><h3>Weekend at a glance</h3><p class="muted" id="admin-weekend-meta"></p></div><button type="button" class="secondary-button weekend-share-trigger" id="admin-weekend-share" data-admin-settings-only>Share weekend</button></div>
             <div class="admin-weekend-list" id="admin-weekend-list"></div>
           </section>
 
@@ -830,6 +831,19 @@
       </div>
       </div>
       <div class="next-fixture-action-bar" id="next-fixture-action-bar"><button type="button" class="secondary-button hidden match-share-icon" id="next-match-share" aria-label="Share match details" title="Share match details"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8.7 10.5l6.6-4M8.7 13.5l6.6 4"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="5" r="3"/><circle cx="18" cy="19" r="3"/></svg></button><button type="button" class="secondary-button hidden" id="next-match-copy">Copy match details</button><button type="button" class="primary-button hidden" id="fixture-confirm-details">Confirm fixture details</button><button type="button" class="text-button" data-close-dialog>Done</button></div>
+    </div>
+  </dialog>
+
+  <dialog id="admin-weekend-share-dialog" class="modal weekend-share-modal" aria-labelledby="admin-weekend-share-title" aria-describedby="admin-weekend-share-status">
+    <div class="weekend-share-shell">
+      <div class="modal-heading"><div><p class="kicker">Club Admin</p><h3 id="admin-weekend-share-title">Share weekend fixtures</h3></div><button type="button" class="icon-button small" data-close-dialog aria-label="Close weekend preview">×</button></div>
+      <p id="admin-weekend-share-status" class="muted" role="status" aria-live="polite"></p>
+      <nav id="admin-weekend-share-days" class="weekend-share-days" aria-label="Jump to fixture day"></nav>
+      <div class="weekend-share-scroll" tabindex="0" aria-label="Confirmed weekend fixtures">
+        <div id="admin-weekend-share-preview"></div>
+        <textarea id="admin-weekend-share-text" class="hidden" readonly rows="12" aria-label="Weekend fixtures text for WhatsApp"></textarea>
+      </div>
+      <div class="weekend-share-actions"><button type="button" class="text-button" id="admin-weekend-share-refresh">Refresh</button><button type="button" class="secondary-button" id="admin-weekend-share-copy" disabled>Copy for WhatsApp</button><button type="button" class="primary-button" id="admin-weekend-share-send" disabled>Share…</button></div>
     </div>
   </dialog>
 

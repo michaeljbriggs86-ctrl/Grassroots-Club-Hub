@@ -68,7 +68,7 @@
     try{localStorage.setItem(key,JSON.stringify(data));}catch(_){/* app state remains the last-known-good fallback */}
   }
 
-  async function fetchStaticFeed(url,key,validator,force=false){
+  async function fetchStaticFeed(url,key,validator,force=false,requireFresh=false){
     const slot=key===DIRECTORY_CACHE_KEY?'directory':'results';
     if(!force&&memoryCache[slot])return memoryCache[slot];
     try{
@@ -78,6 +78,7 @@
       const data=validator(safeJsonParse(response.body,'Static Selkent feed'));
       memoryCache[slot]=data;writeCached(key,data);return data;
     }catch(err){
+      if(requireFresh)throw err;
       const cached=readCached(key,validator);
       if(cached){memoryCache[slot]=cached;return cached;}
       throw err;
@@ -124,7 +125,7 @@
     return fetchStaticFeed(STATIC_DIRECTORY_URL,DIRECTORY_CACHE_KEY,validateDirectory,force)
       .then(attachDirectoryBadges);
   }
-  function loadResults(force=false){return fetchStaticFeed(STATIC_RESULTS_URL,RESULTS_CACHE_KEY,validateResults,force);}
+  function loadResults(force=false,requireFresh=false){return fetchStaticFeed(STATIC_RESULTS_URL,RESULTS_CACHE_KEY,validateResults,force,requireFresh);}
 
   function persistWithoutRender(){
     try{if(typeof window.persistLocalState==='function')window.persistLocalState();else if(typeof state!=='undefined'&&state)localStorage.setItem('grassrootsHub_team_state_v1',JSON.stringify(state));}catch(_){ }
