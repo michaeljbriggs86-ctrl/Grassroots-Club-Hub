@@ -4067,12 +4067,114 @@ function buildAdminWeekendDigest(rows,feed,now=new Date()){
   return {dates,events,pending,generatedAt:now.getTime()};
 }
 function adminWeekendEventLines(e){
-  return [`*${e.time} · ${e.teamLabel}*${e.group?' · Group start (order may change)':''}`,...e.matchups,e.competition,`Ground: ${e.ground||'Venue to confirm'}`,e.address?`Address: ${e.address}`:'Address: to confirm',e.satnav?`Sat nav: ${e.satnav}`:'',e.pitch?`Pitch: ${e.pitch}`:'',e.arrival?`Meet: ${e.arrival}`:'',...e.kits.map(k=>`Kit: ${k}`),e.referee?`Referee: ${e.referee}`:'',e.video?`Filming: ${e.video}`:'',e.notes?`Ground notes: ${e.notes}`:'',e.partialNotes?'Check the original confirmation for any obscured ground notes.':'',e.maps?`Map: ${e.maps}`:''].filter(Boolean);
+  return [`*${e.time} · ${e.teamLabel}*${e.group?' · Group start (order may change)':''}`,...e.matchups,e.competition,`Ground: ${e.ground||'Venue to confirm'}`,e.address?`Address: ${e.address}`:'Address: to confirm',e.satnav?`Sat nav: ${e.satnav}`:'',e.pitch?`Pitch: ${e.pitch}`:'',e.arrival?`Meet: ${e.arrival}`:'',...e.kits.map(k=>`Kit: ${k}`),e.referee?`Referee: ${e.referee}`:'',e.video?`Filming: ${e.video}`:'',e.notes?`Ground notes: ${e.notes}`:'',e.partialNotes?'Check the original confirmation for any obscured ground notes.':''].filter(Boolean);
 }
 function adminWeekendDigestText(digest,clubName){
   const lines=[`*${adminWeekendClean(clubName)||'Club'} — weekend fixtures*`,`${shareDateText(digest.dates[0])} – ${shareDateText(digest.dates[1])}`,`${digest.events.length} confirmed fixture / group start${digest.events.length===1?'':'s'} · Times: UK local`,digest.pending?`${digest.pending} fixture / group${digest.pending===1?'':'s'} awaiting confirmed details — excluded from this list.`:'',''];
   for(const date of digest.dates){const events=digest.events.filter(e=>e.date===date);if(!events.length)continue;lines.push(`*${shareDateText(date)}*`,'');for(const e of events)lines.push(...adminWeekendEventLines(e),'');}
   lines.push('Please check PitchKind for any later changes.');return lines.filter((line,i)=>line||lines[i-1]).join('\n');
+}
+function adminWeekendGraphicLayout(digest,clubName,g,family){
+  const width=1440,commands=[],anchors=[],margin=64,gap=64,col=(width-margin*2-gap)/2;let y=0;
+  const green='#D7E9D3',ink='#F4F6EE',muted='#BBCEBF',mint='#D8E9A6';
+  const rect=(x,top,w,h,fill,r=0)=>commands.push({kind:'rect',x,y:top,w,h,fill,r});
+  const text=(value,x,top,size,weight=400,fill=ink)=>commands.push({kind:'text',value,x,y:top,size,weight,fill});
+  const wrap=(value,size,maxWidth,weight=400)=>{
+    g.font=`${weight} ${size}px ${family}`;const lines=[];
+    for(const paragraph of String(value||'').split('\n')){
+      let line='';for(const word of paragraph.split(/\s+/).filter(Boolean)){
+        const next=line?line+' '+word:word;if(line&&g.measureText(next).width>maxWidth){lines.push(line);line=word;}else line=next;
+        while(g.measureText(line).width>maxWidth&&line.length>1){let cut=line.length-1;while(cut>1&&g.measureText(line.slice(0,cut)).width>maxWidth)cut--;lines.push(line.slice(0,cut));line=line.slice(cut);}
+      }if(line)lines.push(line);
+    }return lines;
+  };
+  const block=(value,x,top,size,maxWidth,weight=400,fill=ink,lineHeight=size+10)=>{const lines=wrap(value,size,maxWidth,weight);lines.forEach((line,i)=>text(line,x,top+i*lineHeight,size,weight,fill));return lines.length*lineHeight;};
+  const kits=e=>(e.kits||[]).map(k=>k.startsWith(e.teamLabel+': ')?k.slice(e.teamLabel.length+2):k),kitValues=digest.events.map(e=>JSON.stringify(kits(e))),variedKits=kitValues.some(k=>k!==kitValues[0]);
+  let hy=76;hy+=block((clubName||'Club').toUpperCase(),margin,hy,34,width-320,600,mint,44);
+  hy+=36;hy+=block('WEEKEND FIXTURES',margin,hy,84,width-margin*2,800,ink,96);
+  hy+=28;hy+=block(`${shareDateText(digest.dates[0])} – ${shareDateText(digest.dates[1])}`,margin,hy,34,width-margin*2,500,muted,44);
+  y=hy+32;y+=block(`${digest.events.length} confirmed starts · UK local time`,margin,y,32,width-margin*2,600,mint,42);
+  if(digest.pending)y+=block(`${digest.pending} awaiting confirmation — excluded`,margin,y,30,width-margin*2,400,muted,40);
+  y+=14;
+  for(const date of digest.dates){
+    const events=digest.events.filter(e=>e.date===date).sort((a,b)=>a.teamLabel.localeCompare(b.teamLabel,undefined,{numeric:true})||a.time.localeCompare(b.time));if(!events.length)continue;
+    const dateLabel=shareDateText(date);
+    y+=22;anchors.push({label:dateLabel,date,top:y,day:true});
+    const sectionTop=y,dayLines=wrap(dateLabel.toUpperCase(),36,width-margin*2,700);
+    dayLines.forEach((line,i)=>text(line,margin,sectionTop+42+i*46,36,700,mint));y+=dayLines.length*46+26;
+    rect(margin,y,width-margin*2,2,'#80947D');y+=28;
+    const full=events.length===1,cardWidth=full?width-margin*2:col,plans=[];
+    for(const e of events){
+      const lines=[],add=(value,size=34,weight=400,fill=ink,space=8)=>{if(!value)return;wrap(value,size,cardWidth,weight).forEach(value=>lines.push({value,size,weight,fill,step:size+10}));lines.push({space});};
+      if(e.group)add('Group start · game order may change',30,700,muted);
+      for(const match of e.matchups){
+        const side=match.match(/ \((Home|Away)\)$/),teams=side?match.slice(0,side.index).split(' v '):[];
+        if(teams.length===2&&teams.filter(t=>t.startsWith(clubName+' ')).length===1){const opponent=teams[side[1]==='Home'?1:0];const away=side[1]==='Away';lines.push({tag:side[1].toUpperCase(),fill:mint});wrap(opponent,36,cardWidth-138,700).forEach(value=>lines.push({value,size:36,weight:700,fill:ink,step:46,indent:138}));lines.push({space:14});}
+        else add(match,36,700);
+      }
+      add(e.competition,30,500,muted,16);
+      add(e.ground||'Venue to confirm',34,700);add(e.address||'Address: to confirm',34,400,muted,12);
+      if(e.satnav)add(`Sat nav: ${e.satnav}`,34,700,green);
+      if(e.pitch)add(`Pitch: ${e.pitch}`);if(e.arrival)add(`Meet: ${e.arrival}`);
+      if(variedKits)kits(e).forEach(k=>add(`Kit: ${k}`));
+      if(e.referee&&!/^Waiting to be Assigned$/i.test(e.referee))add(`Referee: ${e.referee}`);
+      if(e.video==='Not permitted')add('Filming: Not permitted',34,700,'#F1D6A2');
+      if(e.notes)add(e.notes,34,500,green);
+      const title=wrap(e.teamLabel,46,cardWidth-256,800),head=Math.max(76,12+title.length*56),height=head+12+lines.reduce((n,l)=>n+(l.tag?0:l.space===undefined?l.step:l.space),0)+16;
+      plans.push({e,lines,title,head,height});
+    }
+    for(let i=0;i<plans.length;i+=full?1:2){
+      const row=plans.slice(i,i+(full?1:2)),rowHeight=Math.max(...row.map(p=>p.height));
+      row.forEach((p,j)=>{
+        const x=margin+j*(col+gap),top=y;
+        p.title.forEach((line,k)=>text(line,x,top+48+k*56,46,800,ink));
+        text(p.e.time,x+cardWidth,top+54,70,700,mint);commands.at(-1).align='right';
+        let ly=top+p.head+34;for(const line of p.lines){
+          if(line.tag){text(line.tag+' /',x,ly,30,700,mint);continue;}
+          if(line.space!==undefined){ly+=line.space;continue;}text(line.value,x+(line.indent||0),ly,line.size,line.weight,line.fill);ly+=line.step;
+        }
+        rect(x,top+rowHeight+gap/2,cardWidth,1,'#506B59');
+        anchors.push({label:`${p.e.teamLabel} · ${p.e.time}`,date,top,teamLabel:p.e.teamLabel});
+      });y+=rowHeight+gap;
+    }
+  }
+  y+=12;
+  return {width,height:Math.ceil(y),commands,anchors,family,badge:{x:width-140,y:88,size:132},watermark:{x:width*.8,y:y*.53,size:Math.max(width*2,y*.94),angle:-22,opacity:.075}};
+}
+function drawAdminWeekendGraphic(canvas,layout,badge=null,circular=false){
+  canvas.width=layout.width;canvas.height=layout.height;const g=canvas.getContext('2d');if(!g)throw new Error('Image drawing unavailable');
+  g.fillStyle='#0B241A';g.fillRect(0,0,layout.width,layout.height);g.textAlign='left';
+  const badgeWidth=badge&&(badge.naturalWidth||badge.width),badgeHeight=badge&&(badge.naturalHeight||badge.height);
+  if(badge&&badgeWidth&&badgeHeight){
+    const w=layout.watermark,scale=w.size/Math.max(badgeWidth,badgeHeight),bw=badgeWidth*scale,bh=badgeHeight*scale;
+    g.save();g.globalAlpha=w.opacity;g.translate(w.x,w.y);g.rotate(w.angle*Math.PI/180);
+    if(circular){g.beginPath();g.arc(0,0,w.size/2,0,Math.PI*2);g.clip();}
+    g.drawImage(badge,-bw/2,-bh/2,bw,bh);g.restore();
+  }
+  for(const c of layout.commands){g.fillStyle=c.fill;if(c.kind==='text'){g.textAlign=c.align||'left';g.font=`${c.weight} ${c.size}px ${layout.family}`;g.fillText(c.value,c.x,c.y);}else{g.beginPath();g.roundRect(c.x,c.y,c.w,c.h,c.r);g.fill();}}
+  if(badge){const b=layout.badge,scale=Math.min(b.size/badgeWidth,b.size/badgeHeight),w=badgeWidth*scale,h=badgeHeight*scale;g.save();if(circular){g.beginPath();g.arc(b.x,b.y,b.size/2,0,Math.PI*2);g.clip();}g.drawImage(badge,b.x-w/2,b.y-h/2,w,h);g.restore();}
+}
+async function prepareAdminWeekendGraphic(digest,clubName){
+  if(typeof document.createElement!=='function'||!digest.events.length)return null;
+  if(document.fonts?.ready)await document.fonts.ready;
+  const canvas=document.createElement('canvas'),g=canvas.getContext('2d');if(!g)return null;
+  const family=shareCardFontFamily(),layout=adminWeekendGraphicLayout(digest,clubName,g,family);
+  if(layout.height>30000)throw new Error('Infographic too long for this browser');
+  const src=typeof verifiedTeamBadgeUrl==='function'?verifiedTeamBadgeUrl(clubName):'',badge=src?await loadShareBadgeImage(src):null;
+  drawAdminWeekendGraphic(canvas,layout,badge,src==='shooters-hill-logo.png');
+  const dataUrl=canvas.toDataURL('image/png'),fileName=`PitchKind_weekend_${digest.dates[0]}.png`;
+  const bytes=Uint8Array.from(atob(dataUrl.split(',')[1]),char=>char.charCodeAt(0));
+  const file=typeof File==='function'?new File([bytes],fileName,{type:'image/png'}):null;
+  return {dataUrl,file,fileName,width:layout.width,height:layout.height,anchors:layout.anchors};
+}
+function jumpAdminWeekendGraphic(top){
+  const img=document.getElementById('admin-weekend-infographic'),scroller=img?.closest('.weekend-share-scroll');if(!img||!scroller)return;
+  const y=img.getBoundingClientRect().top-scroller.getBoundingClientRect().top+scroller.scrollTop+Number(top)*img.clientWidth/__adminWeekendShare.graphic.width;
+  scroller.scrollTo({top:y,behavior:'smooth'});
+}
+function saveAdminWeekendGraphic(){
+  if(!adminWeekendShareReady()||!__adminWeekendShare.graphic)return toast('Refresh the infographic before saving');
+  const g=__adminWeekendShare.graphic,a=document.createElement('a');a.href=g.dataUrl;a.download=g.fileName;a.click();
 }
 let __adminWeekendShare=null,__adminWeekendShareLoad=0,__adminWeekendSharing=false;
 function adminWeekendShareIdentity(){
@@ -4091,6 +4193,10 @@ function renderAdminWeekendShare(){
   if(status)status.textContent=snap?`${snap.digest.events.length} confirmed fixture / group starts · ${snap.digest.pending} awaiting confirmed details. Times are UK local. Share includes the whole list.`:'Loading the latest confirmed details…';
   if(nav)nav.innerHTML=snap?snap.digest.dates.filter(date=>snap.digest.events.some(e=>e.date===date)).map(date=>`<button type="button" class="secondary-button" data-weekend-share-day="${esc(date)}">${esc(shareDateText(date).split(' ')[0])}</button>`).join(''):'';
   if(preview)preview.innerHTML=snap?snap.digest.dates.map(date=>{const events=snap.digest.events.filter(e=>e.date===date);return events.length?`<section id="weekend-share-${esc(date)}"><h4>${esc(shareDateText(date))}</h4>${events.map(e=>`<article class="weekend-share-card"><h5>${esc(e.time)} · ${esc(e.teamLabel)}</h5>${adminWeekendEventLines(e).slice(1).map(line=>line.startsWith('Map: ')?`<p><a href="${esc(e.maps)}" target="_blank" rel="noopener">Open map</a></p>`:`<p>${esc(line)}</p>`).join('')}${e.group?'<p class="muted">Group start · game order may change</p>':''}</article>`).join('')}</section>`:'';}).join('')||'<p>No confirmed kick-off times for this weekend yet.</p>':'';
+  if(snap?.graphic&&preview)preview.innerHTML=`<img id="admin-weekend-infographic" class="weekend-infographic" src="${esc(snap.graphic.dataUrl)}" width="${snap.graphic.width}" height="${snap.graphic.height}" alt="Confirmed weekend fixture infographic. ${esc(snap.graphic.anchors.filter(a=>!a.day).map(a=>a.label).join('; '))}"><details class="weekend-share-accessible"><summary>Read fixture details as text</summary><pre>${esc(snap.text)}</pre></details>`;
+  const team=document.getElementById('admin-weekend-share-team');if(team){team.disabled=!snap?.graphic;team.innerHTML='<option value="">Find your team…</option>'+(snap?.graphic?.anchors||[]).filter(a=>!a.day).map(a=>`<option value="${a.top}">${esc(a.label)}</option>`).join('');}
+  const send=document.getElementById('admin-weekend-share-send');if(send)send.textContent=snap?.graphic?'Share infographic':'Share…';
+  const save=document.getElementById('admin-weekend-share-save');if(save)save.disabled=!adminWeekendShareReady()||!snap?.graphic;
   for(const id of ['admin-weekend-share-send','admin-weekend-share-copy']){const el=document.getElementById(id);if(el)el.disabled=!adminWeekendShareReady();}
 }
 async function openAdminWeekendShare(){
@@ -4104,15 +4210,20 @@ async function openAdminWeekendShare(){
     if(load!==__adminWeekendShareLoad||identity!==adminWeekendShareIdentity()||!dialog.open)return;
     if(!Array.isArray(rows)||!Array.isArray(feed?.age_groups))throw new Error('Fixture refresh incomplete');
     const digest=buildAdminWeekendDigest(rows,feed),text=adminWeekendDigestText(digest,clubSettings().display_name);
-    __adminWeekendShare={identity,digest,text};renderAdminWeekendShare();
+    const status=document.getElementById('admin-weekend-share-status');if(status)status.textContent='Preparing the full weekend infographic…';
+    const graphic=await prepareAdminWeekendGraphic(digest,clubSettings().display_name);
+    if(load!==__adminWeekendShareLoad||identity!==adminWeekendShareIdentity()||!dialog.open)return;
+    __adminWeekendShare={identity,digest,text,graphic};renderAdminWeekendShare();
   }catch(_){if(load!==__adminWeekendShareLoad)return;__adminWeekendShare=null;renderAdminWeekendShare();const status=document.getElementById('admin-weekend-share-status');if(status)status.textContent='Could not refresh confirmed fixtures. Tap Refresh to try again.';}
 }
 async function shareAdminWeekend(){
   if(__adminWeekendSharing)return;
   if(!adminWeekendShareReady())return toast('Refresh the weekend preview before sharing');
   if(typeof navigator.share!=='function'){document.getElementById('admin-weekend-share-text')?.classList.remove('hidden');return toast('Use Copy for WhatsApp, or select the text below');}
+  const graphic=__adminWeekendShare.graphic;
+  let imageAllowed=false;if(graphic){try{imageAllowed=!!graphic.file&&typeof navigator.canShare==='function'&&navigator.canShare({files:[graphic.file]});}catch(_){}if(!imageAllowed)return toast('Save the infographic and attach it in WhatsApp; image sharing is unavailable here');}
   __adminWeekendSharing=true;
-  try{await navigator.share({title:'Weekend confirmed fixtures',text:__adminWeekendShare.text});}
+  try{await navigator.share(graphic?{title:'Weekend confirmed fixtures',files:[graphic.file]}:{title:'Weekend confirmed fixtures',text:__adminWeekendShare.text});}
   catch(error){if(error?.name!=='AbortError'){document.getElementById('admin-weekend-share-text')?.classList.remove('hidden');toast('Sharing was unavailable. Try again or use Copy for WhatsApp.');}}
   finally{__adminWeekendSharing=false;}
 }
@@ -5157,7 +5268,9 @@ document.getElementById('admin-fixtures-share')?.addEventListener('click',openAd
 document.getElementById('admin-weekend-share-refresh')?.addEventListener('click',openAdminWeekendShare);
 document.getElementById('admin-weekend-share-send')?.addEventListener('click',shareAdminWeekend);
 document.getElementById('admin-weekend-share-copy')?.addEventListener('click',copyAdminWeekend);
-document.getElementById('admin-weekend-share-days')?.addEventListener('click',event=>{const day=event.target.closest('[data-weekend-share-day]')?.dataset.weekendShareDay;if(day)document.getElementById(`weekend-share-${day}`)?.scrollIntoView({behavior:'smooth',block:'start'});});
+document.getElementById('admin-weekend-share-days')?.addEventListener('click',event=>{const day=event.target.closest('[data-weekend-share-day]')?.dataset.weekendShareDay;if(!day)return;const anchor=__adminWeekendShare?.graphic?.anchors.find(a=>a.day&&a.date===day);if(anchor)jumpAdminWeekendGraphic(anchor.top);else document.getElementById(`weekend-share-${day}`)?.scrollIntoView({behavior:'smooth',block:'start'});});
+document.getElementById('admin-weekend-share-team')?.addEventListener('change',event=>{if(event.target.value!=='')jumpAdminWeekendGraphic(event.target.value);});
+document.getElementById('admin-weekend-share-save')?.addEventListener('click',saveAdminWeekendGraphic);
 document.getElementById('admin-weekend-share-dialog')?.addEventListener('close',()=>{++__adminWeekendShareLoad;__adminWeekendShare=null;document.getElementById('admin-weekend-share-text')?.classList.add('hidden');renderAdminWeekendShare();});
 document.getElementById('next-match-copy')?.addEventListener('click',copyNextMatchDetails);
 document.getElementById('matches-next-copy')?.addEventListener('click',copyNextMatchDetails);

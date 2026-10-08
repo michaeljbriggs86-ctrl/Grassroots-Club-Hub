@@ -1539,6 +1539,11 @@ html[data-theme="dark"] .further-fixture-head small{color:#b9c7be}
 .weekend-share-shell h3{font-size:20px;margin:0}
 .weekend-share-shell>p{margin:0;font-size:13px;line-height:1.5}
 .weekend-share-days{display:flex;gap:8px;flex-wrap:wrap}
+.weekend-share-team-picker{display:grid;gap:6px;font-size:14px;font-weight:600}
+.weekend-share-team-picker select{width:100%;min-height:48px;font:inherit}
+.weekend-infographic{display:block;width:100%;height:auto;border-radius:14px}
+.weekend-share-accessible{margin-top:12px;font-size:14px}
+.weekend-share-accessible pre{white-space:pre-wrap;font:inherit;overflow-wrap:anywhere}
 .weekend-share-days button,.weekend-share-actions button{min-height:48px}
 .weekend-share-scroll{overflow:auto;overscroll-behavior:contain;min-height:0;flex:1;scroll-behavior:smooth}
 .weekend-share-scroll h4{font-size:15px;margin:0 0 10px;scroll-margin-top:8px}
