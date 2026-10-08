@@ -4039,7 +4039,7 @@ function adminWeekendKit(f,st){
 }
 function buildAdminWeekendDigest(rows,feed,now=new Date()){
   const dates=adminShareWeekendDates(now),states=new Map(rows.map(r=>[r.team.id,r.state||{}]));
-  const all=buildAdminFixtureRows(rows,feed).filter(f=>dates.includes(f.date)),events=[],seen=new Set();let pending=0;
+  const all=buildAdminFixtureRows(rows,feed).filter(f=>dates.includes(f.date)),events=[],pendingRows=[],seen=new Set();let pending=0;
   for(const f of uniqueClubFixtures(all)){
     const st=states.get(f.team.id)||{},age=Number(String(f.team.ageGroup).replace(/\D/g,''));
     const groupRows=age>=8&&age<=11&&/\b(?:cup|vase)\b/i.test(f.competition)?all.filter(x=>x.team.id===f.team.id&&x.date===f.date&&selkentNorm(x.competition)===selkentNorm(f.competition)&&x.source==='Selkent'):[];
@@ -4051,31 +4051,39 @@ function buildAdminWeekendDigest(rows,feed,now=new Date()){
     const ready=checks.filter(x=>x.ready),representative=ready[0];
     const blocked=fixtures.some(x=>['issue','changed'].includes(x.ack?.status))||checks.some((x,i)=>x.override.confirmedAt&&!x.ready);
     const conflicting=ready.some(x=>['time','groundName','address'].some(k=>adminWeekendClean(x.override[k])!==adminWeekendClean(representative.override[k])));
-    if(f.source!=='Selkent'||!representative||blocked||conflicting||(!group&&f.ack?.status!=='confirmed')||fixtures.some(x=>!x.opponent||!['H','A'].includes(String(x.venue).toUpperCase()))){pending++;continue;}
+    if(f.source!=='Selkent'||!representative||blocked||conflicting||(!group&&f.ack?.status!=='confirmed')||fixtures.some(x=>!x.opponent||!['H','A'].includes(String(x.venue).toUpperCase()))){pending++;
+      const related=[f,...all.filter(x=>x.team.id!==f.team.id&&x.date===f.date&&x.team.ageGroup===f.team.ageGroup&&selkentNorm(fullClubResultTeamName(x.team))===selkentNorm(f.opponent)&&selkentNorm(x.opponent)===selkentNorm(fullClubResultTeamName(f.team)))];
+      for(const x of related){const teamLabel=`${x.team.ageGroup} ${x.team.teamName||fullClubResultTeamName(x.team)}`;
+        if(!pendingRows.some(p=>p.date===x.date&&p.teamLabel===teamLabel))pendingRows.push({date:x.date,teamLabel,opponents:(x===f?fixtures:[x]).map(v=>adminWeekendClean(v.opponent)),reason:blocked||conflicting?'Confirmation needs review':'Kick-off unconfirmed'});
+      }continue;}
     const override=representative.override,own=fullClubResultTeamName(f.team);
-    const matchups=fixtures.map(x=>String(x.venue).toUpperCase()==='A'?`${x.opponent} v ${own} (Away)`:`${own} v ${x.opponent} (Home)`);
     const ground=adminWeekendClean(override.groundName),address=adminWeekendClean(override.address);
+    // Neutral describes the shared venue only; provider identities and confirmations stay intact.
+    const neutral=/\b(?:cup|vase)\b/i.test(f.competition)&&/\bmarathon\b/i.test(ground);
+    const matchups=fixtures.map(x=>neutral?`${own} v ${x.opponent} (Neutral)`:String(x.venue).toUpperCase()==='A'?`${x.opponent} v ${own} (Away)`:`${own} v ${x.opponent} (Home)`);
     const satnav=adminWeekendClean(override.satNavPostcode||override.satnavPostcode||override.satnavAddress);
     const competition=/^(league|division)$/i.test(f.competition)?(override.sourceCompetition||st.division?.name||f.team.division||f.competition):f.competition;
     const kits=[adminWeekendKit(fixtures[checks.findIndex(x=>x===representative)],st)];
     // An internal club fixture has one kick-off but both coaching teams need their shirt choice.
     for(const other of all){if(other.team.id===f.team.id||other.date!==f.date||other.team.ageGroup!==f.team.ageGroup)continue;
       if(selkentNorm(fullClubResultTeamName(other.team))===selkentNorm(f.opponent)&&selkentNorm(other.opponent)===selkentNorm(own)&&other.venue!==f.venue)kits.push(adminWeekendKit(other,states.get(other.team.id)||{}));}
-    events.push({date:f.date,time:override.time,teamLabel:`${f.team.ageGroup} ${f.team.teamName||own}`,group,competition:adminWeekendClean(competition),matchups:matchups.map(adminWeekendClean),ground,address,satnav,maps:mapsShareHref(ground,satnav||address),kits:kits.map(adminWeekendClean),pitch:adminWeekendClean(override.pitch||override.pitchNumber),arrival:adminWeekendTime(override.arrivalTime)?override.arrivalTime:'',referee:adminWeekendClean(override.refereeName||override.refereeStatus),video:adminWeekendClean(override.videoingStatus),notes:adminWeekendClean(override.notes),partialNotes:override.notesPartiallyObscured===true});
+    events.push({date:f.date,time:override.time,teamLabel:`${f.team.ageGroup} ${f.team.teamName||own}`,group,neutral,opponents:fixtures.map(x=>adminWeekendClean(x.opponent)),competition:adminWeekendClean(competition),matchups:matchups.map(adminWeekendClean),ground,address,satnav,maps:mapsShareHref(ground,satnav||address),kits:kits.map(adminWeekendClean),pitch:adminWeekendClean(override.pitch||override.pitchNumber),arrival:adminWeekendTime(override.arrivalTime)?override.arrivalTime:'',referee:adminWeekendClean(override.refereeName||override.refereeStatus),video:adminWeekendClean(override.videoingStatus),notes:adminWeekendClean(override.notes),partialNotes:override.notesPartiallyObscured===true});
   }
   events.sort((a,b)=>a.date.localeCompare(b.date)||a.time.localeCompare(b.time)||a.teamLabel.localeCompare(b.teamLabel,undefined,{numeric:true}));
-  return {dates,events,pending,generatedAt:now.getTime()};
+  pendingRows.sort((a,b)=>a.date.localeCompare(b.date)||a.teamLabel.localeCompare(b.teamLabel,undefined,{numeric:true}));
+  return {dates,events,pending,pendingRows,generatedAt:now.getTime()};
 }
 function adminWeekendEventLines(e){
-  return [`*${e.time} · ${e.teamLabel}*${e.group?' · Group start (order may change)':''}`,...e.matchups,e.competition,`Ground: ${e.ground||'Venue to confirm'}`,e.address?`Address: ${e.address}`:'Address: to confirm',e.satnav?`Sat nav: ${e.satnav}`:'',e.pitch?`Pitch: ${e.pitch}`:'',e.arrival?`Meet: ${e.arrival}`:'',...e.kits.map(k=>`Kit: ${k}`),e.referee?`Referee: ${e.referee}`:'',e.video?`Filming: ${e.video}`:'',e.notes?`Ground notes: ${e.notes}`:'',e.partialNotes?'Check the original confirmation for any obscured ground notes.':''].filter(Boolean);
+  return [`*${e.time} · ${e.teamLabel}*${e.group?' · Group start (order may change)':''}`,...e.matchups,e.competition,`Ground: ${e.ground||'Venue to confirm'}`,e.address?`Address: ${e.address}`:'Address: to confirm',e.satnav?`Sat nav: ${e.satnav}`:'',e.pitch?`Pitch: ${e.pitch}`:'',e.arrival?`Meet: ${e.arrival}`:'',e.referee?`Referee: ${e.referee}`:'',e.video?`Filming: ${e.video}`:'',e.notes?`Ground notes: ${e.notes}`:'',e.partialNotes?'Check the original confirmation for any obscured ground notes.':''].filter(Boolean);
 }
 function adminWeekendDigestText(digest,clubName){
-  const lines=[`*${adminWeekendClean(clubName)||'Club'} — weekend fixtures*`,`${shareDateText(digest.dates[0])} – ${shareDateText(digest.dates[1])}`,`${digest.events.length} confirmed fixture / group start${digest.events.length===1?'':'s'} · Times: UK local`,digest.pending?`${digest.pending} fixture / group${digest.pending===1?'':'s'} awaiting confirmed details — excluded from this list.`:'',''];
+  const lines=[`*${adminWeekendClean(clubName)||'Club'} — weekend fixtures*`,`${shareDateText(digest.dates[0])} – ${shareDateText(digest.dates[1])}`,`${digest.events.length} confirmed fixture / group start${digest.events.length===1?'':'s'} · Times: UK local`,digest.pending?`${digest.pending} fixture / group${digest.pending===1?'':'s'} awaiting confirmed details — listed below.`:'',''];
   for(const date of digest.dates){const events=digest.events.filter(e=>e.date===date);if(!events.length)continue;lines.push(`*${shareDateText(date)}*`,'');for(const e of events)lines.push(...adminWeekendEventLines(e),'');}
+  if(digest.pendingRows?.length){lines.push('*KICK-OFFS TO CONFIRM*','');for(const p of digest.pendingRows)lines.push(`*${p.teamLabel}* · ${shareDateText(p.date)}`,`v ${p.opponents.join(' / ')}`,p.reason,'');}
   lines.push('Please check PitchKind for any later changes.');return lines.filter((line,i)=>line||lines[i-1]).join('\n');
 }
 function adminWeekendGraphicLayout(digest,clubName,g,family){
-  const width=1440,commands=[],anchors=[],margin=64,gap=64,col=(width-margin*2-gap)/2;let y=0;
+  const width=1440,commands=[],anchors=[],margin=64,gap=48,col=(width-margin*2-gap)/2;let y=0;
   const green='#D7E9D3',ink='#F4F6EE',muted='#BBCEBF',mint='#D8E9A6';
   const rect=(x,top,w,h,fill,r=0)=>commands.push({kind:'rect',x,y:top,w,h,fill,r});
   const text=(value,x,top,size,weight=400,fill=ink)=>commands.push({kind:'text',value,x,y:top,size,weight,fill});
@@ -4089,38 +4097,48 @@ function adminWeekendGraphicLayout(digest,clubName,g,family){
     }return lines;
   };
   const block=(value,x,top,size,maxWidth,weight=400,fill=ink,lineHeight=size+10)=>{const lines=wrap(value,size,maxWidth,weight);lines.forEach((line,i)=>text(line,x,top+i*lineHeight,size,weight,fill));return lines.length*lineHeight;};
-  const kits=e=>(e.kits||[]).map(k=>k.startsWith(e.teamLabel+': ')?k.slice(e.teamLabel.length+2):k),kitValues=digest.events.map(e=>JSON.stringify(kits(e))),variedKits=kitValues.some(k=>k!==kitValues[0]);
   let hy=76;hy+=block((clubName||'Club').toUpperCase(),margin,hy,34,width-320,600,mint,44);
-  hy+=36;hy+=block('WEEKEND FIXTURES',margin,hy,84,width-margin*2,800,ink,96);
+  hy+=36;hy+=block('WEEKEND FIXTURES',margin,hy,84,width-margin*2-272,800,ink,96);
   hy+=28;hy+=block(`${shareDateText(digest.dates[0])} – ${shareDateText(digest.dates[1])}`,margin,hy,34,width-margin*2,500,muted,44);
   y=hy+32;y+=block(`${digest.events.length} confirmed starts · UK local time`,margin,y,32,width-margin*2,600,mint,42);
-  if(digest.pending)y+=block(`${digest.pending} awaiting confirmation — excluded`,margin,y,30,width-margin*2,400,muted,40);
-  y+=14;
+  if(digest.pending)y+=block(`${digest.pending} awaiting confirmation — teams listed below`,margin,y,30,width-margin*2,400,muted,40);
+  y+=0;
   for(const date of digest.dates){
     const events=digest.events.filter(e=>e.date===date).sort((a,b)=>a.teamLabel.localeCompare(b.teamLabel,undefined,{numeric:true})||a.time.localeCompare(b.time));if(!events.length)continue;
     const dateLabel=shareDateText(date);
-    y+=22;anchors.push({label:dateLabel,date,top:y,day:true});
+    y+=14;anchors.push({label:dateLabel,date,top:y,day:true});
     const sectionTop=y,dayLines=wrap(dateLabel.toUpperCase(),36,width-margin*2,700);
-    dayLines.forEach((line,i)=>text(line,margin,sectionTop+42+i*46,36,700,mint));y+=dayLines.length*46+26;
+    dayLines.forEach((line,i)=>text(line,margin,sectionTop+42+i*46,36,700,mint));y+=dayLines.length*46+18;
     rect(margin,y,width-margin*2,2,'#80947D');y+=28;
+    if(events.length===1&&events[0].group){
+      const e=events[0],top=y,left=margin,right=margin+col+gap;
+      text(e.teamLabel,left,top+48,46,800);text(e.time,width-margin,top+54,70,700,mint);commands.at(-1).align='right';
+      let ly=top+110,ry=ly;
+      ly+=block(`${e.neutral?'NEUTRAL · ':''}Group start · order may change`,left,ly,30,col,700,mint,40)+8;
+      for(let i=0;i<e.matchups.length;i++)ly+=block(e.neutral?`v ${e.opponents[i]}`:e.matchups[i],left,ly,34,col,700,ink,44)+6;
+      ly+=block(e.competition,left,ly,30,col,500,muted,40);
+      ry+=block(e.ground||'Venue to confirm',right,ry,34,col,700,ink,44)+8;
+      ry+=block(e.address||'Address: to confirm',right,ry,34,col,400,muted,44)+8;
+      for(const value of [e.satnav?`Sat nav: ${e.satnav}`:'',e.pitch?`Pitch: ${e.pitch}`:'',e.arrival?`Meet: ${e.arrival}`:'',e.referee&&!/^Waiting to be Assigned$/i.test(e.referee)?`Referee: ${e.referee}`:'',e.video==='Not permitted'?'Filming: Not permitted':'',e.notes])if(value)ry+=block(value,right,ry,34,col,500,green,44)+8;
+      anchors.push({label:`${e.teamLabel} · ${e.time}`,date,top,teamLabel:e.teamLabel});y=Math.max(ly,ry)+24;continue;
+    }
     const full=events.length===1,cardWidth=full?width-margin*2:col,plans=[];
     for(const e of events){
-      const lines=[],add=(value,size=34,weight=400,fill=ink,space=8)=>{if(!value)return;wrap(value,size,cardWidth,weight).forEach(value=>lines.push({value,size,weight,fill,step:size+10}));lines.push({space});};
+      const lines=[],add=(value,size=34,weight=400,fill=ink,space=6)=>{if(!value)return;wrap(value,size,cardWidth,weight).forEach(value=>lines.push({value,size,weight,fill,step:size+8}));lines.push({space});};
       if(e.group)add('Group start · game order may change',30,700,muted);
       for(const match of e.matchups){
-        const side=match.match(/ \((Home|Away)\)$/),teams=side?match.slice(0,side.index).split(' v '):[];
-        if(teams.length===2&&teams.filter(t=>t.startsWith(clubName+' ')).length===1){const opponent=teams[side[1]==='Home'?1:0];const away=side[1]==='Away';lines.push({tag:side[1].toUpperCase(),fill:mint});wrap(opponent,36,cardWidth-138,700).forEach(value=>lines.push({value,size:36,weight:700,fill:ink,step:46,indent:138}));lines.push({space:14});}
+        const side=match.match(/ \((Home|Away|Neutral)\)$/),teams=side?match.slice(0,side.index).split(' v '):[];
+        if(teams.length===2&&teams.filter(t=>t.startsWith(clubName+' ')).length===1){const opponent=teams[side[1]==='Away'?0:1];const indent=side[1]==='Neutral'?184:138;lines.push({tag:side[1].toUpperCase(),fill:mint});wrap(opponent,36,cardWidth-indent,700).forEach(value=>lines.push({value,size:36,weight:700,fill:ink,step:44,indent}));lines.push({space:8});}
         else add(match,36,700);
       }
-      add(e.competition,30,500,muted,16);
-      add(e.ground||'Venue to confirm',34,700);add(e.address||'Address: to confirm',34,400,muted,12);
+      add(e.competition,30,500,muted,8);
+      add(e.ground||'Venue to confirm',34,700);add(e.address||'Address: to confirm',34,400,muted,8);
       if(e.satnav)add(`Sat nav: ${e.satnav}`,34,700,green);
       if(e.pitch)add(`Pitch: ${e.pitch}`);if(e.arrival)add(`Meet: ${e.arrival}`);
-      if(variedKits)kits(e).forEach(k=>add(`Kit: ${k}`));
       if(e.referee&&!/^Waiting to be Assigned$/i.test(e.referee))add(`Referee: ${e.referee}`);
       if(e.video==='Not permitted')add('Filming: Not permitted',34,700,'#F1D6A2');
       if(e.notes)add(e.notes,34,500,green);
-      const title=wrap(e.teamLabel,46,cardWidth-256,800),head=Math.max(76,12+title.length*56),height=head+12+lines.reduce((n,l)=>n+(l.tag?0:l.space===undefined?l.step:l.space),0)+16;
+      const title=wrap(e.teamLabel,46,cardWidth-256,800),head=Math.max(68,12+title.length*56),height=head+12+lines.reduce((n,l)=>n+(l.tag?0:l.space===undefined?l.step:l.space),0)+8;
       plans.push({e,lines,title,head,height});
     }
     for(let i=0;i<plans.length;i+=full?1:2){
@@ -4138,11 +4156,25 @@ function adminWeekendGraphicLayout(digest,clubName,g,family){
       });y+=rowHeight+gap;
     }
   }
+  if(digest.pendingRows?.length){
+    y+=16;text('KICK-OFFS TO CONFIRM',margin,y+40,36,700,mint);y+=66;rect(margin,y,width-margin*2,2,'#80947D');y+=42;
+    for(let i=0;i<digest.pendingRows.length;i+=2){let bottom=y;
+      digest.pendingRows.slice(i,i+2).forEach((p,j)=>{const x=margin+j*(col+gap),top=y;let py=top;
+        py+=block(p.teamLabel,x,py,42,col,800,ink,52)+8;
+        py+=block(shareDateText(p.date),x,py,30,col,500,muted,40)+8;
+        py+=block(`v ${p.opponents.join(' / ')}`,x,py,32,col,600,ink,42)+8;
+        py+=block(p.reason,x,py,32,col,600,'#F1D6A2',42);bottom=Math.max(bottom,py);
+        anchors.push({label:`${p.teamLabel} · unconfirmed`,date:p.date,top,teamLabel:p.teamLabel,pending:true});
+      });y=bottom+42;
+    }
+  }
   y+=12;
-  return {width,height:Math.ceil(y),commands,anchors,family,badge:{x:width-140,y:88,size:132},watermark:{x:width*.8,y:y*.53,size:Math.max(width*2,y*.94),angle:-22,opacity:.075}};
+  return {width,height:Math.ceil(y),commands,anchors,family,badge:{x:width-margin-112,y:148,size:224},watermark:{x:width*.8,y:y*.53,size:Math.max(width*2,y*.94),angle:-22,opacity:.075}};
 }
 function drawAdminWeekendGraphic(canvas,layout,badge=null,circular=false){
-  canvas.width=layout.width;canvas.height=layout.height;const g=canvas.getContext('2d');if(!g)throw new Error('Image drawing unavailable');
+  // Draw typography at twice the logical size for a lossless, zoomable PNG.
+  const resolution=2;canvas.width=layout.width*resolution;canvas.height=layout.height*resolution;const g=canvas.getContext('2d');if(!g)throw new Error('Image drawing unavailable');
+  g.scale(resolution,resolution);g.imageSmoothingEnabled=true;g.imageSmoothingQuality='high';
   g.fillStyle='#0B241A';g.fillRect(0,0,layout.width,layout.height);g.textAlign='left';
   const badgeWidth=badge&&(badge.naturalWidth||badge.width),badgeHeight=badge&&(badge.naturalHeight||badge.height);
   if(badge&&badgeWidth&&badgeHeight){
@@ -4159,13 +4191,13 @@ async function prepareAdminWeekendGraphic(digest,clubName){
   if(document.fonts?.ready)await document.fonts.ready;
   const canvas=document.createElement('canvas'),g=canvas.getContext('2d');if(!g)return null;
   const family=shareCardFontFamily(),layout=adminWeekendGraphicLayout(digest,clubName,g,family);
-  if(layout.height>30000)throw new Error('Infographic too long for this browser');
+  if(layout.height*2>30000)throw new Error('Infographic too long for this browser');
   const src=typeof verifiedTeamBadgeUrl==='function'?verifiedTeamBadgeUrl(clubName):'',badge=src?await loadShareBadgeImage(src):null;
   drawAdminWeekendGraphic(canvas,layout,badge,src==='shooters-hill-logo.png');
   const dataUrl=canvas.toDataURL('image/png'),fileName=`PitchKind_weekend_${digest.dates[0]}.png`;
   const bytes=Uint8Array.from(atob(dataUrl.split(',')[1]),char=>char.charCodeAt(0));
   const file=typeof File==='function'?new File([bytes],fileName,{type:'image/png'}):null;
-  return {dataUrl,file,fileName,width:layout.width,height:layout.height,anchors:layout.anchors};
+  return {dataUrl,file,fileName,width:canvas.width,height:canvas.height,anchors:layout.anchors.map(a=>({...a,top:a.top*2}))};
 }
 function jumpAdminWeekendGraphic(top){
   const img=document.getElementById('admin-weekend-infographic'),scroller=img?.closest('.weekend-share-scroll');if(!img||!scroller)return;
@@ -4190,7 +4222,7 @@ function adminWeekendShareReady(){
 function renderAdminWeekendShare(){
   const snap=__adminWeekendShare,preview=document.getElementById('admin-weekend-share-preview'),status=document.getElementById('admin-weekend-share-status'),raw=document.getElementById('admin-weekend-share-text'),nav=document.getElementById('admin-weekend-share-days');
   if(raw)raw.value=snap?.text||'';
-  if(status)status.textContent=snap?`${snap.digest.events.length} confirmed fixture / group starts · ${snap.digest.pending} awaiting confirmed details. Times are UK local. Share includes the whole list.`:'Loading the latest confirmed details…';
+  if(status)status.textContent=snap?`${snap.digest.events.length} confirmed fixture / group starts · ${snap.digest.pending} awaiting confirmed details, listed below. Times are UK local. Share includes the whole list.`:'Loading the latest confirmed details…';
   if(nav)nav.innerHTML=snap?snap.digest.dates.filter(date=>snap.digest.events.some(e=>e.date===date)).map(date=>`<button type="button" class="secondary-button" data-weekend-share-day="${esc(date)}">${esc(shareDateText(date).split(' ')[0])}</button>`).join(''):'';
   if(preview)preview.innerHTML=snap?snap.digest.dates.map(date=>{const events=snap.digest.events.filter(e=>e.date===date);return events.length?`<section id="weekend-share-${esc(date)}"><h4>${esc(shareDateText(date))}</h4>${events.map(e=>`<article class="weekend-share-card"><h5>${esc(e.time)} · ${esc(e.teamLabel)}</h5>${adminWeekendEventLines(e).slice(1).map(line=>line.startsWith('Map: ')?`<p><a href="${esc(e.maps)}" target="_blank" rel="noopener">Open map</a></p>`:`<p>${esc(line)}</p>`).join('')}${e.group?'<p class="muted">Group start · game order may change</p>':''}</article>`).join('')}</section>`:'';}).join('')||'<p>No confirmed kick-off times for this weekend yet.</p>':'';
   if(snap?.graphic&&preview)preview.innerHTML=`<img id="admin-weekend-infographic" class="weekend-infographic" src="${esc(snap.graphic.dataUrl)}" width="${snap.graphic.width}" height="${snap.graphic.height}" alt="Confirmed weekend fixture infographic. ${esc(snap.graphic.anchors.filter(a=>!a.day).map(a=>a.label).join('; '))}"><details class="weekend-share-accessible"><summary>Read fixture details as text</summary><pre>${esc(snap.text)}</pre></details>`;
