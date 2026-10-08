@@ -2,10 +2,23 @@ name: Store reviewed pilot badges privately in R2
 
 on:
   workflow_dispatch:
+  # A scrape's GITHUB_TOKEN commit cannot trigger another push workflow.
+  # Completion starts this same guarded publisher without consuming artifacts.
+  workflow_run:
+    workflows:
+      - Scrape Selkent Results
+      - Scrape Selkent Club/League Directory
+      - Publish reviewed private-pilot badges
+    types: [completed]
+    branches: [main]
   push:
     branches: [main]
     paths:
       - '.github/workflows/stage-pilot-badges-r2.yml'
+      - 'scripts/verify_web_deploy_snapshot.py'
+      - 'tests/test_web_deploy_snapshot.py'
+      - 'data/results.json'
+      - 'data/directory.json'
       - 'verification/pilot_verified_badges.json'
       - 'verification/approved_badges/**'
       - 'tests/test_publish_pilot_badges.py'
@@ -21,10 +34,9 @@ on:
       - 'cloudflare/web-app/tests/selkent-feed.test.mjs'
       - 'cloudflare/web-app/wrangler.jsonc'
       - 'cloudflare/web-app/service-worker.js'
-      - 'app/src/main/assets/app.js'
-      - 'app/src/main/assets/styles.css'
-      - 'app/src/main/assets/app-design-system.css'
-      - 'app/src/main/assets/static-feed-overlay.js'
+      - 'cloudflare/web-app/build.py'
+      - 'cloudflare/web-app/_headers'
+      - 'app/src/main/assets/**'
 
 permissions:
   contents: write
@@ -35,6 +47,12 @@ concurrency:
 
 jobs:
   stage:
+    if: >-
+      github.ref == 'refs/heads/main' &&
+      (github.event_name != 'workflow_run' ||
+       (github.event.workflow_run.conclusion == 'success' &&
+        github.event.workflow_run.head_branch == 'main' &&
+        github.event.workflow_run.head_repository.full_name == github.repository))
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
@@ -42,6 +60,13 @@ jobs:
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          # The scrape's head_sha precedes its feed commit. Build current main,
+          # never the triggering branch, an upstream artifact, or a stale SHA.
+          ref: main
+          fetch-depth: 0
+      - name: Validate trusted deployment event
+        run: python scripts/verify_web_deploy_snapshot.py --event-only
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -50,7 +75,8 @@ jobs:
           python-version: '3.12'
       - name: Test approval and protected route
         run: |
-          python -m pip install requests beautifulsoup4 Pillow==12.3.0 numpy==2.3.5 scipy==1.17.0
+          python -m pip install requests beautifulsoup4 Pillow==12.3.0 numpy==2.3.5 scipy==1.17.0 PyYAML==6.0.3
+          python -m unittest discover -s tests -p 'test_web_deploy_snapshot.py' -v
           python -m unittest discover -s tests -p '*pilot_badge*.py' -v
           node --test cloudflare/web-app/tests/pilot-badges.test.mjs
           node --test cloudflare/web-app/tests/badge-review.test.mjs
@@ -78,8 +104,20 @@ jobs:
           python cloudflare/web-app/build.py
           git diff --check
       - name: Deploy protected website Worker with R2 binding
+        id: deploy
         working-directory: cloudflare/web-app
-        run: npx --yes wrangler@4.142.0 deploy
+        run: |
+          # Refuse stale main or a bundle that differs from the checked feeds.
+          python ../../scripts/verify_web_deploy_snapshot.py --receipt "$RUNNER_TEMP/web-deploy-snapshot.json"
+          npx --yes wrangler@4.142.0 deploy
+      - name: Preserve deployment snapshot evidence
+        if: success() && steps.deploy.outcome == 'success'
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-deploy-snapshot-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/web-deploy-snapshot.json
+          if-no-files-found: error
+          retention-days: 30
       - name: Commit verified badge metadata
         run: |
           git config user.name "pitchkind-badge-bot"
