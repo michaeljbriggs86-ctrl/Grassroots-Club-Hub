@@ -5919,3 +5919,33 @@ if (typeof renderMatchOverview === "function") {
     return result;
   };
 }
+
+// Decorative live-page branding follows the already resolved own-club header badge.
+function syncClubPageWatermark(){
+  const layer=document.getElementById('club-page-watermark'),image=layer?.querySelector?.('img'),header=document.querySelector?.('.hero .club-logo');
+  if(!layer||!image||!header)return;
+  const src=header.getAttribute('src')||'';
+  const hide=()=>{layer.hidden=true;document.body.classList.remove('club-watermark-ready');};
+  if(!src||/pitchkind-wt_mark(?:-reverse)?\.svg(?:[?#]|$)/.test(src)){
+    hide();image.onload=null;image.onerror=null;image.removeAttribute('src');return;
+  }
+  if(image.getAttribute('src')===src)return;
+  hide();layer.dataset.circular=String(src==='shooters-hill-logo.png'||/^\/?__pilot_badges\/499\/[a-f0-9]{64}$/i.test(src));
+  image.onload=()=>{if(image.getAttribute('src')===src&&image.naturalWidth>0){layer.hidden=false;document.body.classList.add('club-watermark-ready');}};
+  image.onerror=hide;
+  image.src=src;
+  if(image.complete&&image.naturalWidth>0)image.onload();
+}
+function startClubPageWatermark(){
+  const header=document.querySelector?.('.hero .club-logo');if(!header||header.__clubWatermarkObserver)return;
+  syncClubPageWatermark();
+  // Configuration changes and the existing verified-badge fallback both change src.
+  if(typeof MutationObserver==='function'){
+    const observer=new MutationObserver(syncClubPageWatermark);
+    observer.observe(header,{attributes:true,attributeFilter:['src']});header.__clubWatermarkObserver=observer;
+  }
+}
+if(typeof document!=='undefined'&&typeof window!=='undefined'){
+  if(document.readyState==='loading')window.addEventListener?.('DOMContentLoaded',startClubPageWatermark,{once:true});
+  else startClubPageWatermark();
+}
