@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "provider": "Selkent",
-  "last_updated": "2026-10-09T12:16:16.059305+00:00",
+  "last_updated": "2026-10-09T21:53:06.194736+00:00",
   "fixture_agegroup_discovery_source": "selkent_divisions_all",
   "coverage": {
     "fixtures": {
@@ -2100,16 +2100,6 @@
         {
           "date": "2026-10-10",
           "division_name": "U9 Selkent Cup Two - Round 1",
-          "home": "Dynamo Youth Silver",
-          "away": "Ebbsfleet United Blue",
-          "provider_team_ids": [
-            "2134",
-            "669"
-          ]
-        },
-        {
-          "date": "2026-10-10",
-          "division_name": "U9 Selkent Cup Two - Round 1",
           "home": "Ebbsfleet United Blue",
           "away": "Erith Town Selkent",
           "provider_team_ids": [
@@ -2121,10 +2111,10 @@
           "date": "2026-10-10",
           "division_name": "U9 Selkent Cup Two - Round 1",
           "home": "Erith Town Selkent",
-          "away": "Dynamo Youth Silver",
+          "away": "Ebbsfleet United Blue",
           "provider_team_ids": [
             "338",
-            "2134"
+            "669"
           ]
         },
         {
@@ -2370,11 +2360,11 @@
         {
           "date": "2026-10-11",
           "division_name": "Under 9D Silver",
-          "home": "Blackheath Rhinos Grey",
-          "away": "Deptford United",
+          "home": "Deptford United",
+          "away": "Blackheath Rhinos Grey",
           "provider_team_ids": [
-            "2236",
-            "944"
+            "944",
+            "2236"
           ]
         },
         {
