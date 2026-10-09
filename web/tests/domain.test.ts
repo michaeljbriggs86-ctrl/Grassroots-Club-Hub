@@ -7,7 +7,7 @@ import { eventKey } from '../src/domain/keys.ts';
 import { upcomingEvents } from '../src/domain/upcoming.ts';
 import type { UpcomingInput } from '../src/domain/upcoming.ts';
 import { ageNumber, parseAgeGroup } from '../src/domain/normalise.ts';
-import { can, visibleMatch, playerLoginAllowed } from '../src/domain/access.ts';
+import { can, visibleMatch, playerLoginAllowed, stateForRole } from '../src/domain/access.ts';
 import { assertNoYouthPublicResults, FeedPrivacyError } from '../src/domain/feedGuard.ts';
 import type { FeedFixture, PrivateMatch } from '../src/domain/types.ts';
 
@@ -147,4 +147,22 @@ test('U12X is a published-results group, not a protected youth group', () => {
   const feedLike = { age_groups: [{ age_group: 'U12X', standings: [{}], published_results: [{}] }] };
   assert.doesNotThrow(() => assertNoYouthPublicResults(feedLike));
   assert.equal(parseAgeGroup('U12X').age, 12);
+});
+
+test('private scores: parents and players see them from U12 up only, unknown age fails closed', () => {
+  const m: PrivateMatch = { date: '2026-10-18', opponent: 'X', venue: 'H', status: 'played' };
+  for (const role of ['parent', 'player'] as const) {
+    assert.equal('status' in visibleMatch(role, m, 11), false);
+    assert.equal('status' in visibleMatch(role, m, undefined), false);
+    assert.equal('status' in visibleMatch(role, m, 12), true);
+    assert.equal('status' in visibleMatch(role, m, 15), true);
+  }
+});
+
+test('tactics are coach only', () => {
+  const state = { tactics: [1], squad: [2] };
+  assert.equal('tactics' in stateForRole('parent', state), false);
+  assert.equal('tactics' in stateForRole('player', state), false);
+  assert.equal('tactics' in stateForRole('coach', state), true);
+  assert.equal('squad' in stateForRole('parent', state), true);
 });
