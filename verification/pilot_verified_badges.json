@@ -467,6 +467,87 @@
       "rights_status": "protected_pilot_only_public_rights_not_reviewed",
       "rights_note": "Rights bypassed for protected pilot; public, marketing and wider-use permission not established.",
       "review_basis": "Canonical Selkent club 261 is Dulwich Village. Club-owned homepage links this exact original. SHA-256 and bytes match the 2026-10-08/09 exact-file review and fresh HTTPS re-fetch on 2026-10-09. Native 1051x1063 PNG passes q1; valid PNG decoding/chunks. Original pixels and transparency retained, no redraw, metadata repair, upscaling or derivative. Screened at 128, 48 and 26 CSSpx on white and brand dark-green backgrounds. Mike instructed continued badge population after confirming D1 placeholders. Protected-pilot only; signed-in real-badge phone acceptance and independent Claude verification remain open."
+    },
+    {
+      "club_id": 283,
+      "club_name": "Hayden Youth",
+      "logo_url": "https://images.squarespace-cdn.com/content/v1/6480c5de1292df0da739f2dc/141f334d-342f-44c5-b4ae-e7ac2e9f7612/3B22E655-E6C2-40C1-889E-AF43593FE361-removebg-preview.png",
+      "logo_status": "pilot_verified",
+      "logo_source": "official_site_image",
+      "logo_updated_at": "2026-10-09",
+      "logo_sha256": "f1ad10188183a877d1f7bb60e5c6a80effc286ee6892916fba5dc382a412a513",
+      "original_source_url": "https://images.squarespace-cdn.com/content/v1/6480c5de1292df0da739f2dc/141f334d-342f-44c5-b4ae-e7ac2e9f7612/3B22E655-E6C2-40C1-889E-AF43593FE361-removebg-preview.png",
+      "original_sha256": "f1ad10188183a877d1f7bb60e5c6a80effc286ee6892916fba5dc382a412a513",
+      "source_page_url": "https://www.haydenyouth.co.uk/",
+      "native_width": 388,
+      "native_height": 453,
+      "derivation": "unchanged_official_original",
+      "quality_note": "below q1; unchanged official original at native size",
+      "pilot_quality_exception": {
+        "scope": "shooters_hill_protected_pilot",
+        "max_render_css_px": 128,
+        "quality_note": "below q1",
+        "no_upscaling": true,
+        "native_width": 388,
+        "native_height": 453
+      },
+      "rights_status": "protected_pilot_only_public_rights_not_reviewed",
+      "rights_note": "Rights bypassed for protected pilot; public, marketing and wider-use permission not established.",
+      "review_basis": "Selkent 283 names Hayden Youth with yellow/black colours and Leyton Cross Road ground. The own-site About us page identifies the same youth association and names the same club secretary and fixture secretaries; the homepage displays this exact 388x453 original. It matches the earlier reviewed candidate SHA-256. Fresh HTTPS re-fetch on 2026-10-09 passed exact hash, MIME, PNG CRC/decoding and per-file D2 exception. No redraw, recolouring, crop, repair or upscaling by Codex. Native source pixels and transparency retained; usable at 128, 48 and 26 CSSpx on white and brand dark-green backgrounds. Mike confirmed continuation. Protected-pilot only; independent Claude review, private R2 readback and signed-in phone acceptance remain open."
+    },
+    {
+      "club_id": 445,
+      "club_name": "Riverview FC",
+      "logo_url": "https://riverviewfc.co.uk/wp-content/themes/riverview-fc/inc/img/rfc.png",
+      "logo_status": "pilot_verified",
+      "logo_source": "official_site_image",
+      "logo_updated_at": "2026-10-09",
+      "logo_sha256": "73429f902c4006b6ff680a27e51752a0cdb5ddbae92cc919f5093c60ed015f6b",
+      "original_source_url": "https://riverviewfc.co.uk/wp-content/themes/riverview-fc/inc/img/rfc.png",
+      "original_sha256": "73429f902c4006b6ff680a27e51752a0cdb5ddbae92cc919f5093c60ed015f6b",
+      "source_page_url": "https://riverviewfc.co.uk/",
+      "native_width": 469,
+      "native_height": 469,
+      "derivation": "unchanged_official_original",
+      "quality_note": "below q1; unchanged official original at native size",
+      "pilot_quality_exception": {
+        "scope": "shooters_hill_protected_pilot",
+        "max_render_css_px": 128,
+        "quality_note": "below q1",
+        "no_upscaling": true,
+        "native_width": 469,
+        "native_height": 469
+      },
+      "rights_status": "protected_pilot_only_public_rights_not_reviewed",
+      "rights_note": "Rights bypassed for protected pilot; public, marketing and wider-use permission not established.",
+      "review_basis": "Selkent 445 links riverviewfc.co.uk and names the Gravesend club and Cascades/Thong Lane grounds. Its own homepage stylesheet references this exact 469px flat crest. This original replaces the uploaded 402x403 cutout and raster-wrapped SVG; their unidentified derivation is not inherited. Fresh HTTPS re-fetch on 2026-10-09 passed exact hash, MIME, PNG CRC/decoding and per-file D2 exception. No redraw, recolouring, crop, repair or upscaling by Codex. Native source pixels and transparency retained; usable at 128, 48 and 26 CSSpx on white and brand dark-green backgrounds. Mike confirmed continuation. Protected-pilot only; independent Claude review, private R2 readback and signed-in phone acceptance remain open."
+    },
+    {
+      "club_id": 493,
+      "club_name": "Next Level FC",
+      "logo_url": "https://static.wixstatic.com/media/e1c7e7_0da57d82b4e743109f979ba867aadc3d~mv2.png",
+      "logo_status": "pilot_verified",
+      "logo_source": "official_site_image",
+      "logo_updated_at": "2026-10-09",
+      "logo_sha256": "29c14925ff973836cf5ad2168344b727dbc074b80d3eb5fbd1176b6790d41def",
+      "original_source_url": "https://static.wixstatic.com/media/e1c7e7_0da57d82b4e743109f979ba867aadc3d~mv2.png",
+      "original_sha256": "29c14925ff973836cf5ad2168344b727dbc074b80d3eb5fbd1176b6790d41def",
+      "source_page_url": "https://www.nextlevelfc.co.uk/",
+      "native_width": 339,
+      "native_height": 334,
+      "derivation": "unchanged_official_original",
+      "quality_note": "below q1; unchanged official original at native size",
+      "pilot_quality_exception": {
+        "scope": "shooters_hill_protected_pilot",
+        "max_render_css_px": 128,
+        "quality_note": "below q1",
+        "no_upscaling": true,
+        "native_width": 339,
+        "native_height": 334
+      },
+      "rights_status": "protected_pilot_only_public_rights_not_reviewed",
+      "rights_note": "Rights bypassed for protected pilot; public, marketing and wider-use permission not established.",
+      "review_basis": "Selkent 493 names Next Level FC at Sparrows Lane, Eltham; the own-site contact page gives the same location and domain, and its Selkent Teams page links the league. The homepage displays this exact Wix media asset. It matches the earlier reviewed candidate SHA-256. Fresh HTTPS re-fetch on 2026-10-09 passed exact hash, MIME, PNG CRC/decoding and per-file D2 exception. No redraw, recolouring, crop, repair or upscaling by Codex. Native source pixels and transparency retained; usable at 128, 48 and 26 CSSpx on white and brand dark-green backgrounds. Mike confirmed continuation. Protected-pilot only; independent Claude review, private R2 readback and signed-in phone acceptance remain open."
     }
   ]
 }
