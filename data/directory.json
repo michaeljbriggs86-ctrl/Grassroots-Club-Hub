@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-10-09T18:57:28.057637+00:00",
+  "last_updated": "2026-10-09T21:21:08.473925+00:00",
   "clubs": [
     {
       "club_id": 514,
@@ -315,7 +315,12 @@
     },
     {
       "club_id": 283,
-      "club_name": "Hayden Youth"
+      "club_name": "Hayden Youth",
+      "logo_url": "https://images.squarespace-cdn.com/content/v1/6480c5de1292df0da739f2dc/141f334d-342f-44c5-b4ae-e7ac2e9f7612/3B22E655-E6C2-40C1-889E-AF43593FE361-removebg-preview.png",
+      "logo_status": "pilot_verified",
+      "logo_source": "official_site_image",
+      "logo_updated_at": "2026-10-09",
+      "logo_sha256": "f1ad10188183a877d1f7bb60e5c6a80effc286ee6892916fba5dc382a412a513"
     },
     {
       "club_id": 288,
@@ -434,7 +439,12 @@
     },
     {
       "club_id": 493,
-      "club_name": "Next Level FC"
+      "club_name": "Next Level FC",
+      "logo_url": "https://static.wixstatic.com/media/e1c7e7_0da57d82b4e743109f979ba867aadc3d~mv2.png",
+      "logo_status": "pilot_verified",
+      "logo_source": "official_site_image",
+      "logo_updated_at": "2026-10-09",
+      "logo_sha256": "29c14925ff973836cf5ad2168344b727dbc074b80d3eb5fbd1176b6790d41def"
     },
     {
       "club_id": 544,
@@ -510,7 +520,12 @@
     },
     {
       "club_id": 445,
-      "club_name": "Riverview FC"
+      "club_name": "Riverview FC",
+      "logo_url": "https://riverviewfc.co.uk/wp-content/themes/riverview-fc/inc/img/rfc.png",
+      "logo_status": "pilot_verified",
+      "logo_source": "official_site_image",
+      "logo_updated_at": "2026-10-09",
+      "logo_sha256": "73429f902c4006b6ff680a27e51752a0cdb5ddbae92cc919f5093c60ed015f6b"
     },
     {
       "club_id": 512,
@@ -7792,5 +7807,5 @@
     }
   ],
   "note": "Panel parsing confirmed against all five format categories (mini-soccer, 9-a-side, X-category, 11-a-side, Senior) as of Sept 2026. Club/team linking is heuristic (name-prefix match) - see ambiguous_club_matches in diagnostics for anything flagged as uncertain.",
-  "pilot_badges_revision": "db26b5c2f34dec93aa6c30d0919021700197347a991f1a19aee6972fb882d91c"
+  "pilot_badges_revision": "bf6eade342a97b078766e41c20a59245944c5ec9bde82489a069334ca319fbb8"
 }
