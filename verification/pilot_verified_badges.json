@@ -433,6 +433,40 @@
       "derivation": "outer_background_transparency_only",
       "rights_status": "protected_pilot_only_public_rights_not_reviewed",
       "review_basis": "Mike approved the visible artwork in the upload inbox. Selkent club 508 identifies Corinthian FC; the Corinthian Sports Club and SCEFL sources confirm the same football club and youth pathway. Exact 645x714 official JPEG was re-fetched on 2026-09-30; only the connected white exterior was made transparent, preserving the crest artwork. Phone-size light and dark previews passed."
+    },
+    {
+      "club_id": 254,
+      "club_name": "Welling United",
+      "logo_url": "https://www.wellingutd.com/media/images/user-images/42002/round3wellingutdlogo.png",
+      "logo_status": "pilot_verified",
+      "logo_source": "official_site_image",
+      "logo_updated_at": "2026-10-09",
+      "logo_sha256": "00a2ae3de23777f5558b6fb84e7482336983e239ef4826d70f4cf479bc78242c",
+      "original_source_url": "https://www.wellingutd.com/media/images/user-images/42002/round3wellingutdlogo.png",
+      "source_page_url": "https://www.wellingutd.com/",
+      "native_width": 1024,
+      "native_height": 1024,
+      "quality_note": "meets q1; unchanged official original",
+      "rights_status": "protected_pilot_only_public_rights_not_reviewed",
+      "rights_note": "Rights bypassed for protected pilot; public, marketing and wider-use permission not established.",
+      "review_basis": "Canonical Selkent club 254 is Welling United. Club-owned homepage links this exact original. SHA-256 and bytes match the 2026-10-08/09 exact-file review and fresh HTTPS re-fetch on 2026-10-09. Native 1024x1024 PNG passes q1; valid PNG decoding/chunks. Original pixels and transparency retained, no redraw, metadata repair, upscaling or derivative. Screened at 128, 48 and 26 CSSpx on white and brand dark-green backgrounds. Mike instructed continued badge population after confirming D1 placeholders. Protected-pilot only; signed-in real-badge phone acceptance and independent Claude verification remain open."
+    },
+    {
+      "club_id": 261,
+      "club_name": "Dulwich Village",
+      "logo_url": "https://static.wixstatic.com/media/939998_d662e53a373a437aacd35fab065733aa~mv2.png",
+      "logo_status": "pilot_verified",
+      "logo_source": "official_site_image",
+      "logo_updated_at": "2026-10-09",
+      "logo_sha256": "00c8a58a5521e6573a49cc0a53b618a17d486decba9f79f473503faa7d7d6f3a",
+      "original_source_url": "https://static.wixstatic.com/media/939998_d662e53a373a437aacd35fab065733aa~mv2.png",
+      "source_page_url": "https://www.dulwichvillagefc.co.uk/",
+      "native_width": 1051,
+      "native_height": 1063,
+      "quality_note": "meets q1; unchanged official original",
+      "rights_status": "protected_pilot_only_public_rights_not_reviewed",
+      "rights_note": "Rights bypassed for protected pilot; public, marketing and wider-use permission not established.",
+      "review_basis": "Canonical Selkent club 261 is Dulwich Village. Club-owned homepage links this exact original. SHA-256 and bytes match the 2026-10-08/09 exact-file review and fresh HTTPS re-fetch on 2026-10-09. Native 1051x1063 PNG passes q1; valid PNG decoding/chunks. Original pixels and transparency retained, no redraw, metadata repair, upscaling or derivative. Screened at 128, 48 and 26 CSSpx on white and brand dark-green backgrounds. Mike instructed continued badge population after confirming D1 placeholders. Protected-pilot only; signed-in real-badge phone acceptance and independent Claude verification remain open."
     }
   ]
 }
