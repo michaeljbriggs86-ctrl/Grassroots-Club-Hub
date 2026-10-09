@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-10-09T21:21:08.473925+00:00",
+  "last_updated": "2026-10-09T21:58:53.365622+00:00",
   "clubs": [
     {
       "club_id": 514,
@@ -40,7 +40,12 @@
     },
     {
       "club_id": 239,
-      "club_name": "Baldon Sports"
+      "club_name": "Baldon Sports",
+      "logo_url": "https://images.pitchero.com/club_logos/6221/YBKyTW27RICByxpLXNFb_Screenshot%202024-06-26%20at%2016.47.39.png",
+      "logo_status": "pilot_verified",
+      "logo_source": "official_site_image",
+      "logo_updated_at": "2026-10-09",
+      "logo_sha256": "e77d17390ac6ecc0b6cd382e8ffd854189bf6cd7ed6f35fe9ed547bc4f09b6a0"
     },
     {
       "club_id": 486,
@@ -242,7 +247,12 @@
     },
     {
       "club_id": 411,
-      "club_name": "Erith Town"
+      "club_name": "Erith Town",
+      "logo_url": "https://erithtown.com/wp-content/uploads/2026/03/etfc.png",
+      "logo_status": "pilot_verified",
+      "logo_source": "official_site_image",
+      "logo_updated_at": "2026-10-09",
+      "logo_sha256": "654029a3e8ebf5b1122992582960273351b9b76a54ea37a74627285d2227d376"
     },
     {
       "club_id": 269,
@@ -469,7 +479,12 @@
     },
     {
       "club_id": 474,
-      "club_name": "On Target F.C."
+      "club_name": "On Target F.C.",
+      "logo_url": "https://static.wixstatic.com/media/94aaa0_74164151c81c4500a540bc5f7628b972~mv2.png",
+      "logo_status": "pilot_verified",
+      "logo_source": "official_site_image",
+      "logo_updated_at": "2026-10-09",
+      "logo_sha256": "41f705d7c3f313723eb166340efb6e7cba1adbed2f2510c6acd1d16ab7a55c82"
     },
     {
       "club_id": 480,
@@ -571,7 +586,12 @@
     },
     {
       "club_id": 403,
-      "club_name": "Slade Green Knights"
+      "club_name": "Slade Green Knights",
+      "logo_url": "https://images.pitchero.com/club_logos/78298/ZSskYeWpTbO5EkVrhTZu_SGK.jpg",
+      "logo_status": "pilot_verified",
+      "logo_source": "official_site_image",
+      "logo_updated_at": "2026-10-09",
+      "logo_sha256": "3740606def7455603cb1d60f59a7e3151431b1d9024480cdf9cc1c8bca75a180"
     },
     {
       "club_id": 325,
@@ -7807,5 +7827,5 @@
     }
   ],
   "note": "Panel parsing confirmed against all five format categories (mini-soccer, 9-a-side, X-category, 11-a-side, Senior) as of Sept 2026. Club/team linking is heuristic (name-prefix match) - see ambiguous_club_matches in diagnostics for anything flagged as uncertain.",
-  "pilot_badges_revision": "bf6eade342a97b078766e41c20a59245944c5ec9bde82489a069334ca319fbb8"
+  "pilot_badges_revision": "60f1dd66ab084265efbe415facd8f5788652db71d306aa48bdb84efc2c6555ab"
 }
