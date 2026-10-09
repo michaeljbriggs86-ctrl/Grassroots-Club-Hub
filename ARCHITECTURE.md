@@ -275,6 +275,12 @@ missing
 deprecated
 ```
 
+Mike's decisions D1/D2 (2026-10-08), implementation TESTED locally 2026-10-09; not deployed:
+
+- In the protected Shooters Hill browser pilot, a missing or failed real club badge uses a deterministic club monogram labelled `placeholder_monogram`, with a dashed ring. Resolve it from canonical `club_id` and `club_name`; never guess identity from a team label. Unknown identity retains the product-mark fallback. Monograms are client UI placeholders: never real-badge allowlist entries, R2 assets or real-badge coverage. An admitted real badge takes precedence automatically. Product branding surfaces retain the PitchKind mark.
+- A genuine real raster badge of 192–511 native pixels on its short edge may receive a per-file D2 exception for a display slot no larger than 128 CSS pixels, in this protected pilot only. Keep q1's global 512px/4x rule. Exact-file exception metadata must contain native dimensions, `below q1`, no upscaling and the protected-pilot rights statement. Image hashes, own-page identity and provenance remain mandatory. Raster SVG wrappers do not qualify as vectors.
+- The former no-initials rules below and in the app/brand placement tables are superseded only within this protected browser-pilot scope. Wider distribution retains the existing standards.
+
 Rules:
 
 - canonical `club_id` is the lookup key; club name must never be used as the identity key;
@@ -284,8 +290,7 @@ Rules:
 - selecting a club should resolve its logo automatically and reuse it consistently across
   the club header, dashboard, team pages, fixtures/results, tables and other appropriate
   club-branded surfaces;
-- where no verified logo exists, the app must show the neutral PitchKind product mark
-  rather than guess a badge;
+- where no verified logo exists, use the D1 monogram within the protected browser pilot and the neutral PitchKind product mark elsewhere;
 - a club-admin replacement/upload path should allow an incorrect or outdated badge to be
   corrected without changing canonical club identity;
 - logo provenance must be retained so club-supplied/approved artwork can be distinguished
@@ -324,7 +329,7 @@ Private-pilot badge admission (Mike's decision, 2026-09-26):
   the Cray card's network source remain open.
 - The Android APK is not the active pilot surface. Any future wider distribution,
   club expansion, catalogue/CDN launch or rights claim needs its own decision.
-  A neutral PitchKind fallback must remain when no pilot badge is admitted.
+  The D1 placeholder fallback must remain when no pilot badge is admitted; it is never a real badge.
 
 Historical status on 2026-09-19 (superseded for the private website pilot by the
 2026-09-28 evidence above):

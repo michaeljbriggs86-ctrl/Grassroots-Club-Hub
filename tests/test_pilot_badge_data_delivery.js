@@ -96,6 +96,7 @@ window.location = { protocol: 'https:', hostname: 'test.pitchkind.com' };
 assert.equal(app.verifiedTeamBadgeUrl(crayTeam), `/__pilot_badges/250/${cray.logo_sha256}`);
 app.esc = value => String(value).replace(/[&<>\"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[char]));
 app.matchTeamLabel = name => String(name||'').replace(/_/g,' ').trim();
+vm.runInContext(extract('app/src/main/assets/app.js', 'function clubIdentityName(', 'function clubIdentityBadgeHtml('), app);
 vm.runInContext(extract('app/src/main/assets/app.js', 'function clubListingHtml(', 'document.addEventListener(\'error\''), app);
 assert.match(app.clubListingHtml(crayTeam), new RegExp(`/__pilot_badges/250/${cray.logo_sha256}`),'list rows use the protected reviewed badge');
 assert.match(app.clubListingHtml('Unreviewed FC'), /pitchkind-wt_mark\.svg/,'unapproved clubs use the neutral mark');

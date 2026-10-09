@@ -9,6 +9,8 @@
 **Implementation reference:** `AUTH_LOGIN_REFERENCE_v1_1_2026-09-19.png` (same note)
 **Code marker:** `approved-app-ui-2026-09-19-v1.2-brand-system` stays in source until the source implements v1.4. The marker for v1.4 is `approved-app-ui-2026-09-20-v1.4-pitchkind-identity`.
 
+Mike's D1 amendment (2026-10-08): within the protected Shooters Hill browser pilot only, missing real badges use canonical-club monograms with a dashed ring and accessible placeholder label (`placeholder_monogram`). These are never verified badges, R2 assets or coverage. Product-brand surfaces and unknown club identity retain the PitchKind mark. This scoped decision supersedes older no-initials placement wording; the rest of this document is unchanged. Implementation TESTED locally 2026-10-09, not deployed.
+
 ## 1. Authority and change control
 
 This document is the single governing UI standard for PitchKind.

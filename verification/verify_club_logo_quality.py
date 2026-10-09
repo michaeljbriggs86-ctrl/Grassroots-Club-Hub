@@ -11,6 +11,8 @@ provenance, and rights/use remain separate catalogue gates.
 from __future__ import annotations
 
 import argparse
+import hashlib
+import json
 import re
 import struct
 import sys
@@ -20,6 +22,8 @@ GATE_VERSION = "club-logo-q1"
 DEFAULT_MAX_RENDER_CSS_PX = 128
 DEFAULT_MIN_SCALE_FACTOR = 4
 DEFAULT_RASTER_FLOOR = 512
+PILOT_RASTER_FLOOR = 192
+PILOT_RIGHTS_NOTE = "Rights bypassed for protected pilot; public, marketing and wider-use permission not established."
 RASTER_EXTS = {".png", ".jpg", ".jpeg"}
 VECTOR_EXTS = {".svg"}
 
@@ -141,12 +145,59 @@ def check_asset(path: Path, min_short_edge: int) -> list[str]:
     return errors
 
 
+def check_pilot_exception(path: Path, manifest: dict, club_id: int, max_render_css_px: int) -> list[str]:
+    """D2 is an exact-file exception, never a lower global q1 floor."""
+    if manifest.get('schema_version') != 1 or manifest.get('scope') != 'private_pilot':
+        return ['unsupported private-pilot manifest']
+    badges = manifest.get('badges')
+    if not isinstance(badges, list) or any(not isinstance(r, dict) for r in badges):
+        return ['pilot badges must be a list of admission records']
+    rows = [r for r in badges if r.get('club_id') == club_id]
+    if len(rows) != 1 or rows[0].get('logo_status') != 'pilot_verified':
+        return ['one exact pilot_verified admission is required']
+    row = rows[0]
+    if not path.is_file() or hashlib.sha256(path.read_bytes()).hexdigest() != row.get('logo_sha256'):
+        return ['pilot exception asset SHA-256 mismatch']
+    size = raster_size(path)
+    if not size:
+        return ['pilot exception requires a supported raster; raster SVG wrappers do not qualify']
+    waiver = row.get('pilot_quality_exception') or {}
+    if not isinstance(waiver, dict):
+        return ['pilot exception must be an object']
+    if (waiver.get('scope') != 'shooters_hill_protected_pilot' or
+            waiver.get('max_render_css_px') != 128 or not 0 < max_render_css_px <= 128 or
+            waiver.get('quality_note') != 'below q1' or waiver.get('no_upscaling') is not True or
+            (waiver.get('native_width'), waiver.get('native_height')) != size or
+            row.get('rights_note') != PILOT_RIGHTS_NOTE):
+        return ['pilot exception needs exact native pixels, below q1, no upscaling, 128px slot and rights note']
+    if not PILOT_RASTER_FLOOR <= min(size) < DEFAULT_RASTER_FLOOR:
+        return ['pilot exception shortest edge must be 192 through 511 native pixels']
+    return check_asset(path, PILOT_RASTER_FLOOR)
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--root", default=".", help="Repository root for default scan")
     ap.add_argument("--asset", action="append", default=[], help="Specific asset to check; repeatable")
     ap.add_argument("--max-render-css-px", type=int, default=DEFAULT_MAX_RENDER_CSS_PX)
+    ap.add_argument('--pilot-manifest', type=Path, help='D2: exact-file private-pilot allowlist')
+    ap.add_argument('--club-id', type=int, help='D2: canonical club ID in that allowlist')
     args = ap.parse_args()
+    if args.max_render_css_px <= 0:
+        ap.error('--max-render-css-px must be positive')
+    if args.pilot_manifest or args.club_id is not None:
+        if not args.pilot_manifest or args.club_id is None or len(args.asset) != 1:
+            ap.error('D2 requires --pilot-manifest, --club-id and exactly one --asset')
+        try:
+            errors = check_pilot_exception(Path(args.asset[0]), json.loads(args.pilot_manifest.read_text()),
+                                           args.club_id, args.max_render_css_px)
+        except (OSError, ValueError, TypeError) as exc:
+            errors = [str(exc)]
+        for error in errors:
+            print('FAIL: ' + error, file=sys.stderr)
+        if not errors:
+            print('PASS: protected pilot exact-file D2 exception; below q1, not public clearance')
+        return int(bool(errors))
 
     min_short_edge = required_raster_short_edge(args.max_render_css_px)
     root = Path(args.root).resolve()

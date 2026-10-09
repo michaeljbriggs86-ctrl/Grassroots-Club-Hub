@@ -27,6 +27,9 @@ on:
       - 'scripts/stage_pilot_badges_r2.py'
       - 'scripts/publish_pilot_badges.py'
       - 'scripts/pilot_badge_transparency.py'
+      - 'verification/verify_club_logo_quality.py'
+      - 'tests/test_club_logo*.py'
+      - 'tests/test_club_monogram_placeholder.js'
       - 'cloudflare/web-app/src/pilot-badges.js'
       - 'cloudflare/web-app/src/badge-review.js'
       - 'cloudflare/web-app/src/index.js'
@@ -78,6 +81,9 @@ jobs:
           python -m pip install requests beautifulsoup4 Pillow==12.3.0 numpy==2.3.5 scipy==1.17.0 PyYAML==6.0.3
           python -m unittest discover -s tests -p 'test_web_deploy_snapshot.py' -v
           python -m unittest discover -s tests -p '*pilot_badge*.py' -v
+          python -m unittest discover -s tests -p 'test_club_logo*.py' -v
+          node tests/test_club_monogram_placeholder.js
+          python verification/verify_club_logo_quality.py
           node --test cloudflare/web-app/tests/pilot-badges.test.mjs
           node --test cloudflare/web-app/tests/badge-review.test.mjs
           node --test cloudflare/web-app/tests/selkent-candidate.test.mjs

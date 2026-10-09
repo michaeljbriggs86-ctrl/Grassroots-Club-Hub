@@ -7,6 +7,8 @@
 **Applies to:** website, holding page, email, social media, app-store listings, documents and presentations, print and merchandise, and every image made for any of them. The app is covered by `APP-UI-DESIGN-GUIDELINES.md`, which this document inherits from.
 **Source basis:** `APP-UI-DESIGN-GUIDELINES.md` v1.4 (read 2026-09-20), `ARCHITECTURE.md` (Drive copy modified 2026-09-19), `AI-COLLABORATION-PROTOCOL.md` (Drive copy modified 2026-09-20), and ChatGPT's independent review entry of 2026-09-20 (`LOG-ENTRY_2026-09-20_1716_chatgpt_brand-draft-review-and-history-diff.md`, whose filename minute is known to be wrong; its content stands), and its second review entry (`LOG-ENTRY_2026-09-20_1952_chatgpt_v0.2-holding-page-patch-review.md`).
 
+Mike's D1 amendment (2026-10-08): within the protected Shooters Hill browser pilot only, missing real badges use canonical-club monograms with a dashed ring and accessible placeholder label (`placeholder_monogram`). These are never verified badges, R2 assets or coverage. Product-brand surfaces and unknown club identity retain the PitchKind mark. This scoped decision supersedes older no-initials placement wording; the rest of this document is unchanged. Implementation TESTED locally 2026-10-09, not deployed.
+
 ## 0. Authority and how to read this document
 
 ### 0.1 Rule tags

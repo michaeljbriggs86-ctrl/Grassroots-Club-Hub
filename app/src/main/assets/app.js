@@ -1759,13 +1759,27 @@ function kitColourDisplayText(colours='TBC'){
   const clean=String(colours||'').replace(/\b(?:shirts?|jerseys?|tops?)\b/ig,'').replace(/\s+/g,' ').trim();
   return clean&&knownKit(clean)?clean:'Kit TBC';
 }
+function clubPlaceholderBadgeData(teamName=''){
+  const detail=state.selkent?.directoryDetails?.[selkentNorm(teamName)]||{};
+  const id=Number(detail.clubId),club=String(detail.clubName||'').trim();
+  if(window.ClubHubNative||!pilotVerifiedBadgeScopeAllowed()||!Number.isSafeInteger(id)||id<=0||!club)
+    return {src:'pitchkind-wt_mark.svg',alt:`PitchKind placeholder for ${clubIdentityName(teamName)}`,status:'missing'};
+  const stop=new Set(['fc','afc','football','club','youth','sports','sport','colts','the','sc']);
+  const words=club.replace(/\./g,'').split(/\s+/).filter(Boolean),key=words.filter(w=>!stop.has(w.toLowerCase()));
+  const parts=key.length?key:words,overrides={540:'STH',294:'STS',397:'LDL',303:'LNL',372:'WS'};
+  const initials=overrides[id]||(parts.length>1?parts.slice(0,2).map(w=>w[0]).join(''):parts[0].slice(0,2)).toUpperCase();
+  // Brand greens are deterministic decoration, never an inferred club kit.
+  const colour=id%2?'#0D6A3A':'#064526',label=`${club} monogram placeholder`;
+  const svg=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128"><circle cx="64" cy="64" r="60" fill="${colour}"/><circle cx="64" cy="64" r="55" fill="none" stroke="white" stroke-width="3" stroke-dasharray="6 5"/><text x="64" y="67" text-anchor="middle" dominant-baseline="middle" font-family="Inter,system-ui,Arial,sans-serif" font-weight="700" font-size="${initials.length<3?44:36}" fill="white">${esc(initials)}</text></svg>`;
+  return {src:`data:image/svg+xml,${encodeURIComponent(svg)}`,alt:label,status:'placeholder_monogram',initials};
+}
 function clubPlaceholderBadgeHtml(teamName=''){
-  const club=clubIdentityName(teamName);
-  return `<img class="club-identity-badge club-placeholder-badge" src="pitchkind-wt_mark.svg" alt="PitchKind placeholder for ${esc(club)}" />`;
+  const data=clubPlaceholderBadgeData(teamName);
+  return `<img class="club-identity-badge club-placeholder-badge" data-logo-status="${data.status}" src="${esc(data.src)}" alt="${esc(data.alt)}" />`;
 }
 function clubIdentityBadgeHtml(teamName='',kit='TBC'){
   const badge=verifiedTeamBadgeUrl(teamName),club=clubIdentityName(teamName);
-  return badge?`<img class="club-identity-badge verified-club-badge" src="${esc(badge)}" alt="${esc(club)} club badge" />`:clubPlaceholderBadgeHtml(teamName,kit);
+  return badge?`<img class="club-identity-badge verified-club-badge" data-club-team="${esc(teamName)}" src="${esc(badge)}" alt="${esc(club)} club badge" />`:clubPlaceholderBadgeHtml(teamName,kit);
 }
 function teamIdentityVisualHtml(teamName='',kit='TBC'){return clubIdentityBadgeHtml(teamName,kit);}
 function setStableHtml(element,markup){
@@ -1777,8 +1791,8 @@ function setStableHtml(element,markup){
 function clubListingHtml(teamName='',label=teamName){
   const name=matchTeamLabel(label),badge=verifiedTeamBadgeUrl(teamName);
   const image=badge
-    ?`<img class="club-identity-badge verified-club-badge" src="${esc(badge)}" alt="" aria-hidden="true" loading="lazy" decoding="async" />`
-    :`<img class="club-identity-badge club-placeholder-badge" src="pitchkind-wt_mark.svg" alt="" aria-hidden="true" />`;
+    ?`<img class="club-identity-badge verified-club-badge" data-club-team="${esc(teamName)}" src="${esc(badge)}" alt="" aria-hidden="true" loading="lazy" decoding="async" />`
+    :clubPlaceholderBadgeHtml(teamName);
   return `<span class="club-listing">${image}<span class="club-listing-name">${esc(name)}</span></span>`;
 }
 document.addEventListener('error',event=>{
@@ -1787,8 +1801,9 @@ document.addEventListener('error',event=>{
   const failed=image.getAttribute('src');if(failed)FAILED_BADGE_URLS.add(failed);
   image.classList.remove('verified-club-badge');
   image.classList.add('club-placeholder-badge');
-  image.alt='PitchKind placeholder';
-  image.src='pitchkind-wt_mark.svg';
+  const data=clubPlaceholderBadgeData(image.dataset?.clubTeam||'');
+  image.removeAttribute?.('aria-hidden');
+  image.dataset.logoStatus=data.status;image.alt=data.alt;image.src=data.src;
 },true);
 function matchTeamSideHtml(sideLabel,teamName,kit){
   return `<div class="match-team-side"><span class="match-side-label">${esc(sideLabel)}</span><span class="match-team-badge-slot">${clubIdentityBadgeHtml(teamName,kit)}</span>${clubTeamLink(teamName,'match-team-name',false)}<div class="match-kit-secondary">${teamKitIconHtml(teamName,kit)}<small>${esc(kitColourDisplayText(kit))}</small></div></div>`;
@@ -3993,9 +4008,10 @@ function clubResultTeamBadgeHtml(teamName=''){
   const ownBadge=ownClubTeam&&(own.logo_url||own.logo_asset||
     (normalizeTeamKey(own.display_name)==='shooters hill afc'?'shooters-hill-logo.png':''));
   const usableOwnBadge=ownBadge&&!FAILED_BADGE_URLS.has(ownBadge)?ownBadge:'';
-  const url=approved||usableOwnBadge||'pitchkind-wt_mark.svg';
+  if(!approved&&!usableOwnBadge)return clubPlaceholderBadgeHtml(teamName);
+  const url=approved||usableOwnBadge;
   const kind=approved||usableOwnBadge?'verified-club-badge':'club-placeholder-badge';
-  return `<img class="club-identity-badge ${kind}" src="${esc(url)}" alt="" aria-hidden="true" loading="lazy" decoding="async" />`;
+  return `<img class="club-identity-badge ${kind}" data-club-team="${esc(teamName)}" src="${esc(url)}" alt="" aria-hidden="true" loading="lazy" decoding="async" />`;
 }
 function renderAdminRecentResults(rows=[],feedAvailable=true){
   const box=document.getElementById('admin-recent-results'),count=document.getElementById('admin-results-count'),status=document.getElementById('admin-results-source-status');
