@@ -6,8 +6,8 @@ import { miniCupGroup } from '../src/domain/cupGroups.ts';
 import { eventKey } from '../src/domain/keys.ts';
 import { upcomingEvents } from '../src/domain/upcoming.ts';
 import type { UpcomingInput } from '../src/domain/upcoming.ts';
-import { ageNumber } from '../src/domain/normalise.ts';
-import { can, visibleMatch } from '../src/domain/access.ts';
+import { ageNumber, parseAgeGroup } from '../src/domain/normalise.ts';
+import { can, visibleMatch, playerLoginAllowed } from '../src/domain/access.ts';
 import { assertNoYouthPublicResults, FeedPrivacyError } from '../src/domain/feedGuard.ts';
 import type { FeedFixture, PrivateMatch } from '../src/domain/types.ts';
 
@@ -122,4 +122,23 @@ test('feed guard: real feed passes; a youth results leak is rejected', () => {
   assert.doesNotThrow(() => assertNoYouthPublicResults(feed));
   const leaked = { age_groups: [{ age_group: 'U9', published_results: [{ any: 1 }] }] };
   assert.throws(() => assertNoYouthPublicResults(leaked), FeedPrivacyError);
+});
+
+test('X teams: same age band, flagged as legacy squad format', () => {
+  assert.deepEqual(parseAgeGroup('U9X'), { age: 9, legacyFormat: true });
+  assert.deepEqual(parseAgeGroup('U9'), { age: 9, legacyFormat: false });
+  assert.deepEqual(parseAgeGroup('Senior'), { age: 0, legacyFormat: false });
+});
+
+test('Player Login is U15 only', () => {
+  for (let n = 5; n <= 18; n++) assert.equal(playerLoginAllowed(n), n === 15, `age ${n}`);
+});
+
+test('feed guard covers X youth groups and fails closed on unreadable names', () => {
+  const mk = (age_group: string) => ({ age_groups: [{ age_group, standings: [{}], published_results: [{}] }] });
+  assert.throws(() => assertNoYouthPublicResults(mk('U8X')), FeedPrivacyError);
+  assert.throws(() => assertNoYouthPublicResults(mk('U10X')), FeedPrivacyError);
+  assert.throws(() => assertNoYouthPublicResults(mk('Mystery squad')), FeedPrivacyError);
+  assert.doesNotThrow(() => assertNoYouthPublicResults(mk('Senior')));
+  assert.doesNotThrow(() => assertNoYouthPublicResults(mk('U12X')));
 });

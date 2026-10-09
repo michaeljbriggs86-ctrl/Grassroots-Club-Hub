@@ -14,13 +14,25 @@ export function teamLabel(name: string = ''): string {
   return String(name || '').replace(/_/g, ' ').replace(/\s+/g, ' ').trim();
 }
 
+export interface AgeGroup {
+  age: number;
+  /** True for an "X" team: older, larger squad sizes used before Future Fit (e.g. U9X is 7v7, U9 is 5v5). */
+  legacyFormat: boolean;
+}
+
 /**
- * Age number from text such as "U9", "Under 10" or "U10X". 0 when absent.
+ * Parse "U9", "Under 10" or "U10X". age is 0 when absent.
  * DELIBERATE DIFFERENCE from the legacy ageGroupNumber(): the legacy regex has no
- * word boundary between the digit and a trailing X, so "U10X" read as 0. This
- * version reads it as 10. Confirm with Mike before cutover.
+ * word boundary between the digit and a trailing X, so "U10X" read as 0 and X teams
+ * silently escaped Cup grouping and youth privacy checks. Mike confirmed 9 Oct 2026
+ * that X means pre-Future-Fit squad sizes, so X teams are the same age band.
  */
+export function parseAgeGroup(text: string): AgeGroup {
+  const m = String(text).match(/(?:\bU\s*|\bUnder\s*)(\d{1,2})(X?)\b/i);
+  if (!m || !m[1]) return { age: 0, legacyFormat: false };
+  return { age: Number(m[1]), legacyFormat: m[2] !== '' };
+}
+
 export function ageNumber(text: string): number {
-  const m = String(text).match(/(?:\bU\s*|\bUnder\s*)(\d{1,2})X?\b/i);
-  return m && m[1] ? Number(m[1]) : 0;
+  return parseAgeGroup(text).age;
 }
