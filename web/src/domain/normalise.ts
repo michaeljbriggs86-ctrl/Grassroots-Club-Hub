@@ -18,6 +18,12 @@ export interface AgeGroup {
   age: number;
   /** True for an "X" team: older, larger squad sizes used before Future Fit (e.g. U9X is 7v7, U9 is 5v5). */
   legacyFormat: boolean;
+  /**
+   * Player age as the live database computes it (team_player_age): X labels for 8, 10, 12 and 14
+   * count one year younger, minimum 7. UNCONFIRMED with Mike: the database says "U12X" means
+   * Under-11 players, but the public feed and app treat U12X as a published-results age.
+   */
+  playerAge: number;
 }
 
 /**
@@ -29,8 +35,11 @@ export interface AgeGroup {
  */
 export function parseAgeGroup(text: string): AgeGroup {
   const m = String(text).match(/(?:\bU\s*|\bUnder\s*)(\d{1,2})(X?)\b/i);
-  if (!m || !m[1]) return { age: 0, legacyFormat: false };
-  return { age: Number(m[1]), legacyFormat: m[2] !== '' };
+  if (!m || !m[1]) return { age: 0, legacyFormat: false, playerAge: 0 };
+  const age = Number(m[1]);
+  const legacyFormat = m[2] !== '';
+  const playerAge = legacyFormat && [8, 10, 12, 14].includes(age) ? Math.max(7, age - 1) : age;
+  return { age, legacyFormat, playerAge };
 }
 
 export function ageNumber(text: string): number {

@@ -125,9 +125,9 @@ test('feed guard: real feed passes; a youth results leak is rejected', () => {
 });
 
 test('X teams: same age band, flagged as legacy squad format', () => {
-  assert.deepEqual(parseAgeGroup('U9X'), { age: 9, legacyFormat: true });
-  assert.deepEqual(parseAgeGroup('U9'), { age: 9, legacyFormat: false });
-  assert.deepEqual(parseAgeGroup('Senior'), { age: 0, legacyFormat: false });
+  assert.deepEqual(parseAgeGroup('U9X'), { age: 9, legacyFormat: true, playerAge: 9 });
+  assert.deepEqual(parseAgeGroup('U9'), { age: 9, legacyFormat: false, playerAge: 9 });
+  assert.deepEqual(parseAgeGroup('Senior'), { age: 0, legacyFormat: false, playerAge: 0 });
 });
 
 test('Player Login is U15 only', () => {
@@ -141,4 +141,11 @@ test('feed guard covers X youth groups and fails closed on unreadable names', ()
   assert.throws(() => assertNoYouthPublicResults(mk('Mystery squad')), FeedPrivacyError);
   assert.doesNotThrow(() => assertNoYouthPublicResults(mk('Senior')));
   assert.doesNotThrow(() => assertNoYouthPublicResults(mk('U12X')));
+});
+
+test('playerAge mirrors the database team_player_age rule for X labels', () => {
+  assert.equal(parseAgeGroup('U12X').playerAge, 11);
+  assert.equal(parseAgeGroup('U8X').playerAge, 7);
+  assert.equal(parseAgeGroup('U10X').playerAge, 9);
+  assert.equal(parseAgeGroup('U12').playerAge, 12);
 });
