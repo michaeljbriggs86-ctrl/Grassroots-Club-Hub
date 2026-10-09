@@ -379,6 +379,7 @@ Roles: `club_admin`, `coach`, `assistant_coach`, `parent`, `player`. `pending`, 
 | Private club-entered results, U12 and above | Yes | Yes | Yes |
 | Private club-entered results, U7-U11 | Yes | No (scoreless) | Not applicable (no player access below U15) |
 | Tactics | Yes | No | No |
+| Training sessions | Yes | Yes | Yes |
 | Safeguarding, medical/allergy, parent contacts, private coach notes, attendance | Per Section 2.5 (staff only) | No | No |
 | Inbox / messaging | Yes | Yes | No |
 
@@ -386,8 +387,8 @@ Rules:
 
 - Any result published on the website is viewable by parents and players. U7-U11 results are never published, so Section 7 is unchanged and takes precedence.
 - Private results for U12 and above are visible to parents and players. This replaces the earlier rule that parents and players never see private results. For U7-U11 they remain hidden, and a team with an unknown age fails closed to hidden.
-- Tactics are coach-only. The domain code applies this to every role without the coach-notes capability. Whether `club_admin` and `assistant_coach` are included beyond `coach` is an assumption awaiting Mike's confirmation.
-- X teams (for example U9X, U12X) use older squad sizes from before Future Fit and are the same age band as their label. U12X is a published-results group. U8X and U10X are protected youth groups.
+- Tactics are coach-only. The domain code applies this to every role without the coach-notes capability. All staff roles can see tactics (confirmed by Mike, 2026-10-10).
+- X teams (for example U9X, U12X) use older squad sizes from before Future Fit and are the same age band as their label. U12X is a published-results group. U8X and U10X are protected youth groups; `build.py` now lists U8X in its protected set (2026-10-10).
 - Player Login is U15 only. Widening it requires a club decision and a safeguarding review first.
 
 Implementation status (honest):
