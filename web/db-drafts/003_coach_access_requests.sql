@@ -112,3 +112,5 @@ end $function$;
 
 revoke all on function public.request_coach_access(uuid,text), public.list_pending_coach_requests(), public.review_coach_request(uuid,boolean) from public, anon;
 grant execute on function public.request_coach_access(uuid,text), public.list_pending_coach_requests(), public.review_coach_request(uuid,boolean) to authenticated;
+
+-- APPLIED to the live database 2026-10-10 as migration coach_access_requests_email_flow (Mike: 'Apply step 1').
