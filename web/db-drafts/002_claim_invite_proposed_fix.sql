@@ -1,5 +1,6 @@
--- PROPOSED FIX. NOT APPLIED to Supabase. Differences from the live function:
---  1. 'player' invites map to role 'player' (never 'coach'), only for U15 teams, never auto-approved.
+-- FIX for claim_invite. Rollback: re-run test/01_claim_invite_original.sql (the previous live text). Differences from the live function:
+--  1. 'player' invites map to role 'pending_player' (never 'coach'), only for U15 teams. A pending_player has
+--     no data access (can_read_team ignores it) until a future approval step grants 'player'. Mike approved this 2026-10-10.
 --  2. Any other unrecognised invite role raises instead of becoming an approved coach.
 CREATE OR REPLACE FUNCTION public.claim_invite(p_code text)
  RETURNS jsonb LANGUAGE plpgsql SECURITY DEFINER SET search_path TO 'public', 'extensions'
@@ -30,12 +31,12 @@ begin
   end if;
   v_role=case when inv.role='club_admin' then 'club_admin' when inv.role='parent' then 'pending_parent'
               when inv.role='assistant_coach' then 'assistant_coach' when inv.role='coach' then 'coach'
-              when inv.role='player' then 'player' else null end;
+              when inv.role='player' then 'pending_player' else null end;
   if v_role is null then raise exception 'Unsupported invite role'; end if;
   update public.profiles set club_id=inv.club_id, team_id=inv.team_id, role=v_role, access_method=v_access_method,
       approved_at=case when inv.role in ('club_admin','coach','assistant_coach') then now() else null end,
       approved_by=case when inv.role in ('club_admin','coach','assistant_coach') then inv.created_by else null end,
       updated_at=now() where user_id=auth.uid();
   update public.invitations set used_at=now(),used_by=auth.uid() where id=inv.id;
-  return jsonb_build_object('role',v_role,'team',to_jsonb(t),'approval_required',inv.role='parent','access_method',v_access_method);
+  return jsonb_build_object('role',v_role,'team',to_jsonb(t),'approval_required',inv.role in ('parent','player'),'access_method',v_access_method);
 end $function$;

@@ -395,13 +395,13 @@ Implementation status (honest):
 
 ```text
 Domain rules (web/src/domain on rebuild/domain-core): WRITTEN + TESTED (source, 17 tests)
-Database enforcement: PLANNED / NOT APPLIED
+Database enforcement: PARTIAL. claim_invite fix applied live 2026-10-10 (function text verified by read-back). Tactics, team_player_age and profiles.role CHECK remain PLANNED / NOT APPLIED
 ```
 
 Known database gaps to close before the rules are DEPLOYED-LIVE:
 
 - `get_team_state_for_me` returns the full team state (including `tactics`) to parents and players for U12 and above.
-- `claim_invite` maps an unrecognised invite role, including `player`, to an approved `coach`. No player invites exist today.
+- ~~`claim_invite` mapped an unrecognised invite role, including `player`, to an approved `coach`.~~ FIXED on the live database 2026-10-10 (migration `claim_invite_player_pending_and_reject_unknown_roles`): player invites (U15 only) become `pending_player` with no data access until an approval step exists (not yet built); unknown roles are refused. Tested on a throwaway local Postgres, not on a Supabase branch.
 - `team_player_age` subtracts one year for Under 8/10/12/14X labels, which contradicts U12X being a published-results group. No Shooters Hill team has an X label today.
 - `profiles.role` has no CHECK constraint.
 
