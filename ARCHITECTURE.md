@@ -401,6 +401,8 @@ Database enforcement: PARTIAL. claim_invite fix applied live 2026-10-10 (functio
 
 Known database gaps to close before the rules are DEPLOYED-LIVE:
 
+- **`get_my_context` returns the raw team state to any role other than parent, club admin, coach or assistant coach that has a `team_id`** (found 2026-10-10, by code reading and a local before/after test). That includes `pending_parent`, and the new `pending_coach` and `pending_player` states. One live pending_parent account has a team and team state today. Fix drafted in `web/db-drafts/004_team_state_per_viewer.sql` (default deny, one shared function for both read paths); NOT applied.
+
 - `claim_invite` still lets coaches, assistant coaches and parents join by invite code, and the team state sent to parents still includes the squad list with player names (and, for U12+, goals, assists, bookings and awards that may carry names). Both contradict the 2026-10-10 sign-in and privacy decisions. The email-based coach request and approval flow now exists in the database (UI not built); retire adult invites only after the UI can use it, or new coaches cannot be added.
 - `get_team_state_for_me` returns the full team state (including `tactics`) to parents and players for U12 and above.
 - ~~`claim_invite` mapped an unrecognised invite role, including `player`, to an approved `coach`.~~ FIXED on the live database 2026-10-10 (migration `claim_invite_player_pending_and_reject_unknown_roles`): player invites (U15 only) become `pending_player` with no data access until an approval step exists (not yet built); unknown roles are refused. Tested on a throwaway local Postgres, not on a Supabase branch.
