@@ -40,3 +40,20 @@ for(const id of targetIds){
  assert(!seen.has(initials),`collision: ${name}: ${initials}`);seen.add(initials);
 }
 console.log('Protected-pilot monograms: scope, unknown identity, precedence and 37 initials passed');
+
+// Resolve missing badges through the real static overlay, starting without cached details.
+const overlaySrc=fs.readFileSync(path.join(__dirname,'../app/src/main/assets/static-feed-overlay.js'),'utf8');
+context.norm=norm;state.selkent.directoryDetails={};
+vm.runInContext(overlaySrc.slice(overlaySrc.indexOf('  function attachDirectoryBadges('),overlaySrc.indexOf('  function loadDirectory(')),context);
+context.attachDirectoryBadges(directory);
+for(const [name,initials,id] of [['Lewisham Borough Cobras','LB',286],['Junior Reds Knights','JR',292],['Junior Reds Athletic','JR',292],['Russellers Yellows','RU',322]]){
+ assert.equal(state.selkent.directoryDetails[norm(name)].clubId,id);
+ assert.equal(context.clubPlaceholderBadgeData(name).initials,initials);
+ assert.equal(context.clubPlaceholderBadgeData(name).status,'placeholder_monogram');
+ assert.notEqual(state.selkent.directoryDetails[norm(name)].logoStatus,'pilot_verified');
+}
+const ambiguous=structuredClone(directory);
+ambiguous.team_club_links.push({team_name:'Junior Reds Knights',club_id:286});
+context.attachDirectoryBadges(ambiguous);
+assert.equal(context.clubPlaceholderBadgeData('Junior Reds Knights').status,'missing','a stale cached identity cannot supply a monogram for an ambiguous team');
+console.log('Screenshot fixture teams: fresh directory identity and ambiguous-name fallback passed');

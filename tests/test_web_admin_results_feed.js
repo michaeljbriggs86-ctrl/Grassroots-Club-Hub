@@ -73,9 +73,13 @@ const browserElements={'club-results-list':list,'club-results-age':ageSelect,'cl
 const browserDocument={getElementById:id=>browserElements[id]||null};
 const browserBody=src.slice(src.indexOf('function renderClubResultsBrowser(){'),src.indexOf('async function refreshClubResults(quiet=false){'));
 const badgeBody=src.slice(src.indexOf('function clubResultTeamBadgeHtml(teamName='),src.indexOf('function renderAdminRecentResults(',src.indexOf('function clubResultTeamBadgeHtml(teamName=')));
-const resultBadge=new Function('normalizeTeamKey','verifiedTeamBadgeUrl','clubSettings','configuredClubTeams','esc','FAILED_BADGE_URLS',`${badgeBody}\nreturn clubResultTeamBadgeHtml;`)(
+const placeholderBody=src.slice(src.indexOf('function clubPlaceholderBadgeHtml('),src.indexOf('function clubIdentityBadgeHtml('));
+const placeholderBadge=new Function('clubPlaceholderBadgeData','esc',`${placeholderBody}\nreturn clubPlaceholderBadgeHtml;`)(
+  name=>({src:'pitchkind-wt_mark.svg',alt:`PitchKind placeholder for ${name}`,status:'missing'}),s=>String(s)
+);
+const resultBadge=new Function('normalizeTeamKey','verifiedTeamBadgeUrl','clubSettings','configuredClubTeams','esc','FAILED_BADGE_URLS','clubPlaceholderBadgeHtml',`${badgeBody}\nreturn clubResultTeamBadgeHtml;`)(
   normalizeTeamKey,name=>name==='Cray Wanderers Ambers'?'/__pilot_badges/250/reviewed':'',
-  ()=>({display_name:'Shooters Hill AFC',logo_url:'shooters-hill-logo.png'}),()=>[...teams,{leagueName:'Shooters Hill AFC Archers'}],s=>String(s),new Set()
+  ()=>({display_name:'Shooters Hill AFC',logo_url:'shooters-hill-logo.png'}),()=>[...teams,{leagueName:'Shooters Hill AFC Archers'}],s=>String(s),new Set(),placeholderBadge
 );
 assert.match(resultBadge('Cray Wanderers Ambers'),/\/__pilot_badges\/250\/reviewed/,'approved opponent badges use the reviewed URL');
 assert.match(resultBadge('Shooters Hill AFC Archers'),/shooters-hill-logo\.png/,'other teams at this club use its configured crest');

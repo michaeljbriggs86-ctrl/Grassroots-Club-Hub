@@ -113,11 +113,17 @@
     }
     for(const [key,id] of links){
       const club=clubs.get(id);
-      if(!id||!usable(club))continue;
       const current=details[key]||{};
-      details[key]={...current,clubId:id,clubName:club.club_name,
+      if(!id||!club){
+        details[key]={...current,clubId:null,clubName:'',logoUrl:'',logoStatus:'',logoVerified:false,
+          pilotLogoUrl:'',pilotLogoSha256:'',logoClubId:null};
+        continue;
+      }
+      // Canonical identity is also needed when no real badge is admitted.
+      details[key]={...current,clubId:id,clubName:club.club_name};
+      if(usable(club))Object.assign(details[key],{
         logoUrl:club.logo_url,logoStatus:'pilot_verified',logoVerified:false,
-        pilotLogoUrl:club.logo_url,pilotLogoSha256:club.logo_sha256.toLowerCase(),logoClubId:id};
+        pilotLogoUrl:club.logo_url,pilotLogoSha256:club.logo_sha256.toLowerCase(),logoClubId:id});
     }
     return directory;
   }
