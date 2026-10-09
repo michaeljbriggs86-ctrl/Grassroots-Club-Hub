@@ -10,3 +10,6 @@
 --   CHECK (role in ('club_admin','coach','assistant_coach','parent','player','pending','pending_parent','revoked'));
 -- Also fix parent_player_links_insert: replace "p.club_id = p.club_id" with
 --   "p.club_id = parent_player_links.club_id".
+-- Also: team_player_age() subtracts a year for "Under 8/10/12/14X" labels, so U12X would count as
+-- age 11 (restricted). Mike ruled 10 Oct 2026 that U12X is a published-results group, so this
+-- rule contradicts that. No Shooters Hill team has an X label today. Decide before adding one.
