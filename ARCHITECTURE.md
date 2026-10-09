@@ -1,7 +1,7 @@
 ﻿# PitchKind - Data Architecture Reference
 
 **Document state:** Current governing architecture reference in `00 - CURRENT MASTER`. The GitHub-root copy is a mirror; its presence and byte parity must be checked independently after any Termux push.
-**Last updated:** 2026-09-30
+**Last updated:** 2026-10-10
 **Collaboration rules:** `AI-COLLABORATION-PROTOCOL.md`
 **Product name:** PitchKind (formerly Grassroots Club Hub). Mike authorised the visible PitchKind identity implementation on 2026-09-21. Internal identifiers including `com.grassrootsclubhub.universal`, the `grassrootsclubhub://` scheme, `ClubHubNative`, existing feed/repository paths, localStorage keys and `GCH-PIN` remain unchanged unless separately authorised. Trade-mark clearance is NOT completed.
 **Brand/UI authority:** `APP-UI-DESIGN-GUIDELINES.md` v1.4 governs anything the app shows. `BRAND-GUIDELINES.md` v1.0 is its cross-platform extension; where they conflict on app surfaces, the app guidelines win.
@@ -150,7 +150,7 @@ fails closed on unknown populated shapes. The scheduled GitHub Actions run
 payload contains 217 scored public results (211 U12+ youth and 6 Senior). `cloudflare/web-app/build.py`
 validates and bundles this file for the protected website, but this source/CI
 evidence does not prove the revision currently served to signed-in users.
-U7–U11 results and standings must never appear in public JSON or parent APIs.
+Published results are viewable by parents and players (Section 2.10). U7–U11 results and standings must never appear in public JSON or parent APIs.
 
 ## 2.5 Private club-entered results, player, roster and safeguarding data
 
@@ -368,6 +368,41 @@ private. A parity check is diagnostic only; publishing from the shadow Worker
 requires a separate architecture and privacy decision.
 
 ---
+
+## 2.10 Roles and visibility (decided by Mike, 2026-10-10)
+
+Roles: `club_admin`, `coach`, `assistant_coach`, `parent`, `player`. `pending`, `pending_parent` and `revoked` are account states, not roles, and carry no data access.
+
+| Data | Staff (club_admin, coach, assistant_coach) | Parent | Player (U15 only) |
+|---|---|---|---|
+| Published results (public Selkent feed: U12+ and Senior) | Yes | Yes | Yes |
+| Private club-entered results, U12 and above | Yes | Yes | Yes |
+| Private club-entered results, U7-U11 | Yes | No (scoreless) | Not applicable (no player access below U15) |
+| Tactics | Yes | No | No |
+| Safeguarding, medical/allergy, parent contacts, private coach notes, attendance | Per Section 2.5 (staff only) | No | No |
+| Inbox / messaging | Yes | Yes | No |
+
+Rules:
+
+- Any result published on the website is viewable by parents and players. U7-U11 results are never published, so Section 7 is unchanged and takes precedence.
+- Private results for U12 and above are visible to parents and players. This replaces the earlier rule that parents and players never see private results. For U7-U11 they remain hidden, and a team with an unknown age fails closed to hidden.
+- Tactics are coach-only. The domain code applies this to every role without the coach-notes capability. Whether `club_admin` and `assistant_coach` are included beyond `coach` is an assumption awaiting Mike's confirmation.
+- X teams (for example U9X, U12X) use older squad sizes from before Future Fit and are the same age band as their label. U12X is a published-results group. U8X and U10X are protected youth groups.
+- Player Login is U15 only. Widening it requires a club decision and a safeguarding review first.
+
+Implementation status (honest):
+
+```text
+Domain rules (web/src/domain on rebuild/domain-core): WRITTEN + TESTED (source, 17 tests)
+Database enforcement: PLANNED / NOT APPLIED
+```
+
+Known database gaps to close before the rules are DEPLOYED-LIVE:
+
+- `get_team_state_for_me` returns the full team state (including `tactics`) to parents and players for U12 and above.
+- `claim_invite` maps an unrecognised invite role, including `player`, to an approved `coach`. No player invites exist today.
+- `team_player_age` subtracts one year for Under 8/10/12/14X labels, which contradicts U12X being a published-results group. No Shooters Hill team has an X label today.
+- `profiles.role` has no CHECK constraint.
 
 # 3. Selkent standings contract
 
@@ -719,6 +754,9 @@ must not be represented as a final/deployed agreement.
 ---
 
 # Changelog
+
+## 2026-10-10 - Roles and visibility decisions
+Recorded Mike's decisions: published results are viewable by parents and players; private results for U12+ are visible to parents and players while U7-U11 stay hidden; tactics are coach-only; U12X is a published-results group; Player Login stays U15-only. Added Section 2.10 with the known database gaps. Domain code is WRITTEN/TESTED on `rebuild/domain-core`; no database change has been applied and nothing is claimed DEPLOYED-LIVE.
 
 ## 2026-09-30 - Historical result-count correction and mirror review
 
