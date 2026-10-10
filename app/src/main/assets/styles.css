@@ -1829,3 +1829,5 @@ body.role-parent .cup-group-fixture-lines .canonical-match-badge img{width:36px;
 /* Condensed cup table (Mike, 10 Oct 2026) */
 .competition-games-table{min-width:0}.competition-games-table th,.competition-games-table td{padding:6px 7px;font-size:11px}.competition-games-table .cup-round{display:block;font-size:9.5px;color:var(--muted);font-weight:600}.competition-games-table .competition-result-pill{min-width:44px;padding:3px 7px}.competition-games-panel[hidden]{display:none}
 .cup-progress{padding:8px 11px 10px;border-top:1px solid #1e2a22;display:grid;gap:6px}.cup-through{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700}.cup-through input{width:18px;height:18px}.cup-progress-note{color:var(--muted);font-size:10px}
+
+.coach-requests .team-member-copy{display:grid;gap:2px;min-width:0}.coach-requests .team-member-copy span{display:block;overflow-wrap:anywhere}.coach-requests{margin:12px 0}
