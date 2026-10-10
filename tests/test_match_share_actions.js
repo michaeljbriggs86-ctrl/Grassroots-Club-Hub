@@ -42,6 +42,18 @@ function webContext(options={}){
  assert(cup.calls.some(x=>x[0]==='fillText'&&x[1]==='GROUP START'));assert(cup.calls.some(x=>x[0]==='fillText'&&x[1]==='U9 Selkent Cup Two - Round 1'));
  const second=context({second:true});await second.c.shareNextMatchImage();assert.match(second.calls.find(x=>x[0]==='native')[2],/Our kit: Away - Blue and white/,'share uses confirmed group representative shirt');
  const ordinary=context({group:false});await ordinary.c.shareNextMatchImage();assert.equal(ordinary.canvas.height,1028);assert.equal(ordinary.calls.filter(x=>x[0]==='badge').length,3);assert.match(ordinary.calls.find(x=>x[0]==='native')[2],/Kick-off: 10:00/);
+ // Put private values on the real fixture input and make private state unreadable.
+ // Neither the exported caption nor any canvas text may contain those values.
+ for(const group of [false,true]){
+  const privateShare=context({group});
+  Object.defineProperty(privateShare.c,'state',{get(){throw new Error('Sharing read private player state');}});
+  const resolve=privateShare.c.resolvedFixture;
+  privateShare.c.resolvedFixture=f=>({...resolve(f),gf:91,ga:87,score:'PRIVATE_SCORE',goals:['PRIVATE_GOALS'],assists:['PRIVATE_ASSISTS'],bookings:['PRIVATE_BOOKINGS'],players:['PRIVATE_CHILD'],notes:'PRIVATE_NOTE'});
+  await privateShare.c.shareNextMatchImage();
+  const exported=privateShare.calls.find(x=>x[0]==='native');assert(exported,'privacy test must actually export');
+  const text=JSON.stringify([exported[2],privateShare.calls.filter(x=>x[0]==='fillText').map(x=>x[1])]);
+  assert.doesNotMatch(text,/PRIVATE_|\b91\b|\b87\b/,'private values are absent from both PNG text and caption');
+ }
  const browser=context({group:false,native:false});await browser.c.shareNextMatchImage();assert(browser.calls.some(x=>x[0]==='download'),'existing browser image download retained');
  for(const group of [false,true]){
   const w=webContext({group});await w.c.shareNextMatchImage();assert.equal(w.shares.length,1);
