@@ -772,3 +772,68 @@ body.role-parent #view-home .home-next-match:has(#parent-home-match-info:not(.hi
 #view-more .settings-accordion>summary{min-height:52px;padding:12px 16px}
 #view-squad details.panel{padding:0}
 #view-squad details.panel>summary{min-height:48px;padding:12px 16px}
+
+/* Compact hero (Mike, 2026-10-10): one fixed-height band on every tab, role and width.
+ * Badge and names on the left; the football photo fades in on the right. */
+:root{--hero-band:112px}
+@media(min-width:681px){:root{--hero-band:132px}}
+.hero{
+  height:calc(var(--hero-band) + var(--android-inset-top,0px))!important;
+  min-height:0!important;
+  padding:var(--android-inset-top,0px) clamp(14px,4vw,28px) 0!important;
+  display:flex;align-items:center;overflow:hidden;
+  border-radius:0 0 20px 20px!important;
+}
+.hero-art{inset:0 0 0 auto!important;width:58%!important;height:100%!important;object-position:center 62%!important}
+.hero::before{
+  inset:0 0 0 auto!important;width:58%!important;height:100%!important;
+  background:linear-gradient(90deg,var(--gch-green-950) 0%,rgba(6,69,38,.82) 30%,rgba(6,69,38,.2) 75%,rgba(6,69,38,.05) 100%)!important;
+}
+.hero-inner{width:100%;grid-template-columns:auto minmax(0,1fr)!important;gap:12px!important}
+.club-logo-wrap{width:clamp(52px,12vw,72px)!important;height:clamp(52px,12vw,72px)!important}
+.hero-copy .eyebrow{margin:0;font-size:11px;letter-spacing:.12em}
+.hero-copy h1{margin:2px 0;font-size:clamp(22px,5.6vw,32px)!important;line-height:1.05!important}
+.hero-copy .season-line{margin:0;font-size:13px}
+@media(orientation:landscape) and (max-height:560px){.hero{min-height:0!important}}
+
+/* Home card style on every tab (Mike, 2026-10-10). */
+.view>.section-title-row{margin-bottom:12px}
+.view>.section-title-row h2{font-size:clamp(22px,4.6vw,28px)!important}
+/* Each tab's lead card gets the Home next-match treatment: green top accent, card radius and shadow. */
+#matches-next-fixture,#view-league .league-table-panel,#view-squad .squad-banner{border:1px solid var(--gch-line);border-top:4px solid var(--gch-green-600);border-radius:var(--gch-radius-card);box-shadow:var(--gch-shadow-card)}
+html[data-theme="dark"] #matches-next-fixture,html[data-theme="dark"] #view-league .league-table-panel,html[data-theme="dark"] #view-squad .squad-banner{border-color:#344239;border-top-color:var(--gch-green-600)}
+/* Collapsible rows everywhere use the compact Home summary. */
+.view details.panel:not(.settings-accordion):not(.competition-games-panel){padding:0}
+.view details.panel:not(.settings-accordion):not(.competition-games-panel)>summary{min-height:52px;padding:12px 16px}
+#view-matches .competition-games-panel>summary{padding:12px 16px}
+/* Results tables: rows sit flush, action line reads as part of the row above it. */
+.match-results-table{margin:0}
+.match-results-table .competition-game-link{display:inline;text-align:left}
+.match-results-table .match-detail-badges{display:flex;gap:6px;margin-top:4px}
+.match-results-table tr.match-result-actions td{padding-top:0;border-top:0}
+.match-results-table tr.match-result-actions .match-actions{display:flex;flex-wrap:wrap;gap:6px 14px;justify-content:flex-end;align-items:center;margin:0}
+/* Narrow screens: every results table (Cups, Vases, league, friendlies, tournaments, other) stacks
+ * each row as date · competition · H/A over opponent + result pill, so names never break mid-word. */
+@media(max-width:560px){
+  .competition-games-table{width:100%;min-width:0!important;table-layout:auto}
+  .competition-games-table thead{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+  .competition-games-table tbody tr:not(.match-result-actions){display:grid;grid-template-columns:auto auto minmax(0,1fr) auto;grid-template-areas:"date comp venue result" "opp opp opp result";align-items:stretch;gap:0;padding:0}
+  .competition-games-table tbody tr:not(.match-result-actions)>td{padding:10px 0 2px 8px!important;border:0!important;font-size:12px!important;min-width:0;display:flex;align-items:center}
+  .competition-games-table tbody tr:not(.match-result-actions)>td:nth-child(1){padding-left:12px!important}
+  .competition-games-table tbody tr:not(.match-result-actions)>td:nth-child(3){padding:4px 8px 10px 12px!important}
+  .competition-games-table tbody tr:not(.match-result-actions)>td:nth-child(5){padding:10px 12px 10px 8px!important}
+  .competition-games-table tbody tr>td:nth-child(1){grid-area:date;color:var(--muted)}
+  .competition-games-table tbody tr>td:nth-child(2){grid-area:comp;color:var(--muted)}
+  .competition-games-table tbody tr>td:nth-child(2) b{font-weight:600}
+  .competition-games-table tbody tr>td:nth-child(2) .cup-round{display:inline!important;margin-left:4px;font-size:12px!important}
+  .competition-games-table tbody tr>td:nth-child(3){grid-area:opp;font-size:14px!important;font-weight:700;flex-direction:column;align-items:flex-start!important}
+  .competition-games-table tbody tr>td:nth-child(4){grid-area:venue;color:var(--muted)}
+  .competition-games-table tbody tr>td:nth-child(5){grid-area:result;justify-content:flex-end}
+  .competition-games-table .competition-game-link{font-size:14px;overflow-wrap:normal;word-break:normal}
+  .competition-games-table .competition-result-pill{white-space:nowrap;font-size:12px}
+  .competition-games-table tbody tr.match-result-actions{display:block;padding:0}
+  .competition-games-table tbody tr.match-result-actions>td{display:block;padding:0 12px 10px!important;border:0!important}
+  .competition-games-table tbody tr+tr:not(.match-result-actions){border-top:1px solid var(--gch-line)}
+  html[data-theme="dark"] .competition-games-table tbody tr+tr:not(.match-result-actions){border-top-color:#344239}
+  .competition-games-table td.table-empty{display:block;padding:10px 12px!important}
+}
