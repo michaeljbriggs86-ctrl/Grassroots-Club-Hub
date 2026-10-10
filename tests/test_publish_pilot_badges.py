@@ -15,6 +15,15 @@ spec.loader.exec_module(module)
 
 
 class BadgePublisherTest(unittest.TestCase):
+    def test_user_snapshot_cannot_reference_another_badge_or_source(self):
+        for change in ({'staging_asset': '../other.png'},
+                       {'staging_asset': 'verification/approved_badges/239.png'},
+                       {'logo_source': 'official_site_image'}):
+            changed = copy.deepcopy(self.manifest)
+            next(b for b in changed['badges'] if b['club_id'] == 292).update(change)
+            with self.subTest(change=change), self.assertRaisesRegex(ValueError, 'staging asset'):
+                module.validated_approvals(self.directory, changed)
+
     def setUp(self):
         self.directory = json.loads((ROOT / 'data/directory.json').read_text())
         self.manifest = json.loads((ROOT / 'verification/pilot_verified_badges.json').read_text())

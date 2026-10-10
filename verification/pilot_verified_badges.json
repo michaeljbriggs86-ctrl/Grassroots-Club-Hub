@@ -940,6 +940,31 @@
         "native_height": 480
       },
       "review_basis": "Mike supplied this exact Parkwood Rangers PNG in the canonical badge upload package and requested continued badge integration. Fresh 2026-10-10 HTTPS 200 retrieval from the club-owned Parkwood Rangers Pitchero homepage identifies this original PNG as its logo. The blue/yellow shield, oak, waves and 1997 text match the supplied artwork; own page name, Dartford/Bexley ground and Selkent club 316 identity agree. The 178886-byte official PNG is byte-identical to supplied member 316/1_35cf1f66.png, resolving the earlier own-source matching hold. Whole shield and white crest border remain visible, with original transparent exterior. No pixel edits, redraw, recolour, crop, generation, metadata repair or upscaling. Exact native 480px D2 exception applies only to the protected pilot at maximum 128 CSSpx; global q1 remains 512px. Existing hash-pinned private R2 staging and readback gate must complete before deployment. Signed-in phone visual acceptance remains open."
+    },
+    {
+      "club_id": 292,
+      "club_name": "Junior Reds",
+      "logo_url": "https://test.pitchkind.com/__pilot_badges/292/3aa25e5eff778740a2133b8d0e780b5240bf8b5ca61632061238f3257d1a52d0",
+      "logo_status": "pilot_verified",
+      "logo_source": "user_supplied_private",
+      "logo_updated_at": "2026-10-10",
+      "logo_sha256": "3aa25e5eff778740a2133b8d0e780b5240bf8b5ca61632061238f3257d1a52d0",
+      "original_source_url": "https://drive.google.com/file/d/1kQOM27hchBC-GrkQFRpUFuRWyeXeMz0b/view",
+      "original_sha256": "1f1d5653ccaa12305ed5a36f35340a514d96207b8a7248babfe97dd5c4a2e4b0",
+      "source_user_approved": true,
+      "source_media_type": "image/png",
+      "native_width": 514,
+      "native_height": 512,
+      "derivation": "recalculate_eXIf_crc_only",
+      "staging_asset": "verification/approved_badges/292.png",
+      "source_page_url": "https://x.com/Junior_Reds_FC",
+      "identity_reference_url": "https://pbs.twimg.com/media/GenczFvWwAA0AJm.png",
+      "identity_reference_sha256": "2dc0c54ebe6a0df17bf30727c027a552035a59d308ff369360f8f4a8bce9e977",
+      "display_rotation_degrees": 16,
+      "quality_note": "native supplied 514x512 PNG; whole transparent roundel; presentation-only 16 degree clockwise correction",
+      "rights_status": "protected_pilot_only_public_rights_not_reviewed",
+      "rights_note": "Rights bypassed for protected pilot; public, marketing and wider-use permission not established.",
+      "review_basis": "Mike confirmed on 2026-10-10 that he supplied the Junior Reds badge and explicitly selected Rotate upright. Fresh authenticated Drive retrieval is the exact 193549-byte supplied 514x512 PNG. The supplied media basename GenczFvWwAA0AJm resolves to a public 1179x811 Junior Reds FC Bexleyheath recruitment image with the same tilted roundel and JuniorRedsfc.co.uk club contact. The poster is corroboration only and is not served or substituted for the supplied cutout. Supplied badge pixels, dimensions, IDAT data and transparency are unchanged; only the invalid eXIf chunk CRC is recalculated for valid PNG decoding. A reviewed repository snapshot bootstraps this exact approved PNG to private R2; subsequent deployments read back the immutable stored object. Clockwise 16 degree correction occurs only during page/share rendering for this exact asset hash. No artwork regeneration, redraw, recolour, clipping or upscaling. Canvas meets the 512px q1 floor natively. Private R2 readback/deployment and signed-in phone visual acceptance remain pending."
     }
   ]
 }

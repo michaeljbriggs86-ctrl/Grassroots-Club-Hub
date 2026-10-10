@@ -1132,3 +1132,6 @@ body.auth-open #activation-gate .auth-grass-footer span{font-size:12px!important
 }
 @media(max-height:620px) and (max-width:899px){body.auth-open #activation-gate .auth-scene{height:64px!important;flex-basis:64px!important}}
 @media(max-width:374px){.auth-alternate-routes{grid-template-columns:minmax(0,1fr)}}
+
+/* Exact supplied Junior Reds roundel: upright presentation, artwork unchanged. */
+img.verified-club-badge[src$="/3aa25e5eff778740a2133b8d0e780b5240bf8b5ca61632061238f3257d1a52d0"]{transform:rotate(16deg);transform-origin:50% 50%;clip-path:none}
