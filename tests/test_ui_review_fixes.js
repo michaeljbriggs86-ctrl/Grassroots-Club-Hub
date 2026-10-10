@@ -79,6 +79,6 @@ history.sorted=[];vm.runInNewContext(`{${recentCode}}`,history);assert.match(rec
 const fields={authIcon:()=>'',escapeHtml:s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;')};
 vm.runInNewContext(slice(cloud,'  function authField(','  function authMainScreen('),fields);
 const field=fields.authField({id:'password',type:'password',placeholder:'Password',value:'already entered'});
-assert.match(field,/<label class="a11y-only" for="password">Password<\/label>/);assert.match(field,/name="password"/);
+assert.match(field,/<label class="auth-field-label" for="password">Password<\/label>/);assert.match(field,/name="password"/);
 assert.match(fields.authField({id:'child',placeholder:'Child',label:'Child & guardian'}),/Child &amp; guardian/);
 console.log('PASS UI review fixes: protected routes/history, reduced-motion scrolling, keyboard tactics, recent form and persistent labels');
