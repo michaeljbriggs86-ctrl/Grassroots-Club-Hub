@@ -738,6 +738,57 @@
       "review_basis": "The supplied Long Lane JFC quartered roundel matches the current Selkent-303-linked Long Lane JFC official-site header: horse, rose, ball and cross. The official 120px JPG is corroboration only and is not admitted or enlarged. The exact original was fetched from the canonical PitchKind upload inbox on 2026-10-10 and pinned by Drive URL and SHA-256. This is user-supplied artwork, not claimed to be an unchanged official-hosted original. Original social post URL and creator/cutout process are not exposed. Supplied bytes are unchanged, including transparent margins; no cropping or resizing. No artwork generation, redraw, recolour, background removal or upscaling by Codex. Rights bypassed for protected pilot; public, marketing and wider-use permission not established. Private upload/readback, source push, CI and signed-in phone acceptance remain pending.",
       "source_page_url": "https://www.longlanejfc.co.uk/",
       "identity_reference_url": "https://www.longlanejfc.co.uk/App_Themes/LongLaneJFC/images/logo.jpg"
+    },
+    {
+      "club_id": 325,
+      "club_name": "South Darenth",
+      "logo_url": "https://test.pitchkind.com/__pilot_badges/325/62a9fc1aceeb134353b431690c8b9b4b9f73e3a36fe242559671a07af4d87b88",
+      "logo_status": "pilot_verified",
+      "logo_source": "user_supplied_private",
+      "logo_updated_at": "2026-10-10",
+      "logo_sha256": "62a9fc1aceeb134353b431690c8b9b4b9f73e3a36fe242559671a07af4d87b88",
+      "original_source_url": "https://drive.google.com/file/d/1-Ze4VS7MWbxkAh2niUMeFk2mk1pcjbKY/view",
+      "original_sha256": "62a9fc1aceeb134353b431690c8b9b4b9f73e3a36fe242559671a07af4d87b88",
+      "source_user_approved": true,
+      "source_page_url": "https://southdarenthfc.com/home",
+      "identity_reference_url": "https://southdarenthfc.com/home/_assets/media/41db9bfd0314372059b632fb35befb17.png",
+      "source_media_type": "image/png",
+      "native_width": 968,
+      "native_height": 968,
+      "derivation": "unchanged_uploaded_original",
+      "rights_status": "protected_pilot_only_public_rights_not_reviewed",
+      "rights_note": "Rights bypassed for protected pilot; public, marketing and wider-use permission not established.",
+      "review_basis": "The club own site displays the same purple South Darenth Football Club 2010 roundel, pale blue ball and grey viaduct. Current Selkent 325 lists purple/white and Heathside Sports Ground, matching the own site. Official PNG is corroboration only; supplied flat crest retains the complete lettering and artwork. Mike supplied this exact artwork in the canonical private inbox and requested integration and deployment. Drive source and hash pinned; exact saved/uploaded PNG is unchanged, including alpha and margins. Original creator and cutout history are not independently established. No redraw, crop, recolour, metadata repair, generation or upscaling by Codex. Existing user-supplied protected-pilot admission path applies. Private exact-byte/MIME readback and live phone acceptance remain pending."
+    },
+    {
+      "club_id": 432,
+      "club_name": "AFC Green Court",
+      "logo_url": "https://test.pitchkind.com/__pilot_badges/432/4bc5b18d5196f274c4f8153ebfcdbbdf87bf67220f9d7d2e66a30280b8458610",
+      "logo_status": "pilot_verified",
+      "logo_source": "user_supplied_private",
+      "logo_updated_at": "2026-10-10",
+      "logo_sha256": "4bc5b18d5196f274c4f8153ebfcdbbdf87bf67220f9d7d2e66a30280b8458610",
+      "original_source_url": "https://drive.google.com/file/d/1ofPIjgn8FTLgn4vc4Wk_Cj84himdy8IT/view",
+      "original_sha256": "4bc5b18d5196f274c4f8153ebfcdbbdf87bf67220f9d7d2e66a30280b8458610",
+      "source_user_approved": true,
+      "source_page_url": "https://www.afcgc.co.uk/",
+      "identity_reference_url": "https://www.afcgc.co.uk/App_Themes/AFCGreenCourt/images/logo.jpg",
+      "source_media_type": "image/png",
+      "native_width": 447,
+      "native_height": 447,
+      "derivation": "unchanged_uploaded_original",
+      "rights_status": "protected_pilot_only_public_rights_not_reviewed",
+      "rights_note": "Rights bypassed for protected pilot; public, marketing and wider-use permission not established.",
+      "review_basis": "Selkent 432 links afcgc.co.uk. Its current header crest matches the supplied red cross shield, gold laurels, gold star and black AFC GREEN COURT banner. The 120px official JPG is identity corroboration only, not admitted or enlarged. Mike supplied this exact artwork in the canonical private inbox and requested integration and deployment. Drive source and hash pinned; exact saved/uploaded PNG is unchanged, including alpha and margins. Original creator and cutout history are not independently established. No redraw, crop, recolour, metadata repair, generation or upscaling by Codex. Existing user-supplied protected-pilot admission path applies. Private exact-byte/MIME readback and live phone acceptance remain pending.",
+      "quality_note": "below q1; exact supplied raster, no upscaling",
+      "pilot_quality_exception": {
+        "scope": "shooters_hill_protected_pilot",
+        "max_render_css_px": 128,
+        "quality_note": "below q1",
+        "no_upscaling": true,
+        "native_width": 447,
+        "native_height": 447
+      }
     }
   ]
 }
