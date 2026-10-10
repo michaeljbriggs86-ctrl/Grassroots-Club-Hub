@@ -909,6 +909,37 @@
       "rights_status": "protected_pilot_only_public_rights_not_reviewed",
       "rights_note": "Rights bypassed for protected pilot; public, marketing and wider-use permission not established.",
       "review_basis": "Selkent 397 links LondonLegendsfc.com, which currently redirects to londonlegendsfc.co.uk. Its actual official logo.png is byte-for-byte identical to this supplied 427x371 PNG, including gold lions/laurels, crown with 2016 and blue name ribbon. Preserve the original aspect ratio and complete artwork. Native own-site exact-byte match established. Mike supplied the exact artwork and requested integration/deployment of successive batches. Drive source and original/prepared SHA pins recorded. Only the recorded eXIf CRC is repaired where needed; all chunk payloads/IDAT and decoded image content/dimensions/transparency are unchanged. No artwork redraw, crop, recolour, generated art, background removal or upscaling by Codex. Supplied-file provenance is not replaced by the corroborating URL. Existing private supplied-artwork gate applies. Private R2 readback, deployment and live acceptance remain pending."
+    },
+    {
+      "club_id": 316,
+      "club_name": "Parkwood Rangers",
+      "logo_url": "https://images.pitchero.com/club_logos/72189/NPE9BdMbTvaZ3cutMWVA_logo.png",
+      "logo_status": "pilot_verified",
+      "logo_source": "official_club_site_image",
+      "logo_updated_at": "2026-10-10",
+      "logo_sha256": "35cf1f66ca89da35b1c2c5ebc430248b309b0830852f4e000852aef8e79fba79",
+      "original_source_url": "https://images.pitchero.com/club_logos/72189/NPE9BdMbTvaZ3cutMWVA_logo.png",
+      "original_sha256": "35cf1f66ca89da35b1c2c5ebc430248b309b0830852f4e000852aef8e79fba79",
+      "source_page_url": "https://www.pitchero.com/clubs/parkwoodrangers2/",
+      "source_media_type": "image/png",
+      "native_width": 480,
+      "native_height": 480,
+      "derivation": "unchanged_official_original",
+      "supplied_package_url": "https://drive.google.com/file/d/1FyEkE4nlaD01k9MXje-EParI2MqUkkmi/view",
+      "supplied_package_member": "316/1_35cf1f66.png",
+      "source_user_approved": true,
+      "quality_note": "below q1; native 480px whole shield with original transparent exterior; no upscaling",
+      "rights_status": "protected_pilot_only_public_rights_not_reviewed",
+      "rights_note": "Rights bypassed for protected pilot; public, marketing and wider-use permission not established.",
+      "pilot_quality_exception": {
+        "scope": "shooters_hill_protected_pilot",
+        "max_render_css_px": 128,
+        "quality_note": "below q1",
+        "no_upscaling": true,
+        "native_width": 480,
+        "native_height": 480
+      },
+      "review_basis": "Mike supplied this exact Parkwood Rangers PNG in the canonical badge upload package and requested continued badge integration. Fresh 2026-10-10 HTTPS 200 retrieval from the club-owned Parkwood Rangers Pitchero homepage identifies this original PNG as its logo. The blue/yellow shield, oak, waves and 1997 text match the supplied artwork; own page name, Dartford/Bexley ground and Selkent club 316 identity agree. The 178886-byte official PNG is byte-identical to supplied member 316/1_35cf1f66.png, resolving the earlier own-source matching hold. Whole shield and white crest border remain visible, with original transparent exterior. No pixel edits, redraw, recolour, crop, generation, metadata repair or upscaling. Exact native 480px D2 exception applies only to the protected pilot at maximum 128 CSSpx; global q1 remains 512px. Existing hash-pinned private R2 staging and readback gate must complete before deployment. Signed-in phone visual acceptance remains open."
     }
   ]
 }
