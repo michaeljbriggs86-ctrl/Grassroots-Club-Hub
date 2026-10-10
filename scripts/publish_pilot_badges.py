@@ -47,6 +47,10 @@ def validated_approvals(directory, manifest):
             raise ValueError(f"badge {club_id} has no exact-image SHA-256")
         if not all(badge.get(field) for field in BADGE_FIELDS):
             raise ValueError(f"badge {club_id} is missing provenance metadata")
+        if badge.get('staging_asset') is not None:
+            if (badge.get('logo_source') != 'user_supplied_private' or
+                    badge['staging_asset'] != f'verification/approved_badges/{club_id}.png'):
+                raise ValueError(f"badge {club_id} has an invalid reviewed staging asset")
         if badge.get('logo_source') in ('club_supplied_private', 'user_supplied_private', 'official_source_transparency_derivative_private',
                                         'official_source_trim_derivative_private',
                                         'official_source_vector_raster_private', 'official_source_snapshot_private'):

@@ -1805,6 +1805,10 @@ function verifiedTeamBadgeUrl(teamName=''){
   }
   return d.logoUrl&&!FAILED_BADGE_URLS.has(d.logoUrl)&&(d.logoVerified===true||pilotBadgeOverrideAllowed(d.clubId))?d.logoUrl:'';
 }
+function reviewedBadgeRotation(src=''){
+  // Presentation only: keep Mike's supplied Junior Reds pixels and hash intact.
+  return String(src).endsWith('/3aa25e5eff778740a2133b8d0e780b5240bf8b5ca61632061238f3257d1a52d0')?16:0;
+}
 function clubIdentityName(teamName=''){
   const detail=state.selkent?.directoryDetails?.[selkentNorm(teamName)]||{};
   if(detail.clubName)return String(detail.clubName).trim();
@@ -1943,7 +1947,8 @@ async function drawShareClubIdentity(ctx,x,y,teamName,colours='TBC'){
   // Clip only this known asset; keep approved private badges and the crest artwork unchanged.
   const circular=badge&&src==='shooters-hill-logo.png';
   if(circular){ctx.save();ctx.beginPath();ctx.arc(x,y,Math.min(w,h)/2,0,Math.PI*2);ctx.clip();}
-  try{ctx.drawImage(image,x-w/2,y-h/2,w,h);}finally{if(circular)ctx.restore();}
+  ctx.save();ctx.translate(x,y);ctx.rotate(reviewedBadgeRotation(badge?src:'')*Math.PI/180);
+  try{ctx.drawImage(image,-w/2,-h/2,w,h);}finally{ctx.restore();if(circular)ctx.restore();}
 }
 function matchdayArrivalTime(time=''){
   const m=String(time||'').match(/^(\d{2}):(\d{2})$/);if(!m)return '';

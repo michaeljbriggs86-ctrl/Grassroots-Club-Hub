@@ -1,5 +1,6 @@
 """Exact-byte and provenance gates for private badge object storage."""
 import hashlib
+import json
 import pathlib
 import subprocess
 import sys
@@ -33,6 +34,31 @@ class Response:
 
 
 class StageTest(unittest.TestCase):
+    def test_reviewed_user_snapshot_bootstraps_private_r2_with_exact_readback(self):
+        badge = next(b for b in json.loads((ROOT / 'verification/pilot_verified_badges.json').read_text())['badges']
+                     if b['club_id'] == 292)
+        data = (ROOT / badge['staging_asset']).read_bytes()
+        commands = []
+        def run(command, *, check):
+            commands.append(command)
+            path = pathlib.Path(command[command.index('--file') + 1])
+            if 'get' in command:
+                path.write_bytes(data)
+            else:
+                self.assertEqual(path.read_bytes(), data)
+        reads = iter([None, (data, 'image/png')])
+        stage.upload_badges([badge], lambda *a, **k: self.fail('private upload fetched publicly'), run,
+                            prefer_stored=True, stored_get=lambda key: next(reads))
+        self.assertEqual([c[5] for c in commands], ['put', 'get'])
+        self.assertIn(f"292/{badge['logo_sha256']}", commands[0][6])
+        with patch.object(pathlib.Path, 'read_bytes', return_value=data + b'changed'):
+            with self.assertRaisesRegex(ValueError, 'differ from review'):
+                stage.reviewed_upload_snapshot(badge)
+        for change in ({'staging_asset': '../other.png'}, {'source_user_approved': False},
+                       {'logo_source': 'official_site_image'}, {'native_width': 515}):
+            with self.subTest(change=change), self.assertRaises(ValueError):
+                stage.reviewed_upload_snapshot({**badge, **change})
+
     def setUp(self):
         self.data = b'\x89PNG\r\n\x1a\nreviewed badge bytes'
         self.badge = {'club_id': 250, 'club_name': 'Cray Wanderers',

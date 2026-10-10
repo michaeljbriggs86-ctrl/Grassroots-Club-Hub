@@ -37,13 +37,16 @@ async function checkShareBadges(){
       set src(value){
         this.url=value;requests.push({url:value,cors:this.crossOrigin});
         if(value==='slow.png')return;
-        queueMicrotask(()=>value==='missing.png'?this.onerror():this.onload());
+        queueMicrotask(()=>value==='missing.png'||(context.failBadge&&value===junior)?this.onerror():this.onload());
       }
     }
   };
   vm.createContext(context);
-  vm.runInContext(source.slice(badgeStart,badgeEnd),context);
-  const canvas={drawImage:(image,...args)=>draws.push({url:image.url,args})};
+  const rotationStart=source.indexOf('function reviewedBadgeRotation(');
+  const rotationEnd=source.indexOf('function clubIdentityName(',rotationStart);
+  vm.runInContext(source.slice(rotationStart,rotationEnd)+source.slice(badgeStart,badgeEnd),context);
+  const rotations=[];
+  const canvas={save:()=>{},restore:()=>{},translate:()=>{},rotate:angle=>rotations.push(angle),drawImage:(image,...args)=>draws.push({url:image.url,args})};
   await Promise.all([
     context.drawShareClubIdentity(canvas,270,260,'Own club'),
     context.drawShareClubIdentity(canvas,810,260,'Opponent')
@@ -51,6 +54,19 @@ async function checkShareBadges(){
   assert.deepEqual(draws.map(x=>x.url),[own,opponent],'both club badges reach the shared canvas');
   assert(requests.every(x=>!x.cors),'same-origin badges retain the browser session');
   assert(draws.every(x=>x.args[2]===188&&x.args[3]===117.5),'badge aspect ratio is preserved');
+  assert(rotations.every(angle=>angle===0),'other approved artwork is not rotated');
+  const junior='/__pilot_badges/292/3aa25e5eff778740a2133b8d0e780b5240bf8b5ca61632061238f3257d1a52d0';
+  context.verifiedTeamBadgeUrl=()=>junior;
+  await context.drawShareClubIdentity(canvas,270,260,'Junior Reds Sabres');
+  assert.equal(rotations.at(-1),16*Math.PI/180,'the exact supplied Junior Reds artwork is rotated clockwise in shares');
+  assert.equal(draws.at(-1).url,junior,'rotation uses the same approved bytes');
+  context.failBadge=true;
+  await context.drawShareClubIdentity(canvas,270,260,'Junior Reds Sabres');
+  assert.equal(draws.at(-1).url,'pitchkind-wt_mark.svg','unavailable Junior Reds badge uses the product fallback');
+  assert.equal(rotations.at(-1),0,'the fallback must not inherit the failed badge rotation');
+  context.failBadge=false;
+  assert.equal(context.reviewedBadgeRotation('/__pilot_badges/292/'+ 'c'.repeat(64)),0,'a future Junior Reds replacement gets no inherited correction');
+  context.verifiedTeamBadgeUrl=name=>name==='Own club'?own:name==='Opponent'?opponent:'';
   for(const invalid of ['//foreign.example/crest.png','../crest.png','/../crest.png','/bad\\path.png','javascript:alert(1)']){
     const before=requests.length;
     assert.equal(await context.loadShareBadgeImage(invalid),null);
