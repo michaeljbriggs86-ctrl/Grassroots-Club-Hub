@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-10-10T20:58:06.057506+00:00",
+  "last_updated": "2026-10-10T21:17:47.736501+00:00",
   "clubs": [
     {
       "club_id": 514,
@@ -15,7 +15,12 @@
     },
     {
       "club_id": 432,
-      "club_name": "AFC Green Court"
+      "club_name": "AFC Green Court",
+      "logo_url": "https://test.pitchkind.com/__pilot_badges/432/4bc5b18d5196f274c4f8153ebfcdbbdf87bf67220f9d7d2e66a30280b8458610",
+      "logo_status": "pilot_verified",
+      "logo_source": "user_supplied_private",
+      "logo_updated_at": "2026-10-10",
+      "logo_sha256": "4bc5b18d5196f274c4f8153ebfcdbbdf87bf67220f9d7d2e66a30280b8458610"
     },
     {
       "club_id": 234,
@@ -605,7 +610,12 @@
     },
     {
       "club_id": 325,
-      "club_name": "South Darenth"
+      "club_name": "South Darenth",
+      "logo_url": "https://test.pitchkind.com/__pilot_badges/325/62a9fc1aceeb134353b431690c8b9b4b9f73e3a36fe242559671a07af4d87b88",
+      "logo_status": "pilot_verified",
+      "logo_source": "user_supplied_private",
+      "logo_updated_at": "2026-10-10",
+      "logo_sha256": "62a9fc1aceeb134353b431690c8b9b4b9f73e3a36fe242559671a07af4d87b88"
     },
     {
       "club_id": 540,
@@ -7842,5 +7852,5 @@
     }
   ],
   "note": "Panel parsing confirmed against all five format categories (mini-soccer, 9-a-side, X-category, 11-a-side, Senior) as of Sept 2026. Club/team linking is heuristic (name-prefix match) - see ambiguous_club_matches in diagnostics for anything flagged as uncertain.",
-  "pilot_badges_revision": "3e4ceba32b6abb8a2ced6e799a39c2d1bede80228fe594f4ea538e691a63e63d"
+  "pilot_badges_revision": "95c18f4077385d4545fa0d8e4d3b0731a944b8eab6c52fed1442c274a79ed2c6"
 }
