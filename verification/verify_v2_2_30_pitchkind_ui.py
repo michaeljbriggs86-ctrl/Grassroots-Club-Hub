@@ -451,7 +451,7 @@ check(
 check(
     'Shooters Hill approved source logo is bundled and used in hero',
     (assets/'shooters-hill-logo.png').exists()
-    and sha('app/src/main/assets/shooters-hill-logo.png')=='ea3b232a45b197da47d76ffc4bc38440eef9a096a9510af5a988aabc3df71bce'
+    and sha('app/src/main/assets/shooters-hill-logo.png')=='c99b2d689b5da2ca35cbb4f65ddc2051a503e94e6eeecf2d2a547e88d08226c0'
     and './shooters-hill-logo.png' in sw
     and 'src="shooters-hill-logo.png"' in index,
 )
@@ -566,7 +566,7 @@ check(
 check(
     'Shooters Hill app badge is 512px and exact reviewed derivative',
     png_size(assets/'shooters-hill-logo.png')==(512,512)
-    and sha('app/src/main/assets/shooters-hill-logo.png')=='ea3b232a45b197da47d76ffc4bc38440eef9a096a9510af5a988aabc3df71bce',
+    and sha('app/src/main/assets/shooters-hill-logo.png')=='c99b2d689b5da2ca35cbb4f65ddc2051a503e94e6eeecf2d2a547e88d08226c0',
 )
 check(
     'club-logo-q1 verifier is integrated',
@@ -587,7 +587,7 @@ check(
     'python verification/verify_club_logo_quality.py' in apk_workflow
     and 'assets/shooters-hill-logo.png > "$RUNNER_TEMP/shooters-hill-logo.png"' in apk_workflow
     and '--asset "$RUNNER_TEMP/shooters-hill-logo.png"' in apk_workflow
-    and 'ea3b232a45b197da47d76ffc4bc38440eef9a096a9510af5a988aabc3df71bce' in apk_workflow,
+    and 'c99b2d689b5da2ca35cbb4f65ddc2051a503e94e6eeecf2d2a547e88d08226c0' in apk_workflow,
 )
 
 check(
