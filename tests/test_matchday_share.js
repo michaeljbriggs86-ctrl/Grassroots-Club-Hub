@@ -37,7 +37,7 @@ async function checkShareBadges(){
       set src(value){
         this.url=value;requests.push({url:value,cors:this.crossOrigin});
         if(value==='slow.png')return;
-        queueMicrotask(()=>value==='missing.png'?this.onerror():this.onload());
+        queueMicrotask(()=>value==='missing.png'||(context.failBadge&&value===junior)?this.onerror():this.onload());
       }
     }
   };
@@ -60,6 +60,11 @@ async function checkShareBadges(){
   await context.drawShareClubIdentity(canvas,270,260,'Junior Reds Sabres');
   assert.equal(rotations.at(-1),16*Math.PI/180,'the exact supplied Junior Reds artwork is rotated clockwise in shares');
   assert.equal(draws.at(-1).url,junior,'rotation uses the same approved bytes');
+  context.failBadge=true;
+  await context.drawShareClubIdentity(canvas,270,260,'Junior Reds Sabres');
+  assert.equal(draws.at(-1).url,'pitchkind-wt_mark.svg','unavailable Junior Reds badge uses the product fallback');
+  assert.equal(rotations.at(-1),0,'the fallback must not inherit the failed badge rotation');
+  context.failBadge=false;
   assert.equal(context.reviewedBadgeRotation('/__pilot_badges/292/'+ 'c'.repeat(64)),0,'a future Junior Reds replacement gets no inherited correction');
   context.verifiedTeamBadgeUrl=name=>name==='Own club'?own:name==='Opponent'?opponent:'';
   for(const invalid of ['//foreign.example/crest.png','../crest.png','/../crest.png','/bad\\path.png','javascript:alert(1)']){

@@ -1947,7 +1947,7 @@ async function drawShareClubIdentity(ctx,x,y,teamName,colours='TBC'){
   // Clip only this known asset; keep approved private badges and the crest artwork unchanged.
   const circular=badge&&src==='shooters-hill-logo.png';
   if(circular){ctx.save();ctx.beginPath();ctx.arc(x,y,Math.min(w,h)/2,0,Math.PI*2);ctx.clip();}
-  ctx.save();ctx.translate(x,y);ctx.rotate(reviewedBadgeRotation(src)*Math.PI/180);
+  ctx.save();ctx.translate(x,y);ctx.rotate(reviewedBadgeRotation(badge?src:'')*Math.PI/180);
   try{ctx.drawImage(image,-w/2,-h/2,w,h);}finally{ctx.restore();if(circular)ctx.restore();}
 }
 function matchdayArrivalTime(time=''){
