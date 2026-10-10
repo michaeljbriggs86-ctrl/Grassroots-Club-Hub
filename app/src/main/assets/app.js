@@ -3579,7 +3579,7 @@ async function saveMatchDetails(e){
     try{await saveCurrentMatchAttendance(id);}catch(err){toast('Result saved; attendance could not be saved');}
   }
   if(reportMode&&matchStatus(beforeMatch)!=='played')auditEvent('match_played','match',id,`Marked match played vs ${savedMatch.opponent}`,beforeMatch,savedMatch);const afterDetails={goals:state.goals.filter(x=>x.matchId===id),assists:(state.assists||[]).filter(x=>x.matchId===id),bookings:(state.bookings||[]).filter(x=>x.matchId===id),awards:state.awards.filter(x=>x.matchId===id),homeKitColours:savedMatch.homeKitColours||'',awayKitColours:savedMatch.awayKitColours||''};auditEvent('match_details_updated','match_details',id,`Updated match details vs ${savedMatch.opponent}`,beforeDetails,afterDetails);document.getElementById('match-detail-dialog').close();resetMatchReportMode();renderNextMatch();toast(reportMode?'Match report synced':'Match details saved');
-  if(CLOUD_MODE&&isCoach()&&window.ClubHubCloud?.notifyMatchReport&&isPlayedMatch(savedMatch)){window.ClubHubCloud.notifyMatchReport(savedMatch.id,savedMatch.opponent,matchScoreText(savedMatch)).then(()=>refreshNotifications(true)).catch(()=>{});}
+  // Match report changes no longer notify anyone (Mike, 2026-10-10). Only upcoming fixture changes notify.
 }
 
 async function undoMatchPlayed(){
@@ -3638,15 +3638,6 @@ The Selkent fixture, matchday squad and availability are kept.`;
   document.getElementById('match-detail-dialog')?.close();
   resetMatchReportMode();
 
-  if(CLOUD_MODE&&isCoach()&&window.ClubHubCloud?.notifyMatchReopened){
-    try{
-      await window.ClubHubCloud.notifyMatchReopened(id,m.opponent);
-      await refreshNotifications(true);
-    }catch(err){
-      toast('Match restored; correction notification could not be sent');
-      return;
-    }
-  }
 
   toast(noteWarning?'Match restored; coaching note could not be cleared':'Match returned to Scheduled');
 }
