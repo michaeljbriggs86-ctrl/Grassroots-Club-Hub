@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-10-10T21:33:21.413806+00:00",
+  "last_updated": "2026-10-10T21:49:26.444332+00:00",
   "clubs": [
     {
       "club_id": 514,
@@ -401,7 +401,12 @@
     },
     {
       "club_id": 302,
-      "club_name": "Lewisham Youth"
+      "club_name": "Lewisham Youth",
+      "logo_url": "https://test.pitchkind.com/__pilot_badges/302/8017a2f1c7753eb021439de9494f7ed37fea4f3b614369dce249f6494725bd79",
+      "logo_status": "pilot_verified",
+      "logo_source": "user_supplied_private",
+      "logo_updated_at": "2026-10-10",
+      "logo_sha256": "8017a2f1c7753eb021439de9494f7ed37fea4f3b614369dce249f6494725bd79"
     },
     {
       "club_id": 523,
@@ -413,7 +418,12 @@
     },
     {
       "club_id": 397,
-      "club_name": "London Legends"
+      "club_name": "London Legends",
+      "logo_url": "https://test.pitchkind.com/__pilot_badges/397/add6185551625481d944099fa615a72e2501d5c4e3fad5530a4f17134cebfe5d",
+      "logo_status": "pilot_verified",
+      "logo_source": "user_supplied_private",
+      "logo_updated_at": "2026-10-10",
+      "logo_sha256": "add6185551625481d944099fa615a72e2501d5c4e3fad5530a4f17134cebfe5d"
     },
     {
       "club_id": 303,
@@ -528,7 +538,12 @@
     },
     {
       "club_id": 320,
-      "club_name": "Red Devils"
+      "club_name": "Red Devils",
+      "logo_url": "https://test.pitchkind.com/__pilot_badges/320/68e7aabbc6c6a18dc208a8e2fa90439d77b584cb74a3c9c3ecc7e7aaee6c58a1",
+      "logo_status": "pilot_verified",
+      "logo_source": "user_supplied_private",
+      "logo_updated_at": "2026-10-10",
+      "logo_sha256": "68e7aabbc6c6a18dc208a8e2fa90439d77b584cb74a3c9c3ecc7e7aaee6c58a1"
     },
     {
       "club_id": 482,
@@ -623,7 +638,12 @@
     },
     {
       "club_id": 345,
-      "club_name": "Sporting Club Vista"
+      "club_name": "Sporting Club Vista",
+      "logo_url": "https://test.pitchkind.com/__pilot_badges/345/fa561bda35ef6cf1baacb9b9d8a0130ad8430e7215952e332090c781f0f766c0",
+      "logo_status": "pilot_verified",
+      "logo_source": "user_supplied_private",
+      "logo_updated_at": "2026-10-10",
+      "logo_sha256": "fa561bda35ef6cf1baacb9b9d8a0130ad8430e7215952e332090c781f0f766c0"
     },
     {
       "club_id": 294,
@@ -7852,5 +7872,5 @@
     }
   ],
   "note": "Panel parsing confirmed against all five format categories (mini-soccer, 9-a-side, X-category, 11-a-side, Senior) as of Sept 2026. Club/team linking is heuristic (name-prefix match) - see ambiguous_club_matches in diagnostics for anything flagged as uncertain.",
-  "pilot_badges_revision": "ffa618f9508fdbb6d4e663c58342c42f8e2e0bfdf6d0460ed8e8e05ea84cbfad"
+  "pilot_badges_revision": "9228911a12ff8071ca9aaaa4020e01dfa291b56d9b83263f98deba80516f873b"
 }
