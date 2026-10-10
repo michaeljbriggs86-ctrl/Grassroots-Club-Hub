@@ -429,6 +429,7 @@ function normalizeState(data={}){
       })),
       cancelled:(Array.isArray(data.trainingSchedule?.cancelled)?data.trainingSchedule.cancelled:[]).map(String).filter(v=>/^[^:]{1,80}:\d{4}-\d{2}-\d{2}$/.test(v)).slice(-100)
     },
+    cupProgress: normaliseCupProgress(data.cupProgress),
     tournaments: (Array.isArray(data.tournaments)?data.tournaments:[]).map(t=>({
       id:String(t?.id||uid('t')),name:String(t?.name||'Tournament').trim(),date:String(t?.date||''),location:String(t?.location||'').trim(),format:String(t?.format||'group_knockout'),playerNames:Array.isArray(t?.playerNames)?t.playerNames.map(String):[]
     })),
@@ -3074,12 +3075,28 @@ function competitionGameRow(m){
   const cup=cupNameAndRound(m);
   return `<tr class="${resultClass(r)}"><td>${m.date?formatDate(m.date):'TBC'}</td><td><b>${esc(cup.name)}</b>${cup.round?`<small class="cup-round">${esc(cup.round)}</small>`:''}</td><td>${action}</td><td>${venue}</td><td><span class="competition-result-pill ${r}">${resultText}</span></td></tr>`;
 }
+/** Coach marker: did our team go through a cup round? Keyed by "Cup name|Round". Coach-only: it reveals a U7-U11 result. */
+function normaliseCupProgress(raw){const out={};if(raw&&typeof raw==='object'&&!Array.isArray(raw)){for(const [k,v] of Object.entries(raw)){if(!/^[^|]{1,80}\|[^|]{0,60}$/.test(k)||!v||typeof v!=='object')continue;out[k]={through:v.through===true,at:String(v.at||'').slice(0,40)};}}return out;}
+function cupProgressKey(m){const c=cupNameAndRound(m);return `${c.name}|${c.round}`;}
+function renderCupProgress(panel,rows){
+  let box=panel.querySelector('.cup-progress');
+  const canEdit=CLOUD_MODE?['admin','club_admin','coach','assistant_coach'].includes(currentRole):true;
+  const keys=[...new Set(rows.map(cupProgressKey))];
+  if(!canEdit||!keys.length){box?.remove();return;}
+  if(!box){box=document.createElement('div');box.className='cup-progress';panel.appendChild(box);
+    box.addEventListener('change',e=>{const cb=e.target.closest('[data-cup-through]');if(!cb)return;if(!requireCoach()){cb.checked=!cb.checked;return;}
+      const key=cb.dataset.cupThrough;state.cupProgress=normaliseCupProgress(state.cupProgress);state.cupProgress[key]={through:cb.checked,at:new Date().toISOString()};
+      saveState();auditEvent('cup_progress','cup',key,`${cb.checked?'Marked through':'Unmarked'}: ${key.replace('|',' · ')}`,null,state.cupProgress[key]);toast(cb.checked?'Marked as through to the next round':'Through marker removed');});}
+  const prog=state.cupProgress||{};
+  box.innerHTML=keys.map(k=>{const [name,round]=k.split('|');return `<label class="cup-through"><input type="checkbox" data-cup-through="${esc(k)}"${prog[k]?.through?' checked':''}> <span>Through to next round: ${esc(name)}${round?' · '+esc(round):''}</span></label>`;}).join('')+'<small class="cup-progress-note">Coaches only. The next round appears here when Selkent publishes it.</small>';
+}
 function renderCompetitionGameTable(kind,list){
   const body=document.getElementById(`${kind}-games-body`),count=document.getElementById(`${kind}-games-count`),wrap=document.getElementById(`${kind}-games-panel`);if(!body||!wrap)return;
   const rows=[...list].sort((a,b)=>(b.date||'').localeCompare(a.date||''));if(count)count.textContent=String(rows.length);
   wrap.classList.toggle('empty-competition',rows.length===0);
   if(kind!=='cup')wrap.hidden=rows.length===0;
   if(rows.length&&kind==='cup')wrap.open=true;
+  renderCupProgress(wrap,kind==='cup'?rows:[]);
   body.innerHTML=rows.map(competitionGameRow).join('')||'<tr><td colspan="5" class="table-empty">No games available yet</td></tr>';
 }
 function applyMatchFilter(){
