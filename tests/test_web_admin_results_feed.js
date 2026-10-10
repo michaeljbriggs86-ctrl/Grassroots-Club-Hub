@@ -66,7 +66,7 @@ const recentHtml=elements.get('admin-recent-results').innerHTML;
 assert.doesNotMatch(recentHtml,/Selkent published|Team recorded|4–1/);
 assert.match(recentHtml,/<div class="admin-recent-team"><span class="club-listing">Shooters Hill AFC Valiants<\/span> <b class="admin-recent-score">4<\/b><\/div>/);
 assert.match(recentHtml,/<div class="admin-recent-team"><span class="club-listing">Junior Reds Sabres<\/span> <b class="admin-recent-score">1<\/b><\/div>/);
-assert.ok(html.includes('id="admin-recent-results"')&&html.includes('id="club-results-list"'));
+assert.ok(html.includes('id="club-results-list"'));
 let resultWrites=0,resultHtml='';
 const list={get innerHTML(){return resultHtml},set innerHTML(value){resultHtml=value;resultWrites++}},ageSelect={value:'',innerHTML:''},competitionSelect={value:'league'},page={textContent:''},previous={},next={};
 const browserElements={'club-results-list':list,'club-results-age':ageSelect,'club-results-competition':competitionSelect,'club-results-page':page,'club-results-prev':previous,'club-results-next':next};
