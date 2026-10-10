@@ -4109,12 +4109,23 @@ function clubResultTeamBadgeHtml(teamName=''){
   const kind=approved||usableOwnBadge?'verified-club-badge':'club-placeholder-badge';
   return `<img class="club-identity-badge ${kind}" data-club-team="${esc(teamName)}" src="${esc(url)}" alt="" aria-hidden="true" loading="lazy" decoding="async" />`;
 }
+/* Club results (admin overview and Club > Results) use the same table as Matches > Cups:
+ * date, competition, both teams with badges, H/A and a result pill from the club team's side. */
+function clubResultsTableHTML(rows=[]){
+  const body=rows.map(r=>{
+    const rr=resultForNamedTeam(r.home,r.away,r.hg,r.ag,r.teamName),ownHome=resultForNamedTeam(r.home,r.away,1,0,r.teamName)==='W';
+    const kind=clubResultCompetitionKind(r),label=kind==='league'?(r.divisionName||'League'):(r.competition||({cup:'Cup',friendly:'Friendly'}[kind]||'Other'));
+    const score=ownHome?`${r.hg}–${r.ag}`:`${r.ag}–${r.hg}`;
+    return `<tr class="${resultClass(rr)}"><td>${formatDate(r.date)||esc(r.date)||'Date TBC'}</td><td><b>U${esc(r.ageGroup)}</b><small class="cup-round">${esc(String(label).replace(/_/g,' '))}</small></td><td><span class="club-result-match"><span class="club-result-team home" title="${esc(matchTeamLabel(r.home))}">${clubResultTeamBadgeHtml(r.home)}<span class="club-result-team-name">${esc(matchTeamLabel(r.home))}</span></span><span class="club-result-v">v</span><span class="club-result-team away" title="${esc(matchTeamLabel(r.away))}">${clubResultTeamBadgeHtml(r.away)}<span class="club-result-team-name">${esc(matchTeamLabel(r.away))}</span></span></span></td><td>${ownHome?'H':'A'}</td><td><span class="competition-result-pill ${rr}">${rr?`${rr} `:''}${score}</span></td></tr>`;
+  }).join('');
+  return `<div class="competition-table-scroll match-results-table club-results-table"><table class="competition-games-table"><thead><tr><th>Date</th><th>Competition</th><th>Match</th><th>H/A</th><th>Status / result</th></tr></thead><tbody>${body}</tbody></table></div>`;
+}
 function renderAdminRecentResults(rows=[],feedAvailable=true){
   const box=document.getElementById('admin-recent-results'),count=document.getElementById('admin-results-count'),status=document.getElementById('admin-results-source-status');
   if(count)count.textContent=String(rows.length);
   if(status)status.textContent=feedAvailable?'':'Some published results are temporarily unavailable.';
   if(!box)return;
-  setStableHtml(box,rows.slice(0,3).map(r=>`<div class="admin-recent-result"><span>U${esc(r.ageGroup)} · ${formatDate(r.date)||esc(r.date)}</span><div class="admin-recent-team">${clubListingHtml(r.home)} <b class="admin-recent-score">${esc(r.hg)}</b></div><div class="admin-recent-team">${clubListingHtml(r.away)} <b class="admin-recent-score">${esc(r.ag)}</b></div></div>`).join('')||'<div class="empty-state compact-empty">No club results recorded yet.</div>');
+  setStableHtml(box,rows.length?clubResultsTableHTML(rows.slice(0,3)):'<div class="empty-state compact-empty">No club results recorded yet.</div>');
 }
 function nextWeekendDates(){
   return adminShareWeekendDates();
@@ -4874,7 +4885,7 @@ function renderClubResultsBrowser(){
   const prev=ageSel.value||String(__clubResultsAge);ageSel.innerHTML='<option value="all">All age groups</option>'+ages.map(a=>`<option value="${a}">Under ${a}s</option>`).join('');__clubResultsAge=prev==='all'||ages.includes(Number(prev))?prev:'all';ageSel.value=String(__clubResultsAge);
   if(competitionSel)competitionSel.value=__clubResultsCompetition;
   const filtered=__clubResultsRows.filter(r=>(__clubResultsAge==='all'||Number(r.ageGroup)===Number(__clubResultsAge))&&(__clubResultsCompetition==='all'||clubResultCompetitionKind(r)===__clubResultsCompetition));const pages=Math.max(1,Math.ceil(filtered.length/CLUB_RESULTS_PAGE_SIZE));__clubResultsPage=Math.max(0,Math.min(__clubResultsPage,pages-1));const rows=filtered.slice(__clubResultsPage*CLUB_RESULTS_PAGE_SIZE,(__clubResultsPage+1)*CLUB_RESULTS_PAGE_SIZE);
-  setStableHtml(list,rows.map(r=>{const rr=resultForNamedTeam(r.home,r.away,r.hg,r.ag,r.teamName);const kind=clubResultCompetitionKind(r),label=kind==='league'?(r.divisionName||'League'):(r.competition||({cup:'Cup',friendly:'Friendly'}[kind]||'Other'));return `<article class="club-result-row ${resultClass(rr)}"><div class="club-result-meta"><span>U${esc(r.ageGroup)} · ${esc(String(label).replace(/_/g,' '))}</span><small>${formatDate(r.date)||esc(r.date)||'Date TBC'}</small></div><div class="club-result-score"><div class="club-result-team home" title="${esc(matchTeamLabel(r.home))}">${clubResultTeamBadgeHtml(r.home)}<span class="club-result-team-name">${esc(matchTeamLabel(r.home))}</span></div><strong>${r.hg}–${r.ag}</strong><div class="club-result-team away" title="${esc(matchTeamLabel(r.away))}"><span class="club-result-team-name">${esc(matchTeamLabel(r.away))}</span>${clubResultTeamBadgeHtml(r.away)}</div></div></article>`;}).join('')||'<div class="empty-state"><strong>No results in this filter</strong>Choose another competition or age group, or record the completed match in the team profile.</div>');
+  setStableHtml(list,rows.length?clubResultsTableHTML(rows):'<div class="empty-state"><strong>No results in this filter</strong>Choose another competition or age group, or record the completed match in the team profile.</div>');
   if(pageEl)pageEl.textContent=filtered.length?`${__clubResultsPage+1} of ${pages}`:'0 of 0';const p=document.getElementById('club-results-prev'),n=document.getElementById('club-results-next');if(p)p.disabled=__clubResultsPage<=0;if(n)n.disabled=__clubResultsPage>=pages-1;
 }
 async function refreshClubResults(quiet=false){

@@ -14,10 +14,12 @@ const internalAdminClubResults = new Function('clubSettings','normalizeTeamKey',
 const elements = new Map(['admin-recent-results','admin-results-count','admin-results-breakdown','admin-results-source-status'].map(id => [id,{innerHTML:'',textContent:''}]));
 const document = {getElementById:id => elements.get(id)};
 const helpers = src.slice(src.indexOf('function verifiedClubResultsFeed(feed){'), src.indexOf('function nextWeekendDates(){'));
+const lineOf=(name)=>{const a=src.indexOf(`function ${name}(`);return src.slice(a,src.indexOf('\n',a));};
+const resultHelpers=lineOf('resultForNamedTeam')+'\n'+lineOf('resultClass');
 const {verifiedClubResultsFeed,publishedClubTeamData,clubResultRows,coachClubResultRows,renderAdminRecentResults} = new Function(
-  'normalizeTeamKey','internalAdminClubResults','document','esc','formatDate','matchTeamLabel','clubListingHtml','setStableHtml',
-  `${helpers}\nreturn {verifiedClubResultsFeed,publishedClubTeamData,clubResultRows,coachClubResultRows,renderAdminRecentResults};`
-)(normalizeTeamKey,internalAdminClubResults,document,s=>String(s),(s=>s),(s=>s),(s=>`<span class=\"club-listing\">${s}</span>`),setStableHtml);
+  'normalizeTeamKey','internalAdminClubResults','document','esc','formatDate','matchTeamLabel','clubListingHtml','setStableHtml','verifiedTeamBadgeUrl','clubSettings','configuredClubTeams','FAILED_BADGE_URLS','clubPlaceholderBadgeHtml',
+  `${resultHelpers}\n${helpers}\nreturn {verifiedClubResultsFeed,publishedClubTeamData,clubResultRows,coachClubResultRows,renderAdminRecentResults};`
+)(normalizeTeamKey,internalAdminClubResults,document,s=>String(s),(s=>s),(s=>s),(s=>`<span class=\"club-listing\">${s}</span>`),setStableHtml,()=>'',()=>({}),()=>[],new Set(),name=>`<img class="club-identity-badge" alt="${name}">`);
 
 const teams = [
   {id:'12',ageGroup:'U12',teamName:'Cannons',leagueName:'Shooters Hill AFC Cannons',division:'Under 12C Orange'},
@@ -63,15 +65,18 @@ assert.equal(elements.get('admin-results-count').textContent,'3');
 assert.doesNotMatch(html,/admin-results-breakdown|Selkent published|team recorded/);
 assert.match(html,/Completed matches<\/span><strong id="admin-results-count"/);
 const recentHtml=elements.get('admin-recent-results').innerHTML;
-assert.doesNotMatch(recentHtml,/Selkent published|Team recorded|4–1/);
-assert.match(recentHtml,/<div class="admin-recent-team"><span class="club-listing">Shooters Hill AFC Valiants<\/span> <b class="admin-recent-score">4<\/b><\/div>/);
-assert.match(recentHtml,/<div class="admin-recent-team"><span class="club-listing">Junior Reds Sabres<\/span> <b class="admin-recent-score">1<\/b><\/div>/);
+assert.doesNotMatch(recentHtml,/Selkent published|Team recorded/);
+assert.match(recentHtml,/<table class="competition-games-table"><thead><tr><th>Date<\/th><th>Competition<\/th><th>Match<\/th><th>H\/A<\/th><th>Status \/ result<\/th>/,'latest results use the Cups table layout');
+assert.match(recentHtml,/<span class="club-result-team-name">Shooters Hill AFC Valiants<\/span>/);
+assert.match(recentHtml,/<span class="club-result-team-name">Junior Reds Sabres<\/span>/);
+assert.match(recentHtml,/<td>H<\/td><td><span class="competition-result-pill W">W 4–1<\/span>/,'home win reads from the club side');
+assert.match(recentHtml,/<td>A<\/td><td><span class="competition-result-pill W">W 3–2<\/span>/,'away win reads from the club side (3–2, not 2–3)');
 assert.ok(html.includes('id="club-results-list"'));
 let resultWrites=0,resultHtml='';
 const list={get innerHTML(){return resultHtml},set innerHTML(value){resultHtml=value;resultWrites++}},ageSelect={value:'',innerHTML:''},competitionSelect={value:'league'},page={textContent:''},previous={},next={};
 const browserElements={'club-results-list':list,'club-results-age':ageSelect,'club-results-competition':competitionSelect,'club-results-page':page,'club-results-prev':previous,'club-results-next':next};
 const browserDocument={getElementById:id=>browserElements[id]||null};
-const browserBody=src.slice(src.indexOf('function renderClubResultsBrowser(){'),src.indexOf('async function refreshClubResults(quiet=false){'));
+const browserBody=src.slice(src.indexOf('function clubResultsTableHTML('),src.indexOf('function renderAdminRecentResults('))+src.slice(src.indexOf('function renderClubResultsBrowser(){'),src.indexOf('async function refreshClubResults(quiet=false){'));
 const badgeBody=src.slice(src.indexOf('function clubResultTeamBadgeHtml(teamName='),src.indexOf('function renderAdminRecentResults(',src.indexOf('function clubResultTeamBadgeHtml(teamName=')));
 const placeholderBody=src.slice(src.indexOf('function clubPlaceholderBadgeHtml('),src.indexOf('function clubIdentityBadgeHtml('));
 const placeholderBadge=new Function('clubPlaceholderBadgeData','esc',`${placeholderBody}\nreturn clubPlaceholderBadgeHtml;`)(
@@ -93,8 +98,8 @@ assert.equal(resultWrites,1,'an unchanged results refresh keeps the badge image 
 assert.equal(ageSelect.value,'all','Club Results opens on the complete club view');
 assert.match(ageSelect.innerHTML,/Under 14s/,'coach results can filter ages present in club published rows');
 assert.equal(competitionSelect.value,'league','Club Results defaults to league');
-assert.match(list.innerHTML,/<div class="club-result-meta"><span>U12 · Under 12C Orange<\/span>/,'the card shows age and actual league division');
-assert.match(list.innerHTML,/<div class="club-result-meta"><span>U9 · Under 9D Navy<\/span>/,'team-recorded result shows its division');
+assert.match(list.innerHTML,/<b>U12<\/b><small class="cup-round">Under 12C Orange<\/small>/,'the row shows age and actual league division');
+assert.match(list.innerHTML,/<b>U9<\/b><small class="cup-round">Under 9D Navy<\/small>/,'team-recorded result shows its division');
 assert.doesNotMatch(list.innerHTML,/Selkent published|Team recorded|U9 · Valiants/,'source and nickname do not clutter card metadata');
 assert.match(list.innerHTML,/Shooters Hill AFC Cannons/);
 assert.match(list.innerHTML,/Shooters Hill AFC Valiants|Junior Reds Sabres/);
@@ -104,7 +109,7 @@ assert.doesNotMatch(list.innerHTML,/Junior Reds Sabres/,'the age selector still 
 browser.setRows([...rows,{home:'Valiants',away:'Friendly Rivals',hg:2,ag:1,date:'2026-09-20',competition:'Friendly',teamName:'Valiants',ageGroup:9},{home:'Cup Rivals',away:'Valiants',hg:0,ag:1,date:'2026-09-21',competition:'Challenge Cup',teamName:'Valiants',ageGroup:9}]);
 ageSelect.value='all';browser.show();
 assert.doesNotMatch(list.innerHTML,/Friendly Rivals|Cup Rivals/,'league is the default result category');
-browser.setCompetition('friendly');browser.show();assert.match(list.innerHTML,/Friendly Rivals/);assert.match(list.innerHTML,/U9 · Friendly/);assert.doesNotMatch(list.innerHTML,/Cup Rivals/);
+browser.setCompetition('friendly');browser.show();assert.match(list.innerHTML,/Friendly Rivals/);assert.match(list.innerHTML,/<b>U9<\/b><small class="cup-round">Friendly<\/small>/);assert.doesNotMatch(list.innerHTML,/Cup Rivals/);
 browser.setCompetition('cup');browser.show();assert.match(list.innerHTML,/Cup Rivals/);assert.doesNotMatch(list.innerHTML,/Friendly Rivals/);
 assert.ok(html.includes('id="club-results-competition"'));
 const leagueFixture={date:'2099-09-27',opponent:'Junior Reds Sabres',venue:'A'};
