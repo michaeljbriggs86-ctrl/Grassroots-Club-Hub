@@ -39,7 +39,7 @@ vm.runInNewContext(`${source.slice(start,end)}\nthis.openGate=setGateHtml;`,env)
   nodes.get('cloud-parent-login').listeners.click();
   assert.equal(gate.dataset.authMode,'parentsignin');
   assert.match(gate.innerHTML,/<h1>Parent Sign In<\/h1>/);
-  assert.match(gate.innerHTML,/Parent Sign Up/);
+  assert.match(gate.innerHTML,/Create Account/);
   nodes.get('cloud-email').value='parent@example.test';nodes.get('cloud-password').value='password';
   env.profileRole='coach';
   await nodes.get('cloud-auth-submit').listeners.click();
