@@ -1324,7 +1324,7 @@ function furtherFixtureCardHtml(f,index){
   </div></div><div class="further-fixture-quick"><details class="further-fixture-details"><summary>Match details</summary><div class="further-fixture-body">
     <div class="match-versus">${matchTeamSideHtml('Home',ctx.homeTeam,ctx.homeKit)}<div class="match-versus-mark">V</div>${matchTeamSideHtml('Away',ctx.awayTeam,ctx.awayKit)}</div>
     ${toggle}<div class="match-venue-card"><div><span>Venue</span><strong>${esc(ground)}</strong><small>${esc(address)}</small></div></div>
-  </div></details></div>${warning}${confirmed&&ctx.mapHref?`<a class="map-link compact" href="${esc(ctx.mapHref)}" target="_blank" rel="noopener">Open in Maps</a>`:''}${canConfirmFixtureDetails()?`<button type="button" data-further-match-played="${index}">Match played</button>`:''}</article>`;
+  </div></details></div>${warning}${confirmed&&ctx.mapHref?`<a class="map-link compact" href="${esc(ctx.mapHref)}" target="_blank" rel="noopener">Open in Maps</a>`:''}${canConfirmFixtureDetails()&&matchDayReached(f)?`<button type="button" data-further-match-played="${index}">Match played</button>`:''}</article>`;
 }
 function groupedUpcomingFixtures(fixtures=upcomingFixtures()){
   const seen=new Set(),events=[];
@@ -1517,11 +1517,11 @@ function openCupGroupResultChooser(f){
   dialog.showModal();
 }
 function openNextFixtureMatchReport(){
-  const f=nextPublishedFixture();
+  const f=nextPublishedFixture();if(f&&!matchDayReached(f))return;
   return f&&miniCupGroup(f)?openCupGroupResultChooser(f):openFixtureMatchReport(f);
 }
 function openFurtherFixtureMatchReport(index){
-  const f=groupedUpcomingFixtures().slice(1)[Number(index)];
+  const f=groupedUpcomingFixtures().slice(1)[Number(index)];if(f&&!matchDayReached(f))return;
   return f&&miniCupGroup(f)?openCupGroupResultChooser(f):openFixtureMatchReport(f);
 }
 function fixtureStableKey(f={}){
@@ -2070,8 +2070,14 @@ function syncMatchPlayedActionV141(f){
   for(const id of ['next-match-share','matches-next-share'])document.getElementById(id)?.classList.toggle('hidden',!f||!canConfirmFixtureDetails());
   const button=document.getElementById('matches-next-played');if(!button)return;
   const group=f?miniCupGroup(f):null;
-  button.classList.toggle('hidden',!f||!canConfirmFixtureDetails());
+  button.classList.toggle('hidden',!f||!canConfirmFixtureDetails()||!matchDayReached(f));
   button.textContent=group?'Record group result':'Match played';
+}
+// Results can only be recorded from the fixture's own date (device local time). Undated rows stay recordable.
+function matchDayReached(f={}){
+  const date=String(f?.date||'');if(!/^\d{4}-\d{2}-\d{2}$/.test(date))return true;
+  const d=new Date(),today=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  return date<=today;
 }
 function renderMatchPageNextFixture(){
   const card=document.getElementById('matches-next-fixture');if(!card)return;const f=nextPublishedFixture();syncMatchPlayedActionV141(f);const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
@@ -3078,7 +3084,7 @@ function matchCardHTML(m){
   const editableNonLeague=isCoach()&&isPlayedMatch(m)&&!isLeagueMatch(m)&&!isDivisionMatch(m);
   const editableScheduled=isCoach()&&!isPlayedMatch(m);
   const editAction=editableScheduled?`<button class="inline-action" data-edit-match="${m.id}">Edit fixture</button>`:editableNonLeague?`<button class="inline-action" data-edit-match="${m.id}">Edit result</button>`:'';
-  const playedAction=isCoach()&&status==='scheduled'?`<button class="primary-button compact match-played-action" type="button" data-match-played="${m.id}">Match played</button>`:'';
+  const playedAction=isCoach()&&status==='scheduled'&&matchDayReached(m)?`<button class="primary-button compact match-played-action" type="button" data-match-played="${m.id}">Match played</button>`:'';
   const removeAction=isCoach()&&!isProviderOwnedMatch(m)?`<button class="inline-action delete" type="button" data-delete-match="${m.id}">Remove</button>`:'';
   const actions=`<div class="match-actions"><button class="inline-action" data-details-match="${m.id}">Details</button>${editAction}${playedAction}${removeAction}</div>`;
   return `<article class="match-card ${resultClass(r)}"><div class="result-badge ${r}">${r}</div><div><div class="match-opponent">${clubListingHtml(m.opponent)}</div><div class="match-meta">${formatDate(m.date)}${venue}${stage}${statusMeta}</div>${details}</div><div class="match-score">${matchScoreText(m)}</div>${actions}</article>`;

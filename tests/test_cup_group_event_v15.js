@@ -102,8 +102,13 @@ async function run(){
  c.ageGroupNumber=()=>10;const ordinary={date:'2026-10-03',competition:'League',opponent:'Earlier',venue:'H'},later={...ordinary,date:'2026-10-11',opponent:'Later'};now='2026-10-03T12:00:00Z';c.state.selkent.fixtures=[ordinary,...vikings,later];
  let openedEvent=null;c.openCupGroupResultChooser=f=>openedEvent=f;c.openFixtureMatchReport=f=>openedEvent=f;
  const branch=take("  const furtherPlayed=e.target.closest('[data-further-match-played]');","  const editTournament=e.target.closest('[data-edit-tournament]');");
- const line=branch.split('\n')[0];c.e={target:{closest:()=>({dataset:{furtherMatchPlayed:'0'}})}};vm.runInContext('(function(){'+line+'})()',c);assert.equal(c.fixtureResponseKey(openedEvent),key);
- c.state.matches=[{...vikings[0],status:'played'}];vm.runInContext('(function(){'+line+'})()',c);assert.equal(c.fixtureResponseKey(openedEvent),key);c.e.target.closest=()=>({dataset:{furtherMatchPlayed:'1'}});vm.runInContext('(function(){'+line+'})()',c);assert.equal(openedEvent,later);now='2026-10-04T12:00:00Z';
+ const line=branch.split('\n')[0];c.e={target:{closest:()=>({dataset:{furtherMatchPlayed:'0'}})}};
+ // Match played is only offered from the fixture date (test_match_played_guard.js): on 3 Oct the 4 Oct group must not open.
+ vm.runInContext('(function(){'+line+'})()',c);assert.equal(openedEvent,null,'future group cannot be recorded early');
+ // The routing checks below are about WHICH fixture opens, so the date guard is lifted for them only.
+ const realMatchDayReached=c.matchDayReached;c.matchDayReached=()=>true;
+ vm.runInContext('(function(){'+line+'})()',c);assert.equal(c.fixtureResponseKey(openedEvent),key);
+ c.state.matches=[{...vikings[0],status:'played'}];vm.runInContext('(function(){'+line+'})()',c);assert.equal(c.fixtureResponseKey(openedEvent),key);c.e.target.closest=()=>({dataset:{furtherMatchPlayed:'1'}});vm.runInContext('(function(){'+line+'})()',c);assert.equal(openedEvent,later);c.matchDayReached=realMatchDayReached;now='2026-10-04T12:00:00Z';
  // Notification / acknowledgement / result identity stay per-game.
  assert.notEqual(c.fixtureStableKey(vikings[0]),c.fixtureStableKey(vikings[1]));assert.doesNotMatch(take('function fixtureFingerprint(', 'function fixtureOverride('),/fixtureResponseKey/);
  assert.doesNotMatch(take('function fixtureDatedGameKey(', 'function fixtureFingerprint('),/notifyFixtureChange|saveMatchAvailability|delete/);
