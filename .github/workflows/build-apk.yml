@@ -33,6 +33,7 @@ jobs:
           node tests/test_fixture_ground_parser.js
           node tests/test_matchday_share.js
           node tests/test_parent_family_access.js
+          node tests/test_parent_matchday_cutoff.js
 
       - name: Set up Java 17
         uses: actions/setup-java@v4
