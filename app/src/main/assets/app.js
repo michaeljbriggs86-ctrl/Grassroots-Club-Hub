@@ -3200,25 +3200,20 @@ function matchCardHTML(m){
   const actions=`<div class="match-actions"><button class="inline-action" data-details-match="${m.id}">Details</button>${editAction}${playedAction}${removeAction}</div>`;
   return `<article class="match-card ${resultClass(r)}"><div class="result-badge ${r}">${r}</div><div><div class="match-opponent">${clubListingHtml(m.opponent)}</div><div class="match-meta">${formatDate(m.date)}${venue}${stage}${statusMeta}</div>${details}</div><div class="match-score">${matchScoreText(m)}</div>${actions}</article>`;
 }
-/* One results layout for every list on the Matches page: the Cups table (date, competition,
- * opponent, H/A, result pill, row tinted by outcome). Coaches get the row's actions on a slim
- * line beneath it; tapping the opponent opens Details, as in the Cups table. */
+/* Grouped results share the Cups table spacing and result pills. The section title supplies
+ * the competition; match statistics stay in Details. Coach actions remain beneath the row. */
 function matchResultRowHTML(m){
   const r=resultOf(m),status=matchStatus(m),v=String(m.venue||'').toUpperCase(),venue=['H','A','N'].includes(v)?v:'—';
   const resultText=miniResultsRestrictedView()&&isPlayedMatch(m)?'Result private':(isPlayedMatch(m)?`${r} ${Number(m.gf||0)}–${Number(m.ga||0)}`:(r==='ABD'?`ABD ${Number(m.gf||0)}–${Number(m.ga||0)}`:statusLabel(m)));
   const comp=isCupMatch(m)||isVaseMatch(m)||isShieldMatch(m)?cupNameAndRound(m):{name:String(m.competition||'Match'),round:String(m.stage||'')};
-  const bits=[];
-  const goals=state.goals.filter(g=>g.matchId===m.id).reduce((n,g)=>n+Number(g.goals||0),0),assists=(state.assists||[]).filter(a=>a.matchId===m.id).reduce((n,a)=>n+Number(a.assists||0),0),awards=state.awards.filter(a=>a.matchId===m.id).length,bookings=(state.bookings||[]).filter(b=>b.matchId===m.id).reduce((n,b)=>n+Number(b.yellow||0)+Number(b.red||0),0);
-  if(featureEnabled('goals')&&goals)bits.push(`⚽ ${goals}`);if(featureEnabled('assists')&&assists)bits.push(`A ${assists}`);if(featureEnabled('awards')&&awards)bits.push(`★ ${awards}`);if(featureEnabled('bookings')&&bookings)bits.push(`▣ ${bookings}`);
-  const badges=bits.length?`<span class="match-detail-badges">${bits.map(x=>`<span>${x}</span>`).join('')}</span>`:'';
   const editAction=isCoach()&&!isPlayedMatch(m)?`<button class="inline-action" type="button" data-edit-match="${m.id}">Edit fixture</button>`:isCoach()&&isPlayedMatch(m)&&!isLeagueMatch(m)&&!isDivisionMatch(m)?`<button class="inline-action" type="button" data-edit-match="${m.id}">Edit result</button>`:'';
   const playedAction=isCoach()&&status==='scheduled'&&matchDayReached(m)?`<button class="primary-button compact match-played-action" type="button" data-match-played="${m.id}">Match played</button>`:'';
   const removeAction=isCoach()&&!isProviderOwnedMatch(m)?`<button class="inline-action delete" type="button" data-delete-match="${m.id}">Remove</button>`:'';
-  const actions=editAction||playedAction||removeAction?`<tr class="match-result-actions ${resultClass(r)}"><td colspan="5"><div class="match-actions">${editAction}${playedAction}${removeAction}</div></td></tr>`:'';
-  return `<tr class="${resultClass(r)}"><td>${m.date?formatDate(m.date):'TBC'}</td><td><b>${esc(comp.name)}</b>${comp.round?`<small class="cup-round">${esc(comp.round)}</small>`:''}</td><td><button type="button" class="competition-game-link" data-details-match="${m.id}">${clubListingHtml(m.opponent)}</button>${badges}</td><td>${venue}</td><td><span class="competition-result-pill ${r}">${resultText}</span></td></tr>${actions}`;
+  const actions=editAction||playedAction||removeAction?`<tr class="match-result-actions ${resultClass(r)}"><td colspan="4"><div class="match-actions">${editAction}${playedAction}${removeAction}</div></td></tr>`:'';
+  return `<tr class="${resultClass(r)}"><td>${m.date?formatDate(m.date):'TBC'}</td><td><button type="button" class="competition-game-link" data-details-match="${m.id}">${clubListingHtml(m.opponent)}</button>${comp.round?`<small class="cup-round">${esc(comp.round)}</small>`:''}</td><td>${venue}</td><td><span class="competition-result-pill ${r}">${resultText}</span></td></tr>${actions}`;
 }
 function matchResultsTableHTML(rows){
-  return `<div class="competition-table-scroll match-results-table"><table class="competition-games-table"><thead><tr><th>Date</th><th>Competition</th><th>Opponent</th><th>H/A</th><th>Status / result</th></tr></thead><tbody>${rows.map(matchResultRowHTML).join('')}</tbody></table></div>`;
+  return `<div class="competition-table-scroll match-results-table grouped-results-table"><table class="competition-games-table"><thead><tr><th>Date</th><th>Opponent</th><th>H/A</th><th>Status / result</th></tr></thead><tbody>${rows.map(matchResultRowHTML).join('')}</tbody></table></div>`;
 }
 function renderMatchGroup(listId,countId,rows,emptyText){
   const list=document.getElementById(listId);
