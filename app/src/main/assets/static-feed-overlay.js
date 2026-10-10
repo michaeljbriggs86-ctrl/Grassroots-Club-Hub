@@ -100,6 +100,15 @@
       if(links.has(key)&&links.get(key)!==id)links.set(key,null);
       else if(!links.has(key))links.set(key,id);
     }
+    // Existing friendly records omit AFC and sometimes append the age.
+    // Reuse the known Selkent Cannons identity; do not guess from a prefix
+    // or replace an explicit or ambiguous directory mapping.
+    if(links.get(norm('Shooters Hill AFC Cannons'))===499){
+      for(const label of ['Shooters Hill Cannons','Shooters Hill Cannons U8']){
+        const key=norm(label);
+        if(!links.has(key))links.set(key,499);
+      }
+    }
     const usable=club=>club?.logo_status==='pilot_verified'&&
       /^https:\/\/[^\s/]+\//.test(String(club.logo_url||''))&&
       /^[a-f0-9]{64}$/i.test(String(club.logo_sha256||''));
