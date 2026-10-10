@@ -2327,6 +2327,7 @@ function applyAccessMode(){
   const parent=CLOUD_MODE&&currentRole==='parent';
   document.querySelector('[data-nav="squad"]')?.classList.toggle('hidden',parent||!teamNavVisible);
   const matchesNav=document.querySelector('[data-nav="matches"]');if(matchesNav)matchesNav.textContent=parent?'Schedule':'Matches';
+  const matchesTitle=document.getElementById('matches-screen-title');if(matchesTitle)matchesTitle.textContent=parent?'Schedule':'Matches';
   document.querySelectorAll('[data-coach-ui-only]').forEach(el=>el.classList.toggle('hidden',adminClub||preview||!isCoach()));
   document.querySelectorAll('[data-admin-global-nav]').forEach(el=>el.classList.toggle('hidden',!adminClub));
   document.querySelectorAll('[data-admin-club-root]').forEach(el=>el.classList.toggle('hidden',!adminClub));
