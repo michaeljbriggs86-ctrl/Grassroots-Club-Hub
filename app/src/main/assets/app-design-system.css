@@ -903,3 +903,8 @@ html[data-theme="dark"] #view-inbox .inbox-message.mine .inbox-bubble{background
 #view-inbox .concern-panel textarea{min-height:88px}
 #view-inbox .inbox-message.mine .inbox-bubble,#view-inbox .inbox-message.mine .inbox-bubble *{color:#fff!important}
 #view-inbox .inbox-message.mine .inbox-message-meta span,#view-inbox .inbox-message.mine small{opacity:.88}
+
+/* Recent form: five small result squares in one row (a phone rule for form fields, .form-row>*{flex:1 1 100%},
+ * was stretching each chip to full width because the container shares the .form-row class). */
+#recent-form.form-row{display:flex!important;flex-wrap:nowrap!important;gap:6px;margin:8px 0 12px}
+#recent-form.form-row>*{flex:0 0 34px!important;width:34px!important;height:34px}

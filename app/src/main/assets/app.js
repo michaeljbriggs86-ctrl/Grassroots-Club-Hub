@@ -2978,7 +2978,8 @@ function renderDashboard(){
   document.getElementById('league-total-count').textContent='/'+expected;
   document.getElementById('league-summary-text').textContent=isPublishedLeagueTeam()?`${divisionOpponents().length} opponents · ${expected} league matches`:`${divisionOpponents().length} opponents · results from Selkent`;
 
-  const recent=[...sorted].reverse().slice(0,5);
+  // Form and recent results only count matches that have happened (played or abandoned), never scheduled or postponed fixtures.
+  const recent=[...sorted].filter(m=>['played','abandoned'].includes(matchStatus(m))).reverse().slice(0,5);
   document.getElementById('recent-form').innerHTML=recent.length?recent.map(m=>`<span class="form-chip ${resultOf(m)}">${resultOf(m)}</span>`).join(''):'<span class="form-empty">No matches yet</span>';
   document.getElementById('recent-matches').innerHTML=recent.slice(0,3).map(m=>`<div class="mini-item"><div><div class="mini-team">${clubListingHtml(m.opponent)}</div><div class="mini-meta">${formatDate(m.date)} · ${esc(m.competition)}</div></div><div class="scoreline">${matchScoreText(m)}</div></div>`).join('') || '<div class="empty-state">No match records yet.</div>';
 
