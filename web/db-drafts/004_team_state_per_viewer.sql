@@ -1,5 +1,5 @@
 -- Step 3: one function decides what team state each viewer gets; both read paths use it.
--- Rules (Mike, 2026-10-10): parents see only their own child's name, results and goals; no other
+-- Rules (Mike, 2026-10-10): a parent sees only data strictly related to their own children (name, goals, awards); no other
 -- player names; U11 and under keep the existing scoreless rules; tactics are staff only;
 -- coach notes are never sent to parents. Unknown or pending roles get NO state (default deny).
 -- Fixes a hole: get_my_context returned the raw team state to ANY non-parent role with a team_id,
@@ -51,15 +51,15 @@ begin
   if jsonb_typeof(v->'matches')='array' then
     v := jsonb_set(v,'{matches}',coalesce((select jsonb_agg(e - 'notes') from jsonb_array_elements(v->'matches') e),'[]'::jsonb));
   end if;
-  -- U12 and above: individual events and awards only for own children (matched by shirt number)
-  if p_age >= 12 then
-    foreach k in array array['goals','assists','bookings','awards'] loop
-      if jsonb_typeof(v->k)='array' then
-        v := jsonb_set(v,array[k],coalesce((select jsonb_agg(e) from jsonb_array_elements(v->k) e
-             where (e->>'shirtNumber') ~ '^[0-9]+$' and (e->>'shirtNumber')::int = any(own_nums)),'[]'::jsonb));
-      end if;
-    end loop;
-  end if;
+  -- A parent only ever sees data strictly about their own children (Mike, 2026-10-10).
+  -- Awards: own children only, at every age (matched by shirt number, own number comes from the club's records).
+  -- Goals, assists and bookings: own children only for U12 and above (U7-U11 are already emptied above).
+  foreach k in array case when p_age >= 12 then array['goals','assists','bookings','awards'] else array['awards'] end loop
+    if jsonb_typeof(v->k)='array' then
+      v := jsonb_set(v,array[k],coalesce((select jsonb_agg(e) from jsonb_array_elements(v->k) e
+           where (e->>'shirtNumber') ~ '^[0-9]+$' and (e->>'shirtNumber')::int = any(own_nums)),'[]'::jsonb));
+    end if;
+  end loop;
   return v;
 end $function$;
 revoke all on function private.state_for_viewer(jsonb,uuid,uuid,text,integer) from public, anon, authenticated;
