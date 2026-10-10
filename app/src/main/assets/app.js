@@ -4946,7 +4946,7 @@ function updateMatchStatusUI(){
   if(awards)awards.classList.toggle('hidden',noScore);
   updateGoalCheck();
 }
-const DEFAULT_COMPETITION_OPTIONS=['League','Division','Friendly','Selkent Cup One','Selkent Cup Two','London Cup','Kent Cup','Vase','Shield','Tournament','Preseason Tournament','Other'];
+const DEFAULT_COMPETITION_OPTIONS=['League','Division','Friendly','Selkent Cup One','Selkent Cup Two','London Cup','Kent Cup','Selkent Vase One','Selkent Vase Two','Tournament','Preseason Tournament','Other'];
 function setCompetitionOptions(mode='all',selected=''){
   const sel=document.getElementById('match-competition');if(!sel)return;
   const values=mode==='nonleague'?['Friendly','Tournament']:DEFAULT_COMPETITION_OPTIONS;
