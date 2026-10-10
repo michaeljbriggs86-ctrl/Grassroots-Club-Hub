@@ -142,6 +142,16 @@ function isAdminTeamPreviewMode(){ return CLOUD_MODE && isAdmin() && adminUiMode
 function isClubOverviewMode(){ return CLOUD_MODE && isAdmin() && adminUiMode==='club'; }
 function dualCoachTeam(){ return CLOUD_MODE ? (window.ClubHubCloud?.coachTeam?.()||null) : null; }
 function hasDualAdminCoach(){ return CLOUD_MODE && isAdmin() && !!dualCoachTeam(); }
+let __coachTeamsLoaded=false,__coachTeams=[];
+async function loadCoachTeams(force){
+  if(!CLOUD_MODE||!window.ClubHubCloud?.listMyCoachTeams)return [];
+  if(force||!__coachTeamsLoaded){__coachTeamsLoaded=true;__coachTeams=await window.ClubHubCloud.listMyCoachTeams();}
+  return __coachTeams;
+}
+const coachTeamTitle=t=>matchTeamLabel(`U${String(t.age_group||'').replace(/^U/i,'')} ${t.name||''}`.trim());
+function coachTeamContexts(){
+  return __coachTeams.map(t=>({kind:'coach-team',teamId:String(t.team_id),title:coachTeamTitle(t),detail:'Coach · edit your team',active:!!t.is_active&&(currentRole!=='admin'||isAdminCoachMode())}));
+}
 function availableAccountContexts(){
   if(!CLOUD_MODE)return [];
   const current=window.ClubHubCloud?.currentTeam?.();
@@ -149,15 +159,17 @@ function availableAccountContexts(){
   const label=t=>matchTeamLabel([t.ageGroup,t.teamName].filter(Boolean).join(' '));
   if(currentRole==='admin'){
     const own=dualCoachTeam();
+    const coached=coachTeamContexts();
+    const coachedIds=new Set(coached.map(c=>c.teamId));
     return [
       {kind:'club',title:'Club overview',detail:'Club Admin',active:isClubOverviewMode()},
-      ...(own?[{kind:'coach',title:label(own),detail:'Coach · edit your team',active:isAdminCoachMode()}]:[]),
-      ...teams.map(t=>({kind:'preview',teamId:String(t.id),title:label(t),detail:'Club Admin · read only team view',active:isAdminTeamPreviewMode()&&String(current?.id)===String(t.id)})),
+      ...(coached.length?coached:own?[{kind:'coach',title:label(own),detail:'Coach · edit your team',active:isAdminCoachMode()}]:[]),
+      ...teams.filter(t=>!coachedIds.has(String(t.id))&&String(t.id)!==String(own?.id)).map(t=>({kind:'preview',teamId:String(t.id),title:label(t),detail:'Club Admin · read only team view',active:isAdminTeamPreviewMode()&&String(current?.id)===String(t.id)})),
       {kind:'parent-signin',title:'Parent Sign In',detail:'Sign in with an approved parent account',active:false}
     ];
   }
   if(currentRole==='parent')return teams.map(t=>({kind:'parent',teamId:String(t.id),title:label(t),detail:'Parent · linked team',active:String(current?.id)===String(t.id)}));
-  if(currentRole==='coach')return [{kind:'parent-signin',title:'Parent Sign In',detail:'Sign in with an approved parent account',active:false}];
+  if(currentRole==='coach'||currentRole==='assistant_coach')return [...(__coachTeams.length>1?coachTeamContexts():[]),{kind:'parent-signin',title:'Parent Sign In',detail:'Sign in with an approved parent account',active:false}];
   return [];
 }
 function renderAccountContextControls(){
@@ -165,9 +177,10 @@ function renderAccountContextControls(){
   const show=choices.length>1||choices.some(choice=>choice.kind==='parent-signin');
   ['mobile-context-switch','account-context-switch'].forEach(id=>document.getElementById(id)?.classList.toggle('hidden',!show));
 }
-function openAccountContextSwitch(){
+async function openAccountContextSwitch(){
   if(!CLOUD_MODE)return;
   closeMobileMore();
+  await loadCoachTeams();
   const dialog=document.getElementById('context-switch-dialog'),list=document.getElementById('context-switch-list');
   const choices=availableAccountContexts();
   if(!dialog||!list||(choices.length<2&&!choices.some(choice=>choice.kind==='parent-signin')))return;
@@ -192,6 +205,12 @@ async function switchAccountContext(choice,button){
     if(choice.kind==='parent-signin'){
       await window.ClubHubCloud.switchToParentSignIn();
       return;
+    }else if(choice.kind==='coach-team'){
+      const row=__coachTeams.find(t=>String(t.team_id)===choice.teamId);
+      if(!row)throw new Error('Team access is no longer available');
+      if(currentRole==='admin')localStorage.setItem(ADMIN_UI_MODE_KEY,'coach');
+      if(!row.is_active){await window.ClubHubCloud.switchMyCoachTeam(choice.teamId);location.reload();return;}
+      if(currentRole==='admin'){if(!(await setAdminUiMode('coach')))return;}
     }else if(choice.kind==='club'||choice.kind==='coach'){
       if(currentRole!=='admin')throw new Error('Club Admin access required');
       if(!(await setAdminUiMode(choice.kind)))return;
@@ -262,12 +281,11 @@ function isTeamLocked(){
   return CLOUD_MODE ? (!isAdmin() && !!assignedTeam()) : (!isAdmin() && !!assignedTeam());
 }
 function plural(n,one,many){return `${n} ${Number(n)===1?one:(many||one+'s')}`;}
-let __coachTeamsLoaded=false,__coachTeams=[];
 /** Coaches (and Club Admins who coach) assigned to more than one team pick the team they are working on. */
 async function refreshCoachTeamSwitch(preview){
   const sel=document.getElementById('hero-team-switch');if(!sel)return;
   if(!CLOUD_MODE||!window.ClubHubCloud?.listMyCoachTeams){sel.classList.add('hidden');return;}
-  if(!__coachTeamsLoaded){__coachTeamsLoaded=true;__coachTeams=await window.ClubHubCloud.listMyCoachTeams();}
+  await loadCoachTeams();renderAccountContextControls();
   const show=__coachTeams.length>1&&!preview&&(!isAdmin()||isAdminCoachMode());
   sel.classList.toggle('hidden',!show);if(!show)return;
   sel.innerHTML=__coachTeams.map(t=>`<option value="${esc(t.team_id)}"${t.is_active?' selected':''}>U${esc(t.age_group)} ${esc(t.name)}</option>`).join('');
@@ -2317,7 +2335,8 @@ function applyAccessMode(){
       const ct=window.ClubHubCloud?.currentTeam?.();
       const who=window.ClubHubCloud?.context?.profile?.full_name||cloudBootContext?.email||roleLabel();
       const mode=isAdminCoachMode()?'Coach profile':preview?'Club Admin preview':roleLabel();
-      summary.textContent=`${who} · ${mode}${ct?` · ${ct.ageGroup} ${matchTeamLabel(ct.teamName)}`:''}`;
+      const shown=isAdmin()&&!preview&&!isAdminCoachMode()&&!isAdminTeamPreviewMode()?null:isAdminCoachMode()?dualCoachTeam():ct;
+      summary.textContent=`${who} · ${mode}${shown?` · ${shown.ageGroup} ${matchTeamLabel(shown.teamName)}`:''}`;
     }else if(isAdmin())summary.textContent='Club Admin access.';
     else if(account)summary.textContent=`${account.user||roleLabel()} · ${roleLabel()} · ${account.team.ageGroup} ${matchTeamLabel(account.team.teamName)}`;
     else summary.textContent=`${roleLabel()} access requires activation by a Club Admin.`;
