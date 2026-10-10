@@ -156,6 +156,27 @@ class BadgePublisherTest(unittest.TestCase):
             with self.subTest(changed=changed), self.assertRaises(ValueError):
                 module.validated_approvals(copy.deepcopy(self.directory), altered)
 
+    def test_user_upload_keeps_exact_private_route_and_supplied_provenance(self):
+        badge = next(b for b in self.manifest['badges'] if b['club_id'] == 239)
+        self.assertEqual(badge['logo_source'], 'user_supplied_private')
+        self.assertIn(239, module.validated_approvals(self.directory, self.manifest))
+        with patch('requests.get', side_effect=AssertionError('private upload fetched publicly')):
+            module.verify_hosted_assets({'badges': [badge]})
+        for change in ({'source_user_approved': False}, {'original_sha256': ''},
+                       {'original_source_url': 'https://example.com/image.png'},
+                       {'original_source_url': badge['original_source_url'] + '?token=bad'},
+                       {'derivation': 'redrawn'}, {'original_sha256': badge['logo_sha256']},
+                       {'logo_url': badge['original_source_url']}):
+            changed = copy.deepcopy(self.manifest)
+            next(b for b in changed['badges'] if b['club_id'] == 239).update(change)
+            with self.subTest(change=change), self.assertRaises(ValueError):
+                module.validated_approvals(self.directory, changed)
+        # Existing secretary-supplied Shooters Hill scope is not broadened.
+        changed = copy.deepcopy(self.manifest)
+        next(b for b in changed['badges'] if b['club_id'] == 239)['logo_source'] = 'club_supplied_private'
+        with self.assertRaisesRegex(ValueError, 'outside the private club-supplied pilot'):
+            module.validated_approvals(self.directory, changed)
+
     def test_official_snapshot_keeps_pinned_origin_and_private_route(self):
         candidate = copy.deepcopy(self.manifest)
         badge = next(b for b in candidate['badges'] if b['club_id'] == 520)
