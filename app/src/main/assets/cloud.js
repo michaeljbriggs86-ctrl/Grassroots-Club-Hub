@@ -279,7 +279,7 @@
         catch(e){setGateHtml('signin','Your account was created, but the parent access request could not be submitted. '+(e.message||''));return 'error';}
       }
       if(parentMeta.coach_signup&&metaTeam){
-        try{await resumeCoachSignupRequestFromMetadata();setGateHtml('coachapproval','Your email is confirmed. Your request is waiting for the Club Admin.');return 'coachrequest';}
+        try{const sent=await resumeCoachSignupRequestFromMetadata();if(!sent)throw new Error('The request was not recorded. Sign in again to retry.');setGateHtml('coachapproval','Your email is confirmed. Your request is waiting for the Club Admin.');return 'coachrequest';}
         catch(e){setGateHtml('signin','Your account was created, but the coach access request could not be submitted. '+(e.message||''));return 'error';}
       }
       if(!duringBootstrap) location.reload();
@@ -331,6 +331,8 @@
   // Coach and assistant coach access (Mike, 10 Oct 2026): email and password sign-up, then a request the Club Admin approves. No invite codes.
   async function requestCoachAccess(teamId,roleName){return await rpc('request_coach_access',{p_team_id:String(teamId||''),p_role:String(roleName||'coach')});}
   async function resumeCoachSignupRequestFromMetadata(){
+    // The email confirmation link calls this before any context is loaded, so fetch it first.
+    if(!context?.profile)context=await getContext();
     if(context?.profile?.role!=='pending')return false;
     const metadata=session?.user?.user_metadata||{};
     if(!(metadata.coach_signup===true||metadata.coach_signup==='true'))return false;
