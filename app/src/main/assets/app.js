@@ -4562,8 +4562,10 @@ async function refreshClubCoaches(quiet=false){
   if(!quiet)list.innerHTML='<div class="empty-state compact-empty">Loading coaching staff…</div>';
   try{
     const rows=await window.ClubHubCloud.listClubCoaches();__adminCoachRows=rows;
-    list.innerHTML=rows.map(r=>{const role=r.role==='club_admin'?adminTitleLabel(r.club_title)+' · Coach':r.role==='assistant_coach'?'Assistant Coach':'Coach';const removeLabel=r.role==='club_admin'?'Remove coaching role':'Remove';return `<div class="team-member-row"><div class="team-member-copy"><strong>${esc(r.full_name||role)}</strong><span>${r.age_group?'U'+esc(r.age_group)+' ':''}${r.team_name?clubListingHtml(fullClubResultTeamName({teamName:r.team_name}),r.team_name):'Team not assigned'}</span></div><div class="team-member-actions"><span class="member-role-pill">${role}</span><button class="inline-action delete" data-remove-club-coach="${r.user_id}">${removeLabel}</button></div></div>`;}).join('')||'<div class="empty-state compact-empty">No coaching staff accounts currently have access.</div>';
+    const teamCount={};rows.forEach(r=>{teamCount[r.user_id]=(teamCount[r.user_id]||0)+1;});
+    list.innerHTML=rows.map(r=>{const role=r.role==='club_admin'?adminTitleLabel(r.club_title)+' · Coach':r.role==='assistant_coach'?'Assistant Coach':'Coach';const several=teamCount[r.user_id]>1,removeLabel=several?'Unassign from this team':r.role==='club_admin'?'Remove coaching role':'Remove';const removeAttr=several?`data-unassign-coach-team="${r.user_id}" data-team-id="${r.team_id}"`:`data-remove-club-coach="${r.user_id}"`;return `<div class="team-member-row"><div class="team-member-copy"><strong>${esc(r.full_name||role)}</strong><span>${r.age_group?'U'+esc(r.age_group)+' ':''}${r.team_name?clubListingHtml(fullClubResultTeamName({teamName:r.team_name}),r.team_name):'Team not assigned'}</span></div><div class="team-member-actions"><span class="member-role-pill">${role}</span><button class="inline-action delete" ${removeAttr}>${removeLabel}</button></div></div>`;}).join('')||'<div class="empty-state compact-empty">No coaching staff accounts currently have access.</div>';
     await refreshAdminAccessManagement(true);
+    populateAssignCoachControls();
   }catch(err){list.innerHTML='<div class="empty-state compact-empty">Coaching staff are temporarily unavailable.</div>';}
 }
 let __adminAccessRows=[];
@@ -4580,6 +4582,32 @@ async function refreshAdminAccessManagement(quiet=false){
   try{__adminAccessRows=await window.ClubHubCloud.listClubAccessAccounts();renderAdminAccessManagement();refreshCoachRequests();}catch(err){list.innerHTML='<div class="empty-state compact-empty">Club access is temporarily unavailable.</div>';}
 }
 
+function populateAssignCoachControls(){
+  const person=document.getElementById('assign-coach-person'),team=document.getElementById('assign-coach-team');if(!person||!team)return;
+  const keepP=person.value,keepT=team.value;
+  const people=__adminAccessRows.filter(r=>['coach','assistant_coach','club_admin'].includes(r.role));
+  person.innerHTML='<option value="">Choose a person</option>'+people.map(r=>`<option value="${esc(r.user_id)}">${esc(r.full_name||accessRoleLabel(r.role))}${r.role==='club_admin'?` · ${esc(adminTitleLabel(r.club_title))}`:r.role==='assistant_coach'?' · Assistant Coach':' · Coach'}</option>`).join('');
+  const teams=(window.ClubHubCloud?.visibleTeamList?.()||[]).slice().sort((x,y)=>Number(String(x.ageGroup).replace(/\D/g,''))-Number(String(y.ageGroup).replace(/\D/g,''))||String(x.teamName).localeCompare(String(y.teamName)));
+  team.innerHTML='<option value="">Choose a team</option>'+teams.map(t=>`<option value="${esc(t.id)}">${esc(matchTeamLabel([t.ageGroup,t.teamName].filter(Boolean).join(' ')))}</option>`).join('');
+  if([...person.options].some(o=>o.value===keepP))person.value=keepP;if([...team.options].some(o=>o.value===keepT))team.value=keepT;
+}
+async function assignCoachToTeam(){
+  if(!isAdmin()||!CLOUD_MODE)return;
+  const person=document.getElementById('assign-coach-person'),team=document.getElementById('assign-coach-team'),btn=document.getElementById('assign-coach-button');
+  if(!person?.value||!team?.value)return toast('Choose a person and a team');
+  const name=person.selectedOptions[0]?.textContent.split(' · ')[0]||'Coach',teamName=team.selectedOptions[0]?.textContent||'team';
+  btn.disabled=true;
+  try{await window.ClubHubCloud.assignCoachTeam(person.value,team.value);auditEvent('coach_team_assigned','access',person.value,`Assigned ${name} to ${teamName}`);toast(`${name} assigned to ${teamName}`);team.value='';await refreshClubCoaches(false);await refreshAdminClubOverview(false);}
+  catch(err){alert(err.message||err);}
+  finally{btn.disabled=false;}
+}
+async function unassignCoachFromTeam(userId,teamId){
+  if(!isAdmin()||!CLOUD_MODE)return;
+  const row=__adminCoachRows.find(r=>String(r.user_id)===String(userId)&&String(r.team_id)===String(teamId));
+  if(!confirm(`Take ${row?.full_name||'this person'} off ${row?.age_group?'U'+row.age_group+' ':''}${row?.team_name||'this team'}? They keep their other teams.`))return;
+  try{await window.ClubHubCloud.unassignCoachTeam(userId,teamId);auditEvent('coach_team_unassigned','access',userId,`Removed ${row?.full_name||'coach'} from ${row?.team_name||'a team'}`);toast('Team assignment removed');await refreshClubCoaches(false);await refreshAdminClubOverview(false);}
+  catch(err){alert(err.message||err);}
+}
 async function removeClubCoach(userId){
   if(!isAdmin()||!CLOUD_MODE)return;
   const row=__adminCoachRows.find(r=>String(r.user_id)===String(userId));const dual=row?.role==='club_admin';
@@ -5360,6 +5388,7 @@ document.addEventListener('click',e=>{
   const removeMember=e.target.closest('[data-remove-member]');if(removeMember){removeTeamMember(removeMember.dataset.removeMember);return;}
   const removeAward=e.target.closest('[data-remove-award-type]');if(removeAward){removeAwardType(removeAward.dataset.removeAwardType);return;}
   const removeAwardEntry=e.target.closest('[data-remove-award-id]');if(removeAwardEntry){removeRecordedAward(removeAwardEntry.dataset.removeAwardId);return;}
+  const unassign=e.target.closest('[data-unassign-coach-team]');if(unassign){unassignCoachFromTeam(unassign.dataset.unassignCoachTeam,unassign.dataset.teamId);return;}
   const removeCoach=e.target.closest('[data-remove-club-coach]');if(removeCoach){removeClubCoach(removeCoach.dataset.removeClubCoach);return;}
   const clear=e.target.closest('[data-clear-detail]'); if(clear){clearDetailData(clear.dataset.clearDetail);return;}
   const del=e.target.closest('[data-delete-match]'); if(del){ deleteMatch(del.dataset.deleteMatch); return; }
@@ -5484,6 +5513,7 @@ document.getElementById('inbox-contact-select')?.addEventListener('change',e=>{_
 document.getElementById('send-inbox-message')?.addEventListener('click',sendInboxMessage);
 document.getElementById('refresh-club-coaches')?.addEventListener('click',()=>refreshClubCoaches(false));
 document.getElementById('refresh-coach-club-results')?.addEventListener('click',()=>refreshCoachClubResults(false));
+document.getElementById('assign-coach-button')?.addEventListener('click',assignCoachToTeam);
 document.getElementById('admin-mode-club')?.addEventListener('click',()=>setAdminUiMode('club'));
 document.getElementById('admin-mode-coach')?.addEventListener('click',()=>setAdminUiMode('coach'));
 document.getElementById('account-context-switch')?.addEventListener('click',openAccountContextSwitch);

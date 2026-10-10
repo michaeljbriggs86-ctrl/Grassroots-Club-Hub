@@ -525,6 +525,12 @@
             <div class="panel-heading"><div><p class="kicker">Club staff</p><h3>Coaching Staff</h3></div></div>
             <p class="muted">Approve coach requests and see coaching-staff assignments.</p>
             <div class="coach-requests hidden" id="coach-requests"><div class="panel-heading"><div><p class="kicker">Waiting for you</p><h3>Coach requests</h3></div><span class="match-section-count" id="coach-requests-count">0</span></div><div class="team-members-list" id="coach-requests-list"></div></div>
+            <div class="admin-assign-team" id="admin-assign-team">
+              <div class="panel-heading"><div><p class="kicker">Coaching teams</p><h3>Assign a coach to a team</h3></div></div>
+              <p class="muted">A coach can look after more than one team. They choose which team they are working on from the team switcher.</p>
+              <div class="admin-assign-row"><label class="admin-filter-label">Coach<select id="assign-coach-person"><option value="">Choose a person</option></select></label><label class="admin-filter-label">Team<select id="assign-coach-team"><option value="">Choose a team</option></select></label></div>
+              <button type="button" class="primary-button compact" id="assign-coach-button">Assign to team</button>
+            </div>
             <div id="club-coaches-list" class="team-members-list admin-coach-list"></div>
             <div class="admin-access-management">
               <div class="panel-heading"><div><p class="kicker">Access management</p><h3>All app access</h3></div><label class="admin-access-filter">Show<select id="admin-access-filter"><option value="all">Everyone</option><option value="club_admin">Club Admins</option><option value="staff">Coaching staff</option><option value="parent">Parents</option><option value="pending_parent">Pending parents</option><option value="player">Players</option></select></label></div>
