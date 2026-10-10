@@ -336,7 +336,7 @@
     if(context?.profile?.role!=='pending')return false;
     const metadata=session?.user?.user_metadata||{};
     if(!(metadata.coach_signup===true||metadata.coach_signup==='true'))return false;
-    const teamId=String(metadata.requested_team_id||'').trim(),roleName=metadata.requested_role==='assistant_coach'?'assistant_coach':'coach';
+    const teamId=String(metadata.requested_team_id||'').trim(),roleName=['assistant_coach','club_admin'].includes(metadata.requested_role)?metadata.requested_role:'coach';
     if(!teamId)throw new Error('The saved coach sign up is missing the selected team.');
     await requestCoachAccess(teamId,roleName);
     context=await getContext();
@@ -897,8 +897,7 @@
         <p class="auth-notice ${message?'':'hidden'}" id="cloud-auth-notice">${escapeHtml(message)}</p><p class="activation-error hidden" id="cloud-auth-error"></p>
         <button class="auth-primary" id="cloud-auth-submit">${parentOnly?'Sign In as Parent':'Log In'} <span>→</span></button>
         ${parentOnly?'<button class="auth-link-strong" id="cloud-parent-signin-back">Back to Main Login</button>':`<button class="auth-secondary" id="cloud-parent-login"><span class="auth-button-icon">${authIcon('user')}</span><span>Parent Sign In</span></button><button class="auth-secondary" id="cloud-player-login"><span class="auth-button-icon">${authIcon('user')}</span><span>Player Login</span></button>`}
-        <button class="auth-link-strong" id="cloud-parent-signup">Parent Sign Up</button>
-        ${parentOnly?'':'<button class="auth-link-strong" id="cloud-staff-signup">Coach Sign Up</button>'}`;
+        <button class="auth-link-strong" id="cloud-parent-signup">Create Account</button>`;
       gate.innerHTML=authMainScreen({screen:'adult',heroNote:parentOnly?'One<br/>Team<br/>Together':'More<br/>Than<br/>A Game',title:parentOnly?'Parent Sign In':'Welcome Back',copy:parentOnly?'Use your approved parent email and password.':'Admins, Coaches and Parents sign in with email and password.',body,back:parentOnly});
       bindPasswordToggle('cloud-password','cloud-password-toggle');
       document.getElementById('cloud-forgot-password')?.addEventListener('click',()=>setGateHtml('forgot'));
@@ -906,8 +905,7 @@
       document.getElementById('cloud-parent-signin-back')?.addEventListener('click',()=>setGateHtml('signin'));
       document.getElementById('auth-screen-back')?.addEventListener('click',()=>setGateHtml('signin'));
       document.getElementById('cloud-player-login')?.addEventListener('click',()=>setGateHtml('playerlogin'));
-      document.getElementById('cloud-parent-signup')?.addEventListener('click',()=>setGateHtml('parentsignup'));
-      document.getElementById('cloud-staff-signup')?.addEventListener('click',()=>setGateHtml('coachsignup'));
+      document.getElementById('cloud-parent-signup')?.addEventListener('click',()=>setGateHtml('signup'));
       document.getElementById('cloud-auth-submit')?.addEventListener('click',async()=>{
         const email=document.getElementById('cloud-email')?.value?.trim()||'',password=document.getElementById('cloud-password')?.value||'';
         if(!email||!password)return authError('Enter your email and password.');
@@ -921,30 +919,35 @@
       });return;
     }
 
-    if(mode==='parentsignup'){
-      const body=`<div class="auth-fields">${authField({icon:'user',id:'cloud-parent-name',placeholder:'Parent / guardian name',autocomplete:'name'})}${authField({icon:'mail',id:'cloud-parent-email',type:'email',placeholder:'Email address',autocomplete:'username',value:prefillEmail})}${authField({icon:'lock',id:'cloud-parent-password',type:'password',placeholder:'Create password',autocomplete:'new-password'})}<div class="auth-field"><span class="auth-field-icon">${authIcon('club')}</span><select id="cloud-parent-club"><option value="">Loading clubs…</option></select></div><div class="auth-field"><span class="auth-field-icon">${authIcon('league')}</span><select id="cloud-parent-team"><option value="">Choose a club first</option></select></div>${authField({icon:'user',id:'cloud-parent-child',placeholder:'Child / player name',autocomplete:'off'})}</div><p class="auth-notice ${message?'':'hidden'}" id="cloud-auth-notice">${escapeHtml(message)}</p><p class="activation-error hidden" id="cloud-auth-error"></p><button class="auth-primary" id="cloud-parent-signup-submit">Request Parent Access <span>→</span></button><button class="auth-link-strong" id="cloud-parent-signup-back">Back to Main Login</button>`;
-      gate.innerHTML=authMainScreen({screen:'adult',heroNote:'One<br/>Team<br/>Together',title:'Parent Sign Up',copy:'Create your account, choose your club and team, then submit your child’s name for coach approval.',body,back:true});
-      populateParentSignupChoices();
-      const back=()=>setGateHtml('signin');document.getElementById('auth-screen-back')?.addEventListener('click',back);document.getElementById('cloud-parent-signup-back')?.addEventListener('click',back);
-      document.getElementById('cloud-parent-signup-submit')?.addEventListener('click',async()=>{
-        const name=document.getElementById('cloud-parent-name')?.value?.trim()||'',email=document.getElementById('cloud-parent-email')?.value?.trim()||'',password=document.getElementById('cloud-parent-password')?.value||'',teamId=document.getElementById('cloud-parent-team')?.value||'',child=document.getElementById('cloud-parent-child')?.value?.trim()||'';
-        if(name.length<2)return authError('Enter your name.');if(!/^\S+@\S+\.\S+$/.test(email))return authError('Enter a valid email address.');if(password.length<8)return authError('Use at least 8 characters for the password.');if(!teamId)return authError('Choose your club and team.');if(child.length<2)return authError('Enter your child or player name.');
-        const pending={team_id:teamId,child_name:child};localStorage.setItem(PENDING_PARENT_REQUEST_KEY,JSON.stringify(pending));const btn=document.getElementById('cloud-parent-signup-submit');if(btn){btn.disabled=true;btn.innerHTML='Creating…';}
-        try{const data=await signUp(email,password,name,'',{parent_signup:true,requested_team_id:teamId,requested_child_name:child});if(data?.access_token){await requestParentAccess(teamId,child);localStorage.removeItem(PENDING_PARENT_REQUEST_KEY);context=await getContext();setGateHtml('approval','Your request has been sent to the coaching staff for verification.');return;}setGateHtml('verify','Account created. Confirm your email, then your access request will be sent to the coaching staff.',email);}catch(e){authError(e.message||String(e));if(btn){btn.disabled=false;btn.innerHTML='Request Parent Access <span>→</span>';}}
-      });return;
-    }
-
-    if(mode==='coachsignup'){
-      const body=`<div class="auth-fields">${authField({icon:'user',id:'cloud-coach-name',placeholder:'Your name',autocomplete:'name'})}${authField({icon:'mail',id:'cloud-coach-email',type:'email',placeholder:'Email address',autocomplete:'username',value:prefillEmail})}${authField({icon:'lock',id:'cloud-coach-password',type:'password',placeholder:'Create password',autocomplete:'new-password'})}<div class="auth-field"><span class="auth-field-icon">${authIcon('club')}</span><select id="cloud-coach-club"><option value="">Loading clubs…</option></select></div><div class="auth-field"><span class="auth-field-icon">${authIcon('league')}</span><select id="cloud-coach-team"><option value="">Choose a club first</option></select></div><div class="auth-field"><span class="auth-field-icon">${authIcon('user')}</span><select id="cloud-coach-role"><option value="coach">Coach</option><option value="assistant_coach">Assistant Coach</option></select></div></div><p class="auth-notice ${message?'':'hidden'}" id="cloud-auth-notice">${escapeHtml(message)}</p><p class="activation-error hidden" id="cloud-auth-error"></p><button class="auth-primary" id="cloud-coach-signup-submit">Request Coach Access <span>→</span></button><button class="auth-link-strong" id="cloud-coach-signup-back">Back to Main Login</button>`;
-      gate.innerHTML=authMainScreen({screen:'adult',heroNote:'Welcome<br/>To<br/>The Club',title:'Coach Sign Up',copy:'Create your account, choose your club and team, then your Club Admin approves your access.',body,back:true});
-      populateParentSignupChoices('cloud-coach-club','cloud-coach-team');
-      const back=()=>setGateHtml('signin');document.getElementById('auth-screen-back')?.addEventListener('click',back);document.getElementById('cloud-coach-signup-back')?.addEventListener('click',back);
-      document.getElementById('cloud-coach-signup-submit')?.addEventListener('click',async()=>{
-        const name=document.getElementById('cloud-coach-name')?.value?.trim()||'',email=document.getElementById('cloud-coach-email')?.value?.trim()||'',password=document.getElementById('cloud-coach-password')?.value||'',teamId=document.getElementById('cloud-coach-team')?.value||'',roleName=document.getElementById('cloud-coach-role')?.value==='assistant_coach'?'assistant_coach':'coach';
+    if(mode==='signup'||mode==='parentsignup'||mode==='coachsignup'){
+      // One sign-up screen (Mike, 10 Oct 2026): the account type decides which fields appear. Adults sign up with email and password only.
+      const startType=mode==='coachsignup'?'coach':'parent';
+      const typeOpts=[['parent','Parent / guardian'],['coach','Coach'],['assistant_coach','Assistant Coach'],['club_admin','Club Admin']];
+      const body=`<div class="auth-fields"><div class="auth-field"><span class="auth-field-icon">${authIcon('user')}</span><select id="cloud-signup-type" aria-label="Account type">${typeOpts.map(o=>`<option value="${o[0]}"${o[0]===startType?' selected':''}>${o[1]}</option>`).join('')}</select></div>${authField({icon:'user',id:'cloud-signup-name',placeholder:'Your name',autocomplete:'name'})}${authField({icon:'mail',id:'cloud-signup-email',type:'email',placeholder:'Email address',autocomplete:'username',value:prefillEmail})}${authField({icon:'lock',id:'cloud-signup-password',type:'password',placeholder:'Create password',autocomplete:'new-password'})}<div class="auth-field"><span class="auth-field-icon">${authIcon('club')}</span><select id="cloud-signup-club"><option value="">Loading clubs…</option></select></div><div class="auth-field"><span class="auth-field-icon">${authIcon('league')}</span><select id="cloud-signup-team"><option value="">Choose a club first</option></select></div><div id="cloud-signup-child-wrap">${authField({icon:'user',id:'cloud-signup-child',placeholder:'Child / player name',autocomplete:'off'})}</div></div><p class="auth-notice" id="cloud-signup-help"></p><p class="auth-notice ${message?'':'hidden'}" id="cloud-auth-notice">${escapeHtml(message)}</p><p class="activation-error hidden" id="cloud-auth-error"></p><button class="auth-primary" id="cloud-signup-submit">Create Account <span>→</span></button><button class="auth-link-strong" id="cloud-signup-back">Back to Main Login</button>`;
+      gate.innerHTML=authMainScreen({screen:'adult',heroNote:'Welcome<br/>To<br/>The Club',title:'Create Account',copy:'Choose your account type, then fill in the details shown.',body,back:true});
+      populateParentSignupChoices('cloud-signup-club','cloud-signup-team');
+      const typeSel=document.getElementById('cloud-signup-type'),childWrap=document.getElementById('cloud-signup-child-wrap'),helpEl=document.getElementById('cloud-signup-help'),submitBtn=document.getElementById('cloud-signup-submit'),teamSel=document.getElementById('cloud-signup-team');
+      const HELP={parent:'Enter your child’s name. A coach checks it before you see anything. You only ever see your own children.',coach:'Your Club Admin approves your request before you see team data.',assistant_coach:'Your Club Admin approves your request before you see team data.',club_admin:'The club owner approves Club Admin requests. Pick the team you work with.'};
+      const LABEL={parent:'Request Parent Access',coach:'Request Coach Access',assistant_coach:'Request Assistant Coach Access',club_admin:'Request Club Admin Access'};
+      const applyType=()=>{const t=typeSel.value;childWrap.classList.toggle('hidden',t!=='parent');helpEl.textContent=HELP[t]||'';submitBtn.innerHTML=(LABEL[t]||'Create Account')+' <span>→</span>';};
+      typeSel.addEventListener('change',applyType);applyType();
+      const back=()=>setGateHtml('signin');document.getElementById('auth-screen-back')?.addEventListener('click',back);document.getElementById('cloud-signup-back')?.addEventListener('click',back);
+      submitBtn.addEventListener('click',async()=>{
+        const t=typeSel.value,name=document.getElementById('cloud-signup-name')?.value?.trim()||'',email=document.getElementById('cloud-signup-email')?.value?.trim()||'',password=document.getElementById('cloud-signup-password')?.value||'',teamId=teamSel?.value||'',child=document.getElementById('cloud-signup-child')?.value?.trim()||'';
         if(name.length<2)return authError('Enter your name.');if(!/^\S+@\S+\.\S+$/.test(email))return authError('Enter a valid email address.');if(password.length<8)return authError('Use at least 8 characters for the password.');if(!teamId)return authError('Choose your club and team.');
-        const btn=document.getElementById('cloud-coach-signup-submit');if(btn){btn.disabled=true;btn.innerHTML='Creating…';}
-        try{const data=await signUp(email,password,name,'',{coach_signup:true,requested_team_id:teamId,requested_role:roleName});if(data?.access_token){await hydrateSessionUser();context=await getContext();await requestCoachAccess(teamId,roleName);context=await getContext();setGateHtml('coachapproval','Your request has been sent to the Club Admin for approval.');return;}setGateHtml('verify','Account created. Confirm your email, then sign in and your request goes to the Club Admin.',email);}
-        catch(e){authError(e.message||String(e));if(btn){btn.disabled=false;btn.innerHTML='Request Coach Access <span>→</span>';}}
+        if(t==='parent'&&child.length<2)return authError('Enter your child or player name.');
+        const btn=submitBtn,label=btn.innerHTML;btn.disabled=true;btn.innerHTML='Creating…';
+        try{
+          if(t==='parent'){
+            localStorage.setItem(PENDING_PARENT_REQUEST_KEY,JSON.stringify({team_id:teamId,child_name:child}));
+            const data=await signUp(email,password,name,'',{parent_signup:true,requested_team_id:teamId,requested_child_name:child});
+            if(data?.access_token){await requestParentAccess(teamId,child);localStorage.removeItem(PENDING_PARENT_REQUEST_KEY);context=await getContext();setGateHtml('approval','Your request has been sent to the coaching staff for verification.');return;}
+            setGateHtml('verify','Account created. Confirm your email, then your access request will be sent to the coaching staff.',email);return;
+          }
+          const data=await signUp(email,password,name,'',{coach_signup:true,requested_team_id:teamId,requested_role:t});
+          if(data?.access_token){await hydrateSessionUser();context=await getContext();await requestCoachAccess(teamId,t);context=await getContext();setGateHtml('coachapproval',t==='club_admin'?'Your request has been sent to the club owner for approval.':'Your request has been sent to the Club Admin for approval.');return;}
+          setGateHtml('verify','Account created. Confirm your email, then sign in and your request goes for approval.',email);
+        }catch(e){authError(e.message||String(e));btn.disabled=false;btn.innerHTML=label;}
       });return;
     }
 
@@ -1142,7 +1145,7 @@
     }
     if(context.profile.role==='player'&&context.profile.access_method!=='player_code'&&!context.profile.pin_set_at){setGateHtml('pinsetup','This is a legacy player account. Create a 6-digit PIN to continue.');return null;}
     if(context.profile.role==='revoked'){clearAccountLocalData();setGateHtml('revoked');return null;}
-    if(context.profile.role==='pending'){setGateHtml('coachsignup','This account is not attached to a club yet. Choose your team to request access.');return null;}
+    if(context.profile.role==='pending'){setGateHtml('signup','This account is not attached to a club yet. Choose your account type and team to request access.');return null;}
     if(context.profile.role==='parent'){
       const linked=await teamFetch;
       if(!Array.isArray(linked)){setGateHtml('signin','Could not verify linked teams. Please try again.');return null;}

@@ -4664,7 +4664,7 @@ async function refreshCoachRequests(){
   if(!box||!list||!CLOUD_MODE||currentRole!=='admin'||!window.ClubHubCloud?.listPendingCoachRequests)return;
   let rows=[];try{rows=await window.ClubHubCloud.listPendingCoachRequests();}catch{rows=[];}
   box.classList.toggle('hidden',!rows.length);if(count)count.textContent=String(rows.length);
-  list.innerHTML=rows.map(r=>`<article class="team-member-row" data-coach-request="${esc(r.request_id)}"><div class="team-member-copy"><strong>${esc(r.person_name||'New coach')}</strong><span>${esc(r.person_email||'')}</span><span>${r.requested_role==='assistant_coach'?'Assistant Coach':'Coach'} for ${esc(r.team_name||'Team')}</span></div><div class="team-member-actions"><button type="button" class="primary-button" data-coach-request-approve="${esc(r.request_id)}">Approve</button><button type="button" class="secondary-button" data-coach-request-decline="${esc(r.request_id)}">Decline</button></div></article>`).join('');
+  list.innerHTML=rows.map(r=>`<article class="team-member-row" data-coach-request="${esc(r.request_id)}"><div class="team-member-copy"><strong>${esc(r.person_name||'New coach')}</strong><span>${esc(r.person_email||'')}</span><span>${r.requested_role==='club_admin'?'Club Admin (owner approval)':(r.requested_role==='assistant_coach'?'Assistant Coach':'Coach')+' for '+esc(r.team_name||'Team')}</span></div><div class="team-member-actions"><button type="button" class="primary-button" data-coach-request-approve="${esc(r.request_id)}">Approve</button><button type="button" class="secondary-button" data-coach-request-decline="${esc(r.request_id)}">Decline</button></div></article>`).join('');
 }
 async function reviewCoachRequestClick(requestId,approve){
   if(currentRole!=='admin')return;
