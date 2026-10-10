@@ -144,3 +144,5 @@ begin
     'inbox_allowed',p.role in ('club_admin','coach','assistant_coach','parent')
   );
 end $function$;
+
+-- APPLIED to the live database 2026-10-10 as migration team_state_per_viewer_default_deny (Mike: 'Apply step 3').

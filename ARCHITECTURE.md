@@ -396,15 +396,15 @@ Implementation status (honest):
 
 ```text
 Domain rules (web/src/domain on rebuild/domain-core): WRITTEN + TESTED (source, 17 tests)
-Database enforcement: PARTIAL. claim_invite fix applied live 2026-10-10 (function text verified by read-back). Tactics, team_player_age and profiles.role CHECK remain PLANNED / NOT APPLIED
+Database enforcement: PARTIAL. claim_invite fix applied live 2026-10-10 (function text verified by read-back). Per-viewer team state (tactics, parent own-child filter, player first names, default deny) applied live 2026-10-10. team_player_age X rule and profiles.role CHECK remain PLANNED / NOT APPLIED
 ```
 
 Known database gaps to close before the rules are DEPLOYED-LIVE:
 
-- **`get_my_context` returns the raw team state to any role other than parent, club admin, coach or assistant coach that has a `team_id`** (found 2026-10-10, by code reading and a local before/after test). That includes `pending_parent`, and the new `pending_coach` and `pending_player` states. One live pending_parent account has a team and team state today. Fix drafted in `web/db-drafts/004_team_state_per_viewer.sql` (default deny, one shared function for both read paths); NOT applied.
+- **`get_my_context` returns the raw team state to any role other than parent, club admin, coach or assistant coach that has a `team_id`** (found 2026-10-10, by code reading and a local before/after test). That includes `pending_parent`, and the new `pending_coach` and `pending_player` states. One live pending_parent account has a team and team state today. FIXED on the live database 2026-10-10 (migration `team_state_per_viewer_default_deny`, source `web/db-drafts/004_team_state_per_viewer.sql`): one function, `private.state_for_viewer`, decides what each role receives for both read paths, default deny for pending and unknown roles. Verified with made-up data on the live database; tested locally on stand-in tables; not tested as a real parent.
 
 - `claim_invite` still lets coaches, assistant coaches and parents join by invite code, and the team state sent to parents still includes the squad list with player names (and, for U12+, goals, assists, bookings and awards that may carry names). Both contradict the 2026-10-10 sign-in and privacy decisions. The email-based coach request and approval flow now exists in the database (UI not built); retire adult invites only after the UI can use it, or new coaches cannot be added.
-- `get_team_state_for_me` returns the full team state (including `tactics`) to parents and players for U12 and above.
+- ~~`get_team_state_for_me` returned the full team state (including `tactics`) to parents and players for U12 and above.~~ FIXED 2026-10-10 (see above).
 - ~~`claim_invite` mapped an unrecognised invite role, including `player`, to an approved `coach`.~~ FIXED on the live database 2026-10-10 (migration `claim_invite_player_pending_and_reject_unknown_roles`): player invites (U15 only) become `pending_player` with no data access until an approval step exists (not yet built); unknown roles are refused. Tested on a throwaway local Postgres, not on a Supabase branch.
 - `team_player_age` subtracts one year for Under 8/10/12/14X labels, which contradicts U12X being a published-results group. No Shooters Hill team has an X label today.
 - `profiles.role` has no CHECK constraint.
