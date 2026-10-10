@@ -21,6 +21,7 @@ const ctx={
   toast:message=>messages.push(message),alert:message=>{throw new Error(message)}
 };
 vm.runInNewContext(app.slice(start,end),ctx);
+vm.runInNewContext(app.match(/function preferredScrollBehavior\(\)\{[^\n]+/)[0],ctx);
 (async()=>{
   await ctx.reviewParentAccessNotification('notification');
   assert.equal(review.length,0);

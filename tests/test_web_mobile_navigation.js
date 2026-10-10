@@ -26,7 +26,7 @@ assert.match(source, /button:not\(\[hidden\]\):not\(\.hidden\)/,
   'hidden account actions are skipped by the More focus trap');
 
 const start = source.indexOf('function closeMobileMore(restoreFocus=false){');
-const end = source.indexOf('function navigate(view,scroll=true){', start);
+const end = source.indexOf('// Screen routes use', start);
 assert(start >= 0 && end > start, 'mobile navigation functions are present');
 
 function fixture(role, club, league, awards, tab = 'overview') {
@@ -34,7 +34,7 @@ function fixture(role, club, league, awards, tab = 'overview') {
     dataset: {mobileTab: String(key)},
     label: {textContent: ''},
     attributes: {},
-    querySelector() { return this.label; },
+    querySelector(selector) { return selector === 'span' ? this.label : {setAttribute() {}}; },
     setAttribute(name, value) { this.attributes[name] = value; },
     removeAttribute(name) { delete this.attributes[name]; },
   }));
@@ -42,6 +42,7 @@ function fixture(role, club, league, awards, tab = 'overview') {
     dataset: {mobileMenuTarget: target}, hidden: false, firstChild: {textContent: 'Inbox '},
   }));
   const context = {
+    CLOUD_MODE: true,
     currentRole: role, currentView: club ? 'club' : 'home', __clubTab: tab,
     isClubOverviewMode: () => club,
     isPublishedLeagueTeam: () => league,
@@ -79,22 +80,22 @@ function fixture(role, club, league, awards, tab = 'overview') {
   const {context, tabs, menu} = fixture('admin', true, false, false);
   context.syncMobileNavigation();
   assert.deepEqual([tabs[0], tabs[1], tabs[3]].map(item => [item.label.textContent, item.dataset.mobileTarget]),
-    [['Club', 'club'], ['Fixtures', 'club-fixtures'], ['Results', 'club-results']]);
-  assert.equal(menu['club-coaches'].hidden, false);
+    [['Home', 'club'], ['Matches', 'club-matches'], ['Staff', 'club-coaches']]);
+  assert.equal(menu['club-coaches'].hidden, true, 'staff has its own primary tab');
   assert.equal(menu.inbox.firstChild.textContent, 'Communications ');
   assert.equal(menu.awards.hidden, true);
   assert.equal(menu.league.hidden, true);
   assert.equal(tabs[2].hidden, true);
   context.__clubTab = 'coaches';
   context.syncMobileNavigation();
-  assert.equal(tabs[4].attributes['aria-current'], 'page', 'Coaches is under More');
+  assert.equal(tabs[3].attributes['aria-current'], 'page', 'Coaches selects Staff');
   context.syncMobileNavigation('club-fixtures');
   assert.equal(tabs[1].attributes['aria-current'], 'page');
 }
 {
   const {context, menu, tabs} = fixture('parent', false, false, false);
   context.syncMobileNavigation();
-  assert.equal(menu.inbox.hidden, false);
+  assert.equal(menu.inbox.hidden, true, 'parent Inbox is on the primary bar');
   assert.equal(menu.league.hidden, true);
   assert.equal(tabs[2].hidden, true);
   assert.equal(menu.awards.hidden, true);
