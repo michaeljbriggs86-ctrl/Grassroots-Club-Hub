@@ -19,8 +19,23 @@ begin
   end if;
 
   if p_role = 'player' then
+    -- U15 player: teammates by first name only (Mike, 2026-10-10); no tactics; no coach notes
+    -- (the U15 privacy working copy excludes private coach notes).
     v := case when p_age between 7 and 11 then public.sanitize_mini_soccer_state(p_state,p_age) else p_state end;
-    return v - 'tactics';
+    v := v - 'tactics';
+    if jsonb_typeof(v->'squad')='array' then
+      v := jsonb_set(v,'{squad}',coalesce((select jsonb_agg(case when e ? 'name' then jsonb_set(e,'{name}',to_jsonb(split_part(btrim(e->>'name'),' ',1))) else e end)
+           from jsonb_array_elements(v->'squad') e),'[]'::jsonb));
+    end if;
+    if jsonb_typeof(v->'tournaments')='array' then
+      v := jsonb_set(v,'{tournaments}',coalesce((select jsonb_agg(case when jsonb_typeof(e->'playerNames')='array'
+           then jsonb_set(e,'{playerNames}',coalesce((select jsonb_agg(split_part(btrim(n #>> '{}'),' ',1)) from jsonb_array_elements(e->'playerNames') n),'[]'::jsonb)) else e end)
+           from jsonb_array_elements(v->'tournaments') e),'[]'::jsonb));
+    end if;
+    if jsonb_typeof(v->'matches')='array' then
+      v := jsonb_set(v,'{matches}',coalesce((select jsonb_agg(e - 'notes') from jsonb_array_elements(v->'matches') e),'[]'::jsonb));
+    end if;
+    return v;
   end if;
 
   if p_role <> 'parent' then return null; end if;

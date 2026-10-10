@@ -23,11 +23,11 @@ begin
   perform set_config('app.uid',current_setting('app.'||u),false);
   r:=public.get_my_context(); s:=r->'team_state';
   if s is null then return format('%-26s ctx -> NO STATE', label); end if;
-  return format('%-26s ctx -> squad=%s goals#=%s awards#=%s notes=%s playerNames=%s tactics=%s scores=%s',label,
+  return format('%-26s ctx -> squad=%s goals#=%s awards#=%s notes=%s pn=%s tactics=%s scores=%s',label,
     coalesce((select string_agg(e->>'name',',') from jsonb_array_elements(s->'squad') e),'-'),
     coalesce((select string_agg(e->>'shirtNumber',',') from jsonb_array_elements(s->'goals') e),'-'),
     coalesce((select string_agg(e->>'shirtNumber',',') from jsonb_array_elements(s->'awards') e),'-'),
-    (s->'matches'->0) ? 'notes', (s->'tournaments'->0) ? 'playerNames', s ? 'tactics', (s->'matches'->0) ? 'gf');
+    (s->'matches'->0) ? 'notes', coalesce((select string_agg(n #>> '{}',',') from jsonb_array_elements(s->'tournaments'->0->'playerNames') n),'-'), s ? 'tactics', (s->'matches'->0) ? 'gf');
 end $$;
 select pg_temp.show('parent of Alice (U12)','par');
 select pg_temp.show('parent, no shirt match','par2');
