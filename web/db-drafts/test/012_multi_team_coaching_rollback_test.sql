@@ -145,31 +145,31 @@ revoke all on function public.assign_coach_team(uuid,uuid), public.unassign_coac
 grant execute on function public.assign_coach_team(uuid,uuid), public.unassign_coach_team(uuid,uuid), public.switch_my_active_team(uuid), public.list_my_coach_teams(), public.list_club_coaches() to authenticated, service_role;
 
 
-create temp table t_out(step text, result text);
-grant all on t_out to authenticated;
 do $$
-declare mike uuid:=(select id from auth.users where email='michaeljbriggs86@gmail.com'); james uuid:=(select id from auth.users where email='michaeljbriggs8@gmail.com'); u14 uuid:='007e45d7-51d2-4f5e-b656-17779141f5c8'; u15 uuid:='ed25bf07-56ee-413d-a271-b48d1f5a5432'; val uuid:='24ce341d-fb7d-4367-9f9c-6e875a0493a0'; par uuid:=(select id from auth.users where email='mbriggs.engineer@gmail.com');
+declare mike uuid:=(select id from auth.users where email='michaeljbriggs86@gmail.com'); james uuid:=(select id from auth.users where email='michaeljbriggs8@gmail.com'); par uuid:=(select id from auth.users where email='mbriggs.engineer@gmail.com');
+  u14 uuid:='007e45d7-51d2-4f5e-b656-17779141f5c8'; u15 uuid:='ed25bf07-56ee-413d-a271-b48d1f5a5432'; val uuid:='24ce341d-fb7d-4367-9f9c-6e875a0493a0';
+  o text:=''; v text;
 begin
-  insert into t_out select 'backfill_rows', count(*)::text from public.coach_team_assignments;
+  select count(*)::text into v from public.coach_team_assignments; o:=o||E'\n1 backfill rows (expect 2: Michael, Joe Bloggs): '||v;
   perform set_config('request.jwt.claims', json_build_object('sub',mike,'role','authenticated')::text, true);
   set local role authenticated;
   perform public.assign_coach_team(james,u14);
   perform public.assign_coach_team(james,u15);
-  insert into t_out select 'james_assigned', count(*)::text from public.coach_team_assignments where user_id=james;
-  insert into t_out select 'james_active_after_assign', (select coach_team_id::text from public.profiles where user_id=james);
-  insert into t_out select 'coach_list_rows', count(*)::text from public.list_club_coaches();
+  select count(*)::text into v from public.coach_team_assignments where user_id=james; o:=o||E'\n2 James teams assigned (expect 2): '||v;
+  select coalesce(coach_team_id::text,'none') into v from public.profiles where user_id=james; o:=o||E'\n3 James active team after assigning (expect the U14 Cannons id 007e45d7...): '||v;
+  select count(*)::text into v from public.list_club_coaches(); o:=o||E'\n4 coach list rows (expect 4: Michael, Joe, James x2): '||v;
   perform set_config('request.jwt.claims', json_build_object('sub',james,'role','authenticated')::text, true);
-  insert into t_out select 'james_teams', string_agg(age_group||' '||name||case when is_active then '*' else '' end, ', ') from public.list_my_coach_teams();
+  select string_agg(age_group||' '||name||case when is_active then '*' else '' end, ', ') into v from public.list_my_coach_teams(); o:=o||E'\n5 James sees (expect U14 and U15 Cannons, * on the active one): '||v;
   perform public.switch_my_active_team(u15);
-  insert into t_out select 'after_switch_u15', (select coach_team_id=u15 from public.profiles where user_id=james)::text;
-  insert into t_out select 'can_edit_u15', public.can_edit_team(u15)::text;
-  insert into t_out select 'can_edit_u14_while_u15_active', public.can_edit_team(u14)::text;
-  begin perform public.switch_my_active_team(val); insert into t_out values('switch_unassigned','NOT BLOCKED (bad)'); exception when others then insert into t_out values('switch_unassigned','blocked: '||sqlerrm); end;
+  select (coach_team_id=u15)::text into v from public.profiles where user_id=james; o:=o||E'\n6 after switching to U15 active team is U15 (expect true): '||v;
+  o:=o||E'\n7 can edit U15 (expect true): '||public.can_edit_team(u15)::text;
+  o:=o||E'\n8 can edit U14 while U15 active (expect false): '||public.can_edit_team(u14)::text;
+  begin perform public.switch_my_active_team(val); o:=o||E'\n9 switch to an unassigned team (expect blocked): NOT BLOCKED - BAD'; exception when others then o:=o||E'\n9 switch to an unassigned team (expect blocked): blocked, '||sqlerrm; end;
   perform set_config('request.jwt.claims', json_build_object('sub',par,'role','authenticated')::text, true);
-  begin perform public.switch_my_active_team(u14); insert into t_out values('parent_switch','NOT BLOCKED (bad)'); exception when others then insert into t_out values('parent_switch','blocked: '||sqlerrm); end;
-  begin perform public.assign_coach_team(james,u14); insert into t_out values('parent_assign','NOT BLOCKED (bad)'); exception when others then insert into t_out values('parent_assign','blocked: '||sqlerrm); end;
-  begin insert into t_out select 'parent_reads_assignments', count(*)::text from public.coach_team_assignments; end;
+  begin perform public.switch_my_active_team(u14); o:=o||E'\n10 parent switching team (expect blocked): NOT BLOCKED - BAD'; exception when others then o:=o||E'\n10 parent switching team (expect blocked): blocked, '||sqlerrm; end;
+  begin perform public.assign_coach_team(james,u14); o:=o||E'\n11 parent assigning a coach (expect blocked): NOT BLOCKED - BAD'; exception when others then o:=o||E'\n11 parent assigning a coach (expect blocked): blocked, '||sqlerrm; end;
+  select count(*)::text into v from public.coach_team_assignments; o:=o||E'\n12 assignment rows a parent can read (expect 0): '||v;
   reset role;
+  raise exception E'TEST RESULTS (nothing was saved)%', o;
 end $$;
-select * from t_out;
 rollback;
