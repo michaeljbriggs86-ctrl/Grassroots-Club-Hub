@@ -3065,16 +3065,21 @@ function renderMatchGroup(listId,countId,rows,emptyText){
   if(list) setStableHtml(list,rows.map(matchCardHTML).join('') || `<div class="empty-state"><strong>${emptyText}</strong></div>`);
 }
 function renderMatches(){ applyMatchFilter(); }
+/** "U9 Selkent Cup Two - Round 1" becomes {name:"Selkent Cup Two", round:"Round 1"}. Plain names pass through. */
+function cupNameAndRound(m){const raw=String(m?.competition||m?.type||'').trim();const [head,...rest]=raw.split(/\s+[-–]\s+/);const name=head.replace(/^U\s*\d{1,2}X?\s+/i,'').trim()||raw||'Cup';return {name,round:(rest.join(' - ')||String(m?.stage||'')).trim()};}
 function competitionGameRow(m){
   const r=resultOf(m),venue=String(m.venue||'').toUpperCase()==='H'?'H':String(m.venue||'').toUpperCase()==='A'?'A':String(m.venue||'').toUpperCase()==='N'?'N':'—';
   const resultText=miniResultsRestrictedView()&&isPlayedMatch(m)?'Result private':(isPlayedMatch(m)?`${r} ${Number(m.gf||0)}–${Number(m.ga||0)}`:(r==='ABD'?`ABD ${Number(m.gf||0)}–${Number(m.ga||0)}`:r));
   const action=`<button type="button" class="competition-game-link" data-details-match="${m.id}">${clubListingHtml(m.opponent)}</button>`;
-  return `<tr class="${resultClass(r)}"><td>${m.date?formatDate(m.date):'TBC'}</td><td>${esc(m.stage||'—')}</td><td>${action}</td><td>${venue}</td><td><span class="competition-result-pill ${r}">${resultText}</span></td></tr>`;
+  const cup=cupNameAndRound(m);
+  return `<tr class="${resultClass(r)}"><td>${m.date?formatDate(m.date):'TBC'}</td><td><b>${esc(cup.name)}</b>${cup.round?`<small class="cup-round">${esc(cup.round)}</small>`:''}</td><td>${action}</td><td>${venue}</td><td><span class="competition-result-pill ${r}">${resultText}</span></td></tr>`;
 }
 function renderCompetitionGameTable(kind,list){
   const body=document.getElementById(`${kind}-games-body`),count=document.getElementById(`${kind}-games-count`),wrap=document.getElementById(`${kind}-games-panel`);if(!body||!wrap)return;
   const rows=[...list].sort((a,b)=>(b.date||'').localeCompare(a.date||''));if(count)count.textContent=String(rows.length);
   wrap.classList.toggle('empty-competition',rows.length===0);
+  if(kind!=='cup')wrap.hidden=rows.length===0;
+  if(rows.length&&kind==='cup')wrap.open=true;
   body.innerHTML=rows.map(competitionGameRow).join('')||'<tr><td colspan="5" class="table-empty">No games available yet</td></tr>';
 }
 function applyMatchFilter(){
@@ -4941,7 +4946,7 @@ function updateMatchStatusUI(){
   if(awards)awards.classList.toggle('hidden',noScore);
   updateGoalCheck();
 }
-const DEFAULT_COMPETITION_OPTIONS=['League','Division','Friendly','Challenge Cup','Challenge Vase','Shield','Cup','Tournament','Preseason Tournament','Other'];
+const DEFAULT_COMPETITION_OPTIONS=['League','Division','Friendly','Selkent Cup One','Selkent Cup Two','London Cup','Kent Cup','Vase','Shield','Tournament','Preseason Tournament','Other'];
 function setCompetitionOptions(mode='all',selected=''){
   const sel=document.getElementById('match-competition');if(!sel)return;
   const values=mode==='nonleague'?['Friendly','Tournament']:DEFAULT_COMPETITION_OPTIONS;

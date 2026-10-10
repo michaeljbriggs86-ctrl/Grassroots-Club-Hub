@@ -1825,3 +1825,6 @@ body.role-parent .cup-group-fixture-lines .canonical-match-badge img{width:36px;
 
 /* Monogram artwork includes its own inset and dashed placeholder ring. */
 .club-placeholder-badge[data-logo-status="placeholder_monogram"]{padding:0;background:transparent;border:0;border-radius:50%}
+
+/* Condensed cup table (Mike, 10 Oct 2026) */
+.competition-games-table{min-width:0}.competition-games-table th,.competition-games-table td{padding:6px 7px;font-size:11px}.competition-games-table .cup-round{display:block;font-size:9.5px;color:var(--muted);font-weight:600}.competition-games-table .competition-result-pill{min-width:44px;padding:3px 7px}.competition-games-panel[hidden]{display:none}
