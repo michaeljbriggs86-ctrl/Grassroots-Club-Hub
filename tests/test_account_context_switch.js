@@ -6,7 +6,7 @@ const vm=require('node:vm');
 const source=fs.readFileSync('app/src/main/assets/app.js','utf8');
 const cloud=fs.readFileSync('app/src/main/assets/cloud.js','utf8');
 const html=fs.readFileSync('app/src/main/assets/index.html','utf8');
-const start=source.indexOf('function availableAccountContexts(){');
+const start=source.indexOf('let __coachTeamsLoaded=false');
 const end=source.indexOf('async function setAdminUiMode(mode){',start);
 assert(start>=0&&end>start);
 assert(html.includes('id="mobile-context-switch"')&&html.includes('id="context-switch-dialog"'));
@@ -31,7 +31,7 @@ vm.runInNewContext(source.slice(start,end),context);
 
 (async()=>{
   let choices=context.availableAccountContexts();
-  assert.deepEqual(Array.from(choices.map(c=>c.kind)),['club','coach','preview','preview','parent-signin']);
+  assert.deepEqual(Array.from(choices.map(c=>c.kind)),['club','coach','preview','parent-signin']);
   assert.equal(choices[0].active,true);
   assert.equal(choices.find(c=>c.kind==='coach').teamId,undefined);
   const button={disabled:false};
@@ -43,16 +43,32 @@ vm.runInNewContext(source.slice(start,end),context);
   assert.equal(switches.length,before);
   await context.switchAccountContext(context.availableAccountContexts().find(c=>c.kind==='coach'),button);
   assert.equal(context.adminUiMode,'coach');
-  const previous=current;
+  current=teams[0];const previous=current;
   const closed=switches.filter(x=>x==='close').length;
   context.switchAdminTeamAndLoad=async()=>{throw new Error('offline');};
-  await context.switchAccountContext(context.availableAccountContexts().find(c=>c.kind==='preview'&&c.teamId==='red'),button);
+  await context.switchAccountContext(context.availableAccountContexts().find(c=>c.kind==='preview'&&c.teamId==='blue'),button);
   assert.equal(context.adminUiMode,'coach');assert.equal(current,previous);
   assert.equal(switches.filter(x=>x==='close').length,closed);
   assert(notices.includes('offline'));
   await context.switchAccountContext(context.availableAccountContexts().find(c=>c.kind==='parent-signin'),button);
   assert(switches.includes('parent-signin'));
 
+  // Two assigned coaching teams: each is its own switchable entry
+  context.adminUiMode='club';own=teams[0];
+  const rows=[{team_id:'red',age_group:9,name:'Red',is_active:true},{team_id:'blue',age_group:12,name:'Blue',is_active:false}];
+  context.window.ClubHubCloud.listMyCoachTeams=async()=>rows;
+  context.window.ClubHubCloud.switchMyCoachTeam=async id=>{switches.push('coach:'+id);};
+  context.location={reload:()=>switches.push('reload')};
+  await context.loadCoachTeams();
+  choices=context.availableAccountContexts();
+  assert.deepEqual(Array.from(choices.map(c=>c.kind)),['club','coach-team','coach-team','parent-signin']);
+  assert.equal(choices[1].title,'U9 Red');assert.equal(choices[2].detail,'Coach · edit your team');
+  assert.equal(choices[1].active,false,'club overview mode is not a coaching mode');
+  await context.switchAccountContext(choices[2],button);
+  assert(switches.includes('coach:blue')&&switches.includes('reload'));assert.equal(store.get('mode'),'coach');
+  context.adminUiMode='club';
+
+  rows.length=0;await context.loadCoachTeams(true);
   context.currentRole='parent';own=null;current=teams[0];
   choices=context.availableAccountContexts();
   assert.deepEqual(Array.from(choices.map(c=>c.kind)),['parent','parent']);
