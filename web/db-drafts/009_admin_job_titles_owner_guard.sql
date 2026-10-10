@@ -7,7 +7,7 @@ begin;
 alter table public.profiles add column if not exists club_title text;
 alter table public.profiles drop constraint if exists profiles_club_title_check;
 alter table public.profiles add constraint profiles_club_title_check
-  check (club_title is null or club_title in ('Director','Club Secretary'));
+  check (club_title is null or club_title in ('Director','Club Secretary','Developer'));
 
 update public.profiles p set club_title='Director'
 from auth.users a where a.id=p.user_id and a.email='michaeljbriggs8@gmail.com' and p.role='club_admin';

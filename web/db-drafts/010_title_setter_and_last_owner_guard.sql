@@ -10,7 +10,7 @@ begin
   if me.user_id is null or me.role<>'club_admin' or me.is_owner is not true then raise exception 'Owner access required'; end if;
   select * into target from public.profiles where user_id=p_user_id;
   if target.user_id is null or target.club_id is distinct from me.club_id or target.role<>'club_admin' then raise exception 'Choose a Club Admin in your club'; end if;
-  if t is not null and t not in ('Director','Club Secretary') then raise exception 'Title must be Director or Club Secretary'; end if;
+  if t is not null and t not in ('Director','Club Secretary','Developer') then raise exception 'Title must be Director, Club Secretary or Developer'; end if;
   update public.profiles set club_title=t, updated_at=now() where user_id=p_user_id;
   return jsonb_build_object('ok',true,'user_id',p_user_id,'club_title',t);
 end $function$;
