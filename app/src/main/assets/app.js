@@ -2761,7 +2761,7 @@ function renderNotificationCenter(){
   const appRows=__appNotifications.map(n=>({...n,source:'app'}));const rows=[...appRows,...noticeRows].sort((a,b)=>String(b.created_at||'').localeCompare(String(a.created_at||'')));const unread=rows.filter(r=>!r.read_at).length;
   if(badge){badge.textContent=unread>99?'99+':String(unread);badge.classList.toggle('hidden',!unread);}
   if(mobileBadge){mobileBadge.textContent=unread>99?'99+':String(unread);mobileBadge.classList.toggle('hidden',!unread);}
-  const html=rows.length?rows.map(r=>{const parentReview=r.source==='app'&&r.type==='parent_access_request'&&['admin','coach','assistant_coach'].includes(currentRole);const mark=!r.read_at?`<button type="button" class="text-button compact" ${r.source==='announcement'?`data-read-announcement="${r.id}"`:`data-read-notification="${r.id}"`}>Mark read</button>`:'';const review=parentReview?`<button type="button" class="secondary-button compact notification-review-action" data-review-parent-request="${r.id}">Review request</button>`:'';return `<article class="notification-item ${r.read_at?'read':'unread'} ${r.important?'important':''}"><div class="notification-item-head"><div><strong>${esc(r.title||'Notification')}</strong><small>${r.source==='announcement'?'Club notice':String(r.type||'update').replace(/_/g,' ')}</small></div><time>${notificationDate(r.created_at)}</time></div><p>${esc(r.body||'')}</p>${review||mark?`<div class="notification-item-actions">${review}${mark}</div>`:''}</article>`;}).join(''):'<div class="empty-state compact-empty">No notifications yet.</div>';
+  const html=rows.length?rows.map(r=>{const parentReview=r.source==='app'&&r.type==='parent_access_request'&&['admin','coach','assistant_coach'].includes(currentRole);const mark=!r.read_at?`<button type="button" class="text-button compact" ${r.source==='announcement'?`data-read-announcement="${r.id}"`:`data-read-notification="${r.id}"`}>Mark read</button>`:'';const review=parentReview?`<button type="button" class="secondary-button compact notification-review-action" data-review-parent-request="${r.id}">Review request</button>`:'';const coachReview=r.source==='app'&&r.type==='coach_access_request'&&currentRole==='admin'?`<button type="button" class="secondary-button compact notification-review-action" data-review-coach-request="${r.id}">Review request</button>`:'';return `<article class="notification-item ${r.read_at?'read':'unread'} ${r.important?'important':''}"><div class="notification-item-head"><div><strong>${esc(r.title||'Notification')}</strong><small>${r.source==='announcement'?'Club notice':String(r.type||'update').replace(/_/g,' ')}</small></div><time>${notificationDate(r.created_at)}</time></div><p>${esc(r.body||'')}</p>${review||coachReview||mark?`<div class="notification-item-actions">${review}${coachReview}${mark}</div>`:''}</article>`;}).join(''):'<div class="empty-state compact-empty">No notifications yet.</div>';
   if(list)list.innerHTML=html;
   const adminList=document.getElementById('communications-notifications-list');if(adminList)adminList.innerHTML=html;
 }
@@ -2770,6 +2770,18 @@ function openNotifications(){if(isClubOverviewMode()){__communicationsTab='notif
 async function markAppNotificationRead(id){try{await window.ClubHubCloud.markNotificationRead(id);const row=__appNotifications.find(n=>n.id===id);if(row)row.read_at=new Date().toISOString();renderNotificationCenter();}catch(_){toast('Could not update notification');}}
 async function markAllNotificationsRead(){const app=__appNotifications.filter(n=>!n.read_at),ann=__announcementRows.filter(a=>!a.read_at);try{await Promise.all([...app.map(n=>window.ClubHubCloud.markNotificationRead(n.id)),...ann.map(a=>window.ClubHubCloud.markAnnouncementRead(a.id))]);const now=new Date().toISOString();app.forEach(n=>n.read_at=now);ann.forEach(a=>a.read_at=now);renderAnnouncements();renderNotificationCenter();toast('Notifications marked read');}catch(_){toast('Could not mark all notifications read');}}
 
+async function reviewCoachAccessNotification(){
+  if(currentRole!=='admin')return;
+  try{
+    document.getElementById('notification-dialog')?.close();
+    if(!isClubOverviewMode()){adminUiMode='view';try{localStorage.setItem(ADMIN_UI_MODE_KEY,'view');}catch{}applyAccessMode();}
+    navigate('club',false);setClubTab('coaches');
+    await refreshCoachRequests();
+    const box=document.getElementById('coach-requests');
+    if(box&&!box.classList.contains('hidden'))box.scrollIntoView({behavior:'smooth',block:'start'});
+    else toast('No coach requests are waiting. It may already have been handled.');
+  }catch(err){alert(err.message||err);}
+}
 async function reviewParentAccessNotification(notificationId){
   const row=__appNotifications.find(n=>String(n.id)===String(notificationId));
   if(!row||row.type!=='parent_access_request')return toast('Parent request is no longer available.');
@@ -4659,7 +4671,7 @@ async function refreshCoachRequests(){
   if(!box||!list||!CLOUD_MODE||currentRole!=='admin'||!window.ClubHubCloud?.listPendingCoachRequests)return;
   let rows=[];try{rows=await window.ClubHubCloud.listPendingCoachRequests();}catch{rows=[];}
   box.classList.toggle('hidden',!rows.length);if(count)count.textContent=String(rows.length);
-  list.innerHTML=rows.map(r=>`<article class="team-member-row" data-coach-request="${esc(r.request_id)}"><div><strong>${esc(r.person_name||'New coach')}</strong><span>${esc(r.person_email||'')}</span><span>${r.requested_role==='assistant_coach'?'Assistant Coach':'Coach'} · ${esc(r.team_name||'Team')}</span></div><div class="team-member-actions"><button type="button" class="primary-button" data-coach-request-approve="${esc(r.request_id)}">Approve</button><button type="button" class="secondary-button" data-coach-request-decline="${esc(r.request_id)}">Decline</button></div></article>`).join('');
+  list.innerHTML=rows.map(r=>`<article class="team-member-row" data-coach-request="${esc(r.request_id)}"><div class="team-member-copy"><strong>${esc(r.person_name||'New coach')}</strong><span>${esc(r.person_email||'')}</span><span>${r.requested_role==='assistant_coach'?'Assistant Coach':'Coach'} for ${esc(r.team_name||'Team')}</span></div><div class="team-member-actions"><button type="button" class="primary-button" data-coach-request-approve="${esc(r.request_id)}">Approve</button><button type="button" class="secondary-button" data-coach-request-decline="${esc(r.request_id)}">Decline</button></div></article>`).join('');
 }
 async function reviewCoachRequestClick(requestId,approve){
   if(currentRole!=='admin')return;
@@ -5343,7 +5355,7 @@ document.addEventListener('click',e=>{
   const dlr=e.target.closest('[data-delete-league-result]'); if(dlr){ deleteLeagueResult(dlr.dataset.deleteLeagueResult); return; }
   const readNotice=e.target.closest('[data-read-announcement]');if(readNotice){markAnnouncementRead(readNotice.dataset.readAnnouncement);return;}
   const delNotice=e.target.closest('[data-delete-announcement]');if(delNotice){deleteAnnouncement(delNotice.dataset.deleteAnnouncement);return;}
-  const reviewParentRequest=e.target.closest('[data-review-parent-request]');if(reviewParentRequest){reviewParentAccessNotification(reviewParentRequest.dataset.reviewParentRequest);return;}
+  const reviewCoachNote=e.target.closest('[data-review-coach-request]');if(reviewCoachNote){markAppNotificationRead(reviewCoachNote.dataset.reviewCoachRequest);reviewCoachAccessNotification();return;}const reviewParentRequest=e.target.closest('[data-review-parent-request]');if(reviewParentRequest){reviewParentAccessNotification(reviewParentRequest.dataset.reviewParentRequest);return;}
   const readNotification=e.target.closest('[data-read-notification]');if(readNotification){markAppNotificationRead(readNotification.dataset.readNotification);return;}
 });
 document.getElementById('mobile-more-sheet')?.addEventListener('keydown',e=>{
