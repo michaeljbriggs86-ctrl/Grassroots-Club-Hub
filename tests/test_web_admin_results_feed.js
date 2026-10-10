@@ -71,7 +71,7 @@ assert.match(recentHtml,/<span class="club-result-team-name">Shooters Hill AFC V
 assert.match(recentHtml,/<span class="club-result-team-name">Junior Reds Sabres<\/span>/);
 assert.match(recentHtml,/<td>H<\/td><td><span class="competition-result-pill W">W 4–1<\/span>/,'home win reads from the club side');
 assert.match(recentHtml,/<td>A<\/td><td><span class="competition-result-pill W">W 3–2<\/span>/,'away win reads from the club side (3–2, not 2–3)');
-assert.ok(html.includes('id="admin-recent-results"')&&html.includes('id="club-results-list"'));
+assert.ok(html.includes('id="club-results-list"'));
 let resultWrites=0,resultHtml='';
 const list={get innerHTML(){return resultHtml},set innerHTML(value){resultHtml=value;resultWrites++}},ageSelect={value:'',innerHTML:''},competitionSelect={value:'league'},page={textContent:''},previous={},next={};
 const browserElements={'club-results-list':list,'club-results-age':ageSelect,'club-results-competition':competitionSelect,'club-results-page':page,'club-results-prev':previous,'club-results-next':next};

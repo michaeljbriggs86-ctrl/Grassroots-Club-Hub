@@ -46,6 +46,7 @@
           <img src="shooters-hill-logo.png" alt="Shooters Hill AFC logo" class="club-logo" />
         </div>
         <div class="hero-copy">
+          <span class="mode-pill hidden" id="hero-mode-pill"></span>
           <p class="eyebrow" id="hero-club-name">GRASSROOTS CLUB HUB</p>
           <h1 id="hero-team-name">TEAM</h1>
           <p class="season-line" id="hero-season-line">U9 · 2026/27</p>
@@ -65,10 +66,10 @@
       <button type="button" class="top-nav-tab nav-item" data-nav="matches" data-team-nav>Matches</button>
       <button type="button" class="top-nav-tab nav-item hidden" id="league-nav-item" data-nav="league" data-team-nav data-league-nav>League</button>
       <button type="button" class="top-nav-tab nav-item" data-nav="squad" data-team-nav>Squad</button>
-      <button type="button" class="top-nav-tab nav-item hidden" id="club-global-tab" data-nav="club" data-admin-club-root>Club</button>
-      <button type="button" class="top-nav-tab nav-item hidden" data-nav="club-fixtures" data-admin-global-nav>Fixtures</button>
+      <button type="button" class="top-nav-tab nav-item hidden" id="club-global-tab" data-nav="club" data-admin-club-root>Home</button>
+      <button type="button" class="top-nav-tab nav-item hidden" data-nav="club-matches" data-admin-global-nav>Matches</button>
       <button type="button" class="top-nav-tab nav-item hidden" data-nav="club-results" data-results-global-nav>Results</button>
-      <button type="button" class="top-nav-tab nav-item hidden" data-nav="club-coaches" data-admin-global-nav>Coaches</button>
+      <button type="button" class="top-nav-tab nav-item hidden" data-nav="club-coaches" data-admin-global-nav>Staff</button>
       <button type="button" class="top-nav-tab nav-item hidden" data-nav="inbox"><span id="communications-nav-label">Inbox</span><span class="notification-badge hidden" id="global-inbox-badge">0</span></button>
       <button type="button" class="top-nav-tab nav-item" data-nav="more">Settings</button>
     </nav>
@@ -455,8 +456,13 @@
 
       <section id="view-club" class="view" data-view="club">
         <div class="section-title-row"><div><p class="kicker" id="club-view-kicker">Club administration</p><h2 id="club-view-title">Club Overview</h2></div></div>
+        <div class="club-matches-switch hidden" id="club-matches-switch" role="group" aria-label="Matches view"><button type="button" data-club-tab="fixtures">Fixtures</button><button type="button" data-club-tab="results">Results</button></div>
 
         <div id="club-fixtures-slot"><section class="club-admin-panel hidden" id="club-fixtures-panel">
+          <section class="panel admin-weekend-panel">
+            <div class="panel-heading weekend-share-heading"><div><p class="kicker">Next weekend</p><h3>Weekend at a glance</h3><p class="muted" id="admin-weekend-meta"></p></div><button type="button" class="secondary-button weekend-share-trigger" id="admin-weekend-share" data-admin-settings-only>Share weekend</button></div>
+            <div class="admin-weekend-list" id="admin-weekend-list"></div>
+          </section>
           <section class="panel admin-fixture-centre">
             <label class="admin-filter-label">Age group<select id="admin-fixtures-age"><option value="all">All age groups</option></select></label>
             <p class="admin-fixture-summary" id="admin-fixture-summary" role="status"></p>
@@ -479,6 +485,10 @@
         </section></div>
 
         <section class="admin-club-overview" id="admin-club-overview">
+          <section class="panel admin-attention-panel" id="admin-attention-panel" tabindex="-1">
+            <div class="admin-attention-list" id="admin-attention-list"></div>
+          </section>
+
           <section class="panel admin-dashboard-summary">
             <div class="admin-dashboard-head">
               <h3>Club at a glance</h3>
@@ -492,11 +502,6 @@
             <p class="muted admin-overview-meta hidden" id="admin-overview-meta" role="status"></p>
           </section>
 
-          <section class="panel admin-recent-results-panel">
-            <div class="panel-heading"><div><p class="kicker">Recent matches</p><h3>Latest club results</h3></div></div>
-            <p class="muted" id="admin-results-source-status" role="status"></p>
-            <div class="admin-recent-results-list" id="admin-recent-results"></div>
-          </section>
 
           <section class="admin-team-overview-panel">
             <div class="admin-section-heading"><div><p class="kicker">Teams</p><h3>Browse by age group</h3></div></div>
@@ -504,14 +509,7 @@
             <div class="admin-team-grid admin-age-group-list" id="admin-team-grid"></div>
           </section>
 
-          <section class="panel admin-weekend-panel">
-            <div class="panel-heading weekend-share-heading"><div><p class="kicker">Next weekend</p><h3>Weekend at a glance</h3><p class="muted" id="admin-weekend-meta"></p></div><button type="button" class="secondary-button weekend-share-trigger" id="admin-weekend-share" data-admin-settings-only>Share weekend</button></div>
-            <div class="admin-weekend-list" id="admin-weekend-list"></div>
-          </section>
 
-          <section class="panel admin-attention-panel" id="admin-attention-panel" tabindex="-1">
-            <div class="admin-attention-list" id="admin-attention-list"></div>
-          </section>
         </section>
 
         <section class="club-admin-panel hidden" id="club-coaches-panel">

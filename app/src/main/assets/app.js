@@ -2304,7 +2304,7 @@ function applyAccessMode(){
   document.querySelectorAll('[data-coach-ui-only]').forEach(el=>el.classList.toggle('hidden',adminClub||preview||!isCoach()));
   document.querySelectorAll('[data-admin-global-nav]').forEach(el=>el.classList.toggle('hidden',!adminClub));
   document.querySelectorAll('[data-admin-club-root]').forEach(el=>el.classList.toggle('hidden',!adminClub));
-  document.querySelectorAll('[data-results-global-nav]').forEach(el=>el.classList.toggle('hidden',!coaching&&!adminClub));
+  document.querySelectorAll('[data-results-global-nav]').forEach(el=>el.classList.toggle('hidden',!(coaching||isAdminCoachMode())));
   document.querySelectorAll('[data-admin-settings-only]').forEach(el=>el.classList.toggle('hidden',!adminClub));
   document.querySelectorAll('[data-staff-history]').forEach(el=>el.classList.toggle('hidden',!['admin','coach','assistant_coach'].includes(currentRole)));
   document.querySelectorAll('[data-admin-history]').forEach(el=>el.classList.toggle('hidden',!adminClub));
@@ -2387,8 +2387,8 @@ function syncMobileNavigation(selectedView=currentView){
   const club=isClubOverviewMode();
   const parent=CLOUD_MODE&&currentRole==='parent',showTable=!club&&!parent&&isPublishedLeagueTeam();
   nav.classList.toggle('has-table-tab',showTable);
-  const selected=club&&selectedView==='club'&&__clubTab==='coaches'?'club-coaches':selectedView;
-  const primary=club?[['Club','club'],['Fixtures','club-fixtures'],['Results','club-results']]:parent?[['Home','home'],['Schedule','matches'],['Inbox','inbox'],['Table','league']]:[['Home','home'],['Matches','matches'],['Squad','squad'],['Table','league']];
+  const selected=club&&selectedView==='club'?(__clubTab==='coaches'?'club-coaches':__clubTab==='overview'?'club':'club-matches'):club&&selectedView==='club-fixtures'||club&&selectedView==='club-results'?'club-matches':selectedView;
+  const primary=club?[['Home','club'],['Matches','club-matches'],['Staff','club-coaches']]:parent?[['Home','home'],['Schedule','matches'],['Inbox','inbox'],['Table','league']]:[['Home','home'],['Matches','matches'],['Squad','squad'],['Table','league']];
   nav.querySelectorAll('[data-mobile-tab]').forEach(button=>{
     if(button.dataset.mobileTab==='3'&&!showTable){button.hidden=true;button.removeAttribute('aria-current');return;}
     if(button.dataset.mobileTab!=='more'){
@@ -2407,7 +2407,7 @@ function syncMobileNavigation(selectedView=currentView){
     league:showTable,
     awards:!club&&!parent&&featureEnabled('awards'),
     'club-results':!club&&(['coach','assistant_coach'].includes(currentRole)||isAdminCoachMode()),
-    'club-coaches':club,
+    'club-coaches':false,
     inbox:!parent&&['admin','coach','assistant_coach'].includes(currentRole),
     more:true,
   };
@@ -2445,6 +2445,7 @@ function navigate(view,scroll=true){
   if(view==='more'){const h=document.querySelector('#view-more .section-title-row h2'),k=document.querySelector('#view-more .section-title-row .kicker');if(h)h.textContent=isClubOverviewMode()?'Club settings':'Settings';if(k)k.textContent=isClubOverviewMode()?'Club administration':'Team & app';}
   if(view==='club'&&isAdmin()&&!isClubOverviewMode()){adminUiMode='club';localStorage.setItem(ADMIN_UI_MODE_KEY,'club');}
   if(view==='club'){__clubTab='overview';view='club';}
+  else if(view==='club-matches'){if(!['fixtures','results'].includes(__clubTab))__clubTab='fixtures';view='club';}
   else if(view==='club-fixtures'){__clubTab='fixtures';view='club';}
   else if(view==='club-results'){__clubTab='results';view='club';}
   else if(view==='club-coaches'){__clubTab='coaches';view='club';}
@@ -2459,7 +2460,7 @@ function navigate(view,scroll=true){
   document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.dataset.view===view));
   renderTeamIdentity();
   let activeKey=requested;
-  if(view==='club') activeKey=__clubTab==='overview'?'club':__clubTab==='fixtures'?'club-fixtures':__clubTab==='results'?'club-results':'club-coaches';
+  if(view==='club') activeKey=__clubTab==='overview'?'club':__clubTab==='coaches'?'club-coaches':isClubOverviewMode()?'club-matches':'club-results';
   if(view==='more')activeKey='more';
   document.querySelectorAll('.top-nav-tabs .nav-item').forEach(b=>{
     const active=b.dataset.nav===activeKey;
@@ -2916,7 +2917,9 @@ function renderTeamIdentity(){
   const meta=state.meta;
   const adminClub=isClubOverviewMode();
   document.getElementById('hero-club-name').textContent=(meta.clubName||clubSettings().display_name||'Club').toUpperCase();
-  const adminHero=currentView==='more'?'CLUB SETTINGS':currentView==='club'?'CLUB OVERVIEW':'CLUB ADMINISTRATION';
+  const adminHero=currentView==='more'?'CLUB SETTINGS':currentView==='club'?(__clubTab==='coaches'?'CLUB STAFF':__clubTab==='overview'?'CLUB HOME':'MATCHES'):'CLUB ADMINISTRATION';
+  const pill=document.getElementById('hero-mode-pill');
+  if(pill){const label=!isAdmin()?'':adminClub?'Club Admin':isAdminCoachMode()?'Coach mode':isAdminTeamPreviewMode()?'Read only':'';pill.textContent=label;pill.classList.toggle('hidden',!label);pill.dataset.mode=adminClub?'club':isAdminCoachMode()?'coach':'preview';}
   document.getElementById('hero-team-name').textContent=matchTeamLabel(adminClub?adminHero:(meta.teamName||'Team').toUpperCase());
   document.getElementById('hero-season-line').textContent=adminClub?[`${window.ClubHubCloud?.visibleTeamList?.().length||clubTeams().length} active teams`,meta.season].filter(Boolean).join(' · '):[meta.ageGroup,state.division.name,meta.season].filter(Boolean).join(' · ');
   document.getElementById('dashboard-season-kicker').textContent=(meta.season||'Season')+' season';
@@ -4918,12 +4921,14 @@ function setClubTab(tab='overview'){
   document.getElementById('club-results-panel')?.classList.toggle('hidden',tab!=='results');
   document.getElementById('club-coaches-panel')?.classList.toggle('hidden',tab!=='coaches'||!admin);
   document.querySelectorAll('[data-admin-club-tab]').forEach(b=>b.classList.toggle('hidden',!admin));
-  document.querySelectorAll('[data-club-tab]').forEach(b=>b.classList.toggle('active',b.dataset.clubTab===tab));
-  const title=document.getElementById('club-view-title'),kick=document.getElementById('club-view-kicker');const names={overview:'Club Overview',fixtures:'Upcoming fixtures',results:'Completed matches',coaches:'Coach Overview'};if(title)title.textContent=names[tab]||'Club';if(kick)kick.textContent=admin?'Club administration':isAdminCoachMode()?`Coach · ${dualCoachTeam()?.ageGroup||''} ${dualCoachTeam()?.teamName||''}`.trim():roleLabel();
+  document.querySelectorAll('[data-club-tab]').forEach(b=>{const on=b.dataset.clubTab===tab;b.classList.toggle('active',on);b.setAttribute('aria-pressed',on?'true':'false');});
+  document.getElementById('club-matches-switch')?.classList.toggle('hidden',!(admin&&(tab==='fixtures'||tab==='results')));
+  const title=document.getElementById('club-view-title'),kick=document.getElementById('club-view-kicker');const names={overview:'Club Home',fixtures:'Matches',results:'Matches',coaches:'Club staff'};if(title)title.textContent=names[tab]||'Club';if(kick)kick.textContent=admin?'Club administration':isAdminCoachMode()?`Coach · ${dualCoachTeam()?.ageGroup||''} ${dualCoachTeam()?.teamName||''}`.trim():roleLabel();
   if(tab==='overview')refreshAdminClubOverview(true);
-  if(tab==='fixtures')refreshAdminFixtures(false);
+  if(tab==='fixtures'){refreshAdminFixtures(false);refreshAdminClubOverview(true);}
   if(tab==='results')refreshClubResults(false);
   if(tab==='coaches')refreshClubCoaches(false);
+  renderTeamIdentity();
 }
 function refreshCoachClubResults(quiet=false){return refreshClubResults(quiet);}
 

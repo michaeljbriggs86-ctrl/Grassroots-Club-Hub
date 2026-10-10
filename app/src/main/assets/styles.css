@@ -1833,3 +1833,16 @@ body.role-parent .cup-group-fixture-lines .canonical-match-badge img{width:36px;
 .cup-progress{padding:8px 11px 10px;border-top:1px solid #1e2a22;display:grid;gap:6px}.cup-through{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700}.cup-through input{width:18px;height:18px}.cup-progress-note{color:var(--muted);font-size:10px}
 
 .coach-requests .team-member-copy{display:grid;gap:2px;min-width:0}.coach-requests .team-member-copy span{display:block;overflow-wrap:anywhere}.coach-requests{margin:12px 0}
+
+/* Mode distinction: Club Admin (navy) vs Coach (green) */
+.mode-pill{display:inline-block;margin:0 0 6px;padding:4px 10px;border-radius:999px;font-size:10.5px;font-weight:900;letter-spacing:.9px;text-transform:uppercase;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.3);color:#fff}
+.mode-pill[data-mode="club"]{background:#fff;color:#16295a;border-color:#fff}
+.mode-pill[data-mode="preview"]{background:rgba(255,255,255,.1);border-style:dashed}
+body.admin-club-mode .hero{background:linear-gradient(145deg,#050a14 0%,#0e1a38 42%,#2c4a94 100%)}
+body.admin-club-mode .top-nav-tab.nav-item.active{color:#2c4a94}
+body.admin-club-mode .primary-button{background:#2c4a94;box-shadow:0 7px 16px rgba(30,52,110,.25)}
+body.admin-club-mode .mobile-primary-item[aria-current="page"]{color:#2c4a94}
+.club-matches-switch{display:flex;gap:4px;padding:4px;margin:0 0 14px;background:#eef2ef;border-radius:14px;border:1px solid #d8dfda}
+.club-matches-switch button{flex:1;border:0;background:none;border-radius:10px;padding:10px 12px;font-weight:850;font-size:14px;color:#51615a}
+.club-matches-switch button.active{background:#fff;color:#2c4a94;box-shadow:0 2px 8px rgba(20,40,90,.12)}
+.club-matches-switch.hidden{display:none!important}
