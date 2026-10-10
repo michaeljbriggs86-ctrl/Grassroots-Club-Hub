@@ -904,6 +904,29 @@ html[data-theme="dark"] #view-inbox .inbox-message.mine .inbox-bubble{background
 #view-inbox .inbox-message.mine .inbox-bubble,#view-inbox .inbox-message.mine .inbox-bubble *{color:#fff!important}
 #view-inbox .inbox-message.mine .inbox-message-meta span,#view-inbox .inbox-message.mine small{opacity:.88}
 
+/* Recent form: five small result squares in one row (a phone rule for form fields, .form-row>*{flex:1 1 100%},
+ * was stretching each chip to full width because the container shares the .form-row class). */
+#recent-form.form-row{display:flex!important;flex-wrap:nowrap!important;gap:6px;margin:8px 0 12px}
+#recent-form.form-row>.form-chip{flex:0 0 34px!important;width:34px!important;height:34px}
+#recent-form.form-row>.form-empty{flex:0 1 auto}
+
+
+/* Keep field names and movement announcements available to assistive technology. */
+.a11y-only{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip-path:inset(50%)!important;white-space:nowrap!important;border:0!important}
+
+@font-face{
+  font-family:Inter;
+  font-style:normal;
+  font-weight:100 900;
+  font-display:swap;
+  src:url('./inter-variable.woff2') format('woff2');
+}
+
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto!important}
+  *,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+}
+
 /* Frontend polish: one preparation surface, with values and supporting details. */
 #view-home #matchday-dashboard .matchday-dashboard-grid{gap:0 16px}
 #view-home #matchday-dashboard .matchday-dashboard-grid>article{

@@ -8,6 +8,7 @@
   <link rel="manifest" href="manifest.json" />
   <link rel="icon" href="icon-192.png" />
   <link rel="apple-touch-icon" href="icon-192.png" />
+  <link rel="preload" href="inter-variable.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="stylesheet" href="styles.css" />
   <link rel="stylesheet" href="cloud.css" />
   <link rel="stylesheet" href="onboarding.css" />
@@ -120,7 +121,7 @@
           </div>
           <details class="matchday-dashboard-note">
             <summary>Private coaching note</summary>
-            <textarea id="matchday-dashboard-note-input" rows="3" maxlength="4000" placeholder="Match plan, reminders or coaching focus..."></textarea>
+            <textarea id="matchday-dashboard-note-input" aria-label="Private coaching note" rows="3" maxlength="4000" placeholder="Match plan, reminders or coaching focus..."></textarea>
             <p class="coach-note-readonly hidden" id="matchday-dashboard-note-readonly"></p>
             <button type="button" class="secondary-button compact" id="save-matchday-dashboard-note">Save note</button>
           </details>
@@ -406,7 +407,7 @@
                 <span class="pitch-halfway"></span><span class="pitch-circle"></span><span class="pitch-box pitch-box-top"></span><span class="pitch-box pitch-box-bottom"></span>
                 <span class="tactics-empty hidden" id="tactics-empty"></span>
               </div>
-              <div class="tactics-board-hint"><p class="helper" id="tactics-help">Drag to move a player. Tap two to swap.</p><p class="tactics-availability-hint hidden" id="tactics-availability-hint">Out = unavailable · Unsure = awaiting confirmation. Adjust the lineup if needed.</p></div>
+              <div class="tactics-board-hint"><p class="helper" id="tactics-help">Drag to move a player. Tap two to swap, or select a pitch player and tap an empty spot to move. Use arrow keys to move a focused player; hold Shift for larger steps.</p><span class="a11y-only" id="tactics-position-status" role="status" aria-live="polite" aria-atomic="true"></span><p class="tactics-availability-hint hidden" id="tactics-availability-hint">Out = unavailable · Unsure = awaiting confirmation. Adjust the lineup if needed.</p></div>
               <div class="tactics-fixture" aria-live="polite"><strong id="tactics-fixture-name">General setup</strong><span id="tactics-fixture-meta">No upcoming fixture published</span><small id="tactics-plan-summary">Your squad plan</small><small class="tactics-match-guide" id="tactics-match-guide"></small></div>
               <details class="matchday-squad-picker tactics-squad-options" id="matchday-squad-picker">
                 <summary class="matchday-squad-summary"><div><strong id="matchday-squad-title">Matchday squad</strong><span id="matchday-squad-fixture">Current setup</span></div><b id="matchday-squad-count">0 / 0</b></summary>
@@ -605,7 +606,7 @@
               <div class="custom-award-settings" id="custom-award-settings">
                 <div class="panel-heading"><div><h3>Award types</h3><p class="muted">Create the awards your team uses. Removing a type does not delete awards already recorded.</p></div></div>
                 <div id="award-types-list" class="award-type-list"></div>
-                <div class="inline-add-row"><input id="new-award-type" type="text" maxlength="48" placeholder="e.g. Coaches Player of the Match"/><button type="button" class="secondary-button compact" id="add-award-type">Add award</button></div>
+                <div class="inline-add-row"><input id="new-award-type" aria-label="New award type" type="text" maxlength="48" placeholder="e.g. Coaches Player of the Match"/><button type="button" class="secondary-button compact" id="add-award-type">Add award</button></div>
               </div>
             </div>
           </details>
@@ -689,7 +690,7 @@
             <summary><span>Season history</span><span class="settings-chevron">⌄</span></summary>
             <div class="settings-accordion-body">
               <p class="muted">Archived seasons are read only and preserve the match record from before rollover.</p>
-              <div class="season-history-controls"><select id="season-history-select"><option value="">No archived seasons yet</option></select><button type="button" class="secondary-button compact" id="open-season-archive">View archive</button></div>
+              <div class="season-history-controls"><select id="season-history-select" aria-label="Archived season"><option value="">No archived seasons yet</option></select><button type="button" class="secondary-button compact" id="open-season-archive">View archive</button></div>
               <div id="season-history-summary" class="archive-summary"></div>
             </div>
           </details>
@@ -883,7 +884,7 @@
       <section class="detail-feature-section" id="detail-assists-section" data-detail-feature="assists"><div class="panel-heading"><h3>Assists</h3><span class="helper">Assists</span></div><div id="detail-assists-inputs" class="detail-player-grid"></div></section>
       <section class="detail-feature-section" id="detail-awards-section" data-detail-feature="awards"><h3>Player awards</h3><div class="form-grid" id="detail-award-fields"></div></section>
       <section class="detail-feature-section match-attendance-section hidden" id="match-attendance-section"><div class="panel-heading"><div><h3>Attendance</h3><span class="helper" id="match-attendance-helper">Attendance status</span></div></div><div id="match-attendance-list" class="match-attendance-list"></div></section>
-      <section class="detail-feature-section secure-coach-note hidden" id="coach-note-section"><div class="panel-heading"><div><h3>Coaching notes</h3><span class="helper">Coaching staff only · not visible to parents</span></div></div><textarea id="coach-match-note" rows="4" maxlength="4000" placeholder="Private coaching observations, follow-up points or development notes..."></textarea><p class="coach-note-readonly hidden" id="coach-note-readonly"></p></section>
+      <section class="detail-feature-section secure-coach-note hidden" id="coach-note-section"><div class="panel-heading"><div><h3>Coaching notes</h3><span class="helper">Coaching staff only · not visible to parents</span></div></div><textarea id="coach-match-note" aria-label="Private coaching observations" rows="4" maxlength="4000" placeholder="Private coaching observations, follow-up points or development notes..."></textarea><p class="coach-note-readonly hidden" id="coach-note-readonly"></p></section>
       <section class="detail-feature-section hidden" id="match-through-section"><div class="panel-heading"><div><h3>Did we go through?</h3><span class="helper">Coaches only · <span id="match-through-label"></span></span></div></div><label class="cup-through"><input type="checkbox" id="match-through-checkbox"> <span>We go through to the next round</span></label></section>
       <div class="empty-detail-options hidden" id="empty-detail-options">All match detail options are switched off. Enable the options you want under Settings → Features.</div>
       <div class="modal-actions match-report-actions">

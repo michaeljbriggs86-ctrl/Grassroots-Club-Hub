@@ -14,6 +14,8 @@ Object.defineProperty(gate,'innerHTML',{get(){return this.markup||''},set(markup
 nodes.set('activation-gate',gate);
 const events=[],errors=[],calls=[];
 const storage=new Map();
+let prevented=0;
+const submit=()=>nodes.get('cloud-signin-form').listeners.submit({preventDefault(){prevented++;}});
 const env={
   profileRole:'parent',session:null,context:null,
   AUTH_DESIGN_REVISION:'test',TEST_MODE_KEY:'test',VERIFY_EMAIL_KEY:'verify',
@@ -35,6 +37,9 @@ vm.runInNewContext(`${source.slice(start,end)}\nthis.openGate=setGateHtml;`,env)
 
 (async()=>{
   env.openGate('signin');
+  assert.match(gate.innerHTML,/<form id="cloud-signin-form" novalidate>/);
+  assert.match(gate.innerHTML,/<button type="submit" class="auth-primary" id="cloud-auth-submit">/);
+  assert.ok(nodes.get('cloud-signin-form').listeners.submit,'Enter and the submit button use native form submission');
   assert.match(gate.innerHTML,/Parent Sign In/,'main login offers an explicit parent route');
   nodes.get('cloud-parent-login').listeners.click();
   assert.equal(gate.dataset.authMode,'parentsignin');
@@ -42,21 +47,24 @@ vm.runInNewContext(`${source.slice(start,end)}\nthis.openGate=setGateHtml;`,env)
   assert.match(gate.innerHTML,/Create Account/);
   nodes.get('cloud-email').value='parent@example.test';nodes.get('cloud-password').value='password';
   env.profileRole='coach';
-  await nodes.get('cloud-auth-submit').listeners.click();
+  await submit();
   assert.deepEqual(calls,['signIn','logout','clear','clearData']);
   assert.equal(env.session,null,'a staff account is discarded from the parent route');
   assert.equal(events.length,0,'staff sign-in cannot be counted as a parent test');
   assert.match(errors.at(-1),/approved Parent access/);
 
   env.profileRole='parent';calls.length=0;
-  await nodes.get('cloud-auth-submit').listeners.click();
+  await submit();
   assert.deepEqual(calls,['signIn','openApp']);
   assert.equal(events[0].detail.source,'parent-signin');
   env.openGate('signin');env.profileRole='coach';calls.length=0;
   nodes.get('cloud-email').value='coach@example.test';nodes.get('cloud-password').value='password';
-  await nodes.get('cloud-auth-submit').listeners.click();
+  await submit();
   assert.deepEqual(calls,['signIn','openApp'],'the shared adult login still accepts a coach');
   assert.equal(events.at(-1).detail.source,'signin');
+  await submit();
+  assert.deepEqual(calls,['signIn','openApp'],'repeated submission is ignored while signing in');
+  assert.equal(prevented,4,'form submission never reloads the page');
   const logoutStart=source.indexOf('  async function signOut(event,nextMode='),logoutEnd=source.indexOf('  function updateCloudPanel(){',logoutStart);
   assert(logoutStart>0&&logoutEnd>logoutStart);
   const intents=new Map(),gateModes=[],logoutCalls=[];
