@@ -1423,11 +1423,20 @@ function fixtureIsReported(f={}){
   const self=normalizeTeamKey(state.division?.teamName||state.meta?.teamName||'');
   return (state.selkent?.results||[]).some(r=>r.date===f.date&&[r.home,r.away].some(name=>normalizeTeamKey(name)===self)&&[r.home,r.away].some(name=>normalizeTeamKey(name)===normalizeTeamKey(f.opponent||'')));
 }
+// Parents stop seeing a matchday (and its Respond prompts) this long after kick-off or group start.
+const PARENT_MATCHDAY_WINDOW_MS=3*60*60*1000;
+function parentMatchdayEnded(f={}){
+  const time=String((miniCupGroup(f)?parentCupGroupDetails(f):resolvedFixture(f))?.time||'').trim(),m=time.match(/^(\d{1,2}):(\d{2})$/);
+  if(!f.date||!m)return false;
+  const start=new Date(`${f.date}T${m[1].padStart(2,'0')}:${m[2]}:00`);
+  return !Number.isNaN(start.getTime())&&Date.now()>=start.getTime()+PARENT_MATCHDAY_WINDOW_MS;
+}
 function upcomingFixtures(){
   const today=new Date();today.setHours(0,0,0,0);
   const parent=CLOUD_MODE&&currentRole==='parent',seen=new Set(),events=[];
   for(const f of state.selkent?.fixtures||[]){
     if(f.date&&new Date(f.date+'T12:00:00')<today)continue;
+    if(parent&&parentMatchdayEnded(f))continue;
     const group=miniCupGroup(f);
     if(group){
       if(seen.has(group.key))continue;
