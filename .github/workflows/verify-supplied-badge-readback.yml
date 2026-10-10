@@ -18,7 +18,7 @@ jobs:
     if: >-
       github.repository == 'michaeljbriggs86-ctrl/Grassroots-Club-Hub' &&
       github.event.pull_request.head.repo.full_name == github.repository &&
-      github.event.pull_request.head.ref == 'codex/supplied-badges-batch8'
+      github.event.pull_request.head.ref == 'codex/supplied-badges-batch9'
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
@@ -31,7 +31,7 @@ jobs:
           python-version: '3.12'
       - name: Install HTTP client
         run: python -m pip install requests==2.32.5
-      - name: Verify four immutable private objects without writing or publishing
+      - name: Verify two immutable private objects without writing or publishing
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
@@ -45,10 +45,8 @@ jobs:
           from stage_pilot_badges_r2 import approvals, checked_stored_kind, r2_reader
 
           expected = {
-              239: '7e64946b8128d26c98e1a3a6d46904e985900c2d6e42f4612c8d69914636d0b1',
-              294: '57c759123b698259f11fcd9c9e691d44cfce4615cc44c44220e6972a09a21ed7',
-              497: '368fb01a82172c619d968530fbeb659678cb3152f1779433b67b92882c21f2c4',
-              303: 'd1a81b904aaacf9715e0e8d7005d6ebc5e1e0047469d2f68f58d4cc2bda76d77',
+              325: '62a9fc1aceeb134353b431690c8b9b4b9f73e3a36fe242559671a07af4d87b88',
+              432: '4bc5b18d5196f274c4f8153ebfcdbbdf87bf67220f9d7d2e66a30280b8458610',
           }
           directory = json.loads(Path('data/directory.json').read_text())
           manifest = json.loads(Path('verification/pilot_verified_badges.json').read_text())
@@ -74,5 +72,5 @@ jobs:
               print(f'PASS real private readback club_id={club_id} sha256={digest} bytes={len(data)} MIME={declared}')
           if failed:
               raise SystemExit('Private readback incomplete; do not merge or publish the badge manifest.')
-          print('PASS all four immutable hashes and image MIME types; no cloud writes or deployment performed.')
+          print('PASS all two immutable hashes and image MIME types; no cloud writes or deployment performed.')
           PY
