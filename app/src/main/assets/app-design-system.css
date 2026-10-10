@@ -965,3 +965,32 @@ html[data-theme="dark"] #view-home #matchday-dashboard .matchday-dashboard-grid>
 .next-fixture-venue>div>span{font-size:12px;line-height:1.4;letter-spacing:normal;text-transform:none;font-weight:600}
 .next-fixture-venue>div>strong{font-size:15px;line-height:1.4}
 .next-fixture-venue>div>small{font-size:13px;line-height:1.4}
+
+/* Availability polish: readable replies and comfortable controls within match details. */
+#match-availability-panel{min-width:0}
+#match-availability-panel .match-availability-head{flex-wrap:wrap;align-items:center;gap:8px}
+#match-availability-panel .match-availability-head>strong{min-width:0;font-size:16px;line-height:1.4}
+#match-availability-panel .availability-count{min-width:0;max-width:100%;white-space:normal;font-size:13px!important;font-weight:600;line-height:1.4;overflow-wrap:anywhere}
+#match-availability-panel #availability-reminder-send{min-height:44px;font-size:14px;line-height:1.4;white-space:normal}
+#match-availability-panel .parent-availability-controls label{font-size:14px;font-weight:600}
+#match-availability-panel #availability-player{font-size:14px;min-height:48px;max-width:100%;min-width:0}
+#match-availability-panel .availability-btn{min-height:48px;font-size:14px;line-height:1.4;font-weight:600;white-space:normal}
+#match-availability-panel .coach-availability-summary{grid-template-columns:minmax(0,1fr);gap:12px}
+#match-availability-panel .availability-summary-group{min-width:0}
+#match-availability-panel .availability-summary-group>summary{min-height:44px;padding:10px 0;font-size:14px;line-height:1.4;font-weight:600;overflow-wrap:anywhere}
+#match-availability-panel .availability-summary-group em{font-size:13px;line-height:1.4}
+#match-availability-panel .availability-player-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(128px,160px);gap:8px;padding:12px 0;align-items:center}
+#match-availability-panel .availability-player-row>span,
+#match-availability-panel .availability-player-row>span>span:last-child{font-size:14px;line-height:1.4;font-weight:600}
+#match-availability-panel .availability-player-row small{font-size:12px;line-height:1.4;font-weight:400}
+#match-availability-panel .availability-player-row select{width:100%;min-width:0;min-height:48px;font-size:14px;line-height:1.4;padding:8px}
+#match-availability-panel .availability-player-row:not(:has(select)){grid-template-columns:minmax(0,1fr)}
+#match-availability-warning{font-size:14px;line-height:1.5}
+#match-availability-warning button{min-height:44px;font-size:14px}
+@media(max-width:560px){
+  #match-availability-panel .availability-player-row{grid-template-columns:minmax(0,1fr)}
+  #match-availability-panel #availability-reminder-send{width:100%}
+}
+@media(min-width:900px){
+  #match-availability-panel .coach-availability-summary{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
