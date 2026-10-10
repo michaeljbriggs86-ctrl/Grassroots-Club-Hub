@@ -2181,7 +2181,7 @@ function renderParentHomeMatchInfo(){
   const linksReady=__parentFamilyStatus==='ready'&&__parentFamilyKey===uid+':'+teamId;
   const repliesReady=__availabilityFixture===fixtureResponseKey(fixture)&&__availabilityTeamId===teamId;
   const group=miniCupGroup(fixture);
-  const when=group?`Group starts ${esc(details.time)} · Three games back to back; your team's order may change. Ask the coach when to arrive.`:confirmed&&details.time?`Kick-off ${esc(details.time)} · Arrive ${esc(matchdayArrivalTime(details.time))}`:'Kick-off awaiting coach confirmation';
+  const when=group?`Group starts ${esc(details.time)} · Two games back to back; your team's order may change. Ask the coach when to arrive.`:confirmed&&details.time?`Kick-off ${esc(details.time)} · Arrive ${esc(matchdayArrivalTime(details.time))}`:'Kick-off awaiting coach confirmation';
   const where=confirmed&&details.groundName?esc(details.groundName):'Venue awaiting coach confirmation';
   const children=linksReady?__parentFamilyLinks.map(link=>{
     const name=String(link.player_name||'').trim(),reply=repliesReady&&['ready','partial'].includes(__availabilityLoadStatus)?__availabilityRows.find(row=>selkentNorm(row.player_name)===selkentNorm(name)):null;
