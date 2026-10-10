@@ -1,0 +1,15 @@
+-- DRAFT. NOT APPLIED. Needs Mike's approval and a Supabase branch test first.
+-- Problem: claim_invite maps every unrecognised invite role (including 'player') to an
+-- approved 'coach'. No player invites exist today (10 coach, 4 parent, 1 club_admin).
+-- Fix outline (apply inside claim_invite's v_role CASE and approval logic):
+--   when inv.role='player' then 'player'
+-- and keep approved_at/approved_by NULL for players until a coach approves.
+-- Also: reject unknown roles instead of defaulting to coach:
+--   else raise exception 'Unsupported invite role';
+-- Also add: ALTER TABLE profiles ADD CONSTRAINT profiles_role_check
+--   CHECK (role in ('club_admin','coach','assistant_coach','parent','player','pending','pending_parent','revoked'));
+-- Also fix parent_player_links_insert: replace "p.club_id = p.club_id" with
+--   "p.club_id = parent_player_links.club_id".
+-- Also: team_player_age() subtracts a year for "Under 8/10/12/14X" labels, so U12X would count as
+-- age 11 (restricted). Mike ruled 10 Oct 2026 that U12X is a published-results group, so this
+-- rule contradicts that. No Shooters Hill team has an X label today. Decide before adding one.

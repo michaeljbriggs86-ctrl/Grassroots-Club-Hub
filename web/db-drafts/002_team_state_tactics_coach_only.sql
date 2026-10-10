@@ -1,0 +1,8 @@
+-- DRAFT. NOT APPLIED. Needs Mike's approval and a tested Supabase branch.
+-- Rule (Mike, 10 Oct 2026): tactics are coach only. U12+ parents and players keep private scores.
+-- In get_team_state_for_me, the final ELSE branch (age 12+) currently returns ts.state untouched,
+-- so parents and players receive the 'tactics' key (present on U12 teams today).
+-- Change that branch to:
+--   state := case when me.role in ('parent','player') then ts.state - 'tactics' else ts.state end;
+-- Also strip 'tactics' inside sanitize_mini_soccer_state for completeness.
+-- Staff roles are unchanged.

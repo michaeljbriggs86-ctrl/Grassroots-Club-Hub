@@ -36,7 +36,7 @@ def check_public_feed(path: Path) -> None:
         raise ValueError("Unsupported public Selkent results feed")
     for age in document.get("age_groups", []):
         age_code = str(age.get("age_group", "")).upper()
-        if age_code not in {"U7", "U8", "U9", "U10", "U10X", "U11"}:
+        if age_code not in {"U7", "U8", "U8X", "U9", "U10", "U10X", "U11"}:
             continue
         if (age.get("standings") is not None or age.get("results") is not None
                 or age.get("published_results") is not None
