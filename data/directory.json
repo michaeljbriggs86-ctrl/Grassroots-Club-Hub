@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-10-09T21:58:53.365622+00:00",
+  "last_updated": "2026-10-10T20:58:06.057506+00:00",
   "clubs": [
     {
       "club_id": 514,
@@ -41,11 +41,11 @@
     {
       "club_id": 239,
       "club_name": "Baldon Sports",
-      "logo_url": "https://images.pitchero.com/club_logos/6221/YBKyTW27RICByxpLXNFb_Screenshot%202024-06-26%20at%2016.47.39.png",
+      "logo_url": "https://test.pitchkind.com/__pilot_badges/239/7e64946b8128d26c98e1a3a6d46904e985900c2d6e42f4612c8d69914636d0b1",
       "logo_status": "pilot_verified",
-      "logo_source": "official_site_image",
+      "logo_source": "user_supplied_private",
       "logo_updated_at": "2026-10-09",
-      "logo_sha256": "e77d17390ac6ecc0b6cd382e8ffd854189bf6cd7ed6f35fe9ed547bc4f09b6a0"
+      "logo_sha256": "7e64946b8128d26c98e1a3a6d46904e985900c2d6e42f4612c8d69914636d0b1"
     },
     {
       "club_id": 486,
@@ -412,7 +412,12 @@
     },
     {
       "club_id": 303,
-      "club_name": "Long Lane"
+      "club_name": "Long Lane",
+      "logo_url": "https://test.pitchkind.com/__pilot_badges/303/d1a81b904aaacf9715e0e8d7005d6ebc5e1e0047469d2f68f58d4cc2bda76d77",
+      "logo_status": "pilot_verified",
+      "logo_source": "user_supplied_private",
+      "logo_updated_at": "2026-10-10",
+      "logo_sha256": "d1a81b904aaacf9715e0e8d7005d6ebc5e1e0047469d2f68f58d4cc2bda76d77"
     },
     {
       "club_id": 563,
@@ -552,7 +557,12 @@
     },
     {
       "club_id": 497,
-      "club_name": "S.E. Eagles FC"
+      "club_name": "S.E. Eagles FC",
+      "logo_url": "https://test.pitchkind.com/__pilot_badges/497/368fb01a82172c619d968530fbeb659678cb3152f1779433b67b92882c21f2c4",
+      "logo_status": "pilot_verified",
+      "logo_source": "user_supplied_private",
+      "logo_updated_at": "2026-10-10",
+      "logo_sha256": "368fb01a82172c619d968530fbeb659678cb3152f1779433b67b92882c21f2c4"
     },
     {
       "club_id": 524,
@@ -607,7 +617,12 @@
     },
     {
       "club_id": 294,
-      "club_name": "ST Sports FC"
+      "club_name": "ST Sports FC",
+      "logo_url": "https://test.pitchkind.com/__pilot_badges/294/57c759123b698259f11fcd9c9e691d44cfce4615cc44c44220e6972a09a21ed7",
+      "logo_status": "pilot_verified",
+      "logo_source": "user_supplied_private",
+      "logo_updated_at": "2026-10-10",
+      "logo_sha256": "57c759123b698259f11fcd9c9e691d44cfce4615cc44c44220e6972a09a21ed7"
     },
     {
       "club_id": 567,
@@ -7827,5 +7842,5 @@
     }
   ],
   "note": "Panel parsing confirmed against all five format categories (mini-soccer, 9-a-side, X-category, 11-a-side, Senior) as of Sept 2026. Club/team linking is heuristic (name-prefix match) - see ambiguous_club_matches in diagnostics for anything flagged as uncertain.",
-  "pilot_badges_revision": "60f1dd66ab084265efbe415facd8f5788652db71d306aa48bdb84efc2c6555ab"
+  "pilot_badges_revision": "3e4ceba32b6abb8a2ced6e799a39c2d1bede80228fe594f4ea538e691a63e63d"
 }
