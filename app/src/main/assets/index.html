@@ -95,6 +95,35 @@
           <div class="panel parent-home-match-info hidden" id="parent-home-match-info"></div>
         </section>
 
+        <section class="panel matchday-dashboard canonical-match-card-active hidden" id="matchday-dashboard">
+          <div class="panel-heading matchday-dashboard-heading">
+            <div><p class="kicker" id="matchday-dashboard-kicker">Next fixture prep</p><h3 id="matchday-dashboard-title">Matchday dashboard</h3></div>
+            <span class="matchday-dashboard-status" id="matchday-dashboard-status"></span>
+          </div>
+          <div class="matchday-dashboard-grid">
+            <article class="matchday-dashboard-fixtures"><span>Matches</span><div class="canonical-match-rows" id="matchday-dashboard-opponent">TBC</div></article>
+            <article><span>Kick-off</span><strong id="matchday-dashboard-kickoff">TBC</strong></article>
+            <article><span>Venue</span><strong id="matchday-dashboard-venue">TBC</strong><small id="matchday-dashboard-address"></small></article>
+            <article><span>Availability</span><strong id="matchday-dashboard-availability">0 available</strong></article>
+            <article><span>Squad</span><strong id="matchday-dashboard-squad">0 selected</strong></article>
+            <article><span>Formation</span><strong id="matchday-dashboard-formation">TBC</strong></article>
+          </div>
+          <div class="matchday-dashboard-alert hidden" id="matchday-dashboard-alert"></div>
+          <div class="kit-clash-warning hidden" id="matchday-dashboard-kit-warning"></div>
+          <div class="matchday-dashboard-actions">
+            <a class="secondary-button compact hidden" id="matchday-dashboard-map" href="#">Open in Maps</a>
+            <button type="button" class="secondary-button compact" id="matchday-add-calendar">Add to calendar</button>
+            <button type="button" class="secondary-button compact hidden" id="matchday-notify-squad">Notify selected squad</button>
+            <button type="button" class="primary-button compact" id="matchday-open-tactics">Open squad & tactics</button>
+          </div>
+          <details class="matchday-dashboard-note">
+            <summary>Private coaching note</summary>
+            <textarea id="matchday-dashboard-note-input" rows="3" maxlength="4000" placeholder="Match plan, reminders or coaching focus..."></textarea>
+            <p class="coach-note-readonly hidden" id="matchday-dashboard-note-readonly"></p>
+            <button type="button" class="secondary-button compact" id="save-matchday-dashboard-note">Save note</button>
+          </details>
+        </section>
+
         <section class="panel club-notices-panel hidden" id="home-club-notices">
           <div class="panel-heading"><div><p class="kicker">Notifications</p><h3>Club notices</h3></div><span class="notice-unread-badge hidden" id="home-notices-unread">0 unread</span></div>
           <div class="club-notices-list" id="home-club-notices-list"></div>
@@ -109,6 +138,7 @@
           </div>
         </section>
 
+        <p class="kicker home-season-group-label" id="home-season-group-label">This season</p>
         <details class="panel home-season-details" id="home-season-record">
           <summary><strong>Season record</strong><span>League progress and match totals</span></summary>
           <div class="home-season-details-body">
@@ -160,34 +190,6 @@
 
 
 
-        <section class="panel matchday-dashboard canonical-match-card-active hidden" id="matchday-dashboard">
-          <div class="panel-heading matchday-dashboard-heading">
-            <div><p class="kicker" id="matchday-dashboard-kicker">Next fixture prep</p><h3 id="matchday-dashboard-title">Matchday dashboard</h3></div>
-            <span class="matchday-dashboard-status" id="matchday-dashboard-status"></span>
-          </div>
-          <div class="matchday-dashboard-grid">
-            <article class="matchday-dashboard-fixtures"><span>Matches</span><div class="canonical-match-rows" id="matchday-dashboard-opponent">TBC</div></article>
-            <article><span>Kick-off</span><strong id="matchday-dashboard-kickoff">TBC</strong></article>
-            <article><span>Venue</span><strong id="matchday-dashboard-venue">TBC</strong><small id="matchday-dashboard-address"></small></article>
-            <article><span>Availability</span><strong id="matchday-dashboard-availability">0 available</strong></article>
-            <article><span>Squad</span><strong id="matchday-dashboard-squad">0 selected</strong></article>
-            <article><span>Formation</span><strong id="matchday-dashboard-formation">TBC</strong></article>
-          </div>
-          <div class="matchday-dashboard-alert hidden" id="matchday-dashboard-alert"></div>
-          <div class="kit-clash-warning hidden" id="matchday-dashboard-kit-warning"></div>
-          <div class="matchday-dashboard-actions">
-            <a class="secondary-button compact hidden" id="matchday-dashboard-map" href="#">Open in Maps</a>
-            <button type="button" class="secondary-button compact" id="matchday-add-calendar">Add to calendar</button>
-            <button type="button" class="secondary-button compact hidden" id="matchday-notify-squad">Notify selected squad</button>
-            <button type="button" class="primary-button compact" id="matchday-open-tactics">Open squad & tactics</button>
-          </div>
-          <details class="matchday-dashboard-note">
-            <summary>Private coaching note</summary>
-            <textarea id="matchday-dashboard-note-input" rows="3" maxlength="4000" placeholder="Match plan, reminders or coaching focus..."></textarea>
-            <p class="coach-note-readonly hidden" id="matchday-dashboard-note-readonly"></p>
-            <button type="button" class="secondary-button compact" id="save-matchday-dashboard-note">Save note</button>
-          </details>
-        </section>
 
         <details class="panel home-season-details" id="home-player-stats">
           <summary><strong>Player &amp; team stats</strong><span>Form, awards and player contribution</span></summary>
