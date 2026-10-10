@@ -2,17 +2,17 @@ const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/st
 function createHarness(){
   const source=fs.readFileSync('app/src/main/assets/app.js','utf8'),nodes=new Map();
   const node=id=>{
-    if(!nodes.has(id)){const classes=new Set();nodes.set(id,{innerHTML:'',textContent:'',value:'',href:'',className:'',classList:{toggle(k,on){if(on)classes.add(k);else classes.delete(k);},contains:k=>classes.has(k)},removeAttribute(k){this[k]='';}});}
+    if(!nodes.has(id)){const classes=new Set();nodes.set(id,{innerHTML:'',textContent:'',value:'',href:'',className:'',classList:{add(k){classes.add(k);},toggle(k,on){if(on)classes.add(k);else classes.delete(k);},contains:k=>classes.has(k)},removeAttribute(k){this[k]='';}});}
     return nodes.get(id);
   };
   const own='Shooters Hill AFC Valiants';
   const fixtures=[{date:'2026-10-10',time:'09:00',competition:'U9 Selkent Cup Two - Round 1',opponent:'Chislehurst Wanderers Panthers',venue:'A'},{date:'2026-10-10',time:'09:00',competition:'U9 Selkent Cup Two - Round 1',opponent:'Lewisham Borough Cobras',venue:'H'}];
   const c={state:{selkent:{fixtures},tactics:{formation:'2–3–1'},meta:{}},window:{},document:{getElementById:node},__matchdayNoteStamp:'',
-    fixtures,confirmed:true,coach:true,preview:false,details:{time:'09:00',groundName:'Marathon Sports Ground',address:'Shooters Hill'},context:{ground:'Wrong opponent ground',address:'Wrong opponent address',mapHref:'wrong-map'},
+    fixtures,confirmed:true,coach:true,preview:false,ack:{status:'confirmed'},counts:{available:8,'no-response':2},details:{time:'09:00',groundName:'Marathon Sports Ground',address:'Shooters Hill'},context:{ground:'Wrong opponent ground',address:'Wrong opponent address',mapHref:'wrong-map'},
     isCoach:()=>c.coach,isAdminTeamPreviewMode:()=>c.preview,nextPublishedFixture:()=>c.fixtures[0]||null,
     miniCupGroup:f=>c.fixtures.length===2?{date:f.date,competition:f.competition,fixtures:c.fixtures}:null,
     parentCupGroupDetails:()=>c.details,resolvedFixture:()=>c.details,parentMatchdayReady:()=>c.confirmed,fixtureDetailsConfirmed:()=>c.confirmed,fixtureOverviewContext:()=>c.context,
-    ensureTacticsState:()=>{},currentTacticsFixtureKey:()=> 'test',availabilityCounts:()=>({available:8,'no-response':2}),fixtureAckState:()=>({status:'confirmed'}),requiresMatchdaySelection:()=>false,footballFormat:()=>({matchday:10}),activePlayers:()=>Array(10).fill({}),
+    ensureTacticsState:()=>{},currentTacticsFixtureKey:()=> 'test',availabilityCounts:()=>c.counts,fixtureAckState:()=>c.ack,requiresMatchdaySelection:()=>false,footballFormat:()=>({matchday:10}),activePlayers:()=>Array(10).fill({}),
     kitWarningHtml:()=>'',matchdayFixtureNoteKey:()=>'',formatDate:s=>s.slice(8)+' Oct 26',mapsHref:(...parts)=>'https://maps.example/?q='+encodeURIComponent(parts.join(' ')),
     selkentNorm:s=>String(s||'').toLowerCase(),matchTeamLabel:s=>String(s||'').replace(/_/g,' '),esc:s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;'),
     homeFixtureTeamNames:f=>f.venue==='A'?{home:f.opponent,away:own}:{home:own,away:f.opponent},
@@ -41,8 +41,8 @@ async function verify(){
   c.fixtures=[{...c.fixtures[0],competition:'League'}];c.details={time:'10:00',groundName:'Heathside Sports Ground',address:'Horton Road'};await c.renderMatchdayDashboard();
   assert.equal((node('matchday-dashboard-opponent').innerHTML.match(/class="canonical-match-fixture-row"/g)||[]).length,1);
   assert.equal(node('matchday-dashboard-venue').textContent,'Heathside Sports Ground');assert(!node('matchday-add-calendar').classList.contains('hidden'));
-  c.details={time:''};c.context={ground:'Ground TBC',address:'Address TBC'};c.confirmed=false;await c.renderMatchdayDashboard();
-  assert(node('matchday-dashboard-kickoff').textContent.includes('awaiting confirmation'));assert.equal(node('matchday-dashboard-map').href,'','old map cleared on unconfirmed fixture');assert(node('matchday-dashboard-map').classList.contains('hidden'));
+  c.fixtures[0].time='';c.details={time:''};c.context={ground:'Ground TBC',address:'Address TBC'};c.confirmed=false;await c.renderMatchdayDashboard();
+  assert.equal(node('matchday-dashboard-kickoff').textContent,'10 Oct 26 · Kick-off TBC');assert.equal(node('matchday-dashboard-confirmation').textContent,'Match details awaiting confirmation');assert.equal(node('matchday-dashboard-map').href,'','old map cleared on unconfirmed fixture');assert(node('matchday-dashboard-map').classList.contains('hidden'));
   c.coach=false;c.preview=false;await c.renderMatchdayDashboard();assert(node('matchday-dashboard').classList.contains('hidden'),'parent has no staff matchday preparation panel');
   c.preview=true;await c.renderMatchdayDashboard();assert(!node('matchday-dashboard').classList.contains('hidden'),'admin team preview remains available');
   c.fixtures=[];await c.renderMatchdayDashboard();assert(node('matchday-dashboard').classList.contains('hidden'),'no fixture hides panel');
