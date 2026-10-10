@@ -715,7 +715,7 @@ html[data-theme="dark"] .club-page-watermark{opacity:.07}
 #view-home .next-match-summary-date{display:inline-block;justify-self:center;padding:6px 12px;border-radius:999px;background:var(--gch-soft-green);color:var(--gch-green-900);font-size:15px;line-height:1.3}
 #view-home .home-next-match:has(+#matchday-dashboard:not(.hidden)){margin-bottom:0!important}
 #view-home .home-next-match+#matchday-dashboard{margin-top:0;border-top-left-radius:0;border-top-right-radius:0;border-top:1px dashed var(--gch-line);padding-top:18px}
-#view-home .home-next-match:has(+#matchday-dashboard:not(.hidden)) .next-match-summary-card{margin-bottom:0;border-bottom-left-radius:0;border-bottom-right-radius:0;box-shadow:none}
+#view-home .home-next-match:has(+#matchday-dashboard:not(.hidden)) .next-match-summary-card{margin-bottom:0;border-bottom-left-radius:0!important;border-bottom-right-radius:0!important;box-shadow:none}
 #view-home:has(#next-match-card:not(.hidden):not(.no-fixture)) #matchday-dashboard .matchday-dashboard-fixtures{display:none}
 #view-home #matchday-dashboard{margin-bottom:18px}
 #view-home #matchday-dashboard .matchday-dashboard-heading{margin-bottom:12px}
@@ -993,4 +993,80 @@ html[data-theme="dark"] #view-home #matchday-dashboard .matchday-dashboard-grid>
 }
 @media(min-width:900px){
   #match-availability-panel .coach-availability-summary{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+
+/* Shared screen presentation: every profile uses the same lead-card and copy system. */
+.view .screen-lead-card{
+  border:1px solid var(--gch-line)!important;
+  border-top:4px solid var(--gch-green-600)!important;
+  border-radius:var(--gch-radius-card)!important;
+  box-shadow:var(--gch-shadow-card);
+}
+html[data-theme="dark"] .view .screen-lead-card,
+html[data-theme="dark"] body.role-parent #view-home .screen-lead-card{
+  border-color:#344239!important;border-top-color:var(--gch-green-600)!important;
+}
+.view .panel-heading,.view .section-title-row,.modal .modal-heading{min-width:0;flex-wrap:wrap;gap:10px 14px}
+.view .panel-heading>div,.view .section-title-row>div,.modal .modal-heading>div{min-width:0;flex:1 1 180px}
+.view .panel-heading h3,.view .panel>h3{font-size:18px;line-height:1.3;overflow-wrap:anywhere}
+.view .kicker{font-size:12px;line-height:1.4}
+.view .panel p,.view .panel label,.view .form-panel label,.modal label{font-size:14px;line-height:1.5}
+.view .helper,.view .panel .helper,.view .panel p.muted,.modal .helper,.modal p.muted{font-size:13px;line-height:1.5}
+.view .empty-state{font-size:14px;line-height:1.5}
+.view .empty-state strong{font-size:16px;line-height:1.4}
+.view .panel input,.view .panel select,.view .panel textarea,.modal input,.modal select,.modal textarea{font-size:14px;max-width:100%;min-width:0}
+.view .primary-button,.view .secondary-button,.modal .primary-button,.modal .secondary-button{font-size:14px;line-height:1.4;min-height:48px;white-space:normal}
+.view .screen-section-nav button,#view-inbox .communications-tabs button{min-height:44px;font-size:13px}
+.view .settings-accordion>summary{font-size:16px;line-height:1.4}
+.view .settings-accordion-body{font-size:14px;line-height:1.5}
+.modal .modal-heading h3{font-size:18px;line-height:1.3;overflow-wrap:anywhere}
+.modal .modal-actions{gap:10px}
+
+/* Parent activity cards share the staff Home hierarchy, including the confirmed continuation. */
+body.role-parent #view-home .home-next-match{gap:8px;margin-bottom:16px}
+body.role-parent .parent-home-training{padding:16px;gap:0;margin-bottom:16px}
+body.role-parent .parent-home-training h3{margin:0 0 8px;font-size:18px;line-height:1.3}
+body.role-parent #parent-matches-training .parent-training-row,
+body.role-parent .parent-training-row{gap:4px;padding:12px 0;min-width:0}
+body.role-parent .parent-training-row strong,
+body.role-parent #parent-matches-training .parent-training-row strong{font-size:15px;line-height:1.4;overflow-wrap:anywhere}
+body.role-parent .parent-training-row span,body.role-parent .parent-training-row small,
+body.role-parent #parent-matches-training .parent-training-row span,
+body.role-parent #parent-matches-training .parent-training-row small{font-size:13px;line-height:1.5;overflow-wrap:anywhere}
+body.role-parent .parent-home-training .parent-training-row:first-of-type{border-top:0;padding-top:4px}
+body.role-parent .training-later-dates>summary{min-height:44px;font-size:14px;line-height:1.5}
+body.role-parent .parent-home-match-meta>strong{font-size:18px;line-height:1.3}
+body.role-parent .parent-home-match-meta>span{font-size:14px;line-height:1.5;overflow-wrap:anywhere}
+body.role-parent .parent-home-reply{padding:12px 0 0}
+body.role-parent .parent-home-reply strong,.parent-child-row strong{font-size:14px;line-height:1.4}
+body.role-parent .parent-home-reply small,.parent-child-row small{font-size:13px;line-height:1.5}
+body.role-parent .parent-family-message{font-size:13px;line-height:1.5}
+body.role-parent .parent-home-match-actions button{font-size:14px;min-height:44px}
+body.role-parent #parent-matches-placeholder{font-size:14px;line-height:1.5;padding:16px;border-radius:var(--gch-radius-card);margin-bottom:16px}
+body.role-parent #view-matches:has(#matches-next-fixture:not(.hidden)) #parent-matches-training{border-top-width:1px!important;border-top-color:var(--gch-line)!important}
+html[data-theme="dark"] body.role-parent #view-matches:has(#matches-next-fixture:not(.hidden)) #parent-matches-training{border-top-color:#344239!important}
+body.role-parent #view-home .home-next-match:has(#parent-home-match-info:not(.hidden)):not(:has(.cup-group-fixture-lines)) #next-match-card{
+  margin-bottom:0;border-bottom-left-radius:0!important;border-bottom-right-radius:0!important;box-shadow:none;
+}
+body.role-parent #view-home .home-next-match:has(#parent-home-match-info:not(.hidden)):not(:has(.cup-group-fixture-lines)){gap:0}
+body.role-parent #view-home .home-next-match:not(:has(.cup-group-fixture-lines)) #parent-home-match-info:not(.hidden){
+  border-top:0!important;border-top-left-radius:0!important;border-top-right-radius:0!important;
+}
+body.role-parent #view-home .parent-home-training{margin-bottom:0}
+
+/* The same fixture surface is used on Schedule, staff Matches and the details dialog. */
+.matches-next-fixture .next-fixture-versus,.next-fixture-modal .next-fixture-versus{
+  background:var(--gch-soft-green);border-color:var(--gch-line);color:var(--gch-ink);
+}
+.matches-next-fixture .match-team-side .club-detail-link,.next-fixture-modal .match-team-side .club-detail-link{color:var(--gch-green-900);text-decoration-color:currentColor;font-size:14px;line-height:1.4}
+.matches-next-fixture .match-side-label,.next-fixture-modal .next-fixture-versus .match-side-label{color:var(--gch-muted);font-size:12px;line-height:1.4;letter-spacing:.04em}
+.matches-next-fixture .match-kit-secondary small,.next-fixture-modal .next-fixture-versus .match-kit-secondary small{color:var(--gch-muted);font-size:12px;line-height:1.4}
+html[data-theme="dark"] .matches-next-fixture .next-fixture-versus,html[data-theme="dark"] .next-fixture-modal .next-fixture-versus{background:#17311f;border-color:#344239;color:#f2f7f3}
+html[data-theme="dark"] .matches-next-fixture .match-team-side .club-detail-link,html[data-theme="dark"] .next-fixture-modal .match-team-side .club-detail-link{color:#98e3a3!important}
+html[data-theme="dark"] .matches-next-fixture .match-side-label,html[data-theme="dark"] .next-fixture-modal .next-fixture-versus .match-side-label,
+html[data-theme="dark"] .matches-next-fixture .match-kit-secondary small,html[data-theme="dark"] .next-fixture-modal .next-fixture-versus .match-kit-secondary small{color:#b9c7be}
+@media(max-width:560px){
+  .modal .modal-actions{grid-template-columns:minmax(0,1fr)}
+  .view .panel-heading>button{max-width:100%}
+  body.role-parent .parent-home-family-actions>button{flex:1 1 140px}
 }
