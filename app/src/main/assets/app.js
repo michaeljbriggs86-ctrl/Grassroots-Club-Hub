@@ -365,22 +365,6 @@ function renderAssignmentTeamOptions(){
   }
   updateAssignmentRoleUi();
 }
-async function generateAssignmentCode(){
-  if(!isAdmin()){toast('Club Admin access is required.');return;}
-  if(!CLOUD_MODE){toast('Cloud access is required to create invites.');return;}
-  const role=document.getElementById('assignment-role')?.value||'coach';
-  const team=role==='club_admin'?null:adminAssignmentTeam();
-  if(role!=='club_admin'&&!team){alert('Choose a team.');return;}
-  try{
-    const invite=await window.ClubHubCloud.createInvite({teamId:team?.id||null,role,label:'',expiresHours:168});
-    const out=document.getElementById('assignment-code-output');if(out)out.value=invite?.code||invite?.invite_code||'';
-    const meta=document.getElementById('assignment-code-meta');
-    if(meta)meta.textContent=role==='club_admin'
-      ? 'Club Admin · club-wide access · expires in 7 days'
-      : `${role==='assistant_coach'?'Assistant Coach':role==='coach'?'Coach':'Parent'} · ${team.ageGroup} ${team.teamName} · expires in 7 days`;
-    toast('Invite code created');
-  }catch(err){alert('Could not create invite: '+(err.message||err));}
-}
 async function copyAssignmentCode(){
   const out=document.getElementById('assignment-code-output');if(!out?.value)return;
   try{await navigator.clipboard.writeText(out.value);toast('Access code copied');}catch{out.select();document.execCommand('copy');toast('Access code copied');}
@@ -4675,16 +4659,6 @@ async function reviewCoachRequestClick(requestId,approve){
   catch(err){alert(err.message||err);}
 }
 document.addEventListener('click',e=>{const a=e.target.closest?.('[data-coach-request-approve]'),d=e.target.closest?.('[data-coach-request-decline]');if(a)reviewCoachRequestClick(a.dataset.coachRequestApprove,true);else if(d)reviewCoachRequestClick(d.dataset.coachRequestDecline,false);});
-async function createClubAdminInvite(){
-  if(!CLOUD_MODE||!isAdmin()||!isClubOverviewMode())return;
-  try{
-    const invite=await window.ClubHubCloud.createInvite({teamId:null,role:'club_admin',label:'Club Admin invite',expiresHours:168});
-    if(!invite?.code)throw new Error('The invite service returned no code. Please try again.');
-    const out=document.getElementById('club-admin-invite-code'),wrap=document.getElementById('club-admin-invite-output');if(out)out.value=invite?.code||'';wrap?.classList.remove('hidden');toast('Club Admin invite created');
-  }catch(err){alert(err.message||err);}
-}
-async function copyClubAdminInvite(){const el=document.getElementById('club-admin-invite-code');if(!el?.value)return toast('Create an invite first');try{await navigator.clipboard.writeText(el.value);toast('Club Admin invite copied');}catch{el.select();document.execCommand('copy');toast('Club Admin invite copied');}}
-
 let __complianceStatus=null;
 async function refreshCompliancePanel(){
   const box=document.getElementById('compliance-status');if(!CLOUD_MODE||!window.ClubHubCloud?.getClubComplianceStatus)return;
@@ -5365,8 +5339,6 @@ document.getElementById('create-tournament')?.addEventListener('click',()=>openT
 document.getElementById('tournament-form')?.addEventListener('submit',saveTournament);
 document.getElementById('open-season-archive')?.addEventListener('click',openSeasonArchive);
 document.getElementById('refresh-audit-history')?.addEventListener('click',()=>refreshAuditHistory(false));
-document.getElementById('create-club-admin-invite')?.addEventListener('click',createClubAdminInvite);
-document.getElementById('copy-club-admin-invite')?.addEventListener('click',copyClubAdminInvite);
 document.getElementById('archive-current-season')?.addEventListener('click',archiveCurrentSeason);
 document.getElementById('rollover-season')?.addEventListener('click',rolloverSeason);
 document.getElementById('match-form').addEventListener('submit',submitMatch);
@@ -5453,7 +5425,7 @@ document.getElementById('import-json')?.addEventListener('change',e=>{if(e.targe
 document.getElementById('reset-data')?.addEventListener('click',()=>{if(!requireCoach())return;if(confirm("Reset this team\'s app data?")){state=(CLOUD_MODE&&window.ClubHubCloud?.currentTeam?.())?blankStateForTeam(window.ClubHubCloud.currentTeam()):(isTeamLocked()?blankStateForTeam(assignedTeam()):cloneStarter());enforceAssignedTeam(false);saveState();toast('Team data reset');}});
 const activateBtn=document.getElementById('activate-account-btn');if(activateBtn)activateBtn.addEventListener('click',activateAssignment);
 const assignmentRoleSelect=document.getElementById('assignment-role');if(assignmentRoleSelect)assignmentRoleSelect.addEventListener('change',updateAssignmentRoleUi);
-const generateBtn=document.getElementById('generate-assignment-code');if(generateBtn)generateBtn.addEventListener('click',generateAssignmentCode);
+
 const copyBtn=document.getElementById('copy-assignment-code');if(copyBtn)copyBtn.addEventListener('click',copyAssignmentCode);
 const playerInviteBtn=document.getElementById('generate-team-player-invite');if(playerInviteBtn)playerInviteBtn.addEventListener('click',createTeamPlayerInvite);
 const copyPlayerInviteBtn=document.getElementById('copy-team-player-invite');if(copyPlayerInviteBtn)copyPlayerInviteBtn.addEventListener('click',copyTeamPlayerInvite);
