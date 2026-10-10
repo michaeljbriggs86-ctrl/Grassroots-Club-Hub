@@ -117,7 +117,7 @@ async function run(){
  Object.defineProperty(n.state.selkent,'fixtures',{configurable:true,get(){throw Error('normalizeState must not access global fixtures');}});
  const normalize=take('function normalizeState(', 'function normalizeAwardTypes(');
  const oldNormalize=normalize.replace('function normalizeState(','function oldNormalizeState(').replace('fixtureDatedGameKey(data.selkent.fixtureTracking.snapshot)',"`${String(data.selkent.fixtureTracking.snapshot.date||'')}|${fixtureStableKey(data.selkent.fixtureTracking.snapshot)}`");
- vm.runInContext(normalize+oldNormalize,n);assert.deepEqual(plain(n.normalizeState(saved)),plain(n.oldNormalizeState(saved)));assert.equal(n.normalizeState(saved).selkent.legacyResponseFixtureKey,dated[0]);
+ vm.runInContext(take('function normaliseCupProgress(','function cupProgressKey(')+normalize+oldNormalize,n);assert.deepEqual(plain(n.normalizeState(saved)),plain(n.oldNormalizeState(saved)));assert.equal(n.normalizeState(saved).selkent.legacyResponseFixtureKey,dated[0]);
  saved.selkent.responseKeyVersion=2;saved.selkent.legacyResponseFixtureKey=dated[1];assert.deepEqual(plain(n.normalizeState(saved)),plain(n.oldNormalizeState(saved)));assert.equal(n.normalizeState(saved).selkent.legacyResponseFixtureKey,dated[1]);
  // N4: actual refresh UI retains SAME-context replies, initial failure is unknown, retry recovers, switches clear, and stale requests cannot win.
  const a=context('Shooters Hill AFC Vikings',vikings);let fail=false,scope='team-one',user='user-one';a.window.ClubHubCloud.currentTeam=()=>({id:scope});a.window.ClubHubCloud.session.user={get id(){return user;}};
