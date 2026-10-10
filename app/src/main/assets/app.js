@@ -4849,7 +4849,8 @@ function renderInbox(){
   const rows=__inboxMessages.filter(m=>inboxOtherId(m)===selected),contact=__inboxContacts.find(c=>c.user_id===selected);
   if(hint)hint.textContent=contact?`Conversation with ${inboxContactLabel(contact)}`:'Choose a conversation';
   const theirName=contact?.full_name||inboxContactRoleLabel(contact),initials=String(theirName||'?').split(/\s+/).filter(Boolean).slice(0,2).map(w=>w[0]).join('').toUpperCase()||'?';
-  box.innerHTML=rows.map(m=>{const mine=m.sender_user_id===me;return `<article class="inbox-message ${mine?'mine':'theirs'}">${mine?'':`<span class="inbox-avatar" aria-hidden="true">${esc(initials)}</span>`}<div class="inbox-bubble"><div class="inbox-message-meta"><strong>${mine?'You':esc(theirName)}</strong><span>${new Date(m.created_at).toLocaleString('en-GB',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})}</span></div>${m.subject?`<b class="inbox-message-subject">${esc(m.subject)}</b>`:''}<p>${esc(m.body).replace(/\n/g,'<br>')}</p>${mine?`<small>${m.read_at?'Read':'Sent'}</small>`:''}</div></article>`;}).join('')||'<div class="empty-state compact-empty">No messages in this conversation yet.</div>';
+  let lastSubject='';
+  box.innerHTML=rows.map(m=>{const mine=m.sender_user_id===me,subj=String(m.subject||'').trim(),showSubject=!!subj&&subj!==lastSubject;if(subj)lastSubject=subj;return `<article class="inbox-message ${mine?'mine':'theirs'}">${mine?'':`<span class="inbox-avatar" aria-hidden="true">${esc(initials)}</span>`}<div class="inbox-bubble"><div class="inbox-message-meta"><strong>${mine?'You':esc(theirName)}</strong><span>${new Date(m.created_at).toLocaleString('en-GB',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})}</span></div>${showSubject?`<b class="inbox-message-subject">${esc(subj)}</b>`:''}<p>${esc(m.body).replace(/\n/g,'<br>')}</p>${mine?`<small>${m.read_at?'Read':'Sent'}</small>`:''}</div></article>`;}).join('')||'<div class="empty-state compact-empty">No messages in this conversation yet.</div>';
   box.scrollTop=box.scrollHeight;
   const ids=rows.filter(m=>m.recipient_user_id===me&&!m.read_at).map(m=>m.id);
   if(ids.length)window.ClubHubCloud.markClubMessagesRead(ids).then(()=>{const stamp=new Date().toISOString();__inboxMessages.forEach(m=>{if(ids.includes(m.id))m.read_at=stamp;});updateInboxBadges(__inboxMessages.filter(m=>m.recipient_user_id===me&&!m.read_at).length);}).catch(()=>{});
@@ -4871,6 +4872,7 @@ async function refreshInbox(quiet=false){
     if(help)help.textContent=isAdmin()?'Message anyone in the club, individually or as private group copies.':['coach','assistant_coach'].includes(currentRole)?'Message Club Admin or parents on your team.':'Message Club Admin or your team coaching staff.';
   }catch(err){box.innerHTML='<div class="empty-state compact-empty">Inbox is temporarily unavailable.</div>';}
 }
+function existingInboxSubject(recipient){const me=inboxMyUserId();const rows=__inboxMessages.filter(m=>((m.sender_user_id===me&&m.recipient_user_id===recipient)||(m.recipient_user_id===me&&m.sender_user_id===recipient))&&String(m.subject||'').trim());return rows.length?String(rows[rows.length-1].subject).trim():'';}
 function existingInboxThread(recipient){const me=inboxMyUserId();const rows=__inboxMessages.filter(m=>(m.sender_user_id===me&&m.recipient_user_id===recipient)||(m.recipient_user_id===me&&m.sender_user_id===recipient));return rows.length?rows[rows.length-1].thread_id:null;}
 async function sendInboxMessage(){
   if(!CLOUD_MODE||!['admin','coach','assistant_coach','parent'].includes(currentRole))return;
@@ -4879,7 +4881,8 @@ async function sendInboxMessage(){
   try{
     const recipients=__inboxSelected.startsWith('group:')?inboxGroupRecipients(__inboxSelected):[__inboxSelected].filter(Boolean);
     if(!recipients.length)throw new Error('Choose a recipient');
-    for(const id of recipients)await window.ClubHubCloud.sendClubMessage({recipientUserId:id,subject,body,threadId:existingInboxThread(id)});
+    // club_messages.subject is NOT NULL and send_club_message turns '' into NULL, so a blank subject reuses the conversation's last one, else "Message".
+    for(const id of recipients)await window.ClubHubCloud.sendClubMessage({recipientUserId:id,subject:subject||existingInboxSubject(id)||'Message',body,threadId:existingInboxThread(id)});
     document.getElementById('inbox-message-body').value='';document.getElementById('inbox-subject').value='';
     toast(recipients.length>1?`Message sent to ${recipients.length} people`:'Message sent');await refreshInbox(false);
   }catch(err){alert('Could not send message: '+(err.message||err));}finally{if(btn){btn.disabled=false;btn.textContent='Send';}}
