@@ -262,6 +262,22 @@ function isTeamLocked(){
   return CLOUD_MODE ? (!isAdmin() && !!assignedTeam()) : (!isAdmin() && !!assignedTeam());
 }
 function plural(n,one,many){return `${n} ${Number(n)===1?one:(many||one+'s')}`;}
+let __coachTeamsLoaded=false,__coachTeams=[];
+/** Coaches (and Club Admins who coach) assigned to more than one team pick the team they are working on. */
+async function refreshCoachTeamSwitch(preview){
+  const sel=document.getElementById('hero-team-switch');if(!sel)return;
+  if(!CLOUD_MODE||!window.ClubHubCloud?.listMyCoachTeams){sel.classList.add('hidden');return;}
+  if(!__coachTeamsLoaded){__coachTeamsLoaded=true;__coachTeams=await window.ClubHubCloud.listMyCoachTeams();}
+  const show=__coachTeams.length>1&&!preview&&(!isAdmin()||isAdminCoachMode());
+  sel.classList.toggle('hidden',!show);if(!show)return;
+  sel.innerHTML=__coachTeams.map(t=>`<option value="${esc(t.team_id)}"${t.is_active?' selected':''}>U${esc(t.age_group)} ${esc(t.name)}</option>`).join('');
+  if(!sel.dataset.bound){sel.dataset.bound='1';sel.addEventListener('change',async()=>{
+    const id=sel.value;sel.disabled=true;
+    try{await window.ClubHubCloud.switchMyCoachTeam(id);location.reload();}
+    catch(err){sel.disabled=false;toast(err?.message||'Could not switch team.');__coachTeamsLoaded=false;refreshCoachTeamSwitch(false);}
+  });}
+  sel.disabled=false;
+}
 function adminTitleLabel(title){const t=String(title||'').trim();return t?`${t} · Admin`:'Club Admin';}
 function roleLabel(){ return currentRole==='admin'?adminTitleLabel(window.ClubHubCloud?.context?.profile?.club_title):currentRole==='assistant_coach'?'Assistant Coach':currentRole==='parent'?'Parent':currentRole==='player'?'Player':currentRole==='pending_parent'?'Parent awaiting approval':'Coach'; }
 function b64urlEncodeText(text=''){
@@ -2286,6 +2302,7 @@ function applyAccessMode(){
     profileSwitch.classList.toggle('hidden',!show);
     if(show){const own=dualCoachTeam();profileSwitch.textContent=isAdminCoachMode()?'Club Admin':`Coach · ${own?.ageGroup||''} ${matchTeamLabel(own?.teamName||'')}`.trim();}
   }
+  refreshCoachTeamSwitch(!!preview);
   const previewBack=document.getElementById('hero-admin-preview-back');if(previewBack)previewBack.classList.toggle('hidden',!preview);
   syncHeaderUtilityBar();
   document.body.classList.toggle('team-locked',isTeamLocked());
