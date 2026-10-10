@@ -1,66 +1,41 @@
+// Legacy filename retained; Club Admin summaries now use navigable pages.
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const path=require('node:path');
-
+const vm=require('node:vm');
 const app=fs.readFileSync(path.join(__dirname,'../app/src/main/assets/app.js'),'utf8');
 const html=fs.readFileSync(path.join(__dirname,'../app/src/main/assets/index.html'),'utf8');
-const open=app.slice(app.indexOf('function openAdminClubList(kind){'),app.indexOf('let __divisionEntryMode=false;'));
-const close=app.slice(app.indexOf("for(const kind of ['fixtures','results']){"),app.indexOf("document.getElementById('squad-list-tab')",app.indexOf("for(const kind of ['fixtures','results']){")));
-assert.ok(open.startsWith('function openAdminClubList')&&close.startsWith("for(const kind of ['fixtures','results'])"));
-
-function element(id){
-  const classes=new Set(['hidden']);
-  return {id,children:[],classList:{add:x=>classes.add(x),remove:x=>classes.delete(x),contains:x=>classes.has(x)},
-    appendChild(node){if(node.parent)node.parent.children=node.parent.children.filter(x=>x!==node);this.children.push(node);node.parent=this;},
-    scrollIntoView(){this.scrolled=true;},focus(){this.focused=true;}};
-}
-const ids={};
+const start=app.indexOf('function openAdminSummary(kind){'),end=app.indexOf('let __divisionEntryMode=false;',start);
+assert(start>=0&&end>start,'current summary handler is present');
+const scrollHelper=app.match(/function preferredScrollBehavior\(\)\{[^\n]+/);
+assert(scrollHelper,'production reduced-motion helper is present');
+let overview=true,reducedMotion=false;
+const navigations=[],scrolls=[],focuses=[];
+const ids=Object.fromEntries(['admin-home-age-select','admin-attention-panel'].map(id=>[id,{
+  scrollIntoView:options=>scrolls.push({id,...options}),focus:options=>focuses.push({id,...options})
+}]));
+const c={document:{getElementById:id=>ids[id]||null},isClubOverviewMode:()=>overview,
+  window:{matchMedia:()=>({matches:reducedMotion})},navigate:target=>navigations.push(target)};
+vm.createContext(c);
+vm.runInContext(`${scrollHelper[0]}\n${app.slice(start,end)}`,c);
+c.openAdminSummary('fixtures');c.openAdminSummary('results');
+assert.deepEqual(navigations,['club-fixtures','club-results'],'summaries enter existing routed pages');
+assert.equal(scrolls.length,0,'fixture/results navigation does not scroll overview controls');
+c.openAdminSummary('teams');
+reducedMotion=true;c.openAdminSummary('attention');
+assert.deepEqual(scrolls,[{id:'admin-home-age-select',behavior:'smooth',block:'start'},
+  {id:'admin-attention-panel',behavior:'auto',block:'start'}]);
+assert.deepEqual(focuses,[{id:'admin-home-age-select',preventScroll:true},
+  {id:'admin-attention-panel',preventScroll:true}]);
+delete ids['admin-attention-panel'];c.openAdminSummary('attention');
+assert.equal(focuses.length,2,'missing targets are harmless');
+overview=false;
+for(const kind of ['fixtures','results','teams','attention'])c.openAdminSummary(kind);
+assert.equal(navigations.length,2,'non-overview roles cannot open club-wide summaries');
+assert.equal(scrolls.length,2);
+assert.equal(focuses.length,2);
 for(const kind of ['fixtures','results']){
-  ids[`club-${kind}-panel`]=element(`club-${kind}-panel`);
-  ids[`club-${kind}-slot`]=element(`club-${kind}-slot`);
-  ids[`admin-${kind}-dialog-content`]=element(`admin-${kind}-dialog-content`);
-  ids[`club-${kind}-slot`].appendChild(ids[`club-${kind}-panel`]);
-  const dialog=ids[`admin-${kind}-dialog`]=element(`admin-${kind}-dialog`);
-  dialog.open=false;
-  dialog.listeners={};
-  dialog.showModal=function(){this.open=true;};
-  dialog.addEventListener=function(name,callback){this.listeners[name]=callback;};
-  dialog.close=function(){this.open=false;this.listeners.close();};
+  assert.match(html,new RegExp(`data-admin-summary="${kind}"`));
+  assert.match(html,new RegExp(`id="club-${kind}-panel"`));
 }
-ids['club-results-age']=element('club-results-age');ids['admin-home-age-select']=element('admin-home-age-select');ids['admin-attention-panel']=element('admin-attention-panel');
-let admin=true,fixtures=0,results=0,clubTabs=0;
-const run=new Function('document','isClubOverviewMode','refreshAdminFixtures','refreshClubResults','setClubTab',`
-  const CLOUD_MODE=true;
-  let __clubResultsAge='9',__clubResultsCompetition='all',__clubResultsPage=4,__clubTab='overview',currentView='club';
-  ${open}
-  ${close}
-  return {openAdminClubList,openAdminSummary,getFilters:()=>[__clubResultsAge,__clubResultsCompetition,__clubResultsPage]};
-`)({getElementById:id=>ids[id]||null},()=>admin,()=>{fixtures++;},()=>{results++;},()=>{clubTabs++;});
-
-run.openAdminSummary('fixtures');
-assert.equal(ids['admin-fixtures-dialog'].open,true);
-assert.equal(ids['club-fixtures-panel'].parent,ids['admin-fixtures-dialog-content']);
-assert.equal(ids['club-fixtures-panel'].classList.contains('hidden'),false);
-assert.equal(fixtures,1);
-ids['admin-fixtures-dialog'].close();
-assert.equal(ids['club-fixtures-panel'].parent,ids['club-fixtures-slot']);
-assert.equal(ids['club-fixtures-panel'].classList.contains('hidden'),true);
-
-run.openAdminSummary('results');
-assert.equal(ids['admin-results-dialog'].open,true);
-assert.equal(ids['club-results-panel'].parent,ids['admin-results-dialog-content']);
-assert.deepEqual(run.getFilters(),['all','league',0]);
-assert.equal(results,1);
-ids['admin-results-dialog'].close();
-assert.equal(ids['club-results-panel'].parent,ids['club-results-slot']);
-assert.equal(clubTabs,2);
-
-run.openAdminSummary('teams');run.openAdminSummary('attention');
-assert.equal(ids['admin-home-age-select'].focused,true);
-assert.equal(ids['admin-attention-panel'].scrolled,true);
-admin=false;
-run.openAdminSummary('results');
-assert.equal(results,1,'coach mode cannot open a club-wide results dialog');
-assert.match(html,/data-admin-summary="results"[^>]*aria-controls="admin-results-dialog"/);
-assert.doesNotMatch(html,/data-nav="club-fixtures"/);
-process.stdout.write('Club Admin summary dialogs and coach result panel restoration: OK\n');
+console.log('PASS Club Admin summary page navigation, focus, role gate and reduced-motion scrolling');

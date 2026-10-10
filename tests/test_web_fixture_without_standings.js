@@ -4,7 +4,14 @@ const path = require('node:path');
 const vm = require('node:vm');
 
 const root = path.resolve(__dirname, '..');
-const feed = JSON.parse(fs.readFileSync(path.join(root, 'data/results.json'), 'utf8'));
+// The scheduled scrape changes results.json; use a stable authoritative input.
+const feed = {schema_version:2,provider:'selkent',age_groups:[{
+  age_group:'U12',standings:[{division_name:'Under 12D Navy',provider_division_id:12,rows:[]}],published_results:[],fixtures:[
+    {date:'2026-09-27',division_name:'Under 12D Navy',home:'Shooters Hill AFC Lions',away:'Dartford Royals yellow'},
+    {date:'2026-10-04',division_name:'Under 12D Navy',home:'Cray Wanderers Ambers',away:'Shooters Hill AFC Lions'},
+    {date:'2026-10-04',division_name:'Under 12C Navy',home:'Other Lions',away:'Unrelated FC'}
+  ]
+}]};
 const overlay = fs.readFileSync(path.join(root, 'app/src/main/assets/static-feed-overlay.js'), 'utf8');
 const extract = (start, end) => {
   const a = overlay.indexOf(start), b = overlay.indexOf(end, a);
@@ -15,9 +22,9 @@ const extract = (start, end) => {
 const state = {
   meta: { ageGroup: 'U12', teamName: 'Lions' },
   division: { name: 'Under 12D Navy', teamName: 'Shooters Hill AFC Lions' },
-  selkent: { fixtures: [], table: [] }
+  selkent: { fixtures: [{opponent:'Previously cached fixture'}], table: [{team:'Old standings'}] }
 };
-let saves = 0;
+let saves = 0, fixtureFallbacks = 0;
 const window = {
   leagueTableEnabled: () => true,
   isPublishedLeagueTeam: () => true,
@@ -31,7 +38,8 @@ const context = vm.createContext({
   ageCode: () => 'U12', loadResults: async () => feed,
   persistWithoutRender: () => {}, saveAndRender: () => { saves++; },
   TABLE_SOURCE: 'test-standings', FIXTURE_SOURCE: 'test-fixtures',
-  applyStaticDivision: async () => {}, liveResultFallback: async () => ({ results: [] })
+  applyStaticDivision: async () => {}, liveResultFallback: async () => ({ results: [] }),
+  liveFixtureFallback: async () => {fixtureFallbacks++;throw Error('Unexpected live fixture fallback');}
 });
 vm.runInContext(extract('  function findResultsAge(', '  async function staticPublishedAges('), context);
 vm.runInContext(extract('  function sameTeam(', '  async function liveFixtureFallback('), context);
@@ -47,5 +55,13 @@ vm.runInContext(extract('  window.syncSelkent=async function(silent=false){', ' 
   assert.equal(state.selkent.table.length, 0);
   assert.match(state.selkent.tableStatus, /has not published standings/);
   assert.equal(saves, 1);
+  assert.equal(fixtureFallbacks, 0,'missing standings must not trigger live fixture fallback');
+  feed.age_groups[0].fixtures=[];
+  await window.syncSelkent(true);
+  assert.equal(state.selkent.fixtures.length,0,'an authoritative empty list clears previous fixtures');
+  assert.equal(state.selkent.table.length,0);
+  assert.match(state.selkent.tableStatus,/has not published standings/);
+  assert.equal(fixtureFallbacks,0);
+  assert.equal(saves,2);
   console.log('U12 Lions fixtures load without published standings');
 })().catch(error => { console.error(error); process.exitCode = 1; });
