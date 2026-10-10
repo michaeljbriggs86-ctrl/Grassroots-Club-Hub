@@ -3577,8 +3577,11 @@ function openMatchDetails(matchId){
   detailPlayerInputs('detail-assists-inputs',m.id,'assists');
   detailBookingInputs(m.id);
   renderAwardFields('detail-award-fields',m.id);
-  let visible=0;document.querySelectorAll('[data-detail-feature]').forEach(sec=>{const on=featureEnabled(sec.dataset.detailFeature);sec.classList.toggle('hidden',!on);if(on)visible++;});
-  document.getElementById('empty-detail-options').classList.toggle('hidden',visible>0);
+  // Scoring (goals, assists, awards, bookings) opens on match day, same rule as "Match played".
+  const early=!matchDayReached(m);
+  let visible=0;document.querySelectorAll('[data-detail-feature]').forEach(sec=>{const on=featureEnabled(sec.dataset.detailFeature)&&!early;sec.classList.toggle('hidden',!on);if(on)visible++;});
+  document.getElementById('empty-detail-options').classList.toggle('hidden',visible>0||early);
+  const beforeNote=document.getElementById('detail-before-match-note');if(beforeNote){beforeNote.classList.toggle('hidden',!early);beforeNote.textContent=early?`Goalscorers, assists and awards open on match day (${formatDate(m.date)}).`:'';}
   const saveBtn=document.getElementById('save-match-details');if(saveBtn)saveBtn.classList.toggle('hidden',!isCoach());
   const undoBtn=document.getElementById('undo-match-played');if(undoBtn)undoBtn.classList.toggle('hidden',!(isCoach()&&isPlayedMatch(m)));
   const deleteBtn=document.getElementById('delete-match-detail');if(deleteBtn){const canDelete=isCoach()&&!isProviderOwnedMatch(m);deleteBtn.classList.toggle('hidden',!canDelete);deleteBtn.dataset.deleteMatch=canDelete?m.id:'';}
