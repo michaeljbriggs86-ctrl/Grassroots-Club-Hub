@@ -147,7 +147,7 @@ grant execute on function public.assign_coach_team(uuid,uuid), public.unassign_c
 
 create temp table t_out(step text, result text);
 grant all on t_out to authenticated;
-do $t$
+do $$
 declare mike uuid:=(select id from auth.users where email='michaeljbriggs86@gmail.com'); james uuid:=(select id from auth.users where email='michaeljbriggs8@gmail.com'); u14 uuid:='007e45d7-51d2-4f5e-b656-17779141f5c8'; u15 uuid:='ed25bf07-56ee-413d-a271-b48d1f5a5432'; val uuid:='24ce341d-fb7d-4367-9f9c-6e875a0493a0';
 begin
   insert into t_out select 'backfill_rows', count(*)::text from public.coach_team_assignments;
@@ -170,6 +170,6 @@ begin
   begin perform public.assign_coach_team(james,u14); insert into t_out values('parent_assign','NOT BLOCKED (bad)'); exception when others then insert into t_out values('parent_assign','blocked: '||sqlerrm); end;
   begin insert into t_out select 'parent_reads_assignments', count(*)::text from public.coach_team_assignments; end;
   reset role;
-end $t$;
+end $$;
 select * from t_out;
 rollback;
