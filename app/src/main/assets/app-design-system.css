@@ -750,3 +750,8 @@ html[data-theme="dark"] #view-home .next-match-summary-card:not(:disabled)::afte
 }
 /* Parent cup-group matchday: the panel lists every group game, so the one-game summary card above it is redundant. */
 body.role-parent #view-home .home-next-match:has(#parent-home-match-info:not(.hidden) .cup-group-fixture-lines) #next-match-card{display:none}
+/* Exception to the outline rule above, for one asset only: the approved Shooters Hill
+ * badge (shooters-hill-logo.png, sha256 ea3b232a…) is a round crest on an opaque black
+ * square, accepted in v2.2.20 with a circular crop. Restore that crop for this file alone
+ * so its black corners never show; every other verified badge keeps its own outline. */
+.club-logo-wrap:not(.platform-club-placeholder) img.club-logo[src$="shooters-hill-logo.png"]{clip-path:circle(49.4% at 50% 50%)!important}
