@@ -1846,7 +1846,7 @@ body.role-parent .cup-group-fixture-lines .canonical-match-badge img{width:36px;
 /* Club Admin hero: white, fading through green into the pitch photo */
 body.admin-club-mode .hero{background:#fff!important;box-shadow:0 6px 22px rgba(10,40,20,.14)}
 body.admin-club-mode .hero-art{width:56%!important}
-body.admin-club-mode .hero::before{width:56%!important;background:linear-gradient(90deg,#fff 0%,rgba(255,255,255,.92) 14%,rgba(33,138,33,.78) 55%,rgba(20,95,25,.28) 85%,rgba(20,95,25,0) 100%)!important}
+body.admin-club-mode .hero::before{width:56%!important;background:linear-gradient(90deg,#fff 0%,rgba(255,255,255,.95) 12%,rgba(255,255,255,.6) 40%,rgba(255,255,255,.18) 72%,rgba(255,255,255,0) 100%)!important}
 body.admin-club-mode .hero-copy{max-width:50%}
 body.admin-club-mode .hero-copy h1{color:#0d2a15}
 body.admin-club-mode .hero-copy .eyebrow{color:#2a6b30}
