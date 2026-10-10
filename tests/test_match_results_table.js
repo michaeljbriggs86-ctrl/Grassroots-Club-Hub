@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Every results list on the Matches page uses the Cups table layout, and coaches keep their row actions.
+// Results use compact Cups-style rows; management actions live in Details.
 process.env.TZ='Europe/London';
 const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
 const app=fs.readFileSync('app/src/main/assets/app.js','utf8');
@@ -16,7 +16,7 @@ const ctx={Date:Clock,state:{goals:[{matchId:'f1',goals:2}],assists:[{matchId:'f
   cupNameAndRound:m=>({name:'Selkent Cup Two',round:'Round 1'}),featureEnabled:()=>true,isCoach:()=>coach,isProviderOwnedMatch:m=>m.competition==='League',
   matchDayReached:m=>m.date<='2026-10-10'};
 vm.createContext(ctx);
-vm.runInContext(take('function matchResultRowHTML(','function renderMatches('),ctx);
+vm.runInContext(take('function matchResultCellHTML(','function renderMatches('),ctx);
 const friendly={id:'f1',date:'2026-09-26',opponent:'Lewisham Borough Cobras',competition:'Friendly',venue:'H',gf:2,ga:3};
 const today={id:'s1',date:'2026-10-10',opponent:'Eltham Town Hawks',competition:'Friendly',venue:'A',status:'scheduled'};
 const league={id:'l1',date:'2026-09-12',opponent:'Bromley Youth Lions',competition:'League',venue:'H',gf:4,ga:2};
@@ -25,7 +25,7 @@ const cup={id:'c1',date:'2026-10-10',opponent:'Chislehurst Wanderers Panthers',c
 ctx.renderMatchGroup('list','count',[friendly,today,league,cup],'None');
 const h=list.innerHTML;
 assert.equal(count.textContent,4);
-assert.match(h,/<table class="competition-games-table"><thead><tr><th>Date<\/th><th>Opponent<\/th><th>H\/A<\/th><th>Status \/ result<\/th>/,'grouped lists omit the repeated competition column');
+assert.match(h,/<table class="competition-games-table"><thead><tr><th>Date<\/th><th>Opponent<\/th><th>H\/A<\/th><th>Result<\/th>/,'grouped lists have a Result column');
 assert.doesNotMatch(h,/<th>Competition<\/th>|<b>Friendly<\/b>|<b>League<\/b>/);
 assert.equal((h.match(/<tr class="result-/g)||[]).length,4,'one result row per match');
 assert.match(h,/<span class="competition-result-pill L">L 2–3<\/span>/);
@@ -35,18 +35,20 @@ assert.match(h,/data-details-match="f1">Lewisham Borough Cobras<\/button>/,'oppo
 assert.doesNotMatch(h,/match-detail-badges|⚽|★|⭐|▣/,'stat icons are absent even when the match has goals, awards and bookings');
 assert.equal(ctx.state.goals[0].goals,2,'rendering leaves recorded statistics intact');
 assert.equal(ctx.state.awards.length,1);
-assert.match(h,/<td colspan="4"><div class="match-actions">/,'actions span the revised table');
+assert.doesNotMatch(h,/match-result-actions|data-edit-match|data-delete-match|data-match-played|>Scheduled<|>SCH<|Status \/ result/,'no extra action line or visible status text');
+for(const status of ['scheduled','postponed','abandoned']){
+ assert.equal(ctx.matchResultCellHTML({...friendly,status}),'<span aria-label="No result">—</span>','non-final scores are not presented as results');
+}
+ctx.miniResultsRestrictedView=()=>true;
+assert.doesNotMatch(ctx.matchResultCellHTML(friendly),/2–3/,'restricted results stay private');
+ctx.miniResultsRestrictedView=()=>false;
 // Actual cup tables still identify their distinct cup and round.
 vm.runInContext(take('function cupNameAndRound(','/** Coach marker:'),ctx);
 assert.match(ctx.competitionGameRow(cup),/<b>Selkent Cup Two<\/b><small class="cup-round">Round 1<\/small>/);
-// Coach actions survive the layout change.
-assert.match(h,/data-edit-match="f1">Edit result</);assert.match(h,/data-delete-match="f1">Remove</);
-assert.match(h,/data-edit-match="s1">Edit fixture</);assert.match(h,/data-match-played="s1">Match played</,'match-day guard still decides Match played');
-assert.doesNotMatch(h,/data-edit-match="l1"|data-delete-match="l1"/,'provider-owned league result stays read-only');
 // Non-coaches get no action lines.
 coach=false;ctx.renderMatchGroup('list','count',[friendly,today],'None');assert.doesNotMatch(list.innerHTML,/match-result-actions|data-edit-match|data-delete-match|data-match-played/);
 // Empty lists keep the short empty state.
 ctx.renderMatchGroup('list','count',[],'No friendlies recorded');assert.equal(list.innerHTML,'<div class="empty-state"><strong>No friendlies recorded</strong></div>');
 // Tournament games use the same table.
 assert.match(app,/\(games\.length\?matchResultsTableHTML\(games\):'<div class="empty-state compact-empty">No games added yet\.<\/div>'\)/);
-console.log('PASS every Matches results list uses the Cups table; coach actions preserved');
+console.log('PASS compact result-only rows, no actions/icons, preserved Details, cup names and result privacy');

@@ -3200,20 +3200,19 @@ function matchCardHTML(m){
   const actions=`<div class="match-actions"><button class="inline-action" data-details-match="${m.id}">Details</button>${editAction}${playedAction}${removeAction}</div>`;
   return `<article class="match-card ${resultClass(r)}"><div class="result-badge ${r}">${r}</div><div><div class="match-opponent">${clubListingHtml(m.opponent)}</div><div class="match-meta">${formatDate(m.date)}${venue}${stage}${statusMeta}</div>${details}</div><div class="match-score">${matchScoreText(m)}</div>${actions}</article>`;
 }
-/* Grouped results share the Cups table spacing and result pills. The section title supplies
- * the competition; match statistics stay in Details. Coach actions remain beneath the row. */
+/* Results stay compact; fixture status, statistics and coach actions live in Details. */
+function matchResultCellHTML(m){
+  if(!isPlayedMatch(m))return '<span aria-label="No result">—</span>';
+  const r=resultOf(m),text=miniResultsRestrictedView()?'Result private':`${r} ${Number(m.gf||0)}–${Number(m.ga||0)}`;
+  return `<span class="competition-result-pill ${r}">${text}</span>`;
+}
 function matchResultRowHTML(m){
-  const r=resultOf(m),status=matchStatus(m),v=String(m.venue||'').toUpperCase(),venue=['H','A','N'].includes(v)?v:'—';
-  const resultText=miniResultsRestrictedView()&&isPlayedMatch(m)?'Result private':(isPlayedMatch(m)?`${r} ${Number(m.gf||0)}–${Number(m.ga||0)}`:(r==='ABD'?`ABD ${Number(m.gf||0)}–${Number(m.ga||0)}`:statusLabel(m)));
+  const r=resultOf(m),v=String(m.venue||'').toUpperCase(),venue=['H','A','N'].includes(v)?v:'—';
   const comp=isCupMatch(m)||isVaseMatch(m)||isShieldMatch(m)?cupNameAndRound(m):{name:String(m.competition||'Match'),round:String(m.stage||'')};
-  const editAction=isCoach()&&!isPlayedMatch(m)?`<button class="inline-action" type="button" data-edit-match="${m.id}">Edit fixture</button>`:isCoach()&&isPlayedMatch(m)&&!isLeagueMatch(m)&&!isDivisionMatch(m)?`<button class="inline-action" type="button" data-edit-match="${m.id}">Edit result</button>`:'';
-  const playedAction=isCoach()&&status==='scheduled'&&matchDayReached(m)?`<button class="primary-button compact match-played-action" type="button" data-match-played="${m.id}">Match played</button>`:'';
-  const removeAction=isCoach()&&!isProviderOwnedMatch(m)?`<button class="inline-action delete" type="button" data-delete-match="${m.id}">Remove</button>`:'';
-  const actions=editAction||playedAction||removeAction?`<tr class="match-result-actions ${resultClass(r)}"><td colspan="4"><div class="match-actions">${editAction}${playedAction}${removeAction}</div></td></tr>`:'';
-  return `<tr class="${resultClass(r)}"><td>${m.date?formatDate(m.date):'TBC'}</td><td><button type="button" class="competition-game-link" data-details-match="${m.id}">${clubListingHtml(m.opponent)}</button>${comp.round?`<small class="cup-round">${esc(comp.round)}</small>`:''}</td><td>${venue}</td><td><span class="competition-result-pill ${r}">${resultText}</span></td></tr>${actions}`;
+  return `<tr class="${resultClass(r)}"><td>${m.date?formatDate(m.date):'TBC'}</td><td><button type="button" class="competition-game-link" data-details-match="${m.id}">${clubListingHtml(m.opponent)}</button>${comp.round?`<small class="cup-round">${esc(comp.round)}</small>`:''}</td><td>${venue}</td><td>${matchResultCellHTML(m)}</td></tr>`;
 }
 function matchResultsTableHTML(rows){
-  return `<div class="competition-table-scroll match-results-table grouped-results-table"><table class="competition-games-table"><thead><tr><th>Date</th><th>Opponent</th><th>H/A</th><th>Status / result</th></tr></thead><tbody>${rows.map(matchResultRowHTML).join('')}</tbody></table></div>`;
+  return `<div class="competition-table-scroll match-results-table grouped-results-table"><table class="competition-games-table"><thead><tr><th>Date</th><th>Opponent</th><th>H/A</th><th>Result</th></tr></thead><tbody>${rows.map(matchResultRowHTML).join('')}</tbody></table></div>`;
 }
 function renderMatchGroup(listId,countId,rows,emptyText){
   const list=document.getElementById(listId);
@@ -3226,10 +3225,9 @@ function renderMatches(){ applyMatchFilter(); }
 function cupNameAndRound(m){const raw=String(m?.competition||m?.type||'').trim();const [head,...rest]=raw.split(/\s+[-–]\s+/);const name=head.replace(/^U\s*\d{1,2}X?\s+/i,'').trim()||raw||'Cup';return {name,round:(rest.join(' - ')||String(m?.stage||'')).trim()};}
 function competitionGameRow(m){
   const r=resultOf(m),venue=String(m.venue||'').toUpperCase()==='H'?'H':String(m.venue||'').toUpperCase()==='A'?'A':String(m.venue||'').toUpperCase()==='N'?'N':'—';
-  const resultText=miniResultsRestrictedView()&&isPlayedMatch(m)?'Result private':(isPlayedMatch(m)?`${r} ${Number(m.gf||0)}–${Number(m.ga||0)}`:(r==='ABD'?`ABD ${Number(m.gf||0)}–${Number(m.ga||0)}`:r));
   const action=`<button type="button" class="competition-game-link" data-details-match="${m.id}">${clubListingHtml(m.opponent)}</button>`;
   const cup=cupNameAndRound(m);
-  return `<tr class="${resultClass(r)}"><td>${m.date?formatDate(m.date):'TBC'}</td><td><b>${esc(cup.name)}</b>${cup.round?`<small class="cup-round">${esc(cup.round)}</small>`:''}</td><td>${action}</td><td>${venue}</td><td><span class="competition-result-pill ${r}">${resultText}</span></td></tr>`;
+  return `<tr class="${resultClass(r)}"><td>${m.date?formatDate(m.date):'TBC'}</td><td><b>${esc(cup.name)}</b>${cup.round?`<small class="cup-round">${esc(cup.round)}</small>`:''}</td><td>${action}</td><td>${venue}</td><td>${matchResultCellHTML(m)}</td></tr>`;
 }
 /** Coach marker: did our team go through a cup round? Keyed by "Cup name|Round". Coach-only: it reveals a U7-U11 result. */
 function normaliseCupProgress(raw){const out={};if(raw&&typeof raw==='object'&&!Array.isArray(raw)){for(const [k,v] of Object.entries(raw)){if(!/^[^|]{1,80}\|[^|]{0,60}$/.test(k)||!v||typeof v!=='object')continue;out[k]={through:v.through===true,at:String(v.at||'').slice(0,40)};}}return out;}
@@ -3427,6 +3425,7 @@ function resetMatchReportMode(){
   document.getElementById('match-report-back')?.classList.add('hidden');
   document.getElementById('match-report-next')?.classList.add('hidden');
   document.getElementById('undo-match-played')?.classList.add('hidden');
+  configureMatchDetailActions(null);
   const save=document.getElementById('save-match-details');if(save){save.classList.remove('hidden');save.textContent='Save details';}
 }
 function changeMatchReportStep(delta){
@@ -3442,6 +3441,7 @@ function changeMatchReportStep(delta){
 function openMatchReport(matchId){
   if(!requireCoach())return;
   const m=state.matches.find(x=>x.id===matchId);if(!m)return;
+  configureMatchDetailActions(null);
   __matchReportMode=true;__matchReportStep=0;__matchReportSteps=matchReportStepDefinitions(m);
   const throughBox=document.getElementById('match-through-checkbox');if(throughBox)throughBox.checked=!!(state.cupProgress||{})[cupProgressKey(m)]?.through;
   const throughLabel=document.getElementById('match-through-label');if(throughLabel)throughLabel.textContent=cupNameAndRound(m).name+(cupNameAndRound(m).round?' · '+cupNameAndRound(m).round:'');
@@ -3649,6 +3649,16 @@ function saveClubKitProfile(){
   saveState();auditEvent('kit_profile_updated','team_kit_profile',key,`Updated kit profile for ${teamName}`,before,next);renderClubDetails(teamName);toast('Kit details saved');
 }
 
+function configureMatchDetailActions(m){
+  const coach=!!m&&isCoach(),played=!!m&&isPlayedMatch(m);
+  const edit=document.getElementById('edit-match-detail'),remove=document.getElementById('delete-match-detail'),report=document.getElementById('play-match-detail');
+  const canEdit=coach&&(!played||(!isLeagueMatch(m)&&!isDivisionMatch(m)));
+  if(edit){edit.classList.toggle('hidden',!canEdit);edit.textContent=played?'Edit result':'Edit fixture';edit.dataset.editMatch=canEdit?m.id:'';}
+  const canRemove=coach&&!isProviderOwnedMatch(m);
+  if(remove){remove.classList.toggle('hidden',!canRemove);remove.dataset.deleteMatch=canRemove?m.id:'';}
+  const canReport=coach&&matchStatus(m)==='scheduled'&&matchDayReached(m);
+  if(report){report.classList.toggle('hidden',!canReport);report.dataset.matchPlayed=canReport?m.id:'';}
+}
 function openMatchDetails(matchId){
   resetMatchReportMode();
   const m=state.matches.find(x=>x.id===matchId);if(!m)return;
@@ -3664,7 +3674,7 @@ function openMatchDetails(matchId){
   document.getElementById('empty-detail-options').classList.toggle('hidden',visible>0);
   const saveBtn=document.getElementById('save-match-details');if(saveBtn)saveBtn.classList.toggle('hidden',!isCoach());
   const undoBtn=document.getElementById('undo-match-played');if(undoBtn)undoBtn.classList.toggle('hidden',!(isCoach()&&isPlayedMatch(m)));
-  const deleteBtn=document.getElementById('delete-match-detail');if(deleteBtn){const canDelete=isCoach()&&!isProviderOwnedMatch(m);deleteBtn.classList.toggle('hidden',!canDelete);deleteBtn.dataset.deleteMatch=canDelete?m.id:'';}
+  configureMatchDetailActions(m);
   document.getElementById('match-detail-dialog')?.classList.toggle('readonly-dialog',!isCoach());
   document.getElementById('match-detail-dialog').showModal();
   refreshMatchOverviewDirectory(m);
@@ -5218,6 +5228,7 @@ function resetMatchForm(){
 function editMatch(id){
   if(!requireCoach()) return;
   const m=state.matches.find(x=>x.id===id); if(!m) return;
+  document.getElementById('match-detail-dialog')?.close();
   navigate('add');
   setDivisionEntryMode(isDivisionMatch(m));
   document.getElementById('match-id').value=m.id;
