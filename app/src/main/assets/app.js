@@ -3233,7 +3233,13 @@ let __matchReportMode=false;
 let __matchReportStep=0;
 let __matchReportSteps=[];
 
-function matchReportStepDefinitions(){
+function isFinalCupGameOfRound(m){
+  if(!m||!['cup','vase'].includes(competitionBucket(m)))return false;
+  const age=ageGroupNumber();if(age<8||age>11)return true;
+  const key=cupProgressKey(m);
+  return state.matches.some(x=>x.id!==m.id&&x.date===m.date&&x.status==='played'&&['cup','vase'].includes(competitionBucket(x))&&cupProgressKey(x)===key);
+}
+function matchReportStepDefinitions(m=null){
   const staff=CLOUD_MODE&&['admin','coach','assistant_coach'].includes(currentRole);
   return [
     {key:'score',label:'Score',section:'match-report-score-section',enabled:true},
@@ -3241,13 +3247,14 @@ function matchReportStepDefinitions(){
     {key:'goals',label:'Goals',section:'detail-goals-section',enabled:featureEnabled('goals')},
     {key:'assists',label:'Assists',section:'detail-assists-section',enabled:featureEnabled('assists')},
     {key:'awards',label:'Awards',section:'detail-awards-section',enabled:featureEnabled('awards')},
-    {key:'notes',label:'Coach notes',section:'coach-note-section',enabled:staff}
+    {key:'notes',label:'Coach notes',section:'coach-note-section',enabled:staff},
+    {key:'through',label:'Round',section:'match-through-section',enabled:staff&&isFinalCupGameOfRound(m)}
   ].filter(step=>step.enabled);
 }
 function applyMatchReportStep(){
   if(!__matchReportMode)return;
   const current=__matchReportSteps[__matchReportStep]||__matchReportSteps[0];
-  ['match-report-score-section','match-attendance-section','detail-goals-section','detail-assists-section','detail-awards-section','coach-note-section'].forEach(id=>document.getElementById(id)?.classList.toggle('hidden',id!==current?.section));
+  ['match-report-score-section','match-attendance-section','detail-goals-section','detail-assists-section','detail-awards-section','coach-note-section','match-through-section'].forEach(id=>document.getElementById(id)?.classList.toggle('hidden',id!==current?.section));
   const progress=document.getElementById('match-report-progress');
   if(progress){progress.classList.remove('hidden');progress.innerHTML=__matchReportSteps.map((step,i)=>`<span class="${i===__matchReportStep?'active':i<__matchReportStep?'complete':''}">${i+1}. ${esc(step.label)}</span>`).join('');}
   const back=document.getElementById('match-report-back'),next=document.getElementById('match-report-next'),save=document.getElementById('save-match-details');
@@ -3260,6 +3267,7 @@ function resetMatchReportMode(){
   document.getElementById('match-detail-dialog')?.classList.remove('report-wizard-mode');
   document.getElementById('match-report-progress')?.classList.add('hidden');
   document.getElementById('match-report-score-section')?.classList.add('hidden');
+  document.getElementById('match-through-section')?.classList.add('hidden');
   document.getElementById('match-report-back')?.classList.add('hidden');
   document.getElementById('match-report-next')?.classList.add('hidden');
   document.getElementById('undo-match-played')?.classList.add('hidden');
@@ -3278,7 +3286,9 @@ function changeMatchReportStep(delta){
 function openMatchReport(matchId){
   if(!requireCoach())return;
   const m=state.matches.find(x=>x.id===matchId);if(!m)return;
-  __matchReportMode=true;__matchReportStep=0;__matchReportSteps=matchReportStepDefinitions();
+  __matchReportMode=true;__matchReportStep=0;__matchReportSteps=matchReportStepDefinitions(m);
+  const throughBox=document.getElementById('match-through-checkbox');if(throughBox)throughBox.checked=!!(state.cupProgress||{})[cupProgressKey(m)]?.through;
+  const throughLabel=document.getElementById('match-through-label');if(throughLabel)throughLabel.textContent=cupNameAndRound(m).name+(cupNameAndRound(m).round?' · '+cupNameAndRound(m).round:'');
   document.getElementById('match-detail-id').value=m.id;
   document.getElementById('match-detail-title').textContent=`Match played · ${matchTeamLabel(m.opponent)}`;
   document.getElementById('match-detail-summary').innerHTML=`<strong>${formatDate(m.date)}</strong><span>${esc(m.competition||'Match')} · ${String(m.venue||'').toUpperCase()==='H'?'Home':String(m.venue||'').toUpperCase()==='A'?'Away':'Neutral'}</span>`;
@@ -3517,6 +3527,7 @@ async function loadCoachMatchNote(matchId){
 async function saveMatchDetails(e){
   e.preventDefault();if(!requireCoach())return;
   const id=document.getElementById('match-detail-id').value;const m=state.matches.find(x=>x.id===id);if(!m)return;const reportMode=__matchReportMode;const beforeMatch=JSON.parse(JSON.stringify(m));if(reportMode){const homeScore=Number(document.getElementById('match-report-gf')?.value||0),awayScore=Number(document.getElementById('match-report-ga')?.value||0),away=String(m.venue||'').toUpperCase()==='A';m.gf=away?awayScore:homeScore;m.ga=away?homeScore:awayScore;m.status='played';}const beforeDetails={goals:state.goals.filter(x=>x.matchId===id),assists:(state.assists||[]).filter(x=>x.matchId===id),bookings:(state.bookings||[]).filter(x=>x.matchId===id),awards:state.awards.filter(x=>x.matchId===id),homeKitColours:beforeMatch.homeKitColours||'',awayKitColours:beforeMatch.awayKitColours||''};
+  if(reportMode&&__matchReportSteps.some(st=>st.key==='through')){state.cupProgress=normaliseCupProgress(state.cupProgress);state.cupProgress[cupProgressKey(m)]={through:!!document.getElementById('match-through-checkbox')?.checked,at:new Date().toISOString()};}
   if(featureEnabled('goals')){
     state.goals=state.goals.filter(x=>x.matchId!==id);
     document.querySelectorAll('#detail-goals-inputs input[data-player]').forEach(i=>{const n=Number(i.value||0);if(n>0)state.goals.push({id:uid('g'),matchId:id,player:i.dataset.player,goals:n});});
