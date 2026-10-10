@@ -943,7 +943,7 @@
         </form>
         ${parentOnly?'':`<div class="auth-alternate-routes" role="group" aria-label="Other sign-in options"><button type="button" class="auth-secondary" id="cloud-parent-login"><span class="auth-button-icon">${authIcon('user')}</span><span>Parent Sign In</span></button><button type="button" class="auth-secondary" id="cloud-player-login"><span class="auth-button-icon">${authIcon('user')}</span><span>Player Login</span></button></div>`}
         <button class="auth-link-strong" id="cloud-parent-signup">Create Account</button>`;
-      gate.innerHTML=authMainScreen({screen:'adult',heroNote:parentOnly?'One<br/>Team<br/>Together':'More<br/>Than<br/>A Game',title:parentOnly?'Parent Sign In':'Welcome Back',copy:parentOnly?'Use your approved parent email and password.':'Admins, Coaches and Parents sign in with email and password.',body,back:parentOnly});
+      gate.innerHTML=authMainScreen({screen:'adult',heroNote:parentOnly?'One<br/>Team<br/>Together':'More<br/>Than<br/>A Game',title:parentOnly?'Parent Sign In':'Welcome Back',copy:parentOnly?'Use your approved parent email and password.':'Sign in with your email and password.',body,back:parentOnly});
       bindPasswordToggle('cloud-password','cloud-password-toggle');
       document.getElementById('cloud-forgot-password')?.addEventListener('click',()=>setGateHtml('forgot'));
       document.getElementById('cloud-parent-login')?.addEventListener('click',()=>setGateHtml('parentsignin'));
