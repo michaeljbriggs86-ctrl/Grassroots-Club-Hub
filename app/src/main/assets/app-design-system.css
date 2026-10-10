@@ -847,9 +847,5 @@ html[data-theme="dark"] #matches-next-fixture,html[data-theme="dark"] #view-leag
 .club-results-table .club-result-v{color:var(--muted);font-weight:600;font-size:.9em}
 #admin-recent-results .club-results-table{margin-top:4px}
 
-/* Club Admin mode is navy (#2c4a94, PR #29): its hero photo fade and lead-card accent follow the mode colour. */
-body.admin-club-mode .hero::before{background:linear-gradient(90deg,#0e1a38 0%,rgba(14,26,56,.82) 30%,rgba(14,26,56,.2) 75%,rgba(14,26,56,.05) 100%)!important}
-body.admin-club-mode #view-club .admin-dashboard-summary,body.admin-club-mode #view-club .admin-fixture-centre,body.admin-club-mode #view-club .club-results-browser,body.admin-club-mode #view-club .admin-coach-centre,
-html[data-theme="dark"] body.admin-club-mode #view-club .admin-dashboard-summary,html[data-theme="dark"] body.admin-club-mode #view-club .admin-fixture-centre,html[data-theme="dark"] body.admin-club-mode #view-club .club-results-browser,html[data-theme="dark"] body.admin-club-mode #view-club .admin-coach-centre{border-top-color:#2c4a94!important}
 /* The mode pill sits inside the fixed hero band without growing it. */
 .hero-copy .mode-pill{margin:0 0 3px;padding:2px 8px;font-size:9.5px}
