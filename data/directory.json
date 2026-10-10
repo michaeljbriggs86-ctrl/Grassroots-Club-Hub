@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-10-10T22:02:45.621502+00:00",
+  "last_updated": "2026-10-10T22:24:11.586560+00:00",
   "clubs": [
     {
       "club_id": 514,
@@ -361,7 +361,12 @@
     },
     {
       "club_id": 292,
-      "club_name": "Junior Reds"
+      "club_name": "Junior Reds",
+      "logo_url": "https://test.pitchkind.com/__pilot_badges/292/3aa25e5eff778740a2133b8d0e780b5240bf8b5ca61632061238f3257d1a52d0",
+      "logo_status": "pilot_verified",
+      "logo_source": "user_supplied_private",
+      "logo_updated_at": "2026-10-10",
+      "logo_sha256": "3aa25e5eff778740a2133b8d0e780b5240bf8b5ca61632061238f3257d1a52d0"
     },
     {
       "club_id": 465,
@@ -7877,5 +7882,5 @@
     }
   ],
   "note": "Panel parsing confirmed against all five format categories (mini-soccer, 9-a-side, X-category, 11-a-side, Senior) as of Sept 2026. Club/team linking is heuristic (name-prefix match) - see ambiguous_club_matches in diagnostics for anything flagged as uncertain.",
-  "pilot_badges_revision": "f104017af9e2cfbe4cea1e2a28c12a1c0a8da8f8f5d51fa59e53335991db4361"
+  "pilot_badges_revision": "96007a59ebd0e6d936c0328623ef19c7383c288ee14f4e5f7c2f8a384a7c752c"
 }
