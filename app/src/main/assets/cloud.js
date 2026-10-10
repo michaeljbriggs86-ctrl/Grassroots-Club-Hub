@@ -599,7 +599,7 @@
  }
 
  async function listCurrentClubLoginTeams(){
-   if(role()!=='parent')return [];
+   if(role()!=='parent'&&!isStaffAccount())return [];
    const slug=String(clubConfiguration?.settings?.slug||'').trim();
    if(!slug)return [];
    return await listLoginTeams(slug);
@@ -633,6 +633,21 @@
     await rpc('switch_my_active_team',{p_team_id:String(teamId||'')});
     clearAccountLocalData();// nothing from the previous team stays in this browser
     return true;
+  }
+  // One login, two capacities (draft 015): coaching staff and Club Admins who are also parents.
+  const STAFF_ROLES=['club_admin','coach','assistant_coach'];
+  function realRole(){return context?.real_role||context?.profile?.role||'';}
+  function isStaffAccount(){return !!context?.real_role&&STAFF_ROLES.includes(context.real_role);}// real_role only exists once draft 015 is live, so nothing shows before then
+  function actingAsParent(){return !!(context?.acting_as_parent&&isStaffAccount());}
+  async function setMyCapacity(asParent){
+    if(!isStaffAccount())throw new Error('Only coaching staff and Club Admins have two capacities');
+    await rpc('set_my_capacity',{p_parent:!!asParent});
+    clearAccountLocalData();
+    return true;
+  }
+  async function requestChildLink(teamId,childName){
+    if(!isStaffAccount())throw new Error('Only coaching staff and Club Admins can use this');
+    return await rpc('request_child_link',{p_team_id:String(teamId||''),p_child_name:String(childName||'').trim()});
   }
   // Club Admin gives a coach (or a Club Admin who coaches) another team, or takes one away (draft 012 RPCs).
   async function assignCoachTeam(userId,teamId){
@@ -1209,7 +1224,7 @@
 
   window.ClubHubCloud={
     configured,bootstrap,loadInitialState,queueStateSave,confirmStateSave,pullLatest,startPolling,
-    role,requestCoachAccess,listPendingCoachRequests,reviewCoachRequest,listMyCoachTeams,switchMyCoachTeam,assignCoachTeam,unassignCoachTeam,canEdit,canAdmin,assignedTeam,currentTeam,coachTeam,hasDualCoachAccess,visibleTeamList,getClubConfiguration,listLoginClubs,listLoginTeams,listCurrentClubLoginTeams,createInvite,requestParentAccess,listPendingParentRequests,listTeamMembers,listClubCoaches,listClubAccessAccounts,removeClubCoach,listPublishedClubResults,listParentPlayerLinks,saveParentPlayerLinks,listPlayerAccountLinks,listMatchAvailability,saveMatchAvailability,saveCoachMatchAvailability,listSelkentTeamDirectory,syncSelkentTeamDirectory,getCoachMatchNote,saveCoachMatchNote,listAnnouncements,createAnnouncement,markAnnouncementRead,deleteAnnouncement,listMatchAttendance,saveMatchAttendance,getAvailabilitySettings,setAvailabilityDeadline,sendAvailabilityReminder,listNotifications,markNotificationRead,notifyFixtureChange,notifySelectedSquad,notifyMatchReport,notifyMatchReopened,listPlayerAppearanceStats,recordAuditEvent,listAuditHistory,listSeasonArchives,getSeasonArchive,archiveCurrentSeason,rolloverClubSeason,resetParentPin,setAccessPin,approveParentRequest,removeTeamMember,syncTeamDirectory,switchAdminTeam,switchParentTeam,getClubOverview,signOut,switchToParentSignIn,handleAuthCallback,listMessageContacts,listClubMessages,sendClubMessage,markClubMessagesRead,getClubComplianceStatus,setDisputeReviewers,setClubSafeguardingContacts,getConcernRouting,raiseClubConcern,listGeneralDisputes,listDisputeMessages,upsertU11SafeguardingInfo,exportU11SafeguardingPack,listSafeguardingExportAudit,requestClubCancellation,cancelClubCancellation,
+    role,requestCoachAccess,listPendingCoachRequests,reviewCoachRequest,listMyCoachTeams,switchMyCoachTeam,setMyCapacity,requestChildLink,realRole,isStaffAccount,actingAsParent,assignCoachTeam,unassignCoachTeam,canEdit,canAdmin,assignedTeam,currentTeam,coachTeam,hasDualCoachAccess,visibleTeamList,getClubConfiguration,listLoginClubs,listLoginTeams,listCurrentClubLoginTeams,createInvite,requestParentAccess,listPendingParentRequests,listTeamMembers,listClubCoaches,listClubAccessAccounts,removeClubCoach,listPublishedClubResults,listParentPlayerLinks,saveParentPlayerLinks,listPlayerAccountLinks,listMatchAvailability,saveMatchAvailability,saveCoachMatchAvailability,listSelkentTeamDirectory,syncSelkentTeamDirectory,getCoachMatchNote,saveCoachMatchNote,listAnnouncements,createAnnouncement,markAnnouncementRead,deleteAnnouncement,listMatchAttendance,saveMatchAttendance,getAvailabilitySettings,setAvailabilityDeadline,sendAvailabilityReminder,listNotifications,markNotificationRead,notifyFixtureChange,notifySelectedSquad,notifyMatchReport,notifyMatchReopened,listPlayerAppearanceStats,recordAuditEvent,listAuditHistory,listSeasonArchives,getSeasonArchive,archiveCurrentSeason,rolloverClubSeason,resetParentPin,setAccessPin,approveParentRequest,removeTeamMember,syncTeamDirectory,switchAdminTeam,switchParentTeam,getClubOverview,signOut,switchToParentSignIn,handleAuthCallback,listMessageContacts,listClubMessages,sendClubMessage,markClubMessagesRead,getClubComplianceStatus,setDisputeReviewers,setClubSafeguardingContacts,getConcernRouting,raiseClubConcern,listGeneralDisputes,listDisputeMessages,upsertU11SafeguardingInfo,exportU11SafeguardingPack,listSafeguardingExportAudit,requestClubCancellation,cancelClubCancellation,
     updateCloudPanel,
     get context(){return context;},get configuration(){return clubConfiguration;},get session(){return session;},get revision(){return activeRevision;},get testMode(){return testModeActive();}
   };

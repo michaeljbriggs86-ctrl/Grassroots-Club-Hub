@@ -152,6 +152,24 @@ const coachTeamTitle=t=>matchTeamLabel(`U${String(t.age_group||'').replace(/^U/i
 function coachTeamContexts(){
   return __coachTeams.map(t=>({kind:'coach-team',teamId:String(t.team_id),title:coachTeamTitle(t),detail:'Coach · edit your team',active:!!t.is_active&&(currentRole!=='admin'||isAdminCoachMode())}));
 }
+// One login, two capacities (draft 015). Real role = what the person is at the club; currentRole follows the capacity they are acting in.
+const cloudStaff=()=>!!window.ClubHubCloud?.isStaffAccount?.();
+const cloudActingParent=()=>!!window.ClubHubCloud?.actingAsParent?.();
+function staffRoleTitle(){
+  const real=window.ClubHubCloud?.realRole?.();
+  return real==='club_admin'?adminTitleLabel(window.ClubHubCloud?.context?.profile?.club_title):real==='assistant_coach'?'Assistant Coach':'Coach';
+}
+function capacityContexts(){
+  if(!CLOUD_MODE||!cloudStaff())return [];
+  const ctx=window.ClubHubCloud?.context||{};
+  if(cloudActingParent())return [
+    {kind:'capacity-staff',title:`Back to ${staffRoleTitle()}`,detail:'Your club role',active:false},
+    {kind:'add-child',title:'Add another child',detail:'A Club Admin or coach must approve it',active:false}
+  ];
+  return ctx.has_children
+    ?[{kind:'capacity-parent',title:'Parent view',detail:'See your own children as a parent',active:false}]
+    :[{kind:'add-child',title:'Add my child',detail:'A Club Admin or another coach must approve it',active:false}];
+}
 function availableAccountContexts(){
   if(!CLOUD_MODE)return [];
   const current=window.ClubHubCloud?.currentTeam?.();
@@ -165,11 +183,12 @@ function availableAccountContexts(){
       {kind:'club',title:'Club overview',detail:'Club Admin',active:isClubOverviewMode()},
       ...(coached.length?coached:own?[{kind:'coach',title:label(own),detail:'Coach · edit your team',active:isAdminCoachMode()}]:[]),
       ...teams.filter(t=>!coachedIds.has(String(t.id))&&String(t.id)!==String(own?.id)).map(t=>({kind:'preview',teamId:String(t.id),title:label(t),detail:'Club Admin · read only team view',active:isAdminTeamPreviewMode()&&String(current?.id)===String(t.id)})),
+      ...capacityContexts(),
       {kind:'parent-signin',title:'Parent Sign In',detail:'Sign in with an approved parent account',active:false}
     ];
   }
-  if(currentRole==='parent')return teams.map(t=>({kind:'parent',teamId:String(t.id),title:label(t),detail:'Parent · linked team',active:String(current?.id)===String(t.id)}));
-  if(currentRole==='coach'||currentRole==='assistant_coach')return [...(__coachTeams.length>1?coachTeamContexts():[]),{kind:'parent-signin',title:'Parent Sign In',detail:'Sign in with an approved parent account',active:false}];
+  if(currentRole==='parent')return [...capacityContexts(),...teams.map(t=>({kind:'parent',teamId:String(t.id),title:label(t),detail:'Parent · linked team',active:String(current?.id)===String(t.id)}))];
+  if(currentRole==='coach'||currentRole==='assistant_coach')return [...(__coachTeams.length>1?coachTeamContexts():[]),...capacityContexts(),{kind:'parent-signin',title:'Parent Sign In',detail:'Sign in with an approved parent account',active:false}];
   return [];
 }
 function renderAccountContextControls(){
@@ -205,6 +224,13 @@ async function switchAccountContext(choice,button){
     if(choice.kind==='parent-signin'){
       await window.ClubHubCloud.switchToParentSignIn();
       return;
+    }else if(choice.kind==='capacity-parent'||choice.kind==='capacity-staff'){
+      await window.ClubHubCloud.setMyCapacity(choice.kind==='capacity-parent');
+      try{localStorage.removeItem(ADMIN_UI_MODE_KEY);}catch{}
+      location.reload();return;
+    }else if(choice.kind==='add-child'){
+      document.getElementById('context-switch-dialog')?.close();
+      await openParentAddChildDialog();return;
     }else if(choice.kind==='coach-team'){
       const row=__coachTeams.find(t=>String(t.team_id)===choice.teamId);
       if(!row)throw new Error('Team access is no longer available');
@@ -297,7 +323,7 @@ async function refreshCoachTeamSwitch(preview){
   sel.disabled=false;
 }
 function adminTitleLabel(title){const t=String(title||'').trim();return t?`${t} · Admin`:'Club Admin';}
-function roleLabel(){ return currentRole==='admin'?adminTitleLabel(window.ClubHubCloud?.context?.profile?.club_title):currentRole==='assistant_coach'?'Assistant Coach':currentRole==='parent'?'Parent':currentRole==='player'?'Player':currentRole==='pending_parent'?'Parent awaiting approval':'Coach'; }
+function roleLabel(){ return currentRole==='admin'?adminTitleLabel(window.ClubHubCloud?.context?.profile?.club_title):currentRole==='assistant_coach'?'Assistant Coach':currentRole==='parent'?(cloudActingParent()?`Parent view (${staffRoleTitle()})`:'Parent'):currentRole==='player'?'Player':currentRole==='pending_parent'?'Parent awaiting approval':'Coach'; }
 function b64urlEncodeText(text=''){
   const bytes=new TextEncoder().encode(text);let bin='';bytes.forEach(b=>bin+=String.fromCharCode(b));return btoa(bin).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
 }
@@ -2271,14 +2297,14 @@ async function switchParentFamilyTeam(requestedTeamId){
  try{await window.ClubHubCloud.switchParentTeam(teamId);const now=window.ClubHubCloud.currentTeam?.();__announcementRows=[];__announcementStamp=0;++__announcementLoadVersion;renderAnnouncements();renderAll();resetMatchForm();syncSelkent(true).catch(()=>{});toast(`Switched to ${now?.ageGroup||''} ${matchTeamLabel(now?.teamName||'team')}`.trim());return true;}catch(err){toast(err.message||'Could not switch team');return false;}finally{renderParentFamilyControls();}
 }
 async function openParentAddChildDialog(){
- if(currentRole!=='parent'||!CLOUD_MODE)return;
+ if((currentRole!=='parent'&&!cloudStaff())||!CLOUD_MODE)return;
  const dlg=document.getElementById('parent-add-child-dialog'),select=document.getElementById('parent-add-child-team');if(!dlg||!select)return;
  try{const teams=await window.ClubHubCloud.listCurrentClubLoginTeams();select.innerHTML='<option value="">Choose team…</option>'+teams.map(t=>`<option value="${esc(t.id)}">${esc(t.label||('U'+t.age_group+' '+t.name))}</option>`).join('');const child=document.getElementById('parent-add-child-name');if(child)child.value='';dlg.showModal();}catch(err){alert(err.message||err);}
 }
 async function submitParentAddChild(e){
- e.preventDefault();if(currentRole!=='parent'||!CLOUD_MODE)return;
+ e.preventDefault();if((currentRole!=='parent'&&!cloudStaff())||!CLOUD_MODE)return;
  const teamId=document.getElementById('parent-add-child-team')?.value||'',child=document.getElementById('parent-add-child-name')?.value?.trim()||'';if(!teamId)return alert('Choose the team.');if(child.length<2)return alert('Type your child’s name.');
- try{await window.ClubHubCloud.requestParentAccess(teamId,child);document.getElementById('parent-add-child-dialog')?.close();toast('Access request sent for staff verification');}catch(err){alert(err.message||err);}
+ try{if(cloudStaff())await window.ClubHubCloud.requestChildLink(teamId,child);else await window.ClubHubCloud.requestParentAccess(teamId,child);document.getElementById('parent-add-child-dialog')?.close();toast(cloudStaff()?'Request sent. A Club Admin or another coach must approve it':'Access request sent for staff verification');}catch(err){alert(err.message||err);}
 }
 
 function applyAccessMode(){
@@ -2919,7 +2945,7 @@ function renderTeamIdentity(){
   document.getElementById('hero-club-name').textContent=(meta.clubName||clubSettings().display_name||'Club').toUpperCase();
   const adminHero=currentView==='more'?'CLUB SETTINGS':currentView==='club'?(__clubTab==='coaches'?'CLUB STAFF':__clubTab==='overview'?'CLUB HOME':'MATCHES'):currentView==='inbox'?'COMMUNICATIONS':'CLUB HOME';
   const pill=document.getElementById('hero-mode-pill');
-  if(pill){const label=!isAdmin()?'':adminClub?'Club Admin':isAdminCoachMode()?'Coach mode':isAdminTeamPreviewMode()?'Read only':'';pill.textContent=label;pill.classList.toggle('hidden',!label);pill.dataset.mode=adminClub?'club':isAdminCoachMode()?'coach':'preview';}
+  if(pill){const acting=CLOUD_MODE&&cloudActingParent();const label=acting?'Parent view':!isAdmin()?'':adminClub?'Club Admin':isAdminCoachMode()?'Coach mode':isAdminTeamPreviewMode()?'Read only':'';pill.textContent=label;pill.classList.toggle('hidden',!label);pill.dataset.mode=acting?'parent':adminClub?'club':isAdminCoachMode()?'coach':'preview';}
   document.getElementById('hero-team-name').textContent=matchTeamLabel(adminClub?adminHero:(meta.teamName||'Team').toUpperCase());
   document.getElementById('hero-season-line').textContent=adminClub?[`${window.ClubHubCloud?.visibleTeamList?.().length||clubTeams().length} active teams`,meta.season].filter(Boolean).join(' · '):[meta.ageGroup,state.division.name,meta.season].filter(Boolean).join(' · ');
   document.getElementById('dashboard-season-kicker').textContent=(meta.season||'Season')+' season';
