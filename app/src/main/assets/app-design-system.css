@@ -750,8 +750,3 @@ html[data-theme="dark"] #view-home .next-match-summary-card:not(:disabled)::afte
 }
 /* Parent cup-group matchday: the panel lists every group game, so the one-game summary card above it is redundant. */
 body.role-parent #view-home .home-next-match:has(#parent-home-match-info:not(.hidden) .cup-group-fixture-lines) #next-match-card{display:none}
-/* v2.2.20 — verified club badge hero formatting: round badge artwork, so opaque square corners in the source image never show. */
-.club-logo-wrap:not(.platform-club-placeholder){border-radius:50%!important;background:transparent!important;border:0!important;overflow:hidden}
-.club-logo-wrap:not(.platform-club-placeholder) .club-logo{width:100%;height:100%;object-fit:contain;clip-path:circle(49.4% at 50% 50%)!important}
-.club-logo-wrap.platform-club-placeholder{background:rgba(255,255,255,.96)!important}
-.club-logo-wrap.platform-club-placeholder .club-logo{clip-path:none!important}
