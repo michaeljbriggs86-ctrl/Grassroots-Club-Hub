@@ -5,6 +5,7 @@ const STATIC = [
   './', './index.html', './manifest.json', './cloud-config.js', './cloud.js',
   './onboarding.js', './onboarding.css', './app.js', './static-feed-overlay.js',
   './styles.css', './cloud.css', './app-design-system.css',
+  './inter-variable.woff2', './inter-OFL.txt',
   './pilot-rights-runtime.js', './pitchkind-wt_logo-primary.svg',
   './pitchkind-wt_logo-reverse.svg', './pitchkind-wt_mark.svg',
   './pitchkind-wt_mark-reverse.svg', './pitchkind-wt_app-icon.svg',
