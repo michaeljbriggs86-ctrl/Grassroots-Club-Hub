@@ -810,7 +810,6 @@ html[data-theme="dark"] #matches-next-fixture,html[data-theme="dark"] #view-leag
 /* Results tables: rows sit flush, action line reads as part of the row above it. */
 .match-results-table{margin:0}
 .match-results-table .competition-game-link{display:inline;text-align:left}
-.match-results-table .match-detail-badges{display:flex;gap:6px;margin-top:4px}
 .match-results-table tr.match-result-actions td{padding-top:0;border-top:0}
 .match-results-table tr.match-result-actions .match-actions{display:flex;flex-wrap:wrap;gap:6px 14px;justify-content:flex-end;align-items:center;margin:0}
 /* Narrow screens: every results table (Cups, Vases, league, friendlies, tournaments, other) stacks
@@ -837,6 +836,12 @@ html[data-theme="dark"] #matches-next-fixture,html[data-theme="dark"] #view-leag
   .competition-games-table tbody tr+tr:not(.match-result-actions){border-top:1px solid var(--gch-line)}
   html[data-theme="dark"] .competition-games-table tbody tr+tr:not(.match-result-actions){border-top-color:#344239}
   .competition-games-table td.table-empty{display:block;padding:10px 12px!important}
+  /* Grouped lists omit the competition cell; keep the Cups row's two-line rhythm. */
+  .grouped-results-table .competition-games-table tbody tr:not(.match-result-actions){grid-template-columns:auto minmax(0,1fr) auto;grid-template-areas:"date venue result" "opp opp result"}
+  .grouped-results-table .competition-games-table tbody tr:not(.match-result-actions)>td:nth-child(2){grid-area:opp;padding:4px 8px 10px 12px!important;font-size:14px!important;font-weight:700;flex-direction:column;align-items:flex-start}
+  .grouped-results-table .competition-games-table tbody tr:not(.match-result-actions)>td:nth-child(2) .cup-round{display:block!important;margin-left:0}
+  .grouped-results-table .competition-games-table tbody tr:not(.match-result-actions)>td:nth-child(3){grid-area:venue;padding:10px 0 2px 8px!important;font-size:12px!important;font-weight:400;flex-direction:row;align-items:center!important;color:var(--muted)}
+  .grouped-results-table .competition-games-table tbody tr:not(.match-result-actions)>td:nth-child(4){grid-area:result;padding:10px 12px 10px 8px!important;justify-content:flex-end}
 }
 
 /* Club results (admin overview and Club > Results): both teams in the Match cell. */

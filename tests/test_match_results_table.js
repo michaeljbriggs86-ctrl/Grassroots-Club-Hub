@@ -7,7 +7,7 @@ const take=(from,to)=>{const a=app.indexOf(from),b=app.indexOf(to,a);assert(a>=0
 let now='2026-10-10T10:00:00Z',coach=true;
 class Clock extends Date{constructor(...args){super(...(args.length?args:[now]));}static now(){return new Date(now).getTime();}}
 const list={innerHTML:''},count={textContent:''};
-const ctx={Date:Clock,state:{goals:[{matchId:'f1',goals:2}],assists:[],awards:[],bookings:[]},
+const ctx={Date:Clock,state:{goals:[{matchId:'f1',goals:2}],assists:[{matchId:'f1',assists:1}],awards:[{matchId:'f1'}],bookings:[{matchId:'f1',yellow:1}]},
   document:{getElementById:id=>id==='list'?list:id==='count'?count:null},setStableHtml:(el,html)=>{el.innerHTML=html;},
   esc:s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;'),formatDate:s=>s,clubListingHtml:s=>s,
   resultOf:m=>m.status==='scheduled'?'SCH':m.gf>m.ga?'W':m.gf<m.ga?'L':'D',matchStatus:m=>m.status||'played',isPlayedMatch:m=>(m.status||'played')==='played',
@@ -25,12 +25,20 @@ const cup={id:'c1',date:'2026-10-10',opponent:'Chislehurst Wanderers Panthers',c
 ctx.renderMatchGroup('list','count',[friendly,today,league,cup],'None');
 const h=list.innerHTML;
 assert.equal(count.textContent,4);
-assert.match(h,/<table class="competition-games-table"><thead><tr><th>Date<\/th><th>Competition<\/th><th>Opponent<\/th><th>H\/A<\/th><th>Status \/ result<\/th>/,'same columns as the Cups table');
+assert.match(h,/<table class="competition-games-table"><thead><tr><th>Date<\/th><th>Opponent<\/th><th>H\/A<\/th><th>Status \/ result<\/th>/,'grouped lists omit the repeated competition column');
+assert.doesNotMatch(h,/<th>Competition<\/th>|<b>Friendly<\/b>|<b>League<\/b>/);
 assert.equal((h.match(/<tr class="result-/g)||[]).length,4,'one result row per match');
 assert.match(h,/<span class="competition-result-pill L">L 2–3<\/span>/);
 assert.match(h,/<span class="competition-result-pill W">W 4–2<\/span>/);
-assert.match(h,/<b>Selkent Cup Two<\/b><small class="cup-round">Round 1<\/small>/,'cups keep name + round');
-assert.match(h,/data-details-match="f1">Lewisham Borough Cobras<\/button><span class="match-detail-badges"><span>⚽ 2<\/span>/,'opponent opens details; stat badges kept');
+assert.match(h,/<small class="cup-round">Round 1<\/small>/,'match stage remains available without a competition column');
+assert.match(h,/data-details-match="f1">Lewisham Borough Cobras<\/button>/,'opponent still opens details');
+assert.doesNotMatch(h,/match-detail-badges|⚽|★|⭐|▣/,'stat icons are absent even when the match has goals, awards and bookings');
+assert.equal(ctx.state.goals[0].goals,2,'rendering leaves recorded statistics intact');
+assert.equal(ctx.state.awards.length,1);
+assert.match(h,/<td colspan="4"><div class="match-actions">/,'actions span the revised table');
+// Actual cup tables still identify their distinct cup and round.
+vm.runInContext(take('function cupNameAndRound(','/** Coach marker:'),ctx);
+assert.match(ctx.competitionGameRow(cup),/<b>Selkent Cup Two<\/b><small class="cup-round">Round 1<\/small>/);
 // Coach actions survive the layout change.
 assert.match(h,/data-edit-match="f1">Edit result</);assert.match(h,/data-delete-match="f1">Remove</);
 assert.match(h,/data-edit-match="s1">Edit fixture</);assert.match(h,/data-match-played="s1">Match played</,'match-day guard still decides Match played');
