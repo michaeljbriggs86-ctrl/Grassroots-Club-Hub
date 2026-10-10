@@ -5,6 +5,7 @@ on:
       - 'app/src/main/assets/**'
       - 'cloudflare/web-app/build.py'
       - 'tests/**'
+      - 'verification/verify_v2_2_30_pitchkind_ui.py'
       - '.github/workflows/ui-review-fixes.yml'
   workflow_dispatch:
 permissions:
@@ -25,6 +26,7 @@ jobs:
           set -euo pipefail
           node --check app/src/main/assets/app.js
           node --check app/src/main/assets/cloud.js
+          python verification/verify_v2_2_30_pitchkind_ui.py
           for test in tests/test_*.js; do
             echo "Running $test"
             node "$test"
