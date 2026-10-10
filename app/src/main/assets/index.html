@@ -343,7 +343,8 @@
             <h3>Match details</h3>
             <div class="form-grid two">
               <label>Date<input id="match-date" type="date" required /></label>
-              <label id="match-opponent-input-wrap">Opponent<select id="match-opponent" required><option value="">Select same-age Selkent team</option></select><small class="helper" id="match-opponent-directory-help">Teams are filtered to this age group from the Selkent club directory.</small></label><datalist id="division-opponents-list"></datalist>
+              <label id="match-opponent-age-wrap" class="hidden">Opponent age group<select id="match-opponent-age" disabled></select><small class="helper">Friendlies can be played against another age group.</small></label>
+              <label id="match-opponent-input-wrap">Opponent<select id="match-opponent" required><option value="">Select Selkent team</option></select><small class="helper" id="match-opponent-directory-help">Choose an opponent from the Selkent club directory.</small></label><datalist id="division-opponents-list"></datalist>
               <label id="match-opponent-select-wrap" class="hidden">Opponent<select id="match-opponent-select"><option value="">Select opponent</option></select></label>
               <label>Competition
                 <select id="match-competition">

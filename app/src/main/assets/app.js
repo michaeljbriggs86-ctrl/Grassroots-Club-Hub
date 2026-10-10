@@ -2560,41 +2560,74 @@ let __selkentAgeTeams=[];
 let __selkentDirectoryAge=0;
 let __selkentDirectoryLoading=false;
 let __selkentDirectorySyncTried=false;
+let __selkentDirectoryLoadVersion=0;
+function friendlyOpponentAgeGroupAllowed(){
+  return providerType()==='selkent'&&String(document.getElementById('match-competition')?.value||'').trim().toLowerCase()==='friendly';
+}
+function selectedOpponentAgeGroup(){
+  const age=Number(document.getElementById('match-opponent-age')?.value||0);
+  return friendlyOpponentAgeGroupAllowed()&&Number.isInteger(age)&&age>=7&&age<=21?age:ageGroupNumber();
+}
+function configureOpponentAgeGroup(){
+  const select=document.getElementById('match-opponent-age'),wrap=document.getElementById('match-opponent-age-wrap');
+  const allowed=friendlyOpponentAgeGroupAllowed();wrap?.classList.toggle('hidden',!allowed);
+  if(!select)return;
+  select.disabled=!allowed;
+  if(!select.options.length){select.innerHTML=Array.from({length:15},(_,i)=>i+7).map(age=>`<option value="${age}">Under ${age}s</option>`).join('');select.value=String(ageGroupNumber());}
+  if(!allowed||!select.value)select.value=String(ageGroupNumber());
+}
+function resetOpponentAgeGroup(age=ageGroupNumber()){
+  configureOpponentAgeGroup();
+  const select=document.getElementById('match-opponent-age'),value=Number(age);
+  if(select)select.value=String(Number.isInteger(value)&&value>=7&&value<=21?value:ageGroupNumber());
+}
+function matchOpponentDirectorySelection(competition,opponent,existing={}){
+  if(providerType()!=='selkent'||!isFriendlyMatch({competition}))return {opponentAgeGroup:null,opponentProviderTeamId:null};
+  const age=selectedOpponentAgeGroup();
+  const row=__selkentDirectoryAge===age?__selkentAgeTeams.find(r=>r.display_name===opponent):null;
+  const previous=existing?.opponent===opponent&&Number(existing?.opponentAgeGroup)===age?existing.opponentProviderTeamId:null;
+  return {opponentAgeGroup:age,opponentProviderTeamId:row?.id||previous||null};
+}
 function configureOpponentEditorForProvider(){
+  configureOpponentAgeGroup();
   const current=document.getElementById('match-opponent'),wrap=document.getElementById('match-opponent-input-wrap'),help=document.getElementById('match-opponent-directory-help');if(!current||!wrap)return;
   if(providerType()!=='selkent'&&current.tagName==='SELECT'){
     const input=document.createElement('input');input.id='match-opponent';input.required=true;input.setAttribute('list','division-opponents-list');input.placeholder='Type opponent name';input.value=current.value||'';current.replaceWith(input);if(help)help.textContent='Manual provider · type the opponent or choose a saved division opponent.';
   }else if(providerType()==='selkent'&&current.tagName==='INPUT'){
-    const select=document.createElement('select');select.id='match-opponent';select.required=true;select.innerHTML='<option value="">Select same-age provider team</option>';current.replaceWith(select);if(help)help.textContent='Teams are filtered to this age group from the competition provider directory.';
+    const select=document.createElement('select');select.id='match-opponent';select.required=true;select.innerHTML='<option value="">Select Selkent team</option>';current.replaceWith(select);if(help)help.textContent='Choose an opponent from the selected age group.';
   }
 }
 function renderSelkentOpponentSelect(){
   const select=document.getElementById('match-opponent');if(!select||select.tagName!=='SELECT')return;
   const keep=select.value;
-  const ownNames=[state.division?.teamName,state.meta?.teamName,`${state.meta?.clubName||clubSettings().display_name||'Club'} ${state.meta?.teamName||''}`].filter(Boolean).map(selkentNorm);
+  const age=selectedOpponentAgeGroup();
+  const ownNames=age===ageGroupNumber()?[state.division?.teamName,state.meta?.teamName,`${state.meta?.clubName||clubSettings().display_name||'Club'} ${state.meta?.teamName||''}`].filter(Boolean).map(selkentNorm):[];
   const rows=__selkentAgeTeams.filter(r=>!ownNames.includes(selkentNorm(r.display_name))).slice().sort((a,b)=>String(a.display_name||'').localeCompare(String(b.display_name||'')));
-  select.innerHTML='<option value="">Select same-age provider team</option>'+rows.map(r=>`<option value="${esc(r.display_name)}">${esc(r.club_name)} — ${esc(r.team_label.replace(/^Under\s+\d+(?:X)?s?\s*/i,'' )||r.team_label)}</option>`).join('');
+  select.innerHTML=`<option value="">Select Under ${age}s team</option>`+rows.map(r=>`<option value="${esc(r.display_name)}">${esc(r.club_name)} — ${esc(String(r.team_label||'').replace(/^Under\s+\d+(?:X)?s?\s*/i,'' )||r.team_label||r.display_name)} (${esc(r.age_variant||`U${age}`)})</option>`).join('');
   if(keep&&!rows.some(r=>r.display_name===keep))select.add(new Option(keep,keep));
   if(keep)select.value=keep;
-  const help=document.getElementById('match-opponent-directory-help');if(help)help.textContent=rows.length?`${rows.length} U${ageGroupNumber()} provider teams available`:'Loading same-age provider teams…';
+  const help=document.getElementById('match-opponent-directory-help');if(help)help.textContent=rows.length?`${rows.length} U${age} Selkent teams available`:(__selkentDirectoryLoading?`Loading U${age} Selkent teams…`:`No U${age} teams found in the Selkent directory.`);
 }
 function ensureOpponentOption(name=''){const select=document.getElementById('match-opponent');const value=String(name||'').trim();if(!select||!value)return;if(select.tagName==='INPUT'){select.value=value;return;}if(![...select.options].some(o=>o.value===value))select.add(new Option(value,value));select.value=value;}
 async function refreshSelkentOpponentDirectory(force=false){
   configureOpponentEditorForProvider();
   if(providerType()!=='selkent'){const help=document.getElementById('match-opponent-directory-help');if(help)help.textContent='Manual provider · type the opponent or use a saved opponent.';return;}
   if(!CLOUD_MODE||!window.ClubHubCloud?.listSelkentTeamDirectory)return;
-  const age=ageGroupNumber();if(!age)return;
-  if(__selkentDirectoryLoading)return;
+  const age=selectedOpponentAgeGroup();if(!age)return;
+  if(__selkentDirectoryLoading&&__selkentDirectoryAge===age)return;
   if(!force&&__selkentDirectoryAge===age&&__selkentAgeTeams.length){renderSelkentOpponentSelect();return;}
-  __selkentDirectoryLoading=true;__selkentDirectoryAge=age;
+  const version=++__selkentDirectoryLoadVersion;
+  __selkentDirectoryLoading=true;__selkentDirectoryAge=age;__selkentAgeTeams=[];renderSelkentOpponentSelect();
   try{
     let rows=await window.ClubHubCloud.listSelkentTeamDirectory(age);
+    if(version!==__selkentDirectoryLoadVersion||age!==selectedOpponentAgeGroup()||providerType()!=='selkent')return;
     if(!rows.length&&!__selkentDirectorySyncTried&&window.ClubHubCloud.syncSelkentTeamDirectory){
       __selkentDirectorySyncTried=true;
       try{await window.ClubHubCloud.syncSelkentTeamDirectory();rows=await window.ClubHubCloud.listSelkentTeamDirectory(age);}catch(_){}
     }
-    __selkentAgeTeams=Array.isArray(rows)?rows:[];renderSelkentOpponentSelect();
-  }catch(_){const help=document.getElementById('match-opponent-directory-help');if(help)help.textContent='Selkent opponent directory is temporarily unavailable.';}finally{__selkentDirectoryLoading=false;}
+    if(version!==__selkentDirectoryLoadVersion||age!==selectedOpponentAgeGroup()||providerType()!=='selkent')return;
+    __selkentAgeTeams=Array.isArray(rows)?rows:[];__selkentDirectoryLoading=false;renderSelkentOpponentSelect();
+  }catch(_){if(version===__selkentDirectoryLoadVersion){const help=document.getElementById('match-opponent-directory-help');if(help)help.textContent=`The U${age} opponent directory is temporarily unavailable.`;}}finally{if(version===__selkentDirectoryLoadVersion)__selkentDirectoryLoading=false;}
 }
 
 let __availabilityRows=[];
@@ -5079,6 +5112,7 @@ function setDivisionEntryMode(enabled,competitionName=null){
   if(input)input.required=!__divisionEntryMode;
   if(select){select.required=__divisionEntryMode;select.innerHTML='<option value="">Select opponent</option>'+divisionOpponents().map(t=>`<option value="${esc(t)}">${esc(matchTeamLabel(t))}</option>`).join('');}
   if(competition){competition.disabled=__divisionEntryMode;if(__divisionEntryMode)competition.value=__programmeCompetition;}
+  configureOpponentAgeGroup();
   if(venue){
     const value=venue.value;
     if(__divisionEntryMode){venue.innerHTML='<option value="">Choose H / A</option><option value="H">Home</option><option value="A">Away</option>';venue.value=['H','A'].includes(value)?value:'';}
@@ -5172,6 +5206,7 @@ function resetMatchForm(){
   document.getElementById('match-form').reset();
   document.getElementById('match-id').value='';
   document.getElementById('match-competition').value=isPublishedLeagueTeam()?'League':'Division';
+  resetOpponentAgeGroup();
   document.getElementById('match-gf').value=0;
   document.getElementById('match-ga').value=0;
   const status=document.getElementById('match-status');if(status)status.value='scheduled';
@@ -5198,6 +5233,8 @@ function editMatch(id){
   if(simpleNonLeague)setCompetitionOptions('nonleague',m.competition);else setCompetitionOptions('all',m.competition);
   document.getElementById('match-competition').value=simpleNonLeague?(isFriendlyMatch(m)?'Friendly':'Tournament'):m.competition;
   if(!document.getElementById('match-competition').value) document.getElementById('match-competition').add(new Option(m.competition,m.competition,true,true));
+  resetOpponentAgeGroup(m.opponentAgeGroup||String(m.opponent||'').match(/\bU(\d{1,2})\s*$/i)?.[1]||ageGroupNumber());
+  refreshSelkentOpponentDirectory(false);
   updateTournamentMatchUI(m.tournamentId||'');if(document.getElementById('match-tournament'))document.getElementById('match-tournament').value=m.tournamentId||'';
   document.getElementById('match-venue').value=m.venue||'';
   document.getElementById('match-stage').value=m.stage||'';
@@ -5237,6 +5274,7 @@ async function submitMatch(e){
     id,
     date:document.getElementById('match-date').value,
     opponent,
+    ...matchOpponentDirectorySelection(competition,opponent,existing),
     competition,
     type:competition.includes('Tournament')?'Tournament':competition,
     tournamentId:/tournament/i.test(competition)?(document.getElementById('match-tournament')?.value||null):null,
@@ -5541,7 +5579,8 @@ document.getElementById('match-search').addEventListener('input',applyMatchFilte
 document.getElementById('match-gf').addEventListener('input',updateGoalCheck);
 document.getElementById('match-status')?.addEventListener('change',updateMatchStatusUI);
 document.getElementById('match-venue')?.addEventListener('change',updateGoalCheck);
-document.getElementById('match-competition')?.addEventListener('change',()=>updateTournamentMatchUI());
+document.getElementById('match-competition')?.addEventListener('change',()=>{updateTournamentMatchUI();configureOpponentAgeGroup();refreshSelkentOpponentDirectory(false);});
+document.getElementById('match-opponent-age')?.addEventListener('change',()=>{const opponent=document.getElementById('match-opponent');if(opponent)opponent.value='';return refreshSelkentOpponentDirectory(false);});
 document.getElementById('create-tournament')?.addEventListener('click',()=>openTournamentDialog());
 document.getElementById('tournament-form')?.addEventListener('submit',saveTournament);
 document.getElementById('open-season-archive')?.addEventListener('click',openSeasonArchive);
