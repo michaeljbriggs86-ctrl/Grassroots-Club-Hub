@@ -105,19 +105,19 @@
           </div>
           <div class="matchday-dashboard-grid">
             <article class="matchday-dashboard-fixtures"><span>Matches</span><div class="canonical-match-rows" id="matchday-dashboard-opponent">TBC</div></article>
-            <article><span>Kick-off</span><strong id="matchday-dashboard-kickoff">TBC</strong></article>
+            <article><span>Date &amp; time</span><strong id="matchday-dashboard-kickoff">TBC</strong><small id="matchday-dashboard-confirmation"></small></article>
             <article><span>Venue</span><strong id="matchday-dashboard-venue">TBC</strong><small id="matchday-dashboard-address"></small></article>
-            <article><span>Availability</span><strong id="matchday-dashboard-availability">0 available</strong></article>
+            <article><span>Availability</span><strong id="matchday-dashboard-availability">0 available</strong><small id="matchday-dashboard-availability-breakdown"></small></article>
             <article><span>Squad</span><strong id="matchday-dashboard-squad">0 selected</strong></article>
             <article><span>Formation</span><strong id="matchday-dashboard-formation">TBC</strong></article>
           </div>
           <div class="matchday-dashboard-alert hidden" id="matchday-dashboard-alert"></div>
           <div class="kit-clash-warning hidden" id="matchday-dashboard-kit-warning"></div>
           <div class="matchday-dashboard-actions">
+            <button type="button" class="primary-button compact" id="matchday-open-tactics">Open squad &amp; tactics</button>
             <a class="secondary-button compact hidden" id="matchday-dashboard-map" href="#">Open in Maps</a>
             <button type="button" class="secondary-button compact" id="matchday-add-calendar">Add to calendar</button>
             <button type="button" class="secondary-button compact hidden" id="matchday-notify-squad">Notify selected squad</button>
-            <button type="button" class="primary-button compact" id="matchday-open-tactics">Open squad & tactics</button>
           </div>
           <details class="matchday-dashboard-note">
             <summary>Private coaching note</summary>
@@ -793,7 +793,7 @@
       <div class="next-fixture-scroll" id="next-fixture-scroll">
       <div class="next-match-confirmed-bar"><span class="next-match-status hidden" id="next-match-status"></span><button type="button" class="fixture-edit-button hidden" id="next-match-edit" aria-label="Edit confirmed match details" title="Edit match details">✎</button></div>
       <div class="match-versus next-fixture-versus" id="next-match-versus"></div>
-      <div class="next-match-grid next-fixture-time-only"><div class="fixture-date-with-calendar"><div class="fixture-date-copy"><span>Date / time</span><strong id="next-match-when">Date · Kick-off awaiting confirmation</strong></div><button type="button" class="text-button compact hidden" id="next-match-calendar">Add to calendar</button></div></div>
+      <div class="next-match-grid next-fixture-time-only"><div class="fixture-date-with-calendar"><div class="fixture-date-copy"><span>Date / time</span><strong id="next-match-when">Date · Kick-off TBC</strong></div><button type="button" class="text-button compact hidden" id="next-match-calendar">Add to calendar</button></div></div>
       <section class="fixture-confirmation-editor hidden" id="next-match-confirmation-editor">
         <div class="panel-heading"><div><h3>Confirm match details</h3><span class="helper">Club information for parents</span></div></div>
         <div class="form-grid two">

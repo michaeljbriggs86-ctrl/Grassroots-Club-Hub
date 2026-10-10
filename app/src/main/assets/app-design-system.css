@@ -791,7 +791,7 @@ body.role-parent #view-home .home-next-match:has(#parent-home-match-info:not(.hi
 }
 .hero-inner{width:100%;grid-template-columns:auto minmax(0,1fr)!important;gap:12px!important}
 .club-logo-wrap{width:clamp(52px,12vw,72px)!important;height:clamp(52px,12vw,72px)!important}
-.hero-copy .eyebrow{margin:0;font-size:11px;letter-spacing:.12em}
+.hero-copy .eyebrow{margin:0;font-size:12px;letter-spacing:.12em}
 .hero-copy h1{margin:2px 0;font-size:clamp(22px,5.6vw,32px)!important;line-height:1.05!important}
 .hero-copy .season-line{margin:0;font-size:13px}
 @media(orientation:landscape) and (max-height:560px){.hero{min-height:0!important}}
@@ -848,7 +848,7 @@ html[data-theme="dark"] #matches-next-fixture,html[data-theme="dark"] #view-leag
 #admin-recent-results .club-results-table{margin-top:4px}
 
 /* The mode pill sits inside the fixed hero band without growing it. */
-.hero-copy .mode-pill{margin:0 0 3px;padding:2px 8px;font-size:9.5px}
+.hero-copy .mode-pill{margin:0 0 2px;padding:2px 8px;font-size:12px;line-height:1.2}
 
 /* Admin lead cards (Mike, 2026-10-10): keep the layout; the first card on each admin tab carries the
  * Home green top border, and its summary line uses the Home date pill. */
@@ -925,4 +925,26 @@ html[data-theme="dark"] #view-inbox .inbox-message.mine .inbox-bubble{background
 @media (prefers-reduced-motion:reduce){
   html{scroll-behavior:auto!important}
   *,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+}
+
+/* Frontend polish: one preparation surface, with values and supporting details. */
+#view-home #matchday-dashboard .matchday-dashboard-grid{gap:0 16px}
+#view-home #matchday-dashboard .matchday-dashboard-grid>article{
+  padding:12px 0;background:transparent;border:0;border-bottom:1px solid var(--gch-line);border-radius:0;
+}
+#view-home #matchday-dashboard .matchday-dashboard-grid>article>span{
+  font-size:12px;font-weight:600;text-transform:none;letter-spacing:normal;
+}
+#view-home #matchday-dashboard .matchday-dashboard-grid>article>strong{font-size:15px}
+#view-home #matchday-dashboard .matchday-dashboard-grid>article>small{font-size:13px;font-weight:400}
+#view-home #matchday-dashboard .matchday-dashboard-heading{flex-wrap:wrap;gap:8px}
+#view-home #matchday-dashboard .matchday-dashboard-status{font-size:12px;line-height:1.4;font-weight:600;white-space:normal}
+#view-home #matchday-dashboard .matchday-dashboard-alert{font-size:14px;font-weight:600}
+#view-home #matchday-dashboard .canonical-match-fixture-label{font-size:12px}
+#view-home #matchday-dashboard .matchday-dashboard-actions{align-items:stretch}
+#view-home #matchday-dashboard #matchday-open-tactics{flex-basis:100%;min-height:48px}
+#view-home #matchday-dashboard .matchday-dashboard-actions>.secondary-button{min-height:44px;font-size:14px;flex:1 1 140px}
+.competition-games-table .cup-round{font-size:12px;line-height:1.4}
+html[data-theme="dark"] #view-home #matchday-dashboard .matchday-dashboard-grid>article{
+  background:transparent!important;border-color:#344239!important;
 }
