@@ -1,0 +1,53 @@
+name: UI review regression checks
+on:
+  # Check the combined main tree after merges.
+  push:
+    branches:
+      - main
+  # The guarded publisher commits with GITHUB_TOKEN, which cannot trigger push CI.
+  # Check current main after it finishes, without consuming artifacts or secrets.
+  workflow_run:
+    workflows:
+      - Store reviewed pilot badges privately in R2
+    types: [completed]
+    branches: [main]
+  pull_request:
+    paths:
+      - 'app/src/main/assets/**'
+      - 'cloudflare/web-app/build.py'
+      - 'tests/**'
+      - 'verification/verify_v2_2_30_pitchkind_ui.py'
+      - '.github/workflows/ui-review-fixes.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  ui-regressions:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Check client behavior and build
+        run: |
+          set -euo pipefail
+          node --check app/src/main/assets/app.js
+          node --check app/src/main/assets/cloud.js
+          python verification/verify_v2_2_30_pitchkind_ui.py
+          python verification/verify_club_logo_quality.py
+          for test in tests/test_*.js; do
+            echo "Running $test"
+            node "$test"
+          done
+          python cloudflare/web-app/build.py
+          for asset in index.html app.js cloud.js styles.css app-design-system.css; do
+            cmp "app/src/main/assets/$asset" "cloudflare/web-app/dist/$asset"
+          done
+          cmp app/src/main/assets/inter-variable.woff2 cloudflare/web-app/dist/inter-variable.woff2
+          cmp app/src/main/assets/inter-OFL.txt cloudflare/web-app/dist/inter-OFL.txt
+          git diff --check

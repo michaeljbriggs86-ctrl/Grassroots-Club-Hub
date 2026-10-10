@@ -2,6 +2,7 @@
 const fs=require('node:fs'),assert=require('node:assert/strict');
 const old=fs.readFileSync('tests/test_admin_weekend_share.js','utf8');
 const {c,row,fixture,confirm,feedFor,node}=new Function('require',old.slice(0,old.indexOf('(async()=>{')).replace(/^#![^\n]*\n/,'')+'\nreturn {c,row,fixture,confirm,feedFor,node};')(require);
+require('node:vm').runInContext(fs.readFileSync('app/src/main/assets/app.js','utf8').match(/function preferredScrollBehavior\(\)\{[^\n]+/)[0],c);
 const g={font:'',measureText(s){return {width:String(s).length*Number(this.font.match(/(\d+)px/)?.[1]||34)*.54};},scale(x,y){this.scaling=[x,y];},fillRect(){},save(){},restore(){},translate(){},rotate(){},arc(){},clip(){},drawImage(){},fillText(){},beginPath(){},roundRect(){},fill(){}};
 const cupA=fixture('Cup North','A','Selkent Cup Two - Round 1','2026-10-10'),cupB=fixture('Cup South','H',cupA.competition,cupA.date);
 const cup=row('cup','Valiants',9,[cupA,cupB]);confirm(cup,cupB,{time:'09:00',groundName:'Marathon Sports Ground',address:'Shooters Hill'});

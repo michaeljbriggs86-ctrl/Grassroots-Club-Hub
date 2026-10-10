@@ -46,6 +46,11 @@ const overlaySrc=fs.readFileSync(path.join(__dirname,'../app/src/main/assets/sta
 context.norm=norm;state.selkent.directoryDetails={};
 vm.runInContext(overlaySrc.slice(overlaySrc.indexOf('  function attachDirectoryBadges('),overlaySrc.indexOf('  function loadDirectory(')),context);
 context.attachDirectoryBadges(directory);
+for(const name of ['Shooters Hill Cannons','Shooters Hill cannons U8']){
+ assert.equal(state.selkent.directoryDetails[norm(name)].clubId,499);
+ assert.equal(state.selkent.directoryDetails[norm(name)].logoStatus,'pilot_verified');
+ assert.equal(state.selkent.directoryDetails[norm(name)].pilotLogoSha256,directory.clubs.find(c=>c.club_id===499).logo_sha256);
+}
 for(const [name,initials,id] of [['Lewisham Borough Cobras','LB',286],['Junior Reds Knights','JR',292],['Junior Reds Athletic','JR',292],['Russellers Yellows','RU',322]]){
  assert.equal(state.selkent.directoryDetails[norm(name)].clubId,id);
  assert.equal(context.clubPlaceholderBadgeData(name).initials,initials);
@@ -57,3 +62,10 @@ ambiguous.team_club_links.push({team_name:'Junior Reds Knights',club_id:286});
 context.attachDirectoryBadges(ambiguous);
 assert.equal(context.clubPlaceholderBadgeData('Junior Reds Knights').status,'missing','a stale cached identity cannot supply a monogram for an ambiguous team');
 console.log('Screenshot fixture teams: fresh directory identity and ambiguous-name fallback passed');
+
+const conflictingCannons=structuredClone(directory);
+conflictingCannons.team_club_links.push({team_name:'Shooters Hill Cannons',club_id:286},{team_name:'Shooters Hill Cannons',club_id:499});
+context.attachDirectoryBadges(conflictingCannons);
+assert.equal(state.selkent.directoryDetails[norm('Shooters Hill Cannons')].clubId,null);
+assert.equal(context.clubPlaceholderBadgeData('Shooters Hill Cannons').status,'missing');
+console.log('Friendly Cannons aliases use the canonical badge and fail closed on a conflicting mapping');

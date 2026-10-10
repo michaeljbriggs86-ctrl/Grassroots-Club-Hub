@@ -8,6 +8,7 @@
   <link rel="manifest" href="manifest.json" />
   <link rel="icon" href="icon-192.png" />
   <link rel="apple-touch-icon" href="icon-192.png" />
+  <link rel="preload" href="inter-variable.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="stylesheet" href="styles.css" />
   <link rel="stylesheet" href="cloud.css" />
   <link rel="stylesheet" href="onboarding.css" />
@@ -85,7 +86,7 @@
 
         <section class="home-next-match" id="home-next-match">
           <p class="kicker" id="home-next-title">Next match</p>
-          <button type="button" class="panel next-match-card next-match-summary-card" id="next-match-card" aria-haspopup="dialog" aria-controls="next-fixture-dialog">
+          <button type="button" class="panel next-match-card next-match-summary-card screen-lead-card" id="next-match-card" aria-haspopup="dialog" aria-controls="next-fixture-dialog">
             <div class="next-match-summary-versus" id="next-match-home-teams" aria-label="Next match teams">
               <div class="next-match-summary-team"><span class="next-match-summary-visual">—</span><strong>Team TBC</strong></div>
               <span class="next-match-summary-v">V</span>
@@ -93,8 +94,8 @@
             </div>
             <time class="next-match-summary-date" id="next-match-home-date">Date TBC</time>
           </button>
-          <div class="panel parent-home-training hidden" id="parent-home-training"></div>
-          <div class="panel parent-home-match-info hidden" id="parent-home-match-info"></div>
+          <div class="panel parent-home-training screen-lead-card hidden" id="parent-home-training"></div>
+          <div class="panel parent-home-match-info screen-lead-card hidden" id="parent-home-match-info"></div>
         </section>
 
         <section class="panel matchday-dashboard canonical-match-card-active hidden" id="matchday-dashboard">
@@ -104,23 +105,23 @@
           </div>
           <div class="matchday-dashboard-grid">
             <article class="matchday-dashboard-fixtures"><span>Matches</span><div class="canonical-match-rows" id="matchday-dashboard-opponent">TBC</div></article>
-            <article><span>Kick-off</span><strong id="matchday-dashboard-kickoff">TBC</strong></article>
+            <article><span>Date &amp; time</span><strong id="matchday-dashboard-kickoff">TBC</strong><small id="matchday-dashboard-confirmation"></small></article>
             <article><span>Venue</span><strong id="matchday-dashboard-venue">TBC</strong><small id="matchday-dashboard-address"></small></article>
-            <article><span>Availability</span><strong id="matchday-dashboard-availability">0 available</strong></article>
+            <article><span>Availability</span><strong id="matchday-dashboard-availability">0 available</strong><small id="matchday-dashboard-availability-breakdown"></small></article>
             <article><span>Squad</span><strong id="matchday-dashboard-squad">0 selected</strong></article>
             <article><span>Formation</span><strong id="matchday-dashboard-formation">TBC</strong></article>
           </div>
           <div class="matchday-dashboard-alert hidden" id="matchday-dashboard-alert"></div>
           <div class="kit-clash-warning hidden" id="matchday-dashboard-kit-warning"></div>
           <div class="matchday-dashboard-actions">
+            <button type="button" class="primary-button compact" id="matchday-open-tactics">Open squad &amp; tactics</button>
             <a class="secondary-button compact hidden" id="matchday-dashboard-map" href="#">Open in Maps</a>
             <button type="button" class="secondary-button compact" id="matchday-add-calendar">Add to calendar</button>
             <button type="button" class="secondary-button compact hidden" id="matchday-notify-squad">Notify selected squad</button>
-            <button type="button" class="primary-button compact" id="matchday-open-tactics">Open squad & tactics</button>
           </div>
           <details class="matchday-dashboard-note">
             <summary>Private coaching note</summary>
-            <textarea id="matchday-dashboard-note-input" rows="3" maxlength="4000" placeholder="Match plan, reminders or coaching focus..."></textarea>
+            <textarea id="matchday-dashboard-note-input" aria-label="Private coaching note" rows="3" maxlength="4000" placeholder="Match plan, reminders or coaching focus..."></textarea>
             <p class="coach-note-readonly hidden" id="matchday-dashboard-note-readonly"></p>
             <button type="button" class="secondary-button compact" id="save-matchday-dashboard-note">Save note</button>
           </details>
@@ -238,7 +239,7 @@
 
       <section id="view-matches" class="view" data-view="matches">
         <div class="section-title-row">
-          <div><p class="kicker" id="matches-division-kicker">Under 9D Navy</p><h2>Matches</h2></div>
+          <div><p class="kicker" id="matches-division-kicker">Under 9D Navy</p><h2 id="matches-screen-title">Matches</h2></div>
           <button type="button" class="primary-button compact" data-action="quick-add" data-requires-edit>+ Add match</button>
         </div>
 
@@ -251,7 +252,7 @@
           <button type="button" data-scroll-to="tournament-events-section">Tournaments</button>
         </nav>
 
-        <section class="panel next-match-card matches-next-fixture" id="matches-next-fixture">
+        <section class="panel next-match-card matches-next-fixture screen-lead-card" id="matches-next-fixture">
           <div class="panel-heading"><div><p class="kicker">Next fixture</p><h3 id="matches-next-opponent">TBC</h3></div></div>
           <div class="match-versus next-fixture-versus" id="matches-next-versus"></div>
           <div class="next-match-grid matches-fixture-time-row"><div class="fixture-date-with-calendar"><div class="fixture-date-copy"><span>Date / time</span><strong id="matches-next-when">Date / kick-off TBC</strong></div><button type="button" class="text-button compact hidden" id="matches-next-calendar">Add to calendar</button></div><div><span>Competition</span><strong id="matches-next-venue">Venue TBC</strong></div></div>
@@ -259,10 +260,10 @@
           <div class="fixture-map-preview hidden" id="matches-next-map-preview"><iframe id="matches-next-map-frame" title="Next fixture venue map" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe><a class="map-link hidden" id="matches-next-map" href="#" aria-label="Open next fixture venue in Maps">Open in Maps</a></div>
           <div class="kit-clash-warning hidden" id="matches-next-kit-warning"></div>
           <div class="next-match-kits hidden"><span>Match details</span><strong id="matches-next-kits">Kit colours and away details will appear when confirmed.</strong></div>
-          <div class="next-match-links matches-next-actions"><button type="button" class="secondary-button compact" id="matches-next-details">Match details</button><button type="button" class="secondary-button compact hidden match-share-icon" id="matches-next-share" aria-label="Share match details" title="Share match details"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8.7 10.5l6.6-4M8.7 13.5l6.6 4"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="5" r="3"/><circle cx="18" cy="19" r="3"/></svg></button><button type="button" class="secondary-button compact hidden" id="matches-next-copy">Copy match details</button><button type="button" class="primary-button compact match-played-action hidden" id="matches-next-played" data-requires-edit>Match played</button></div>
+          <div class="next-match-links matches-next-actions"><button type="button" class="primary-button compact match-played-action hidden" id="matches-next-played" data-requires-edit>Match played</button><button type="button" class="secondary-button compact" id="matches-next-details">Match details</button><button type="button" class="secondary-button compact hidden match-share-icon" id="matches-next-share" aria-label="Share match details" title="Share match details"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8.7 10.5l6.6-4M8.7 13.5l6.6 4"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="5" r="3"/><circle cx="18" cy="19" r="3"/></svg></button><button type="button" class="secondary-button compact hidden" id="matches-next-copy">Copy match details</button></div>
         </section>
 
-        <section class="panel parent-home-training hidden" id="parent-matches-training" aria-label="Upcoming training sessions"></section>
+        <section class="panel parent-home-training screen-lead-card hidden" id="parent-matches-training" aria-label="Upcoming training sessions"></section>
         <section class="panel parent-matches-placeholder hidden" id="parent-matches-placeholder">Matchday details will appear here when the coach confirms the next fixture.</section>
 
         <details class="panel league-programme" id="league-programme-panel">
@@ -319,7 +320,7 @@
         <div class="section-title-row">
           <div><p class="kicker">Published competition</p><h2 id="league-quick-title">League</h2></div>
         </div>
-        <section class="panel league-table-panel">
+        <section class="panel league-table-panel screen-lead-card">
           <div class="panel-heading league-table-heading"><div><p class="kicker">Standings</p><h3 id="league-quick-table-title">League table</h3></div><span class="age-rule">Official</span></div>
           <div class="league-table-scroll"><table class="league-table"><thead><tr><th>#</th><th>Team</th><th>P</th><th>W</th><th>D</th><th>L</th><th>GF</th><th>GA</th><th>GD</th><th>Pts</th></tr></thead><tbody id="league-quick-table-body"></tbody></table></div>
           <p class="table-meta" id="league-quick-table-meta"></p>
@@ -338,11 +339,12 @@
         <div class="read-only-card hidden" id="read-only-card">Parent mode is read-only. Switch to coach mode to add or edit records.</div>
         <form id="match-form" class="form-stack">
           <input type="hidden" id="match-id" />
-          <div class="panel form-panel">
+          <div class="panel form-panel screen-lead-card">
             <h3>Match details</h3>
             <div class="form-grid two">
               <label>Date<input id="match-date" type="date" required /></label>
-              <label id="match-opponent-input-wrap">Opponent<select id="match-opponent" required><option value="">Select same-age Selkent team</option></select><small class="helper" id="match-opponent-directory-help">Teams are filtered to this age group from the Selkent club directory.</small></label><datalist id="division-opponents-list"></datalist>
+              <label id="match-opponent-age-wrap" class="hidden">Opponent age group<select id="match-opponent-age" disabled></select><small class="helper">Friendlies can be played against another age group.</small></label>
+              <label id="match-opponent-input-wrap">Opponent<select id="match-opponent" required><option value="">Select Selkent team</option></select><small class="helper" id="match-opponent-directory-help">Choose an opponent from the Selkent club directory.</small></label><datalist id="division-opponents-list"></datalist>
               <label id="match-opponent-select-wrap" class="hidden">Opponent<select id="match-opponent-select"><option value="">Select opponent</option></select></label>
               <label>Competition
                 <select id="match-competition">
@@ -393,7 +395,7 @@
         </div>
         <div class="squad-pages" id="squad-pages">
           <section class="squad-view-page" id="squad-list-page" data-squad-view="0" role="tabpanel" aria-labelledby="squad-list-tab">
-            <div class="panel squad-banner compact-squad-banner">
+            <div class="panel squad-banner compact-squad-banner screen-lead-card">
               <div class="squad-count"><strong id="squad-count">0</strong><span>registered players</span></div>
               <div class="squad-space-count" id="squad-space-count"></div>
             </div>
@@ -406,7 +408,7 @@
                 <span class="pitch-halfway"></span><span class="pitch-circle"></span><span class="pitch-box pitch-box-top"></span><span class="pitch-box pitch-box-bottom"></span>
                 <span class="tactics-empty hidden" id="tactics-empty"></span>
               </div>
-              <div class="tactics-board-hint"><p class="helper" id="tactics-help">Drag to move a player. Tap two to swap.</p><p class="tactics-availability-hint hidden" id="tactics-availability-hint">Out = unavailable · Unsure = awaiting confirmation. Adjust the lineup if needed.</p></div>
+              <div class="tactics-board-hint"><p class="helper" id="tactics-help">Drag to move a player. Tap two to swap, or select a pitch player and tap an empty spot to move. Use arrow keys to move a focused player; hold Shift for larger steps.</p><span class="a11y-only" id="tactics-position-status" role="status" aria-live="polite" aria-atomic="true"></span><p class="tactics-availability-hint hidden" id="tactics-availability-hint">Out = unavailable · Unsure = awaiting confirmation. Adjust the lineup if needed.</p></div>
               <div class="tactics-fixture" aria-live="polite"><strong id="tactics-fixture-name">General setup</strong><span id="tactics-fixture-meta">No upcoming fixture published</span><small id="tactics-plan-summary">Your squad plan</small><small class="tactics-match-guide" id="tactics-match-guide"></small></div>
               <details class="matchday-squad-picker tactics-squad-options" id="matchday-squad-picker">
                 <summary class="matchday-squad-summary"><div><strong id="matchday-squad-title">Matchday squad</strong><span id="matchday-squad-fixture">Current setup</span></div><b id="matchday-squad-count">0 / 0</b></summary>
@@ -429,7 +431,7 @@
         <div class="section-title-row"><div><p class="kicker">Private club messaging</p><h2>Inbox</h2></div><button type="button" class="secondary-button compact" id="refresh-club-inbox">Refresh <span class="notification-badge hidden" id="club-inbox-badge">0</span></button></div>
         <nav class="communications-tabs hidden" id="communications-tabs" aria-label="Communications sections"><button type="button" class="secondary-button compact active" data-communications-tab="inbox">Inbox</button><button type="button" class="secondary-button compact" data-communications-tab="notifications">Notifications</button><button type="button" class="secondary-button compact" data-communications-tab="notices">Club notices</button></nav>
         <div id="communications-inbox-panel">
-        <section class="panel inbox-card"><div class="panel-heading"><div><p class="kicker">Conversations</p><h3>Messages</h3><p class="muted" id="club-inbox-help">Messages leave the active inbox 60 days after they are sent.</p></div></div>
+        <section class="panel inbox-card screen-lead-card"><div class="panel-heading"><div><p class="kicker">Conversations</p><h3>Messages</h3><p class="muted" id="club-inbox-help">Messages leave the active inbox 60 days after they are sent.</p></div></div>
           <label class="inbox-conversation-label">Conversation<select id="inbox-contact-select"><option value="">Choose…</option></select></label>
           <p class="helper inbox-hint-pill" id="inbox-compose-hint"></p>
           <div class="inbox-thread" id="inbox-thread" aria-live="polite"></div>
@@ -441,9 +443,9 @@
         <section class="panel concern-panel"><div class="panel-heading"><div><p class="kicker">Complaint / concern</p><h3>Raise an issue</h3></div></div><label>Category<select id="concern-category"><option value="general">General dispute / complaint</option><option value="safeguarding">Safeguarding concern about a child</option></select></label><label>Subject<input id="concern-subject" maxlength="120"/></label><label>Details<textarea id="concern-body" rows="4" maxlength="4000"></textarea></label><p class="muted">Safeguarding concern content is not stored. If Safeguarding is selected, the app records only that you raised a concern and directs you to external safeguarding contacts.</p><button type="button" class="secondary-button" id="submit-concern">Continue</button><div class="provider-summary" id="concern-result"></div></section>
         <section class="panel hidden" id="dispute-reviewer-panel"><div class="panel-heading"><div><p class="kicker">Restricted role</p><h3>Dispute Reviewer</h3><p class="muted">Only assigned reviewers can open retained dispute material. Access is audited.</p></div></div><div id="reviewer-dispute-list"><div class="empty-state compact-empty">No open disputes loaded.</div></div><label>Retained message thread ID<input id="reviewer-thread-id" placeholder="Thread UUID"/></label><button type="button" class="secondary-button" id="load-retained-thread">Open retained thread</button><div id="reviewer-retained-thread" class="inbox-thread"></div></section>
         </div>
-        <section class="panel hidden communications-notifications-panel" id="communications-notifications-panel"><div class="panel-heading"><div><p class="kicker">Notifications</p><h3>Updates</h3></div><button type="button" class="secondary-button compact" id="communications-mark-all">Mark all read</button></div><div class="notification-list" id="communications-notifications-list"></div></section>
+        <section class="panel hidden communications-notifications-panel screen-lead-card" id="communications-notifications-panel"><div class="panel-heading"><div><p class="kicker">Notifications</p><h3>Updates</h3></div><button type="button" class="secondary-button compact" id="communications-mark-all">Mark all read</button></div><div class="notification-list" id="communications-notifications-list"></div></section>
         <div class="hidden" id="communications-notices-panel">
-          <section class="panel admin-announcement-centre">
+          <section class="panel admin-announcement-centre screen-lead-card">
             <div class="panel-heading"><div><p class="kicker">Notifications</p><h3>Club notices</h3><p class="muted">Broadcast a read-only notification to the relevant members.</p></div></div>
             <div class="announcement-compose-grid">
               <label>Title<input id="announcement-title" type="text" maxlength="120" placeholder="e.g. Training cancelled" /></label>
@@ -467,7 +469,7 @@
         <div class="club-matches-switch hidden" id="club-matches-switch" role="group" aria-label="Matches view"><button type="button" data-club-tab="fixtures">Fixtures</button><button type="button" data-club-tab="results">Results</button></div>
 
         <div id="club-fixtures-slot"><section class="club-admin-panel hidden" id="club-fixtures-panel">
-          <section class="panel admin-weekend-panel">
+          <section class="panel admin-weekend-panel screen-lead-card">
             <div class="panel-heading weekend-share-heading"><div><p class="kicker">Next weekend</p><h3>Weekend at a glance</h3><p class="muted" id="admin-weekend-meta"></p></div><button type="button" class="secondary-button weekend-share-trigger" id="admin-weekend-share" data-admin-settings-only>Share weekend</button></div>
             <div class="admin-weekend-list" id="admin-weekend-list"></div>
           </section>
@@ -480,7 +482,7 @@
         </section></div>
 
         <div id="club-results-slot"><section class="club-results-panel hidden" id="club-results-panel">
-          <section class="panel club-results-browser">
+          <section class="panel club-results-browser screen-lead-card">
             <p class="muted" id="club-results-source-status" role="status"></p>
             <div class="club-results-filters"><label class="club-results-age-label">Age group<select id="club-results-age"></select></label><label class="club-results-age-label">Competition<select id="club-results-competition"><option value="league">League</option><option value="friendly">Friendly</option><option value="cup">Cup / tournament</option><option value="other">Other</option><option value="all">All competitions</option></select></label></div>
             <div id="club-results-list" class="club-results-list"></div>
@@ -493,7 +495,7 @@
         </section></div>
 
         <section class="admin-club-overview" id="admin-club-overview">
-          <section class="panel admin-attention-panel" id="admin-attention-panel" tabindex="-1">
+          <section class="panel admin-attention-panel screen-lead-card" id="admin-attention-panel" tabindex="-1">
             <div class="admin-attention-list" id="admin-attention-list"></div>
           </section>
 
@@ -521,7 +523,7 @@
         </section>
 
         <section class="club-admin-panel hidden" id="club-coaches-panel">
-          <section class="panel admin-coach-centre">
+          <section class="panel admin-coach-centre screen-lead-card">
             <div class="panel-heading"><div><p class="kicker">Club staff</p><h3>Coaching Staff</h3></div></div>
             <p class="muted">Approve coach requests and see coaching-staff assignments.</p>
             <div class="coach-requests hidden" id="coach-requests"><div class="panel-heading"><div><p class="kicker">Waiting for you</p><h3>Coach requests</h3></div><span class="match-section-count" id="coach-requests-count">0</span></div><div class="team-members-list" id="coach-requests-list"></div></div>
@@ -605,7 +607,7 @@
               <div class="custom-award-settings" id="custom-award-settings">
                 <div class="panel-heading"><div><h3>Award types</h3><p class="muted">Create the awards your team uses. Removing a type does not delete awards already recorded.</p></div></div>
                 <div id="award-types-list" class="award-type-list"></div>
-                <div class="inline-add-row"><input id="new-award-type" type="text" maxlength="48" placeholder="e.g. Coaches Player of the Match"/><button type="button" class="secondary-button compact" id="add-award-type">Add award</button></div>
+                <div class="inline-add-row"><input id="new-award-type" aria-label="New award type" type="text" maxlength="48" placeholder="e.g. Coaches Player of the Match"/><button type="button" class="secondary-button compact" id="add-award-type">Add award</button></div>
               </div>
             </div>
           </details>
@@ -689,7 +691,7 @@
             <summary><span>Season history</span><span class="settings-chevron">⌄</span></summary>
             <div class="settings-accordion-body">
               <p class="muted">Archived seasons are read only and preserve the match record from before rollover.</p>
-              <div class="season-history-controls"><select id="season-history-select"><option value="">No archived seasons yet</option></select><button type="button" class="secondary-button compact" id="open-season-archive">View archive</button></div>
+              <div class="season-history-controls"><select id="season-history-select" aria-label="Archived season"><option value="">No archived seasons yet</option></select><button type="button" class="secondary-button compact" id="open-season-archive">View archive</button></div>
               <div id="season-history-summary" class="archive-summary"></div>
             </div>
           </details>
@@ -792,7 +794,7 @@
       <div class="next-fixture-scroll" id="next-fixture-scroll">
       <div class="next-match-confirmed-bar"><span class="next-match-status hidden" id="next-match-status"></span><button type="button" class="fixture-edit-button hidden" id="next-match-edit" aria-label="Edit confirmed match details" title="Edit match details">✎</button></div>
       <div class="match-versus next-fixture-versus" id="next-match-versus"></div>
-      <div class="next-match-grid next-fixture-time-only"><div class="fixture-date-with-calendar"><div class="fixture-date-copy"><span>Date / time</span><strong id="next-match-when">Date · Kick-off awaiting confirmation</strong></div><button type="button" class="text-button compact hidden" id="next-match-calendar">Add to calendar</button></div></div>
+      <div class="next-match-grid next-fixture-time-only"><div class="fixture-date-with-calendar"><div class="fixture-date-copy"><span>Date / time</span><strong id="next-match-when">Date · Kick-off TBC</strong></div><button type="button" class="text-button compact hidden" id="next-match-calendar">Add to calendar</button></div></div>
       <section class="fixture-confirmation-editor hidden" id="next-match-confirmation-editor">
         <div class="panel-heading"><div><h3>Confirm match details</h3><span class="helper">Club information for parents</span></div></div>
         <div class="form-grid two">
@@ -837,7 +839,7 @@
         <div class="coach-availability-summary hidden" id="coach-availability-summary"></div>
       </div>
       </div>
-      <div class="next-fixture-action-bar" id="next-fixture-action-bar"><button type="button" class="secondary-button hidden match-share-icon" id="next-match-share" aria-label="Share match details" title="Share match details"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8.7 10.5l6.6-4M8.7 13.5l6.6 4"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="5" r="3"/><circle cx="18" cy="19" r="3"/></svg></button><button type="button" class="secondary-button hidden" id="next-match-copy">Copy match details</button><button type="button" class="primary-button hidden" id="fixture-confirm-details">Confirm fixture details</button><button type="button" class="text-button" data-close-dialog>Done</button></div>
+      <div class="next-fixture-action-bar" id="next-fixture-action-bar"><button type="button" class="primary-button hidden" id="fixture-confirm-details">Confirm fixture details</button><button type="button" class="secondary-button hidden match-share-icon" id="next-match-share" aria-label="Share match details" title="Share match details"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8.7 10.5l6.6-4M8.7 13.5l6.6 4"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="5" r="3"/><circle cx="18" cy="19" r="3"/></svg></button><button type="button" class="secondary-button hidden" id="next-match-copy">Copy match details</button><button type="button" class="text-button" data-close-dialog>Done</button></div>
     </div>
   </dialog>
 
@@ -883,7 +885,7 @@
       <section class="detail-feature-section" id="detail-assists-section" data-detail-feature="assists"><div class="panel-heading"><h3>Assists</h3><span class="helper">Assists</span></div><div id="detail-assists-inputs" class="detail-player-grid"></div></section>
       <section class="detail-feature-section" id="detail-awards-section" data-detail-feature="awards"><h3>Player awards</h3><div class="form-grid" id="detail-award-fields"></div></section>
       <section class="detail-feature-section match-attendance-section hidden" id="match-attendance-section"><div class="panel-heading"><div><h3>Attendance</h3><span class="helper" id="match-attendance-helper">Attendance status</span></div></div><div id="match-attendance-list" class="match-attendance-list"></div></section>
-      <section class="detail-feature-section secure-coach-note hidden" id="coach-note-section"><div class="panel-heading"><div><h3>Coaching notes</h3><span class="helper">Coaching staff only · not visible to parents</span></div></div><textarea id="coach-match-note" rows="4" maxlength="4000" placeholder="Private coaching observations, follow-up points or development notes..."></textarea><p class="coach-note-readonly hidden" id="coach-note-readonly"></p></section>
+      <section class="detail-feature-section secure-coach-note hidden" id="coach-note-section"><div class="panel-heading"><div><h3>Coaching notes</h3><span class="helper">Coaching staff only · not visible to parents</span></div></div><textarea id="coach-match-note" aria-label="Private coaching observations" rows="4" maxlength="4000" placeholder="Private coaching observations, follow-up points or development notes..."></textarea><p class="coach-note-readonly hidden" id="coach-note-readonly"></p></section>
       <section class="detail-feature-section hidden" id="match-through-section"><div class="panel-heading"><div><h3>Did we go through?</h3><span class="helper">Coaches only · <span id="match-through-label"></span></span></div></div><label class="cup-through"><input type="checkbox" id="match-through-checkbox"> <span>We go through to the next round</span></label></section>
       <div class="empty-detail-options detail-before-match hidden" id="detail-before-match-note"></div>
       <div class="empty-detail-options hidden" id="empty-detail-options">All match detail options are switched off. Enable the options you want under Settings → Features.</div>

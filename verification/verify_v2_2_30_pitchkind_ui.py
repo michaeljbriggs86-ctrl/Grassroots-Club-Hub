@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
+# Historical entry point retained by Android CI; current contract and evidence
+# are documented in verification/UI_GATE_RECONCILIATION.md.
 from pathlib import Path
-import hashlib, json, re, struct, sys
+import hashlib, json, re, struct, subprocess, sys
 root=Path(__file__).resolve().parents[1]
 assets=root/'app/src/main/assets'
 fail=[]; passed=0
@@ -9,6 +11,25 @@ def check(name, cond):
     global passed
     if cond: passed+=1; print('PASS',name)
     else: fail.append(name); print('FAIL',name)
+
+
+# Runtime checks replace retired source spelling/layout assumptions. Run each
+# regression file once, even when it protects several requirements. A missing
+# runtime, timeout, missing test or assertion failure must fail the source gate.
+_behavior_results={}
+def behavior_tests(*names):
+    for name in names:
+        if name not in _behavior_results:
+            try:
+                result=subprocess.run(['node',str(root/'tests'/name)], cwd=root,
+                    text=True,capture_output=True,timeout=60)
+                _behavior_results[name]=result.returncode == 0
+                if result.returncode:
+                    print(f'BEHAVIOR FAILURE {name}\n{result.stdout}{result.stderr}')
+            except (OSError,subprocess.TimeoutExpired) as error:
+                _behavior_results[name]=False
+                print(f'BEHAVIOR FAILURE {name}: {error}')
+    return all(_behavior_results[name] for name in names)
 
 def txt(p): return (root/p).read_text(encoding='utf-8')
 def sha(p): return hashlib.sha256((root/p).read_bytes()).hexdigest()
@@ -42,11 +63,13 @@ check('HTML title PitchKind','<title>PitchKind</title>' in index)
 check('About version 2.2.35','App version 2.2.35' in index)
 check('manifest name PitchKind',manifest.get('name')=='PitchKind' and manifest.get('short_name')=='PitchKind')
 check('manifest version 2.2.35',manifest.get('version')=='2.2.35')
-check('v2.2.35 fresh native assets and visible build marker',
-      main.count('file:///android_asset/index.html?build=2235') == 2
-      and 's.setCacheMode(WebSettings.LOAD_NO_CACHE)' in main
-      and 'pitchkind-v2235-ui' in sw
-      and 'App version 2.2.35 · Build 2235' in index)
+check(
+    'v2.2.35 native cache bypass, build marker and service-worker lifecycle',
+    main.count('file:///android_asset/index.html?build=2235') == 2
+    and 's.setCacheMode(WebSettings.LOAD_NO_CACHE)' in main
+    and 'App version 2.2.35 · Build 2235' in index
+    and behavior_tests('test_ui_source_contract.js'),
+)
 check('v1.4 marker','approved-app-ui-2026-09-21-v1.4-pitchkind' in cloud and 'approved-app-ui-2026-09-21-v1.4-pitchkind' in txt('app/src/main/assets/app-design-system.css'))
 
 hashes={
@@ -67,7 +90,10 @@ check('no retired visual asset refs',not re.search(r'(?<![A-Za-z0-9_-])gch-(?:lo
 check('splash uses reverse PitchKind logo','pitchkind-wt_logo-reverse.svg' in index)
 check('auth uses primary PitchKind logo','pitchkind-wt_logo-primary.svg' in cloud)
 check('onboarding uses primary PitchKind logo','pitchkind-wt_logo-primary.svg' in onboard)
-check('fallback uses PitchKind mark',"img.src=logo||'pitchkind-wt_mark.svg'" in app)
+check(
+    'club hero fallback uses PitchKind mark without retry loops',
+    behavior_tests('test_ui_source_contract.js', 'test_web_badge_render_stability.js'),
+)
 check('demo club does not masquerade platform mark as club badge',"logo_asset:''" in cloud)
 check('service worker caches PitchKind assets','pitchkind-wt_logo-primary.svg' in sw and 'gch-logo-primary.svg' not in sw)
 
@@ -170,26 +196,11 @@ check(
 u9 = next((g for g in results_feed.get('age_groups', []) if g.get('age_group') == 'U9'), {})
 u9_fixtures = u9.get('fixtures') or []
 check(
-    'verified populated U9 multi-week fixture feed retained',
+    'U9 rolling fixture feed retains verified discovery and provider identities',
     u9.get('fixture_parse_status') == 'verified_multiweek_fixture_rows_v2'
-    and 2 in (u9.get('fixture_week_ids') or [])
-    and 3 in (u9.get('fixture_week_ids') or [])
-    and any(
-        f.get('date') == '2026-09-27'
-        and f.get('division_name') == 'Under 9D Navy'
-        and f.get('home') == 'Junior Reds Sabres'
-        and f.get('away') == 'Shooters Hill AFC Valiants'
-        and f.get('provider_team_ids') == ['139', '972']
-        for f in u9_fixtures
-    )
-    and any(
-        f.get('date') == '2026-10-04'
-        and f.get('division_name') == 'Under 9D Navy'
-        and f.get('home') == 'Shooters Hill AFC Valiants'
-        and f.get('away') == 'Phoenix Sports Panthers'
-        and f.get('provider_team_ids') == ['972', '771']
-        for f in u9_fixtures
-    ),
+    and len(set(u9.get('fixture_week_ids') or [])) >= 2
+    and bool(u9_fixtures)
+    and all((re.fullmatch('\\d{4}-\\d{2}-\\d{2}', f.get('date', '')) and f.get('division_name') and f.get('home') and f.get('away') and (len(f.get('provider_team_ids') or []) == (1 if f.get('away') == 'TBD' else 2)) for f in u9_fixtures)),
 )
 
 build_gradle = txt('app/build.gradle')
@@ -235,9 +246,8 @@ check(
     and 'test_collect_fixtures_fetches_every_advertised_week_without_u9_special_case' in scraper_tests,
 )
 check(
-    'full future fixture list is accessible',
-    'further.slice(0,11)' not in app
-    and 'further.map(furtherFixtureCardHtml)' in app,
+    'full future fixture list is accessible with Cup grouping',
+    behavior_tests('test_ui_source_contract.js', 'test_cup_group_fixture_list.js'),
 )
 check(
     'Selkent feed refreshes six-hourly',
@@ -278,10 +288,10 @@ check(
     and "'match_report_cleared'" in app,
 )
 check(
-    'undo correction notification RPC wired',
-    "notifyMatchReopened" in cloud
+    'undo does not send retired match-report notifications',
+    'notifyMatchReopened' in cloud
     and "rpc('notify_match_reopened'" in cloud
-    and "window.ClubHubCloud?.notifyMatchReopened" in app,
+    and behavior_tests('test_ui_source_contract.js'),
 )
 
 
@@ -373,13 +383,8 @@ check(
 
 
 check(
-    'further fixtures use full visible identity venue and map treatment',
-    'function furtherFixtureCardHtml(f,index)' in app
-    and 'class="further-fixture-card"' in app
-    and 'fixture-map-preview further-fixture-map' in app
-    and 'data-further-match-played' in app
-    and "matchTeamSideHtml('Home',ctx.homeTeam,ctx.homeKit)" in app
-    and "matchTeamSideHtml('Away',ctx.awayTeam,ctx.awayKit)" in app,
+    'further fixtures show identity and confirmed Maps while parent Cup cards remain compact',
+    behavior_tests('test_ui_source_contract.js', 'test_cup_group_fixture_list.js'),
 )
 check(
     'next-match popup omits redundant competition tile',
@@ -390,16 +395,16 @@ check(
     and 'Competition TBC' in app,
 )
 check(
-    'v2.2.35 popup keeps actions with their details and frees the bottom bar',
+    'fixture popup keeps timing, Maps and availability details with persistent actions',
     '<h3 id="next-match-opponent">Upcoming match details</h3>' in index
-    and "set('next-match-opponent','Upcoming match details')" in app
-    and re.search(r'class="next-match-grid next-fixture-time-only".*?id="next-match-when".*?id="next-match-calendar"',index)
-    and re.search(r'id="next-match-map-preview".*?<iframe.*?<a class="map-link hidden" id="next-match-map"',index)
+    and re.search('class="next-match-grid next-fixture-time-only".*?id="next-match-when".*?id="next-match-calendar"', index)
+    and re.search('id="next-match-map-preview".*?<iframe.*?<a class="map-link hidden" id="next-match-map"', index)
     and 'id="fixture-ack-panel"' not in index
     and 'id="match-availability-meta"' not in index
     and 'data-availability-group="awaiting"' in app
-    and 'coachSummary.querySelectorAll(\'details[open]\')' in app
-    and 'bottom:calc(var(--android-inset-bottom,0px) + env(safe-area-inset-bottom) + 16px)' in styles,
+    and "coachSummary.querySelectorAll('details[open]')" in app
+    and 'bottom:calc(var(--android-inset-bottom,0px) + env(safe-area-inset-bottom) + 16px)' in styles
+    and behavior_tests('test_dashboard_kickoff_visible.js', 'test_ui_source_contract.js'),
 )
 check(
     'team kit profiles persist home and away shirt knowledge',
@@ -481,9 +486,8 @@ check(
     and '.record-card.knight-panel.dashboard-record-retired{display:none!important}' in styles,
 )
 check(
-    'only important announcements override prime Next Fixture',
-    'important=active.filter(a=>a.important)' in app
-    and "nextCard.classList.toggle('hidden',!!important.length)" in app,
+    'parent updates include ordinary notices and staff notices retain important priority',
+    behavior_tests('test_parent_home_updates.js'),
 )
 check(
     'dark match availability contrast is explicit',
@@ -513,9 +517,9 @@ check(
     and 'scroll-snap-type:x mandatory' not in styles,
 )
 check(
-    'Tactics board is above matchday squad controls',
-    index.find('id="tactics-pitch"') < index.find('id="matchday-squad-picker"')
-    and index.find('id="tactics-formation"') < index.find('id="tactics-pitch"'),
+    'Tactics board precedes collapsible formation and squad controls',
+    0 <= index.find('id="tactics-pitch"') < index.find('id="matchday-squad-picker"') < index.find('id="tactics-formation"')
+    and re.search('\\.tactics-pitch\\s*\\{[^}]*order:0', design_system),
 )
 check(
     'Matchday squad controls are collapsible after the board',
@@ -547,13 +551,14 @@ check(
     and index.find('id="appearance-settings"') < index.find('id="access-panel"'),
 )
 check(
-    'Rules procedures are staff-only and use configured age rules',
+    'Rules procedures remain staff-only with age-specific privacy and official match-card guidance',
     'id="rules-procedures-settings" data-staff-settings' in index
     and "document.querySelectorAll('[data-staff-settings]')" in app
-    and "const r=competitionRuleForAge(ageGroupNumber())" in app
-    and 'Scores remain private to authenticated club accounts' in app
-    and 'Before the match' in index
-    and 'After the match' in index,
+    and 'const r=competitionRuleForAge(age)' in app
+    and 'Scores and tables are limited to coaching staff and club admins; parents and players do not see them' in app
+    and 'Before kick-off' in index
+    and 'After the match' in index
+    and "Selkent's official match-card procedure" in index,
 )
 check(
     'v2.2.18 responsive settings and tactics styles are present',
@@ -591,12 +596,8 @@ check(
 )
 
 check(
-    'verified club badge hero uses circular artwork presentation',
-    'v2.2.20 — verified club badge hero formatting' in design_system
-    and '.club-logo-wrap:not(.platform-club-placeholder)' in design_system
-    and 'border-radius:50%!important' in design_system
-    and 'background:transparent!important' in design_system
-    and 'clip-path:circle(49.4% at 50% 50%)!important' in design_system,
+    'verified club hero preserves approved artwork without blanket circular cropping',
+    behavior_tests('test_ui_source_contract.js'),
 )
 check(
     'missing club badge placeholder keeps neutral tile treatment',
@@ -638,27 +639,19 @@ check(
 )
 
 check(
-    'parent self-signup is exposed from adult login',
-    'id="cloud-parent-signup"' in cloud
-    and 'Parent Sign Up' in cloud
-    and "setGateHtml('parentsignup')" in cloud
-    and 'Club Sign Up' not in cloud[cloud.find("if(mode==='signin')"):cloud.find("if(mode==='playerlogin')")],
+    'adult login exposes unified Create Account and dedicated parent sign-in',
+    behavior_tests('test_coach_signup_flow.js', 'test_web_parent_signin.js'),
 )
 check(
-    'parent self-signup collects account club team and child',
-    "if(mode==='parentsignup')" in cloud
-    and "id:'cloud-parent-name'" in cloud
-    and "id:'cloud-parent-email'" in cloud
-    and "id:'cloud-parent-password'" in cloud
-    and 'id="cloud-parent-club"' in cloud
-    and 'id="cloud-parent-team"' in cloud
-    and "id:'cloud-parent-child'" in cloud
-    and '<select id="cloud-parent-child"' not in cloud
-    and 'cloud-parent-player' not in cloud,
+    'unified signup collects account, club, team and free-text child for parents',
+    all(('cloud-signup-' + field in cloud for field in ['name', 'email', 'password', 'club', 'team', 'child']))
+    and '<select id="cloud-signup-child"' not in cloud
+    and 'cloud-parent-player' not in cloud
+    and behavior_tests('test_coach_signup_flow.js'),
 )
 check(
-    'parent self-signup uses public login directory selectors',
-    'function populateParentSignupChoices()' in cloud
+    'unified signup uses public club and team directory selectors',
+    "populateParentSignupChoices('cloud-signup-club','cloud-signup-team')" in cloud
     and 'await listLoginClubs()' in cloud
     and 'await listLoginTeams(slug)' in cloud,
 )
@@ -692,7 +685,7 @@ check(
     'coaches see pending child identity before approval',
     'listPendingParentRequests' in cloud
     and 'list_pending_parent_requests' in cloud
-    and 'pendingRequests' in app
+    and '__pendingParentRequests' in app
     and 'pending-parent-details' in app
     and '<b>Child name supplied</b>${esc(req.child_name' in app
     and '<b>Email</b>${esc(req.parent_email' in app,
@@ -730,11 +723,13 @@ check('normal email password login resumes parent signup request',
 check('bootstrap and normal login share parent request recovery',
     "try{await resumeParentSignupRequestFromMetadata();}" in cloud
     and "Your account is verified, but the parent access request could not be submitted." in cloud)
-check('verify screen supports manual return when deep link fails',
+check(
+    'verification screen gives explicit manual sign-in return',
     'id="cloud-verify-continue"' in cloud
-    and 'I’ve Verified My Email' in cloud
-    and 'If the browser does not reopen the app automatically' in cloud
-    and "setGateHtml('signin','Sign in to finish sending your parent access request.'" in cloud)
+    and 'Sign in to finish sending your parent access request.' in cloud
+    and 'Sign in to finish applying your club invitation.' in cloud
+    and behavior_tests('test_web_parent_auth_return.js'),
+)
 check('live redirect failure is recorded without claiming it fixed',
     'http://localhost:3000' in backend_contract
     and 'email_confirmed_at was set' in backend_contract
@@ -771,10 +766,12 @@ check('pending parent card wraps identity data without clipping',
     and '.pending-parent-details' in styles
     and 'overflow-wrap:anywhere' in styles
     and '.parent-approve-action' in styles)
-check('notification content wraps and actions stay usable',
-    '.notification-item-head>div{min-width:0}' in styles
+check(
+    'notification content wraps and actions stay usable',
+    re.search('\\.notification-item-head>div\\s*\\{[^}]*min-width:0(?:;|})', styles)
     and '.notification-item-head strong,.notification-item p{white-space:normal;overflow-wrap:anywhere' in styles
-    and '.notification-item-actions{display:flex' in styles)
+    and '.notification-item-actions{display:flex' in styles,
+)
 check('live pending request and UI root cause are recorded',
     'one live pending request' in backend_contract
     and 'recipient account is a Club Admin with a coach_team_id' in backend_contract
@@ -823,11 +820,10 @@ check('Valiants shirt icons reflect current green and blue reference kits',
 share_start=app.find('async function shareNextMatchImage()')
 share_end=app.find('function renderNextMatch()',share_start)
 share_block=app[share_start:share_end] if share_start>=0 and share_end>share_start else ''
-check('Share matchday image contains no player data or score fields',
-    share_start>=0
-    and 'MATCHDAY INFO' in share_block
-    and 'id="next-match-share"' in index
-    and all(token not in share_block.lower() for token in ['score','goals','assists','bookings','player data']))
+check(
+    'matchday image and caption exclude private player data and score fields',
+    behavior_tests('test_match_share_actions.js'),
+)
 check('native PNG sharing uses read-only provider',
     'sharePngDataUrl' in main
     and (root/'app/src/main/java/com/grassrootsclubhub/universal/ShareImageProvider.java').exists()
@@ -838,18 +834,14 @@ check('v2.2.25 compact fixture styles present',
     and '.fixture-confirmation-editor' in styles)
 
 
-check('v2.2.26 verified badge or generic club placeholder is always primary identity',
-    'function clubIdentityBadgeHtml' in app
-    and 'function clubPlaceholderBadgeHtml' in app
-    and 'data-generated-club-badge="true"' in app
-    and 'function clubIdentityName' in app
-    and 'function clubPlaceholderInitials' in app
-    and 'function clubIdentityColours' in app)
-check('generic placeholder is based on club identity and colours rather than PitchKind product mark',
-    'kitColourPair(source)' in app
-    and 'clubPlaceholderInitials(teamName)' in app
-    and 'generic PitchKind placeholder' in app
-    and 'pitchkind-wt_mark.svg' not in app[app.find('function clubIdentityName'):app.find('function homeFixtureTeamNames')])
+check(
+    'approved badge takes priority over explicitly labelled club monogram',
+    behavior_tests('test_club_monogram_placeholder.js'),
+)
+check(
+    'club monograms use canonical identity and unknown clubs keep the product fallback',
+    behavior_tests('test_club_monogram_placeholder.js'),
+)
 check('match layouts use prominent badges plus secondary shirt visuals',
     'function matchTeamSideHtml' in app
     and 'match-team-badge-slot' in app
@@ -861,69 +853,59 @@ check('match layouts use prominent badges plus secondary shirt visuals',
 check('redundant home shirt and away shirt copy removed from fixture rendering',
     'function kitColourDisplayText' in app
     and "ctx.homeKitType} ·" not in app[app.find('function renderFixtureOverview'):app.find('function clearFixtureOverview')])
-check('Club Admin team preview can confirm fixture details',
-    'function canConfirmFixtureDetails(){return isCoach()||isAdmin();}' in app
-    and '<section class="fixture-confirmation-editor hidden" id="next-match-confirmation-editor">' in index
-    and 'id="next-match-confirmation-editor" data-requires-edit' not in index)
-check('confirmation and share actions are explicit and visible to staff',
-    'Confirm fixture details' in index
-    and 'id="next-match-share">Share matchday info' in index
-    and 'id="matches-next-share">Share matchday info' in index
-    and 'id="next-match-share" data-requires-edit' not in index
-    and 'share.disabled=false' in app)
-check('match image is badge-first and built from confirmed key matchday details',
-    'if(!confirmed||!d.time||!d.groundName||!d.address)' in app
-    and 'function drawShareClubIdentity' in app
-    and 'function drawSharePlaceholderBadge' in app
-    and 'MATCHDAY INFO' in app
-    and 'KICK-OFF' in app
-    and 'ARRIVAL' in app
-    and "drawShareJersey(g,112,900,kit,.42)" in app)
+check(
+    'fixture confirmation requires coach capacity and cloud write permission',
+    behavior_tests('test_web_fixture_confirmation_access.js'),
+)
+check(
+    'accessible share actions follow staff permission and confirmed details',
+    behavior_tests('test_match_share_actions.js', 'test_web_fixture_confirmation_access.js'),
+)
+check(
+    'ordinary and Cup matchday images render badges and confirmed time, arrival, venue and kit',
+    behavior_tests('test_match_share_actions.js', 'test_matchday_share.js'),
+)
 check('v2.2.26 badge-first responsive styles present',
     'v2.2.26 — badge-first match identity, generic club placeholders and fixture actions' in styles
     and '.club-placeholder-badge' in styles
     and '.match-team-side .match-team-name' in styles
     and '.fixture-share-action' in styles)
 
-check('v2.2.27 share controls are visible in popup and Matches next-fixture card',
-    'id="next-match-share">Share matchday info' in index
-    and 'id="matches-next-share">Share matchday info' in index
-    and "document.getElementById('matches-next-share')?.addEventListener('click',shareNextMatchImage)" in app)
-check('v2.2.29 share remains visible but requires confirmed key details before native sharing',
-    'Confirm kick-off, venue and kit before sharing matchday info' in app
-    and "share.title=confirmed?'Share matchday image and WhatsApp details':'Confirm match details first'" in app)
+check(
+    'share controls remain visible to authorised staff on popup and Matches',
+    behavior_tests('test_match_share_actions.js'),
+)
+check(
+    'share requires confirmed key details before native or web export',
+    behavior_tests('test_match_share_actions.js'),
+)
 
 
 check('v2.2.28 next-fixture dialog has a real scroll container',
     'id="next-fixture-scroll"' in index
     and '.next-fixture-scroll{' in styles
     and 'overflow-y:auto' in styles[styles.find('.next-fixture-scroll{'):styles.find('.next-fixture-action-bar{')])
-check('v2.2.28 confirm and share live outside the scroll region in persistent footer',
-    'id="next-fixture-action-bar"' in index
-    and 'id="next-match-share">Share matchday info' in index[index.find('id="next-fixture-action-bar"'):]
-    and 'id="fixture-confirm-details">Confirm fixture details' in index[index.find('id="next-fixture-action-bar"'):]
-    and '.next-fixture-action-bar{' in styles)
+check(
+    'confirm and accessible share actions remain outside the scroll region',
+    behavior_tests('test_ui_source_contract.js', 'test_match_share_actions.js'),
+)
 check('v2.2.28 Matches page routes into the canonical details workflow',
     'id="matches-next-details">Match details' in index
     and "document.getElementById('matches-next-details')?.addEventListener('click',openNextFixtureDetails)" in app)
-check('v2.2.28 staff actions share the same role gate and are not buried',
-    "confirmBtn.classList.toggle('hidden',!editing)" in app
-    and "shareBtn.classList.toggle('hidden',!can)" in app
-    and 'function canConfirmFixtureDetails(){return isCoach()||isAdmin();}' in app)
+check(
+    'staff share and confirmation actions enforce coach write permission',
+    behavior_tests('test_web_fixture_confirmation_access.js', 'test_match_share_actions.js'),
+)
 
 
-check('v2.2.29 arrival time is fixed at 30 minutes before kickoff',
-    'function matchdayArrivalTime' in app
-    and 'hh*60+mm-30+1440' in app
-    and 'Arrival ${matchdayArrivalTime(d.time)}' in app)
-check('v2.2.29 WhatsApp caption carries HTTPS Maps link and key matchday fields',
-    'function mapsShareHref' in app
-    and 'https://www.google.com/maps/search/?api=1&query=' in app
-    and 'function matchdayShareCaption' in app
-    and '`Kick-off: ${d.time}`' in app
-    and '`Arrival: ${arrival}`' in app
-    and '`Venue: ${d.groundName}`' in app
-    and '`Maps: ${map}`' in app)
+check(
+    'arrival is 30 minutes before ordinary kickoff or Cup group start',
+    behavior_tests('test_matchday_share.js', 'test_match_share_actions.js'),
+)
+check(
+    'WhatsApp caption carries HTTPS Maps, confirmed kit, venue and ordinary or group timing',
+    behavior_tests('test_matchday_share.js', 'test_match_share_actions.js'),
+)
 check('v2.2.29 share snapshot requires confirmed matchday details',
     'Confirm kick-off, venue and kit before sharing matchday info' in app
     and 'if(!confirmed||!d.time||!d.groundName||!d.address)' in app)
@@ -940,21 +922,28 @@ check('v2.2.35 JS invokes native share without relying on return conversion',
     and 'window.ClubHubNative.shareMatchCard(dataUrl,caption);' in app
     and 'const ok=window.ClubHubNative.shareMatchCard' not in app
     and 'Could not prepare matchday share. Please try again.' in app)
-check('v2.2.29 share UI uses matchday wording',
-    index.count('Share matchday info')==2)
+check(
+    'share icons expose accessible match-details wording',
+    behavior_tests('test_match_share_actions.js'),
+)
 check('v2.2.29 matchday helper regression test is wired into CI',
     (root/'tests/test_matchday_share.js').exists()
     and 'node tests/test_matchday_share.js' in apk_workflow)
 
-check('v2.2.35 verified badge clips opaque source corners in UI',
-    '.verified-club-badge{object-fit:contain;border-radius:50%;clip-path:circle(50%);overflow:hidden}' in styles)
+check(
+    'verified UI badges preserve complete approved artwork',
+    behavior_tests('test_ui_source_contract.js'),
+)
 check('v2.2.35 share canvas uses origin-safe native asset data for bundled badges',
     'async function loadShareBadgeImage' in app
     and 'ClubHubNative?.assetDataUrl' in app
     and 'String assetDataUrl(String assetName)' in main
     and 'Base64.NO_WRAP' in main)
-check('v2.2.35 verified badge is circularly clipped on shared canvas',
-    'ctx.arc(x,y,94,0,Math.PI*2);ctx.clip();ctx.drawImage' in app)
+check(
+    'shared canvas preserves badge aspect ratio and only clips known bundled fallback',
+    "const circular=badge&&src==='shooters-hill-logo.png'" in app
+    and behavior_tests('test_matchday_share.js'),
+)
 check('v2.2.35 entire matchday share path surfaces JavaScript preparation errors',
     "console.error('matchday share failed',e)" in app
     and 'Could not prepare matchday share. Please try again.' in app)
@@ -981,13 +970,10 @@ check('v2.2.35 matches fixture shows calendar within date and Maps on map',
     and 'id="matches-next-kit-toggle"' not in index
     and 'id="next-match-kit-choice"' in index
     and re.search(r'id="next-match-when".*?id="next-match-calendar"',index,re.S))
-check('v2.2.35 matches team names and actions remain readable',
-    "set('matches-next-opponent',matchTeamLabel(f.opponent||'TBC'))" in app
-    and '.matches-next-fixture .match-team-side .club-detail-link{color:#fff' in styles
-    and '.matches-next-actions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px' in styles
-    and '@media(max-width:560px){.matches-next-actions{grid-template-columns:repeat(2,minmax(0,1fr))}' in styles
-    and 'esc(matchTeamLabel(m.opponent))' in app
-    and 'esc(matchTeamLabel(r.team))' in app)
+check(
+    'canonical fixture names and current result tables retain readable staff actions',
+    behavior_tests('test_canonical_match_cards_v14_finalizer.js', 'test_match_results_table.js', 'test_ui_source_contract.js'),
+)
 check('v2.2.35 family request approval is atomic and staff-selected',
     "rpc('approve_parent_request',{p_request_id:req,p_player_name:player})" in cloud
     and "rpc('approve_parent',{" not in cloud

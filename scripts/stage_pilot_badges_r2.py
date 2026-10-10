@@ -163,7 +163,7 @@ def upload_badges(badges, get, run, *, prefer_stored=False, stored_get=None):
                     print(f"Checked stored R2 badge club_id={badge['club_id']} sha256={badge['logo_sha256']}")
                     continue
                 # Only a missing object uses the original source admission gates.
-            if badge.get('logo_source') in ('club_supplied_private', 'official_source_snapshot_private'):
+            if badge.get('logo_source') in ('club_supplied_private', 'user_supplied_private', 'official_source_snapshot_private'):
                 # Secretary-supplied artwork has no public source. It was staged
                 # privately, and CI admits only its exact reviewed bytes.
                 run([*WRANGLER, 'r2', 'object', 'get', f'{BUCKET}/{key}',

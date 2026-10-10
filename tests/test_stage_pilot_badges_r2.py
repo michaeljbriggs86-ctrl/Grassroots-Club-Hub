@@ -52,6 +52,30 @@ class StageTest(unittest.TestCase):
                 stage.approvals(self.directory, {**self.manifest,
                     'badges': [{**self.badge, **update}]})
 
+    def test_user_upload_reads_only_exact_private_png_and_missing_or_changed_fails(self):
+        badge = {**self.badge, 'logo_source': 'user_supplied_private'}
+        commands = []
+        def run(command, *, check):
+            commands.append(command)
+            pathlib.Path(command[command.index('--file') + 1]).write_bytes(self.data)
+        stage.upload_badges([badge], lambda *a, **k: self.fail('private upload fetched publicly'), run)
+        self.assertEqual(len(commands), 1)
+        self.assertIn('get', commands[0])
+        def changed(command, *, check):
+            pathlib.Path(command[command.index('--file') + 1]).write_bytes(self.data + b'changed')
+        with self.assertRaisesRegex(ValueError, 'private R2 bytes differ'):
+            stage.upload_badges([badge], lambda *a, **k: self.fail('public fallback'), changed)
+        def missing(command, *, check):
+            raise subprocess.CalledProcessError(1, command)
+        with self.assertRaises(subprocess.CalledProcessError):
+            stage.upload_badges([badge], lambda *a, **k: self.fail('public fallback'), missing)
+        jpeg = b'\xff\xd8\xffreviewed bytes'
+        bad = {**badge, 'logo_sha256': hashlib.sha256(jpeg).hexdigest()}
+        def wrong_kind(command, *, check):
+            pathlib.Path(command[command.index('--file') + 1]).write_bytes(jpeg)
+        with self.assertRaisesRegex(ValueError, 'private R2 bytes differ'):
+            stage.upload_badges([bad], lambda *a, **k: self.fail('public fallback'), wrong_kind)
+
     def test_download_hash_mime_and_readback(self):
         commands = []
         def run(command, *, check):

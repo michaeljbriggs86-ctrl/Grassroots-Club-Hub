@@ -47,7 +47,7 @@ def validated_approvals(directory, manifest):
             raise ValueError(f"badge {club_id} has no exact-image SHA-256")
         if not all(badge.get(field) for field in BADGE_FIELDS):
             raise ValueError(f"badge {club_id} is missing provenance metadata")
-        if badge.get('logo_source') in ('club_supplied_private', 'official_source_transparency_derivative_private',
+        if badge.get('logo_source') in ('club_supplied_private', 'user_supplied_private', 'official_source_transparency_derivative_private',
                                         'official_source_trim_derivative_private',
                                         'official_source_vector_raster_private', 'official_source_snapshot_private'):
             if badge['logo_source'] == 'club_supplied_private' and club_id != 499:
@@ -55,6 +55,19 @@ def validated_approvals(directory, manifest):
             expected = f"https://test.pitchkind.com/__pilot_badges/{club_id}/{badge['logo_sha256'].lower()}"
             if badge['logo_url'] != expected:
                 raise ValueError(f"badge {club_id} has an invalid private-pilot URL")
+            if badge['logo_source'] == 'user_supplied_private':
+                original = urlsplit(str(badge.get('original_source_url') or ''))
+                original_hash = str(badge.get('original_sha256') or '').lower()
+                method = badge.get('derivation')
+                if (original.scheme != 'https' or original.hostname != 'drive.google.com' or
+                        original.username or original.password or original.query or original.fragment or
+                        not re.fullmatch(r'/file/d/[A-Za-z0-9_-]+/view', original.path) or
+                        not re.fullmatch(r'[a-f0-9]{64}', original_hash) or
+                        badge.get('source_user_approved') is not True or
+                        method not in ('unchanged_uploaded_original', 'recalculate_eXIf_crc_only') or
+                        (method == 'unchanged_uploaded_original' and original_hash != badge['logo_sha256'].lower()) or
+                        (method == 'recalculate_eXIf_crc_only' and original_hash == badge['logo_sha256'].lower())):
+                    raise ValueError(f"badge {club_id} lacks reviewed user-upload provenance")
             if badge['logo_source'] == 'official_source_transparency_derivative_private':
                 original = urlsplit(str(badge.get('original_source_url') or ''))
                 if (original.scheme != 'https' or not original.hostname or original.username or
@@ -98,7 +111,7 @@ def verify_hosted_assets(manifest):
     for badge in manifest['badges']:
         # Club-supplied bytes were reviewed locally and must be read back from
         # private R2 by the staging gate. They have no publicly fetchable source.
-        if badge.get('logo_source') in ('club_supplied_private', 'official_source_transparency_derivative_private',
+        if badge.get('logo_source') in ('club_supplied_private', 'user_supplied_private', 'official_source_transparency_derivative_private',
                                         'official_source_trim_derivative_private',
                                         'official_source_vector_raster_private', 'official_source_snapshot_private'):
             continue
