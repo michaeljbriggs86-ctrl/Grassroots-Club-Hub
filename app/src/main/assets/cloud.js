@@ -903,15 +903,24 @@
     return `<div class="auth-brand"><img src="pitchkind-wt_logo-primary.svg" alt="PitchKind — Organise, Connect, Play" class="auth-brand-lockup"/></div>`;
   }
   function authField({icon='user',id,type='text',placeholder='',label=placeholder,autocomplete='',inputmode='',maxlength='',value='',extra=''}){
-    return `<div class="auth-field"><label class="a11y-only" for="${id}">${escapeHtml(label)}</label><span class="auth-field-icon" aria-hidden="true">${authIcon(icon)}</span><input id="${id}" name="${id}" type="${type}" ${autocomplete?`autocomplete="${autocomplete}"`:''} ${inputmode?`inputmode="${inputmode}"`:''} ${maxlength?`maxlength="${maxlength}"`:''} value="${escapeHtml(value)}" placeholder="${escapeHtml(placeholder)}" ${extra}/></div>`;
+    return `<div class="auth-field-group"><label class="auth-field-label" for="${id}">${escapeHtml(label)}</label><div class="auth-field"><span class="auth-field-icon" aria-hidden="true">${authIcon(icon)}</span><input id="${id}" name="${id}" type="${type}" ${autocomplete?`autocomplete="${autocomplete}"`:''} ${inputmode?`inputmode="${inputmode}"`:''} ${maxlength?`maxlength="${maxlength}"`:''} value="${escapeHtml(value)}" placeholder="${escapeHtml(placeholder)}" ${extra}/></div></div>`;
   }
   function authMainScreen({screen='adult',tagline,heroNote='',title,copy,body,footer='COMMUNITY FUELS BRIGHTER FUTURES',back=false}){
-    return `<div class="auth-showcase auth-${screen}">${back?'<button type="button" class="auth-back" id="auth-screen-back">‹ Back</button>':''}${authBrand()}<div class="auth-scene" aria-hidden="true"></div><div class="auth-main"><h1>${title}</h1><p class="auth-lead">${copy}</p>${body}</div><div class="auth-grass-footer"><span>${footer}</span></div></div>`;
+    return `<div class="auth-showcase auth-${screen}">${authBrand()}<div class="auth-scene" aria-hidden="true"></div><div class="auth-main">${back?'<button type="button" class="auth-back" id="auth-screen-back">‹ Back</button>':''}<h1>${title}</h1><p class="auth-lead">${copy}</p>${body}</div><div class="auth-grass-footer"><span>${footer}</span></div></div>`;
   }
   function authSimple(title,copy,body,tagline='GRASSROOTS CLUB HUB'){
     return `<div class="auth-simple">${authBrand()}<div class="auth-simple-card"><h1>${title}</h1>${copy?`<p class="auth-lead">${copy}</p>`:''}${body}</div></div>`;
   }
-  function bindPasswordToggle(inputId,buttonId){document.getElementById(buttonId)?.addEventListener('click',()=>{const input=document.getElementById(inputId);if(!input)return;input.type=input.type==='password'?'text':'password';});}
+  function bindPasswordToggle(inputId,buttonId){
+    const button=document.getElementById(buttonId);
+    button?.addEventListener('click',()=>{
+      const input=document.getElementById(inputId);if(!input)return;
+      const reveal=input.type==='password';input.type=reveal?'text':'password';
+      button.textContent=reveal?'Hide':'Show';
+      button.setAttribute('aria-label',reveal?'Hide password':'Show password');
+      button.setAttribute('aria-pressed',String(reveal));
+    });
+  }
 
   function setGateHtml(mode='signin',message='',prefillEmail=''){
     const gate=document.getElementById('activation-gate');
@@ -926,19 +935,18 @@
         <form id="cloud-signin-form" novalidate>
         <div class="auth-fields">
           ${authField({icon:'mail',id:'cloud-email',type:'email',placeholder:'Email address',autocomplete:'username',value:prefillEmail})}
-          <div class="auth-password-wrap">${authField({icon:'lock',id:'cloud-password',type:'password',placeholder:'Password',autocomplete:'current-password'})}<button type="button" class="auth-eye" id="cloud-password-toggle" aria-label="Show or hide password">◉</button></div>
+          <div class="auth-password-wrap">${authField({icon:'lock',id:'cloud-password',type:'password',placeholder:'Password',autocomplete:'current-password'})}<button type="button" class="auth-eye" id="cloud-password-toggle" aria-label="Show password" aria-controls="cloud-password" aria-pressed="false">Show</button></div>
         </div>
         <button type="button" class="auth-forgot" id="cloud-forgot-password">Forgot password?</button>
         <p class="auth-notice ${message?'':'hidden'}" id="cloud-auth-notice">${escapeHtml(message)}</p><p class="activation-error hidden" id="cloud-auth-error" role="alert"></p>
         <button type="submit" class="auth-primary" id="cloud-auth-submit">${parentOnly?'Sign In as Parent':'Log In'} <span>→</span></button>
         </form>
-        ${parentOnly?'<button class="auth-link-strong" id="cloud-parent-signin-back">Back to Main Login</button>':`<button class="auth-secondary" id="cloud-parent-login"><span class="auth-button-icon">${authIcon('user')}</span><span>Parent Sign In</span></button><button class="auth-secondary" id="cloud-player-login"><span class="auth-button-icon">${authIcon('user')}</span><span>Player Login</span></button>`}
+        ${parentOnly?'':`<div class="auth-alternate-routes" role="group" aria-label="Other sign-in options"><button type="button" class="auth-secondary" id="cloud-parent-login"><span class="auth-button-icon">${authIcon('user')}</span><span>Parent Sign In</span></button><button type="button" class="auth-secondary" id="cloud-player-login"><span class="auth-button-icon">${authIcon('user')}</span><span>Player Login</span></button></div>`}
         <button class="auth-link-strong" id="cloud-parent-signup">Create Account</button>`;
       gate.innerHTML=authMainScreen({screen:'adult',heroNote:parentOnly?'One<br/>Team<br/>Together':'More<br/>Than<br/>A Game',title:parentOnly?'Parent Sign In':'Welcome Back',copy:parentOnly?'Use your approved parent email and password.':'Admins, Coaches and Parents sign in with email and password.',body,back:parentOnly});
       bindPasswordToggle('cloud-password','cloud-password-toggle');
       document.getElementById('cloud-forgot-password')?.addEventListener('click',()=>setGateHtml('forgot'));
       document.getElementById('cloud-parent-login')?.addEventListener('click',()=>setGateHtml('parentsignin'));
-      document.getElementById('cloud-parent-signin-back')?.addEventListener('click',()=>setGateHtml('signin'));
       document.getElementById('auth-screen-back')?.addEventListener('click',()=>setGateHtml('signin'));
       document.getElementById('cloud-player-login')?.addEventListener('click',()=>setGateHtml('playerlogin'));
       document.getElementById('cloud-parent-signup')?.addEventListener('click',()=>setGateHtml('signup'));

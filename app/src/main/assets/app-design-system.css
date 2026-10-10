@@ -1070,3 +1070,59 @@ html[data-theme="dark"] .matches-next-fixture .match-kit-secondary small,html[da
   .view .panel-heading>button{max-width:100%}
   body.role-parent .parent-home-family-actions>button{flex:1 1 140px}
 }
+
+/* Login repair: one readable form, natural scrolling, and a coherent light auth surface. */
+body.auth-open #activation-gate{width:100%!important;align-items:flex-start!important;scroll-padding-block:20px;padding:0!important}
+body.auth-open #activation-gate .auth-showcase,
+body.auth-open #activation-gate .auth-simple{color:var(--gch-ink);min-width:0;max-width:100%;flex-shrink:0}
+body.auth-open #activation-gate .auth-main,
+body.auth-open #activation-gate .auth-simple-card{min-width:0;text-align:left}
+body.auth-open #activation-gate .auth-main h1,
+body.auth-open #activation-gate .auth-simple-card h1{font-size:clamp(26px,6vw,32px)!important;line-height:1.15!important;letter-spacing:-.025em;color:var(--gch-ink)}
+body.auth-open #activation-gate .auth-lead{max-width:none;margin:8px 0 18px!important;font-size:14px!important;line-height:1.5!important;color:var(--gch-copy)}
+body.auth-open #activation-gate .auth-back{position:static!important;align-self:flex-start;width:auto;min-height:44px;padding:8px 0;margin:0 0 8px;line-height:1.4}
+.auth-field-group{display:grid;gap:6px;min-width:0;text-align:left}
+body.auth-open #activation-gate .auth-field-label{display:block;margin:0;color:var(--gch-ink);font-size:14px;font-weight:600;line-height:1.4;text-align:left}
+body.auth-open #activation-gate .auth-fields{gap:14px!important}
+body.auth-open #activation-gate .auth-field{min-height:52px!important;height:auto;border-radius:var(--gch-radius-field)!important;background:#fff!important}
+body.auth-open #activation-gate .auth-field input,
+body.auth-open #activation-gate .auth-field select{height:50px!important;min-height:50px;max-width:100%;border:0!important;background:transparent!important;color:var(--gch-ink)!important;font-size:16px!important;line-height:1.4!important;scroll-margin-block:24px}
+body.auth-open #activation-gate .auth-field input::placeholder{color:var(--gch-muted);opacity:1}
+body.auth-open #activation-gate .auth-field option{background:#fff;color:var(--gch-ink)}
+body.auth-open #activation-gate .auth-password-wrap .auth-field{padding-right:64px}
+body.auth-open #activation-gate .auth-eye{top:auto;bottom:1px;right:1px;width:62px;height:50px!important;min-height:44px;color:var(--gch-green-900);font-size:13px;font-weight:600;background:transparent}
+body.auth-open #activation-gate .auth-forgot{font-size:14px!important;line-height:1.4;min-height:44px;margin:0 0 0 auto!important;padding:8px 0}
+body.auth-open #activation-gate #cloud-signin-form{display:grid;gap:10px;min-width:0}
+body.auth-open #activation-gate .auth-primary,
+body.auth-open #activation-gate .auth-secondary{min-height:48px!important;height:auto;padding:12px 36px 12px 14px;font-size:14px!important;line-height:1.4;white-space:normal}
+body.auth-open #activation-gate .auth-secondary{padding:12px 10px}
+.auth-alternate-routes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:16px}
+body.auth-open #activation-gate .auth-alternate-routes .auth-secondary{margin:0;min-width:0}
+body.auth-open #activation-gate .auth-notice,
+body.auth-open #activation-gate .activation-error{font-size:13px!important;line-height:1.5!important;overflow-wrap:anywhere;margin:0!important}
+body.auth-open #activation-gate .auth-link-strong{min-height:44px;font-size:14px;line-height:1.4;margin-top:10px;padding:8px}
+body.auth-open #activation-gate .auth-eye:focus-visible,
+body.auth-open #activation-gate .auth-back:focus-visible,
+body.auth-open #activation-gate .auth-forgot:focus-visible,
+body.auth-open #activation-gate .auth-link-strong:focus-visible{outline:3px solid var(--gch-green-600);outline-offset:2px}
+body.auth-open #activation-gate .auth-simple{margin:16px auto;border-radius:var(--gch-radius-card);padding:16px 16px calc(16px + var(--android-inset-bottom,0px) + env(safe-area-inset-bottom))}
+body.auth-open #activation-gate .auth-simple-card{display:grid;gap:12px;padding:16px 0 0}
+body.auth-open #activation-gate .auth-simple .auth-brand{min-height:72px!important;padding:0!important}
+body.auth-open #activation-gate .auth-grass-footer span{font-size:12px!important;letter-spacing:.06em!important}
+@media(max-width:899px){
+  body.auth-open #activation-gate .auth-showcase{display:flex!important;width:min(560px,100%)!important;max-width:100%!important;min-height:100dvh!important;overflow:visible!important;border-radius:0!important}
+  body.auth-open #activation-gate .auth-brand{min-height:80px!important;padding:calc(8px + var(--android-inset-top,0px)) 16px 8px!important}
+  body.auth-open #activation-gate .auth-brand .auth-brand-lockup{width:min(300px,84vw)!important;max-height:72px!important}
+  body.auth-open #activation-gate .auth-scene{height:148px!important;min-height:0!important;flex:0 0 148px!important}
+  body.auth-open #activation-gate .auth-main{padding:20px clamp(16px,4vw,24px) 24px!important;display:block!important}
+  body.auth-open #activation-gate .auth-grass-footer{display:flex!important}
+}
+@media(min-width:900px){
+  body.auth-open #activation-gate{padding:20px!important}
+  body.auth-open #activation-gate .auth-showcase{width:min(980px,100%)!important;min-height:0!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;border-radius:var(--gch-radius-card)!important;margin-block:auto}
+  body.auth-open #activation-gate .auth-scene{height:100%!important;min-height:320px!important}
+  body.auth-open #activation-gate .auth-main{padding:28px!important}
+  body.auth-open #activation-gate .auth-grass-footer{display:flex!important;grid-row:3!important}
+}
+@media(max-height:620px) and (max-width:899px){body.auth-open #activation-gate .auth-scene{height:96px!important;flex-basis:96px!important}}
+@media(max-width:374px){.auth-alternate-routes{grid-template-columns:minmax(0,1fr)}}
