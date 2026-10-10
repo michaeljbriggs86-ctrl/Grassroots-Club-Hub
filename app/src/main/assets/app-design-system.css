@@ -748,3 +748,5 @@ html[data-theme="dark"] #view-home .next-match-summary-card:not(:disabled)::afte
   #view-home #matchday-dashboard .matchday-dashboard-grid>article:nth-child(3){grid-column:1/-1}
   #view-home .next-match-summary-card{padding:14px 12px 12px}
 }
+/* Parent cup-group matchday: the panel lists every group game, so the one-game summary card above it is redundant. */
+body.role-parent #view-home .home-next-match:has(#parent-home-match-info:not(.hidden) .cup-group-fixture-lines) #next-match-card{display:none}
