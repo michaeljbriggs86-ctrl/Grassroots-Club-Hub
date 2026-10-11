@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-10-10T22:24:11.586560+00:00",
+  "last_updated": "2026-10-11T07:28:22.496389+00:00",
   "clubs": [
     {
       "club_id": 514,
@@ -41,7 +41,12 @@
     },
     {
       "club_id": 484,
-      "club_name": "Avery Hill Athletic"
+      "club_name": "Avery Hill Athletic",
+      "logo_url": "https://test.pitchkind.com/__pilot_badges/484/e513c0ffd15147a6e8241f0e2ad42cd6e012dabeda008ee51fb3e5b35f1a8902",
+      "logo_status": "pilot_verified",
+      "logo_source": "user_supplied_private",
+      "logo_updated_at": "2026-10-11",
+      "logo_sha256": "e513c0ffd15147a6e8241f0e2ad42cd6e012dabeda008ee51fb3e5b35f1a8902"
     },
     {
       "club_id": 239,
@@ -7882,5 +7887,5 @@
     }
   ],
   "note": "Panel parsing confirmed against all five format categories (mini-soccer, 9-a-side, X-category, 11-a-side, Senior) as of Sept 2026. Club/team linking is heuristic (name-prefix match) - see ambiguous_club_matches in diagnostics for anything flagged as uncertain.",
-  "pilot_badges_revision": "96007a59ebd0e6d936c0328623ef19c7383c288ee14f4e5f7c2f8a384a7c752c"
+  "pilot_badges_revision": "f8506269261deb2e28c1364e4d18f9c7f1372b6b3364b0a866dd36d3638847ee"
 }
