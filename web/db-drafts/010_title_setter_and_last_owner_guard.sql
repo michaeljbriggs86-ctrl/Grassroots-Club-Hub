@@ -18,17 +18,18 @@ revoke all on function public.set_admin_title(uuid,text) from public, anon;
 grant execute on function public.set_admin_title(uuid,text) to authenticated;
 
 
--- A club must always keep at least one owner: block removing the last owner flag.
-create or replace function public.guard_last_owner() returns trigger language plpgsql as $function$
+-- A club must always keep at least one owner: block removing the last owner flag, and block turning the last owner into a non-admin.
+-- (Hardened 11 Oct 2026: also guards role changes, fixes the function search_path, and only counts owners who are still Club Admins.)
+create or replace function public.guard_last_owner() returns trigger language plpgsql set search_path to 'public' as $function$
 begin
-  if old.is_owner is true and new.is_owner is not true then
-    if not exists (select 1 from public.profiles p where p.club_id=old.club_id and p.is_owner is true and p.user_id<>old.user_id) then
-      raise exception 'A club must keep at least one owner';
+  if old.is_owner is true and (new.is_owner is not true or new.role is distinct from 'club_admin') then
+    if not exists (select 1 from public.profiles p where p.club_id=old.club_id and p.is_owner is true and p.role='club_admin' and p.user_id<>old.user_id) then
+      raise exception 'A club must keep at least one owner who is a Club Admin';
     end if;
   end if;
   return new;
 end $function$;
 drop trigger if exists trg_guard_last_owner on public.profiles;
-create trigger trg_guard_last_owner before update of is_owner on public.profiles for each row execute function public.guard_last_owner();
+create trigger trg_guard_last_owner before update of is_owner, role on public.profiles for each row execute function public.guard_last_owner();
 
 commit;
