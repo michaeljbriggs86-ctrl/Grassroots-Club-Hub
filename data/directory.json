@@ -1,9 +1,14 @@
 {
-  "last_updated": "2026-10-11T08:32:55.792702+00:00",
+  "last_updated": "2026-10-11T08:48:32.987181+00:00",
   "clubs": [
     {
       "club_id": 514,
-      "club_name": "Abbeymead FC"
+      "club_name": "Abbeymead FC",
+      "logo_url": "https://test.pitchkind.com/__pilot_badges/514/2b9b292f7eb4f13d5f7d8e569261fc2cb35b6d44fcaec7c51bf06dcb34e3f70e",
+      "logo_status": "pilot_verified",
+      "logo_source": "user_supplied_private",
+      "logo_updated_at": "2026-10-11",
+      "logo_sha256": "2b9b292f7eb4f13d5f7d8e569261fc2cb35b6d44fcaec7c51bf06dcb34e3f70e"
     },
     {
       "club_id": 556,
@@ -7897,5 +7902,5 @@
     }
   ],
   "note": "Panel parsing confirmed against all five format categories (mini-soccer, 9-a-side, X-category, 11-a-side, Senior) as of Sept 2026. Club/team linking is heuristic (name-prefix match) - see ambiguous_club_matches in diagnostics for anything flagged as uncertain.",
-  "pilot_badges_revision": "5a10e7eb3b2955634c061b1389a8a5d050ab6b50102469c8a7b09df878898140"
+  "pilot_badges_revision": "e5c9631cb0a2bf10f8caa587057cf0abe00382e594eb3ebbd644daf48835f19d"
 }
