@@ -1,7 +1,8 @@
 {
   "schema_version": 2,
   "provider": "Selkent",
-  "last_updated": "2026-10-11T21:12:34.815237+00:00",
+  "last_updated": "2026-10-11T22:02:39.505969+00:00",
+  "cup_results_last_updated": "2026-10-11T22:02:39.505969+00:00",
   "fixture_agegroup_discovery_source": "selkent_divisions_all",
   "coverage": {
     "fixtures": {
@@ -20546,6 +20547,5 @@
     "U7-U11/private club-entered results are intentionally excluded from this public feed.",
     "Unknown fixture/result shapes fail closed rather than publish guessed data.",
     "Standings preserve Selkent display sequence as row_order; row_order is not an authoritative tied-team position."
-  ],
-  "cup_results_last_updated": "2026-10-11T21:51:18.106116+00:00"
+  ]
 }
