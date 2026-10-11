@@ -16,6 +16,14 @@ Scope confirmed by Mike: track only Enhanced DBS, safeguarding and first aid. Co
 
 Renewal suggestions are editable calendar anniversaries, with leap days clamped to February's last day. They are not verification. Changing a date/course clears the editor's club-check checkbox. Dates are interpreted using London today. Expiry today is shown as due today; dates before today are expired (DBS: renewal overdue). The 60-day due-soon window is an app reminder threshold, not an FA rule. Missing entries and unchecked records are distinct. No automated eligibility blocks or reminders are added.
 
+## Club Home matrix
+
+Club Home displays one row per coach/assistant, including unassigned coaching accounts and Club Admins who also have a coaching assignment. Pure Club Admins are excluded. Enhanced DBS, safeguarding and first aid are the three columns. An amber notice lists renewals within 60 days (including today); a red notice prioritises overdue dates. Missing and unchecked counts are separate, with filters for all coaches, renewals due and missing/unchecked records. Colour is accompanied by text and actual dates. Coach names open the existing editor. Phone users can swipe the table; its coach column stays visible.
+
+The admin-only `list_coach_qualifications()` RPC returns only same-club coaching accounts, with each account listed once regardless of team assignments. Its server gate reuses the trusted profile/effective-capacity helper in admin-only mode. Coaches retain self-only reads; parents and Parent capacity cannot load the matrix. The UI discards old replies and clears the matrix on user/club/capacity changes. It refreshes on Club Home/document refresh, successful edit/removal and returning to the visible page. Warnings are in-app notices; no email, WhatsApp or push reminders are added. A failed load shows unavailable rather than falsely indicating no renewals.
+
+017 is still unapplied and has been extended in place with the matrix RPC; use the latest draft, not the earlier PR79 snapshot.
+
 ## Storage / RPC design
 
 Private tables hold one collection per club/staff member and a private change audit. There are no public table grants or authenticated/anon grants on private tables/helpers; RLS is enabled as defense in depth. Public get/save RPCs revoke PUBLIC/anon execution and allow authenticated execution only. Security-definer functions are necessary for access to protected profiles and private storage; they fix the search path to empty and validate the database profile, effective capacity, target role and club each time.
@@ -36,7 +44,7 @@ Run with PGlite **0.3.14**:
 node web/db-drafts/test/run-coach-qualifications.cjs /absolute/path/to/node_modules/@electric-sql/pglite
 ```
 
-The runner inlines the draft, executes the rolled-back assertions and checks that the private table no longer exists. Coverage: RPC/private grants, RLS enabled, same-club writes, self-only staff reads, parent/player/pending/unknown/anonymous denial, parent-capacity denial, invalid fields/dates/course combinations, duplicate types, expired historical records, rejected coaching/UEFA categories and expiry required for all three document types, stale revision, server verification attribution, removal and audit. It proves local function logic and grants against stand-ins; it is not a live migration or a Supabase integration test. Current live columns and helper/list functions were inspected read-only before drafting.
+The runner inlines the draft, executes the rolled-back assertions and checks that the private table no longer exists. Coverage: RPC/private grants, RLS enabled, same-club writes, admin-only matrix with unique coaching accounts (including both admin-coach assignment forms), pure-admin/other-club exclusion, self-only staff reads, parent/player/pending/unknown/anonymous denial, parent-capacity denial, invalid fields/dates/course combinations, duplicate types, expired historical records, rejected coaching/UEFA categories and expiry required for all three document types, stale revision, server verification attribution, removal and audit. It proves local function logic and grants against stand-ins; it is not a live migration or a Supabase integration test. Current live columns and helper/list functions were inspected read-only before drafting.
 
 The frontend suite `tests/test_coach_qualifications.js` executes the production module and actual cloud wrappers, covering London/leap dates, expiry boundaries, validation, admin/self-only routing, cancellation, duplicate submits, revisions, failures and stale contexts. The browser build explicitly includes the new script; database drafts remain outside its asset allow-list.
 

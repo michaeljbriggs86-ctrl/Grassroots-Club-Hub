@@ -33,7 +33,7 @@
   function same(s=state){const c=context();return !!(s&&c&&c.cloud===s.cloud&&c.user===s.user&&c.club===s.club&&c.role===s.role&&c.editable===s.editable&&el('coach-qualification-dialog')?.open);}
   function message(text,error=false){const node=el('coach-qualification-status');if(node){node.textContent=text;node.classList.toggle('qualification-error',error);}}
   function close(){loadVersion++;state=null;el('coach-qualification-editor')?.classList.add('hidden');const dialog=el('coach-qualification-dialog');if(dialog?.open)dialog.close();}
-  function syncAccess(){const c=context(),button=el('coach-profile-self');button?.classList.toggle('hidden',!c);if(state&&!same())close();}
+  function syncAccess(){const c=context(),button=el('coach-profile-self');button?.classList.toggle('hidden',!c);if(state&&!same())close();if(matrix&&!matrixCurrent())clearMatrix();el('coach-document-matrix')?.classList.toggle('hidden',!c?.editable);}
   function render(){
     if(!same()||!state.loaded)return;
     el('coach-qualification-list').innerHTML=catalogue.map(item=>{const record=state.records.find(r=>r.kind===item.kind),s=status(record);return `<article class="coach-qualification-row"><div><h4>${esc(item.label)}</h4><span class="qualification-state ${s.tone}">${esc(s.label)}</span>${record?`<p>${esc(item.courses[record.course]||'Qualification')}</p><p>${esc(item.dateLabel||'Completed')}: ${esc(record.completed_on)}<br>${esc(item.expiryLabel||'Expiry')}: ${record.expires_on?esc(record.expires_on):'No expiry recorded'}</p><p class="muted">${record.club_checked?'Club checked'+(record.checked_at?' · '+esc(String(record.checked_at).slice(0,10)):''):'Needs club check'}</p>`:''}</div>${state.editable?`<button type="button" class="secondary-button" data-edit-qualification="${item.kind}">${record?'Edit':'Add'}</button>`:''}</article>`;}).join('');
@@ -69,7 +69,7 @@
     if(!same(s)||state!==s||!s.editable)return;
     const version=loadVersion;
     try{const data=response(await s.cloud.saveCoachQualifications(s.target,records,s.revision));if(version!==loadVersion||state!==s||!same(s))return;
-      s.records=data.records;s.revision=Number(data.revision);render();el('coach-qualification-editor').classList.add('hidden');message('Qualifications saved.');
+      s.records=data.records;s.revision=Number(data.revision);render();el('coach-qualification-editor').classList.add('hidden');message('Qualifications saved.');refreshMatrix();
     }catch(error){if(version===loadVersion&&state===s&&same(s))message(userError(error),true);}
   }
   async function save(event){
@@ -85,7 +85,41 @@
       await write(s.records.filter(r=>r.kind!==kind).map(r=>validate(r)),s);
     }finally{setBusy(false);}
   }
+  // Club-wide overview is admin-only and lives only in this module's current-session memory.
+  let matrix=null,matrixVersion=0;
+  function matrixCurrent(s=matrix){const c=context();return !!(s&&c?.editable&&c.cloud===s.cloud&&c.user===s.user&&c.club===s.club&&c.role===s.role);}
+  function clearMatrix(){matrixVersion++;matrix=null;for(const id of ['coach-document-table','coach-document-notice'])if(el(id))el(id).innerHTML='';if(el('coach-document-status'))el('coach-document-status').textContent='';if(el('coach-document-notice'))el('coach-document-notice').hidden=true;}
+  function documentDate(value){return new Intl.DateTimeFormat('en-GB',{day:'numeric',month:'short',year:'numeric',timeZone:'Europe/London'}).format(new Date(value+'T00:00:00Z'));}
+  function matrixSummary(rows,date=today()){
+    const due=[],overdue=[];let missing=0,unchecked=0;
+    for(const person of rows)for(const item of catalogue){const record=person.records.find(r=>r.kind===item.kind);if(!record){missing++;continue;}if(!record.club_checked)unchecked++;const s=status(record,date);const entry={user_id:person.user_id,name:person.full_name||'Coach',item,record};if(s.tone==='expired')overdue.push(entry);else if(s.tone==='due')due.push(entry);}
+    const order=(a,b)=>a.record.expires_on.localeCompare(b.record.expires_on)||a.name.localeCompare(b.name,'en-GB');due.sort(order);overdue.sort(order);
+    return {due,overdue,missing,unchecked};
+  }
+  function renderMatrix(){
+    if(!matrixCurrent()||!matrix.loaded)return;
+    const date=today(),summary=matrixSummary(matrix.rows,date),notice=el('coach-document-notice'),count=(n,label)=>`${n} ${label}${n===1?'':'s'}`;
+    if(notice){notice.hidden=!summary.overdue.length&&!summary.due.length;notice.classList.toggle('expired',!!summary.overdue.length);notice.classList.toggle('due',!summary.overdue.length);notice.innerHTML=`<strong>${summary.overdue.length?count(summary.overdue.length,'document')+' overdue':count(summary.due.length,'renewal')+' due within 60 days'}</strong>${summary.overdue.length&&summary.due.length?`<p>${esc(count(summary.due.length,'renewal'))} also due within 60 days.</p>`:''}<ul>${[...summary.overdue,...summary.due].slice(0,3).map(e=>`<li>${esc(e.name)} · ${esc(e.item.label)} · ${esc(status(e.record,date).label)} (${esc(documentDate(e.record.expires_on))})</li>`).join('')}</ul>${summary.overdue.length+summary.due.length>3?'<p>Filter to Renewals due for the full list.</p>':''}`;}
+    if(el('coach-document-status'))el('coach-document-status').textContent=`${count(matrix.rows.length,'coach')} · ${count(summary.missing,'missing record')} · ${count(summary.unchecked,'unchecked record')}. Updated ${new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/London',hour:'2-digit',minute:'2-digit'}).format(new Date())}.`;
+    const mode=el('coach-document-filter')?.value||'all',rank=p=>Math.min(...catalogue.map(item=>{const s=status(p.records.find(r=>r.kind===item.kind),date);return s.tone==='expired'?0:s.tone==='due'?1:s.tone==='missing'?2:3;}));
+    const rows=matrix.rows.filter(p=>mode==='due'?p.records.some(r=>['due','expired'].includes(status(r,date).tone)):mode==='missing'?catalogue.some(item=>{const r=p.records.find(x=>x.kind===item.kind);return !r||!r.club_checked;}):true).sort((a,b)=>rank(a)-rank(b)||(a.full_name||'').localeCompare(b.full_name||'','en-GB'));
+    if(!el('coach-document-table'))return;
+    el('coach-document-table').innerHTML=rows.length?`<table class="coach-document-grid"><caption class="helper">Coach document expiry and renewal matrix</caption><thead><tr><th scope="col">Coach</th>${catalogue.map(item=>`<th scope="col">${esc(item.label)}</th>`).join('')}</tr></thead><tbody>${rows.map(p=>`<tr><th scope="row"><button type="button" class="text-button" data-matrix-coach="${esc(p.user_id)}">${esc(p.full_name||'Coach')}</button><small>${p.role==='assistant_coach'?'Assistant Coach':p.role==='club_admin'?'Club Admin · Coach':'Coach'}</small></th>${catalogue.map(item=>{const record=p.records.find(r=>r.kind===item.kind),s=status(record,date);return `<td><span class="qualification-state ${s.tone}">${esc(s.label)}</span><small>${record?`${item.kind==='dbs'?'Renewal':'Expiry'}: ${esc(documentDate(record.expires_on))}`:'Add a record'}</small>${record?`<small>${record.club_checked?'Club checked':'Needs club check'}</small>`:''}</td>`;}).join('')}</tr>`).join('')}</tbody></table>`:`<p class="muted">${matrix.rows.length?'No coaches match this filter.':'No coaching accounts yet. Approved coaches and assistants will appear here.'}</p>`;
+  }
+  async function refreshMatrix(){
+    const c=context();if(!c?.editable){clearMatrix();return;}
+    const old=matrix;if(old&&!matrixCurrent(old))clearMatrix();
+    const version=++matrixVersion;matrix={...c,rows:[],loaded:false};
+    el('coach-document-matrix')?.classList.remove('hidden');if(el('coach-document-table'))el('coach-document-table').innerHTML='';if(el('coach-document-notice')){el('coach-document-notice').innerHTML='';el('coach-document-notice').hidden=true;}if(el('coach-document-status'))el('coach-document-status').textContent='Loading coach documents…';
+    try{const rows=await c.cloud.listCoachQualifications();if(version!==matrixVersion||!matrixCurrent())return;
+      if(!Array.isArray(rows))throw Error('Invalid matrix');const seen=new Set();
+      for(const p of rows){if(!p||typeof p.user_id!=='string'||!p.user_id||seen.has(p.user_id)||!['club_admin','coach','assistant_coach'].includes(p.role)||typeof p.full_name!=='string')throw Error('Invalid coach');response(p);seen.add(p.user_id);}
+      matrix.rows=rows;matrix.loaded=true;renderMatrix();
+    }catch(_){if(version===matrixVersion&&matrixCurrent()){matrix.rows=[];matrix.loaded=false;if(el('coach-document-status'))el('coach-document-status').textContent='Coach documents unavailable. Refresh to retry; no expiry status can be confirmed.';}}
+  }
   document.addEventListener('click',event=>{
+    if(event.target.closest?.('#coach-document-refresh')){refreshMatrix();return;}
+    const matrixCoach=event.target.closest?.('[data-matrix-coach]');if(matrixCoach){if(!matrixCurrent()||!matrix.loaded)return;const person=matrix.rows.find(p=>p.user_id===matrixCoach.dataset.matrixCoach);if(person)open(person.user_id,person.full_name||'Coach');return;}
     const target=event.target.closest?.('[data-coach-profile]');if(target){const c=context(),id=target.dataset.coachProfile;if(!c?.editable)return;const rows=typeof __adminCoachRows!=='undefined'?__adminCoachRows:[],access=typeof __adminAccessRows!=='undefined'?__adminAccessRows:[];const person=[...rows,...access].find(r=>r.user_id===id&&['club_admin','coach','assistant_coach'].includes(r.role));if(person)open(id,person.full_name||'Coach');return;}
     const row=event.target.closest?.('[data-edit-qualification]');if(row)edit(row.dataset.editQualification);
     if(event.target.closest?.('#coach-profile-self')){const c=context();if(c)open(c.user,c.cloud.context.profile.full_name||'My profile');}
@@ -97,6 +131,8 @@
     if(id==='coach-qualification-completed'&&!el('coach-qualification-expiry').value){const item=catalogue.find(x=>x.kind===state?.editing);const years=item?.kind==='first_aid'&&el('coach-qualification-course').value!=='fa_ifaif'?0:item?.years;el('coach-qualification-expiry').value=suggestedExpiry(el('coach-qualification-completed').value,years);}
   });
   el('coach-qualification-dialog')?.addEventListener('close',()=>{loadVersion++;state=null;});
-  window.ClubHubCoachQualifications={syncAccess,open,catalogue,today,validDate,suggestedExpiry,status,validate};
+  el('coach-document-filter')?.addEventListener('change',renderMatrix);
+  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&matrixCurrent())refreshMatrix();});
+  window.ClubHubCoachQualifications={syncAccess,open,refreshMatrix,matrixSummary,catalogue,today,validDate,suggestedExpiry,status,validate};
   syncAccess();
 })();

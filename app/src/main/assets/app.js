@@ -4616,6 +4616,7 @@ async function refreshAdminClubOverview(quiet=false){
   const show=CLOUD_MODE&&isAdmin()&&isClubOverviewMode();panel.classList.toggle('hidden',!show||__clubTab!=='overview');if(!show)return;
   const identity=adminWeekendShareIdentity();if(!identity)return;
   if(quiet&&identity===__adminHomeIdentity&&Date.now()-__adminOverviewStamp<15000)return;
+  window.ClubHubCoachQualifications?.refreshMatrix();
   const changed=identity!==__adminHomeIdentity;__adminHomeIdentity=identity;__adminOverviewStamp=Date.now();
   if(changed)clearAdminHome(true);
   const version=++__adminHomeLoadVersion,cloud=window.ClubHubCloud;
