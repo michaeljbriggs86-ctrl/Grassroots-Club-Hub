@@ -34,6 +34,42 @@ class Response:
 
 
 class StageTest(unittest.TestCase):
+    def test_native_jpeg_snapshot_bootstraps_with_exact_bytes_mime_and_d2(self):
+        badge = next(b for b in json.loads((ROOT / 'verification/pilot_verified_badges.json').read_text())['badges']
+                     if b['club_id'] == 275)
+        data = (ROOT / badge['staging_asset']).read_bytes()
+        self.assertEqual(stage.reviewed_upload_snapshot(badge), data)
+        commands = []
+        def run(command, *, check):
+            commands.append(command)
+            path = pathlib.Path(command[command.index('--file') + 1])
+            if 'get' in command:
+                path.write_bytes(data)
+            else:
+                self.assertEqual(path.read_bytes(), data)
+                self.assertEqual(command[command.index('--content-type') + 1], 'image/jpeg')
+        reads = iter([None, (data, 'image/jpeg')])
+        stage.upload_badges([badge], lambda *a, **k: self.fail('public fallback'), run,
+                            prefer_stored=True, stored_get=lambda key: next(reads))
+        self.assertEqual([c[5] for c in commands], ['put', 'get'])
+        for change in ({'source_user_approved': False}, {'native_width': 201},
+                       {'staging_asset': 'verification/approved_badges/275.png'},
+                       {'source_media_type': 'image/webp'}, {'pilot_quality_exception': None},
+                       {'logo_sha256': 'a' * 64}):
+            with self.subTest(change=change), self.assertRaises(ValueError):
+                stage.reviewed_upload_snapshot({**badge, **change})
+        # A JPEG declaration cannot disguise PNG bytes, even at the right path/hash.
+        png_badge = next(b for b in json.loads((ROOT / 'verification/pilot_verified_badges.json').read_text())['badges']
+                         if b['club_id'] == 484)
+        png = (ROOT / png_badge['staging_asset']).read_bytes()
+        with patch.object(pathlib.Path, 'read_bytes', return_value=png):
+            with self.assertRaisesRegex(ValueError, 'image type differs'):
+                stage.reviewed_upload_snapshot({**badge, 'logo_sha256': hashlib.sha256(png).hexdigest()})
+        bad_reads = iter([None, (data, 'image/png')])
+        with self.assertRaisesRegex(ValueError, 'metadata readback failed'):
+            stage.upload_badges([badge], lambda *a, **k: self.fail('public fallback'), run,
+                                prefer_stored=True, stored_get=lambda key: next(bad_reads))
+
     def test_reviewed_d2_user_snapshot_keeps_exact_file_quality_gate(self):
         badge = next(b for b in json.loads((ROOT / 'verification/pilot_verified_badges.json').read_text())['badges']
                      if b['club_id'] == 484)

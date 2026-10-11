@@ -32,6 +32,15 @@ REVIEWED_METADATA_REPAIRS = {
 }
 
 
+def reviewed_upload_spec(badge):
+    """Keep approved native JPEGs intact; existing uploads default to PNG."""
+    kind = badge.get('source_media_type', 'image/png')
+    suffix = {'image/png': 'png', 'image/jpeg': 'jpg'}.get(kind)
+    if suffix is None:
+        raise ValueError('unsupported reviewed upload image type')
+    return f"verification/approved_badges/{int(badge['club_id'])}.{suffix}", kind
+
+
 def validated_approvals(directory, manifest):
     if manifest.get("schema_version") != 1 or manifest.get("scope") != "private_pilot":
         raise ValueError("unsupported pilot badge manifest")
@@ -61,8 +70,9 @@ def validated_approvals(directory, manifest):
         if not all(badge.get(field) for field in BADGE_FIELDS):
             raise ValueError(f"badge {club_id} is missing provenance metadata")
         if badge.get('staging_asset') is not None:
+            expected_asset, _ = reviewed_upload_spec(badge)
             if (badge.get('logo_source') != 'user_supplied_private' or
-                    badge['staging_asset'] != f'verification/approved_badges/{club_id}.png'):
+                    badge['staging_asset'] != expected_asset):
                 raise ValueError(f"badge {club_id} has an invalid reviewed staging asset")
         if badge.get('logo_source') in ('club_supplied_private', 'user_supplied_private', 'official_source_transparency_derivative_private',
                                         'official_source_trim_derivative_private',

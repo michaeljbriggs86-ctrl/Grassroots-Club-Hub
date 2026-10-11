@@ -15,6 +15,20 @@ spec.loader.exec_module(module)
 
 
 class BadgePublisherTest(unittest.TestCase):
+    def test_native_jpeg_upload_keeps_exact_club_path_and_source_type(self):
+        badge = next(b for b in self.manifest['badges'] if b['club_id'] == 275)
+        self.assertIn(275, module.validated_approvals(self.directory, self.manifest))
+        self.assertEqual(badge['original_sha256'], badge['logo_sha256'])
+        for change in ({'staging_asset': 'verification/approved_badges/275.png'},
+                       {'staging_asset': 'verification/approved_badges/322.jpg'},
+                       {'source_media_type': 'image/png'},
+                       {'source_media_type': 'image/webp'},
+                       {'source_user_approved': False}):
+            changed = copy.deepcopy(self.manifest)
+            next(b for b in changed['badges'] if b['club_id'] == 275).update(change)
+            with self.subTest(change=change), self.assertRaises(ValueError):
+                module.validated_approvals(self.directory, changed)
+
     def test_user_snapshot_cannot_reference_another_badge_or_source(self):
         for change in ({'staging_asset': '../other.png'},
                        {'staging_asset': 'verification/approved_badges/239.png'},

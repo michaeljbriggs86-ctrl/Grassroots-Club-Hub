@@ -16,7 +16,7 @@ import sys
 import tempfile
 from urllib.parse import urlsplit
 
-from publish_pilot_badges import MAX_IMAGE_BYTES, validated_approvals
+from publish_pilot_badges import MAX_IMAGE_BYTES, reviewed_upload_spec, validated_approvals
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'verification'))
 from verify_club_logo_quality import check_pilot_exception
@@ -125,15 +125,15 @@ def checked_stored_kind(badge, data):
 
 
 def reviewed_upload_snapshot(badge):
-    """Bootstrap only an explicitly reviewed, hash-pinned user-upload PNG."""
-    expected = f"verification/approved_badges/{int(badge['club_id'])}.png"
+    """Bootstrap only an explicitly reviewed, hash-pinned native PNG or JPEG."""
+    expected, expected_kind = reviewed_upload_spec(badge)
     if (badge.get('logo_source') != 'user_supplied_private' or
             badge.get('source_user_approved') is not True or
             badge.get('staging_asset') != expected):
         raise ValueError('invalid reviewed upload staging asset')
     data = Path(expected).read_bytes()
-    if checked_stored_kind(badge, data) != 'image/png':
-        raise ValueError('reviewed upload snapshot must be PNG')
+    if checked_stored_kind(badge, data) != expected_kind:
+        raise ValueError('reviewed upload snapshot image type differs')
     from PIL import Image
     with Image.open(io.BytesIO(data)) as image:
         if image.size != (badge.get('native_width'), badge.get('native_height')):
@@ -207,7 +207,8 @@ def upload_badges(badges, get, run, *, prefer_stored=False, stored_get=None):
                 print(f"Checked private R2 badge club_id={badge['club_id']} sha256={badge['logo_sha256']}")
                 continue
             if local_upload:
-                data, kind = reviewed_upload_snapshot(badge), 'image/png'
+                data = reviewed_upload_snapshot(badge)
+                kind = media_type(data)
             elif badge.get('logo_source') in ('official_source_transparency_derivative_private',
                                             'official_source_trim_derivative_private'):
                 # Fetch the exact official original, repeat the reviewed outer
