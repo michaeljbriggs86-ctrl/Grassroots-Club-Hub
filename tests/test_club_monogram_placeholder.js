@@ -13,7 +13,7 @@ assert.equal(first.status,'placeholder_monogram');
 assert.equal(first.src,context.clubPlaceholderBadgeData('Welling Sport').src);
 assert.match(decodeURIComponent(first.src),/stroke-dasharray/);
 assert.match(first.alt,/monogram placeholder/);
-assert.equal(context.clubPlaceholderBadgeData('unknown').src,'pitchkind-wt_mark.svg');
+assert.equal(context.clubPlaceholderBadgeData('unknown').src,'club-badge-unavailable.svg');
 allowed=false;assert.equal(context.clubPlaceholderBadgeData('Welling Sport').status,'missing');
 allowed=true;window.ClubHubNative={};assert.equal(context.clubPlaceholderBadgeData('Welling Sport').status,'missing');
 delete window.ClubHubNative;

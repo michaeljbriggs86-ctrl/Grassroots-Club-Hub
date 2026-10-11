@@ -57,7 +57,7 @@ function webContext(options={}){
  const browser=context({group:false,native:false});await browser.c.shareNextMatchImage();assert(browser.calls.some(x=>x[0]==='download'),'existing browser image download retained');
  for(const group of [false,true]){
   const w=webContext({group});await w.c.shareNextMatchImage();assert.equal(w.shares.length,1);
-  const data=w.shares[0],file=data.files[0];assert.equal(data.title,'Matchday details');assert.equal(file.name,'PitchKind_2026-10-10_test.png');assert.equal(file.type,'image/png');assert.deepEqual(Buffer.from(await file.arrayBuffer()),w.bytes);
+  const data=w.shares[0],file=data.files[0];assert.equal(data.title,'Matchday details');assert.equal(file.name,'Shooters_Hill_2026-10-10_test.png');assert.equal(file.type,'image/png');assert.deepEqual(Buffer.from(await file.arrayBuffer()),w.bytes);
   assert.match(data.text,/Marathon Sports Ground/);assert.match(data.text,/Shooters Hill/);assert.match(data.text,/Our kit: Home - Green and white/);assert.match(data.text,/https:\/\/www.google.com\/maps\/search/);
   assert.match(data.text,group?/Group start: 10:00\nArrival: 09:30/:/Kick-off: 10:00\nArrival: 09:30/);
   if(group)assert.match(data.text,/Lewisham Borough Cobras/);

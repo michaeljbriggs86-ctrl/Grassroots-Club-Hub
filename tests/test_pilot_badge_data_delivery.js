@@ -123,7 +123,7 @@ vm.runInContext(extract('app/src/main/assets/app.js', 'function clubIdentityName
 assert.equal(app.clubPlaceholderBadgeData('Boca Polars').initials,'BO','the older manual name receives the Boca FC monogram, without claiming a verified crest');
 vm.runInContext(extract('app/src/main/assets/app.js', 'function clubListingHtml(', 'document.addEventListener(\'error\''), app);
 assert.match(app.clubListingHtml(crayTeam), new RegExp(`/__pilot_badges/250/${cray.logo_sha256}`),'list rows use the protected reviewed badge');
-assert.match(app.clubListingHtml('Unreviewed FC'), /pitchkind-wt_mark\.svg/,'unapproved clubs use the neutral mark');
+assert.match(app.clubListingHtml('Unreviewed FC'), /club-badge-unavailable\.svg/,'unapproved clubs use the neutral mark');
 const standingsBody = {innerHTML:''};
 const standingsView = vm.createContext({
   state:{selkent:{tableSource:'github-static-results-v2',table:[{team:crayTeam,sourceOrder:1,p:1,w:1,d:0,l:0,gf:2,ga:0,gd:2,pts:3},{team:'Unreviewed FC',sourceOrder:2,p:1,w:0,d:0,l:1,gf:0,ga:2,gd:-2,pts:0}]},division:{teamName:ownTeam,name:'Under 12A'}},
@@ -133,7 +133,7 @@ const standingsView = vm.createContext({
 vm.runInContext(extract('app/src/main/assets/static-feed-overlay.js', '  window.renderLeagueTable=function(){', '  async function primeStaticFeeds(){'), standingsView);
 standingsView.window.renderLeagueTable();
 assert.match(standingsBody.innerHTML,new RegExp(`/__pilot_badges/250/${cray.logo_sha256}`),'published standings show the admitted club badge');
-assert.match(standingsBody.innerHTML,/Unreviewed FC[\s\S]*pitchkind-wt_mark\.svg|pitchkind-wt_mark\.svg[\s\S]*Unreviewed FC/,'unreviewed standings clubs keep the neutral mark');
+assert.match(standingsBody.innerHTML,/Unreviewed FC[\s\S]*club-badge-unavailable\.svg|club-badge-unavailable\.svg[\s\S]*Unreviewed FC/,'unreviewed standings clubs keep the neutral mark');
 assert.doesNotMatch(app.clubListingHtml('<script>'), /<script>/,'club names are escaped in badge rows');
 vm.runInContext(extract('app/src/main/assets/app.js', 'function clubTeamLink(', 'function kitWarningHtml('), app);
 app.clubIdentityBadgeHtml = team => `<img class="club-identity-badge" alt="${team} badge">`;
@@ -148,7 +148,7 @@ assert.equal((app.clubTeamLink(crayTeam, 'division-team-link').match(/<img\b/g) 
 assert.equal(app.verifiedTeamBadgeUrl(secondTeam), `/__pilot_badges/261/${'a'.repeat(64)}`);
 window.location.hostname = 'pitchkind.com';
 assert.equal(app.verifiedTeamBadgeUrl(secondTeam), '');
-assert.match(app.clubListingHtml(secondTeam), /pitchkind-wt_mark\.svg/,'a public host cannot use pilot badges in list rows');
+assert.match(app.clubListingHtml(secondTeam), /club-badge-unavailable\.svg/,'a public host cannot use pilot badges in list rows');
 window.location.hostname = 'test.pitchkind.com';
 window.location.protocol = 'http:';
 assert.equal(app.verifiedTeamBadgeUrl(secondTeam), '');

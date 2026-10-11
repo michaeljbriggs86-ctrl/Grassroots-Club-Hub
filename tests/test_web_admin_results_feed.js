@@ -81,7 +81,7 @@ const browserBody=src.slice(src.indexOf('function clubResultsTableHTML('),src.in
 const badgeBody=src.slice(src.indexOf('function clubResultTeamBadgeHtml(teamName='),src.indexOf('function renderAdminRecentResults(',src.indexOf('function clubResultTeamBadgeHtml(teamName=')));
 const placeholderBody=src.slice(src.indexOf('function clubPlaceholderBadgeHtml('),src.indexOf('function clubIdentityBadgeHtml('));
 const placeholderBadge=new Function('clubPlaceholderBadgeData','esc',`${placeholderBody}\nreturn clubPlaceholderBadgeHtml;`)(
-  name=>({src:'pitchkind-wt_mark.svg',alt:`PitchKind placeholder for ${name}`,status:'missing'}),s=>String(s)
+  name=>({src:'club-badge-unavailable.svg',alt:`Unavailable badge for ${name}`,status:'missing'}),s=>String(s)
 );
 const resultBadge=new Function('normalizeTeamKey','verifiedTeamBadgeUrl','clubSettings','configuredClubTeams','esc','FAILED_BADGE_URLS','clubPlaceholderBadgeHtml',`${badgeBody}\nreturn clubResultTeamBadgeHtml;`)(
   normalizeTeamKey,name=>name==='Cray Wanderers Ambers'?'/__pilot_badges/250/reviewed':'',
@@ -89,7 +89,7 @@ const resultBadge=new Function('normalizeTeamKey','verifiedTeamBadgeUrl','clubSe
 );
 assert.match(resultBadge('Cray Wanderers Ambers'),/\/__pilot_badges\/250\/reviewed/,'approved opponent badges use the reviewed URL');
 assert.match(resultBadge('Shooters Hill AFC Archers'),/shooters-hill-logo\.png/,'other teams at this club use its configured crest');
-assert.match(resultBadge('Junior Reds Sabres'),/pitchkind-wt_mark\.svg/,'an unapproved opponent uses the PitchKind placeholder');
+assert.match(resultBadge('Junior Reds Sabres'),/club-badge-unavailable\.svg/,'an unapproved opponent uses the Unavailable badge');
 const browser=new Function('document','window','resultForNamedTeam','resultClass','esc','matchTeamLabel','formatDate','isAdmin','isClubOverviewMode','clubResultCompetitionKind','clubResultTeamBadgeHtml','setStableHtml',
   `let __clubResultsRows=[],__clubResultsAge='all',__clubResultsCompetition='league',__clubResultsPage=0;const CLUB_RESULTS_PAGE_SIZE=6;const currentView='home',__clubTab='overview';${browserBody}\nreturn {show:renderClubResultsBrowser,setRows:rows=>{__clubResultsRows=rows},setCompetition:value=>{__clubResultsCompetition=value}};`
 )(browserDocument,{ClubHubCloud:{visibleTeamList:()=>teams}},()=> 'W',()=> 'result-W',s=>String(s),s=>s,s=>s,()=>true,()=>true,new Function(`${helpers}\nreturn clubResultCompetitionKind;`)(),resultBadge,setStableHtml);

@@ -1,7 +1,7 @@
 {
-  "name": "PitchKind",
-  "short_name": "PitchKind",
-  "description": "PitchKind grassroots football club and team management app",
+  "name": "Shooters Hill AFC",
+  "short_name": "Shooters Hill",
+  "description": "Shooters Hill AFC club and team hub",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
@@ -9,22 +9,10 @@
   "theme_color": "#0B5D35",
   "icons": [
     {
-      "src": "icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "icon-512.png",
+      "src": "shooters-hill-logo.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
-    },
-    {
-      "src": "icon-maskable-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "maskable"
     }
   ],
   "version": "2.2.35"
