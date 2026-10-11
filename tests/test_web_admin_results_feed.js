@@ -66,11 +66,11 @@ assert.doesNotMatch(html,/admin-results-breakdown|Selkent published|team recorde
 assert.match(html,/Completed matches<\/span><strong id="admin-results-count"/);
 const recentHtml=elements.get('admin-recent-results').innerHTML;
 assert.doesNotMatch(recentHtml,/Selkent published|Team recorded/);
-assert.match(recentHtml,/<table class="competition-games-table"><thead><tr><th>Date<\/th><th>Competition<\/th><th>Match<\/th><th>H\/A<\/th><th>Status \/ result<\/th>/,'latest results use the Cups table layout');
+assert.match(recentHtml,/<table class="competition-games-table"><thead><tr><th>Date<\/th><th>Age \/ competition<\/th><th>Match<\/th><th>Result<\/th>/,'latest results use the Cups table layout');
 assert.match(recentHtml,/<span class="club-result-team-name">Shooters Hill AFC Valiants<\/span>/);
 assert.match(recentHtml,/<span class="club-result-team-name">Junior Reds Sabres<\/span>/);
-assert.match(recentHtml,/<td>H<\/td><td><span class="competition-result-pill W">W 4–1<\/span>/,'home win reads from the club side');
-assert.match(recentHtml,/<td>A<\/td><td><span class="competition-result-pill W">W 3–2<\/span>/,'away win reads from the club side (3–2, not 2–3)');
+assert.match(recentHtml,/<td><span class="competition-result-pill W">W 4–1<\/span>/,'home win reads from the club side');
+assert.match(recentHtml,/<td><span class="competition-result-pill W">W 3–2<\/span>/,'away win reads from the club side (3–2, not 2–3)');
 assert.ok(html.includes('id="club-results-list"'));
 let resultWrites=0,resultHtml='';
 const list={get innerHTML(){return resultHtml},set innerHTML(value){resultHtml=value;resultWrites++}},ageSelect={value:'',innerHTML:''},competitionSelect={value:'league'},page={textContent:''},previous={},next={};
@@ -121,4 +121,14 @@ assert.equal(nextFixture().opponent,'Phoenix Sports Panthers','the next match ad
 const directory={leagues:[{age_group:'U9',division_name:'Under 9D Navy',teams:['Shooters Hill AFC Valiants']},{age_group:'U12',division_name:'Under 12C Orange',teams:['Shooters Hill AFC Cannons']}]};
 const directoryClubDivision=new Function('normalizeTeamKey',`${helpers}\nreturn directoryClubDivision;`)(normalizeTeamKey);
 assert.equal(directoryClubDivision({...teams[2],division:''},directory),'Under 9D Navy','missing database divisions resolve from the club directory');
+const derby=[
+ {team:{id:'a',ageGroup:'U12',teamName:'A',leagueName:'Club A'},state:{matches:[{id:'a1',status:'played',date:'2099-10-01',venue:'H',opponent:'Club B',competition:'Cup',gf:2,ga:1}]}},
+ {team:{id:'b',ageGroup:'U12',teamName:'B',leagueName:'Club B'},state:{matches:[{id:'b1',status:'played',date:'2099-10-01',venue:'A',opponent:'Club A',competition:'Cup',gf:1,ga:2}]}}
+];
+assert.equal(clubResultRows(derby,derby.map(r=>r.team),null,true).length,1,'both club teams recording one match do not duplicate a result');
+const multiAgeFeed={age_groups:[12,14].map(age=>({age_group:'U'+age,standings:[],published_results:[{date:'2099-10-01',division_name:'Under '+age+'A',home:'Club A',away:'Club B',homeGoals:2,awayGoals:1}]}))};
+const multiAgeTeams=[12,14].map(age=>({id:String(age),ageGroup:'U'+age,teamName:'A',leagueName:'Club A'}));
+assert.equal(clubResultRows([],multiAgeTeams,multiAgeFeed).length,2,'same club names on the same day in different ages are distinct matches');
+const competitionRows=[{team:multiAgeTeams[0],state:{matches:[{id:'league',status:'played',date:'2099-10-01',venue:'H',opponent:'Club B',competition:'League',gf:2,ga:1},{id:'cup',status:'played',date:'2099-10-01',venue:'H',opponent:'Club B',competition:'Cup',gf:1,ga:0}]}}];
+assert.equal(clubResultRows(competitionRows,multiAgeTeams,multiAgeFeed,true).length,3,'the published league score supersedes its team copy, while a cup game remains distinct');
 console.log('Club Admin results feed, overview count and U9 privacy checks passed');

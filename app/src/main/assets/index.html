@@ -469,22 +469,17 @@
         <div class="club-matches-switch hidden" id="club-matches-switch" role="group" aria-label="Matches view"><button type="button" data-club-tab="fixtures">Fixtures</button><button type="button" data-club-tab="results">Results</button></div>
 
         <div id="club-fixtures-slot"><section class="club-admin-panel hidden" id="club-fixtures-panel">
-          <section class="panel admin-weekend-panel screen-lead-card">
-            <div class="panel-heading weekend-share-heading"><div><p class="kicker">Next weekend</p><h3>Weekend at a glance</h3><p class="muted" id="admin-weekend-meta"></p></div><button type="button" class="secondary-button weekend-share-trigger" id="admin-weekend-share" data-admin-settings-only>Share weekend</button></div>
-            <div class="admin-weekend-list" id="admin-weekend-list"></div>
-          </section>
-          <section class="panel admin-fixture-centre">
-            <label class="admin-filter-label">Age group<select id="admin-fixtures-age"><option value="all">All age groups</option></select></label>
+          <section class="panel admin-fixture-centre club-matches-browser screen-lead-card">
+            <div class="club-matches-filters"><label class="club-results-age-label">Age group<select id="admin-fixtures-age"><option value="all">All age groups</option></select></label><button type="button" class="secondary-button weekend-share-trigger" id="admin-fixtures-share" data-admin-settings-only>Share weekend</button></div>
             <p class="admin-fixture-summary" id="admin-fixture-summary" role="status"></p>
-            <button type="button" class="secondary-button weekend-share-trigger" id="admin-fixtures-share" data-admin-settings-only>Share weekend</button>
             <div class="admin-fixture-list" id="admin-fixture-list"></div>
           </section>
         </section></div>
 
         <div id="club-results-slot"><section class="club-results-panel hidden" id="club-results-panel">
-          <section class="panel club-results-browser screen-lead-card">
+          <section class="panel club-results-browser club-matches-browser screen-lead-card">
             <p class="muted" id="club-results-source-status" role="status"></p>
-            <div class="club-results-filters"><label class="club-results-age-label">Age group<select id="club-results-age"></select></label><label class="club-results-age-label">Competition<select id="club-results-competition"><option value="league">League</option><option value="friendly">Friendly</option><option value="cup">Cup / tournament</option><option value="other">Other</option><option value="all">All competitions</option></select></label></div>
+            <div class="club-results-filters club-matches-filters"><label class="club-results-age-label">Age group<select id="club-results-age"></select></label><label class="club-results-age-label">Competition<select id="club-results-competition"><option value="league">League</option><option value="friendly">Friendly</option><option value="cup">Cup / tournament</option><option value="other">Other</option><option value="all">All competitions</option></select></label></div>
             <div id="club-results-list" class="club-results-list"></div>
             <div class="club-results-pager">
               <button type="button" class="secondary-button compact" id="club-results-prev">← Previous</button>

@@ -10,7 +10,7 @@ const body = src.slice(src.indexOf('function adminFixtureHasResult(st,team,fixtu
 const norm = s => String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
 const stableKey = f => [norm(f.opponent||'tbc'),String(f.venue||'').toUpperCase(),norm(f.competition||'fixture')].join('|');
 const key = f => [f.date,stableKey(f)].join('|');
-const {build,uniqueClubFixtures} = new Function('selkentNorm', 'normalizeTeamKey', 'fixtureAckState', 'fixtureKitSelectionKey', 'fixtureStableKey', 'matchStatus', 'publishedClubTeamData', 'verifiedClubResultsFeed', `${body}\nreturn {build:buildAdminFixtureRows,uniqueClubFixtures};`)(
+const {build,uniqueClubFixtures,adminFixtureKickoffMinutes,adminFixtureTimeConflicts} = new Function('selkentNorm', 'normalizeTeamKey', 'fixtureAckState', 'fixtureKitSelectionKey', 'fixtureStableKey', 'matchStatus', 'publishedClubTeamData', 'verifiedClubResultsFeed', `${body}\nreturn {build:buildAdminFixtureRows,uniqueClubFixtures,adminFixtureKickoffMinutes,adminFixtureTimeConflicts};`)(
   norm,
   norm,
   (st, f) => st.selkent?.fixtureAcknowledgement?.status === 'confirmed' && st.selkent.fixtureAcknowledgement.key === key(f)
@@ -120,24 +120,37 @@ let fixtureWrites=0,fixtureHtml='';
 const list={get innerHTML(){return fixtureHtml},set innerHTML(value){fixtureHtml=value;fixtureWrites++}},summary={textContent:''},ageSelect={value:'all'};
 const homeTeam={id:'u12-lions',ageGroup:'U12',teamName:'Lions'};
 const fixtureRows=[{team:homeTeam,source:'Selkent',date:'2099-10-01',time:'10:30',opponent:'Dartford Royals',venue:'H',competition:'Division',groundName:'Oak Field',address:'1 Oak Road',ack:{status:'confirmed',label:'Fixture confirmed'}}];
-const render=new Function('document','populateAdminFixtureAgeFilter','__adminOverviewRows','__adminFixtureRows','__adminPublishedFeed','__adminDirectoryCache','selkentNorm','formatDate','matchTeamLabel','esc','clubResultTeamBadgeHtml','fullClubResultTeamName','uniqueClubFixtures','setStableHtml',`${renderBody}\nreturn renderAdminFixtures;`)(
+const render=new Function('document','populateAdminFixtureAgeFilter','__adminOverviewRows','__adminFixtureRows','__adminPublishedFeed','__adminDirectoryCache','selkentNorm','formatDate','matchTeamLabel','esc','clubResultTeamBadgeHtml','fullClubResultTeamName','uniqueClubFixtures','setStableHtml','adminFixtureKickoffMinutes','adminFixtureTimeConflicts',`${renderBody}\nreturn renderAdminFixtures;`)(
   {getElementById:id=>({'admin-fixture-list':list,'admin-fixtures-age':ageSelect,'admin-fixture-summary':summary})[id]},
   ()=>{},[{team:homeTeam}],
   fixtureRows,
-  {age_groups:[]},new Map(),norm,s=>s,s=>s,s=>s,s=>`<img alt="" src="badge.svg" data-team="${s}">`,team=>`Shooters Hill AFC ${team.teamName}`,uniqueClubFixtures,setStableHtml
+  {age_groups:[]},new Map(),norm,s=>s,s=>s,s=>s,s=>`<img alt="" src="badge.svg" data-team="${s}">`,team=>`Shooters Hill AFC ${team.teamName}`,uniqueClubFixtures,setStableHtml,adminFixtureKickoffMinutes,adminFixtureTimeConflicts
 );
 render();
 render();
 assert.equal(fixtureWrites,1,'an unchanged fixture refresh keeps the badge image elements in place');
 assert.equal((list.innerHTML.match(/badge\.svg/g)||[]).length,2,'Admin fixtures show a badge beside both clubs');
 assert.doesNotMatch(list.innerHTML,/Oak Field|1 Oak Road|East Wickham Primary Academy/,'venue and address are absent from the card');
-assert.match(list.innerHTML,/admin-fixture-matchup.*<b>v<\/b>/,'clubs share one matchup row');
+assert.match(list.innerHTML,/admin-fixture-matchup.*<b class="club-result-v">v<\/b>/,'clubs share one matchup row');
 assert.match(list.innerHTML,/>League</,'division fixtures display as league fixtures');
-assert.match(list.innerHTML,/club-result-team home[^>]*>.*Shooters Hill AFC Lions.*<b>v<\/b>.*club-result-team away[^>]*>.*Dartford Royals.*badge\.svg/s,'home name and badge are left, away name and badge are right');
+assert.match(list.innerHTML,/club-result-team home[^>]*>.*Shooters Hill AFC Lions.*<b class="club-result-v">v<\/b>.*club-result-team away[^>]*>.*badge\.svg.*Dartford Royals/s,'home name and badge are left, away name and badge are right');
 assert.doesNotMatch(list.innerHTML,/League · Home|League · Away|Venue unconfirmed/,'venue labels are absent');
 assert.doesNotMatch(list.innerHTML,/Open in Maps|fixture-source-pill|>Selkent</,'redundant links and source labels are omitted');
 fixtureRows[0].venue='A';
 render();
 assert.equal(fixtureWrites,2,'a changed fixture still updates the card');
-assert.match(list.innerHTML,/club-result-team home[^>]*>.*Dartford Royals.*<b>v<\/b>.*club-result-team away[^>]*>.*Shooters Hill AFC Lions.*badge\.svg/s,'an away fixture puts the opponent and its badge on the left');
-console.log('Club Admin fixture feed checks passed');
+assert.match(list.innerHTML,/club-result-team home[^>]*>.*Dartford Royals.*<b class="club-result-v">v<\/b>.*club-result-team away[^>]*>.*badge\.svg.*Shooters Hill AFC Lions/s,'an away fixture puts the opponent and its badge on the left');
+// Mixed ages must follow the kick-off, with unknown times last on each day.
+const timed=(id,age,time,date='2099-10-20')=>({team:{id,ageGroup:age,teamName:id,leagueName:id},state:{matches:[{id,date,time,status:'scheduled',opponent:'Opponent '+id,venue:'H',competition:'Friendly'}]}});
+const timeRows=build([timed('late','U8','14:00'),timed('early','U15','9:30'),timed('middle','U12','11:00'),timed('unknown','U9',''),timed('bad','U10','25:00'),timed('tomorrow','U8','08:00','2099-10-21'),timed('no-date','U8','','')],null);
+assert.deepEqual(timeRows.map(f=>f.team.id),['early','middle','late','unknown','bad','tomorrow','no-date']);
+assert.equal(adminFixtureKickoffMinutes('9:30'),570);
+assert.equal(adminFixtureKickoffMinutes('09.30'),570);
+for(const value of ['TBC','09:60','24:00','09:30 pending',''])assert.equal(adminFixtureKickoffMinutes(value),null);
+assert.deepEqual(uniqueClubFixtures([...timeRows].reverse()).map(f=>f.team.id),timeRows.map(f=>f.team.id),'deduplication also restores date/time order');
+const clashRows=[...timeRows,{...timeRows[0],team:{id:'clash'},time:'10:00'}];
+assert.equal(adminFixtureTimeConflicts(clashRows).has(timeRows[0]),true,'home-time warnings survive consolidation');
+assert.equal(adminFixtureTimeConflicts(timeRows).size,0,'unknown/invalid times create no false clashes');
+assert.equal((list.innerHTML.match(/<tr class="admin-fixture-row/g)||[]).length,1);
+assert.match(list.innerHTML,/<th>Kick-off<\/th>/);
+console.log('Club Admin fixture feed and chronological order checks passed');
