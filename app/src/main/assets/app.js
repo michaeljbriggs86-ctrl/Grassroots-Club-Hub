@@ -5041,18 +5041,20 @@ function renderAdminFixtures(){
   if(summary)summary.textContent=`${rows.length} fixture${rows.length===1?'':'s'} this weekend across ${activeIds.size} team${activeIds.size===1?'':'s'}`+(missing>0?` · ${missing} team${missing===1?'':'s'} without a fixture this weekend`:'')+(midweek.length?` · ${midweek.length} midweek`: '')+(undated.length?` · ${undated.length} dates to confirm`:'')+(!__adminPublishedFeed?' · Showing saved fixtures; live feed unavailable':'');
   const conflicts=adminFixtureTimeConflicts(rows);
   const rowHTML=f=>{
-    const detail=__adminDirectoryCache.get(selkentNorm(f.opponent))||{};
-    const colours=f.kitColours||detail.colours||'';
     const away=String(f.venue||'').toUpperCase()==='A';
-    const clash=/\bgreen\b/i.test(colours),ack=f.ack;
+    const ack=f.ack;
+    const minutes=adminFixtureKickoffMinutes(f.time);
+    const kickoff=minutes===null?'TBC':`${String(Math.floor(minutes/60)).padStart(2,'0')}:${String(minutes%60).padStart(2,'0')}`;
+    const confirmationWarning=ack&&(['issue','changed'].includes(ack.status)||ack.label==='1 of 2 teams confirmed');
     const competition=String(f.competition||'Fixture').toLowerCase()==='division'?'League':f.competition||'Fixture';
     const clubName=fullClubResultTeamName(f.team),opponent=f.opponent||'Opponent unconfirmed';
     const homeName=away?opponent:clubName,awayName=away?clubName:opponent;
-    const notes=[f.status==='postponed'?'Postponed':'',clash?'Possible kit clash':'',conflicts.has(f)?'Possible home-time conflict':'',colours&&colours!=='TBC'?`Opponent kit: ${colours}`:''].filter(Boolean);
-    return `<tr class="admin-fixture-row${f.status==='postponed'?' status-postponed':''}"><td>${f.date?formatDate(f.date):'Date TBC'}</td><td><b>${esc(f.team.ageGroup)}</b><small class="cup-round">${esc(competition)}</small></td><td><span class="club-result-match admin-fixture-matchup" aria-label="${esc(homeName)} versus ${esc(awayName)}"><span class="club-result-team home" title="${esc(homeName)}">${clubResultTeamBadgeHtml(homeName)}<span class="club-result-team-name">${esc(matchTeamLabel(homeName))}</span></span><b class="club-result-v">v</b><span class="club-result-team away" title="${esc(awayName)}">${clubResultTeamBadgeHtml(awayName)}<span class="club-result-team-name">${esc(matchTeamLabel(awayName))}</span></span></span>${notes.length?`<small class="club-fixture-notes">${esc(notes.join(' · '))}</small>`:''}</td><td><strong class="club-fixture-time">${adminFixtureKickoffMinutes(f.time)!==null?esc(f.time):'Kick-off unconfirmed'}</strong>${ack?`<small class="club-fixture-confirmation ${esc(ack.status)}">${esc(ack.label)}</small>`:''}</td></tr>`;
+    const competitionDetail=/^(league|division|friendly|match|fixture)$/i.test(competition)?'':competition;
+    const notes=[f.status==='postponed'?'Postponed':'',conflicts.has(f)?'Possible home-time conflict':''].filter(Boolean);
+    return `<tr class="admin-fixture-row${f.status==='postponed'?' status-postponed':''}"><td>${f.date?formatDate(f.date):'Date TBC'}</td><td><b>${esc(f.team.ageGroup)}</b>${competitionDetail?`<small class="cup-round">${esc(competitionDetail)}</small>`:''}</td><td><span class="club-result-match admin-fixture-matchup" aria-label="${esc(homeName)} versus ${esc(awayName)}"><span class="club-result-team home" title="${esc(homeName)}">${clubResultTeamBadgeHtml(homeName)}<span class="club-result-team-name">${esc(matchTeamLabel(homeName))}</span></span><b class="club-result-v">v</b><span class="club-result-team away" title="${esc(awayName)}">${clubResultTeamBadgeHtml(awayName)}<span class="club-result-team-name">${esc(matchTeamLabel(awayName))}</span></span></span>${notes.length?`<small class="club-fixture-notes">${esc(notes.join(' · '))}</small>`:''}</td><td><strong class="club-fixture-time">${esc(kickoff)}</strong>${confirmationWarning?`<small class="club-fixture-confirmation ${esc(ack.status)}">${esc(ack.label)}</small>`:''}</td></tr>`;
   };
   const categories=[['league','League'],['cup','Cup'],['friendly','Friendly'],['other','Other']];
-  const tableHTML=matches=>`<div class="competition-table-scroll match-results-table club-results-table club-matches-table club-fixtures-table"><table class="competition-games-table"><thead><tr><th>Date</th><th>Age / competition</th><th>Match</th><th>Kick-off</th></tr></thead><tbody>${matches.map(rowHTML).join('')}</tbody></table></div>`;
+  const tableHTML=matches=>`<div class="competition-table-scroll match-results-table club-results-table club-matches-table club-fixtures-table"><table class="competition-games-table"><thead><tr><th>Date</th><th>Age</th><th>Match</th><th>Kick-off</th></tr></thead><tbody>${matches.map(rowHTML).join('')}</tbody></table></div>`;
   const markup=categories.map(([kind,title])=>{
     const matches=rows.filter(f=>clubResultCompetitionKind(f)===kind);
     return matches.length?`<section class="club-fixture-group"><h3>${title}</h3>${tableHTML(matches)}</section>`:'';
