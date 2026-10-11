@@ -162,7 +162,7 @@ img{max-width:100%}
 .danger-button{min-height:44px;border-radius:var(--gch-radius-button)}
 .text-button,.inline-action,.map-link{color:var(--gch-green-700)!important}
 
-input,select,textarea,.auth-field,.onboard-card input,.onboard-card select,.onboard-card textarea{
+input:where(:not([type="checkbox"],[type="radio"],[type="hidden"],[type="color"],[type="range"],[type="file"])),select,textarea,.auth-field{
   min-height:48px;border-radius:var(--gch-radius-field)!important;border-color:var(--gch-line)!important;background:#fff!important;color:var(--gch-ink)!important;
 }
 textarea{min-height:96px}
@@ -1132,6 +1132,86 @@ body.auth-open #activation-gate .auth-grass-footer span{font-size:12px!important
 }
 @media(max-height:620px) and (max-width:899px){body.auth-open #activation-gate .auth-scene{height:64px!important;flex-basis:64px!important}}
 @media(max-width:374px){.auth-alternate-routes{grid-template-columns:minmax(0,1fr)}}
+
+/* Shared fields and browser dropdown pickers use the same app palette. */
+:root{
+  --gch-control-surface:var(--gch-white);
+  --gch-control-copy:var(--gch-ink);
+  --gch-control-muted:var(--gch-muted);
+  --gch-control-line:var(--gch-line);
+  --gch-control-choice:var(--gch-soft-green);
+  --gch-control-choice-copy:var(--gch-green-950);
+  --gch-control-focus:var(--gch-green-600);
+}
+html[data-theme="dark"]{
+  --gch-control-surface:#101713;
+  --gch-control-copy:#f2f7f3;
+  --gch-control-muted:#a9b8ae;
+  --gch-control-line:#35443a;
+  --gch-control-choice:#17311f;
+  --gch-control-choice-copy:#b6efc0;
+  --gch-control-focus:#8ee09a;
+}
+/* Auth and setup keep their governing white form surfaces in either theme. */
+#activation-gate,.universal-onboarding{
+  color-scheme:light;
+  --gch-control-surface:var(--gch-white);
+  --gch-control-copy:var(--gch-ink);
+  --gch-control-muted:var(--gch-muted);
+  --gch-control-line:var(--gch-line);
+  --gch-control-choice:var(--gch-soft-green);
+  --gch-control-choice-copy:var(--gch-green-950);
+  --gch-control-focus:var(--gch-green-600);
+}
+input,select,textarea{accent-color:var(--gch-control-focus)}
+select{cursor:pointer;min-width:0;min-height:48px!important;font-size:1rem!important;line-height:1.4}
+select:disabled{cursor:not-allowed}
+input:focus-visible,select:focus-visible,textarea:focus-visible{
+  outline:2px solid var(--gch-control-focus)!important;outline-offset:2px;
+}
+input[type="checkbox"],input[type="radio"]{
+  min-width:20px;min-height:20px;width:20px;height:20px;flex-shrink:0;padding:0;
+}
+.checkbox-line,.parent-link-player,.rule-toggle{min-height:44px}
+input[type="file"]{min-height:48px;font-size:1rem;color:var(--gch-control-copy)}
+input::file-selector-button{
+  min-height:44px;margin-inline-end:12px;padding:10px 14px;border:1px solid var(--gch-control-line);
+  border-radius:var(--gch-radius-button);background:var(--gch-control-choice);color:var(--gch-control-choice-copy);font:inherit;font-weight:700;cursor:pointer;
+}
+input:-webkit-autofill{
+  -webkit-text-fill-color:var(--gch-control-copy);
+  box-shadow:0 0 0 1000px var(--gch-control-surface) inset!important;
+}
+/* Keep native labels, validation, keyboard behavior and change handlers.
+   Supporting browsers render this picker in the top layer, including in dialogs.
+   Older browsers retain their working native picker. No JS or markup rewrite. */
+@supports (appearance:base-select) and selector(select::picker(select)){
+  select:not([multiple]):not([size]),select[size="1"]{
+    appearance:base-select!important;-webkit-appearance:base-select!important;
+    align-items:center;gap:12px;white-space:normal;overflow-wrap:anywhere;
+  }
+  select:not([multiple]):not([size])::picker(select),select[size="1"]::picker(select){
+    appearance:base-select;background:var(--gch-control-surface);color:var(--gch-control-copy);
+    border:1px solid var(--gch-control-line);border-radius:var(--gch-radius-field);
+    box-shadow:var(--gch-shadow-card);padding:6px;
+    min-width:anchor-size(width);max-width:calc(100vw - 24px);
+    max-height:min(360px,60dvh);overflow-y:auto;overscroll-behavior:contain;
+    font-family:var(--gch-font);font-size:1rem;line-height:1.4;color-scheme:inherit;
+  }
+  select::picker-icon{color:var(--gch-control-choice-copy);flex-shrink:0}
+  select:open{outline:2px solid var(--gch-control-focus);outline-offset:2px}
+  select option{
+    min-height:48px;padding:12px;gap:12px;border-radius:8px;
+    background:var(--gch-control-surface)!important;color:var(--gch-control-copy)!important;
+    font:inherit;white-space:normal;overflow-wrap:anywhere;
+  }
+  select option:is(:checked,:hover,:focus){background:var(--gch-control-choice)!important;color:var(--gch-control-choice-copy)!important}
+  select option:checked{font-weight:700}
+  select option:focus-visible{outline:2px solid var(--gch-control-focus);outline-offset:-2px}
+  select option::checkmark{color:var(--gch-control-choice-copy);flex-shrink:0}
+  select option:disabled{color:var(--gch-control-muted)!important;cursor:not-allowed}
+  select optgroup{color:var(--gch-control-muted);font:inherit;font-weight:700}
+}
 
 /* Shared confirmations inherit the app dialog palette, font and theme. */
 #app-confirm-dialog{width:min(92vw,460px);border-radius:var(--gch-radius-card)}
