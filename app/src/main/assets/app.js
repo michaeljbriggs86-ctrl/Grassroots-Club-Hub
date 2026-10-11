@@ -3011,7 +3011,7 @@ function renderTeamIdentity(){
   const meta=state.meta;
   const adminClub=isClubOverviewMode();
   document.getElementById('hero-club-name').textContent=(meta.clubName||clubSettings().display_name||'Club').toUpperCase();
-  const adminHero=currentView==='more'?'CLUB SETTINGS':currentView==='club'?(__clubTab==='coaches'?'CLUB STAFF':__clubTab==='overview'?'CLUB HOME':'MATCHES'):currentView==='inbox'?'COMMUNICATIONS':'CLUB HOME';
+  const adminHero=currentView==='more'?'CLUB SETTINGS':currentView==='club'?(__clubTab==='coaches'?'CLUB STAFF':__clubTab==='overview'?'CLUB HOME':'MATCHES'):currentView==='inbox'?'MESSAGES':'CLUB HOME';
   const pill=document.getElementById('hero-mode-pill');
   if(pill){const acting=CLOUD_MODE&&cloudActingParent();const label=acting?'Parent view':!isAdmin()?'':adminClub?'Club Admin':isAdminCoachMode()?'Coach mode':isAdminTeamPreviewMode()?'Read only':'';pill.textContent=label;pill.classList.toggle('hidden',!label);pill.dataset.mode=acting?'parent':adminClub?'club':isAdminCoachMode()?'coach':'preview';}
   document.getElementById('hero-team-name').textContent=matchTeamLabel(adminClub?adminHero:(meta.teamName||'Team').toUpperCase());
