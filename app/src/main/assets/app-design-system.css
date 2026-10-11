@@ -1374,8 +1374,9 @@ html[data-theme="dark"] .club-matches-table .club-fixture-confirmation.confirmed
   .club-matches-table .competition-games-table th:first-child{width:64px}
   .club-matches-table .competition-games-table th:nth-child(2){width:24%}
   .club-matches-table .competition-games-table th:last-child{width:72px}
-  .club-fixtures-table .competition-games-table th:last-child{width:118px}
-  .club-fixtures-table .club-fixture-time{white-space:normal}
+  .club-fixtures-table .competition-games-table th:nth-child(2){width:16%}
+  .club-fixtures-table .competition-games-table th:last-child{width:76px}
+  .club-fixtures-table .club-fixture-time{white-space:nowrap;font-variant-numeric:tabular-nums}
 }
 
 /* 11 October 2026: Mike's Shooters Hill identity across the club app. */
