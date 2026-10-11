@@ -25,6 +25,12 @@ REVIEWED_FRAGMENT_CLEANUPS = {
           '00105ade6767394c6ecab1edf658364238431d66de2d00fa5e881af0fa291e79'),
 }
 
+# Exact metadata-only repair: no PNG payload or decoded pixel changes.
+REVIEWED_METADATA_REPAIRS = {
+    514: ('50123d20921d3872b527f0e98bd6427457442213ae5e66251d20d22bb6c33f29',
+          '2b9b292f7eb4f13d5f7d8e569261fc2cb35b6d44fcaec7c51bf06dcb34e3f70e'),
+}
+
 
 def validated_approvals(directory, manifest):
     if manifest.get("schema_version") != 1 or manifest.get("scope") != "private_pilot":
@@ -76,7 +82,8 @@ def validated_approvals(directory, manifest):
                         not re.fullmatch(r'[a-f0-9]{64}', original_hash) or
                         badge.get('source_user_approved') is not True or
                         method not in ('unchanged_uploaded_original', 'recalculate_eXIf_crc_only',
-                                       'remove_reviewed_exterior_fragments_only') or
+                                       'remove_reviewed_exterior_fragments_only',
+                                       'recalculate_eXIf_crc_and_remove_trailing_editor_metadata') or
                         (method == 'unchanged_uploaded_original' and original_hash != badge['logo_sha256'].lower()) or
                         (method == 'recalculate_eXIf_crc_only' and original_hash == badge['logo_sha256'].lower())):
                     raise ValueError(f"badge {club_id} lacks reviewed user-upload provenance")
@@ -84,6 +91,10 @@ def validated_approvals(directory, manifest):
                         REVIEWED_FRAGMENT_CLEANUPS.get(club_id) !=
                         (original_hash, badge['logo_sha256'].lower())):
                     raise ValueError(f"badge {club_id} lacks exact fragment-cleanup review")
+                if (method == 'recalculate_eXIf_crc_and_remove_trailing_editor_metadata' and
+                        REVIEWED_METADATA_REPAIRS.get(club_id) !=
+                        (original_hash, badge['logo_sha256'].lower())):
+                    raise ValueError(f"badge {club_id} lacks exact metadata-repair review")
             if badge['logo_source'] == 'official_source_transparency_derivative_private':
                 original = urlsplit(str(badge.get('original_source_url') or ''))
                 if (original.scheme != 'https' or not original.hostname or original.username or
