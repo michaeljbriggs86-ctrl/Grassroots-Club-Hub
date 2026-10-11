@@ -1080,6 +1080,36 @@ html[data-theme="dark"] body.role-parent #view-home .screen-lead-card{
   #view-club .admin-home .panel-heading>button{width:auto}
 }
 
+/* Staff qualification profiles: same surfaces, typography and touch targets as club cards. */
+#coach-profile-self{margin-bottom:16px;min-height:48px}
+.coach-qualification-dialog{width:min(94vw,680px);max-height:88dvh;border-radius:var(--gch-radius-card)}
+.coach-qualification-dialog .modal-body{min-width:0;max-height:none;padding:18px}
+.coach-qualification-dialog p,.coach-qualification-dialog .helper,.coach-qualification-dialog label,.coach-qualification-dialog a{font-size:14px;line-height:1.5;overflow-wrap:anywhere}
+.coach-qualification-dialog h4{margin:0 0 8px;font-size:16px;line-height:1.4}
+.coach-qualification-row{display:flex;align-items:flex-start;flex-wrap:wrap;gap:12px;padding:16px 0;border-bottom:1px solid var(--gch-control-line)}
+.coach-qualification-row>div{flex:1 1 240px;min-width:0}
+.coach-qualification-row p{margin:6px 0}
+.coach-qualification-row>.secondary-button{min-height:48px}
+.qualification-state{display:inline-block;padding:4px 10px;border-radius:999px;font-size:14px;line-height:1.5;background:var(--gch-control-choice);color:var(--gch-control-choice-copy)}
+.qualification-state.expired{background:var(--gch-error-bg);color:var(--gch-error)}
+.qualification-state.due{background:#fff4d4;color:#755300}
+.qualification-error{color:var(--gch-error)}
+#coach-qualification-editor{margin-top:18px;padding:16px;border-radius:var(--gch-radius-field);background:var(--gch-control-choice)}
+#coach-qualification-form{display:grid;gap:14px}
+#coach-qualification-form label{margin:0}
+#coach-qualification-form input[type=date],#coach-qualification-form select{width:100%;margin-top:6px;min-height:48px;font-size:16px}
+.qualification-date-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+#coach-qualification-form .qualification-check{display:flex;align-items:center;gap:12px;min-height:48px}
+.qualification-actions{display:flex;flex-wrap:wrap;gap:10px}
+.qualification-actions>button{flex:1 1 150px;min-height:48px}
+#coach-qualification-source{display:inline-flex;align-items:center;min-height:44px}
+.qualification-guidance{margin-top:18px;font-size:14px;line-height:1.5}
+.qualification-guidance>summary{min-height:48px;padding:12px 0;cursor:pointer}
+html[data-theme="dark"] .qualification-state.expired{background:#3d2225;color:#ffb4b4}
+html[data-theme="dark"] .qualification-state.due{background:#3b3116;color:#f0d68a}
+html[data-theme="dark"] .qualification-error{color:#ffb4b4}
+@media(max-width:440px){.qualification-date-fields{grid-template-columns:minmax(0,1fr)}.coach-qualification-dialog .modal-body{padding:14px}}
+
 /* Parent activity cards share the staff Home hierarchy, including the confirmed continuation. */
 body.role-parent #view-home .home-next-match{gap:8px;margin-bottom:16px}
 body.role-parent .parent-home-training{padding:16px;gap:0;margin-bottom:16px}

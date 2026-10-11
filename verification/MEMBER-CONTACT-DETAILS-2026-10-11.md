@@ -65,7 +65,7 @@ verified against real schema/function definitions and checked with advisors.
   matched the tested source. SQL/tests/docs are excluded from the website
   allowlist. Both cache versions advance to team-contacts-20261011.
 
-Browser build SHA-256:
+Original PR browser build SHA-256 (before the main-branch integration below):
 
 | File | SHA-256 |
 | --- | --- |
@@ -83,3 +83,25 @@ errors. Attempt other-parent/off-team/cross-club calls with authenticated
 sessions. Confirm no contacts remain after logout or in browser storage/cache.
 Until the backend is applied the panel reports contacts unavailable without
 falling back to a broader member endpoint. No live acceptance is claimed.
+
+## PR80 conflict resolution — 11 October 2026
+
+Integrated main 95a80eaa954f2f47cc4dd3c52dbc1e2d496273d7, including merged
+coach qualifications PR79 and the approved badge batch. The only merge
+conflicts were the two service workers' cache definitions. Both now use
+`pitchkind-web-contacts-coach-documents-20261011` and retain the new
+`coach-qualifications.js` static asset. No contact SQL or permission rule was
+changed by this integration.
+
+All 97 JavaScript suites and 191 UI source checks passed on the combined tree.
+Python regressions, badge quality, pilot scope, browser build, source/build
+byte comparisons and diff checks also passed. No live SQL or deployment was
+performed. The combined browser bundle hashes are:
+
+| File | SHA-256 |
+| --- | --- |
+| index.html | 558570b7c4b9b712bf41790debb3595b0c24c360383c01c42eacfb1f7b8adf7d |
+| app.js | 9a0798ebd2a9e9a96858e4f62c398d03c9eb15772f5b604edb1a3282fdeb7cfe |
+| cloud.js | c8b7593c2df50e817f24e2dff26a3c79c2af3a21b9fa2a3cb376f0cdb2c1c22d |
+| app-design-system.css | d1b306c4b3df016166f01d9fe10b7c75acc536bdfd93584be47c34af2b29a4f3 |
+| coach-qualifications.js | 33123bedc3ef0efc2e2eb3e72b24f5dd3fe8b9933e807ec2330c265e40d5faf2 |

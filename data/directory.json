@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-10-11T08:48:32.987181+00:00",
+  "last_updated": "2026-10-11T09:34:52.853534+00:00",
   "clubs": [
     {
       "club_id": 514,
@@ -16,7 +16,12 @@
     },
     {
       "club_id": 308,
-      "club_name": "AFC Gravesend"
+      "club_name": "AFC Gravesend",
+      "logo_url": "https://test.pitchkind.com/__pilot_badges/308/8cff57ae67300af573ff1dabfbae6f4196ee81468aabcee141b213c5da7f4fe8",
+      "logo_status": "pilot_verified",
+      "logo_source": "user_supplied_private",
+      "logo_updated_at": "2026-10-11",
+      "logo_sha256": "8cff57ae67300af573ff1dabfbae6f4196ee81468aabcee141b213c5da7f4fe8"
     },
     {
       "club_id": 432,
@@ -38,7 +43,12 @@
     },
     {
       "club_id": 307,
-      "club_name": "AFC Unity"
+      "club_name": "AFC Unity",
+      "logo_url": "https://test.pitchkind.com/__pilot_badges/307/8b5634cc15600a56cd773aa733020793d7407c15c7abd016bfcd8ad491114b20",
+      "logo_status": "pilot_verified",
+      "logo_source": "user_supplied_private",
+      "logo_updated_at": "2026-10-11",
+      "logo_sha256": "8b5634cc15600a56cd773aa733020793d7407c15c7abd016bfcd8ad491114b20"
     },
     {
       "club_id": 238,
@@ -221,7 +231,12 @@
     },
     {
       "club_id": 256,
-      "club_name": "Dartford Royals"
+      "club_name": "Dartford Royals",
+      "logo_url": "https://test.pitchkind.com/__pilot_badges/256/dc3e64287e51eefd9673680060f837abf07fd3c7ab578427e02220cac519384b",
+      "logo_status": "pilot_verified",
+      "logo_source": "user_supplied_private",
+      "logo_updated_at": "2026-10-11",
+      "logo_sha256": "dc3e64287e51eefd9673680060f837abf07fd3c7ab578427e02220cac519384b"
     },
     {
       "club_id": 407,
@@ -315,7 +330,12 @@
     },
     {
       "club_id": 275,
-      "club_name": "Foots Cray Lions"
+      "club_name": "Foots Cray Lions",
+      "logo_url": "https://test.pitchkind.com/__pilot_badges/275/fb6c62b6aa3faaa40ad13f8fc27ea58b0db8505484ab1761445b6cf8b3c5ce97",
+      "logo_status": "pilot_verified",
+      "logo_source": "user_supplied_private",
+      "logo_updated_at": "2026-10-11",
+      "logo_sha256": "fb6c62b6aa3faaa40ad13f8fc27ea58b0db8505484ab1761445b6cf8b3c5ce97"
     },
     {
       "club_id": 548,
@@ -377,7 +397,12 @@
     },
     {
       "club_id": 290,
-      "club_name": "Istead United Colts"
+      "club_name": "Istead United Colts",
+      "logo_url": "https://test.pitchkind.com/__pilot_badges/290/0da40409b0b6c612cc9cab08b32bec8925d7e0aa331be34efd3e67064dce297f",
+      "logo_status": "pilot_verified",
+      "logo_source": "user_supplied_private",
+      "logo_updated_at": "2026-10-11",
+      "logo_sha256": "0da40409b0b6c612cc9cab08b32bec8925d7e0aa331be34efd3e67064dce297f"
     },
     {
       "club_id": 292,
@@ -414,7 +439,12 @@
     },
     {
       "club_id": 286,
-      "club_name": "Lewisham Borough"
+      "club_name": "Lewisham Borough",
+      "logo_url": "https://test.pitchkind.com/__pilot_badges/286/90d2e27b45911ee949a97c9be1020c7e381926383aab8fd445dd07595dd7cbe7",
+      "logo_status": "pilot_verified",
+      "logo_source": "user_supplied_private",
+      "logo_updated_at": "2026-10-11",
+      "logo_sha256": "90d2e27b45911ee949a97c9be1020c7e381926383aab8fd445dd07595dd7cbe7"
     },
     {
       "club_id": 442,
@@ -490,7 +520,12 @@
     },
     {
       "club_id": 511,
-      "club_name": "Newpark Football Club"
+      "club_name": "Newpark Football Club",
+      "logo_url": "https://test.pitchkind.com/__pilot_badges/511/f518762f7a9b60c340eb4035af042770300381f3c23c4479322d273ac75f4c0c",
+      "logo_status": "pilot_verified",
+      "logo_source": "user_supplied_private",
+      "logo_updated_at": "2026-10-11",
+      "logo_sha256": "f518762f7a9b60c340eb4035af042770300381f3c23c4479322d273ac75f4c0c"
     },
     {
       "club_id": 493,
@@ -503,7 +538,12 @@
     },
     {
       "club_id": 544,
-      "club_name": "North Kent Wolves FC"
+      "club_name": "North Kent Wolves FC",
+      "logo_url": "https://test.pitchkind.com/__pilot_badges/544/3a9e83cf48e67d488a021e231ad9328a516f92f825c25a7dbb2f901c0d53b1d3",
+      "logo_status": "pilot_verified",
+      "logo_source": "user_supplied_private",
+      "logo_updated_at": "2026-10-11",
+      "logo_sha256": "3a9e83cf48e67d488a021e231ad9328a516f92f825c25a7dbb2f901c0d53b1d3"
     },
     {
       "club_id": 520,
@@ -603,7 +643,12 @@
     },
     {
       "club_id": 322,
-      "club_name": "Russellers"
+      "club_name": "Russellers",
+      "logo_url": "https://test.pitchkind.com/__pilot_badges/322/460763dc7f336697493e535afc0dc45ca6776aaa0be702e4b4d3fee35dfee51b",
+      "logo_status": "pilot_verified",
+      "logo_source": "user_supplied_private",
+      "logo_updated_at": "2026-10-11",
+      "logo_sha256": "460763dc7f336697493e535afc0dc45ca6776aaa0be702e4b4d3fee35dfee51b"
     },
     {
       "club_id": 497,
@@ -664,7 +709,12 @@
     },
     {
       "club_id": 540,
-      "club_name": "Sporting Club Thamesmead"
+      "club_name": "Sporting Club Thamesmead",
+      "logo_url": "https://test.pitchkind.com/__pilot_badges/540/4ab8a1fbfa33f482ee0d23cac944ca8d24e8f04a9b6707c2ab94f8812bd39960",
+      "logo_status": "pilot_verified",
+      "logo_source": "user_supplied_private",
+      "logo_updated_at": "2026-10-11",
+      "logo_sha256": "4ab8a1fbfa33f482ee0d23cac944ca8d24e8f04a9b6707c2ab94f8812bd39960"
     },
     {
       "club_id": 345,
@@ -708,7 +758,12 @@
     },
     {
       "club_id": 383,
-      "club_name": "Swanley Rangers"
+      "club_name": "Swanley Rangers",
+      "logo_url": "https://test.pitchkind.com/__pilot_badges/383/07259743a89ecb3d2499e7cc09d037daec9d9db363b7d657cf4b7466bce5c683",
+      "logo_status": "pilot_verified",
+      "logo_source": "user_supplied_private",
+      "logo_updated_at": "2026-10-11",
+      "logo_sha256": "07259743a89ecb3d2499e7cc09d037daec9d9db363b7d657cf4b7466bce5c683"
     },
     {
       "club_id": 332,
@@ -7902,5 +7957,5 @@
     }
   ],
   "note": "Panel parsing confirmed against all five format categories (mini-soccer, 9-a-side, X-category, 11-a-side, Senior) as of Sept 2026. Club/team linking is heuristic (name-prefix match) - see ambiguous_club_matches in diagnostics for anything flagged as uncertain.",
-  "pilot_badges_revision": "e5c9631cb0a2bf10f8caa587057cf0abe00382e594eb3ebbd644daf48835f19d"
+  "pilot_badges_revision": "58f66443e3f075bae0590053ac91c3f5bc403356475d9e78c1b277b3096df204"
 }
