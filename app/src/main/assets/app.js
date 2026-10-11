@@ -4208,7 +4208,7 @@ function publishedClubResults(teams=[],feed=null){
   const seen=new Set(),out=[];
   for(const team of teams){
     for(const result of publishedClubTeamData(team,feed).results){
-      const key=[result.date,normalizeTeamKey(result.home),normalizeTeamKey(result.away)].join('|');
+      const key=[team.ageGroup,result.date,normalizeTeamKey(result.home),normalizeTeamKey(result.away)].join('|');
       if(seen.has(key))continue;seen.add(key);
       out.push({home:result.home,away:result.away,hg:Number(result.homeGoals),ag:Number(result.awayGoals),date:result.date||'',competition:'League',divisionName:result.division_name||'',teamName:team.teamName||team.leagueName||'',ageGroup:Number(String(team.ageGroup||'').match(/\d+/)?.[0]||0),source:'selkent-static'});
     }
@@ -4218,13 +4218,14 @@ function publishedClubResults(teams=[],feed=null){
 function clubResultIdentity(result,teams=[]){
   const own=teams.find(team=>Number(String(team.ageGroup||'').match(/\d+/)?.[0]||0)===Number(result.ageGroup)&&normalizeTeamKey(team.teamName)===normalizeTeamKey(result.teamName));
   const canonical=name=>own&&[own.teamName,own.selkentName,own.leagueName].some(alias=>normalizeTeamKey(alias)===normalizeTeamKey(name))?normalizeTeamKey(own.leagueName||name):normalizeTeamKey(name);
-  return [result.date,canonical(result.home),canonical(result.away)].join('|');
+  const competition=clubResultCompetitionKind(result)==='league'?'league':normalizeTeamKey(result.competition);
+  return [Number(result.ageGroup)||0,result.date,canonical(result.home),canonical(result.away),competition].join('|');
 }
 function clubResultRows(overview=[],teams=[],feed=null,includeInternal=false){
   const published=publishedClubResults(teams,feed);
   if(!includeInternal)return published.sort((a,b)=>String(b.date).localeCompare(String(a.date)));
   const publishedKeys=new Set(published.map(r=>clubResultIdentity(r,teams)));
-  const internal=internalAdminClubResults(overview).filter(r=>!publishedKeys.has(clubResultIdentity(r,teams)));
+  const internal=internalAdminClubResults(overview).filter(r=>{const key=clubResultIdentity(r,teams);if(publishedKeys.has(key))return false;publishedKeys.add(key);return true;});
   return [...published,...internal].sort((a,b)=>String(b.date).localeCompare(String(a.date))||Number(a.ageGroup)-Number(b.ageGroup));
 }
 function coachClubResultRows(own,ownState,feed,clubTeams=configuredClubTeams()){
@@ -4249,16 +4250,16 @@ function clubResultTeamBadgeHtml(teamName=''){
   const kind=approved||usableOwnBadge?'verified-club-badge':'club-placeholder-badge';
   return `<img class="club-identity-badge ${kind}" data-club-team="${esc(teamName)}" src="${esc(url)}" alt="" aria-hidden="true" loading="lazy" decoding="async" />`;
 }
-/* Club results (admin overview and Club > Results) use the same table as Matches > Cups:
- * date, competition, both teams with badges, H/A and a result pill from the club team's side. */
+/* Club fixtures and results share a compact four-column layout. Scores remain
+ * from the club team's side; the home team is always shown on the left. */
 function clubResultsTableHTML(rows=[]){
   const body=rows.map(r=>{
     const rr=resultForNamedTeam(r.home,r.away,r.hg,r.ag,r.teamName),ownHome=resultForNamedTeam(r.home,r.away,1,0,r.teamName)==='W';
     const kind=clubResultCompetitionKind(r),label=kind==='league'?(r.divisionName||'League'):(r.competition||({cup:'Cup',friendly:'Friendly'}[kind]||'Other'));
     const score=ownHome?`${r.hg}–${r.ag}`:`${r.ag}–${r.hg}`;
-    return `<tr class="${resultClass(rr)}"><td>${formatDate(r.date)||esc(r.date)||'Date TBC'}</td><td><b>U${esc(r.ageGroup)}</b><small class="cup-round">${esc(String(label).replace(/_/g,' '))}</small></td><td><span class="club-result-match"><span class="club-result-team home" title="${esc(matchTeamLabel(r.home))}">${clubResultTeamBadgeHtml(r.home)}<span class="club-result-team-name">${esc(matchTeamLabel(r.home))}</span></span><span class="club-result-v">v</span><span class="club-result-team away" title="${esc(matchTeamLabel(r.away))}">${clubResultTeamBadgeHtml(r.away)}<span class="club-result-team-name">${esc(matchTeamLabel(r.away))}</span></span></span></td><td>${ownHome?'H':'A'}</td><td><span class="competition-result-pill ${rr}">${rr?`${rr} `:''}${score}</span></td></tr>`;
+    return `<tr class="${resultClass(rr)}"><td>${formatDate(r.date)||esc(r.date)||'Date TBC'}</td><td><b>U${esc(r.ageGroup)}</b><small class="cup-round">${esc(String(label).replace(/_/g,' '))}</small></td><td><span class="club-result-match"><span class="club-result-team home" title="${esc(matchTeamLabel(r.home))}">${clubResultTeamBadgeHtml(r.home)}<span class="club-result-team-name">${esc(matchTeamLabel(r.home))}</span></span><span class="club-result-v">v</span><span class="club-result-team away" title="${esc(matchTeamLabel(r.away))}">${clubResultTeamBadgeHtml(r.away)}<span class="club-result-team-name">${esc(matchTeamLabel(r.away))}</span></span></span></td><td><span class="competition-result-pill ${rr}">${rr?`${rr} `:''}${score}</span></td></tr>`;
   }).join('');
-  return `<div class="competition-table-scroll match-results-table club-results-table"><table class="competition-games-table"><thead><tr><th>Date</th><th>Competition</th><th>Match</th><th>H/A</th><th>Status / result</th></tr></thead><tbody>${body}</tbody></table></div>`;
+  return `<div class="competition-table-scroll match-results-table club-results-table club-matches-table"><table class="competition-games-table"><thead><tr><th>Date</th><th>Age / competition</th><th>Match</th><th>Result</th></tr></thead><tbody>${body}</tbody></table></div>`;
 }
 function renderAdminRecentResults(rows=[],feedAvailable=true){
   const box=document.getElementById('admin-recent-results'),count=document.getElementById('admin-results-count'),status=document.getElementById('admin-results-source-status');
@@ -4269,15 +4270,6 @@ function renderAdminRecentResults(rows=[],feedAvailable=true){
 }
 function nextWeekendDates(){
   return adminShareWeekendDates();
-}
-function fixtureTimeMinutes(t=''){const m=String(t).match(/(\d{1,2})[:.](\d{2})/);return m?Number(m[1])*60+Number(m[2]):null;}
-function renderAdminWeekend(rows){
-  const box=document.getElementById('admin-weekend-list'),meta=document.getElementById('admin-weekend-meta');if(!box)return;
-  const [sat,sun]=nextWeekendDates();const all=uniqueClubFixtures(buildAdminFixtureRows(rows,__adminPublishedFeed).filter(f=>[sat,sun].includes(f.date)));
-  const home=all.filter(f=>String(f.venue||'').toUpperCase()==='H');const conflicts=new Set();
-  for(let i=0;i<home.length;i++)for(let j=i+1;j<home.length;j++){if(home[i].date!==home[j].date)continue;const a=fixtureTimeMinutes(home[i].time),b=fixtureTimeMinutes(home[j].time);if(a!==null&&b!==null&&Math.abs(a-b)<=45){conflicts.add(`${home[i].team.id}|${home[i].date}`);conflicts.add(`${home[j].team.id}|${home[j].date}`);}}
-  if(meta)meta.textContent=`${formatDate(sat)}–${formatDate(sun)} · ${all.length} fixture${all.length===1?'':'s'}`;
-  setStableHtml(box,all.length?all.map(f=>{const ack=f.ack||{status:'awaiting',label:'Awaiting confirmation'};const warn=conflicts.has(`${f.team.id}|${f.date}`);return `<article class="weekend-fixture-row ${warn?'warning':''}"><div><strong>${esc(f.team.ageGroup)} ${clubListingHtml(fullClubResultTeamName(f.team))}</strong><span>${f.date?formatDate(f.date):'TBC'} · ${esc(f.time||'Kick-off TBC')} · ${String(f.venue||'').toUpperCase()==='A'?'Away':'Home'}</span><small>${clubListingHtml(f.opponent||'Opponent TBC')}${warn?' · ⚠ Possible home-time conflict':''}</small></div><span class="fixture-ack-pill ${ack.status}">${esc(ack.label)}</span></article>`;}).join(''):'<div class="empty-state compact-empty">No published fixtures for the next weekend yet.</div>');
 }
 // Club-wide sharing reads explicit team states; it never switches the active team.
 function adminShareWeekendDates(now=new Date()){
@@ -4537,14 +4529,14 @@ async function copyAdminWeekend(){
 }
 async function refreshAdminClubOverview(quiet=false){
   const panel=document.getElementById('admin-club-overview');if(!panel)return;
-  const show=CLOUD_MODE&&isAdmin();panel.classList.toggle('hidden',!show);if(!show)return;
+  const show=CLOUD_MODE&&isAdmin();panel.classList.toggle('hidden',!show||__clubTab!=='overview');if(!show)return;
   if(quiet&&Date.now()-__adminOverviewStamp<15000)return;__adminOverviewStamp=Date.now();
   const meta=document.getElementById('admin-overview-meta');if(meta){meta.textContent='Loading club data…';meta.classList.remove('hidden');}
   try{
     const directoryPromise=window.ClubHubStaticSelkent?.loadDirectory?window.ClubHubStaticSelkent.loadDirectory(!quiet).catch(()=>null):null;
     const [rows,coaches,accessRows,rawFeed,directory]=await Promise.all([window.ClubHubCloud.getClubOverview(),window.ClubHubCloud.listClubCoaches().catch(()=>[]),window.ClubHubCloud.listClubAccessAccounts().catch(()=>[]),loadAdminPublishedFeed(!quiet),directoryPromise]);
     const feed=verifiedClubResultsFeed(rawFeed);
-    __adminOverviewRows=rows||[];__adminCoachRows=coaches||[];renderAdminWeekend(__adminOverviewRows);
+    __adminOverviewRows=rows||[];__adminCoachRows=coaches||[];
     renderAdminRecentResults(clubResultRows(rows,rows.map(r=>r.team),feed,true),!!feed);
     const coachesByTeam=new Map();
     __adminCoachRows.forEach(c=>{if(!c.team_id)return;const a=coachesByTeam.get(c.team_id)||[];a.push(c);coachesByTeam.set(c.team_id,a);});
@@ -4780,6 +4772,26 @@ function isSelkentLeagueDivision(name){
   // All league division titles in the current Selkent directory use these forms.
   return /^(?:under\s*\d{1,2}x?(?:\s*[a-z](?=\s|$)|\s+(?:division|navy|blue|green|orange|red|silver|yellow|white)(?=\s|$))|senior\s+division\b)/i.test(String(name||'').trim());
 }
+function adminFixtureKickoffMinutes(time=''){
+  const match=String(time).trim().match(/^(\d{1,2})[:.](\d{2})$/);
+  if(!match||Number(match[1])>23||Number(match[2])>59)return null;
+  return Number(match[1])*60+Number(match[2]);
+}
+function compareAdminFixtures(a,b){
+  const date=String(a.date||'9999-99-99').localeCompare(String(b.date||'9999-99-99'));
+  if(date)return date;
+  const time=(adminFixtureKickoffMinutes(a.time)??1440)-(adminFixtureKickoffMinutes(b.time)??1440);
+  return time||(Number(String(a.team.ageGroup||'').replace(/\D/g,''))||99)-(Number(String(b.team.ageGroup||'').replace(/\D/g,''))||99)||String(a.team.teamName||'').localeCompare(String(b.team.teamName||''))||String(a.opponent||'').localeCompare(String(b.opponent||''));
+}
+function adminFixtureTimeConflicts(fixtures=[]){
+  const home=fixtures.filter(f=>f.date&&String(f.venue||'').toUpperCase()==='H'),conflicts=new Set();
+  for(let i=0;i<home.length;i++)for(let j=i+1;j<home.length;j++){
+    if(home[i].date!==home[j].date)continue;
+    const a=adminFixtureKickoffMinutes(home[i].time),b=adminFixtureKickoffMinutes(home[j].time);
+    if(a!==null&&b!==null&&Math.abs(a-b)<=45){conflicts.add(home[i]);conflicts.add(home[j]);}
+  }
+  return conflicts;
+}
 function buildAdminFixtureRows(rows,feed=null){
   const now=new Date().toISOString().slice(0,10),out=[];
   for(const r of rows||[]){
@@ -4826,7 +4838,7 @@ function buildAdminFixtureRows(rows,feed=null){
       if(!duplicate)out.push({team,source:'Team',date:m.date||'',time:m.time||'',opponent:m.opponent||'',venue:m.venue||'',competition:m.competition||m.type||'Match',status:matchStatus(m)});
     });
   }
-  return out.sort((a,b)=>(a.date||'9999-99-99').localeCompare(b.date||'9999-99-99')||(Number(String(a.team.ageGroup||'').replace(/\D/g,''))||99)-(Number(String(b.team.ageGroup||'').replace(/\D/g,''))||99)||String(a.team.teamName||'').localeCompare(String(b.team.teamName||'')));
+  return out.sort(compareAdminFixtures);
 }
 function uniqueClubFixtures(fixtures=[]){
   const clubNames=new Set(fixtures.map(f=>`${f.team.ageGroup}|${selkentNorm(f.team.leagueName||f.team.selkentName||'')}`));
@@ -4850,7 +4862,7 @@ function uniqueClubFixtures(fixtures=[]){
     else if(statuses.includes('awaiting')&&statuses.includes('confirmed'))shown[index]={...shown[index],ack:{status:'awaiting',label:'1 of 2 teams confirmed'}};
     else if(statuses.includes('awaiting'))shown[index]={...shown[index],ack:{status:'awaiting',label:'Awaiting confirmation'}};
   }
-  return shown;
+  return shown.sort(compareAdminFixtures);
 }
 function renderAdminFixtures(){
   const list=document.getElementById('admin-fixture-list');if(!list)return;
@@ -4862,17 +4874,19 @@ function renderAdminFixtures(){
   const activeIds=new Set(teamRows.map(f=>f.team.id)),missing=teams.length-activeIds.size;
   const summary=document.getElementById('admin-fixture-summary');
   if(summary)summary.textContent=`${rows.length} upcoming fixture${rows.length===1?'':'s'} across ${activeIds.size} team${activeIds.size===1?'':'s'}`+(missing>0?` · ${missing} team${missing===1?'':'s'} without a published fixture`:'')+(!__adminPublishedFeed?' · Showing saved fixtures; live feed unavailable':'');
-  setStableHtml(list,rows.map(f=>{
+  const conflicts=adminFixtureTimeConflicts(rows);
+  const body=rows.map(f=>{
     const detail=__adminDirectoryCache.get(selkentNorm(f.opponent))||{};
     const colours=f.kitColours||detail.colours||'';
     const away=String(f.venue||'').toUpperCase()==='A';
-    const clash=/\bgreen\b/i.test(colours);
-    const ack=f.ack;
+    const clash=/\bgreen\b/i.test(colours),ack=f.ack;
     const competition=String(f.competition||'Fixture').toLowerCase()==='division'?'League':f.competition||'Fixture';
     const clubName=fullClubResultTeamName(f.team),opponent=f.opponent||'Opponent unconfirmed';
     const homeName=away?opponent:clubName,awayName=away?clubName:opponent;
-    return `<article class="admin-fixture-row"><div class="admin-fixture-date"><strong>${f.date?formatDate(f.date):'Date TBC'} · ${esc(f.team.ageGroup)}</strong><span>${f.time?esc(f.time):'Kick-off unconfirmed'}</span></div><div class="admin-fixture-main"><div class="admin-fixture-matchup" aria-label="${esc(homeName)} versus ${esc(awayName)}"><div class="club-result-team home" title="${esc(homeName)}">${clubResultTeamBadgeHtml(homeName)}<span class="club-result-team-name">${esc(matchTeamLabel(homeName))}</span></div><b>v</b><div class="club-result-team away" title="${esc(awayName)}"><span class="club-result-team-name">${esc(matchTeamLabel(awayName))}</span>${clubResultTeamBadgeHtml(awayName)}</div></div><span>${esc(competition)}${f.status==='postponed'?' · Postponed':''}${clash?' · ⚠ Possible kit clash':''}</span>${colours&&colours!=='TBC'?`<small>Opponent kit: ${esc(colours)}</small>`:''}${ack?`<span class="fixture-ack-pill ${esc(ack.status)}">${esc(ack.label)}</span>`:''}</div></article>`;
-  }).join('')||'<div class="empty-state compact-empty">No published fixtures or scheduled team matches for this selection.</div>');
+    const notes=[f.status==='postponed'?'Postponed':'',clash?'Possible kit clash':'',conflicts.has(f)?'Possible home-time conflict':'',colours&&colours!=='TBC'?`Opponent kit: ${colours}`:''].filter(Boolean);
+    return `<tr class="admin-fixture-row${f.status==='postponed'?' status-postponed':''}"><td>${f.date?formatDate(f.date):'Date TBC'}</td><td><b>${esc(f.team.ageGroup)}</b><small class="cup-round">${esc(competition)}</small></td><td><span class="club-result-match admin-fixture-matchup" aria-label="${esc(homeName)} versus ${esc(awayName)}"><span class="club-result-team home" title="${esc(homeName)}">${clubResultTeamBadgeHtml(homeName)}<span class="club-result-team-name">${esc(matchTeamLabel(homeName))}</span></span><b class="club-result-v">v</b><span class="club-result-team away" title="${esc(awayName)}">${clubResultTeamBadgeHtml(awayName)}<span class="club-result-team-name">${esc(matchTeamLabel(awayName))}</span></span></span>${notes.length?`<small class="club-fixture-notes">${esc(notes.join(' · '))}</small>`:''}</td><td><strong class="club-fixture-time">${adminFixtureKickoffMinutes(f.time)!==null?esc(f.time):'Kick-off unconfirmed'}</strong>${ack?`<small class="club-fixture-confirmation ${esc(ack.status)}">${esc(ack.label)}</small>`:''}</td></tr>`;
+  }).join('');
+  setStableHtml(list,rows.length?`<div class="competition-table-scroll match-results-table club-results-table club-matches-table club-fixtures-table"><table class="competition-games-table"><thead><tr><th>Date</th><th>Age / competition</th><th>Match</th><th>Kick-off</th></tr></thead><tbody>${body}</tbody></table></div>`:'<div class="empty-state compact-empty">No published fixtures or scheduled team matches for this selection.</div>');
 }
 async function refreshAdminFixtures(quiet=false){
   if(!CLOUD_MODE||!isAdmin())return;
@@ -5097,7 +5111,7 @@ function setClubTab(tab='overview'){
   document.getElementById('club-matches-switch')?.classList.toggle('hidden',!(admin&&(tab==='fixtures'||tab==='results')));
   const title=document.getElementById('club-view-title'),kick=document.getElementById('club-view-kicker');const names={overview:'Club Home',fixtures:'Matches',results:'Matches',coaches:'Club staff'};if(title)title.textContent=names[tab]||'Club';if(kick)kick.textContent=admin?'Club administration':isAdminCoachMode()?`Coach · ${dualCoachTeam()?.ageGroup||''} ${dualCoachTeam()?.teamName||''}`.trim():roleLabel();
   if(tab==='overview')refreshAdminClubOverview(true);
-  if(tab==='fixtures'){refreshAdminFixtures(false);refreshAdminClubOverview(true);}
+  if(tab==='fixtures')refreshAdminFixtures(false);
   if(tab==='results')refreshClubResults(false);
   if(tab==='coaches')refreshClubCoaches(false);
   renderTeamIdentity();
@@ -5572,7 +5586,6 @@ document.getElementById('fixture-confirm-details')?.addEventListener('click',sav
 document.getElementById('next-match-edit')?.addEventListener('click',()=>{const f=nextPublishedFixture();if(!f||!canConfirmFixtureDetails()||!fixtureDetailsConfirmed(f))return;__fixtureEditingKey=fixtureKitSelectionKey(f);renderFixtureConfirmationEditor(f);document.getElementById('next-match-edit')?.classList.add('hidden');document.getElementById('next-match-confirm-time')?.focus();});
 document.getElementById('next-match-share')?.addEventListener('click',shareNextMatchImage);
 document.getElementById('matches-next-share')?.addEventListener('click',shareNextMatchImage);
-document.getElementById('admin-weekend-share')?.addEventListener('click',openAdminWeekendShare);
 document.getElementById('admin-fixtures-share')?.addEventListener('click',openAdminWeekendShare);
 document.getElementById('admin-weekend-share-refresh')?.addEventListener('click',openAdminWeekendShare);
 document.getElementById('admin-weekend-share-send')?.addEventListener('click',shareAdminWeekend);
