@@ -5,8 +5,6 @@
     {kind:'dbs',label:'Enhanced DBS',dateLabel:'DBS disclosure issued',expiryLabel:'FA renewal due',years:3,courses:{fa_enhanced_dbs:'FA-accepted Enhanced DBS with Children’s Barred List'},help:'For eligible roles working with under-18s, age 16+. Check FA acceptance and the renewal date in Club Portal. This records the FA renewal date, not a legal expiry of the disclosure.',url:'https://www.thefa.com/football-rules-governance/safeguarding/section-3-safer-recruitment-and-dbs-checks'},
     {kind:'safeguarding',label:'Safeguarding Children',years:2,courses:{fa_safeguarding_children:'FA Safeguarding Children',fa_safeguarding_recertification:'FA Safeguarding Children recertification'},help:'The FA course is valid for two years. Record the completion and expiry dates shown on the qualification.',url:'https://learn.englandfootball.com/courses/safeguarding/safeguarding-children-course'},
     {kind:'first_aid',label:'First aid in football',years:3,courses:{fa_ifaif:'Introduction to First Aid in Football (IFAiF)',fa_efaif:'Emergency First Aid in Football (EFAiF)',other_first_aid:'Other first aid qualification'},help:'IFAiF is valid for three years. For any other course, use its recorded expiry and confirm acceptance with the County FA.',url:'https://learn.englandfootball.com/courses/medical/introduction-to-first-aid-in-football'},
-    {kind:'coaching',label:'Coaching qualification',years:0,courses:{fa_i2cf:'Introduction to Coaching Football (I2CF)',fa_level_1:'FA Level 1 in Coaching Football',fa_level_2:'FA Level 2 in Coaching Football',uefa_c_diploma:'UEFA C diploma',uefa_b_diploma:'UEFA B diploma',uefa_a_diploma:'UEFA A diploma',uefa_pro_diploma:'UEFA Pro diploma'},help:'Record the coaching award separately from any UEFA licence. Leave expiry blank unless the award record states one.',url:'https://learn.englandfootball.com/courses/football/introduction-to-coaching-football'},
-    {kind:'uefa_licence',label:'UEFA coaching licence',dateLabel:'Licence issued or renewed',years:3,optional:true,courses:{uefa_c:'UEFA C licence',uefa_b:'UEFA B licence',uefa_a:'UEFA A licence',uefa_pro:'UEFA Pro licence',uefa_youth_b:'UEFA Youth B licence',uefa_elite_youth_a:'UEFA Elite Youth A licence',uefa_goalkeeper_b:'UEFA Goalkeeper B licence',uefa_goalkeeper_a:'UEFA Goalkeeper A licence',uefa_futsal_b:'UEFA Futsal B licence'},help:'Add this if held. UEFA licences renew every three years; the diploma and current licence are separate records.',url:'https://www.uefa.com/development/coaches/uefa-coaching-licences/'}
   ];
   const el=id=>document.getElementById(id),esc=s=>String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   const today=(now=new Date())=>new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/London',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(now).filter(p=>['year','month','day'].includes(p.type)).sort((a,b)=>['year','month','day'].indexOf(a.type)-['year','month','day'].indexOf(b.type)).map(p=>p.value).join('-');
@@ -16,17 +14,17 @@
     if(!record)return{tone:'missing',label:'Not recorded'};
     if(record.expires_on){if(record.expires_on<date)return{tone:'expired',label:record.kind==='dbs'?'Renewal overdue':'Expired'};if(record.expires_on===date)return{tone:'due',label:'Due today'};const limit=new Date(date+'T00:00:00Z');limit.setUTCDate(limit.getUTCDate()+60);if(record.expires_on<=limit.toISOString().slice(0,10))return{tone:'due',label:'Due within 60 days'};}
     if(!record.club_checked)return{tone:'missing',label:'Needs club check'};
-    return {tone:'current',label:record.expires_on?'In date':'Award recorded'};
+    return {tone:'current',label:'In date'};
   }
   function validate(record,date=today()){
     const item=catalogue.find(x=>x.kind===record.kind);if(!item||!Object.hasOwn(item.courses,record.course))throw Error('Choose a qualification from the list.');
     if(!validDate(record.completed_on)||record.completed_on>date||record.completed_on<'1900-01-01')throw Error('Enter a valid issue or completion date, up to today.');
-    if(record.kind!=='coaching'&&!record.expires_on)throw Error('Enter the recorded expiry or renewal date.');
+    if(!record.expires_on)throw Error('Enter the recorded expiry or renewal date.');
     if(record.expires_on&&(!validDate(record.expires_on)||record.expires_on<=record.completed_on))throw Error('Expiry or renewal must be after the issue or completion date.');
     return {kind:record.kind,course:record.course,completed_on:record.completed_on,expires_on:record.expires_on||null,club_checked:record.club_checked===true};
   }
   function response(data){
-    if(!Array.isArray(data?.records)||data.records.length>5||data.revision===null||!Number.isSafeInteger(Number(data.revision))||Number(data.revision)<0)throw Error('Invalid qualification response');
+    if(!Array.isArray(data?.records)||data.records.length>catalogue.length||data.revision===null||!Number.isSafeInteger(Number(data.revision))||Number(data.revision)<0)throw Error('Invalid qualification response');
     const seen=new Set();for(const record of data.records){validate(record);if(seen.has(record.kind))throw Error('Duplicate qualification');seen.add(record.kind);}
     return {...data,revision:Number(data.revision)};
   }
@@ -38,7 +36,7 @@
   function syncAccess(){const c=context(),button=el('coach-profile-self');button?.classList.toggle('hidden',!c);if(state&&!same())close();}
   function render(){
     if(!same()||!state.loaded)return;
-    el('coach-qualification-list').innerHTML=catalogue.map(item=>{const record=state.records.find(r=>r.kind===item.kind),s=status(record);return `<article class="coach-qualification-row"><div><h4>${esc(item.label)}</h4><span class="qualification-state ${s.tone}">${esc(!record&&item.optional?'Not added (if held)':s.label)}</span>${record?`<p>${esc(item.courses[record.course]||'Qualification')}</p><p>${esc(item.dateLabel||'Completed')}: ${esc(record.completed_on)}<br>${esc(item.expiryLabel||'Expiry')}: ${record.expires_on?esc(record.expires_on):'No expiry recorded'}</p><p class="muted">${record.club_checked?'Club checked'+(record.checked_at?' · '+esc(String(record.checked_at).slice(0,10)):''):'Needs club check'}</p>`:''}</div>${state.editable?`<button type="button" class="secondary-button" data-edit-qualification="${item.kind}">${record?'Edit':'Add'}</button>`:''}</article>`;}).join('');
+    el('coach-qualification-list').innerHTML=catalogue.map(item=>{const record=state.records.find(r=>r.kind===item.kind),s=status(record);return `<article class="coach-qualification-row"><div><h4>${esc(item.label)}</h4><span class="qualification-state ${s.tone}">${esc(s.label)}</span>${record?`<p>${esc(item.courses[record.course]||'Qualification')}</p><p>${esc(item.dateLabel||'Completed')}: ${esc(record.completed_on)}<br>${esc(item.expiryLabel||'Expiry')}: ${record.expires_on?esc(record.expires_on):'No expiry recorded'}</p><p class="muted">${record.club_checked?'Club checked'+(record.checked_at?' · '+esc(String(record.checked_at).slice(0,10)):''):'Needs club check'}</p>`:''}</div>${state.editable?`<button type="button" class="secondary-button" data-edit-qualification="${item.kind}">${record?'Edit':'Add'}</button>`:''}</article>`;}).join('');
     el('coach-qualification-readonly').hidden=state.editable;
   }
   function edit(kind){
@@ -48,8 +46,8 @@
     el('coach-qualification-course').innerHTML=Object.entries(item.courses).map(([value,label])=>`<option value="${esc(value)}">${esc(label)}</option>`).join('');
     el('coach-qualification-course').value=record?.course||Object.keys(item.courses)[0];
     el('coach-qualification-completed').value=record?.completed_on||'';el('coach-qualification-completed').max=today();
-    el('coach-qualification-expiry').value=record?.expires_on||'';el('coach-qualification-expiry').required=kind!=='coaching';
-    el('coach-qualification-date-label').textContent=item.dateLabel||'Completed';el('coach-qualification-expiry-label').textContent=(item.expiryLabel||'Expiry')+(kind==='coaching'?' (if stated)':'');
+    el('coach-qualification-expiry').value=record?.expires_on||'';el('coach-qualification-expiry').required=true;
+    el('coach-qualification-date-label').textContent=item.dateLabel||'Completed';el('coach-qualification-expiry-label').textContent=item.expiryLabel||'Expiry';
     el('coach-qualification-help').textContent=item.help;
     el('coach-qualification-source').href=item.url;
     el('coach-qualification-checked').checked=record?.club_checked===true;

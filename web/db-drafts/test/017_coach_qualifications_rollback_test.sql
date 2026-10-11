@@ -37,6 +37,10 @@ begin
   jsonb_build_array(good->0||'{"criminal_record":"forbidden"}'::jsonb),
   jsonb_build_array(good->0||'{"course":"unknown"}'::jsonb),
   jsonb_build_array(good->0||'{"kind":"unknown"}'::jsonb),
+  jsonb_build_array(good->0||'{"kind":"coaching","course":"fa_i2cf"}'::jsonb),
+  jsonb_build_array(good->0||'{"kind":"uefa_licence","course":"uefa_c"}'::jsonb),
+  jsonb_build_array(good->0||'{"kind":"safeguarding","course":"fa_safeguarding_children","expires_on":null}'::jsonb),
+  jsonb_build_array(good->0||'{"kind":"first_aid","course":"fa_ifaif","expires_on":null}'::jsonb),
   jsonb_build_array(good->0||'{"expires_on":null}'::jsonb),
   jsonb_build_array(good->0||'{"completed_on":"2023-02-29"}'::jsonb),
   jsonb_build_array(good->0||'{"completed_on":"2099-01-01","expires_on":"2102-01-01"}'::jsonb),
@@ -47,9 +51,9 @@ begin
  end loop;
  r:=public.save_coach_qualifications('00000000-0000-0000-0000-000000000002',good,1);
  if r->'records'->0->>'checked_at' is null then raise exception 'verification missing';end if;
- r:=public.save_coach_qualifications('00000000-0000-0000-0000-000000000002','[{"kind":"coaching","course":"fa_i2cf","completed_on":"2024-01-01","expires_on":null,"club_checked":false}]',2);
+ r:=public.save_coach_qualifications('00000000-0000-0000-0000-000000000002','[{"kind":"safeguarding","course":"fa_safeguarding_children","completed_on":"2024-01-01","expires_on":"2026-01-01","club_checked":false},{"kind":"first_aid","course":"fa_ifaif","completed_on":"2024-01-01","expires_on":"2027-01-01","club_checked":false}]',2);
  if r->'records'->0 ? 'checked_by' then raise exception 'unverified record attributed';end if;
- if r->'records'->0->'expires_on'<>'null'::jsonb then raise exception 'coaching expiry incorrectly required';end if;
+ if jsonb_array_length(r->'records')<>2 then raise exception 'safeguarding and first aid not saved';end if;
  r:=public.save_coach_qualifications('00000000-0000-0000-0000-000000000002','[]',3);
  if r->>'revision'<>'4' or jsonb_array_length(r->'records')<>0 then raise exception 'remove record failed';end if;
 end $$;

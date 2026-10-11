@@ -5,7 +5,7 @@
 create table private.coach_qualification_profiles (
   club_id uuid not null references public.clubs(id) on delete cascade,
   user_id uuid not null references public.profiles(user_id) on delete cascade,
-  records jsonb not null default '[]'::jsonb check(jsonb_typeof(records)='array' and jsonb_array_length(records)<=5),
+  records jsonb not null default '[]'::jsonb check(jsonb_typeof(records)='array' and jsonb_array_length(records)<=3),
   revision bigint not null default 1 check(revision>0),
   updated_at timestamptz not null default statement_timestamp(),
   updated_by uuid not null,
@@ -79,7 +79,7 @@ begin
   if p_expected_revision is null or p_expected_revision<>coalesce(old.revision,0) then
     raise exception 'Qualifications changed. Reload before saving.' using errcode='40001';
   end if;
-  if p_records is null or jsonb_typeof(p_records)<>'array' or jsonb_array_length(p_records)>5 then
+  if p_records is null or jsonb_typeof(p_records)<>'array' or jsonb_array_length(p_records)>3 then
     raise exception 'Invalid qualification records' using errcode='22023';
   end if;
   for item in select value from jsonb_array_elements(p_records) loop
@@ -93,9 +93,7 @@ begin
     if kind=any(seen) or kind is null or course is null or not(
       (kind='dbs' and course='fa_enhanced_dbs') or
       (kind='safeguarding' and course in ('fa_safeguarding_children','fa_safeguarding_recertification')) or
-      (kind='first_aid' and course in ('fa_ifaif','fa_efaif','other_first_aid')) or
-      (kind='coaching' and course in ('fa_i2cf','fa_level_1','fa_level_2','uefa_c_diploma','uefa_b_diploma','uefa_a_diploma','uefa_pro_diploma')) or
-      (kind='uefa_licence' and course in ('uefa_c','uefa_b','uefa_a','uefa_pro','uefa_youth_b','uefa_elite_youth_a','uefa_goalkeeper_b','uefa_goalkeeper_a','uefa_futsal_b'))
+      (kind='first_aid' and course in ('fa_ifaif','fa_efaif','other_first_aid'))
     ) then raise exception 'Invalid or duplicate qualification type' using errcode='22023'; end if;
     seen:=array_append(seen,kind);
     if coalesce(item->>'completed_on','') !~ '^\d{4}-\d{2}-\d{2}$'
@@ -104,7 +102,7 @@ begin
     end if;
     begin completed:=(item->>'completed_on')::date;expiry:=(item->>'expires_on')::date;
     exception when datetime_field_overflow or invalid_datetime_format then raise exception 'Use valid qualification dates' using errcode='22023'; end;
-    if completed>today or completed<'1900-01-01'::date or (kind<>'coaching' and expiry is null) or (expiry is not null and expiry<=completed) then
+    if completed>today or completed<'1900-01-01'::date or expiry is null or (expiry is not null and expiry<=completed) then
       raise exception 'Check completion and expiry dates' using errcode='22023';
     end if;
     checked:=(item->>'club_checked')::boolean;
