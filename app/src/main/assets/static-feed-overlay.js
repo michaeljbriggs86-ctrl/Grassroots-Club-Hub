@@ -109,6 +109,12 @@
         if(!links.has(key))links.set(key,499);
       }
     }
+    // Exact legacy names from recorded tournaments, mapped to existing club IDs.
+    // A conflicting directory link wins; no fuzzy prefix match or new badge approval.
+    for(const [alias,id,clubName] of [['Cray Wanderers Blue',250,'Cray Wanderers'],['Boca Polars',513,'Boca FC']]){
+      const key=norm(alias),club=clubs.get(id);
+      if(club&&norm(club.club_name)===norm(clubName)&&!links.has(key))links.set(key,id);
+    }
     const usable=club=>club?.logo_status==='pilot_verified'&&
       /^https:\/\/[^\s/]+\//.test(String(club.logo_url||''))&&
       /^[a-f0-9]{64}$/i.test(String(club.logo_sha256||''));

@@ -10,7 +10,7 @@ const body = src.slice(src.indexOf('function adminFixtureHasResult(st,team,fixtu
 const norm = s => String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
 const stableKey = f => [norm(f.opponent||'tbc'),String(f.venue||'').toUpperCase(),norm(f.competition||'fixture')].join('|');
 const key = f => [f.date,stableKey(f)].join('|');
-const {build,uniqueClubFixtures,adminFixtureKickoffMinutes,adminFixtureTimeConflicts} = new Function('selkentNorm', 'normalizeTeamKey', 'fixtureAckState', 'fixtureKitSelectionKey', 'fixtureStableKey', 'matchStatus', 'publishedClubTeamData', 'verifiedClubResultsFeed', `${body}\nreturn {build:buildAdminFixtureRows,uniqueClubFixtures,adminFixtureKickoffMinutes,adminFixtureTimeConflicts};`)(
+const {build,uniqueClubFixtures,adminFixtureKickoffMinutes,adminFixtureTimeConflicts,adminFixtureWeekendKey} = new Function('selkentNorm', 'normalizeTeamKey', 'fixtureAckState', 'fixtureKitSelectionKey', 'fixtureStableKey', 'matchStatus', 'publishedClubTeamData', 'verifiedClubResultsFeed', `${body}\nreturn {build:buildAdminFixtureRows,uniqueClubFixtures,adminFixtureKickoffMinutes,adminFixtureTimeConflicts,adminFixtureWeekendKey};`)(
   norm,
   norm,
   (st, f) => st.selkent?.fixtureAcknowledgement?.status === 'confirmed' && st.selkent.fixtureAcknowledgement.key === key(f)
@@ -119,12 +119,12 @@ const renderBody=src.slice(src.indexOf('function renderAdminFixtures(){'),src.in
 let fixtureWrites=0,fixtureHtml='';
 const list={get innerHTML(){return fixtureHtml},set innerHTML(value){fixtureHtml=value;fixtureWrites++}},summary={textContent:''},ageSelect={value:'all'};
 const homeTeam={id:'u12-lions',ageGroup:'U12',teamName:'Lions'};
-const fixtureRows=[{team:homeTeam,source:'Selkent',date:'2099-10-01',time:'10:30',opponent:'Dartford Royals',venue:'H',competition:'Division',groundName:'Oak Field',address:'1 Oak Road',ack:{status:'confirmed',label:'Fixture confirmed'}}];
-const render=new Function('document','populateAdminFixtureAgeFilter','__adminOverviewRows','__adminFixtureRows','__adminPublishedFeed','__adminDirectoryCache','selkentNorm','formatDate','matchTeamLabel','esc','clubResultTeamBadgeHtml','fullClubResultTeamName','uniqueClubFixtures','setStableHtml','adminFixtureKickoffMinutes','adminFixtureTimeConflicts',`${renderBody}\nreturn renderAdminFixtures;`)(
+const fixtureRows=[{team:homeTeam,source:'Selkent',date:'2099-10-03',time:'10:30',opponent:'Dartford Royals',venue:'H',competition:'Division',groundName:'Oak Field',address:'1 Oak Road',ack:{status:'confirmed',label:'Fixture confirmed'}}];
+const render=new Function('document','populateAdminFixtureAgeFilter','__adminOverviewRows','__adminFixtureRows','__adminPublishedFeed','__adminDirectoryCache','selkentNorm','formatDate','matchTeamLabel','esc','clubResultTeamBadgeHtml','fullClubResultTeamName','uniqueClubFixtures','setStableHtml','adminFixtureKickoffMinutes','adminFixtureTimeConflicts','adminFixtureWeekendKey','clubResultCompetitionKind',`let __adminFixtureWeekend='2099-10-03';${renderBody}\nreturn renderAdminFixtures;`)(
   {getElementById:id=>({'admin-fixture-list':list,'admin-fixtures-age':ageSelect,'admin-fixture-summary':summary})[id]},
   ()=>{},[{team:homeTeam}],
   fixtureRows,
-  {age_groups:[]},new Map(),norm,s=>s,s=>s,s=>s,s=>`<img alt="" src="badge.svg" data-team="${s}">`,team=>`Shooters Hill AFC ${team.teamName}`,uniqueClubFixtures,setStableHtml,adminFixtureKickoffMinutes,adminFixtureTimeConflicts
+  {age_groups:[]},new Map(),norm,s=>s,s=>s,s=>s,s=>`<img alt="" src="badge.svg" data-team="${s}">`,team=>`Shooters Hill AFC ${team.teamName}`,uniqueClubFixtures,setStableHtml,adminFixtureKickoffMinutes,adminFixtureTimeConflicts,adminFixtureWeekendKey,()=> 'league'
 );
 render();
 render();

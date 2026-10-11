@@ -74,6 +74,29 @@ ambiguous.team_club_links.push({ team_name: crayTeam, club_id: 261 });
 overlay.attachDirectoryBadges(ambiguous);
 assert.equal(app.verifiedTeamBadgeUrl(crayTeam), '');
 
+// Manually entered tournament opponents reuse exact canonical identities.
+overlay.attachDirectoryBadges(original);
+assert.equal(app.verifiedTeamBadgeUrl('Cray Wanderers Blue'),cray.logo_url);
+assert.equal(state.selkent.directoryDetails[norm('Boca Polars')].clubId,513);
+assert.equal(state.selkent.directoryDetails[norm('Boca Polars')].clubName,'Boca FC');
+assert.equal(app.verifiedTeamBadgeUrl('Boca Polars'),'','identity mapping cannot invent badge approval');
+const conflictingLegacy=structuredClone(second);
+conflictingLegacy.team_club_links.push({team_name:'Cray Wanderers Blue',club_id:261});
+overlay.attachDirectoryBadges(conflictingLegacy);
+assert.equal(state.selkent.directoryDetails[norm('Cray Wanderers Blue')].clubId,261,'an explicit directory identity wins over a legacy alias');
+conflictingLegacy.team_club_links.push({team_name:'Cray Wanderers Blue',club_id:250});
+overlay.attachDirectoryBadges(conflictingLegacy);
+assert.equal(app.verifiedTeamBadgeUrl('Cray Wanderers Blue'),'','ambiguous manual names must fail closed');
+const wrongCanonical=structuredClone(original);
+wrongCanonical.clubs.find(c=>c.club_id===250).club_name='Different Club';
+overlay.attachDirectoryBadges(wrongCanonical);
+assert.equal(app.verifiedTeamBadgeUrl('Cray Wanderers Blue'),'','club ID/name pair must still agree');
+assert.equal(state.selkent.directoryDetails[norm('Cray Wanderers Blue')].logoStatus,'');
+const revokedLegacy=structuredClone(original);
+delete revokedLegacy.clubs.find(c=>c.club_id===250).logo_status;
+overlay.attachDirectoryBadges(revokedLegacy);
+assert.equal(app.verifiedTeamBadgeUrl('Cray Wanderers Blue'),'','legacy aliases respect revoked approvals');
+
 // No pilot display in a release build, another club's runtime, or when config disagrees.
 overlay.attachDirectoryBadges(second);
 window.__PITCHKIND_PILOT_RIGHTS = undefined;
@@ -97,6 +120,7 @@ assert.equal(app.verifiedTeamBadgeUrl(crayTeam), `/__pilot_badges/250/${cray.log
 app.esc = value => String(value).replace(/[&<>\"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[char]));
 app.matchTeamLabel = name => String(name||'').replace(/_/g,' ').trim();
 vm.runInContext(extract('app/src/main/assets/app.js', 'function clubIdentityName(', 'function clubIdentityBadgeHtml('), app);
+assert.equal(app.clubPlaceholderBadgeData('Boca Polars').initials,'BO','the older manual name receives the Boca FC monogram, without claiming a verified crest');
 vm.runInContext(extract('app/src/main/assets/app.js', 'function clubListingHtml(', 'document.addEventListener(\'error\''), app);
 assert.match(app.clubListingHtml(crayTeam), new RegExp(`/__pilot_badges/250/${cray.logo_sha256}`),'list rows use the protected reviewed badge');
 assert.match(app.clubListingHtml('Unreviewed FC'), /pitchkind-wt_mark\.svg/,'unapproved clubs use the neutral mark');

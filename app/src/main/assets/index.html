@@ -471,8 +471,9 @@
         <div id="club-fixtures-slot"><section class="club-admin-panel hidden" id="club-fixtures-panel">
           <section class="panel admin-fixture-centre club-matches-browser screen-lead-card">
             <div class="club-matches-filters"><label class="club-results-age-label">Age group<select id="admin-fixtures-age"><option value="all">All age groups</option></select></label><button type="button" class="secondary-button weekend-share-trigger" id="admin-fixtures-share" data-admin-settings-only>Share weekend</button></div>
+            <div class="club-weekend-navigation" aria-label="Choose fixture weekend"><button type="button" class="secondary-button compact" id="admin-fixtures-weekend-prev" aria-label="Previous weekend">←</button><strong id="admin-fixtures-weekend-label" aria-live="polite"></strong><button type="button" class="secondary-button compact" id="admin-fixtures-weekend-next" aria-label="Next weekend">→</button></div>
             <p class="admin-fixture-summary" id="admin-fixture-summary" role="status"></p>
-            <div class="admin-fixture-list" id="admin-fixture-list"></div>
+            <div id="admin-fixtures-viewport" class="club-weekend-viewport" tabindex="0" role="region" aria-label="Weekend fixtures. Swipe or use arrow keys to change weekend."><div class="admin-fixture-list" id="admin-fixture-list"></div></div>
           </section>
         </section></div>
 
