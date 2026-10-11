@@ -16,6 +16,9 @@ on:
       - 'app/src/main/assets/**'
       - 'cloudflare/web-app/build.py'
       - 'tests/**'
+      - 'web/db-drafts/019_member_contact*.sql'
+      - 'web/db-drafts/test/*contact*.sql'
+      - 'web/db-drafts/test/run-member-contact-import.cjs'
       - 'verification/verify_v2_2_30_pitchkind_ui.py'
       - '.github/workflows/ui-review-fixes.yml'
   workflow_dispatch:
@@ -45,9 +48,13 @@ jobs:
             node "$test"
           done
           python cloudflare/web-app/build.py
-          for asset in index.html app.js cloud.js styles.css app-design-system.css; do
+          for asset in index.html app.js cloud.js styles.css app-design-system.css coach-qualifications.js member-contact-import.js; do
             cmp "app/src/main/assets/$asset" "cloudflare/web-app/dist/$asset"
           done
           cmp app/src/main/assets/inter-variable.woff2 cloudflare/web-app/dist/inter-variable.woff2
           cmp app/src/main/assets/inter-OFL.txt cloudflare/web-app/dist/inter-OFL.txt
           git diff --check
+      - name: Check contact import in throwaway PostgreSQL
+        run: |
+          npm install --prefix "$RUNNER_TEMP/member-contact-sql" --no-audit --no-fund @electric-sql/pglite@0.3.14
+          node web/db-drafts/test/run-member-contact-import.cjs "$RUNNER_TEMP/member-contact-sql/node_modules/@electric-sql/pglite"

@@ -15,6 +15,8 @@ const cloud={context:{profile},role:()=>ctx.currentRole,currentTeam:()=>({id:tea
  listContactDirectory:async id=>{calls.push(id);return{self,can_manage:true,contacts:[contact('coach'),contact('parent','parent'),contact('other','coach','b')]};},
  saveMemberContactDetails:async input=>{saved.push(input);return{ok:true}}};
 ctx.window.ClubHubCloud=cloud;vm.createContext(ctx);
+let importerVisible=false,importerOptions=null;
+ctx.window.ClubHubContactImport={reset:()=>{importerVisible=false;},show:value=>{importerVisible=value;},configure:value=>{importerOptions=value;}};
 vm.runInContext(source.slice(source.indexOf("let __contactDirectoryIdentity="),source.indexOf('let __inboxStamp=')),ctx);
 const open=()=>{ctx.syncContactDirectoryContext();node('member-contacts-panel').open=true;};
 const list=()=>node('member-contacts-list').innerHTML;
@@ -26,14 +28,18 @@ const deferred=()=>{let resolve;const promise=new Promise(r=>resolve=r);return{p
  assert(!list().includes('Parent</p>'));assert(!list().includes('data-contact-user'),'parent cannot edit anyone else');
  assert(node('member-contacts-self').innerHTML.includes('data-contact-user="me"'),'member can edit self');
  assert(node('member-contacts-team-wrap').classList.contains('hidden'));
+ assert.equal(importerVisible,false);assert.equal(importerOptions.isAdmin(),false,'parent has no import controls');
  ctx.currentRole='coach';open();await ctx.refreshContactDirectory();
  assert(list().includes('Parent'),'coach sees team parents');assert(!list().includes('data-contact-user'),'coach cannot edit parent contact');
+ assert.equal(importerVisible,false);assert.equal(importerOptions.isAdmin(),false,'coach has no import controls');
  ctx.currentRole='admin';ctx.admin=true;open();await ctx.refreshContactDirectory();
  assert.equal(calls.at(-1),null,'club admin can read whole club');assert(list().includes('data-contact-user="parent"'));assert(!node('member-contacts-team-wrap').classList.contains('hidden'));
+ assert.equal(importerVisible,true);assert.equal(importerOptions.isAdmin(),true);
  node('member-contacts-team').value='b';await ctx.refreshContactDirectory();assert.equal(calls.at(-1),'b');assert(!list().includes('data-contact-user="parent"'),'admin team filter enforced in UI too');
  const old=cloud.listContactDirectory,late=deferred();cloud.listContactDirectory=()=>late.promise;
  const pending=ctx.refreshContactDirectory();ctx.currentRole='parent';ctx.admin=false;ctx.syncContactDirectoryContext();
  assert.equal(list(),'','changing capacity clears sensitive contact DOM immediately');assert.equal(node('member-contacts-panel').open,false);assert(node('member-contacts-team-wrap').classList.contains('hidden'));
+ assert.equal(importerVisible,false,'changing capacity also clears import');
  late.resolve({self,can_manage:true,contacts:[contact('private-parent','parent')]});await pending;assert.equal(list(),'','late admin response discarded');
  cloud.listContactDirectory=old;open();await ctx.refreshContactDirectory();
  cloud.listContactDirectory=async()=>{throw new Error('backend missing')};await ctx.refreshContactDirectory();assert.equal(list(),'');assert.equal(node('member-contacts-self').innerHTML,'');assert.match(node('member-contacts-status').textContent,/unavailable/);

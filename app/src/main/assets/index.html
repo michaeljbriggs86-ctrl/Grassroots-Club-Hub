@@ -437,6 +437,16 @@
             <p class="muted" id="member-contacts-help">Team contact details</p>
             <div class="contact-directory-controls"><label class="hidden" id="member-contacts-team-wrap">Team<select id="member-contacts-team"><option value="">All club teams</option></select></label><button type="button" class="secondary-button" id="refresh-member-contacts">Refresh contacts</button></div>
             <p class="helper" id="member-contacts-status" role="status" aria-live="polite"></p>
+            <section class="member-contact-card hidden" id="contact-import-panel" aria-labelledby="contact-import-heading">
+              <h4 id="contact-import-heading">Import contacts from a spreadsheet</h4>
+              <p class="helper">Club Admin only. Download the member template or use columns full_name, team, role, email and phone. Keep phone numbers as text to preserve leading zeroes. Export from Excel or Google Sheets as CSV, then preview the matches.</p>
+              <p class="helper">Blank email or phone cells keep existing details. Use [CLEAR] to remove a detail. One row per person, up to 500 rows. Only approved club members can be matched; team links and access permissions stay as configured. Do not include addresses.</p>
+              <button type="button" class="secondary-button" id="contact-import-template" disabled>Download member template</button>
+              <label>Contact spreadsheet (CSV)<input type="file" id="contact-import-file" accept=".csv,text/csv" disabled /></label>
+              <div class="contact-directory-controls"><button type="button" class="secondary-button" id="contact-import-preview" disabled>Preview import</button><button type="button" class="primary-button" id="contact-import-save" disabled>Import contacts</button><button type="button" class="secondary-button" id="contact-import-cancel">Clear preview</button></div>
+              <p class="helper" id="contact-import-status" role="status" aria-live="polite"></p>
+              <div class="member-contact-list" id="contact-import-results"></div>
+            </section>
             <div id="member-contacts-self"></div>
             <div class="member-contact-list" id="member-contacts-list"></div>
           </div>
@@ -1089,6 +1099,7 @@
   <script src="cloud.js"></script>
   <script src="pilot-rights-runtime.js"></script>
   <script src="coach-qualifications.js"></script>
+  <script src="member-contact-import.js"></script>
   <script src="app.js"></script>
   <script src="static-feed-overlay.js"></script>
 </body>
