@@ -1355,3 +1355,15 @@ html[data-theme="dark"] .club-matches-table .club-fixture-confirmation.confirmed
 .onboard-product-brand img{width:96px!important;height:96px!important;object-fit:contain!important}
 .gch-about-banner{width:96px!important;height:96px!important;max-height:96px;object-fit:contain!important;background:transparent!important}
 .gch-about-copy{text-align:center}
+.contact-directory-controls {display:flex;flex-wrap:wrap;align-items:end;gap:12px;margin-bottom:16px}
+.contact-directory-controls label {flex:1 1 220px}
+.member-contact-list {display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:16px;margin-top:16px}
+.member-contact-card {min-width:0;padding:16px;border:1px solid var(--gch-line);border-radius:16px;background:var(--gch-white);overflow-wrap:anywhere}
+.member-contact-card h4 {margin:0 0 8px;font-size:18px;line-height:1.4}
+.member-contact-links {display:flex;flex-direction:column;gap:8px;margin:12px 0;font-size:14px;line-height:1.5}
+.member-contact-links a {display:flex;align-items:center;min-height:44px;color:var(--gch-green-800);text-decoration:underline}
+.contact-edit summary {min-height:44px;padding:12px 0;cursor:pointer;font-size:14px;font-weight:750}
+.contact-details-form {display:grid;gap:12px;margin-top:8px}
+.contact-details-form label {display:grid;gap:8px;font-size:14px}
+html[data-theme="dark"] .member-contact-card {background:#151D18;border-color:#35443A}
+html[data-theme="dark"] .member-contact-links a {color:#8EE09A}

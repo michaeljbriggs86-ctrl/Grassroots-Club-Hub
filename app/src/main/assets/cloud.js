@@ -66,6 +66,7 @@
   function cachedTeamState(teamId){try{const x=JSON.parse(localStorage.getItem(TEAM_STATE_CACHE_PREFIX+teamId)||'null');return x&&x.state?x:null;}catch{return null;}}
   function cacheTeamState(teamId,row){if(!teamId||!row?.state)return;try{localStorage.setItem(TEAM_STATE_CACHE_PREFIX+teamId,JSON.stringify({state:row.state,revision:Number(row.revision??0),updated_at:row.updated_at||'',savedAt:Date.now()}));}catch{}}
   function clearAccountLocalData(){
+    window.dispatchEvent(new Event('clubhub-contacts-clear'));
     try{
       localStorage.removeItem(APP_STATE_STORAGE_KEY);
       localStorage.removeItem(ACTIVE_TEAM_KEY);
@@ -554,6 +555,7 @@
     if(pendingState&&canEdit()){const p=pendingState;pendingState=null;await saveTeamStateNow(p).catch(()=>{});}
     const previousTeam=activeTeam,previousRevision=activeRevision,previousUpdatedAt=lastRemoteUpdatedAt;
     activeTeam=team;localStorage.setItem(ACTIVE_TEAM_KEY,team.id);
+    window.dispatchEvent(new Event('clubhub-contacts-clear'));
     try{
     const sensitiveMini=Number(team.age_group||0)>=7&&Number(team.age_group||0)<=11;
     if(sensitiveMini)localStorage.removeItem(TEAM_STATE_CACHE_PREFIX+team.id);
@@ -591,6 +593,7 @@
    catch(err){activeRevision=previousRevision;lastRemoteUpdatedAt=previousUpdatedAt;throw err;}
    if(!row?.state){activeRevision=previousRevision;lastRemoteUpdatedAt=previousUpdatedAt;throw new Error('Team information is not available');}
    activeTeam=team;
+   window.dispatchEvent(new Event('clubhub-contacts-clear'));
    localStorage.setItem(ACTIVE_TEAM_KEY,team.id);
    context={...(context||{}),team};
    hooks.onRemoteState&&hooks.onRemoteState(row.state,{reason:'parent-team-switch'});
@@ -682,6 +685,15 @@
     if(!['admin','coach','assistant_coach','parent'].includes(role()))return [];
     const data=await rpc('list_message_contacts',{});
     return Array.isArray(data)?data:[];
+  }
+  async function listContactDirectory(teamId=null){
+    if(testModeActive()||!['admin','coach','assistant_coach','parent'].includes(role()))throw new Error('Approved adult access required');
+    return await rpc('list_contact_directory',{p_team_id:teamId||null});
+  }
+  async function saveMemberContactDetails({userId,email='',phone=''}={}){
+    if(testModeActive()||!['admin','coach','assistant_coach','parent'].includes(role()))throw new Error('Approved adult access required');
+    if(!userId)throw new Error('Choose a contact');
+    return await rpc('save_member_contact_details',{p_user_id:userId,p_email:String(email).trim(),p_phone:String(phone).trim()});
   }
   async function listClubMessages(){
     if(!['admin','coach','assistant_coach','parent'].includes(role()))return [];
@@ -1235,6 +1247,7 @@
   }
 
   window.ClubHubCloud={
+    listContactDirectory,saveMemberContactDetails,
     configured,bootstrap,loadInitialState,queueStateSave,confirmStateSave,pullLatest,startPolling,
     role,requestCoachAccess,listPendingCoachRequests,reviewCoachRequest,listMyCoachTeams,switchMyCoachTeam,setMyCapacity,requestChildLink,realRole,isStaffAccount,actingAsParent,assignCoachTeam,unassignCoachTeam,canEdit,canAdmin,assignedTeam,currentTeam,coachTeam,hasDualCoachAccess,visibleTeamList,getClubConfiguration,listLoginClubs,listLoginTeams,listCurrentClubLoginTeams,createInvite,requestParentAccess,listPendingParentRequests,listTeamMembers,listClubCoaches,listClubAccessAccounts,removeClubCoach,listPublishedClubResults,listParentPlayerLinks,saveParentPlayerLinks,listPlayerAccountLinks,listMatchAvailability,saveMatchAvailability,saveCoachMatchAvailability,listSelkentTeamDirectory,syncSelkentTeamDirectory,getCoachMatchNote,saveCoachMatchNote,listAnnouncements,createAnnouncement,markAnnouncementRead,deleteAnnouncement,listMatchAttendance,saveMatchAttendance,getAvailabilitySettings,setAvailabilityDeadline,sendAvailabilityReminder,listNotifications,markNotificationRead,notifyFixtureChange,notifySelectedSquad,notifyMatchReport,notifyMatchReopened,listPlayerAppearanceStats,recordAuditEvent,listAuditHistory,listSeasonArchives,getSeasonArchive,archiveCurrentSeason,rolloverClubSeason,resetParentPin,setAccessPin,approveParentRequest,removeTeamMember,syncTeamDirectory,switchAdminTeam,switchParentTeam,getClubOverview,signOut,switchToParentSignIn,handleAuthCallback,listMessageContacts,listClubMessages,sendClubMessage,markClubMessagesRead,getClubComplianceStatus,setDisputeReviewers,setClubSafeguardingContacts,getConcernRouting,raiseClubConcern,listGeneralDisputes,listDisputeMessages,upsertU11SafeguardingInfo,exportU11SafeguardingPack,listSafeguardingExportAudit,requestClubCancellation,cancelClubCancellation,
     updateCloudPanel,

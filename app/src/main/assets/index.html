@@ -431,6 +431,16 @@
         <div class="section-title-row"><div><p class="kicker">Private club messaging</p><h2>Inbox</h2></div><button type="button" class="secondary-button compact" id="refresh-club-inbox">Refresh <span class="notification-badge hidden" id="club-inbox-badge">0</span></button></div>
         <nav class="communications-tabs hidden" id="communications-tabs" aria-label="Communications sections"><button type="button" class="secondary-button compact active" data-communications-tab="inbox">Inbox</button><button type="button" class="secondary-button compact" data-communications-tab="notifications">Notifications</button><button type="button" class="secondary-button compact" data-communications-tab="notices">Club notices</button></nav>
         <div id="communications-inbox-panel">
+        <details class="panel settings-accordion hidden" id="member-contacts-panel">
+          <summary><span>Contact details</span><span class="settings-chevron">⌄</span></summary>
+          <div class="settings-accordion-body">
+            <p class="muted" id="member-contacts-help">Team contact details</p>
+            <div class="contact-directory-controls"><label class="hidden" id="member-contacts-team-wrap">Team<select id="member-contacts-team"><option value="">All club teams</option></select></label><button type="button" class="secondary-button" id="refresh-member-contacts">Refresh contacts</button></div>
+            <p class="helper" id="member-contacts-status" role="status" aria-live="polite"></p>
+            <div id="member-contacts-self"></div>
+            <div class="member-contact-list" id="member-contacts-list"></div>
+          </div>
+        </details>
         <section class="panel inbox-card screen-lead-card"><div class="panel-heading"><div><p class="kicker">Conversations</p><h3>Messages</h3><p class="muted" id="club-inbox-help">Messages leave the active inbox 60 days after they are sent.</p></div></div>
           <label class="inbox-conversation-label">Conversation<select id="inbox-contact-select"><option value="">Choose…</option></select></label>
           <p class="helper inbox-hint-pill" id="inbox-compose-hint"></p>

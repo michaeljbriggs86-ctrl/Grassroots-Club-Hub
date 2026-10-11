@@ -22,8 +22,9 @@ assert.equal(ctx.chooseActiveTeam(null).id,'b');
 assert.equal(memory.get('current'),'b');
 
 // Switching to an unlinked team never fetches data; a failed fetch leaves the old team active.
-let reads=[],updates=[];
+let reads=[],updates=[],contactEvents=[];
 ctx={visibleTeams:[a,b],context:{team:a},activeTeam:a,activeRevision:8,lastRemoteUpdatedAt:'old',
+  Event,window:{dispatchEvent:event=>contactEvents.push(event.type)},
   localStorage:storage,ACTIVE_TEAM_KEY:'current',role:()=> 'parent',
   fetchTeamState:async id=>{reads.push(id);throw new Error('offline');},
   hooks:{onRemoteState:state=>updates.push(state)},updateCloudPanel:()=>{},oldShapeTeam:x=>x};
@@ -37,12 +38,14 @@ vm.runInNewContext(section(cloud,'async function switchParentTeam(teamId){','asy
   assert.equal(memory.get('current'),'a');
   assert.equal(ctx.activeRevision,8);
   assert.deepEqual(updates,[]);
+  assert.deepEqual(contactEvents,[],'failed parent switch retains the current team contact context');
   ctx.fetchTeamState=async id=>{reads.push(id);ctx.activeRevision=9;return {state:{team:id}};};
   await ctx.switchParentTeam('b');
   assert.equal(ctx.activeTeam.id,'b');
   assert.equal(ctx.context.team.id,'b');
   assert.equal(memory.get('current'),'b');
   assert.equal(updates.length,1);
+  assert.deepEqual(contactEvents,['clubhub-contacts-clear'],'successful parent team switch clears contact details');
 
   // Re-rendering the controls must retain a newly chosen team until Switch is pressed.
   let selected='';const select={options:[],disabled:false,get value(){return selected;},set value(v){selected=v;},

@@ -90,7 +90,9 @@ vm.runInNewContext(source.slice(start,end),context);
   assert(cloudStart>=0&&cloudEnd>cloudStart);
   const old={id:'old',age_group:9},next={id:'next',age_group:12};
   const saved=new Map([['active','old']]);
+  const contactEvents=[];
   const cloudContext={visibleTeams:[old,next],activeTeam:old,activeRevision:7,lastRemoteUpdatedAt:'yesterday',
+    Event,window:{dispatchEvent:event=>contactEvents.push(event.type)},
     ACTIVE_TEAM_KEY:'active',TEAM_STATE_CACHE_PREFIX:'state:',pendingState:null,
     canAdmin:()=>true,canEdit:()=>false,cachedTeamState:()=>null,
     fetchTeamState:async()=>{throw new Error('offline');},updateCloudPanel:()=>{},
@@ -100,5 +102,6 @@ vm.runInNewContext(source.slice(start,end),context);
   assert.equal(cloudContext.activeTeam,old);
   assert.equal(cloudContext.activeRevision,7);
   assert.equal(saved.get('active'),'old');
+  assert.deepEqual(contactEvents,['clubhub-contacts-clear'],'old contact details clear before an admin team request, even when the switch fails');
   console.log('PASS account contexts and authorized transitions');
 })().catch(e=>{console.error(e);process.exitCode=1;});
