@@ -6,6 +6,7 @@ on:
       - '.github/workflows/scrape-selkent.yml'
       - 'scripts/scrape.py'
       - 'tests/test_selkent_scrape.py'
+      - 'tests/test_selkent_cup_results.py'
   schedule:
     # Refresh public Selkent feed data every six hours so newly published
     # fixtures become available to the app promptly across all age groups.
@@ -40,6 +41,7 @@ jobs:
         run: |
           python -m unittest discover -s tests -p 'test_selkent_scrape.py' -v
           python -m unittest discover -s tests -p 'test_selkent_results.py' -v
+          python -m unittest discover -s tests -p 'test_selkent_cup_results.py' -v
 
       - name: Run generalized Selkent scraper
         run: python scripts/scrape.py

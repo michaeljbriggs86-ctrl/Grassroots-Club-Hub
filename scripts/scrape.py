@@ -589,6 +589,106 @@ def parse_published_results(html: str) -> list[dict[str, Any]]:
     return rows
 
 
+def parse_published_cup_results(html: str, agegroup_id: int) -> list[dict[str, Any]]:
+    """Verified public cupspage shape, captured 2026-10-11 (U12+ only).
+
+    Each competition pane contains dated rounds, four-cell fixture rows and
+    a numeric .vCol score. A date inside .matchRef overrides the round's
+    start date; a round date range otherwise uses its published start date.
+    """
+    soup = BeautifulSoup(html, "html.parser")
+    tabs = soup.select("a.tabType")
+    competitions = []
+    for tab in tabs:
+        target = str(tab.get("href", ""))
+        name = _normalise_text(tab.get_text(" ", strip=True))
+        pane = soup.find(id=target[1:]) if target.startswith("#") else None
+        if pane is None or not re.search(r"cup|vase", name, re.I):
+            raise UnverifiedPublishedResultsMarkupError("Unknown cup competition tab")
+        competitions.append((pane, name, target[1:]))
+    if not tabs:
+        competitions = [(soup, "Selkent Cup", f"cup-{agegroup_id}")]
+
+    def dates(text: str) -> list[str]:
+        values = []
+        for day, month, year in re.findall(r"\b(\d{1,2})/(\d{1,2})/(\d{2,4})\b", text):
+            year = int(year)
+            try:
+                values.append(datetime(year + 2000 if year < 100 else year, int(month), int(day)).date().isoformat())
+            except ValueError as exc:
+                raise UnverifiedPublishedResultsMarkupError("Invalid cup date") from exc
+        return values
+
+    results = []
+    for pane, competition, provider_cup_id in competitions:
+        panels = pane.select(".panel.panel-static")
+        if not panels:
+            raise UnverifiedPublishedResultsMarkupError("Cup response has no verified round panels")
+        for panel in panels:
+            heading, body = panel.select_one(".panel-heading"), panel.select_one(".panel-body")
+            heading_text = _normalise_text(heading.get_text(" ", strip=True)) if heading else ""
+            round_dates = dates(heading_text)
+            if body is None or not round_dates or "::" not in heading_text:
+                raise UnverifiedPublishedResultsMarkupError("Unknown cup round heading/body")
+            round_name = heading_text.split("::", 1)[0].strip()
+            match_rows = body.select(".fixtureRow")
+            if any("fixtureRow" not in row.get("class", []) for row in body.find_all("div", recursive=False)):
+                raise UnverifiedPublishedResultsMarkupError("Unknown cup body row")
+            if not match_rows and _normalise_text(body.get_text(" ", strip=True)):
+                raise UnverifiedPublishedResultsMarkupError("Unknown populated cup round")
+            for row in match_rows:
+                cells = row.find_all("div", recursive=False)
+                if len(cells) != 4 or "matchRef" not in cells[0].get("class", []) or "vCol" not in cells[2].get("class", []):
+                    raise UnverifiedPublishedResultsMarkupError("Unknown cup team/score cells")
+                score = _normalise_text(cells[2].get_text(" ", strip=True))
+                if score in ("v", "n/g", "", "-"):
+                    continue
+                scored = re.fullmatch(r"(\d{1,2})\s*-\s*(\d{1,2})", score)
+                home, away = (_normalise_text(cells[i].get_text(" ", strip=True)) for i in (1, 3))
+                if not scored or not home or not away:
+                    raise UnverifiedPublishedResultsMarkupError(f"Unknown cup score/team: {score!r}")
+                ref_text = _normalise_text(cells[0].get_text(" ", strip=True))
+                override = dates(ref_text)
+                if len(override) > 1:
+                    raise UnverifiedPublishedResultsMarkupError("Ambiguous cup match date")
+                results.append({
+                    "date": override[0] if override else round_dates[0],
+                    "home": home, "away": away,
+                    "homeGoals": int(scored.group(1)), "awayGoals": int(scored.group(2)),
+                    "competition": competition, "round": round_name,
+                    "provider_cup_id": provider_cup_id,
+                    "provider_match_ref": ref_text.split()[0],
+                })
+    return results
+
+
+def collect_cup_results(results_agegroups: dict[int, dict[str, str]]) -> dict[int, list[dict[str, Any]]]:
+    """Use advertised cup tabs intersected with public Results eligibility."""
+    collected = {}
+    for format_type in ("9", "11"):
+        soup = BeautifulSoup(fetch_text(f"cups/{format_type}"), "html.parser")
+        tabs = soup.select("#cupTabs a[data-agegroup-id]")
+        if not tabs:
+            raise SelkentFeedError("Public cup page has no age-group tabs")
+        for tab in tabs:
+            raw_id = str(tab.get("data-agegroup-id", ""))
+            if not raw_id.isdigit():
+                raise SelkentFeedError("Invalid public cup age-group ID")
+            age_id = int(raw_id)
+            metadata = results_agegroups.get(age_id)
+            if metadata is None:
+                continue
+            label = metadata["age_group"]
+            age = re.fullmatch(r"U(\d+)X?", label, re.I)
+            if label.lower() != "senior" and (age is None or int(age.group(1)) < 12):
+                continue
+            if _normalise_text(tab.get_text(" ", strip=True)) != label or metadata["format_type"] != format_type:
+                raise SelkentFeedError("Cup/Results age-group metadata conflict")
+            collected[age_id] = parse_published_cup_results(fetch_json(f"cupspage/{age_id}"), age_id)
+            _sleep_between_requests()
+    return collected
+
+
 def collect_fixtures(
     fixture_agegroups: dict[int, str],
 ) -> dict[int, dict[str, Any]]:
@@ -708,6 +808,8 @@ def build_payload() -> dict[str, Any]:
 
     fixtures_by_age = collect_fixtures(fixture_agegroups)
     standings_by_age = collect_standings(results_agegroups)
+    cups_by_age = collect_cup_results(results_agegroups)
+    generated_at = datetime.now(timezone.utc).isoformat()
 
     all_age_ids = sorted(set(fixtures_by_age) | set(standings_by_age))
     age_groups: list[dict[str, Any]] = []
@@ -745,7 +847,7 @@ def build_payload() -> dict[str, Any]:
         if standings_data is not None:
             entry["results_format_type"] = standings_data["format_type"]
             entry["standings"] = standings_data["standings"]
-            entry["published_results"] = standings_data["published_results"]
+            entry["published_results"] = standings_data["published_results"] + cups_by_age.get(agegroup_id, [])
             entry["published_results_status"] = standings_data[
                 "published_results_status"
             ]
@@ -761,7 +863,8 @@ def build_payload() -> dict[str, Any]:
     return {
         "schema_version": SCHEMA_VERSION,
         "provider": "Selkent",
-        "last_updated": datetime.now(timezone.utc).isoformat(),
+        "last_updated": generated_at,
+        "cup_results_last_updated": generated_at,
         "fixture_agegroup_discovery_source": fixture_discovery_source,
         "coverage": {
             "fixtures": {
@@ -779,6 +882,7 @@ def build_payload() -> dict[str, Any]:
             "published_results": {
                 "scope": "Selkent-public Results age groups only",
                 "parser_status": "verified_scored_rows_v1",
+                "cup_parser_status": "verified_cup_scored_rows_v1",
             },
         },
         "age_groups": age_groups,

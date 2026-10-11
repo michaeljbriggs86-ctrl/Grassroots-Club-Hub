@@ -1,0 +1,52 @@
+"""Public cupspage captures fetched 2026-10-11; whitespace normalized only."""
+import sys
+import unittest
+from pathlib import Path
+from unittest.mock import patch
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "scripts"))
+from scrape import collect_cup_results, parse_published_cup_results, UnverifiedPublishedResultsMarkupError
+
+
+class CupResultsTests(unittest.TestCase):
+    def source(self, age_id):
+        return (ROOT / f"tests/fixtures/selkent_cupspage_{age_id}_2026_10_11.html").read_text()
+
+    def test_real_scored_cups_and_unplayed_ties(self):
+        rows = parse_published_cup_results(self.source(6), 6)
+        self.assertEqual(len(rows), 30)
+        cannons = next(r for r in rows if r['away'] == 'Shooters Hill AFC Cannons')
+        self.assertEqual((cannons['date'], cannons['homeGoals'], cannons['awayGoals'], cannons['competition']),
+                         ('2026-10-11', 2, 3, 'Selkent Cup Two'))
+        self.assertEqual(cannons['provider_match_ref'], 'B')
+        self.assertFalse(any(r['away'] == 'Shooters Hill AFC Lions' for r in rows))
+        u15 = parse_published_cup_results(self.source(9), 9)
+        self.assertEqual(next(r for r in u15 if r['away'] == 'Shooters Hill AFC Cannons')['awayGoals'], 5)
+        self.assertFalse(any('withdrawn' in r['away'] for r in u15))
+
+    def test_date_override_and_range_start(self):
+        rows = parse_published_cup_results(self.source(7), 7)
+        self.assertEqual(next(r for r in rows if r['home'] == 'IEXEL F.C Gold')['date'], '2026-10-11')
+        self.assertEqual(next(r for r in rows if r['home'] == 'North Kent Wolves FC')['date'], '2026-10-04')
+
+    def test_single_competition_with_no_scored_matches(self):
+        self.assertEqual(parse_published_cup_results(self.source(11), 11), [])
+
+    def test_unknown_score_or_markup_fails_closed(self):
+        for html in [self.source(6).replace('2 - 3', 'Won on penalties'),
+                     self.source(6).replace('class="col-xs-1 vCol"', 'class="new-score"'),
+                     '<p>Results moved</p>', self.source(6).replace('11/10/26', '32/10/26')]:
+            with self.subTest(html=html[:40]), self.assertRaises(UnverifiedPublishedResultsMarkupError):
+                parse_published_cup_results(html, 6)
+
+    def test_only_advertised_public_eligible_ages_are_fetched(self):
+        tabs = '<ul id="cupTabs"><a data-agegroup-id="4">U9</a><a data-agegroup-id="6">U12</a><a data-agegroup-id="8">U13</a></ul>'
+        with patch('scrape.fetch_text', side_effect=[tabs, '<ul id="cupTabs"><a data-agegroup-id="11">U17</a></ul>']), patch('scrape.fetch_json', return_value=self.source(6)) as fetch, patch('scrape._sleep_between_requests'):
+            results = collect_cup_results({4: {'age_group': 'U9', 'format_type': '9'}, 6: {'age_group': 'U12', 'format_type': '9'}})
+        self.assertEqual(set(results), {6})
+        fetch.assert_called_once_with('cupspage/6')
+
+
+if __name__ == '__main__':
+    unittest.main()

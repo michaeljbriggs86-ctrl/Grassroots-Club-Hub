@@ -4195,10 +4195,12 @@ function publishedClubTeamData(team,feed){
   const standings=groups.flatMap(group=>group.standings||[]).filter(table=>(table.rows||[]).some(row=>normalizeTeamKey(row.team_name)===name));
   const exactStanding=standings.find(table=>division&&normalizeTeamKey(table.division_name)===division);
   const standing=exactStanding||(standings.length===1?standings[0]:null);
-  const candidates=groups.flatMap(group=>group.published_results||[]).filter(result=>(normalizeTeamKey(result.home)===name||normalizeTeamKey(result.away)===name)&&Number.isInteger(result.homeGoals)&&Number.isInteger(result.awayGoals));
+  const matches=result=>(normalizeTeamKey(result.home)===name||normalizeTeamKey(result.away)===name)&&Number.isInteger(result.homeGoals)&&Number.isInteger(result.awayGoals);
+  const candidates=groups.flatMap(group=>group.published_results||[]).filter(result=>!result.provider_cup_id&&matches(result));
+  const cups=feed?.coverage?.published_results?.cup_parser_status==='verified_cup_scored_rows_v1'?groups.filter(group=>String(group.age_group||'').toUpperCase()===String(team.ageGroup||'').toUpperCase()).flatMap(group=>group.published_results||[]).filter(result=>result.provider_cup_id&&/cup|vase/i.test(result.competition||'')&&matches(result)):[];
   const exact=candidates.filter(result=>division&&normalizeTeamKey(result.division_name)===division);
   const divisions=new Set(candidates.map(result=>normalizeTeamKey(result.division_name)));
-  return{results:exact.length?exact:!exactStanding&&divisions.size===1?candidates:[],standing};
+  return{results:[...(exact.length?exact:!exactStanding&&divisions.size===1?candidates:[]),...cups],standing};
 }
 function directoryClubDivision(team,directory){
   const age=String(team?.ageGroup||'').toUpperCase(),name=normalizeTeamKey(team?.leagueName||'');
@@ -4211,9 +4213,9 @@ function publishedClubResults(teams=[],feed=null){
   const seen=new Set(),out=[];
   for(const team of teams){
     for(const result of publishedClubTeamData(team,feed).results){
-      const key=[team.ageGroup,result.date,normalizeTeamKey(result.home),normalizeTeamKey(result.away)].join('|');
+      const key=[team.ageGroup,result.date,normalizeTeamKey(result.home),normalizeTeamKey(result.away),result.provider_cup_id||'league',result.provider_match_ref||''].join('|');
       if(seen.has(key))continue;seen.add(key);
-      out.push({home:result.home,away:result.away,hg:Number(result.homeGoals),ag:Number(result.awayGoals),date:result.date||'',competition:'League',divisionName:result.division_name||'',teamName:team.teamName||team.leagueName||'',ageGroup:Number(String(team.ageGroup||'').match(/\d+/)?.[0]||0),source:'selkent-static'});
+      out.push({home:result.home,away:result.away,hg:Number(result.homeGoals),ag:Number(result.awayGoals),date:result.date||'',competition:result.provider_cup_id?result.competition:'League',divisionName:result.division_name||'',teamName:team.teamName||team.leagueName||'',ageGroup:Number(String(team.ageGroup||'').match(/\d+/)?.[0]||0),source:'selkent-static'});
     }
   }
   return out;

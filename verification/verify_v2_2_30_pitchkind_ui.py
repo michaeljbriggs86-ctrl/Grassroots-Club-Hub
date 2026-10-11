@@ -198,7 +198,9 @@ u9_fixtures = u9.get('fixtures') or []
 check(
     'U9 rolling fixture feed retains verified discovery and provider identities',
     u9.get('fixture_parse_status') == 'verified_multiweek_fixture_rows_v2'
-    and len(set(u9.get('fixture_week_ids') or [])) >= 2
+    # Selkent advertises only week 4 on 2026-10-11. Validate every provided
+    # week/row without requiring the provider to expose a second week.
+    and len(set(u9.get('fixture_week_ids') or [])) >= 1
     and bool(u9_fixtures)
     and all((re.fullmatch('\\d{4}-\\d{2}-\\d{2}', f.get('date', '')) and f.get('division_name') and f.get('home') and f.get('away') and (len(f.get('provider_team_ids') or []) == (1 if f.get('away') == 'TBD' else 2)) for f in u9_fixtures)),
 )

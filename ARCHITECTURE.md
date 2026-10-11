@@ -152,6 +152,17 @@ validates and bundles this file for the protected website, but this source/CI
 evidence does not prove the revision currently served to signed-in users.
 U7–U11 results and standings must never appear in public JSON or parent APIs.
 
+Public cup results follow the same static feed authority. The scraper reads
+advertised Cups & Vases age-group tabs for 9/11-a-side, intersects them with
+public Results eligibility, and publishes only scored U12+ / Senior rows.
+The verified `cupspage` parser preserves competition, round and match reference,
+uses match date overrides before the round start date, excludes unplayed / n/g
+ties and fails closed on unfamiliar populated markup. Cup rows use
+`provider_cup_id` rather than a league division and never affect standings.
+The client requires `verified_cup_scored_rows_v1` coverage and an exact age-group
+label for cup matches (U12 and U12X remain separate). Signed-in website
+acceptance remains OPEN until the protected served revision is checked.
+
 ## 2.5 Private club-entered results, player, roster and safeguarding data
 
 Authoritative source:

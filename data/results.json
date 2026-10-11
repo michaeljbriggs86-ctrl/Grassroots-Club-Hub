@@ -16,7 +16,8 @@
     },
     "published_results": {
       "scope": "Selkent-public Results age groups only",
-      "parser_status": "verified_scored_rows_v1"
+      "parser_status": "verified_scored_rows_v1",
+      "cup_parser_status": "verified_cup_scored_rows_v1"
     }
   },
   "age_groups": [
@@ -6066,6 +6067,336 @@
           "awayGoals": 1,
           "provider_division_id": 4259,
           "division_name": "Under 12D Silver"
+        },
+        {
+          "date": "2026-10-11",
+          "home": "Ebbsfleet United Black",
+          "away": "London Legends Gold",
+          "homeGoals": 2,
+          "awayGoals": 3,
+          "competition": "Selkent Cup One",
+          "round": "Prelim Round",
+          "provider_cup_id": "cupCombined6-0",
+          "provider_match_ref": "A"
+        },
+        {
+          "date": "2026-10-11",
+          "home": "Teviot Rangers Gold",
+          "away": "London Kickers FC Red",
+          "homeGoals": 2,
+          "awayGoals": 1,
+          "competition": "Selkent Cup One",
+          "round": "Prelim Round",
+          "provider_cup_id": "cupCombined6-0",
+          "provider_match_ref": "B"
+        },
+        {
+          "date": "2026-10-11",
+          "home": "Dynamo Youth Silver",
+          "away": "Foots Cray Lions Yellow",
+          "homeGoals": 10,
+          "awayGoals": 0,
+          "competition": "Selkent Cup One",
+          "round": "Prelim Round",
+          "provider_cup_id": "cupCombined6-0",
+          "provider_match_ref": "C"
+        },
+        {
+          "date": "2026-10-11",
+          "home": "Hillyfielders Hawks",
+          "away": "Dartford FC White",
+          "homeGoals": 0,
+          "awayGoals": 5,
+          "competition": "Selkent Cup One",
+          "round": "Prelim Round",
+          "provider_cup_id": "cupCombined6-0",
+          "provider_match_ref": "D"
+        },
+        {
+          "date": "2026-10-11",
+          "home": "Erith & Belvedere Selkent",
+          "away": "Cray Wanderers Panthers",
+          "homeGoals": 0,
+          "awayGoals": 12,
+          "competition": "Selkent Cup One",
+          "round": "Prelim Round",
+          "provider_cup_id": "cupCombined6-0",
+          "provider_match_ref": "E"
+        },
+        {
+          "date": "2026-10-11",
+          "home": "Welling United Navy",
+          "away": "Dulwich Village White",
+          "homeGoals": 4,
+          "awayGoals": 0,
+          "competition": "Selkent Cup One",
+          "round": "Prelim Round",
+          "provider_cup_id": "cupCombined6-0",
+          "provider_match_ref": "F"
+        },
+        {
+          "date": "2026-10-11",
+          "home": "Metrogas FC White",
+          "away": "Sutton Athletic Whites",
+          "homeGoals": 6,
+          "awayGoals": 0,
+          "competition": "Selkent Cup One",
+          "round": "Prelim Round",
+          "provider_cup_id": "cupCombined6-0",
+          "provider_match_ref": "G"
+        },
+        {
+          "date": "2026-10-11",
+          "home": "Sutton Athletic Stripes",
+          "away": "Dulwich Village Orange",
+          "homeGoals": 8,
+          "awayGoals": 0,
+          "competition": "Selkent Cup One",
+          "round": "Prelim Round",
+          "provider_cup_id": "cupCombined6-0",
+          "provider_match_ref": "H"
+        },
+        {
+          "date": "2026-10-11",
+          "home": "South Darenth Purples",
+          "away": "SE Dons Football Club",
+          "homeGoals": 3,
+          "awayGoals": 5,
+          "competition": "Selkent Cup One",
+          "round": "Prelim Round",
+          "provider_cup_id": "cupCombined6-0",
+          "provider_match_ref": "I"
+        },
+        {
+          "date": "2026-10-11",
+          "home": "London Legends red",
+          "away": "Greenwich Peninsula Lions",
+          "homeGoals": 2,
+          "awayGoals": 1,
+          "competition": "Selkent Cup One",
+          "round": "Prelim Round",
+          "provider_cup_id": "cupCombined6-0",
+          "provider_match_ref": "J"
+        },
+        {
+          "date": "2026-10-11",
+          "home": "AFC Lewisham Blue",
+          "away": "Bexley Ballers Football Club",
+          "homeGoals": 1,
+          "awayGoals": 9,
+          "competition": "Selkent Cup One",
+          "round": "Prelim Round",
+          "provider_cup_id": "cupCombined6-0",
+          "provider_match_ref": "K"
+        },
+        {
+          "date": "2026-10-11",
+          "home": "Old Roan FC Gold",
+          "away": "Sutton Athletic Greens",
+          "homeGoals": 6,
+          "awayGoals": 1,
+          "competition": "Selkent Cup One",
+          "round": "Prelim Round",
+          "provider_cup_id": "cupCombined6-0",
+          "provider_match_ref": "L"
+        },
+        {
+          "date": "2026-10-11",
+          "home": "Vikings FC Red",
+          "away": "Dulwich Hamlet JFC Pink",
+          "homeGoals": 1,
+          "awayGoals": 6,
+          "competition": "Selkent Cup One",
+          "round": "Prelim Round",
+          "provider_cup_id": "cupCombined6-0",
+          "provider_match_ref": "M"
+        },
+        {
+          "date": "2026-10-11",
+          "home": "Lewisham Project Gold",
+          "away": "AFC Unity",
+          "homeGoals": 3,
+          "awayGoals": 1,
+          "competition": "Selkent Cup One",
+          "round": "Prelim Round",
+          "provider_cup_id": "cupCombined6-0",
+          "provider_match_ref": "N"
+        },
+        {
+          "date": "2026-10-11",
+          "home": "On Target F.C. Red",
+          "away": "Cray Valley (PM) FC Black",
+          "homeGoals": 1,
+          "awayGoals": 3,
+          "competition": "Selkent Cup One",
+          "round": "Prelim Round",
+          "provider_cup_id": "cupCombined6-0",
+          "provider_match_ref": "O"
+        },
+        {
+          "date": "2026-10-11",
+          "home": "Hayden Youth Tigers",
+          "away": "ST Sports FC Blue",
+          "homeGoals": 1,
+          "awayGoals": 2,
+          "competition": "Selkent Cup One",
+          "round": "Prelim Round",
+          "provider_cup_id": "cupCombined6-0",
+          "provider_match_ref": "P"
+        },
+        {
+          "date": "2026-10-11",
+          "home": "Metrogas FC Red",
+          "away": "The Bosco FC Dons",
+          "homeGoals": 10,
+          "awayGoals": 3,
+          "competition": "Selkent Cup One",
+          "round": "Prelim Round",
+          "provider_cup_id": "cupCombined6-0",
+          "provider_match_ref": "Q"
+        },
+        {
+          "date": "2026-10-11",
+          "home": "Cray Wanderers Cobras",
+          "away": "Cobham Colts FC",
+          "homeGoals": 1,
+          "awayGoals": 3,
+          "competition": "Selkent Cup One",
+          "round": "Prelim Round",
+          "provider_cup_id": "cupCombined6-0",
+          "provider_match_ref": "R"
+        },
+        {
+          "date": "2026-10-11",
+          "home": "Fleetdown United black",
+          "away": "Fisher Youth",
+          "homeGoals": 3,
+          "awayGoals": 5,
+          "competition": "Selkent Cup One",
+          "round": "Prelim Round",
+          "provider_cup_id": "cupCombined6-0",
+          "provider_match_ref": "S"
+        },
+        {
+          "date": "2026-10-11",
+          "home": "Cray Wanderers Wolves",
+          "away": "Russellers Whites",
+          "homeGoals": 3,
+          "awayGoals": 2,
+          "competition": "Selkent Cup One",
+          "round": "Prelim Round",
+          "provider_cup_id": "cupCombined6-0",
+          "provider_match_ref": "T"
+        },
+        {
+          "date": "2026-10-11",
+          "home": "Crayford Arrows Red",
+          "away": "Dulwich Village Black",
+          "homeGoals": 0,
+          "awayGoals": 2,
+          "competition": "Selkent Cup One",
+          "round": "Prelim Round",
+          "provider_cup_id": "cupCombined6-0",
+          "provider_match_ref": "U"
+        },
+        {
+          "date": "2026-10-11",
+          "home": "Sporting Club Vista",
+          "away": "Eagles & Stars FC",
+          "homeGoals": 0,
+          "awayGoals": 4,
+          "competition": "Selkent Cup One",
+          "round": "Prelim Round",
+          "provider_cup_id": "cupCombined6-0",
+          "provider_match_ref": "V"
+        },
+        {
+          "date": "2026-10-11",
+          "home": "Beacons Red",
+          "away": "Punjab United",
+          "homeGoals": 0,
+          "awayGoals": 3,
+          "competition": "Selkent Cup Two",
+          "round": "Extra Prelim Round",
+          "provider_cup_id": "cupCombined6-1",
+          "provider_match_ref": "A"
+        },
+        {
+          "date": "2026-10-11",
+          "home": "IEXEL F.C Gold",
+          "away": "Shooters Hill AFC Cannons",
+          "homeGoals": 2,
+          "awayGoals": 3,
+          "competition": "Selkent Cup Two",
+          "round": "Extra Prelim Round",
+          "provider_cup_id": "cupCombined6-1",
+          "provider_match_ref": "B"
+        },
+        {
+          "date": "2026-10-11",
+          "home": "Crayford Arrows White",
+          "away": "Deptford United Falcons",
+          "homeGoals": 4,
+          "awayGoals": 1,
+          "competition": "Selkent Cup Two",
+          "round": "Extra Prelim Round",
+          "provider_cup_id": "cupCombined6-1",
+          "provider_match_ref": "C"
+        },
+        {
+          "date": "2026-10-11",
+          "home": "Northumberland Heath",
+          "away": "Slade Green Knights Whites",
+          "homeGoals": 2,
+          "awayGoals": 3,
+          "competition": "Selkent Cup Two",
+          "round": "Extra Prelim Round",
+          "provider_cup_id": "cupCombined6-1",
+          "provider_match_ref": "D"
+        },
+        {
+          "date": "2026-10-11",
+          "home": "Dartford Royals yellow",
+          "away": "Junior Reds Valiants",
+          "homeGoals": 5,
+          "awayGoals": 1,
+          "competition": "Selkent Cup Two",
+          "round": "Extra Prelim Round",
+          "provider_cup_id": "cupCombined6-1",
+          "provider_match_ref": "E"
+        },
+        {
+          "date": "2026-10-11",
+          "home": "Vikings FC yellow",
+          "away": "Swanscombe Tigers Stripes",
+          "homeGoals": 1,
+          "awayGoals": 11,
+          "competition": "Selkent Cup Two",
+          "round": "Extra Prelim Round",
+          "provider_cup_id": "cupCombined6-1",
+          "provider_match_ref": "F"
+        },
+        {
+          "date": "2026-10-11",
+          "home": "Shooters Hill AFC Archers",
+          "away": "Istead United Colts",
+          "homeGoals": 0,
+          "awayGoals": 8,
+          "competition": "Selkent Cup Two",
+          "round": "Extra Prelim Round",
+          "provider_cup_id": "cupCombined6-1",
+          "provider_match_ref": "G"
+        },
+        {
+          "date": "2026-10-11",
+          "home": "Beacons Black",
+          "away": "Cray Wanderers Piranhas",
+          "homeGoals": 2,
+          "awayGoals": 0,
+          "competition": "Selkent Cup Two",
+          "round": "Extra Prelim Round",
+          "provider_cup_id": "cupCombined6-1",
+          "provider_match_ref": "H"
         }
       ],
       "published_results_status": "verified_scored_rows_v1"
@@ -8462,6 +8793,248 @@
           "awayGoals": 1,
           "provider_division_id": 4279,
           "division_name": "Under 14D Silver"
+        },
+        {
+          "date": "2026-10-11",
+          "home": "IEXEL F.C Gold",
+          "away": "Sutton Athletic Stripes",
+          "homeGoals": 4,
+          "awayGoals": 6,
+          "competition": "Selkent Cup One",
+          "round": "Prelim Round",
+          "provider_cup_id": "cupCombined7-0",
+          "provider_match_ref": "A"
+        },
+        {
+          "date": "2026-10-04",
+          "home": "Phoenix Sports Cobras",
+          "away": "Metrogas FC Black",
+          "homeGoals": 5,
+          "awayGoals": 2,
+          "competition": "Selkent Cup One",
+          "round": "Prelim Round",
+          "provider_cup_id": "cupCombined7-0",
+          "provider_match_ref": "B"
+        },
+        {
+          "date": "2026-10-04",
+          "home": "Erith Town Black",
+          "away": "AFC Lewisham White",
+          "homeGoals": 1,
+          "awayGoals": 0,
+          "competition": "Selkent Cup One",
+          "round": "Prelim Round",
+          "provider_cup_id": "cupCombined7-0",
+          "provider_match_ref": "C"
+        },
+        {
+          "date": "2026-10-11",
+          "home": "SE Dons Football Club Lions",
+          "away": "Swanscombe Tigers Yellow",
+          "homeGoals": 5,
+          "awayGoals": 6,
+          "competition": "Selkent Cup One",
+          "round": "Prelim Round",
+          "provider_cup_id": "cupCombined7-0",
+          "provider_match_ref": "E"
+        },
+        {
+          "date": "2026-10-04",
+          "home": "Woolwich Wanderers FC",
+          "away": "Mayow Park Rangers FC White",
+          "homeGoals": 0,
+          "awayGoals": 13,
+          "competition": "Selkent Cup Two",
+          "round": "Prelim Round",
+          "provider_cup_id": "cupCombined7-1",
+          "provider_match_ref": "A"
+        },
+        {
+          "date": "2026-10-11",
+          "home": "Fleetdown United",
+          "away": "Dulwich Hamlet JFC",
+          "homeGoals": 2,
+          "awayGoals": 0,
+          "competition": "Selkent Cup Two",
+          "round": "Prelim Round",
+          "provider_cup_id": "cupCombined7-1",
+          "provider_match_ref": "B"
+        },
+        {
+          "date": "2026-10-11",
+          "home": "Cray Wanderers Lions",
+          "away": "Riverview FC Spitfires",
+          "homeGoals": 0,
+          "awayGoals": 2,
+          "competition": "Selkent Cup Two",
+          "round": "Prelim Round",
+          "provider_cup_id": "cupCombined7-1",
+          "provider_match_ref": "C"
+        },
+        {
+          "date": "2026-10-04",
+          "home": "Teviot Rangers WHITE",
+          "away": "London Blazers FC",
+          "homeGoals": 4,
+          "awayGoals": 0,
+          "competition": "Selkent Cup Two",
+          "round": "Prelim Round",
+          "provider_cup_id": "cupCombined7-1",
+          "provider_match_ref": "D"
+        },
+        {
+          "date": "2026-10-11",
+          "home": "Hayden Youth Sharks",
+          "away": "Teviot Rangers Silver",
+          "homeGoals": 5,
+          "awayGoals": 3,
+          "competition": "Selkent Cup Two",
+          "round": "Prelim Round",
+          "provider_cup_id": "cupCombined7-1",
+          "provider_match_ref": "E"
+        },
+        {
+          "date": "2026-10-04",
+          "home": "Mayow Park Rangers FC Blue",
+          "away": "Total FC",
+          "homeGoals": 1,
+          "awayGoals": 8,
+          "competition": "Selkent Cup Two",
+          "round": "Prelim Round",
+          "provider_cup_id": "cupCombined7-1",
+          "provider_match_ref": "F"
+        },
+        {
+          "date": "2026-10-04",
+          "home": "Thamesmead Tigers FC",
+          "away": "Welling United Black",
+          "homeGoals": 3,
+          "awayGoals": 0,
+          "competition": "Selkent Cup Two",
+          "round": "Prelim Round",
+          "provider_cup_id": "cupCombined7-1",
+          "provider_match_ref": "G"
+        },
+        {
+          "date": "2026-10-04",
+          "home": "Parkwood Rangers Wolverines",
+          "away": "Erith Town Red",
+          "homeGoals": 16,
+          "awayGoals": 0,
+          "competition": "Selkent Cup Two",
+          "round": "Prelim Round",
+          "provider_cup_id": "cupCombined7-1",
+          "provider_match_ref": "H"
+        },
+        {
+          "date": "2026-10-04",
+          "home": "Welling United white",
+          "away": "SE Dons Football Club",
+          "homeGoals": 3,
+          "awayGoals": 2,
+          "competition": "Selkent Cup Two",
+          "round": "Prelim Round",
+          "provider_cup_id": "cupCombined7-1",
+          "provider_match_ref": "I"
+        },
+        {
+          "date": "2026-10-04",
+          "home": "Slade Green Knights Whites",
+          "away": "Hillyfielders Falcons",
+          "homeGoals": 1,
+          "awayGoals": 8,
+          "competition": "Selkent Cup Two",
+          "round": "Prelim Round",
+          "provider_cup_id": "cupCombined7-1",
+          "provider_match_ref": "J"
+        },
+        {
+          "date": "2026-10-04",
+          "home": "Metrogas FC White",
+          "away": "S.E. Eagles FC",
+          "homeGoals": 5,
+          "awayGoals": 3,
+          "competition": "Selkent Cup Two",
+          "round": "Prelim Round",
+          "provider_cup_id": "cupCombined7-1",
+          "provider_match_ref": "K"
+        },
+        {
+          "date": "2026-10-04",
+          "home": "Baldon Sports Lions",
+          "away": "Bridon Ropes",
+          "homeGoals": 2,
+          "awayGoals": 4,
+          "competition": "Selkent Cup Two",
+          "round": "Prelim Round",
+          "provider_cup_id": "cupCombined7-1",
+          "provider_match_ref": "L"
+        },
+        {
+          "date": "2026-10-04",
+          "home": "North Kent Wolves FC",
+          "away": "Shooters Hill AFC Lions",
+          "homeGoals": 1,
+          "awayGoals": 4,
+          "competition": "Selkent Cup Two",
+          "round": "Prelim Round",
+          "provider_cup_id": "cupCombined7-1",
+          "provider_match_ref": "M"
+        },
+        {
+          "date": "2026-10-04",
+          "home": "AFC Gravesend Hearts",
+          "away": "Dulwich Village Orange",
+          "homeGoals": 8,
+          "awayGoals": 9,
+          "competition": "Selkent Cup Two",
+          "round": "Prelim Round",
+          "provider_cup_id": "cupCombined7-1",
+          "provider_match_ref": "N"
+        },
+        {
+          "date": "2026-10-04",
+          "home": "London Legends Blue",
+          "away": "The Bosco FC Dons",
+          "homeGoals": 1,
+          "awayGoals": 5,
+          "competition": "Selkent Cup Two",
+          "round": "Prelim Round",
+          "provider_cup_id": "cupCombined7-1",
+          "provider_match_ref": "O"
+        },
+        {
+          "date": "2026-10-04",
+          "home": "Athenlay FC",
+          "away": "Teviot Rangers RED",
+          "homeGoals": 2,
+          "awayGoals": 1,
+          "competition": "Selkent Cup Two",
+          "round": "Prelim Round",
+          "provider_cup_id": "cupCombined7-1",
+          "provider_match_ref": "P"
+        },
+        {
+          "date": "2026-10-11",
+          "home": "Kent United FC Reds",
+          "away": "Junior Reds Sabres",
+          "homeGoals": 2,
+          "awayGoals": 0,
+          "competition": "Selkent Cup Two",
+          "round": "Prelim Round",
+          "provider_cup_id": "cupCombined7-1",
+          "provider_match_ref": "Q"
+        },
+        {
+          "date": "2026-10-04",
+          "home": "Hayden Youth Hurricanes",
+          "away": "Guru Nanak Youth",
+          "homeGoals": 2,
+          "awayGoals": 4,
+          "competition": "Selkent Cup Two",
+          "round": "Prelim Round",
+          "provider_cup_id": "cupCombined7-1",
+          "provider_match_ref": "R"
         }
       ],
       "published_results_status": "verified_scored_rows_v1"
@@ -10431,6 +11004,226 @@
           "awayGoals": 5,
           "provider_division_id": 4266,
           "division_name": "Under 13D Silver"
+        },
+        {
+          "date": "2026-10-11",
+          "home": "Fisher Youth Sharks",
+          "away": "Riverview FC",
+          "homeGoals": 2,
+          "awayGoals": 3,
+          "competition": "Selkent Cup One",
+          "round": "Round 1",
+          "provider_cup_id": "cupCombined8-0",
+          "provider_match_ref": "B"
+        },
+        {
+          "date": "2026-10-11",
+          "home": "Fleetdown United",
+          "away": "Hayden Youth Pumas",
+          "homeGoals": 3,
+          "awayGoals": 1,
+          "competition": "Selkent Cup One",
+          "round": "Round 1",
+          "provider_cup_id": "cupCombined8-0",
+          "provider_match_ref": "C"
+        },
+        {
+          "date": "2026-10-11",
+          "home": "Ballers SE Blue",
+          "away": "Next Level FC Black",
+          "homeGoals": 3,
+          "awayGoals": 5,
+          "competition": "Selkent Cup One",
+          "round": "Round 1",
+          "provider_cup_id": "cupCombined8-0",
+          "provider_match_ref": "D"
+        },
+        {
+          "date": "2026-10-11",
+          "home": "Long Lane Tigers",
+          "away": "Blackheath Rhinos Blue",
+          "homeGoals": 4,
+          "awayGoals": 2,
+          "competition": "Selkent Cup Two",
+          "round": "Prelim Round",
+          "provider_cup_id": "cupCombined8-1",
+          "provider_match_ref": "A"
+        },
+        {
+          "date": "2026-10-11",
+          "home": "S.E. Eagles FC Gold",
+          "away": "Junior Reds Sabres",
+          "homeGoals": 0,
+          "awayGoals": 4,
+          "competition": "Selkent Cup Two",
+          "round": "Prelim Round",
+          "provider_cup_id": "cupCombined8-1",
+          "provider_match_ref": "B"
+        },
+        {
+          "date": "2026-10-11",
+          "home": "Cray Valley (PM) FC Green",
+          "away": "Dartford Royals yellow",
+          "homeGoals": 1,
+          "awayGoals": 5,
+          "competition": "Selkent Cup Two",
+          "round": "Prelim Round",
+          "provider_cup_id": "cupCombined8-1",
+          "provider_match_ref": "C"
+        },
+        {
+          "date": "2026-10-11",
+          "home": "Sutton Dynamo FC",
+          "away": "Braves Sporting Club",
+          "homeGoals": 5,
+          "awayGoals": 4,
+          "competition": "Selkent Cup Two",
+          "round": "Prelim Round",
+          "provider_cup_id": "cupCombined8-1",
+          "provider_match_ref": "D"
+        },
+        {
+          "date": "2026-10-11",
+          "home": "Eversley Rangers",
+          "away": "Swanley Rangers White",
+          "homeGoals": 3,
+          "awayGoals": 1,
+          "competition": "Selkent Cup Two",
+          "round": "Prelim Round",
+          "provider_cup_id": "cupCombined8-1",
+          "provider_match_ref": "E"
+        },
+        {
+          "date": "2026-10-11",
+          "home": "L.I.C. FC",
+          "away": "Mighty Warriors FC",
+          "homeGoals": 2,
+          "awayGoals": 7,
+          "competition": "Selkent Cup Two",
+          "round": "Prelim Round",
+          "provider_cup_id": "cupCombined8-1",
+          "provider_match_ref": "F"
+        },
+        {
+          "date": "2026-10-11",
+          "home": "Junior Reds Spartans",
+          "away": "Foots Cray Lions",
+          "homeGoals": 0,
+          "awayGoals": 2,
+          "competition": "Selkent Cup Two",
+          "round": "Prelim Round",
+          "provider_cup_id": "cupCombined8-1",
+          "provider_match_ref": "G"
+        },
+        {
+          "date": "2026-10-11",
+          "home": "Dartford Royals white",
+          "away": "Teviot Rangers Yellow",
+          "homeGoals": 1,
+          "awayGoals": 5,
+          "competition": "Selkent Cup Two",
+          "round": "Prelim Round",
+          "provider_cup_id": "cupCombined8-1",
+          "provider_match_ref": "I"
+        },
+        {
+          "date": "2026-10-11",
+          "home": "Crayford Arrows White",
+          "away": "Blackheath Village Blue",
+          "homeGoals": 5,
+          "awayGoals": 0,
+          "competition": "Selkent Cup Two",
+          "round": "Prelim Round",
+          "provider_cup_id": "cupCombined8-1",
+          "provider_match_ref": "J"
+        },
+        {
+          "date": "2026-10-11",
+          "home": "Blackheath Rhinos Grey",
+          "away": "Punjab United",
+          "homeGoals": 0,
+          "awayGoals": 4,
+          "competition": "Selkent Cup Two",
+          "round": "Prelim Round",
+          "provider_cup_id": "cupCombined8-1",
+          "provider_match_ref": "K"
+        },
+        {
+          "date": "2026-10-11",
+          "home": "AFC Green Court Dukes",
+          "away": "Erith Town Red",
+          "homeGoals": 1,
+          "awayGoals": 5,
+          "competition": "Selkent Cup Two",
+          "round": "Prelim Round",
+          "provider_cup_id": "cupCombined8-1",
+          "provider_match_ref": "L"
+        },
+        {
+          "date": "2026-10-11",
+          "home": "EWD Eagles Youth",
+          "away": "Next Level FC Silvers",
+          "homeGoals": 0,
+          "awayGoals": 1,
+          "competition": "Selkent Cup Two",
+          "round": "Prelim Round",
+          "provider_cup_id": "cupCombined8-1",
+          "provider_match_ref": "M"
+        },
+        {
+          "date": "2026-10-11",
+          "home": "KSI Coaching FC Navy",
+          "away": "Slade Green Knights Green",
+          "homeGoals": 4,
+          "awayGoals": 6,
+          "competition": "Selkent Cup Two",
+          "round": "Prelim Round",
+          "provider_cup_id": "cupCombined8-1",
+          "provider_match_ref": "N"
+        },
+        {
+          "date": "2026-10-11",
+          "home": "Total FC",
+          "away": "Hillyfielders Falcons",
+          "homeGoals": 10,
+          "awayGoals": 0,
+          "competition": "Selkent Cup Two",
+          "round": "Prelim Round",
+          "provider_cup_id": "cupCombined8-1",
+          "provider_match_ref": "O"
+        },
+        {
+          "date": "2026-10-11",
+          "home": "S.E. Lions FC Gold",
+          "away": "Ballers SE Yellow",
+          "homeGoals": 1,
+          "awayGoals": 15,
+          "competition": "Selkent Cup Two",
+          "round": "Prelim Round",
+          "provider_cup_id": "cupCombined8-1",
+          "provider_match_ref": "P"
+        },
+        {
+          "date": "2026-10-11",
+          "home": "Lewisham Borough VIPERS",
+          "away": "S.E. Lions FC Blues",
+          "homeGoals": 3,
+          "awayGoals": 0,
+          "competition": "Selkent Cup Two",
+          "round": "Prelim Round",
+          "provider_cup_id": "cupCombined8-1",
+          "provider_match_ref": "Q"
+        },
+        {
+          "date": "2026-10-11",
+          "home": "Chislehurst Wanderers Tigers",
+          "away": "Crayford Arrows Black",
+          "homeGoals": 2,
+          "awayGoals": 5,
+          "competition": "Selkent Cup Two",
+          "round": "Prelim Round",
+          "provider_cup_id": "cupCombined8-1",
+          "provider_match_ref": "R"
         }
       ],
       "published_results_status": "verified_scored_rows_v1"
@@ -12237,6 +13030,149 @@
           "awayGoals": 2,
           "provider_division_id": 4285,
           "division_name": "Under 15D Silver"
+        },
+        {
+          "date": "2026-10-11",
+          "home": "Bridon Ropes",
+          "away": "Foots Cray Lions",
+          "homeGoals": 2,
+          "awayGoals": 3,
+          "competition": "Selkent Cup One",
+          "round": "Round 1",
+          "provider_cup_id": "cupCombined9-0",
+          "provider_match_ref": "A"
+        },
+        {
+          "date": "2026-10-11",
+          "home": "Junior Reds Knights",
+          "away": "Phoenix Sports Panthers",
+          "homeGoals": 5,
+          "awayGoals": 4,
+          "competition": "Selkent Cup One",
+          "round": "Round 1",
+          "provider_cup_id": "cupCombined9-0",
+          "provider_match_ref": "B"
+        },
+        {
+          "date": "2026-10-11",
+          "home": "Hillyfielders Falcons",
+          "away": "Omarie Youth Red",
+          "homeGoals": 2,
+          "awayGoals": 5,
+          "competition": "Selkent Cup One",
+          "round": "Round 1",
+          "provider_cup_id": "cupCombined9-0",
+          "provider_match_ref": "C"
+        },
+        {
+          "date": "2026-10-11",
+          "home": "Teviot Rangers WHITE",
+          "away": "Teviot Rangers RED",
+          "homeGoals": 3,
+          "awayGoals": 0,
+          "competition": "Selkent Cup One",
+          "round": "Round 1",
+          "provider_cup_id": "cupCombined9-0",
+          "provider_match_ref": "D"
+        },
+        {
+          "date": "2026-10-11",
+          "home": "Long Lane Tigers",
+          "away": "Shooters Hill AFC Cannons",
+          "homeGoals": 1,
+          "awayGoals": 5,
+          "competition": "Selkent Cup One",
+          "round": "Round 1",
+          "provider_cup_id": "cupCombined9-0",
+          "provider_match_ref": "E"
+        },
+        {
+          "date": "2026-10-11",
+          "home": "Hillyfielders Hawks",
+          "away": "Athenlay FC",
+          "homeGoals": 3,
+          "awayGoals": 2,
+          "competition": "Selkent Cup One",
+          "round": "Round 1",
+          "provider_cup_id": "cupCombined9-0",
+          "provider_match_ref": "G"
+        },
+        {
+          "date": "2026-10-11",
+          "home": "Beacons Red",
+          "away": "Sutton Athletic Whites",
+          "homeGoals": 1,
+          "awayGoals": 0,
+          "competition": "Selkent Cup Two",
+          "round": "Prelim Round",
+          "provider_cup_id": "cupCombined9-1",
+          "provider_match_ref": "A"
+        },
+        {
+          "date": "2026-10-11",
+          "home": "Dartford Royals Blue",
+          "away": "Greenwich Peninsula Lions",
+          "homeGoals": 4,
+          "awayGoals": 1,
+          "competition": "Selkent Cup Two",
+          "round": "Prelim Round",
+          "provider_cup_id": "cupCombined9-1",
+          "provider_match_ref": "B"
+        },
+        {
+          "date": "2026-10-11",
+          "home": "Junior Reds Valiants",
+          "away": "Welling United orange",
+          "homeGoals": 1,
+          "awayGoals": 3,
+          "competition": "Selkent Cup Two",
+          "round": "Prelim Round",
+          "provider_cup_id": "cupCombined9-1",
+          "provider_match_ref": "C"
+        },
+        {
+          "date": "2026-10-11",
+          "home": "Dulwich Hamlet JFC",
+          "away": "Mighty Warriors FC Mars",
+          "homeGoals": 1,
+          "awayGoals": 0,
+          "competition": "Selkent Cup Two",
+          "round": "Prelim Round",
+          "provider_cup_id": "cupCombined9-1",
+          "provider_match_ref": "D"
+        },
+        {
+          "date": "2026-10-11",
+          "home": "Lewisham Youth",
+          "away": "Castle Hill United FC",
+          "homeGoals": 0,
+          "awayGoals": 1,
+          "competition": "Selkent Cup Two",
+          "round": "Prelim Round",
+          "provider_cup_id": "cupCombined9-1",
+          "provider_match_ref": "E"
+        },
+        {
+          "date": "2026-10-11",
+          "home": "Swanscombe Tigers Yellows",
+          "away": "Welling United Black",
+          "homeGoals": 0,
+          "awayGoals": 3,
+          "competition": "Selkent Cup Two",
+          "round": "Prelim Round",
+          "provider_cup_id": "cupCombined9-1",
+          "provider_match_ref": "G"
+        },
+        {
+          "date": "2026-10-11",
+          "home": "Blue Stars Elite FC Stars",
+          "away": "Beacons Blue",
+          "homeGoals": 4,
+          "awayGoals": 3,
+          "competition": "Selkent Cup Two",
+          "round": "Prelim Round",
+          "provider_cup_id": "cupCombined9-1",
+          "provider_match_ref": "H"
         }
       ],
       "published_results_status": "verified_scored_rows_v1"
@@ -18387,6 +19323,39 @@
           "awayGoals": 1,
           "provider_division_id": 4248,
           "division_name": "Under 12X C Silver"
+        },
+        {
+          "date": "2026-10-04",
+          "home": "Cray Wanderers Lions",
+          "away": "Welling United White",
+          "homeGoals": 6,
+          "awayGoals": 7,
+          "competition": "Selkent Cup One",
+          "round": "Prelim Round",
+          "provider_cup_id": "cupCombined22-0",
+          "provider_match_ref": "B"
+        },
+        {
+          "date": "2026-10-11",
+          "home": "Lewisham Borough Cobras",
+          "away": "Dulwich Hamlet JFC Pink",
+          "homeGoals": 5,
+          "awayGoals": 1,
+          "competition": "Selkent Cup One",
+          "round": "Prelim Round",
+          "provider_cup_id": "cupCombined22-0",
+          "provider_match_ref": "D"
+        },
+        {
+          "date": "2026-10-04",
+          "home": "Erith & Belvedere",
+          "away": "Eversley Rangers",
+          "homeGoals": 7,
+          "awayGoals": 2,
+          "competition": "Selkent Cup One",
+          "round": "Prelim Round",
+          "provider_cup_id": "cupCombined22-0",
+          "provider_match_ref": "E"
         }
       ],
       "published_results_status": "verified_scored_rows_v1"
@@ -19577,5 +20546,6 @@
     "U7-U11/private club-entered results are intentionally excluded from this public feed.",
     "Unknown fixture/result shapes fail closed rather than publish guessed data.",
     "Standings preserve Selkent display sequence as row_order; row_order is not an authoritative tied-team position."
-  ]
+  ],
+  "cup_results_last_updated": "2026-10-11T21:51:18.106116+00:00"
 }
