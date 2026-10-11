@@ -18,6 +18,13 @@ from urllib.parse import urlsplit
 BADGE_FIELDS = ("logo_url", "logo_status", "logo_source", "logo_updated_at", "logo_sha256")
 MAX_IMAGE_BYTES = 12 * 1024 * 1024
 
+# User-requested fragment removal is an exact source/result review, never an
+# unrestricted redraw admission. Every additional pair requires its own review.
+REVIEWED_FRAGMENT_CLEANUPS = {
+    269: ('0156e1466e39b2179a6a622f553e9c1e81d974dc5ac727fd17c177381ef244e7',
+          '00105ade6767394c6ecab1edf658364238431d66de2d00fa5e881af0fa291e79'),
+}
+
 
 def validated_approvals(directory, manifest):
     if manifest.get("schema_version") != 1 or manifest.get("scope") != "private_pilot":
@@ -68,10 +75,15 @@ def validated_approvals(directory, manifest):
                         not re.fullmatch(r'/file/d/[A-Za-z0-9_-]+/view', original.path) or
                         not re.fullmatch(r'[a-f0-9]{64}', original_hash) or
                         badge.get('source_user_approved') is not True or
-                        method not in ('unchanged_uploaded_original', 'recalculate_eXIf_crc_only') or
+                        method not in ('unchanged_uploaded_original', 'recalculate_eXIf_crc_only',
+                                       'remove_reviewed_exterior_fragments_only') or
                         (method == 'unchanged_uploaded_original' and original_hash != badge['logo_sha256'].lower()) or
                         (method == 'recalculate_eXIf_crc_only' and original_hash == badge['logo_sha256'].lower())):
                     raise ValueError(f"badge {club_id} lacks reviewed user-upload provenance")
+                if (method == 'remove_reviewed_exterior_fragments_only' and
+                        REVIEWED_FRAGMENT_CLEANUPS.get(club_id) !=
+                        (original_hash, badge['logo_sha256'].lower())):
+                    raise ValueError(f"badge {club_id} lacks exact fragment-cleanup review")
             if badge['logo_source'] == 'official_source_transparency_derivative_private':
                 original = urlsplit(str(badge.get('original_source_url') or ''))
                 if (original.scheme != 'https' or not original.hostname or original.username or
