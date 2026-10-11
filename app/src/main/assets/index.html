@@ -437,8 +437,8 @@
             <p class="muted" id="member-contacts-help">Team contact details</p>
             <div class="contact-directory-controls"><label class="hidden" id="member-contacts-team-wrap">Team<select id="member-contacts-team"><option value="">All club teams</option></select></label><button type="button" class="secondary-button" id="refresh-member-contacts">Refresh contacts</button></div>
             <p class="helper" id="member-contacts-status" role="status" aria-live="polite"></p>
-            <section class="member-contact-card hidden" id="contact-import-panel" aria-labelledby="contact-import-heading">
-              <h4 id="contact-import-heading">Import contacts from a spreadsheet</h4>
+            <details class="member-contact-card hidden" id="contact-import-panel">
+              <summary id="contact-import-heading">Import contacts from a spreadsheet</summary>
               <p class="helper">Club Admin only. Download the member template or use columns full_name, team, role, email and phone. Keep phone numbers as text to preserve leading zeroes. Export from Excel or Google Sheets as CSV, then preview the matches.</p>
               <p class="helper">Blank email or phone cells keep existing details. Use [CLEAR] to remove a detail. One row per person, up to 500 rows. Only approved club members can be matched; team links and access permissions stay as configured. Do not include addresses.</p>
               <button type="button" class="secondary-button" id="contact-import-template" disabled>Download member template</button>
@@ -446,7 +446,7 @@
               <div class="contact-directory-controls"><button type="button" class="secondary-button" id="contact-import-preview" disabled>Preview import</button><button type="button" class="primary-button" id="contact-import-save" disabled>Import contacts</button><button type="button" class="secondary-button" id="contact-import-cancel">Clear preview</button></div>
               <p class="helper" id="contact-import-status" role="status" aria-live="polite"></p>
               <div class="member-contact-list" id="contact-import-results"></div>
-            </section>
+            </details>
             <div id="member-contacts-self"></div>
             <div class="member-contact-list" id="member-contacts-list"></div>
           </div>
@@ -484,6 +484,12 @@
 
       </section>
 
+      <section id="view-person" class="view" data-view="person" aria-labelledby="person-profile-name">
+        <button type="button" class="secondary-button person-profile-back" id="person-profile-back">← Back to list</button>
+        <div class="section-title-row"><div><p class="kicker">Individual profile</p><h2 id="person-profile-name" tabindex="-1">Person details</h2></div></div>
+        <p class="helper" id="person-profile-status" role="status" aria-live="polite"></p>
+        <div class="person-profile-body" id="person-profile-body"></div>
+      </section>
       <section id="view-club" class="view" data-view="club">
         <div class="section-title-row"><div><p class="kicker" id="club-view-kicker">Club administration</p><h2 id="club-view-title">Club Overview</h2></div></div>
         <div class="club-matches-switch hidden" id="club-matches-switch" role="group" aria-label="Matches view"><button type="button" data-club-tab="fixtures">Fixtures</button><button type="button" data-club-tab="results">Results</button></div>
@@ -592,7 +598,8 @@
           <button type="button" data-scroll-to="appearance-settings">Appearance</button>
           <button type="button" data-scroll-to="access-panel">My account</button>
         </nav>
-        <button type="button" class="secondary-button hidden" id="coach-profile-self">My coaching qualifications</button>
+        <button type="button" class="secondary-button hidden" id="coach-profile-self">My coaching profile</button>
+        <button type="button" class="secondary-button hidden" id="person-profile-self">My profile</button>
         <div class="settings-accordion-list">
 
 <div class="settings-group-heading" data-coach-ui-only><span>Team</span><small>Tools and access for this team</small></div>
@@ -995,24 +1002,6 @@
     </form>
   </dialog>
 
-  <dialog id="player-profile-dialog" class="modal player-profile-modal">
-    <div class="player-profile-shell">
-      <div class="modal-heading"><div><p class="kicker">Player profile</p><h3 id="player-profile-name">Player</h3></div><button type="button" class="icon-button small" data-close-dialog aria-label="Close">×</button></div>
-      <div class="player-profile-hero" id="player-profile-hero"></div>
-      <div class="player-profile-stats" id="player-profile-stats"></div>
-      <section class="player-profile-availability hidden" id="player-profile-availability">
-        <div class="panel-heading"><div><h3>Next match availability</h3><p class="muted" id="player-profile-fixture">Upcoming fixture</p></div></div>
-        <div class="availability-buttons" role="group" aria-label="Player availability">
-          <button type="button" class="availability-btn available" data-profile-availability="available">Available</button>
-          <button type="button" class="availability-btn unsure" data-profile-availability="unsure">Unsure</button>
-          <button type="button" class="availability-btn unavailable" data-profile-availability="unavailable">Unavailable</button>
-        </div>
-        <p class="muted" id="player-profile-availability-note">Only linked parent accounts can change availability.</p>
-      </section>
-      <div class="player-profile-readonly-note">Profiles are read only. Availability is the only parent-controlled field.</div>
-    </div>
-  </dialog>
-
   <dialog id="player-dialog" class="modal">
     <form method="dialog" id="player-form" novalidate>
       <div class="modal-heading"><h3 id="player-dialog-title">Add player</h3><button type="button" class="icon-button small" data-close-dialog aria-label="Close">×</button></div>
@@ -1109,6 +1098,7 @@
   <script src="pilot-rights-runtime.js"></script>
   <script src="coach-qualifications.js"></script>
   <script src="member-contact-import.js"></script>
+  <script src="person-profiles.js"></script>
   <script src="app.js"></script>
   <script src="static-feed-overlay.js"></script>
 </body>

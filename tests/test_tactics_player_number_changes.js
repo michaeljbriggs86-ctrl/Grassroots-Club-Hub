@@ -15,7 +15,7 @@ const tactics={
 };
 const state={squad:[{number:1,name:'Albie',status:'active',role:'goalkeeper'},{number:2,name:'Oscar',status:'active',role:'outfield'}],meta:{ageGroup:'U9'},tactics};
 const fields={'player-original-number':{value:'1'},'player-number':{value:'9'},'player-name':{value:'Albie'},'player-role':{value:'goalkeeper'},'player-status':{value:'active'},'player-dialog':{close(){}}};
-const context={state,document:{getElementById:id=>fields[id]},requireCoach:()=>true,
+const context={state,window:{},document:{getElementById:id=>fields[id]},requireCoach:()=>true,
   footballFormat:()=>({registered:10,format:'5v5'}),confirm:()=>true,
   saveState:()=>{},auditEvent:()=>{},toast:()=>{},alert:msg=>{throw Error(msg);}};
 vm.createContext(context);vm.runInContext(helper+editing,context);

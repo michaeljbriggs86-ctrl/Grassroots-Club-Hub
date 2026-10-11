@@ -32,7 +32,7 @@
   function context(){const cloud=window.ClubHubCloud,profile=cloud?.context?.profile,role=cloud?.role?.();if(!cloud?.session?.user?.id||!profile?.club_id||!['admin','coach','assistant_coach'].includes(role)||cloud?.actingAsParent?.())return null;return{cloud,user:cloud.session.user.id,club:profile.club_id,role,editable:role==='admin'&&typeof isClubOverviewMode==='function'&&isClubOverviewMode()};}
   function same(s=state){const c=context();return !!(s&&c&&c.cloud===s.cloud&&c.user===s.user&&c.club===s.club&&c.role===s.role&&c.editable===s.editable&&el('coach-qualification-dialog')?.open);}
   function message(text,error=false){const node=el('coach-qualification-status');if(node){node.textContent=text;node.classList.toggle('qualification-error',error);}}
-  function close(){loadVersion++;state=null;el('coach-qualification-editor')?.classList.add('hidden');const dialog=el('coach-qualification-dialog');if(dialog?.open)dialog.close();}
+  function close(){const target=state?.target;loadVersion++;state=null;el('coach-qualification-editor')?.classList.add('hidden');const list=el('coach-qualification-list');if(list)list.innerHTML='';const name=el('coach-qualification-name');if(name)name.textContent='Coach profile';const form=el('coach-qualification-form');form?.reset?.();const dialog=el('coach-qualification-dialog');if(dialog?.open)dialog.close();if(target&&window.ClubHubPersonProfiles?.selectedSnapshot()?.userId===target)window.ClubHubPersonProfiles.refresh();}
   function syncAccess(){const c=context(),button=el('coach-profile-self');button?.classList.toggle('hidden',!c);if(state&&!same())close();if(matrix&&!matrixCurrent())clearMatrix();el('coach-document-matrix')?.classList.toggle('hidden',!c?.editable);}
   function render(){
     if(!same()||!state.loaded)return;
@@ -119,10 +119,10 @@
   }
   document.addEventListener('click',event=>{
     if(event.target.closest?.('#coach-document-refresh')){refreshMatrix();return;}
-    const matrixCoach=event.target.closest?.('[data-matrix-coach]');if(matrixCoach){if(!matrixCurrent()||!matrix.loaded)return;const person=matrix.rows.find(p=>p.user_id===matrixCoach.dataset.matrixCoach);if(person)open(person.user_id,person.full_name||'Coach');return;}
-    const target=event.target.closest?.('[data-coach-profile]');if(target){const c=context(),id=target.dataset.coachProfile;if(!c?.editable)return;const rows=typeof __adminCoachRows!=='undefined'?__adminCoachRows:[],access=typeof __adminAccessRows!=='undefined'?__adminAccessRows:[];const person=[...rows,...access].find(r=>r.user_id===id&&['club_admin','coach','assistant_coach'].includes(r.role));if(person)open(id,person.full_name||'Coach');return;}
+    const matrixCoach=event.target.closest?.('[data-matrix-coach]');if(matrixCoach){if(!matrixCurrent()||!matrix.loaded)return;const person=matrix.rows.find(p=>p.user_id===matrixCoach.dataset.matrixCoach);if(person){if(window.ClubHubPersonProfiles)window.ClubHubPersonProfiles.open({kind:'member',id:person.user_id,source:'access'});else open(person.user_id,person.full_name||'Coach');}return;}
+    const target=event.target.closest?.('[data-coach-profile]');if(target){const c=context(),id=target.dataset.coachProfile;if(!c?.editable)return;const rows=typeof __adminCoachRows!=='undefined'?__adminCoachRows:[],access=typeof __adminAccessRows!=='undefined'?__adminAccessRows:[];const person=[...rows,...access].find(r=>r.user_id===id&&['club_admin','coach','assistant_coach'].includes(r.role));if(person){if(window.ClubHubPersonProfiles)window.ClubHubPersonProfiles.open({kind:'member',id,source:rows.some(r=>r.user_id===id)?'club':'access'});else open(id,person.full_name||'Coach');}return;}
     const row=event.target.closest?.('[data-edit-qualification]');if(row)edit(row.dataset.editQualification);
-    if(event.target.closest?.('#coach-profile-self')){const c=context();if(c)open(c.user,c.cloud.context.profile.full_name||'My profile');}
+    if(event.target.closest?.('#coach-profile-self')){const c=context();if(c){if(window.ClubHubPersonProfiles)window.ClubHubPersonProfiles.open({kind:'member',id:c.user,source:'self'});else open(c.user,c.cloud.context.profile.full_name||'My profile');}}
     if(event.target.closest?.('#coach-qualification-close'))close();
   });
   el('coach-qualification-form')?.addEventListener('submit',save);el('coach-qualification-remove')?.addEventListener('click',remove);
@@ -133,6 +133,6 @@
   el('coach-qualification-dialog')?.addEventListener('close',()=>{loadVersion++;state=null;});
   el('coach-document-filter')?.addEventListener('change',renderMatrix);
   document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&matrixCurrent())refreshMatrix();});
-  window.ClubHubCoachQualifications={syncAccess,open,refreshMatrix,matrixSummary,catalogue,today,validDate,suggestedExpiry,status,validate};
+  window.ClubHubCoachQualifications={syncAccess,open,close,refreshMatrix,matrixSummary,catalogue,today,validDate,suggestedExpiry,status,validate};
   syncAccess();
 })();

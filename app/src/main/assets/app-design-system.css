@@ -1416,6 +1416,22 @@ html[data-theme="dark"] .club-matches-table .club-fixture-confirmation.confirmed
 .contact-directory-controls {display:flex;flex-wrap:wrap;align-items:end;gap:12px;margin-bottom:16px}
 .contact-directory-controls label {flex:1 1 220px}
 .member-contact-list {display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:16px;margin-top:16px}
+.person-name-button {display:inline-flex;align-items:center;justify-content:flex-start;min-height:44px;max-width:100%;padding:4px 0;border:0;background:transparent;color:var(--gch-green-800);font:inherit;font-weight:750;text-align:left;white-space:normal;overflow-wrap:anywhere;text-decoration:underline;text-underline-offset:4px;box-shadow:none}
+.person-name-button:hover {background:transparent;color:var(--ink)}
+.person-name-button:focus-visible {outline:3px solid var(--gch-green-800);outline-offset:4px;border-radius:4px}
+.member-contact-summary .helper {margin-bottom:0}
+.person-profile-back {margin-bottom:20px}
+.person-profile-body {display:grid;gap:20px;max-width:900px;margin:0 auto}
+.person-profile-body .panel {margin:0;min-width:0;overflow-wrap:anywhere}
+.person-profile-body .member-contact-card {border:0;padding:0;background:transparent}
+.person-profile-teams {margin:12px 0;padding-left:20px;line-height:1.7}
+.person-profile-actions {display:flex;flex-wrap:wrap;gap:12px}
+.person-profile-actions button {white-space:normal;text-align:left}
+#person-profile-name {overflow-wrap:anywhere}
+#contact-import-panel>summary {font-weight:750;min-height:44px;cursor:pointer}
+html[data-theme="dark"] .person-name-button {color:#8EE09A}
+html[data-theme="dark"] .person-name-button:hover {color:#F6FAF7}
+html[data-theme="dark"] .person-name-button:focus-visible {outline-color:#8EE09A}
 .member-contact-card {min-width:0;padding:16px;border:1px solid var(--gch-line);border-radius:16px;background:var(--gch-white);overflow-wrap:anywhere}
 .member-contact-card h4 {margin:0 0 8px;font-size:18px;line-height:1.4}
 .member-contact-links {display:flex;flex-direction:column;gap:8px;margin:12px 0;font-size:14px;line-height:1.5}
