@@ -41,31 +41,73 @@ for(const id of targetIds){
 }
 console.log('Protected-pilot monograms: scope, unknown identity, precedence and 37 initials passed');
 
-// Resolve missing badges through the real static overlay, starting without cached details.
+// Keep feed identities real, but control approval states: directory publication
+// can legitimately replace a missing badge with a reviewed one at any time.
+const missingBadges=structuredClone(directory);
+for(const club of missingBadges.clubs){
+ if([286,292,322].includes(Number(club.club_id))){
+  for(const field of ['logo_status','logo_url','logo_sha256','logo_source'])delete club[field];
+ }
+}
+const ownHash='b'.repeat(64);
+Object.assign(missingBadges.clubs.find(c=>Number(c.club_id)===499),{
+ logo_status:'pilot_verified',logo_source:'club_supplied_private',logo_sha256:ownHash,
+ logo_url:`https://test.pitchkind.com/__pilot_badges/499/${ownHash}`
+});
+
+// Resolve missing badges through the real static overlay and badge selector,
+// starting without cached details.
 const overlaySrc=fs.readFileSync(path.join(__dirname,'../app/src/main/assets/static-feed-overlay.js'),'utf8');
 context.norm=norm;state.selkent.directoryDetails={};
 vm.runInContext(overlaySrc.slice(overlaySrc.indexOf('  function attachDirectoryBadges('),overlaySrc.indexOf('  function loadDirectory(')),context);
-context.attachDirectoryBadges(directory);
+context.isOwnTeamName=()=>false;
+context.pilotBadgeOverrideAllowed=()=>false;
+vm.runInContext(src.slice(src.indexOf('function verifiedTeamBadgeUrl('),src.indexOf('function reviewedBadgeRotation(')),context);
+context.attachDirectoryBadges(missingBadges);
 for(const name of ['Shooters Hill Cannons','Shooters Hill cannons U8']){
  assert.equal(state.selkent.directoryDetails[norm(name)].clubId,499);
  assert.equal(state.selkent.directoryDetails[norm(name)].logoStatus,'pilot_verified');
- assert.equal(state.selkent.directoryDetails[norm(name)].pilotLogoSha256,directory.clubs.find(c=>c.club_id===499).logo_sha256);
+ assert.equal(state.selkent.directoryDetails[norm(name)].pilotLogoSha256,ownHash);
 }
 for(const [name,initials,id] of [['Lewisham Borough Cobras','LB',286],['Junior Reds Knights','JR',292],['Junior Reds Athletic','JR',292],['Russellers Yellows','RU',322]]){
  assert.equal(state.selkent.directoryDetails[norm(name)].clubId,id);
  assert.equal(context.clubPlaceholderBadgeData(name).initials,initials);
  assert.equal(context.clubPlaceholderBadgeData(name).status,'placeholder_monogram');
  assert.notEqual(state.selkent.directoryDetails[norm(name)].logoStatus,'pilot_verified');
+ assert.equal(context.verifiedTeamBadgeUrl(name),'');
+ assert.match(context.clubIdentityBadgeHtml(name),/placeholder_monogram/);
 }
-const ambiguous=structuredClone(directory);
+
+// A new approval must take precedence, and its removal must restore monograms.
+const approved=structuredClone(missingBadges),juniorHash='c'.repeat(64);
+Object.assign(approved.clubs.find(c=>Number(c.club_id)===292),{
+ logo_status:'pilot_verified',logo_source:'user_supplied_private',logo_sha256:juniorHash,
+ logo_url:`https://test.pitchkind.com/__pilot_badges/292/${juniorHash}`
+});
+context.attachDirectoryBadges(approved);
+for(const name of ['Junior Reds Knights','Junior Reds Athletic']){
+ assert.equal(state.selkent.directoryDetails[norm(name)].logoStatus,'pilot_verified');
+ assert.equal(context.verifiedTeamBadgeUrl(name),`/__pilot_badges/292/${juniorHash}`);
+ assert.match(context.clubIdentityBadgeHtml(name),/verified-club-badge/);
+ assert.doesNotMatch(context.clubIdentityBadgeHtml(name),/placeholder_monogram/);
+}
+context.attachDirectoryBadges(missingBadges);
+for(const name of ['Junior Reds Knights','Junior Reds Athletic']){
+ assert.equal(context.verifiedTeamBadgeUrl(name),'');
+ assert.match(context.clubIdentityBadgeHtml(name),/placeholder_monogram/);
+}
+context.attachDirectoryBadges(approved);
+const ambiguous=structuredClone(approved);
 ambiguous.team_club_links.push({team_name:'Junior Reds Knights',club_id:286});
 context.attachDirectoryBadges(ambiguous);
 assert.equal(context.clubPlaceholderBadgeData('Junior Reds Knights').status,'missing','a stale cached identity cannot supply a monogram for an ambiguous team');
-console.log('Screenshot fixture teams: fresh directory identity and ambiguous-name fallback passed');
+assert.equal(context.verifiedTeamBadgeUrl('Junior Reds Knights'),'','an ambiguous team cannot retain its previously approved badge');
+console.log('Fixture teams: missing, newly approved, revoked and ambiguous badge states passed');
 
-const conflictingCannons=structuredClone(directory);
+const conflictingCannons=structuredClone(approved);
 conflictingCannons.team_club_links.push({team_name:'Shooters Hill Cannons',club_id:286},{team_name:'Shooters Hill Cannons',club_id:499});
 context.attachDirectoryBadges(conflictingCannons);
 assert.equal(state.selkent.directoryDetails[norm('Shooters Hill Cannons')].clubId,null);
 assert.equal(context.clubPlaceholderBadgeData('Shooters Hill Cannons').status,'missing');
+assert.equal(context.verifiedTeamBadgeUrl('Shooters Hill Cannons'),'');
 console.log('Friendly Cannons aliases use the canonical badge and fail closed on a conflicting mapping');

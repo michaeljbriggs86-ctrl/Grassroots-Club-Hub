@@ -6,15 +6,20 @@ existing pilot manifest is the only admission list. R2 has no public URL.
 """
 import argparse
 import hashlib
+import io
 import json
 import os
 from pathlib import Path
 import re
 import subprocess
+import sys
 import tempfile
 from urllib.parse import urlsplit
 
 from publish_pilot_badges import MAX_IMAGE_BYTES, validated_approvals
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'verification'))
+from verify_club_logo_quality import check_pilot_exception
 
 
 BUCKET = 'pitchkind-pilot-badges'
@@ -119,6 +124,30 @@ def checked_stored_kind(badge, data):
     return media_type(data)
 
 
+def reviewed_upload_snapshot(badge):
+    """Bootstrap only an explicitly reviewed, hash-pinned user-upload PNG."""
+    expected = f"verification/approved_badges/{int(badge['club_id'])}.png"
+    if (badge.get('logo_source') != 'user_supplied_private' or
+            badge.get('source_user_approved') is not True or
+            badge.get('staging_asset') != expected):
+        raise ValueError('invalid reviewed upload staging asset')
+    data = Path(expected).read_bytes()
+    if checked_stored_kind(badge, data) != 'image/png':
+        raise ValueError('reviewed upload snapshot must be PNG')
+    from PIL import Image
+    with Image.open(io.BytesIO(data)) as image:
+        if image.size != (badge.get('native_width'), badge.get('native_height')):
+            raise ValueError('reviewed upload native dimensions differ')
+        if min(image.size) < 512:
+            errors = check_pilot_exception(Path(expected),
+                {'schema_version': 1, 'scope': 'private_pilot', 'badges': [badge]},
+                int(badge['club_id']), 128)
+            if errors:
+                raise ValueError('reviewed upload snapshot is below q1: ' + '; '.join(errors))
+        image.verify()
+    return data
+
+
 def upload_badges(badges, get, run, *, prefer_stored=False, stored_get=None):
     if stored_get is not None and not prefer_stored:
         raise ValueError('stored metadata checks require prefer_stored')
@@ -163,7 +192,8 @@ def upload_badges(badges, get, run, *, prefer_stored=False, stored_get=None):
                     print(f"Checked stored R2 badge club_id={badge['club_id']} sha256={badge['logo_sha256']}")
                     continue
                 # Only a missing object uses the original source admission gates.
-            if badge.get('logo_source') in ('club_supplied_private', 'user_supplied_private', 'official_source_snapshot_private'):
+            local_upload = badge.get('logo_source') == 'user_supplied_private' and badge.get('staging_asset') is not None
+            if not local_upload and badge.get('logo_source') in ('club_supplied_private', 'user_supplied_private', 'official_source_snapshot_private'):
                 # Secretary-supplied artwork has no public source. It was staged
                 # privately, and CI admits only its exact reviewed bytes.
                 run([*WRANGLER, 'r2', 'object', 'get', f'{BUCKET}/{key}',
@@ -176,7 +206,9 @@ def upload_badges(badges, get, run, *, prefer_stored=False, stored_get=None):
                 readback.unlink()
                 print(f"Checked private R2 badge club_id={badge['club_id']} sha256={badge['logo_sha256']}")
                 continue
-            if badge.get('logo_source') in ('official_source_transparency_derivative_private',
+            if local_upload:
+                data, kind = reviewed_upload_snapshot(badge), 'image/png'
+            elif badge.get('logo_source') in ('official_source_transparency_derivative_private',
                                             'official_source_trim_derivative_private'):
                 # Fetch the exact official original, repeat the reviewed outer
                 # background edit on Linux, and require the exact approved PNG.

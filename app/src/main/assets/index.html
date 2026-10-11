@@ -300,8 +300,8 @@
         <section class="match-section competition-games-section" id="competition-games-section">
           <div class="match-section-heading"><div><p class="kicker">Group and knockout competitions</p><h3>Cups & Vases</h3></div></div>
           <div class="competition-game-grid">
-            <details class="panel competition-games-panel" id="cup-games-panel"><summary><div><strong>Cups</strong><small>Selkent Cup One and Two, London and Kent cups</small></div><div class="competition-summary-actions"><span class="match-section-count" id="cup-games-count">0</span></div></summary><div class="competition-table-scroll"><table class="competition-games-table"><thead><tr><th>Date</th><th>Cup</th><th>Opponent</th><th>H/A</th><th>Status / result</th></tr></thead><tbody id="cup-games-body"></tbody></table></div></details>
-            <details class="panel competition-games-panel" id="vase-games-panel"><summary><div><strong>Vases</strong><small>Selkent Vase One and Two</small></div><div class="competition-summary-actions"><span class="match-section-count" id="vase-games-count">0</span></div></summary><div class="competition-table-scroll"><table class="competition-games-table"><thead><tr><th>Date</th><th>Cup</th><th>Opponent</th><th>H/A</th><th>Status / result</th></tr></thead><tbody id="vase-games-body"></tbody></table></div></details>
+            <details class="panel competition-games-panel" id="cup-games-panel"><summary><div><strong>Cups</strong><small>Selkent Cup One and Two, London and Kent cups</small></div><div class="competition-summary-actions"><span class="match-section-count" id="cup-games-count">0</span></div></summary><div class="competition-table-scroll"><table class="competition-games-table"><thead><tr><th>Date</th><th>Cup</th><th>Opponent</th><th>H/A</th><th>Result</th></tr></thead><tbody id="cup-games-body"></tbody></table></div></details>
+            <details class="panel competition-games-panel" id="vase-games-panel"><summary><div><strong>Vases</strong><small>Selkent Vase One and Two</small></div><div class="competition-summary-actions"><span class="match-section-count" id="vase-games-count">0</span></div></summary><div class="competition-table-scroll"><table class="competition-games-table"><thead><tr><th>Date</th><th>Cup</th><th>Opponent</th><th>H/A</th><th>Result</th></tr></thead><tbody id="vase-games-body"></tbody></table></div></details>
           </div>
         </section>
 
@@ -887,10 +887,13 @@
       <section class="detail-feature-section match-attendance-section hidden" id="match-attendance-section"><div class="panel-heading"><div><h3>Attendance</h3><span class="helper" id="match-attendance-helper">Attendance status</span></div></div><div id="match-attendance-list" class="match-attendance-list"></div></section>
       <section class="detail-feature-section secure-coach-note hidden" id="coach-note-section"><div class="panel-heading"><div><h3>Coaching notes</h3><span class="helper">Coaching staff only · not visible to parents</span></div></div><textarea id="coach-match-note" aria-label="Private coaching observations" rows="4" maxlength="4000" placeholder="Private coaching observations, follow-up points or development notes..."></textarea><p class="coach-note-readonly hidden" id="coach-note-readonly"></p></section>
       <section class="detail-feature-section hidden" id="match-through-section"><div class="panel-heading"><div><h3>Did we go through?</h3><span class="helper">Coaches only · <span id="match-through-label"></span></span></div></div><label class="cup-through"><input type="checkbox" id="match-through-checkbox"> <span>We go through to the next round</span></label></section>
+      <div class="empty-detail-options detail-before-match hidden" id="detail-before-match-note"></div>
       <div class="empty-detail-options hidden" id="empty-detail-options">All match detail options are switched off. Enable the options you want under Settings → Features.</div>
       <div class="modal-actions match-report-actions">
         <button type="button" class="secondary-button hidden" id="match-report-back">Back</button>
-        <button type="button" class="danger-button hidden" id="delete-match-detail" data-delete-match="">Delete match</button>
+        <button type="button" class="secondary-button hidden" id="edit-match-detail" data-edit-match="">Edit fixture</button>
+        <button type="button" class="primary-button hidden" id="play-match-detail" data-match-played="">Match played</button>
+        <button type="button" class="danger-button hidden" id="delete-match-detail" data-delete-match="">Remove</button>
         <button type="button" class="danger-button hidden" id="undo-match-played">Undo match played</button>
         <button type="button" class="secondary-button" id="match-detail-cancel" data-close-dialog>Cancel</button>
         <button type="button" class="primary-button hidden" id="match-report-next">Next</button>

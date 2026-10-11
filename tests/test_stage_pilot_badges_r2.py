@@ -1,5 +1,6 @@
 """Exact-byte and provenance gates for private badge object storage."""
 import hashlib
+import json
 import pathlib
 import subprocess
 import sys
@@ -33,6 +34,67 @@ class Response:
 
 
 class StageTest(unittest.TestCase):
+    def test_reviewed_d2_user_snapshot_keeps_exact_file_quality_gate(self):
+        badge = next(b for b in json.loads((ROOT / 'verification/pilot_verified_badges.json').read_text())['badges']
+                     if b['club_id'] == 484)
+        data = (ROOT / badge['staging_asset']).read_bytes()
+        self.assertEqual(stage.reviewed_upload_snapshot(badge), data)
+        for change in ({'pilot_quality_exception': None}, {'rights_note': ''},
+                       {'pilot_quality_exception': {**badge['pilot_quality_exception'], 'no_upscaling': False}},
+                       {'pilot_quality_exception': {**badge['pilot_quality_exception'], 'max_render_css_px': 129}},
+                       {'pilot_quality_exception': {**badge['pilot_quality_exception'], 'native_width': 371}}):
+            with self.subTest(change=change), self.assertRaises(ValueError):
+                stage.reviewed_upload_snapshot({**badge, **change})
+        import io
+        from PIL import Image
+        buffer = io.BytesIO()
+        Image.new('RGBA', (191, 191)).save(buffer, format='PNG')
+        too_small = buffer.getvalue()
+        smaller = {**badge, 'logo_sha256': hashlib.sha256(too_small).hexdigest(),
+                   'native_width': 191, 'native_height': 191,
+                   'pilot_quality_exception': {**badge['pilot_quality_exception'],
+                                               'native_width': 191, 'native_height': 191}}
+        with patch.object(pathlib.Path, 'read_bytes', return_value=too_small):
+            with self.assertRaisesRegex(ValueError, '192 through 511'):
+                stage.reviewed_upload_snapshot(smaller)
+        commands = []
+        def run(command, *, check):
+            commands.append(command)
+            path = pathlib.Path(command[command.index('--file') + 1])
+            if 'get' in command:
+                path.write_bytes(data)
+            else:
+                self.assertEqual(path.read_bytes(), data)
+        reads = iter([None, (data, 'image/png')])
+        stage.upload_badges([badge], lambda *a, **k: self.fail('public fallback'), run,
+                            prefer_stored=True, stored_get=lambda key: next(reads))
+        self.assertEqual([c[5] for c in commands], ['put', 'get'])
+
+    def test_reviewed_user_snapshot_bootstraps_private_r2_with_exact_readback(self):
+        badge = next(b for b in json.loads((ROOT / 'verification/pilot_verified_badges.json').read_text())['badges']
+                     if b['club_id'] == 292)
+        data = (ROOT / badge['staging_asset']).read_bytes()
+        commands = []
+        def run(command, *, check):
+            commands.append(command)
+            path = pathlib.Path(command[command.index('--file') + 1])
+            if 'get' in command:
+                path.write_bytes(data)
+            else:
+                self.assertEqual(path.read_bytes(), data)
+        reads = iter([None, (data, 'image/png')])
+        stage.upload_badges([badge], lambda *a, **k: self.fail('private upload fetched publicly'), run,
+                            prefer_stored=True, stored_get=lambda key: next(reads))
+        self.assertEqual([c[5] for c in commands], ['put', 'get'])
+        self.assertIn(f"292/{badge['logo_sha256']}", commands[0][6])
+        with patch.object(pathlib.Path, 'read_bytes', return_value=data + b'changed'):
+            with self.assertRaisesRegex(ValueError, 'differ from review'):
+                stage.reviewed_upload_snapshot(badge)
+        for change in ({'staging_asset': '../other.png'}, {'source_user_approved': False},
+                       {'logo_source': 'official_site_image'}, {'native_width': 515}):
+            with self.subTest(change=change), self.assertRaises(ValueError):
+                stage.reviewed_upload_snapshot({**badge, **change})
+
     def setUp(self):
         self.data = b'\x89PNG\r\n\x1a\nreviewed badge bytes'
         self.badge = {'club_id': 250, 'club_name': 'Cray Wanderers',
