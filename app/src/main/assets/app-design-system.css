@@ -1252,8 +1252,10 @@ img.verified-club-badge[src$="/3aa25e5eff778740a2133b8d0e780b5240bf8b5ca61632061
 .club-matches-table .competition-games-table tr.admin-fixture-row{display:table-row;padding:0;border:0;border-radius:0;background:transparent}
 .club-matches-table .competition-games-table th:last-child,.club-matches-table .competition-games-table td:last-child{text-align:right}
 .club-matches-table .club-result-match{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:8px;width:100%;font-size:14px;line-height:1.3}
-.club-matches-table .club-result-team{min-width:0;align-items:center}
-.club-matches-table .club-result-team.away{justify-content:flex-end;text-align:right;flex-direction:row-reverse}
+.club-matches-table .club-result-team{display:grid;grid-template-columns:22px minmax(0,1fr);gap:6px;width:100%;min-width:0;align-items:center}
+.club-matches-table .club-result-team.away{grid-template-columns:minmax(0,1fr) 22px;justify-content:normal;text-align:right}
+.club-matches-table .club-result-team.away .club-identity-badge{grid-column:2;grid-row:1}
+.club-matches-table .club-result-team.away .club-result-team-name{grid-column:1;grid-row:1}
 .club-matches-table .club-result-team-name{min-width:0;overflow-wrap:break-word;word-break:normal}
 .club-matches-table .club-fixture-time{display:block;font-size:14px;white-space:nowrap}
 .club-matches-table .club-fixture-notes,.club-matches-table .club-fixture-confirmation{display:block;margin-top:4px;font-size:12px;line-height:1.35;color:var(--muted)}
@@ -1282,3 +1284,13 @@ html[data-theme="dark"] .club-matches-table .club-fixture-confirmation.confirmed
 #view-club .club-fixture-group h3{margin:0 0 8px;font-size:1rem;line-height:1.4}
 #view-club .club-fixture-group summary{cursor:pointer;min-height:44px;padding:12px 0;font-weight:700}
 .club-matches-table .competition-result-pill{white-space:nowrap;flex-shrink:0}
+
+/* Fixed column boundaries keep badges and the v aligned across competition lists. */
+@media(min-width:561px){
+  .club-matches-table .competition-games-table{table-layout:fixed;width:100%}
+  .club-matches-table .competition-games-table th:first-child{width:64px}
+  .club-matches-table .competition-games-table th:nth-child(2){width:24%}
+  .club-matches-table .competition-games-table th:last-child{width:72px}
+  .club-fixtures-table .competition-games-table th:last-child{width:118px}
+  .club-fixtures-table .club-fixture-time{white-space:normal}
+}
