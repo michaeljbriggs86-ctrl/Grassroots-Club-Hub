@@ -241,6 +241,27 @@ class BadgePublisherTest(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'exact fragment-cleanup review'):
             module.validated_approvals(self.directory, changed)
 
+    def test_native_flyer_crop_requires_exact_reviewed_source_result_and_club(self):
+        badge = next(b for b in self.manifest['badges'] if b['club_id'] == 566)
+        self.assertIn(566, module.validated_approvals(self.directory, self.manifest))
+        self.assertEqual(badge['derivation'], 'native_flyer_crop_and_exterior_alpha_only')
+        for change in ({'original_sha256': 'a' * 64}, {'logo_sha256': 'b' * 64},
+                       {'source_user_approved': False}, {'derivation': 'redrawn'}):
+            changed = copy.deepcopy(self.manifest)
+            row = next(b for b in changed['badges'] if b['club_id'] == 566)
+            row.update(change)
+            row['logo_url'] = f"https://test.pitchkind.com/__pilot_badges/566/{row['logo_sha256']}"
+            with self.subTest(change=change), self.assertRaises(ValueError):
+                module.validated_approvals(self.directory, changed)
+        changed = copy.deepcopy(self.manifest)
+        row = next(b for b in changed['badges'] if b['club_id'] == 238)
+        row.update({'original_sha256': badge['original_sha256'],
+                    'logo_sha256': badge['logo_sha256'],
+                    'derivation': badge['derivation'],
+                    'logo_url': f"https://test.pitchkind.com/__pilot_badges/238/{badge['logo_sha256']}"})
+        with self.assertRaisesRegex(ValueError, 'exact source-crop review'):
+            module.validated_approvals(self.directory, changed)
+
     def test_official_snapshot_keeps_pinned_origin_and_private_route(self):
         candidate = copy.deepcopy(self.manifest)
         badge = next(b for b in candidate['badges'] if b['club_id'] == 520)
