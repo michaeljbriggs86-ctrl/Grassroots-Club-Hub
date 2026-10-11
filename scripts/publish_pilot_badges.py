@@ -31,6 +31,13 @@ REVIEWED_METADATA_REPAIRS = {
           '2b9b292f7eb4f13d5f7d8e569261fc2cb35b6d44fcaec7c51bf06dcb34e3f70e'),
 }
 
+# User-approved native flyer extraction. This permits only the reviewed source
+# and result for Woolwich, never arbitrary cropping or generated replacements.
+REVIEWED_SOURCE_CROPS = {
+    566: ('7f087983fb8c5e6840e6374beb733268d1e0cdf9a3e71d06615c89b68bdd99a4',
+          '3afe97e8c67b47fc1ad60be8c9153115fae5d8904256319d09b210a966d0d579'),
+}
+
 
 def reviewed_upload_spec(badge):
     """Keep approved native JPEGs intact; existing uploads default to PNG."""
@@ -93,7 +100,8 @@ def validated_approvals(directory, manifest):
                         badge.get('source_user_approved') is not True or
                         method not in ('unchanged_uploaded_original', 'recalculate_eXIf_crc_only',
                                        'remove_reviewed_exterior_fragments_only',
-                                       'recalculate_eXIf_crc_and_remove_trailing_editor_metadata') or
+                                       'recalculate_eXIf_crc_and_remove_trailing_editor_metadata',
+                                       'native_flyer_crop_and_exterior_alpha_only') or
                         (method == 'unchanged_uploaded_original' and original_hash != badge['logo_sha256'].lower()) or
                         (method == 'recalculate_eXIf_crc_only' and original_hash == badge['logo_sha256'].lower())):
                     raise ValueError(f"badge {club_id} lacks reviewed user-upload provenance")
@@ -105,6 +113,10 @@ def validated_approvals(directory, manifest):
                         REVIEWED_METADATA_REPAIRS.get(club_id) !=
                         (original_hash, badge['logo_sha256'].lower())):
                     raise ValueError(f"badge {club_id} lacks exact metadata-repair review")
+                if (method == 'native_flyer_crop_and_exterior_alpha_only' and
+                        REVIEWED_SOURCE_CROPS.get(club_id) !=
+                        (original_hash, badge['logo_sha256'].lower())):
+                    raise ValueError(f"badge {club_id} lacks exact source-crop review")
             if badge['logo_source'] == 'official_source_transparency_derivative_private':
                 original = urlsplit(str(badge.get('original_source_url') or ''))
                 if (original.scheme != 'https' or not original.hostname or original.username or

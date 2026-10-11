@@ -1,0 +1,27 @@
+{
+  "source_sha256": "7f087983fb8c5e6840e6374beb733268d1e0cdf9a3e71d06615c89b68bdd99a4",
+  "source_size": [
+    1057,
+    1536
+  ],
+  "source_crop_box": [
+    231,
+    253,
+    835,
+    896
+  ],
+  "output_size": [
+    604,
+    643
+  ],
+  "output_sha256": "3afe97e8c67b47fc1ad60be8c9153115fae5d8904256319d09b210a966d0d579",
+  "derivation": "native source crop plus manually traced exterior alpha mask",
+  "all_visible_rgb_identical_to_source_crop": true,
+  "resized": false,
+  "generated_artwork": false,
+  "club_id": 566,
+  "source_url": "https://drive.google.com/file/d/1xXt9zaGkmjmAroa5vE-eiGdDaBdpPUvE/view",
+  "candidate_url": "https://drive.google.com/file/d/1_FZPT1YG8_TYGWu5dS8dIkAvczp77GBv/view",
+  "user_approval_at": "2026-10-11T11:37:11+01:00",
+  "rights_note": "Rights bypassed for protected pilot; public, marketing and wider-use permission not established."
+}
