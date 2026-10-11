@@ -2314,6 +2314,7 @@ async function submitParentAddChild(e){
 }
 
 function applyAccessMode(){
+  syncContactDirectoryContext();
   if(typeof __adminWeekendShare!=='undefined'&&__adminWeekendShare&&__adminWeekendShare.identity!==adminWeekendShareIdentity()){__adminWeekendShare=null;++__adminWeekendShareLoad;document.getElementById('admin-weekend-share-dialog')?.close();renderAdminWeekendShare();}
   if(isTeamLocked())enforceAssignedTeam(false);
   const preview=isAdminTeamPreviewMode();
@@ -5118,6 +5119,78 @@ async function exportU11Safeguarding(){const team=window.ClubHubCloud?.currentTe
 function renderU11SafeguardingControls(){const panel=document.getElementById('u11-safeguarding-panel');if(!panel)return;const show=isCoach()&&ageGroupNumber()<=11;panel.classList.toggle('hidden',!show);if(!show)return;const sel=document.getElementById('u11-safeguarding-player');if(sel)sel.innerHTML='<option value="">Choose player…</option>'+activePlayers().map(p=>`<option value="${esc(p.name)}">#${p.number||'—'} ${esc(p.name)}</option>`).join('');}
 async function requestClubCancellationUi(){if(!confirm('Cancel this club workspace? Data will be permanently deleted 30 days after this request.'))return;try{await window.ClubHubCloud.requestClubCancellation();toast('Club cancellation scheduled');await refreshCompliancePanel();}catch(e){alert(e.message||e);}}
 async function cancelClubCancellationUi(){try{await window.ClubHubCloud.cancelClubCancellation();toast('Club cancellation withdrawn');await refreshCompliancePanel();}catch(e){alert(e.message||e);}}
+
+let __contactDirectoryIdentity='',__contactDirectoryLoad=0;
+function contactDirectoryIdentity(){
+  const cloud=window.ClubHubCloud,ctx=cloud?.context;
+  if(!CLOUD_MODE||cloud?.testMode||!['admin','coach','assistant_coach','parent'].includes(currentRole)||!ctx?.profile?.user_id)return '';
+  return [ctx.profile.user_id,ctx.profile.club_id,cloud.role(),currentRole,cloud.currentTeam?.()?.id||'',isClubOverviewMode()?'club':'team'].join('|');
+}
+function resetContactDirectory(){
+  ++__contactDirectoryLoad;
+  ['member-contacts-self','member-contacts-list'].forEach(id=>{const el=document.getElementById(id);if(el)el.innerHTML='';});
+  const status=document.getElementById('member-contacts-status');if(status)status.textContent='';
+}
+function syncContactDirectoryContext(){
+  const identity=contactDirectoryIdentity(),panel=document.getElementById('member-contacts-panel');
+  if(identity!==__contactDirectoryIdentity){resetContactDirectory();__contactDirectoryIdentity=identity;if(panel)panel.open=false;const filter=document.getElementById('member-contacts-team');if(filter)filter.value='';}
+  panel?.classList.toggle('hidden',!identity);
+  document.getElementById('member-contacts-team-wrap')?.classList.toggle('hidden',!identity||!isClubOverviewMode());
+}
+function contactDetailsForm(contact,label='Edit contact details'){
+  return `<details class="contact-edit"><summary>${esc(label)}</summary><form class="contact-details-form" data-contact-user="${esc(contact.user_id)}"><label>Contact email<input name="email" type="email" maxlength="254" autocomplete="off" value="${esc(contact.email||'')}" /></label><label>Phone number<input name="phone" type="tel" maxlength="40" autocomplete="off" value="${esc(contact.phone||'')}" /></label><p class="helper">Leave a field blank to clear it. This does not change the email you use to sign in.</p><p class="helper contact-form-status" role="status" aria-live="polite"></p><button type="submit" class="primary-button">Save contact details</button></form></details>`;
+}
+function memberContactCard(contact,canManage=false){
+  const email=String(contact.email||''),phone=String(contact.phone||''),tel=phone.replace(/[() .-]/g,'');
+  const emailLink=email&&/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)?`<a href="mailto:${esc(encodeURIComponent(email))}">${esc(email)}</a>`:'<span>Contact email not added</span>';
+  const phoneLink=phone&&/^\+?\d{6,}$/.test(tel)?`<a href="tel:${esc(tel)}">${esc(phone)}</a>`:'<span>Phone number not added</span>';
+  const players=contact.kind==='parent'&&Array.isArray(contact.player_names)?contact.player_names.filter(x=>typeof x==='string'):[];
+  return `<article class="member-contact-card"><h4>${esc(contact.full_name||'Club member')}</h4><p class="helper">${esc(inboxContactRoleLabel(contact))}${contact.team_name?` · ${contact.age_group?'U'+esc(contact.age_group)+' ':''}${esc(contact.team_name)}`:''}</p>${players.length?`<p class="helper">Parent of ${esc(players.join(', '))}</p>`:''}<div class="member-contact-links">${emailLink}${phoneLink}</div>${canManage?contactDetailsForm(contact):''}</article>`;
+}
+async function refreshContactDirectory(){
+  syncContactDirectoryContext();
+  const identity=contactDirectoryIdentity(),cloud=window.ClubHubCloud,panel=document.getElementById('member-contacts-panel');
+  if(!identity||!panel?.open)return;
+  resetContactDirectory();const version=__contactDirectoryLoad;
+  const status=document.getElementById('member-contacts-status'),filter=document.getElementById('member-contacts-team');
+  const admin=isClubOverviewMode(),teamId=admin?(filter?.value||null):(cloud.currentTeam?.()?.id||null);
+  const valid=()=>version===__contactDirectoryLoad&&identity===contactDirectoryIdentity()&&cloud===window.ClubHubCloud&&panel.open;
+  if(status)status.textContent='Loading contact details…';
+  try{
+    const data=await cloud.listContactDirectory(teamId);
+    if(!valid())return;
+    if(!data||!Array.isArray(data.contacts)||data.self?.user_id!==cloud.context?.profile?.user_id)throw new Error('Invalid contact response');
+    const canManage=admin&&data.can_manage===true;
+    const rows=data.contacts.filter(c=>c&&c.user_id!==data.self.user_id&&['club_admin','coach','assistant_coach','parent'].includes(c.role)
+      &&(!teamId||c.team_id===teamId)&&(currentRole!=='parent'||(c.kind==='staff'&&c.role!=='parent')));
+    const help=document.getElementById('member-contacts-help');if(help)help.textContent=currentRole==='parent'?'Coaches for this team. Other parents’ contact details are private.':admin?'Approved club contacts. You can add or update email and phone details.':'Coaches and parents for this team. Parent contacts are visible only to their team’s staff and Club Admins.';
+    document.getElementById('member-contacts-team-wrap')?.classList.toggle('hidden',!admin);
+    if(admin&&filter){const keep=teamId||'';filter.innerHTML='<option value="">All club teams</option>'+(cloud.visibleTeamList?.()||[]).map(t=>`<option value="${esc(t.id)}">${esc(t.ageGroup||'')} ${esc(t.teamName||t.name||'Team')}</option>`).join('');filter.value=keep;}
+    const self=document.getElementById('member-contacts-self');if(self)self.innerHTML=`<section class="member-contact-card"><h4>My contact details</h4><p class="helper">${esc(data.self.full_name||'Your account')} · Your club’s admins can manage these details. Your team’s ${currentRole==='parent'?'coaches':'parents and staff'} can see them.</p>${contactDetailsForm(data.self,'Update my contact details')}</section>`;
+    const list=document.getElementById('member-contacts-list');if(list)list.innerHTML=rows.map(c=>memberContactCard(c,canManage)).join('')||'<div class="empty-state compact-empty">No team contacts available yet.</div>';
+    if(status)status.textContent=rows.length?`${rows.length} team contact${rows.length===1?'':'s'}`:'Contact details can be added as members receive access.';
+  }catch(e){if(valid()&&status)status.textContent='Contact details are unavailable. Please try Refresh contacts later.';}
+}
+async function saveContactDetailsForm(form){
+  const identity=contactDirectoryIdentity(),cloud=window.ClubHubCloud;
+  if(!identity||!form?.isConnected)return;
+  const button=form.querySelector('button[type="submit"]'),status=form.querySelector('.contact-form-status');
+  if(button?.disabled)return;
+  const email=form.elements.email.value.trim(),phone=form.elements.phone.value.trim();
+  if(!form.reportValidity())return;
+  if(button)button.disabled=true;if(status)status.textContent='Saving…';
+  try{
+    await cloud.saveMemberContactDetails({userId:form.dataset.contactUser,email,phone});
+    if(identity!==contactDirectoryIdentity()||cloud!==window.ClubHubCloud||!form.isConnected)return;
+    await refreshContactDirectory();const out=document.getElementById('member-contacts-status');if(out&&identity===contactDirectoryIdentity())out.textContent='Contact details saved.';
+  }catch(e){if(identity===contactDirectoryIdentity()&&form.isConnected&&status)status.textContent=e.message||'Could not save contact details. Please try again.';}
+  finally{if(button?.isConnected)button.disabled=false;}
+}
+window.addEventListener('clubhub-contacts-clear',()=>{resetContactDirectory();__contactDirectoryIdentity='';const panel=document.getElementById('member-contacts-panel');if(panel){panel.open=false;panel.classList.add('hidden');}});
+document.getElementById('member-contacts-panel')?.addEventListener('toggle',e=>{if(e.target.open)refreshContactDirectory();else resetContactDirectory();});
+document.getElementById('refresh-member-contacts')?.addEventListener('click',refreshContactDirectory);
+document.getElementById('member-contacts-team')?.addEventListener('change',refreshContactDirectory);
+document.getElementById('member-contacts-panel')?.addEventListener('submit',e=>{const form=e.target.closest('.contact-details-form');if(form){e.preventDefault();saveContactDetailsForm(form);}});
 
 let __inboxStamp=0,__inboxMessages=[],__inboxContacts=[],__inboxSelected='';
 function inboxMyUserId(){return window.ClubHubCloud?.session?.user?.id||'';}
