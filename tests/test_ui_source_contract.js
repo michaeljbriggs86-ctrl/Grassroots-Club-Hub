@@ -19,7 +19,7 @@ vm.runInNewContext(fs.readFileSync(assets+'service-worker.js','utf8'),worker);
 const hero={getAttribute:()=>'',classList:{toggle(){}},closest:()=>null};
 const fallback={window:{},document:{querySelectorAll:()=>[hero]},privatePilotOwnBadgeUrl:()=>'',FAILED_BADGE_URLS:new Set(),clubSettings:()=>({}),clubDisplayName:()=> 'Example'};
 vm.runInNewContext(take(app,'window.applyPilotOwnClubBadge=function(){','function verifiedTeamBadgeUrl('),fallback);
-fallback.window.applyPilotOwnClubBadge();assert.equal(hero.src,'pitchkind-wt_mark.svg');
+fallback.window.applyPilotOwnClubBadge();assert.equal(hero.src,'shooters-hill-logo.png');
 
 // More than eleven future events must remain reachable for both staff and parents.
 const fixtureNodes=new Map(['selkent-fixtures-list','selkent-fixtures-count','selkent-fixtures-heading','selkent-fixtures-meta'].map(id=>[id,{}]));
@@ -63,7 +63,7 @@ for(const id of ['fixture-confirm-details','next-match-share'])assert(ancestors.
 
 (async()=>{
   let pending;handlers.install({waitUntil:promise=>{pending=promise;}});await pending;
-  assert(opened[0]);assert(skipped);assert(assetsAdded.includes('./pitchkind-wt_logo-primary.svg'));
+  assert(opened[0]);assert(skipped);assert(assetsAdded.includes('./shooters-hill-logo.png'));
   for(const path of assetsAdded)assert(fs.existsSync(assets+path.replace(/^\.\//,'')),`cache asset exists: ${path}`);
   handlers.activate({waitUntil:promise=>{pending=promise;}});await pending;
   assert.deepEqual(deleted,['retired-cache']);assert(claimed);
