@@ -694,7 +694,9 @@ check(
     'staff explicitly select an active squad player before atomic approval',
     'data-review-parent-request-id' in app
     and 'input type="radio" name="parent-request-player"' in app
-    and 'window.ClubHubCloud.approveParentRequest(requestId,selected)' in app
+    and 'await cloud.approveParentRequest(requestId,selected)' in app
+    and 'const cloud=window.ClubHubCloud,teamId=' in app
+    and 'if(!(await appConfirm(' in app
     and "rpc('approve_parent_request',{p_request_id:req,p_player_name:player})" in cloud
     and "rpc('approve_parent',{" not in cloud,
 )

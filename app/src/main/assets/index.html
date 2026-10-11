@@ -914,6 +914,15 @@
     </div>
   </dialog>
 
+  <dialog id="app-confirm-dialog" class="modal app-confirm-modal" aria-labelledby="app-confirm-title" aria-describedby="app-confirm-body app-confirm-detail">
+    <form method="dialog" class="app-confirm-shell">
+      <div class="modal-heading"><h3 id="app-confirm-title">Confirm</h3></div>
+      <p id="app-confirm-body"></p>
+      <p id="app-confirm-detail" class="muted" hidden></p>
+      <div class="modal-actions"><button type="button" id="app-confirm-cancel" class="secondary-button" autofocus>Cancel</button><button type="button" id="app-confirm-accept" class="primary-button">Confirm</button></div>
+    </form>
+  </dialog>
+
   <dialog id="parent-request-review-dialog" class="modal parent-link-modal">
    <form method="dialog" id="parent-request-review-form">
      <div class="modal-heading"><div><p class="kicker">Parent access request</p><h3>Verify child</h3></div><button type="button" class="icon-button small" data-close-dialog aria-label="Close">×</button></div>
@@ -921,7 +930,7 @@
      <input type="hidden" id="parent-request-review-id" />
      <div class="parent-request-summary"><span><b>Parent</b><strong id="parent-request-review-parent">Parent</strong></span><span><b>Submitted child name</b><strong id="parent-request-review-child">—</strong></span><span><b>Email</b><strong id="parent-request-review-email">—</strong></span></div>
      <fieldset class="parent-request-player-fieldset"><legend>Choose the correct player</legend><div class="parent-link-player-list" id="parent-request-player-list"></div></fieldset>
-     <div class="modal-actions"><button type="button" class="secondary-button" data-close-dialog>Cancel</button><button type="submit" class="primary-button">Approve & link</button></div>
+     <div class="modal-actions"><button type="button" class="secondary-button" data-close-dialog>Cancel</button><button type="submit" class="primary-button" id="parent-request-approve">Approve & link</button></div>
    </form>
  </dialog>
 
