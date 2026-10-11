@@ -1027,6 +1027,59 @@ html[data-theme="dark"] body.role-parent #view-home .screen-lead-card{
 .modal .modal-heading h3{font-size:18px;line-height:1.3;overflow-wrap:anywhere}
 .modal .modal-actions{gap:10px}
 
+/* Club Admin Home: matchday preparation, staffing and communications use the app card family. */
+#view-club .admin-home{display:grid;grid-template-columns:minmax(0,1fr);gap:16px}
+#view-club .admin-home>.panel{margin:0;min-width:0}
+#view-club .admin-home .helper,#view-club .admin-home p.muted,#view-club .admin-home small{font-size:14px;line-height:1.5}
+#view-club .admin-home h4{margin:0 0 8px;font-size:15px;line-height:1.4}
+#view-club .admin-home-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;padding:16px 0;border-block:1px solid var(--gch-control-line)}
+#view-club .admin-home-metrics>div{display:grid;align-content:start;gap:3px;min-width:0}
+#view-club .admin-home-metrics strong{font-size:28px;line-height:1.15;color:var(--gch-control-choice-copy)}
+#view-club .admin-home-metrics span{font-size:14px;line-height:1.4;color:var(--gch-control-muted)}
+#view-club .admin-home-actions{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:14px}
+#view-club .admin-home-actions>button{flex:1 1 150px;min-height:48px;font-size:14px}
+#view-club .admin-home-fixture{display:flex;gap:16px;padding:12px 0;border-bottom:1px solid var(--gch-control-line)}
+#view-club .admin-home-fixture>span{min-width:0;display:grid;gap:3px;overflow-wrap:anywhere}
+#view-club .admin-home-fixture strong,#view-club .admin-home-desk-row strong{font-size:15px;line-height:1.4}
+#view-club .admin-home-fixture small,#view-club .admin-home-team small{color:var(--gch-control-muted)}
+#view-club .admin-home-time{flex:0 0 90px}
+#view-club .admin-home-finish{margin-top:14px;padding:14px;border-radius:var(--gch-radius-field);background:var(--gch-control-choice)}
+#view-club .admin-home-finish ul{margin:0;padding-left:20px}
+#view-club .admin-home-finish li{padding:4px 0;font-size:14px;line-height:1.5;overflow-wrap:anywhere}
+#view-club .admin-home-finish li span{display:block;color:var(--gch-control-muted)}
+#view-club .admin-home-desk-row{display:flex;align-items:center;flex-wrap:wrap;gap:10px 14px;padding:14px 0;border-bottom:1px solid var(--gch-control-line)}
+#view-club .admin-home-desk-row>div{flex:1 1 170px;min-width:0}
+#view-club .admin-home-desk-row p{margin:4px 0 0;color:var(--gch-control-muted)}
+#view-club .admin-home-desk-row>button{flex:0 1 auto}
+#view-club .admin-home-coverage-list{display:grid;gap:8px;margin-top:12px}
+#view-club .admin-home-assign,#view-club .admin-home-team{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px 12px;width:100%;min-height:48px;padding:12px;border:1px solid var(--gch-control-line);border-radius:var(--gch-radius-field);background:var(--gch-control-choice);color:var(--gch-control-copy);font:inherit;font-size:14px;line-height:1.5;text-align:left;cursor:pointer;overflow-wrap:anywhere}
+#view-club .admin-home-assign>span:first-child,#view-club .admin-home-team>span:first-child{flex:1 1 150px;min-width:0}
+#view-club .admin-home-assign>span:last-child{color:var(--gch-control-choice-copy);font-weight:700}
+#view-club .admin-home-team{background:var(--gch-control-surface);margin:8px 0 0}
+#view-club .admin-home-team strong{display:block;font-size:15px;line-height:1.4}
+#view-club .admin-home-team small{display:block;margin-top:4px;font-weight:400}
+#view-club .admin-home-team-size{font-size:14px;font-weight:400;color:var(--gch-control-muted)}
+#view-club .admin-home-team-size>span{margin-left:8px;color:var(--gch-control-choice-copy);font-size:20px}
+#view-club .admin-home-assign:focus-visible,#view-club .admin-home-team:focus-visible{outline:3px solid var(--gch-control-focus);outline-offset:2px}
+#view-club .admin-home-directory>summary{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:16px;cursor:pointer}
+#view-club .admin-home-directory>summary::after{content:'+';font-size:22px;color:var(--gch-control-choice-copy)}
+#view-club .admin-home-directory[open]>summary::after{content:'−'}
+#view-club .admin-home-directory>summary .muted{margin-left:auto;font-size:14px;font-weight:400}
+#view-club .admin-home-directory-body{padding:0 16px 16px}
+#view-club .admin-home-team-filters{display:flex;flex-wrap:wrap;gap:12px}
+#view-club .admin-home-team-filters>label{flex:1 1 180px;min-width:0}
+#view-club .admin-home-team-filters input,#view-club .admin-home-team-filters select{width:100%;margin-top:6px}
+#view-club .admin-home .admin-team-grid{display:grid;grid-template-columns:minmax(0,1fr);gap:18px}
+#view-club .admin-home-team-group{min-width:0}
+@media(min-width:760px){
+  #view-club .admin-home{grid-template-columns:repeat(2,minmax(0,1fr))}
+  #view-club .admin-home-weekend,#view-club .admin-home-directory{grid-column:1/-1}
+}
+@media(max-width:440px){
+  #view-club .admin-home-desk-row>button{flex:1 1 100%}
+  #view-club .admin-home .panel-heading>button{width:auto}
+}
+
 /* Parent activity cards share the staff Home hierarchy, including the confirmed continuation. */
 body.role-parent #view-home .home-next-match{gap:8px;margin-bottom:16px}
 body.role-parent .parent-home-training{padding:16px;gap:0;margin-bottom:16px}

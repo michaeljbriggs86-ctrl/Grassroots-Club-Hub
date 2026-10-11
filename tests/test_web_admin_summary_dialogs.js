@@ -11,9 +11,10 @@ const scrollHelper=app.match(/function preferredScrollBehavior\(\)\{[^\n]+/);
 assert(scrollHelper,'production reduced-motion helper is present');
 let overview=true,reducedMotion=false;
 const navigations=[],scrolls=[],focuses=[];
-const ids=Object.fromEntries(['admin-home-age-select','admin-attention-panel'].map(id=>[id,{
+const ids=Object.fromEntries(['admin-home-age-select','admin-home-people'].map(id=>[id,{
   scrollIntoView:options=>scrolls.push({id,...options}),focus:options=>focuses.push({id,...options})
 }]));
+ids['admin-home-teams']={open:false};
 const c={document:{getElementById:id=>ids[id]||null},isClubOverviewMode:()=>overview,
   window:{matchMedia:()=>({matches:reducedMotion})},navigate:target=>navigations.push(target)};
 vm.createContext(c);
@@ -22,12 +23,13 @@ c.openAdminSummary('fixtures');c.openAdminSummary('results');
 assert.deepEqual(navigations,['club-fixtures','club-results'],'summaries enter existing routed pages');
 assert.equal(scrolls.length,0,'fixture/results navigation does not scroll overview controls');
 c.openAdminSummary('teams');
+assert.equal(ids['admin-home-teams'].open,true,'team shortcut opens the directory before focusing its filter');
 reducedMotion=true;c.openAdminSummary('attention');
 assert.deepEqual(scrolls,[{id:'admin-home-age-select',behavior:'smooth',block:'start'},
-  {id:'admin-attention-panel',behavior:'auto',block:'start'}]);
+  {id:'admin-home-people',behavior:'auto',block:'start'}]);
 assert.deepEqual(focuses,[{id:'admin-home-age-select',preventScroll:true},
-  {id:'admin-attention-panel',preventScroll:true}]);
-delete ids['admin-attention-panel'];c.openAdminSummary('attention');
+  {id:'admin-home-people',preventScroll:true}]);
+delete ids['admin-home-people'];c.openAdminSummary('attention');
 assert.equal(focuses.length,2,'missing targets are harmless');
 overview=false;
 for(const kind of ['fixtures','results','teams','attention'])c.openAdminSummary(kind);
