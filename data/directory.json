@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-10-11T09:34:52.853534+00:00",
+  "last_updated": "2026-10-11T10:42:20.153559+00:00",
   "clubs": [
     {
       "club_id": 514,
@@ -845,7 +845,12 @@
     },
     {
       "club_id": 566,
-      "club_name": "Woolwich Wanderers FC"
+      "club_name": "Woolwich Wanderers FC",
+      "logo_url": "https://test.pitchkind.com/__pilot_badges/566/3afe97e8c67b47fc1ad60be8c9153115fae5d8904256319d09b210a966d0d579",
+      "logo_status": "pilot_verified",
+      "logo_source": "user_supplied_private",
+      "logo_updated_at": "2026-10-11",
+      "logo_sha256": "3afe97e8c67b47fc1ad60be8c9153115fae5d8904256319d09b210a966d0d579"
     }
   ],
   "leagues": [
@@ -7957,5 +7962,5 @@
     }
   ],
   "note": "Panel parsing confirmed against all five format categories (mini-soccer, 9-a-side, X-category, 11-a-side, Senior) as of Sept 2026. Club/team linking is heuristic (name-prefix match) - see ambiguous_club_matches in diagnostics for anything flagged as uncertain.",
-  "pilot_badges_revision": "58f66443e3f075bae0590053ac91c3f5bc403356475d9e78c1b277b3096df204"
+  "pilot_badges_revision": "b91ea6b8ac8024b5a3a8540e97e4de1133b582ddf0473f8bee6f43236bdc0c6c"
 }
