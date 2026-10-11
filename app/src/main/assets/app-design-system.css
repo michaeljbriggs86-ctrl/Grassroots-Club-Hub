@@ -1135,3 +1135,21 @@ body.auth-open #activation-gate .auth-grass-footer span{font-size:12px!important
 
 /* Exact supplied Junior Reds roundel: upright presentation, artwork unchanged. */
 img.verified-club-badge[src$="/3aa25e5eff778740a2133b8d0e780b5240bf8b5ca61632061238f3257d1a52d0"]{transform:rotate(16deg);transform-origin:50% 50%;clip-path:none}
+
+/* Match-details names use full column width on phones, with intact word breaks. */
+#match-detail-versus :is(.canonical-v11-side,.canonical-match-team) strong,
+#match-detail-versus .match-team-name,
+#match-detail-versus .club-listing-name{
+  min-width:0;max-width:100%;white-space:normal;
+  word-break:normal;overflow-wrap:break-word;hyphens:none;
+}
+@media(max-width:560px){
+  #match-detail-versus :is(.canonical-v11-teams,.canonical-match-team-row){align-items:start}
+  #match-detail-versus :is(.canonical-v11-side,.canonical-match-team){
+    flex-direction:column;align-items:center;text-align:center;gap:6px;
+  }
+  #match-detail-versus :is(.canonical-v11-badge,.canonical-v13-badge-fallback,.canonical-match-badge){order:-1}
+  #match-detail-versus :is(.canonical-v11-side,.canonical-match-team) strong{
+    width:100%;font-size:14px;line-height:1.4;
+  }
+}
