@@ -10,7 +10,7 @@ const tabs=['fixtures','results'].map(tab=>({dataset:{clubTab:tab},classList:{to
 const c=vm.createContext({CLOUD_MODE:true,currentRole:'admin',currentView:'club',__clubTab:'overview',__adminOverviewStamp:Date.now(),
  document:{getElementById:node,querySelectorAll:s=>s==='[data-club-tab]'?tabs:[]},
  isAdmin:()=>admin,isClubOverviewMode:()=>admin,isAdminCoachMode:()=>false,roleLabel:()=> 'Coach',
- refreshAdminFixtures:()=>refreshes.push('fixtures'),refreshClubResults:()=>refreshes.push('results'),refreshClubCoaches(){},
+ refreshAdminFixtures:()=>refreshes.push('fixtures'),refreshClubResults:()=>refreshes.push('results'),refreshClubCoaches(){},adminWeekendShareIdentity:()=>'',
  renderTeamIdentity(){},syncNavigationUrl(){},navigate:()=>refreshes.push('home')});
 vm.runInContext(src.slice(src.indexOf("let __clubTab='overview';"),src.indexOf('function refreshCoachClubResults(')),c);
 // Exercise the real overview refresh visibility path with a fresh cache.

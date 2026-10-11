@@ -63,7 +63,8 @@ assert.equal(verifiedClubResultsFeed({...feed,coverage:{published_results:{parse
 renderAdminRecentResults(rows,true);
 assert.equal(elements.get('admin-results-count').textContent,'3');
 assert.doesNotMatch(html,/admin-results-breakdown|Selkent published|team recorded/);
-assert.match(html,/Completed matches<\/span><strong id="admin-results-count"/);
+assert.match(html,/data-admin-summary="results">Club results<\/button>/);
+assert.doesNotMatch(html,/id="admin-results-count"/);
 const recentHtml=elements.get('admin-recent-results').innerHTML;
 assert.doesNotMatch(recentHtml,/Selkent published|Team recorded/);
 assert.match(recentHtml,/<table class="competition-games-table"><thead><tr><th>Date<\/th><th>Age \/ competition<\/th><th>Match<\/th><th>Result<\/th>/,'latest results use the Cups table layout');

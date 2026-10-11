@@ -490,32 +490,42 @@
           </section>
         </section></div>
 
-        <section class="admin-club-overview" id="admin-club-overview">
-          <section class="panel admin-attention-panel screen-lead-card" id="admin-attention-panel" tabindex="-1">
-            <div class="admin-attention-list" id="admin-attention-list"></div>
-          </section>
-
-          <section class="panel admin-dashboard-summary">
-            <div class="admin-dashboard-head">
-              <h3>Club at a glance</h3>
+        <section class="admin-club-overview admin-home" id="admin-club-overview">
+          <section class="panel screen-lead-card admin-home-weekend" aria-labelledby="admin-home-weekend-title">
+            <div class="panel-heading"><div><p class="kicker">Club matchday</p><h3 id="admin-home-weekend-title">This weekend</h3><p class="muted" id="admin-home-weekend-dates"></p></div><button type="button" class="secondary-button" id="admin-home-refresh">Refresh</button></div>
+            <p class="muted admin-overview-meta" id="admin-overview-meta" role="status">Loading club data…</p>
+            <div class="admin-home-metrics">
+              <div><strong id="admin-home-fixture-count">—</strong><span>Weekend fixtures</span></div>
+              <div><strong id="admin-home-ready-count">—</strong><span>Ready to share</span></div>
+              <div><strong id="admin-home-pending-count">—</strong><span>Details to finish</span></div>
             </div>
-            <div class="admin-overview-stats">
-              <button type="button" class="admin-stat" data-admin-summary="teams" aria-label="Browse club teams"><span>Teams</span><strong id="admin-team-count">0</strong></button>
-              <button type="button" class="admin-stat" data-admin-summary="fixtures"><span>Upcoming fixtures</span><strong id="admin-fixtures-count">0</strong></button>
-              <button type="button" class="admin-stat" data-admin-summary="results"><span>Completed matches</span><strong id="admin-results-count">0</strong></button>
-              <button type="button" class="admin-stat" data-admin-summary="attention" aria-label="View club items needing action"><span>Needs action</span><strong id="admin-alert-count">0</strong></button>
+            <p class="helper">Ready to share counts confirmed fixtures or cup group starts.</p>
+            <div id="admin-home-weekend-list" class="admin-home-weekend-list"></div>
+            <div class="admin-home-actions"><button type="button" class="primary-button" data-admin-home-action="share" id="admin-home-share" disabled>Share weekend</button><button type="button" class="secondary-button" data-admin-home-action="fixtures" data-admin-summary="fixtures">Review fixtures</button></div>
+          </section>
+
+          <section class="panel admin-home-people" id="admin-home-people" tabindex="-1" aria-labelledby="admin-home-people-title">
+            <div class="panel-heading"><div><p class="kicker">People &amp; access</p><h3 id="admin-home-people-title">Coaching staff</h3></div></div>
+            <div class="admin-home-desk-row"><div><strong>Staff access requests</strong><p id="admin-home-request-status">Loading requests…</p></div><button type="button" class="secondary-button" data-admin-home-action="requests">Review requests</button></div>
+            <div class="admin-home-desk-row"><div><strong>Team coverage</strong><p id="admin-home-coverage-status">Loading staff assignments…</p></div><button type="button" class="secondary-button" data-admin-home-action="staff">Manage staff</button></div>
+            <div id="admin-home-coverage-list" class="admin-home-coverage-list"></div>
+          </section>
+
+          <section class="panel admin-home-communications" aria-labelledby="admin-home-communications-title">
+            <div class="panel-heading"><div><p class="kicker">Club desk</p><h3 id="admin-home-communications-title">Communications</h3></div></div>
+            <div class="admin-home-desk-row"><div><strong>Your messages</strong><p id="admin-home-message-status">Loading messages…</p></div><button type="button" class="secondary-button" data-admin-home-action="messages">Open messages</button></div>
+            <div class="admin-home-desk-row"><div><strong>Club notices</strong><p id="admin-home-notice-status">Loading notices…</p></div><button type="button" class="secondary-button" data-admin-home-action="notice">Write a notice</button></div>
+            <div class="admin-home-actions"><button type="button" class="text-button" data-admin-summary="results">Club results</button><button type="button" class="text-button" data-admin-home-action="settings">Club settings</button></div>
+          </section>
+
+          <details class="panel admin-home-directory" id="admin-home-teams">
+            <summary><span>Club teams</span><span class="muted" id="admin-team-count">—</span></summary>
+            <div class="admin-home-directory-body">
+              <div class="admin-home-team-filters"><label>Find a team<input type="search" id="admin-home-team-search" placeholder="Team or coach name" /></label><label>Age group<select id="admin-home-age-select"><option value="">All age groups</option></select></label></div>
+              <p class="helper">Open a team to view its squad and match information.</p>
+              <div class="admin-team-grid admin-age-group-list" id="admin-team-grid"></div>
             </div>
-            <p class="muted admin-overview-meta hidden" id="admin-overview-meta" role="status"></p>
-          </section>
-
-
-          <section class="admin-team-overview-panel">
-            <div class="admin-section-heading"><div><p class="kicker">Teams</p><h3>Browse by age group</h3></div></div>
-            <label class="admin-filter-label admin-home-age-label">Age group<select id="admin-home-age-select"><option value="">Choose an age group</option></select></label>
-            <div class="admin-team-grid admin-age-group-list" id="admin-team-grid"></div>
-          </section>
-
-
+          </details>
         </section>
 
         <section class="club-admin-panel hidden" id="club-coaches-panel">
