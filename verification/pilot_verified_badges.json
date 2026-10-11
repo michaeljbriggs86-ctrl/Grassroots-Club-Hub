@@ -1067,6 +1067,35 @@
       "logo_sha256": "00105ade6767394c6ecab1edf658364238431d66de2d00fa5e881af0fa291e79",
       "logo_url": "https://test.pitchkind.com/__pilot_badges/269/00105ade6767394c6ecab1edf658364238431d66de2d00fa5e881af0fa291e79",
       "staging_asset": "verification/approved_badges/269.png"
+    },
+    {
+      "club_id": 514,
+      "club_name": "Abbeymead FC",
+      "logo_status": "pilot_verified",
+      "logo_source": "user_supplied_private",
+      "logo_updated_at": "2026-10-11",
+      "logo_sha256": "2b9b292f7eb4f13d5f7d8e569261fc2cb35b6d44fcaec7c51bf06dcb34e3f70e",
+      "original_source_url": "https://drive.google.com/file/d/1okJS0E2JOBWBoiXt7XwRyR7Ki4Ydcw2l/view",
+      "original_sha256": "50123d20921d3872b527f0e98bd6427457442213ae5e66251d20d22bb6c33f29",
+      "staging_asset": "verification/approved_badges/514.png",
+      "source_user_approved": true,
+      "source_media_type": "image/png",
+      "native_width": 252,
+      "native_height": 301,
+      "derivation": "recalculate_eXIf_crc_and_remove_trailing_editor_metadata",
+      "pilot_quality_exception": {
+        "scope": "shooters_hill_protected_pilot",
+        "max_render_css_px": 128,
+        "quality_note": "below q1",
+        "no_upscaling": true,
+        "native_width": 252,
+        "native_height": 301
+      },
+      "rights_status": "protected_pilot_only_public_rights_not_reviewed",
+      "rights_note": "Rights bypassed for protected pilot; public, marketing and wider-use permission not established.",
+      "identity_reference_page_url": "https://wesfa.co/division-2-clubs",
+      "review_basis": "Mike confirmed this owl/ruined-arch ABBEYMEAD F.C. shield as canonical Selkent club 514 on 8 October 2026 at 23:04, preserved in Claude's 2320 and 2355 entries. His subsequent direction is to keep saved artwork and continue badge integration. Fresh Drive original is the exact 134802-byte 252x301 transparent cutout SHA50123d20. Current WESFA Division 2 and Selkent 514 listings share the same secretary, fixture contact, Meridian ground and red/black colours; no substitution with Gloucestershire Abbeymead Rovers or Wiltshire Abbey Meads. Exact social-post URL and cutout history remain unestablished. Original was supplied from a Ministry of Ball match graphic per the 2250 handoff; no claim of a club-authored original. Preparation recalculates only the invalid eXIf CRC at offsets 422-425 and drops exactly 1811 PhotoEditor bytes after IEND. Every PNG chunk payload including IDAT, native dimensions, decoded RGBA pixel and alpha value is retained byte-for-byte. No crop, redraw, image generation, recolouring or upscaling. Saved exterior transparency, black shield border and all lettering are retained. Final PNG is 132991 bytes. Exact source/result metadata repair is allowlisted; D2 below-q1 exception applies at maximum 128 CSSpx only in the protected Shooters Hill pilot, not a global quality waiver. Immutable hash/MIME/R2 readback gates apply. Independent review and signed-in phone visual acceptance remain open.",
+      "logo_url": "https://test.pitchkind.com/__pilot_badges/514/2b9b292f7eb4f13d5f7d8e569261fc2cb35b6d44fcaec7c51bf06dcb34e3f70e"
     }
   ]
 }
