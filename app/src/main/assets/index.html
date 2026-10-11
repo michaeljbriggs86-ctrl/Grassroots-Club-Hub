@@ -563,6 +563,7 @@
           <button type="button" data-scroll-to="appearance-settings">Appearance</button>
           <button type="button" data-scroll-to="access-panel">My account</button>
         </nav>
+        <button type="button" class="secondary-button hidden" id="coach-profile-self">My coaching qualifications</button>
         <div class="settings-accordion-list">
 
 <div class="settings-group-heading" data-coach-ui-only><span>Team</span><small>Tools and access for this team</small></div>
@@ -1042,10 +1043,42 @@
   </dialog>
 
   <div id="toast" class="toast" role="status"></div>
+  <dialog id="coach-qualification-dialog" class="modal coach-qualification-dialog" aria-labelledby="coach-qualification-name">
+    <div class="modal-body">
+      <div class="modal-heading"><h3 id="coach-qualification-name">Coach profile</h3><button type="button" class="secondary-button" id="coach-qualification-close">Close</button></div>
+      <p>Qualification dates and renewals for this coach.</p>
+      <p class="helper" id="coach-qualification-readonly" hidden>Your Club Admin maintains these records. Ask them to update any changes.</p>
+      <p id="coach-qualification-status" role="status" aria-live="polite"></p>
+      <div id="coach-qualification-list"></div>
+      <section id="coach-qualification-editor" class="hidden">
+        <h4>Update qualification</h4>
+        <form id="coach-qualification-form" novalidate>
+          <input type="hidden" id="coach-qualification-kind" />
+          <label>Qualification<select id="coach-qualification-course" required></select></label>
+          <div class="qualification-date-fields">
+            <label><span id="coach-qualification-date-label">Completed</span><input type="date" id="coach-qualification-completed" required /></label>
+            <label><span id="coach-qualification-expiry-label">Expiry</span><input type="date" id="coach-qualification-expiry" /></label>
+          </div>
+          <p class="helper" id="coach-qualification-help"></p>
+          <a id="coach-qualification-source" href="https://learn.englandfootball.com/" target="_blank" rel="noopener">View official guidance</a>
+          <label class="qualification-check"><input type="checkbox" id="coach-qualification-checked" /><span id="coach-qualification-check-label">Club has checked this qualification and its dates</span></label>
+          <div class="qualification-actions"><button type="submit" class="primary-button">Save record</button><button type="button" class="secondary-button" id="coach-qualification-remove" hidden>Remove record</button></div>
+        </form>
+      </section>
+      <details class="qualification-guidance"><summary>Which records should the club check?</summary>
+        <p>Eligible under-18 coaching roles need an FA-accepted Enhanced DBS with Children’s Barred List check. The FA renewal period is three years from issue. Safeguarding Children is valid for two years; IFAiF is valid for three.</p>
+        <p>For England Football Accredited youth teams, at least one coach or manager per team needs I2CF with in-date safeguarding and first aid. Check the club’s and league’s role requirements; a missing record here is not an eligibility decision.</p>
+        <p>UEFA licences renew every three years. Record the award and licence separately. Confirm exact dates and acceptance in <a href="https://clubs.thefa.com/" target="_blank" rel="noopener">FA Club Portal</a>.</p>
+        <p>Record dates and club checks only. Do not upload DBS certificates, certificate numbers or criminal-record information.</p>
+      </details>
+    </div>
+  </dialog>
+
   <script src="cloud-config.js"></script>
   <script src="onboarding.js"></script>
   <script src="cloud.js"></script>
   <script src="pilot-rights-runtime.js"></script>
+  <script src="coach-qualifications.js"></script>
   <script src="app.js"></script>
   <script src="static-feed-overlay.js"></script>
 </body>
