@@ -300,8 +300,8 @@
         <section class="match-section competition-games-section" id="competition-games-section">
           <div class="match-section-heading"><div><p class="kicker">Group and knockout competitions</p><h3>Cups & Vases</h3></div></div>
           <div class="competition-game-grid">
-            <details class="panel competition-games-panel" id="cup-games-panel"><summary><div><strong>Cups</strong><small>Selkent Cup One and Two, London and Kent cups</small></div><div class="competition-summary-actions"><span class="match-section-count" id="cup-games-count">0</span></div></summary><div class="competition-table-scroll"><table class="competition-games-table"><thead><tr><th>Date</th><th>Cup</th><th>Opponent</th><th>H/A</th><th>Status / result</th></tr></thead><tbody id="cup-games-body"></tbody></table></div></details>
-            <details class="panel competition-games-panel" id="vase-games-panel"><summary><div><strong>Vases</strong><small>Selkent Vase One and Two</small></div><div class="competition-summary-actions"><span class="match-section-count" id="vase-games-count">0</span></div></summary><div class="competition-table-scroll"><table class="competition-games-table"><thead><tr><th>Date</th><th>Cup</th><th>Opponent</th><th>H/A</th><th>Status / result</th></tr></thead><tbody id="vase-games-body"></tbody></table></div></details>
+            <details class="panel competition-games-panel" id="cup-games-panel"><summary><div><strong>Cups</strong><small>Selkent Cup One and Two, London and Kent cups</small></div><div class="competition-summary-actions"><span class="match-section-count" id="cup-games-count">0</span></div></summary><div class="competition-table-scroll"><table class="competition-games-table"><thead><tr><th>Date</th><th>Cup</th><th>Opponent</th><th>H/A</th><th>Result</th></tr></thead><tbody id="cup-games-body"></tbody></table></div></details>
+            <details class="panel competition-games-panel" id="vase-games-panel"><summary><div><strong>Vases</strong><small>Selkent Vase One and Two</small></div><div class="competition-summary-actions"><span class="match-section-count" id="vase-games-count">0</span></div></summary><div class="competition-table-scroll"><table class="competition-games-table"><thead><tr><th>Date</th><th>Cup</th><th>Opponent</th><th>H/A</th><th>Result</th></tr></thead><tbody id="vase-games-body"></tbody></table></div></details>
           </div>
         </section>
 
@@ -890,7 +890,9 @@
       <div class="empty-detail-options hidden" id="empty-detail-options">All match detail options are switched off. Enable the options you want under Settings → Features.</div>
       <div class="modal-actions match-report-actions">
         <button type="button" class="secondary-button hidden" id="match-report-back">Back</button>
-        <button type="button" class="danger-button hidden" id="delete-match-detail" data-delete-match="">Delete match</button>
+        <button type="button" class="secondary-button hidden" id="edit-match-detail" data-edit-match="">Edit fixture</button>
+        <button type="button" class="primary-button hidden" id="play-match-detail" data-match-played="">Match played</button>
+        <button type="button" class="danger-button hidden" id="delete-match-detail" data-delete-match="">Remove</button>
         <button type="button" class="danger-button hidden" id="undo-match-played">Undo match played</button>
         <button type="button" class="secondary-button" id="match-detail-cancel" data-close-dialog>Cancel</button>
         <button type="button" class="primary-button hidden" id="match-report-next">Next</button>
