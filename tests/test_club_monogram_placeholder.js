@@ -46,11 +46,17 @@ const overlaySrc=fs.readFileSync(path.join(__dirname,'../app/src/main/assets/sta
 context.norm=norm;state.selkent.directoryDetails={};
 vm.runInContext(overlaySrc.slice(overlaySrc.indexOf('  function attachDirectoryBadges('),overlaySrc.indexOf('  function loadDirectory(')),context);
 context.attachDirectoryBadges(directory);
-for(const name of ['Shooters Hill Cannons','Shooters Hill cannons U8']){
- assert.equal(state.selkent.directoryDetails[norm(name)].clubId,499);
+for(const [name,id] of [['Shooters Hill Cannons',499],['Shooters Hill cannons U8',499],['Junior Reds Knights',292],['Junior Reds Athletic',292]]){
+ assert.equal(state.selkent.directoryDetails[norm(name)].clubId,id);
  assert.equal(state.selkent.directoryDetails[norm(name)].logoStatus,'pilot_verified');
- assert.equal(state.selkent.directoryDetails[norm(name)].pilotLogoSha256,directory.clubs.find(c=>c.club_id===499).logo_sha256);
+ assert.equal(state.selkent.directoryDetails[norm(name)].pilotLogoSha256,directory.clubs.find(c=>c.club_id===id).logo_sha256);
 }
+// Exercise unavailable-artwork fallback explicitly, including newly admitted clubs.
+const missingArtwork=structuredClone(directory);
+for(const club of missingArtwork.clubs.filter(c=>[286,292,322].includes(Number(c.club_id)))){
+ for(const field of ['logo_url','logo_status','logo_source','logo_updated_at','logo_sha256'])delete club[field];
+}
+context.attachDirectoryBadges(missingArtwork);
 for(const [name,initials,id] of [['Lewisham Borough Cobras','LB',286],['Junior Reds Knights','JR',292],['Junior Reds Athletic','JR',292],['Russellers Yellows','RU',322]]){
  assert.equal(state.selkent.directoryDetails[norm(name)].clubId,id);
  assert.equal(context.clubPlaceholderBadgeData(name).initials,initials);
