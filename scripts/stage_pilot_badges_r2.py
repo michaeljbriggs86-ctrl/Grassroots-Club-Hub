@@ -12,10 +12,14 @@ import os
 from pathlib import Path
 import re
 import subprocess
+import sys
 import tempfile
 from urllib.parse import urlsplit
 
 from publish_pilot_badges import MAX_IMAGE_BYTES, validated_approvals
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'verification'))
+from verify_club_logo_quality import check_pilot_exception
 
 
 BUCKET = 'pitchkind-pilot-badges'
@@ -135,7 +139,11 @@ def reviewed_upload_snapshot(badge):
         if image.size != (badge.get('native_width'), badge.get('native_height')):
             raise ValueError('reviewed upload native dimensions differ')
         if min(image.size) < 512:
-            raise ValueError('reviewed upload snapshot is below q1')
+            errors = check_pilot_exception(Path(expected),
+                {'schema_version': 1, 'scope': 'private_pilot', 'badges': [badge]},
+                int(badge['club_id']), 128)
+            if errors:
+                raise ValueError('reviewed upload snapshot is below q1: ' + '; '.join(errors))
         image.verify()
     return data
 

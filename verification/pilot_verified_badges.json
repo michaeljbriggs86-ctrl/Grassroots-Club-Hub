@@ -965,6 +965,38 @@
       "rights_status": "protected_pilot_only_public_rights_not_reviewed",
       "rights_note": "Rights bypassed for protected pilot; public, marketing and wider-use permission not established.",
       "review_basis": "Mike confirmed on 2026-10-10 that he supplied the Junior Reds badge and explicitly selected Rotate upright. Fresh authenticated Drive retrieval is the exact 193549-byte supplied 514x512 PNG. The supplied media basename GenczFvWwAA0AJm resolves to a public 1179x811 Junior Reds FC Bexleyheath recruitment image with the same tilted roundel and JuniorRedsfc.co.uk club contact. The poster is corroboration only and is not served or substituted for the supplied cutout. Supplied badge pixels, dimensions, IDAT data and transparency are unchanged; only the invalid eXIf chunk CRC is recalculated for valid PNG decoding. A reviewed repository snapshot bootstraps this exact approved PNG to private R2; subsequent deployments read back the immutable stored object. Clockwise 16 degree correction occurs only during page/share rendering for this exact asset hash. No artwork regeneration, redraw, recolour, clipping or upscaling. Canvas meets the 512px q1 floor natively. Private R2 readback/deployment and signed-in phone visual acceptance remain pending."
+    },
+    {
+      "club_id": 484,
+      "club_name": "Avery Hill Athletic",
+      "logo_url": "https://test.pitchkind.com/__pilot_badges/484/e513c0ffd15147a6e8241f0e2ad42cd6e012dabeda008ee51fb3e5b35f1a8902",
+      "logo_status": "pilot_verified",
+      "logo_source": "user_supplied_private",
+      "logo_updated_at": "2026-10-11",
+      "logo_sha256": "e513c0ffd15147a6e8241f0e2ad42cd6e012dabeda008ee51fb3e5b35f1a8902",
+      "original_source_url": "https://drive.google.com/file/d/1bzyc3kaSjGm57VwXMKeUXdraLswrWvNi/view",
+      "original_sha256": "1afe2c8063125b95b11ceae30a154b4c8485715a3bc09f7f9838a2d565895d9a",
+      "source_user_approved": true,
+      "source_media_type": "image/png",
+      "native_width": 370,
+      "native_height": 370,
+      "derivation": "recalculate_eXIf_crc_only",
+      "staging_asset": "verification/approved_badges/484.png",
+      "identity_reference_page_url": "https://wesfa.co/division-4-clubs",
+      "identity_reference_url": "https://img1.wsimg.com/isteam/ip/ff75cc23-56cd-49a1-90d9-1c216194c2d3/Avery%20Hill%20Athletic%20Reserves-dc65e71.jpg",
+      "identity_reference_sha256": "5b35a6f7e300e3048c5879f0529ae4e90af2c23a5a4844e7002ee05e55aa851a",
+      "quality_note": "below q1; supplied native 370px whole transparent roundel at maximum 128 CSSpx; no upscaling",
+      "pilot_quality_exception": {
+        "scope": "shooters_hill_protected_pilot",
+        "max_render_css_px": 128,
+        "quality_note": "below q1",
+        "no_upscaling": true,
+        "native_width": 370,
+        "native_height": 370
+      },
+      "rights_status": "protected_pilot_only_public_rights_not_reviewed",
+      "rights_note": "Rights bypassed for protected pilot; public, marketing and wider-use permission not established.",
+      "review_basis": "Mike supplied this exact orange Avery Hill Athletic PNG and on 2026-10-11 requested continued badge integration and explicitly selected Keep saved artwork. Fresh authenticated Drive bytes match the pinned original 197512-byte 370x370 PNG. Current WESFA Division 4 club listing independently displays the same orange/white eagle-eye roundel, AVERYHILL ATHLETIC FOOTBALL CLUB text and two stars. WESFA and canonical Selkent 484 share club secretary Rebecca Morris and the same listed contact, establishing the club link. The current league 400px JPEG is corroboration only; no replacement, crop or enlargement of that image is served. Only the invalid eXIf chunk CRC at offsets 362-365 is recalculated; all chunk payloads, IDAT, dimensions and alpha remain unchanged. Original transparent exterior and complete roundel retained. Exact-file D2 protected-pilot exception applies at maximum 128 CSSpx; global 512px q1 remains unchanged. No redraw, recolour, generated artwork, pixel edits, crop or upscaling by Codex. Supplied cutout history and originating social page are not independently established and are not invented. Existing immutable private R2 upload/readback gates apply. Signed-in phone visual acceptance remains open."
     }
   ]
 }
