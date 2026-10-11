@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "provider": "Selkent",
-  "last_updated": "2026-10-11T19:32:59.169098+00:00",
+  "last_updated": "2026-10-11T21:12:34.815237+00:00",
   "fixture_agegroup_discovery_source": "selkent_divisions_all",
   "coverage": {
     "fixtures": {
@@ -17023,7 +17023,7 @@
         },
         {
           "division_name": "Under 12X A Silver",
-          "updated_at_text": "11/10/26 15:50:02",
+          "updated_at_text": "11/10/26 21:05:23",
           "source_order_authoritative_for_ties": false,
           "source_disclaimer": "Note: Table does not yet take account of rules for determining winner if teams on equal points",
           "rows": [
