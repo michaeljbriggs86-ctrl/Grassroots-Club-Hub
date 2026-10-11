@@ -1271,3 +1271,14 @@ html[data-theme="dark"] .club-matches-table .club-fixture-confirmation.confirmed
   .club-matches-table .club-fixture-confirmation{max-width:100px;font-size:11px}
   .club-matches-table .club-result-match{gap:6px}
 }
+
+/* Club fixtures browse a Saturday/Sunday window without losing unscheduled games. */
+#view-club .club-weekend-navigation{display:grid;grid-template-columns:44px minmax(0,1fr) 44px;align-items:center;gap:12px;margin:4px 0 12px;text-align:center}
+#view-club .club-weekend-navigation button{min-width:44px;min-height:44px;padding:8px;font-size:20px}
+#view-club .club-weekend-navigation strong{font-size:1rem;line-height:1.4}
+#view-club .club-weekend-viewport{touch-action:pan-y;min-width:0}
+#view-club .club-weekend-viewport:focus-visible{outline:2px solid var(--green-2);outline-offset:4px;border-radius:8px}
+#view-club .club-fixture-group{margin:16px 0 0}
+#view-club .club-fixture-group h3{margin:0 0 8px;font-size:1rem;line-height:1.4}
+#view-club .club-fixture-group summary{cursor:pointer;min-height:44px;padding:12px 0;font-weight:700}
+.club-matches-table .competition-result-pill{white-space:nowrap;flex-shrink:0}

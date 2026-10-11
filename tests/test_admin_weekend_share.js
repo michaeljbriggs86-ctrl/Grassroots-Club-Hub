@@ -69,6 +69,24 @@ const digest=rows=>c.buildAdminWeekendDigest(rows,feedFor(rows));
  c.navigator.share=undefined;c.window.ClubHubStaticSelkent.loadResults=async()=>feedFor([a]);c.window.ClubHubCloud.getClubOverview=async()=>[a];await c.openAdminWeekendShare();await c.shareAdminWeekend();assert.match(notices.at(-1),/Use Copy/);
  c.navigator.clipboard.writeText=async()=>{throw new Error('clipboard denied');};await c.copyAdminWeekend();assert.match(notices.at(-1),/Select and copy/);
  let resolveRows;c.window.ClubHubCloud.getClubOverview=()=>new Promise(resolve=>resolveRows=resolve);const loading=c.openAdminWeekendShare();c.window.ClubHubCloud.context.profile.role='parent';resolveRows([a]);await loading;assert.equal(c.adminWeekendShareReady(),false,'role changes during refresh cannot prepare an export');
+ // Sharing follows the viewed weekend, retaining a fresh cache timestamp.
+ c.window.ClubHubCloud.context.profile.role='admin';
+ const future=plain(a);future.state.selkent.fixtures[0].date='2026-10-18';
+ future.state.selkent.fixtureOverrides={};confirm(future,future.state.selkent.fixtures[0]);
+ c.window.ClubHubCloud.getClubOverview=async()=>[a,future];c.window.ClubHubStaticSelkent.loadResults=async()=>feedFor([a,future]);
+ await c.openAdminWeekendShare('2026-10-17');
+ assert.equal(c.adminWeekendShareReady(),true,'a future viewed weekend is ready now');
+ assert.match(node('admin-weekend-share-text').value,/Sunday, 18 October/);assert.doesNotMatch(node('admin-weekend-share-text').value,/Sunday, 11 October/);
+ assert.equal(vm.runInContext('__adminWeekendShare.digest.generatedAt',c),clock);
+ assert.equal(vm.runInContext('__adminWeekendShareWeekend',c),'2026-10-17');
+ clock+=300000;assert.equal(c.adminWeekendShareReady(),false,'selected weekend still expires normally');clock-=300000;
+ // Previously scheduled fixtures remain reachable in an explicitly viewed past window.
+ const past=plain(a);past.state.selkent.fixtures[0].date='2026-10-04';past.state.selkent.fixtureOverrides={};confirm(past,past.state.selkent.fixtures[0]);
+ c.window.ClubHubCloud.getClubOverview=async()=>[past];c.window.ClubHubStaticSelkent.loadResults=async()=>feedFor([past]);
+ await c.openAdminWeekendShare('2026-10-03');assert.equal(c.adminWeekendShareReady(),true);assert.match(node('admin-weekend-share-text').value,/Sunday, 4 October/);
+ // Default previews still expire when London's current weekend rolls over.
+ c.window.ClubHubCloud.getClubOverview=async()=>[a];c.window.ClubHubStaticSelkent.loadResults=async()=>feedFor([a]);clock=Date.parse('2026-10-11T22:59:00Z');
+ await c.openAdminWeekendShare();assert.equal(c.adminWeekendShareReady(),true);clock+=120000;assert.equal(c.adminWeekendShareReady(),false);
  // A strict export refresh rejects cached feed fallback while existing overview readers keep it.
  const overlay=fs.readFileSync('app/src/main/assets/static-feed-overlay.js','utf8');const slice=(a,b)=>overlay.slice(overlay.indexOf(a),overlay.indexOf(b,overlay.indexOf(a)));
  const cache={age_groups:[]};const oc={Date,window:{nativeHttp:async()=>{throw new Error('offline');}},memoryCache:{},DIRECTORY_CACHE_KEY:'directory',readCached:()=>cache,writeCached:()=>{},safeJsonParse:JSON.parse};vm.createContext(oc);vm.runInContext(slice('  async function fetchStaticFeed(', '  function attachDirectoryBadges('),oc);
