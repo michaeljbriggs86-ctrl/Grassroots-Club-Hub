@@ -4633,6 +4633,47 @@ async function refreshTeamMembers(quiet=false){
    return requestsResult.status==='fulfilled'?__pendingParentRequests.length:null;
  }catch(err){list.innerHTML='<div class="empty-state compact-empty">Team access is temporarily unavailable. Reopen to retry.</div>';return null;}
 }
+let __appConfirmPending=false;
+function appConfirm({title='Confirm',body='',detail='',confirmLabel='Confirm',cancelLabel='Cancel',tone='default'}={}){
+ const dialog=document.getElementById('app-confirm-dialog'),cancel=document.getElementById('app-confirm-cancel'),accept=document.getElementById('app-confirm-accept');
+ if(__appConfirmPending||!dialog||!cancel||!accept||dialog.open||typeof dialog.showModal!=='function')return Promise.resolve(false);
+ const returnFocus=document.activeElement;
+ __appConfirmPending=true;
+ return new Promise(resolve=>{
+   let settled=false;
+   const finish=approved=>{
+     if(settled)return;settled=true;
+     cancel.removeEventListener('click',onCancel);accept.removeEventListener('click',onAccept);
+     dialog.removeEventListener('cancel',onCancel);dialog.removeEventListener('close',onClose);dialog.removeEventListener('keydown',onKey);
+     try{if(dialog.open)dialog.close();}finally{
+       __appConfirmPending=false;
+       try{if(returnFocus?.isConnected&&typeof returnFocus.focus==='function')returnFocus.focus({preventScroll:true});}catch(_){}
+       resolve(approved);
+     }
+   };
+   const onCancel=e=>{e.preventDefault();finish(false);},onAccept=()=>finish(true);
+   // A previous close event can arrive after this shared dialog is reopened.
+   const onClose=()=>{if(!dialog.open)finish(false);};
+   const onKey=e=>{
+     if(e.key==='Escape'){e.preventDefault();finish(false);}
+     else if(e.key==='Tab'){
+       e.preventDefault();
+       const active=document.activeElement;
+       (active===cancel?accept:active===accept?cancel:e.shiftKey?accept:cancel).focus({preventScroll:true});
+     }
+   };
+   cancel.addEventListener('click',onCancel);accept.addEventListener('click',onAccept);
+   dialog.addEventListener('cancel',onCancel);dialog.addEventListener('close',onClose);dialog.addEventListener('keydown',onKey);
+   try{
+     document.getElementById('app-confirm-title').textContent=String(title);
+     document.getElementById('app-confirm-body').textContent=String(body);
+     const note=document.getElementById('app-confirm-detail');note.textContent=String(detail);note.hidden=!detail;
+     cancel.textContent=String(cancelLabel);accept.textContent=String(confirmLabel);
+     dialog.dataset.tone=tone==='danger'?'danger':'default';dialog.returnValue='';
+     dialog.showModal();cancel.focus({preventScroll:true});
+   }catch(_){finish(false);}
+ });
+}
 function openParentRequestReview(requestId){
  if(!['admin','coach','assistant_coach'].includes(currentRole))return toast('Staff access is required to review parent requests.');
  const req=__pendingParentRequests.find(r=>String(r.request_id)===String(requestId));
@@ -4645,20 +4686,42 @@ function openParentRequestReview(requestId){
  list.innerHTML=activePlayers().map(p=>`<label class="parent-link-player parent-request-player"><input type="radio" name="parent-request-player" value="${esc(p.name)}"/><span>${miniJerseyHTML(p.number,p.role,'compact')}</span><span>${esc(p.name)}</span></label>`).join('')||'<div class="empty-state compact-empty">Add an active player to the squad before approving this request.</div>';
  dlg.showModal();
 }
+let __parentRequestApprovalPending=false;
 async function submitParentRequestReview(e){
  e.preventDefault();
+ if(__parentRequestApprovalPending)return;
  if(!['admin','coach','assistant_coach'].includes(currentRole))return toast('Staff access is required to review parent requests.');
  const requestId=document.getElementById('parent-request-review-id')?.value||'';
  const selected=document.querySelector('#parent-request-player-list input[name="parent-request-player"]:checked')?.value||'';
  if(!selected)return alert('Select the correct active squad player before approving this request.');
- const supplied=document.getElementById('parent-request-review-child')?.textContent||'the submitted child';
- if(!confirm(`Approve this request and link "${supplied}" to ${selected}? Existing sibling and other-team links will be kept.`))return;
+ const cloud=window.ClubHubCloud,teamId=cloud?.currentTeam?.()?.id,userId=cloud?.session?.user?.id,role=currentRole;
+ const request=__pendingParentRequests.find(r=>String(r.request_id)===requestId);
+ if(!request||!teamId||!userId||!activePlayers().some(p=>p.name===selected))return toast('Reopen the request and choose an active squad player.');
+ const supplied=String(request.child_name||'').trim(),parentId=request.user_id;
+ const sameName=name=>String(name).trim().replace(/\s+/g,' ').toLocaleLowerCase();
+ const body=!supplied||sameName(supplied)===sameName(selected)
+   ?`Approve this request and link ${selected} to this parent?`
+   :`Approve this request? The parent typed “${supplied}” and you chose ${selected}.`;
+ const sameContext=()=>window.ClubHubCloud===cloud&&cloud.currentTeam?.()?.id===teamId&&cloud.session?.user?.id===userId&&currentRole===role&&cloud.role?.()===role;
+ const button=document.getElementById('parent-request-approve');
+ __parentRequestApprovalPending=true;
  try{
-   await window.ClubHubCloud.approveParentRequest(requestId,selected);
+   if(!(await appConfirm({title:'Approve parent request',body,detail:'Existing child links are kept.',confirmLabel:'Approve & link'})))return;
+   const current=__pendingParentRequests.find(r=>String(r.request_id)===requestId);
+   if(!sameContext()||!document.getElementById('parent-request-review-dialog')?.open||
+     document.getElementById('parent-request-review-id')?.value!==requestId||
+     document.querySelector('#parent-request-player-list input[name="parent-request-player"]:checked')?.value!==selected||
+     !activePlayers().some(p=>p.name===selected)||!current||current.user_id!==parentId||String(current.child_name||'').trim()!==supplied)
+     return toast('The request or active team changed. Reopen the request before approving.');
+   if(button)button.disabled=true;
+   await cloud.approveParentRequest(requestId,selected);
+   if(!sameContext())return toast(`Parent access approved for ${selected}. Reopen Team access to refresh.`);
    auditEvent('parent_request_approved','access',requestId,`Approved parent request and linked ${selected}`);
-   document.getElementById('parent-request-review-dialog')?.close();toast(`Parent access approved for ${selected}`);
+   if(document.getElementById('parent-request-review-id')?.value===requestId)document.getElementById('parent-request-review-dialog')?.close();
+   toast(`Parent access approved for ${selected}`);
    __teamMembersStamp=0;await refreshTeamMembers(false);await refreshNotifications(false);
  }catch(err){alert(err.message||err);}
+ finally{__parentRequestApprovalPending=false;if(button)button.disabled=false;}
 }
 async function openParentLinkDialog(userId,parentName='Parent'){
  if(!requireCoach())return;const dlg=document.getElementById('parent-link-dialog'),list=document.getElementById('parent-link-player-list');if(!dlg||!list)return;
