@@ -997,6 +997,76 @@
       "rights_status": "protected_pilot_only_public_rights_not_reviewed",
       "rights_note": "Rights bypassed for protected pilot; public, marketing and wider-use permission not established.",
       "review_basis": "Mike supplied this exact orange Avery Hill Athletic PNG and on 2026-10-11 requested continued badge integration and explicitly selected Keep saved artwork. Fresh authenticated Drive bytes match the pinned original 197512-byte 370x370 PNG. Current WESFA Division 4 club listing independently displays the same orange/white eagle-eye roundel, AVERYHILL ATHLETIC FOOTBALL CLUB text and two stars. WESFA and canonical Selkent 484 share club secretary Rebecca Morris and the same listed contact, establishing the club link. The current league 400px JPEG is corroboration only; no replacement, crop or enlargement of that image is served. Only the invalid eXIf chunk CRC at offsets 362-365 is recalculated; all chunk payloads, IDAT, dimensions and alpha remain unchanged. Original transparent exterior and complete roundel retained. Exact-file D2 protected-pilot exception applies at maximum 128 CSSpx; global 512px q1 remains unchanged. No redraw, recolour, generated artwork, pixel edits, crop or upscaling by Codex. Supplied cutout history and originating social page are not independently established and are not invented. Existing immutable private R2 upload/readback gates apply. Signed-in phone visual acceptance remains open."
+    },
+    {
+      "logo_status": "pilot_verified",
+      "logo_source": "user_supplied_private",
+      "logo_updated_at": "2026-10-11",
+      "source_user_approved": true,
+      "source_media_type": "image/png",
+      "rights_status": "protected_pilot_only_public_rights_not_reviewed",
+      "rights_note": "Rights bypassed for protected pilot; public, marketing and wider-use permission not established.",
+      "club_id": 238,
+      "club_name": "Athenlay",
+      "original_source_url": "https://drive.google.com/file/d/1LUxQjlVJITOoLJQv9F5VhZoKaVvUySjt/view",
+      "original_sha256": "2486bd69382b5931a32acae466fa1406a727ad7db5a6cccc8b45608f6c5a3a32",
+      "native_width": 941,
+      "native_height": 941,
+      "derivation": "recalculate_eXIf_crc_only",
+      "identity_reference_page_url": "https://www.facebook.com/AthenlayFootballClub/",
+      "identity_reference_sha256": "131863d921529816f86783eec5bc2638f687890afb2b4655aec06e1663ec9481",
+      "review_basis": "Mike explicitly selected the circular Athenlay badge on 2026-10-11. Fresh original Drive bytes match the 733895-byte saved PNG. Current own Facebook profile returns Athenlay Football Club London and displays the same blue/yellow players/handshake roundel, ATHENLAY FC and 1979; club identity corroborates canonical Selkent 238 and own-site club contacts. Own Facebook reference 720x720 JPEG is corroboration only; the supplied transparent 941x941 artwork is retained. Only invalid eXIf CRC bytes at offsets 362-365 are recalculated; all chunk payloads, pixels and alpha remain unchanged. No crop, redraw, recolour, generation or enlargement. Different shield in current website header is not substituted. Original cutout history is not established. User identity/artwork choice resolves the hold. Protected pilot only; phone visual acceptance remains open.",
+      "logo_sha256": "324b22dbbc0f908300f1cf27c206dc096a944a71cc66d7197dd5393ae01c03e4",
+      "logo_url": "https://test.pitchkind.com/__pilot_badges/238/324b22dbbc0f908300f1cf27c206dc096a944a71cc66d7197dd5393ae01c03e4",
+      "staging_asset": "verification/approved_badges/238.png"
+    },
+    {
+      "logo_status": "pilot_verified",
+      "logo_source": "user_supplied_private",
+      "logo_updated_at": "2026-10-11",
+      "source_user_approved": true,
+      "source_media_type": "image/png",
+      "rights_status": "protected_pilot_only_public_rights_not_reviewed",
+      "rights_note": "Rights bypassed for protected pilot; public, marketing and wider-use permission not established.",
+      "club_id": 269,
+      "club_name": "Eversley Rangers",
+      "original_source_url": "https://drive.google.com/file/d/1lx_ll1wGuFAw6JDBTqR0eRCYiu1AxqPA/view",
+      "original_sha256": "0156e1466e39b2179a6a622f553e9c1e81d974dc5ac727fd17c177381ef244e7",
+      "native_width": 1895,
+      "native_height": 1994,
+      "derivation": "remove_reviewed_exterior_fragments_only",
+      "source_upscaling_history": "unknown; supplied raster canvas dimensions are not proof of original detail resolution",
+      "fragment_cleanup": {
+        "source_sha256": "0156e1466e39b2179a6a622f553e9c1e81d974dc5ac727fd17c177381ef244e7",
+        "prepared_sha256": "00105ade6767394c6ecab1edf658364238431d66de2d00fa5e881af0fa291e79",
+        "width": 1895,
+        "height": 1994,
+        "removed_alpha_pixels": 1223,
+        "cleared_transparent_rgb_pixels": 18059,
+        "changed_positions_and_original_rgba_sha256": "23fbdd7f961e98064ca31078fb08f08f4115aed9a03914088da4e3cf0ba218ae",
+        "retained_visible_rgb_unchanged": true,
+        "all_alpha_changes_to_zero": true,
+        "recipe": [
+          {
+            "side": "left",
+            "y_start": 920,
+            "y_end": 985,
+            "edge_margin": 2
+          },
+          {
+            "side": "right",
+            "y_start": 1330,
+            "y_end": 1435,
+            "edge_margin": 2
+          }
+        ]
+      },
+      "identity_reference_page_url": "https://findmefootball.com/clubs/eversley-rangers-fc",
+      "identity_reference_url": "https://images.tournhq.com/org-logos/e843e90d-e14c-461d-a2b5-6720ae5f7850.png",
+      "review_basis": "Mike requested tidying the two exterior fragments in this exact supplied Eversley Rangers badge on 2026-10-11. Badge identity matches his supplied recruitment poster as recorded in Claude 2026-10-08 2310: Eversley Rangers U15, Selkent C League, Bexley; canonical Selkent 269 lists Bexley Hall Place and red/white. Web search found FindMeFootball listing linking own Facebook eversleyrangersfc and matching birds/football, ER/FC split shield; its reference image clips the lower ribbon and is corroboration only, never served. Own Facebook page could not be independently read. Built-in image editing was attempted but changed interior details, so its rendered crest is discarded. Final PNG uses only supplied source raster colours; a surgical alpha cleanup removes 1223 nontransparent exterior pixels in two reviewed edge regions and zeroes RGB of 18059 fully transparent pixels, avoiding thumbnail halos. Retained visible RGB and alpha are unchanged; script letters, birds, ball and Founded 1977 ribbon are preserved. Exact source/result pair is narrowly allowlisted, existing hash/readback gates retained. Canvas stays 1895x1994 with no resize/crop/enlargement by Codex. Prior external upscaling/cutout history and original native detail resolution are unknown; no q1 native-resolution claim is made from the large canvas. Protected pilot only; phone visual acceptance remains open.",
+      "logo_sha256": "00105ade6767394c6ecab1edf658364238431d66de2d00fa5e881af0fa291e79",
+      "logo_url": "https://test.pitchkind.com/__pilot_badges/269/00105ade6767394c6ecab1edf658364238431d66de2d00fa5e881af0fa291e79",
+      "staging_asset": "verification/approved_badges/269.png"
     }
   ]
 }
