@@ -36,8 +36,8 @@ function applyClubConfiguration(config){
   const meta=document.querySelector('meta[name="theme-color"]');if(meta&&resolvedTheme()!=='dark')meta.content=s.primary_color||'#218a21';document.title=`${s.display_name||'Club'} Team Hub`;
   const desc=document.querySelector('meta[name="description"]');if(desc)desc.content=`Team management hub for ${s.display_name||'your club'}.`;
   const clubEl=document.getElementById('hero-club-name');if(clubEl)clubEl.textContent=(s.display_name||'Club').toUpperCase();
-  const pilotLogo=privatePilotOwnBadgeUrl(),preferred=pilotLogo&&!FAILED_BADGE_URLS.has(pilotLogo)?pilotLogo:s.logo_url||s.logo_asset||'',logo=FAILED_BADGE_URLS.has(preferred)?'':preferred;document.querySelectorAll('.club-logo').forEach(img=>{const src=logo||'pitchkind-wt_mark.svg';if(img.getAttribute('src')!==src)img.src=src;img.alt=logo?`${s.display_name||'Club'} logo`:'PitchKind placeholder';img.style.display='';});
-  const wrap=document.querySelector('.club-logo-wrap');if(wrap){wrap.classList.toggle('platform-club-placeholder',!logo);wrap.classList.remove('generic-club-mark');delete wrap.dataset.short;wrap.setAttribute('aria-label',logo?((s.display_name||'Club')+' logo'):'Club logo unavailable — PitchKind placeholder');}
+  const pilotLogo=privatePilotOwnBadgeUrl(),preferred=pilotLogo&&!FAILED_BADGE_URLS.has(pilotLogo)?pilotLogo:s.logo_url||s.logo_asset||'',logo=FAILED_BADGE_URLS.has(preferred)||/pitchkind-wt_/i.test(preferred)?'':preferred;document.querySelectorAll('.club-logo').forEach(img=>{const src=logo||'shooters-hill-logo.png';if(img.getAttribute('src')!==src)img.src=src;img.alt=logo?`${s.display_name||'Club'} logo`:'Shooters Hill AFC club badge';img.style.display='';});
+  const wrap=document.querySelector('.club-logo-wrap');if(wrap){wrap.classList.remove('platform-club-placeholder');wrap.classList.remove('generic-club-mark');delete wrap.dataset.short;wrap.setAttribute('aria-label',logo?((s.display_name||'Club')+' logo'):'Shooters Hill AFC club badge');}
   configureOpponentEditorForProvider();
   if(typeof state!=='undefined'&&state){state.meta=state.meta||{};state.meta.clubName=s.display_name||state.meta.clubName;state.meta.season=s.current_season||state.meta.season;const p=primaryProvider(),pc=p?.config||{};state.selkent=state.selkent||{};state.selkent.enabled=providerType()==='selkent';if(providerType()==='selkent'){state.selkent.clubUrl=pc.club_url||state.selkent.clubUrl;state.selkent.divisionsUrl=pc.divisions_url||state.selkent.divisionsUrl;state.selkent.fixturesUrl=pc.fixtures_url||state.selkent.fixturesUrl;state.selkent.resultsUrl=pc.results_url||state.selkent.resultsUrl;}else{state.selkent.status='Manual competition provider';state.selkent.fixtures=state.selkent.fixtures||[];state.selkent.results=[];state.selkent.table=[];}}
 }
@@ -1774,7 +1774,8 @@ function privatePilotOwnBadgeUrl(){
 }
 window.applyPilotOwnClubBadge=function(){
   const pilotLogo=privatePilotOwnBadgeUrl(),logo=pilotLogo&&!FAILED_BADGE_URLS.has(pilotLogo)?pilotLogo:'';
-  const fallback=pilotLogo?'shooters-hill-logo.png':clubSettings().logo_url||clubSettings().logo_asset||'pitchkind-wt_mark.svg';
+  const configured=clubSettings().logo_url||clubSettings().logo_asset||'';
+  const fallback=pilotLogo||/pitchkind-wt_/i.test(configured)?'shooters-hill-logo.png':configured||'shooters-hill-logo.png';
   document.querySelectorAll('.club-logo').forEach(img=>{
     img.onerror=logo?()=>{FAILED_BADGE_URLS.add(logo);img.onerror=null;if(img.getAttribute('src')!==fallback)img.src=fallback;}:null;
     const src=logo||fallback;if(img.getAttribute('src')!==src)img.src=src;
@@ -1788,7 +1789,7 @@ function verifiedTeamBadgeUrl(teamName=''){
     const privateBadge=privatePilotOwnBadgeUrl();
     if(privateBadge&&!FAILED_BADGE_URLS.has(privateBadge))return privateBadge;
     const own=clubSettings(),configured=own.logo_url||own.logo_asset||'';
-    if(configured&&!FAILED_BADGE_URLS.has(configured))return configured;
+    if(configured&&!/pitchkind-wt_/i.test(configured)&&!FAILED_BADGE_URLS.has(configured))return configured;
     if(selkentNorm(own.display_name||state.meta?.clubName||'').includes('shooters hill'))return 'shooters-hill-logo.png';
   }
   const d=state.selkent?.directoryDetails?.[selkentNorm(teamName)]||{};
@@ -1823,7 +1824,7 @@ function clubPlaceholderBadgeData(teamName=''){
   const detail=state.selkent?.directoryDetails?.[selkentNorm(teamName)]||{};
   const id=Number(detail.clubId),club=String(detail.clubName||'').trim();
   if(window.ClubHubNative||!pilotVerifiedBadgeScopeAllowed()||!Number.isSafeInteger(id)||id<=0||!club)
-    return {src:'pitchkind-wt_mark.svg',alt:`PitchKind placeholder for ${clubIdentityName(teamName)}`,status:'missing'};
+    return {src:'club-badge-unavailable.svg',alt:`Badge unavailable for ${clubIdentityName(teamName)}`,status:'missing'};
   const stop=new Set(['fc','afc','football','club','youth','sports','sport','colts','the','sc']);
   const words=club.replace(/\./g,'').split(/\s+/).filter(Boolean),key=words.filter(w=>!stop.has(w.toLowerCase()));
   const parts=key.length?key:words,overrides={540:'STH',294:'STS',397:'LDL',303:'LNL',372:'WS'};
@@ -1940,7 +1941,7 @@ async function loadShareBadgeImage(src=''){
 }
 async function drawShareClubIdentity(ctx,x,y,teamName,colours='TBC'){
   const src=verifiedTeamBadgeUrl(teamName);
-  const badge=src&&await loadShareBadgeImage(src),image=badge||await loadShareBadgeImage('pitchkind-wt_mark.svg');
+  const badge=src&&await loadShareBadgeImage(src),image=badge||await loadShareBadgeImage('club-badge-unavailable.svg');
   if(!image)return;
   const max=188,ratio=Math.min(max/image.naturalWidth,max/image.naturalHeight),w=image.naturalWidth*ratio,h=image.naturalHeight*ratio;
   // The bundled Shooters Hill fallback has black square corners outside its circular crest.
@@ -2089,7 +2090,7 @@ async function shareNextMatchImage(){
     }
     if(window.ClubHubNative?.sharePngDataUrl){window.ClubHubNative.sharePngDataUrl(dataUrl);return toast('Opening share options');}
   }catch(_){return toast('Could not open share options');}
-  const fileName=`PitchKind_${String(f.date||'match')}_${safeFileName()}.png`;
+  const fileName=`Shooters_Hill_${String(f.date||'match')}_${safeFileName()}.png`;
   if(typeof navigator.share==='function'&&typeof navigator.canShare==='function'&&typeof File==='function'){
     const bytes=Uint8Array.from(atob(dataUrl.split(',')[1]),c=>c.charCodeAt(0)),file=new File([bytes],fileName,{type:'image/png'});
     if(navigator.canShare({files:[file]})){
@@ -2948,7 +2949,7 @@ function renderUniversalClubConfiguration(){
   const clubWide=isClubOverviewMode(),select=document.getElementById('club-rule-age'),field=document.getElementById('club-rule-age-field');
   field?.classList.toggle('hidden',!clubWide);
   const intro=document.getElementById('rules-procedures-intro');
-  if(intro)intro.textContent=clubWide?'Club-wide Selkent procedures are below. Choose an age group to see its playing format and limits.':"Team settings below are for PitchKind. Selkent's official match card and fixture updates are completed on the league system.";
+  if(intro)intro.textContent=clubWide?'Club-wide Selkent procedures are below. Choose an age group to see its playing format and limits.':"Team settings below are for your club. Selkent's official match card and fixture updates are completed on the league system.";
   if(clubWide&&select){
     const previous=select.value;
     const ages=[...new Set((window.ClubHubCloud?.visibleTeamList?.()||[]).map(t=>Number(String(t.ageGroup||'').replace(/\D/g,''))).filter(Boolean))].sort((a,b)=>a-b);
@@ -4343,7 +4344,7 @@ function adminWeekendDigestText(digest,clubName){
   const lines=[`*${adminWeekendClean(clubName)||'Club'} — weekend fixtures*`,`${shareDateText(digest.dates[0])} – ${shareDateText(digest.dates[1])}`,`${digest.events.length} confirmed fixture / group start${digest.events.length===1?'':'s'} · Times: UK local`,digest.pending?`${digest.pending} fixture / group${digest.pending===1?'':'s'} awaiting confirmed details — listed below.`:'',''];
   for(const date of digest.dates){const events=digest.events.filter(e=>e.date===date);if(!events.length)continue;lines.push(`*${shareDateText(date)}*`,'');for(const e of events)lines.push(...adminWeekendEventLines(e),'');}
   if(digest.pendingRows?.length){lines.push('*KICK-OFFS TO CONFIRM*','');for(const p of digest.pendingRows)lines.push(`*${p.teamLabel}* · ${shareDateText(p.date)}`,`v ${p.opponents.join(' / ')}`,p.reason,'');}
-  lines.push('Please check PitchKind for any later changes.');return lines.filter((line,i)=>line||lines[i-1]).join('\n');
+  lines.push('Please check the Shooters Hill app for any later changes.');return lines.filter((line,i)=>line||lines[i-1]).join('\n');
 }
 function adminWeekendGraphicLayout(digest,clubName,g,family){
   const width=1440,commands=[],anchors=[],margin=64,gap=48,col=(width-margin*2-gap)/2;let y=0;
@@ -4457,7 +4458,7 @@ async function prepareAdminWeekendGraphic(digest,clubName){
   if(layout.height*2>30000)throw new Error('Infographic too long for this browser');
   const src=typeof verifiedTeamBadgeUrl==='function'?verifiedTeamBadgeUrl(clubName):'',badge=src?await loadShareBadgeImage(src):null;
   drawAdminWeekendGraphic(canvas,layout,badge,src==='shooters-hill-logo.png');
-  const dataUrl=canvas.toDataURL('image/png'),fileName=`PitchKind_weekend_${digest.dates[0]}.png`;
+  const dataUrl=canvas.toDataURL('image/png'),fileName=`Shooters_Hill_weekend_${digest.dates[0]}.png`;
   const bytes=Uint8Array.from(atob(dataUrl.split(',')[1]),char=>char.charCodeAt(0));
   const file=typeof File==='function'?new File([bytes],fileName,{type:'image/png'}):null;
   return {dataUrl,file,fileName,width:canvas.width,height:canvas.height,anchors:layout.anchors.map(a=>({...a,top:a.top*2}))};

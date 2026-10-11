@@ -1,16 +1,12 @@
 // Browser pilot: cache reviewed same-origin application files only.
 // Never intercept Supabase responses, Selkent feeds, or private API calls.
-const CACHE = 'pitchkind-dashboard-kickoff-20260930-23679bad8def';
+const CACHE = 'pitchkind-web-shooters-hill-branding-20261011';
 const STATIC = [
   './', './index.html', './manifest.json', './cloud-config.js', './cloud.js',
   './onboarding.js', './onboarding.css', './app.js', './static-feed-overlay.js',
   './styles.css', './cloud.css', './app-design-system.css',
   './inter-variable.woff2', './inter-OFL.txt',
-  './pilot-rights-runtime.js', './pitchkind-wt_logo-primary.svg',
-  './pitchkind-wt_logo-reverse.svg', './pitchkind-wt_mark.svg',
-  './pitchkind-wt_mark-reverse.svg', './pitchkind-wt_app-icon.svg',
-  './shooters-hill-logo.png', './icon-192.png', './icon-512.png',
-  './icon-maskable-512.png', './football-login-adult.jpg',
+  './pilot-rights-runtime.js', './shooters-hill-logo.png', './club-badge-unavailable.svg', './football-login-adult.jpg',
   './football-login-player.jpg', './football-login-club.jpg',
   './football-pitch-hero.jpg', './football-pitch-hero-illustration.png',
 ];
@@ -19,7 +15,7 @@ self.addEventListener('install', event => event.waitUntil(
   caches.open(CACHE).then(cache => cache.addAll(STATIC)).then(() => self.skipWaiting())
 ));
 self.addEventListener('activate', event => event.waitUntil(
-  caches.keys().then(keys => Promise.all(keys.filter(key => key.startsWith('pitchkind-web-') && key !== CACHE).map(key => caches.delete(key)))).then(() => self.clients.claim())
+  caches.keys().then(keys => Promise.all(keys.filter(key => (key.startsWith('pitchkind-web-') || key === 'pitchkind-dashboard-kickoff-20260930-23679bad8def') && key !== CACHE).map(key => caches.delete(key)))).then(() => self.clients.claim())
 ));
 self.addEventListener('fetch', event => {
   const request = event.request;

@@ -59,9 +59,9 @@ check('auth scheme preserved','"grassrootsclubhub".equalsIgnoreCase' in main and
 check('ClubHubNative preserved','"ClubHubNative"' in main)
 check('static feed host preserved','raw.githubusercontent.com' in main and 'Grassroots-Club-Hub/main/data/directory.json' in main and 'Grassroots-Club-Hub/main/data/results.json' in main)
 check('Android app label PitchKind','>PitchKind<' in strings)
-check('HTML title PitchKind','<title>PitchKind</title>' in index)
+check('HTML title Shooters Hill AFC','<title>Shooters Hill AFC</title>' in index)
 check('About version 2.2.35','App version 2.2.35' in index)
-check('manifest name PitchKind',manifest.get('name')=='PitchKind' and manifest.get('short_name')=='PitchKind')
+check('manifest name Shooters Hill',manifest.get('name')=='Shooters Hill AFC' and manifest.get('short_name')=='Shooters Hill')
 check('manifest version 2.2.35',manifest.get('version')=='2.2.35')
 check(
     'v2.2.35 native cache bypass, build marker and service-worker lifecycle',
@@ -87,15 +87,15 @@ active_text='\n'.join([index,app,cloud,onboard,sw,txt('app/src/main/assets/app-d
 check('no retired official tagline in active UI','CONNECT • ORGANISE • GROW THE GAME' not in active_text)
 check('no More Than A Game text in active UI','More Than A Game' not in active_text)
 check('no retired visual asset refs',not re.search(r'(?<![A-Za-z0-9_-])gch-(?:logo|mark|banner|app-icon)', active_text))
-check('splash uses reverse PitchKind logo','pitchkind-wt_logo-reverse.svg' in index)
-check('auth uses primary PitchKind logo','pitchkind-wt_logo-primary.svg' in cloud)
-check('onboarding uses primary PitchKind logo','pitchkind-wt_logo-primary.svg' in onboard)
+check('splash uses approved Shooters Hill badge','src="shooters-hill-logo.png"' in index)
+check('auth uses approved Shooters Hill badge','src="shooters-hill-logo.png"' in cloud)
+check('onboarding uses approved Shooters Hill badge','src="shooters-hill-logo.png"' in onboard)
 check(
-    'club hero fallback uses PitchKind mark without retry loops',
+    'club hero fallback uses Shooters Hill badge without retry loops',
     behavior_tests('test_ui_source_contract.js', 'test_web_badge_render_stability.js'),
 )
 check('demo club does not masquerade platform mark as club badge',"logo_asset:''" in cloud)
-check('service worker caches PitchKind assets','pitchkind-wt_logo-primary.svg' in sw and 'gch-logo-primary.svg' not in sw)
+check('service worker caches club identity assets','./shooters-hill-logo.png' in sw and './club-badge-unavailable.svg' in sw and 'pitchkind-wt_' not in sw)
 
 # Image dimensions without external libraries.
 def png_size(p):
@@ -841,7 +841,7 @@ check(
     behavior_tests('test_club_monogram_placeholder.js'),
 )
 check(
-    'club monograms use canonical identity and unknown clubs keep the product fallback',
+    'club monograms use canonical identity and unknown clubs keep a neutral unavailable indicator',
     behavior_tests('test_club_monogram_placeholder.js'),
 )
 check('match layouts use prominent badges plus secondary shirt visuals',

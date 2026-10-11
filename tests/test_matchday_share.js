@@ -62,7 +62,7 @@ async function checkShareBadges(){
   assert.equal(draws.at(-1).url,junior,'rotation uses the same approved bytes');
   context.failBadge=true;
   await context.drawShareClubIdentity(canvas,270,260,'Junior Reds Sabres');
-  assert.equal(draws.at(-1).url,'pitchkind-wt_mark.svg','unavailable Junior Reds badge uses the product fallback');
+  assert.equal(draws.at(-1).url,'club-badge-unavailable.svg','unavailable Junior Reds badge uses the neutral fallback');
   assert.equal(rotations.at(-1),0,'the fallback must not inherit the failed badge rotation');
   context.failBadge=false;
   assert.equal(context.reviewedBadgeRotation('/__pilot_badges/292/'+ 'c'.repeat(64)),0,'a future Junior Reds replacement gets no inherited correction');
@@ -78,10 +78,10 @@ async function checkShareBadges(){
   const slow=context.loadShareBadgeImage('slow.png');context.timeout();
   assert.equal(await slow,null,'an image that never loads cannot block sharing');
   await context.drawShareClubIdentity(canvas,270,260,'No approved badge');
-  assert.equal(draws.at(-1).url,'pitchkind-wt_mark.svg','missing approved badge uses the product placeholder');
+  assert.equal(draws.at(-1).url,'club-badge-unavailable.svg','missing approved badge uses the neutral unavailable indicator');
   context.verifiedTeamBadgeUrl=()=> 'missing.png';
   await context.drawShareClubIdentity(canvas,270,260,'Failed badge');
-  assert.equal(draws.at(-1).url,'pitchkind-wt_mark.svg','failed approved badge uses the product placeholder');
+  assert.equal(draws.at(-1).url,'club-badge-unavailable.svg','failed approved badge uses the neutral unavailable indicator');
   context.window.ClubHubNative={assetDataUrl:path=>{nativeAssets.push(path);return 'data:image/png;base64,AA==';}};
   assert.equal(await context.loadShareBadgeImage(own),null,'private website paths are never passed to the native asset bridge');
   await context.loadShareBadgeImage('shooters-hill-logo.png');
