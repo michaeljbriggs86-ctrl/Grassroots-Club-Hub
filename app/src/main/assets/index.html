@@ -531,6 +531,15 @@
             <div id="admin-home-coverage-list" class="admin-home-coverage-list"></div>
           </section>
 
+          <section class="panel hidden" id="coach-document-matrix" aria-labelledby="coach-document-title">
+            <div class="panel-heading"><div><p class="kicker">Coaching staff</p><h3 id="coach-document-title">Coach documents</h3></div><button type="button" class="secondary-button" id="coach-document-refresh" aria-label="Refresh coach documents">Refresh</button></div>
+            <p class="helper">Amber: renewal due within 60 days. Red: overdue. Open a coach’s name to update their records.</p>
+            <div id="coach-document-notice" class="coach-document-notice" role="status" aria-live="polite" hidden></div>
+            <div class="coach-document-toolbar"><label>Show<select id="coach-document-filter"><option value="all">All coaches</option><option value="due">Renewals due</option><option value="missing">Missing / unchecked</option></select></label><p id="coach-document-status" class="helper" role="status" aria-live="polite"></p></div>
+            <p class="helper coach-document-scroll-hint">Swipe across the table to view all three documents.</p>
+            <div id="coach-document-table" class="coach-document-scroll" tabindex="0" role="region" aria-label="Coach document matrix, scroll horizontally to view all columns"></div>
+          </section>
+
           <section class="panel admin-home-communications" aria-labelledby="admin-home-communications-title">
             <div class="panel-heading"><div><p class="kicker">Club desk</p><h3 id="admin-home-communications-title">Communications</h3></div></div>
             <div class="admin-home-desk-row"><div><strong>Your messages</strong><p id="admin-home-message-status">Loading messages…</p></div><button type="button" class="secondary-button" data-admin-home-action="messages">Open messages</button></div>

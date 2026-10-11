@@ -62,6 +62,28 @@ end $$;
 revoke all on function public.get_coach_qualifications(uuid) from public,anon;
 grant execute on function public.get_coach_qualifications(uuid) to authenticated;
 
+-- Admin-only club matrix. One row per coaching account even with multiple assignments.
+-- Pure Club Admins have no coaching obligation inferred from their admin role.
+create function public.list_coach_qualifications()
+returns table(user_id uuid,full_name text,role text,records jsonb,revision bigint)
+language plpgsql security definer set search_path to '' as $$
+declare club uuid;
+begin
+  club:=private.coach_qualification_club(auth.uid(),true);
+  return query
+    select p.user_id,coalesce(p.full_name,''),p.role,coalesce(q.records,'[]'::jsonb),coalesce(q.revision,0::bigint)
+    from public.profiles p
+    left join private.coach_qualification_profiles q on q.user_id=p.user_id and q.club_id=club
+    where p.club_id=club and (
+      p.role in ('coach','assistant_coach') or
+      (p.role='club_admin' and (p.coach_team_id is not null or exists(
+        select 1 from public.coach_team_assignments a where a.user_id=p.user_id and a.club_id=club
+      )))
+    ) order by lower(coalesce(p.full_name,'')),p.user_id;
+end $$;
+revoke all on function public.list_coach_qualifications() from public,anon;
+grant execute on function public.list_coach_qualifications() to authenticated;
+
 create function public.save_coach_qualifications(p_user_id uuid,p_records jsonb,p_expected_revision bigint)
 returns jsonb language plpgsql security definer set search_path to '' as $$
 declare club uuid; locked_club uuid; old private.coach_qualification_profiles;
