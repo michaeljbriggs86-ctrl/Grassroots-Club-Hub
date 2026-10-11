@@ -5128,6 +5128,7 @@ function contactDirectoryIdentity(){
 }
 function resetContactDirectory(){
   ++__contactDirectoryLoad;
+  window.ClubHubContactImport?.reset();
   ['member-contacts-self','member-contacts-list'].forEach(id=>{const el=document.getElementById(id);if(el)el.innerHTML='';});
   const status=document.getElementById('member-contacts-status');if(status)status.textContent='';
 }
@@ -5163,7 +5164,8 @@ async function refreshContactDirectory(){
     const canManage=admin&&data.can_manage===true;
     const rows=data.contacts.filter(c=>c&&c.user_id!==data.self.user_id&&['club_admin','coach','assistant_coach','parent'].includes(c.role)
       &&(!teamId||c.team_id===teamId)&&(currentRole!=='parent'||(c.kind==='staff'&&c.role!=='parent')));
-    const help=document.getElementById('member-contacts-help');if(help)help.textContent=currentRole==='parent'?'Coaches for this team. Other parents’ contact details are private.':admin?'Approved club contacts. You can add or update email and phone details.':'Coaches and parents for this team. Parent contacts are visible only to their team’s staff and Club Admins.';
+    const help=document.getElementById('member-contacts-help');if(help)help.textContent=currentRole==='parent'?'Coaches for this team. Other parents’ contact details are private.':admin?'Approved club contacts. Import the club spreadsheet to populate email and phone details.':'Coaches and parents for this team. Parent contacts are visible only to their team’s staff and Club Admins.';
+    window.ClubHubContactImport?.show(canManage);
     document.getElementById('member-contacts-team-wrap')?.classList.toggle('hidden',!admin);
     if(admin&&filter){const keep=teamId||'';filter.innerHTML='<option value="">All club teams</option>'+(cloud.visibleTeamList?.()||[]).map(t=>`<option value="${esc(t.id)}">${esc(t.ageGroup||'')} ${esc(t.teamName||t.name||'Team')}</option>`).join('');filter.value=keep;}
     const self=document.getElementById('member-contacts-self');if(self)self.innerHTML=`<section class="member-contact-card"><h4>My contact details</h4><p class="helper">${esc(data.self.full_name||'Your account')} · Your club’s admins can manage these details. Your team’s ${currentRole==='parent'?'coaches':'parents and staff'} can see them.</p>${contactDetailsForm(data.self,'Update my contact details')}</section>`;
@@ -5186,6 +5188,11 @@ async function saveContactDetailsForm(form){
   }catch(e){if(identity===contactDirectoryIdentity()&&form.isConnected&&status)status.textContent=e.message||'Could not save contact details. Please try again.';}
   finally{if(button?.isConnected)button.disabled=false;}
 }
+window.ClubHubContactImport?.configure({
+  isAdmin:()=>currentRole==='admin'&&isClubOverviewMode()&&window.ClubHubCloud?.role()==='admin',
+  contextKey:contactDirectoryIdentity,cloud:()=>window.ClubHubCloud,escape:esc,
+  onImported:async count=>{const identity=contactDirectoryIdentity();await refreshContactDirectory();if(identity===contactDirectoryIdentity()){const out=document.getElementById('member-contacts-status');if(out)out.textContent=`${count} contact(s) imported from the spreadsheet.`;}}
+});
 window.addEventListener('clubhub-contacts-clear',()=>{resetContactDirectory();__contactDirectoryIdentity='';const panel=document.getElementById('member-contacts-panel');if(panel){panel.open=false;panel.classList.add('hidden');}});
 document.getElementById('member-contacts-panel')?.addEventListener('toggle',e=>{if(e.target.open)refreshContactDirectory();else resetContactDirectory();});
 document.getElementById('refresh-member-contacts')?.addEventListener('click',refreshContactDirectory);
