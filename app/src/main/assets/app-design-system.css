@@ -1896,7 +1896,7 @@ html body.auth-open #activation-gate .auth-redesign input:-webkit-autofill{-webk
 }
 
 /* Dialogs are outside .content, and therefore need the same shared surfaces. */
-html body dialog.modal{background:var(--gch-depth-canvas)!important;color:var(--gch-control-copy)!important;border:1px solid var(--gch-depth-line)!important;border-radius:24px;box-shadow:0 20px 60px -12px rgba(6,69,38,.4);font-size:1rem}
+html[data-theme] body dialog.modal{background:var(--gch-depth-canvas)!important;color:var(--gch-control-copy)!important;border:1px solid var(--gch-depth-line)!important;border-radius:24px;box-shadow:0 20px 60px -12px rgba(6,69,38,.4);font-size:1rem}
 html body dialog.modal :is(.helper,.muted,.kicker){color:var(--gch-control-muted)!important;font-size:.8125rem;line-height:1.5}
 html body dialog.modal h3{font-size:1.125rem;line-height:1.3;font-weight:650}
 html body dialog.modal :is(.primary-button,.secondary-button,.icon-button){min-height:48px;border-radius:12px;font-size:.875rem;line-height:1.4;font-weight:600!important}
@@ -1944,12 +1944,18 @@ html body .league-progress-ring{background:var(--gch-info-green)!important;color
 html body .league-progress-ring :is(strong,span){color:var(--gch-green-950)!important}
 html[data-theme="dark"] body :is(.rank-value,.person-name-button,.text-button,.award-history-inline>summary,.readonly-detail-row strong,.detail-player-row b){color:var(--gch-control-choice-copy)!important}
 html body :is(.mini-team,.rank-left){min-width:0;overflow-wrap:anywhere}
-html body :is(.match-card,.record-card,.read-only-card,.inbox-card,.team-member-row,.admin-team-card){box-shadow:var(--gch-shadow-card)}
+html[data-theme] body :is(.match-card,.record-card,.read-only-card,.inbox-card,.team-member-row,.admin-team-card){box-shadow:var(--gch-shadow-card)}
 @media(max-width:480px){html body #match-detail-dialog #match-detail-form{padding:16px}html body #match-detail-dialog .detail-feature-section{padding:12px}html body #match-detail-dialog #match-detail-versus{padding:16px 12px}}
 
 html body #match-detail-dialog #match-detail-versus :is(.match-side-label,.match-versus-mark,.match-kit-secondary small){color:var(--gch-info-green)!important}
-html body :is(.match-card,.record-card,.read-only-card,.inbox-card,.team-member-row,.admin-team-card){background:var(--gch-depth-panel)!important;border-color:var(--gch-depth-line)!important;color:var(--gch-control-copy)!important}
+html[data-theme] body :is(.match-card,.record-card,.read-only-card,.inbox-card,.team-member-row,.admin-team-card){background:var(--gch-depth-panel)!important;border-color:var(--gch-depth-line)!important;color:var(--gch-control-copy)!important}
 html body dialog.modal label{font-size:.875rem;font-weight:600;line-height:1.5}
 html body #match-detail-dialog .kit-clash-warning{background:linear-gradient(140deg,var(--gch-error-bg),var(--gch-white))!important;color:var(--gch-error)!important}
 html[data-theme="dark"] body #match-detail-dialog .kit-clash-warning{background:linear-gradient(140deg,rgba(165,38,38,.22),rgba(165,38,38,.08))!important;color:#ffb8b8!important}
 html body #match-detail-dialog .empty-detail-options{background:var(--gch-control-choice)!important;color:var(--gch-control-copy)!important;border-color:var(--gch-control-line)!important}
+html body.auth-open #activation-gate .auth-redesign{font-weight:400}
+html body.auth-open #activation-gate .auth-redesign .auth-brand{background:transparent!important}
+html body.auth-open #activation-gate .auth-redesign .auth-lead{font-weight:400!important}
+html body.auth-open #activation-gate .auth-redesign input::placeholder{font-weight:400!important}
+html body.auth-open #activation-gate .auth-redesign :is(.auth-player-eligibility,.auth-login-footer){font-weight:500}
+html[data-theme] body .club-page-watermark{opacity:.015!important}

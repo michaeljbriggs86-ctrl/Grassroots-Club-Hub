@@ -34,14 +34,14 @@ async function loginChecks(page,width,theme){
   const gate=document.querySelector('#activation-gate'),card=document.querySelector('.auth-main'),badge=document.querySelector('.auth-brand-lockup');
   const rect=selector=>{const r=document.querySelector(selector).getBoundingClientRect();return {x:r.x,y:r.y,width:r.width,height:r.height};};
   return {cardBackground:getComputedStyle(card).backgroundImage,gateBackground:getComputedStyle(gate).backgroundImage,
-   input:rect('.auth-field'),button:rect('#cloud-auth-submit'),badge:rect('.auth-brand-lockup'),badgeLoaded:badge.complete&&badge.naturalWidth===512,
+   brandBackground:getComputedStyle(document.querySelector('.auth-brand')).backgroundColor,inputWeight:getComputedStyle(document.querySelector('#cloud-email')).fontWeight,input:rect('.auth-field'),button:rect('#cloud-auth-submit'),badge:rect('.auth-brand-lockup'),badgeLoaded:badge.complete&&badge.naturalWidth===512,
    card:rect('.auth-main'),font:getComputedStyle(card).fontFamily,iconVisible:getComputedStyle(document.querySelector('.auth-field-icon')).display!=='none'};
  });
  assert(measurements.cardBackground.includes('gradient'),'login card must use the approved gradient');
  assert(measurements.gateBackground.includes('gradient'),'login canvas must use the approved gradient');
  assert(measurements.input.height>=52&&measurements.button.height>=52,'login has 52px fields and buttons');
  assert.equal(measurements.badge.width,width>=1000?136:88,'badge slot matches Figma');
- assert(measurements.badgeLoaded,'original club badge is loaded');assert(!measurements.iconVisible,'Figma fields retain persistent labels without extra icons');
+ assert(measurements.badgeLoaded,'original club badge is loaded');assert.equal(measurements.brandBackground,'rgba(0, 0, 0, 0)','old white identity banner must not remain');assert.equal(measurements.inputWeight,'400','input text follows Figma regular weight');assert(!measurements.iconVisible,'Figma fields retain persistent labels without extra icons');
  assert(measurements.font.includes('Inter'));const g=await geometry(page);assert(g.documentWidth<=g.viewport+1,'login cannot overflow horizontally');
  if(width===393)assert(Math.abs(measurements.card.width-353)<2,'phone card width matches Figma');
  await page.locator('#cloud-password-toggle').click();assert.equal(await page.locator('#cloud-password').getAttribute('type'),'text');assert.equal(await page.locator('#cloud-password-toggle').getAttribute('aria-pressed'),'true');
@@ -69,10 +69,11 @@ async function teamChecks(page,theme){
  await page.locator('#view-team-stats .page-back').click();await page.evaluate(()=>openMatchDetails('review-fixture'));
  await page.locator('#match-detail-dialog').waitFor({state:'visible'});
  const modal=await page.locator('#match-detail-dialog').evaluate(el=>({background:getComputedStyle(el).backgroundImage,saveBackground:getComputedStyle(el.querySelector('#save-match-details')).backgroundImage,fixtureBackground:getComputedStyle(el.querySelector('#match-detail-versus')).backgroundImage}));
- assert(modal.background.includes('gradient')&&modal.saveBackground.includes('gradient')&&modal.fixtureBackground.includes('gradient'),'match dialog and its actions use the shared gradients');
+ assert(modal.background.includes('gradient')&&modal.saveBackground.includes('gradient')&&modal.fixtureBackground.includes('gradient'),'match dialog and its actions use the shared gradients: '+JSON.stringify(modal));
  const attendance=page.locator('#match-attendance-list .attendance-switch').first();
  if(await attendance.count()){const before=await attendance.getAttribute('aria-pressed');await attendance.click();assert.notEqual(await attendance.getAttribute('aria-pressed'),before,'attendance retains its real event handler');}
  await page.screenshot({path:path.join(out,`match-details-${theme}.png`),fullPage:true});
+ page.once('dialog',async dialog=>{assert.match(dialog.message(),/Discard your unsaved match changes/);await dialog.accept();});
  await page.locator('#match-detail-cancel').click();assert.equal(await page.locator('#match-detail-dialog').isVisible(),false);
  return {screen:'team',theme,ranking,modal};
 }
