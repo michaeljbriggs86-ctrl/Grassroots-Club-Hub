@@ -20,11 +20,11 @@
   <div id="app-splash" class="app-splash" aria-hidden="true">
     <img src="shooters-hill-logo.png" alt="" class="app-splash-watermark" />
     <div class="app-splash-inner">
-      <p class="app-splash-context">Shooters Hill Youth FC</p>
+      <p class="app-splash-context">Shooters Hill AFC</p>
       <div class="app-splash-identity">
         <div class="app-splash-badge-shadow" aria-hidden="true"></div>
         <img src="shooters-hill-logo.png" alt="Shooters Hill AFC club badge" class="app-splash-logo" width="160" height="160" fetchpriority="high" />
-        <h1 class="app-splash-title">Shooters Hill<br />Youth FC</h1>
+        <h1 class="app-splash-title">Shooters Hill<br />AFC</h1>
         <p class="app-splash-description">Your club, together.</p>
       </div>
       <div class="app-splash-status">
@@ -536,10 +536,10 @@
             <div class="panel-heading"><div><p class="kicker">Club desk</p><h3 id="admin-home-communications-title">Communications</h3></div></div>
             <div class="admin-home-desk-row"><div><strong>Your messages</strong><p id="admin-home-message-status">Loading messages…</p></div><button type="button" class="secondary-button" data-admin-home-action="messages">Open messages</button></div>
             <div class="admin-home-desk-row"><div><strong>Club notices</strong><p id="admin-home-notice-status">Loading notices…</p></div><button type="button" class="secondary-button" data-admin-home-action="notice">Write a notice</button></div>
-            <div class="admin-home-actions"><button type="button" class="text-button" data-admin-summary="results">Club results</button><button type="button" class="text-button" data-admin-home-action="settings">Club settings</button></div>
           </section>
 
-          <section class="panel"><a class="page-link" href="?view=club-teams" data-page-route="club-teams" ><span><strong>Club teams</strong><small>Open the team directory</small></span><span aria-hidden="true">›</span></a><p class="helper" id="admin-team-count">—</p></section>
+          <a class="page-link admin-home-directory-link" href="?view=club-teams" data-page-route="club-teams"><span><strong>Club teams</strong><small>Open the team directory</small><small id="admin-team-count"></small></span><span aria-hidden="true">›</span></a>
+          <nav class="admin-home-footer" aria-label="More club tools"><button type="button" class="text-button" data-admin-summary="results">Club results</button><button type="button" class="text-button" data-admin-home-action="settings">Club settings</button></nav>
         </section>
 
         <section class="club-admin-panel hidden" id="club-coaches-panel">

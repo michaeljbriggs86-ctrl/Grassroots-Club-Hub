@@ -1470,15 +1470,15 @@ html[data-theme="dark"] .member-contact-links a {color:#8EE09A}
 html[data-theme="dark"] .top-nav-tabs .top-nav-tab.nav-item.active{background:transparent!important;color:var(--gch-control-choice-copy)!important;border-bottom-color:var(--gch-control-focus);box-shadow:none!important}
 .content{padding-top:16px;padding-inline:16px}
 .section-title-row{margin-bottom:16px}
-.section-title-row h2{font-size:24px;line-height:1.2;font-weight:700;letter-spacing:-.025em}
+.section-title-row h2{font-size:1.5rem;line-height:1.2;font-weight:700;letter-spacing:-.025em}
 .view .kicker{font-weight:600;letter-spacing:.05em}
-.view .panel-heading h3,.view .panel>h3{font-size:17px;font-weight:650;line-height:1.4}
+.view .panel-heading h3,.view .panel>h3{font-size:1.0625rem;font-weight:650;line-height:1.4}
 .content .panel{box-shadow:none;padding:16px;margin-bottom:16px}
 .content details.panel{padding:0}
 .content .panel .panel{padding:12px 0;margin:0;border:0!important;border-radius:0!important;background:transparent!important}
 .view .panel-heading{gap:8px 12px;align-items:center}
 .view .panel-heading>div{flex-basis:140px}
-.view .panel p.muted,.view .panel .helper{margin-block:8px;font-size:13px;font-weight:400;line-height:1.45}
+.view .panel p.muted,.view .panel .helper{margin-block:8px;font-size:0.8125rem;font-weight:400;line-height:1.45}
 .view :is(.screen-lead-card,.next-match-summary-card,.squad-banner,.league-table-panel,.inbox-card),
 #matches-next-fixture,#view-home #matchday-dashboard,#view-club .club-matches-browser,
 #view-club .admin-coach-centre,#view-inbox .inbox-card{
@@ -1492,7 +1492,7 @@ html[data-theme="dark"] #view-home #matchday-dashboard,
 html[data-theme="dark"] #view-club .club-matches-browser,
 html[data-theme="dark"] #view-club .admin-coach-centre,
 html[data-theme="dark"] #view-inbox .inbox-card{border-top-color:var(--gch-control-line)!important}
-.content .primary-button,.content .secondary-button{padding:10px 14px;font-size:14px;font-weight:600!important;box-shadow:none!important}
+.content .primary-button,.content .secondary-button{padding:10px 14px;font-size:0.875rem;font-weight:600!important;box-shadow:none!important}
 .content .primary-button{background:var(--gch-green-800)!important}
 /* Secondary actions read as quiet actions, rather than competing green boxes. */
 .content .secondary-button,
@@ -1519,15 +1519,15 @@ html[data-theme="dark"] #view-inbox .communications-tabs button.active{backgroun
 #view-club .admin-home>.panel.admin-home-directory>summary{padding-inline:0}
 #view-club .admin-home-directory-body{padding-inline:0}
 #view-club .admin-home-metrics{gap:12px;padding:12px 0;border-top:0}
-#view-club .admin-home-metrics strong{font-size:24px;font-weight:650}
-#view-club .admin-home-metrics span{font-size:12px;line-height:1.4}
-#view-club .admin-home .helper,#view-club .admin-home p.muted,#view-club .admin-home small{font-size:13px;line-height:1.45}
+#view-club .admin-home-metrics strong{font-size:1.5rem;font-weight:650}
+#view-club .admin-home-metrics span{font-size:0.75rem;line-height:1.4}
+#view-club .admin-home .helper,#view-club .admin-home p.muted,#view-club .admin-home small{font-size:0.8125rem;line-height:1.45}
 #view-club .admin-home-actions{gap:8px;margin-top:12px}
 #view-club .admin-home-fixture{gap:12px;padding:10px 0}
-#view-club .admin-home-fixture strong,#view-club .admin-home-desk-row strong{font-size:14px;font-weight:600}
+#view-club .admin-home-fixture strong,#view-club .admin-home-desk-row strong{font-size:0.875rem;font-weight:600}
 #view-club .admin-home-time{flex-basis:76px}
 #view-club .admin-home-finish{padding:12px 0 0;border-top:1px solid var(--gch-control-line);border-radius:0;background:transparent;margin-top:12px}
-#view-club .admin-home-finish h4{font-size:14px;font-weight:600}
+#view-club .admin-home-finish h4{font-size:0.875rem;font-weight:600}
 #view-club .admin-home-finish ul{padding-left:16px}
 #view-club .admin-home-desk-row{flex-wrap:nowrap;gap:12px;padding:10px 0}
 #view-club .admin-home-desk-row>div{flex:1 1 0}
@@ -1537,8 +1537,8 @@ html[data-theme="dark"] #view-inbox .communications-tabs button.active{backgroun
 #view-club .admin-home-directory-body{padding:0 16px 16px}
 #view-home #matchday-dashboard .matchday-dashboard-grid>article{padding:10px 0;border:0!important;border-bottom:1px solid var(--gch-control-line)!important;border-radius:0;background:transparent!important}
 #view-home #matchday-dashboard .matchday-dashboard-grid{gap:8px 16px}
-#view-home #matchday-dashboard .matchday-dashboard-grid>article>span{font-size:12px;font-weight:500;text-transform:none;letter-spacing:0}
-#view-home #matchday-dashboard .matchday-dashboard-grid>article>strong{font-size:14px;font-weight:600}
+#view-home #matchday-dashboard .matchday-dashboard-grid>article>span{font-size:0.75rem;font-weight:500;text-transform:none;letter-spacing:0}
+#view-home #matchday-dashboard .matchday-dashboard-grid>article>strong{font-size:0.875rem;font-weight:600}
 .content .matchday-dashboard-actions{gap:8px}
 .bottom-nav{box-shadow:none}
 .bottom-nav .nav-item{font-weight:500}
@@ -1616,12 +1616,12 @@ html body .hero::before,html body.admin-club-mode .hero::before{
 html body .hero::after{
   content:"";position:absolute;z-index:1;pointer-events:none;
   top:-34px;right:-58px;width:236px;height:236px;
-  background:url("shooters-hill-logo.png") center/contain no-repeat;opacity:.065;
+  background:url("shooters-hill-logo.png") center/contain no-repeat;opacity:.04;
 }
 html body.admin-club-mode .hero-copy{max-width:none}
 html body .hero-copy :is(h1,.eyebrow,.season-line),
 html body.admin-club-mode .hero-copy :is(h1,.eyebrow,.season-line){color:var(--gch-white)!important}
-.hero-copy h1{font-size:clamp(20px,5vw,28px)!important;line-height:1.2!important}
+.hero-copy h1{font-size:clamp(1.25rem,5vw,1.75rem)!important;line-height:1.2!important}
 html body .content .panel,html body .content .page-link,
 html body #view-club .admin-home>.panel{
   background:var(--gch-depth-panel)!important;
@@ -1657,7 +1657,7 @@ html body .content .view :is(#view-matches #matches-next-fixture,#view-home #mat
 html body .content .view :is(#view-matches #matches-next-fixture,#view-home #matchday-dashboard,#view-club .admin-home-weekend) .secondary-button{
   color:var(--gch-info-green)!important;border-color:rgba(255,255,255,.3)!important;
 }
-html body .content .view :is(#view-home #next-match-card,#view-matches #matches-next-fixture,#view-home #matchday-dashboard,#view-club .admin-home-weekend) :is(.muted,.helper,.canonical-match-fixture-label,.canonical-match-v,.canonical-v11-label,.canonical-v11-v,.matchday-dashboard-kits){color:rgba(255,255,255,.75)!important}
+html body .content .view :is(#view-home #next-match-card,#view-matches #matches-next-fixture,#view-home #matchday-dashboard,#view-club .admin-home-weekend) :is(.kicker,.muted,.helper,.canonical-match-fixture-label,.canonical-match-v,.canonical-v11-label,.canonical-v11-v,.matchday-dashboard-kits){color:rgba(255,255,255,.75)!important}
 html body .content .view :is(#view-matches #matches-next-fixture,#view-home #matchday-dashboard) :is(.next-match-grid>div,.next-match-kits,.match-venue-card,.match-kit-correction){
   background:linear-gradient(145deg,rgba(255,255,255,.08),rgba(255,255,255,.025))!important;
   border-color:rgba(255,255,255,.16)!important;color:var(--gch-white)!important;
@@ -1668,8 +1668,8 @@ html body :is(.bottom-nav,.mobile-primary-nav,.top-nav-tabs){
   background:var(--gch-depth-navigation)!important;border-color:var(--gch-depth-line)!important;
   box-shadow:0 -4px 18px -5px rgba(6,69,38,.12),inset 0 1px 1px rgba(255,255,255,.08)!important;
 }
-html body .club-page-watermark{opacity:.022}
-html[data-theme="dark"] body .club-page-watermark{opacity:.033}
+html body .club-page-watermark{opacity:.012}
+html[data-theme="dark"] body .club-page-watermark{opacity:.015}
 
 /* The splash uses the same supplied badge and one coordinated Figma timeline. */
 .app-splash{
@@ -1685,16 +1685,16 @@ html[data-theme="dark"] body .club-page-watermark{opacity:.033}
   padding:max(40px,calc(56px + env(safe-area-inset-top))) 32px max(32px,calc(52px + env(safe-area-inset-bottom)));
   color:inherit;animation:none;
 }
-.app-splash-context{margin:0;font-size:14px;font-weight:600;line-height:20px;color:rgba(255,255,255,.7)}
+.app-splash-context{margin:0;font-size:0.875rem;font-weight:600;line-height:1.43;color:rgba(255,255,255,.7)}
 .app-splash-identity{position:relative;display:flex;flex-direction:column;align-items:center;gap:24px;width:100%;padding-block:10px}
-.app-splash-identity .app-splash-logo{display:block;width:160px!important;height:160px!important;max-height:none;filter:none;margin:0;animation:kf_50_232_opacity_0 2s linear,kf_50_232_translate_0 2s linear;animation-iteration-count:infinite}
-.app-splash-badge-shadow{position:absolute;top:10px;width:160px;height:160px;border-radius:50%;background:rgba(255,255,255,.04);box-shadow:0 8px 24px -2px rgba(6,69,38,.35);animation:kf_52_226_opacity_0 2s linear;animation-iteration-count:infinite}
-.app-splash-title{margin:0;font-size:36px;font-weight:700;line-height:42px;letter-spacing:-.02em;animation:kf_50_233_opacity_0 2s linear;animation-iteration-count:infinite}
-.app-splash-description{margin:0;font-size:14px;line-height:24px;color:rgba(255,255,255,.76);animation:kf_50_234_opacity_0 2s linear;animation-iteration-count:infinite}
-.app-splash-status{display:flex;flex-direction:column;align-items:center;gap:16px;padding-block:12px;animation:kf_50_235_opacity_0 2s linear;animation-iteration-count:infinite}
-.app-splash-status p{margin:0;font-size:14px;line-height:20px;color:rgba(255,255,255,.68)}
+.app-splash-identity .app-splash-logo{display:block;width:160px!important;height:160px!important;max-height:none;filter:none;margin:0;animation:kf_50_232_opacity_0 2s linear,kf_50_232_translate_0 2s linear;animation-fill-mode:both}
+.app-splash-badge-shadow{position:absolute;top:10px;width:160px;height:160px;border-radius:50%;background:rgba(255,255,255,.04);box-shadow:0 8px 24px -2px rgba(6,69,38,.35);animation:kf_52_226_opacity_0 2s linear;animation-fill-mode:both}
+.app-splash-title{margin:0;font-size:2.25rem;font-weight:700;line-height:1.167;letter-spacing:-.02em;animation:kf_50_233_opacity_0 2s linear;animation-fill-mode:both}
+.app-splash-description{margin:0;font-size:0.875rem;line-height:1.714;color:rgba(255,255,255,.76);animation:kf_50_234_opacity_0 2s linear;animation-fill-mode:both}
+.app-splash-status{display:flex;flex-direction:column;align-items:center;gap:16px;padding-block:12px;animation:kf_50_235_opacity_0 2s linear;animation-fill-mode:both}
+.app-splash-status p{margin:0;font-size:0.875rem;line-height:1.43;color:rgba(255,255,255,.68)}
 .app-splash-loading{width:120px;height:3px;border-radius:1.5px;overflow:hidden;background:rgba(255,255,255,.12)}
-.app-splash-loading span{display:block;width:36px;height:3px;border-radius:1.5px;background:linear-gradient(90deg,rgba(232,247,237,.2),var(--gch-info-green),rgba(232,247,237,.2));animation:kf_50_237_translate_0 2s linear;animation-iteration-count:infinite}
+.app-splash-loading span{display:block;width:36px;height:3px;border-radius:1.5px;background:linear-gradient(90deg,rgba(232,247,237,.2),var(--gch-info-green),rgba(232,247,237,.2));animation:kf_50_237_translate_0 3s linear infinite}
 html[data-theme="light"] .app-splash{background:radial-gradient(ellipse at 50% 45%,rgba(232,247,237,.8),transparent 68%),var(--gch-depth-canvas);color:var(--gch-ink)}
 html[data-theme="light"] .app-splash-context{color:var(--gch-green-950)}
 html[data-theme="light"] .app-splash-description,html[data-theme="light"] .app-splash-status p{color:var(--gch-copy)}
@@ -1711,9 +1711,40 @@ html[data-theme="light"] .app-splash-loading span{background:linear-gradient(90d
 @media(max-height:600px){
   .app-splash-inner{padding-block:max(20px,env(safe-area-inset-top)) max(20px,env(safe-area-inset-bottom));gap:16px;overflow:auto}
   .app-splash-identity{gap:12px}.app-splash-identity .app-splash-logo,.app-splash-badge-shadow{width:96px!important;height:96px!important}
-  .app-splash-title{font-size:28px;line-height:32px}.app-splash-status{gap:10px}
+  .app-splash-title{font-size:1.75rem;line-height:1.143}.app-splash-status{gap:10px}
 }
 @media(prefers-reduced-motion:reduce){
   .app-splash{transition:none}
   .app-splash :is(.app-splash-logo,.app-splash-badge-shadow,.app-splash-title,.app-splash-description,.app-splash-status,.app-splash-loading span){animation:none;opacity:1;translate:none}
 }
+
+/* v0 review refinements, 12 October 2026: readable text and consistent navigation. */
+:root{--gch-shell-gutter:clamp(16px,4vw,28px)}
+html body{font-size:1rem}
+html body .hero{height:auto!important;min-height:calc(var(--hero-band) + var(--android-inset-top,0px))!important;padding:calc(16px + var(--android-inset-top,0px)) var(--gch-shell-gutter) 16px!important}
+html body .content{max-width:none;padding-inline:var(--gch-shell-gutter)}
+html body .top-nav-tabs{padding-inline:var(--gch-shell-gutter)}
+html body .top-nav-tabs .top-nav-tab.nav-item{font-size:.875rem;padding-inline:12px}
+html body .top-nav-tabs .top-nav-tab.nav-item:first-child{padding-left:0}
+html body .view :is(.screen-section-nav,.communications-tabs) button{font-size:.875rem}
+html body .view :is(label,.helper,.muted,.small-text){font-size:.875rem}
+html body #matches-next-versus:empty{display:none}
+html[data-theme="dark"] body .match-section-count{background:var(--gch-green-950);color:var(--gch-info-green)}
+.screen-section-nav{scroll-padding-inline:16px;--nav-fade-start:0px;--nav-fade-end:0px}
+.screen-section-nav.has-scroll-start{--nav-fade-start:16px}
+.screen-section-nav.has-scroll-end{--nav-fade-end:16px}
+.screen-section-nav:is(.has-scroll-start,.has-scroll-end){mask-image:linear-gradient(90deg,transparent,#000 var(--nav-fade-start),#000 calc(100% - var(--nav-fade-end)),transparent)}
+html body #view-more .settings-accordion{border:1px solid var(--gch-depth-line)!important;border-radius:var(--gch-radius-card);background:var(--gch-depth-panel)!important;box-shadow:var(--gch-shadow-card);margin-bottom:16px}
+html body #view-more .settings-accordion>summary{padding:16px;font-size:1rem;line-height:1.4}
+html body #view-more .settings-accordion-body{padding:0 16px 16px}
+html body #view-club .admin-home-directory-link{grid-column:1/-1;margin:0;padding:16px;border-radius:var(--gch-radius-card)!important}
+#admin-team-count:empty{display:none}
+#view-club .admin-home-footer{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:8px 24px;border-top:1px solid var(--gch-control-line);padding-top:4px}
+html body #view-club .admin-home-footer .text-button{float:none;display:inline-flex;align-items:center;min-height:44px;padding:8px 0;font-size:.875rem;font-weight:600;text-decoration:underline;text-underline-offset:3px;color:var(--gch-control-choice-copy)}
+
+html body .hero-copy .eyebrow{font-size:.75rem}
+html body .hero-copy .season-line{font-size:.8125rem}
+html body .view>.section-title-row h2{font-size:clamp(1.375rem,4.6vw,1.75rem)!important}
+
+html body .mobile-primary-item{font-size:.75rem;line-height:1.3;min-height:56px;height:auto}
+html body .bottom-nav .nav-item{font-size:.6875rem}

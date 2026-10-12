@@ -65,6 +65,7 @@ function requiresMatchdaySelection(){
 }
 function selkentMinimumPlayers(format){return {'3v3':2,'5v5':4,'7v7':5,'9v9':6,'11v11':7}[String(format||'').toLowerCase()]||null;}
 
+let openingSplashReady=false,openingSplashDurationElapsed=false;
 function dismissOpeningSplash(){
   const splash=document.getElementById('app-splash');
   if(!splash||splash.classList.contains('is-leaving'))return;
@@ -74,10 +75,13 @@ function dismissOpeningSplash(){
   window.setTimeout(()=>splash.remove(),250);
 }
 function finishOpeningSplash(){
-  // Let the first app frame paint, then reveal it without an artificial minimum wait.
+  openingSplashReady=true;
+  if(!openingSplashDurationElapsed)return;
+  // Preserve the approved three-second opening, then reveal a painted app frame.
   const paint=window.requestAnimationFrame?.bind(window)||(callback=>window.setTimeout(callback,0));
   paint(()=>paint(dismissOpeningSplash));
 }
+window.setTimeout(()=>{openingSplashDurationElapsed=true;if(openingSplashReady)finishOpeningSplash();},3000);
 // A stalled startup must not leave a decorative overlay blocking the app.
 window.setTimeout(dismissOpeningSplash,4000);
 
@@ -2554,6 +2558,24 @@ function preferredScrollBehavior(){return window.matchMedia?.('(prefers-reduced-
 window.addEventListener('popstate',event=>{
   if(__navigationReady&&!__booting){window.ClubHubPersonProfiles?.restore(event?.state?.clubhubPerson);navigate(navigationViewFromUrl()||(isClubOverviewMode()?'club':'home'),false,'replace');}
 });
+function updateSectionNavigation(nav){
+  const max=Math.max(0,nav.scrollWidth-nav.clientWidth);
+  nav.classList.toggle('has-scroll-start',nav.scrollLeft>1);
+  nav.classList.toggle('has-scroll-end',nav.scrollLeft<max-1);
+}
+function revealSectionNavigationControl(control){
+  const nav=control.closest('.screen-section-nav');
+  if(!nav)return;
+  const bounds=nav.getBoundingClientRect(),item=control.getBoundingClientRect();
+  let offset=0;
+  if(item.left<bounds.left+16)offset=item.left-bounds.left-16;
+  else if(item.right>bounds.right-16)offset=item.right-bounds.right+16;
+  if(offset)nav.scrollTo({left:nav.scrollLeft+offset,behavior:preferredScrollBehavior()});
+  updateSectionNavigation(nav);
+}
+function refreshSectionNavigation(){
+  document.querySelectorAll('.screen-section-nav').forEach(updateSectionNavigation);
+}
 function navigate(view,scroll=true,historyMode='push'){
   if(!NAVIGATION_VIEWS.has(view))view='home';
   if(!linkedPageAllowed(view))view=isClubOverviewMode()?'club':'home';
@@ -2608,6 +2630,7 @@ function navigate(view,scroll=true,historyMode='push'){
     if(view==='inbox'){setCommunicationsTab(__communicationsTab);if(__communicationsTab==='inbox'||!isClubOverviewMode())refreshInbox(false);}
     if(view==='person')window.ClubHubPersonProfiles?.enter();
     enterLinkedPage(view);
+    refreshSectionNavigation();
     if(scroll) window.scrollTo({top:0,behavior:preferredScrollBehavior()});
   }finally{__navigationInProgress=false;}
   syncNavigationUrl(historyMode);
@@ -3069,6 +3092,7 @@ function renderAll(){
   if(CLOUD_MODE&&['coach','assistant_coach'].includes(currentRole)&&currentView==='club'&&__clubTab==='results')refreshCoachClubResults(true);
   if(CLOUD_MODE&&['admin','coach','assistant_coach'].includes(currentRole)&&currentView==='more'){refreshSeasonHistory(true);if(isClubOverviewMode())refreshAuditHistory(true);}
   const roll=document.getElementById('rollover-season-name');if(roll&&!roll.value)roll.value=suggestedNextSeason();
+  refreshSectionNavigation();
 }
 
 function renderTeamIdentity(){
@@ -4613,7 +4637,8 @@ function buildAdminHomeSnapshot(rows,coaches,requests,messages,notices,feed,dire
 }
 function clearAdminHome(resetSearch=false){
   __adminHomeSnapshot=null;
-  for(const id of ['admin-home-fixture-count','admin-home-ready-count','admin-home-pending-count','admin-team-count'])adminHomeText(id,'—');
+  for(const id of ['admin-home-fixture-count','admin-home-ready-count','admin-home-pending-count'])adminHomeText(id,'—');
+  adminHomeText('admin-team-count','');
   for(const id of ['admin-home-weekend-list','admin-home-coverage-list','admin-team-grid']){const el=document.getElementById(id);if(el)setStableHtml(el,'');}
   for(const id of ['admin-home-request-status','admin-home-coverage-status','admin-home-message-status','admin-home-notice-status'])adminHomeText(id,'Loading…');
   adminHomeText('admin-home-weekend-dates','');
@@ -5913,6 +5938,16 @@ function toast(msg){
   clearTimeout(window.__toast);
   window.__toast=setTimeout(()=>t.classList.remove('show'),1800);
 }
+
+document.addEventListener('scroll',e=>{if(e.target.matches?.('.screen-section-nav'))updateSectionNavigation(e.target);},true);
+document.addEventListener('focusin',e=>revealSectionNavigationControl(e.target));
+document.addEventListener('click',e=>{
+  const control=e.target.closest('.screen-section-nav button');
+  if(control)revealSectionNavigationControl(control);
+  window.requestAnimationFrame?.(refreshSectionNavigation);
+},true);
+window.addEventListener('resize',refreshSectionNavigation);
+refreshSectionNavigation();
 
 // Events
 document.addEventListener('click',e=>{
