@@ -6,8 +6,8 @@ for(const id of ['assign-coach-person','assign-coach-team','assign-coach-button'
 assert(cloud.includes("rpc('assign_coach_team'")&&cloud.includes("rpc('unassign_coach_team'"));
 assert(/assignCoachTeam,unassignCoachTeam/.test(cloud),'exported');
 assert(app.includes('function assignCoachToTeam')&&app.includes('function unassignCoachFromTeam')&&app.includes('data-unassign-coach-team'));
-// People with several teams get a per-team unassign; people with one team keep Remove.
-assert(app.includes("several?'Unassign from this team'"));
+// Individual profiles retain per-team unassignment and full coaching-access removal.
+assert(app.includes("Unassign from ${esc(")&&app.includes("data-remove-club-coach"));
 // Admin-only guards on the client
 assert(/async function assignCoachTeam[\s\S]{0,120}Club Admin access required/.test(cloud));
 console.log('PASS assign coach to team UI');

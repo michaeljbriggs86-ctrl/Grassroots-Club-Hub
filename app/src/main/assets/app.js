@@ -2268,7 +2268,7 @@ function renderParentFamilySummary(){
   const currentKey=String(window.ClubHubCloud?.session?.user?.id||'')+':'+String(team?.id||''),currentLinks=__parentFamilyKey===currentKey?__parentFamilyLinks:[];
   const rows=currentLinks.map(link=>{
     const name=String(link.player_name||'').trim();
-    return `<div class="parent-child-row"><span class="parent-child-initial" aria-hidden="true">${esc(name.charAt(0).toUpperCase())}</span><div><strong>${esc(name)}</strong><small>${esc(label)}${link.shirt_number?' · #'+esc(link.shirt_number):''}</small></div></div>`;
+    return `<div class="parent-child-row"><span class="parent-child-initial" aria-hidden="true">${esc(name.charAt(0).toUpperCase())}</span><div><button type="button" class="person-name-button" data-player-profile="${esc(name)}">${esc(name)}</button><small>${esc(label)}${link.shirt_number?' · #'+esc(link.shirt_number):''}</small></div></div>`;
   }).join('');
   const message=__parentFamilyKey!==currentKey||__parentFamilyStatus==='loading'?'Checking approved child links…':__parentFamilyStatus==='error'?'Child links could not be loaded. Refresh to try again.':'No child is linked to this team yet. Ask the coach to check your approved player link, or request another child or team.';
   const list=document.getElementById('parent-home-family-list'),accountList=document.getElementById('parent-family-linked-list');
@@ -2315,6 +2315,8 @@ async function submitParentAddChild(e){
 
 function applyAccessMode(){
   syncContactDirectoryContext();
+  window.ClubHubPersonProfiles?.syncAccess();
+  document.getElementById('person-profile-self')?.classList.toggle('hidden',!CLOUD_MODE||!['parent','player'].includes(currentRole));
   if(typeof __adminWeekendShare!=='undefined'&&__adminWeekendShare&&__adminWeekendShare.identity!==adminWeekendShareIdentity()){__adminWeekendShare=null;++__adminWeekendShareLoad;document.getElementById('admin-weekend-share-dialog')?.close();renderAdminWeekendShare();}
   if(isTeamLocked())enforceAssignedTeam(false);
   const preview=isAdminTeamPreviewMode();
@@ -2475,7 +2477,7 @@ function navigateMobileAwards(){
   requestAnimationFrame(()=>section.scrollIntoView({behavior:preferredScrollBehavior(),block:'start'}));
 }
 // Screen routes use a query parameter so authentication callback fragments stay intact.
-const NAVIGATION_VIEWS=new Set(['home','matches','squad','add','league','club','club-matches','club-fixtures','club-results','club-coaches','inbox','more']);
+const NAVIGATION_VIEWS=new Set(['home','matches','squad','add','league','club','club-matches','club-fixtures','club-results','club-coaches','inbox','more','person']);
 let __navigationReady=false;
 let __navigationInProgress=false;
 function navigationViewFromUrl(){
@@ -2487,19 +2489,20 @@ function syncNavigationUrl(mode='push'){
   if(!NAVIGATION_VIEWS.has(view))return;
   try{
     const url=new URL(window.location.href);
-    if(url.searchParams.get('view')===view)return;
+    const personKey=view==='person'?(window.ClubHubPersonProfiles?.historyKey()||''):'';
+    if(url.searchParams.get('view')===view&&(!personKey||window.history.state?.clubhubPerson===personKey))return;
     url.searchParams.set('view',view);
     // File-based Android clients may not support history updates; screen navigation still works.
-    window.history[mode==='replace'?'replaceState':'pushState'](null,'',url.href);
+    window.history[mode==='replace'?'replaceState':'pushState'](personKey?{clubhubPerson:personKey}:null,'',url.href);
   }catch{}
 }
 function preferredScrollBehavior(){return window.matchMedia?.('(prefers-reduced-motion: reduce)').matches?'auto':'smooth';}
-window.addEventListener('popstate',()=>{
-  if(__navigationReady&&!__booting)navigate(navigationViewFromUrl()||(isClubOverviewMode()?'club':'home'),false,'replace');
+window.addEventListener('popstate',event=>{
+  if(__navigationReady&&!__booting){window.ClubHubPersonProfiles?.restore(event?.state?.clubhubPerson);navigate(navigationViewFromUrl()||(isClubOverviewMode()?'club':'home'),false,'replace');}
 });
 function navigate(view,scroll=true,historyMode='push'){
   if(!NAVIGATION_VIEWS.has(view))view='home';
-  if(CLOUD_MODE&&currentRole==='parent'&&!['home','matches','inbox','more'].includes(view))view='home';
+  if(CLOUD_MODE&&currentRole==='parent'&&!['home','matches','inbox','more','person'].includes(view))view='home';
   if(view==='more'){const h=document.querySelector('#view-more .section-title-row h2'),k=document.querySelector('#view-more .section-title-row .kicker');if(h)h.textContent=isClubOverviewMode()?'Club settings':'Settings';if(k)k.textContent=isClubOverviewMode()?'Club administration':'Team & app';}
   if(view==='club'&&isAdmin()&&!isClubOverviewMode()){adminUiMode='club';localStorage.setItem(ADMIN_UI_MODE_KEY,'club');}
   if(view==='club'){__clubTab='overview';view='club';}
@@ -2516,6 +2519,7 @@ function navigate(view,scroll=true,historyMode='push'){
     else if(['coach','assistant_coach'].includes(currentRole)&&__clubTab!=='results')__clubTab='results';
     else if(isAdmin()&&!['overview','fixtures','results','coaches'].includes(__clubTab))__clubTab='overview';
   }
+  if(view!=='person')window.ClubHubPersonProfiles?.leave();
   currentView=view;
   __navigationInProgress=true;
   try{
@@ -2546,6 +2550,7 @@ function navigate(view,scroll=true,historyMode='push'){
       navBar.scrollTo({left:navBar.scrollLeft+tab.left-bar.left-(bar.width-tab.width)/2,behavior:preferredScrollBehavior()});
     }
     if(view==='inbox'){setCommunicationsTab(__communicationsTab);if(__communicationsTab==='inbox'||!isClubOverviewMode())refreshInbox(false);}
+    if(view==='person')window.ClubHubPersonProfiles?.enter();
     if(scroll) window.scrollTo({top:0,behavior:preferredScrollBehavior()});
   }finally{__navigationInProgress=false;}
   syncNavigationUrl(historyMode);
@@ -2651,7 +2656,7 @@ function appearanceStatFor(name){return __appearanceStats.find(r=>selkentNorm(r.
 async function refreshAppearanceStats(quiet=true){
   if(!CLOUD_MODE||!['admin','coach','assistant_coach','parent','player'].includes(currentRole)||!window.ClubHubCloud?.listPlayerAppearanceStats)return;
   if(quiet&&Date.now()-__appearanceStamp<15000)return;__appearanceStamp=Date.now();
-  try{__appearanceStats=await window.ClubHubCloud.listPlayerAppearanceStats();renderSeasonPlayerStats();const dlg=document.getElementById('player-profile-dialog');if(dlg?.open&&dlg.dataset.playerName)openPlayerProfile(dlg.dataset.playerName);}catch(_){if(!quiet)toast('Appearance statistics are temporarily unavailable');}
+  try{__appearanceStats=await window.ClubHubCloud.listPlayerAppearanceStats();renderSeasonPlayerStats();if(window.ClubHubPersonProfiles?.isActive()&&window.ClubHubPersonProfiles.selectedSnapshot()?.role==='player')window.ClubHubPersonProfiles.refresh();}catch(_){if(!quiet)toast('Appearance statistics are temporarily unavailable');}
 }
 function attendancePercent(stat){const recorded=Number(stat?.recorded||0);return recorded?Math.round(Number(stat?.appearances||0)*100/recorded):0;}
 
@@ -2683,7 +2688,7 @@ function renderSeasonPlayerStats(){
   const rows=activePlayers().map(p=>{const ap=appearanceStatFor(p.name);return {p,ap,g:goalMap[p.name]||0,a:assistMap[p.name]||0,aw:awardMap[p.name]||0,picks:pickMap[tacticsPlayerId(p)]||0};})
     .sort((x,y)=>Number(y.ap.appearances||0)-Number(x.ap.appearances||0)||(y.g+y.a)-(x.g+x.a)||y.aw-x.aw||x.p.number-y.p.number);
   body.innerHTML=rows.map(r=>`<tr>${columns.map(c=>{
-    if(c.key==='player')return `<td><span class="season-player-name">${miniJerseyHTML(r.p.number,r.p.role,'compact')}<strong>${esc(r.p.name)}</strong></span></td>`;
+    if(c.key==='player')return `<td><span class="season-player-name">${miniJerseyHTML(r.p.number,r.p.role,'compact')}<button type="button" class="person-name-button" data-player-profile="${esc(r.p.name)}">${esc(r.p.name)}</button></span></td>`;
     if(c.key==='apps')return `<td><b>${Number(r.ap.appearances||0)}</b></td>`;
     if(c.key==='starts')return `<td>${Number(r.ap.starts||0)}</td>`;
     if(c.key==='att')return `<td>${attendancePercent(r.ap)}%</td>`;
@@ -4035,7 +4040,7 @@ function resetTactics(){if(!requireCoach())return;ensureTacticsState();const key
 function renderSquad(){
   const squad=rosterPlayers(),f=footballFormat();document.getElementById('squad-count').textContent=squad.length;const space=Math.max(0,f.registered-squad.length);const sc=document.getElementById('squad-space-count');if(sc)sc.textContent=`${space} registration space${space===1?'':'s'} remaining`;
   const summary=document.getElementById('squad-format-summary');if(summary)summary.innerHTML=`<span>${f.format}</span><span>${f.onPitch} on pitch</span><span>Max registered ${f.registered}</span><span>Matchday ${f.matchday}</span>`;
-  document.getElementById('squad-list').innerHTML=squad.map((p,i)=>{const action=isCoach()?`<button class="player-edit" data-edit-player="${p.number}">Edit</button>`:'';const role=p.role==='goalkeeper'?'Goalkeeper':'Outfield';const status=p.status==='inactive'?' · Inactive':'';const ownPlayer=currentRole!=='player'||selkentNorm(window.ClubHubCloud?.context?.profile?.full_name||'')===selkentNorm(p.name);const profile=playerAccountsAllowedForAge(ageGroupNumber())&&ownPlayer?` data-player-profile="${esc(p.name)}" title="Open player profile"`:'';return `<article class="player-card player-profile-card"${profile}>${jerseyHTML(p)}<div><div class="player-name">${esc(p.name)}</div><div class="player-sub">${role}${status}</div></div>${action}</article>`;}).join('')||'<div class="empty-state"><strong>No players yet</strong>Add players to build the squad.</div>';
+  document.getElementById('squad-list').innerHTML=squad.map(p=>{const role=p.role==='goalkeeper'?'Goalkeeper':'Outfield',status=p.status==='inactive'?' · Inactive':'';const ownPlayer=currentRole!=='player'||selkentNorm(window.ClubHubCloud?.context?.profile?.full_name||'')===selkentNorm(p.name);return `<article class="player-card player-profile-card">${jerseyHTML(p)}<div>${ownPlayer?`<button type="button" class="person-name-button player-name" data-player-profile="${esc(p.name)}">${esc(p.name)}</button>`:`<div class="player-name">${esc(p.name)}</div>`}<div class="player-sub">${role}${status}</div></div></article>`;}).join('')||'<div class="empty-state"><strong>No players yet</strong>Add players to build the squad.</div>';
   if(featureEnabled('tactics'))renderTacticsBoard();else setSquadPage(0);
 }
 
@@ -4671,17 +4676,11 @@ async function refreshTeamMembers(quiet=false){
    __teamPlayerAccountLinks=playerLinksResult.status==='fulfilled'?(playerLinksResult.value||[]):[];
    __pendingParentRequests=requestsResult.status==='fulfilled'?(requestsResult.value||[]):[];
    const preview=isAdminTeamPreviewMode();
-   const requestHtml=__pendingParentRequests.map(req=>`<div class="team-member-row pending"><div class="team-member-copy"><strong>${esc(req.parent_name||'Parent')}</strong><span>Parent · awaiting child verification</span><div class="pending-parent-details"><span><b>Child name supplied</b>${esc(req.child_name||'Not supplied')}</span><span><b>Email</b>${esc(req.parent_email||'Not supplied')}</span></div></div><div class="team-member-actions"><span class="member-role-pill">Pending</span><button class="primary-button compact parent-approve-action" data-review-parent-request-id="${esc(req.request_id)}">Review request</button></div></div>`).join('');
+   const requestHtml=__pendingParentRequests.map(req=>`<div class="team-member-row pending"><div class="team-member-copy">${personNameButton(req.parent_name||'Parent',req.request_id,'request',teamId||'')}<span>Parent · awaiting child verification</span></div><span class="member-role-pill">Pending</span></div>`).join('');
    const active=(rows||[]).filter(r=>r.role!=='pending_parent');
    const rowHtml=r=>{
-     const staff=['club_admin','coach','assistant_coach'].includes(r.role),parent=r.role==='parent',player=r.role==='player';
-     const roleText=r.role==='club_admin'?'Club Admin · Coach':r.role==='assistant_coach'?'Assistant Coach':r.role==='coach'?'Coach':player?'Player profile':'Parent';
-     const pill=r.role==='club_admin'?'Admin Coach':r.role==='assistant_coach'?'Assistant':r.role==='coach'?'Coach':player?'Player':'Parent';
-     const canRemove=!preview&&(!staff||(isAdmin()&&isClubOverviewMode()));
-     const pinState=player?(r.access_method==='player_code'?'Reusable code':r.pin_reset_required?'Temporary PIN':r.pin_set?'PIN set':'Legacy access'):parent?(r.access_method==='email'?'Email login':r.pin_reset_required?'Temporary PIN':r.pin_set?'Legacy PIN':'Email login'):'';
-     const linked=parent?__teamParentLinks.filter(x=>x.parent_user_id===r.user_id):player?__teamPlayerAccountLinks.filter(x=>x.user_id===r.user_id):[];
-     const linkText=linked.length?` · ${linked.map(x=>x.player_name).join(', ')}`:(parent?(parentLinksAvailable?' · No player linked':' · Player links unavailable'):'');
-     return `<div class="team-member-row"><div class="team-member-copy"><strong>${esc(r.full_name||'Member')}</strong><span>${esc(roleText)}${pinState?' · '+esc(pinState):''}${(parent||player)?esc(linkText):''}</span></div><div class="team-member-actions"><span class="member-role-pill">${pill}</span>${!preview&&parent&&isCoach()?`<button class="inline-action" data-link-parent-player="${r.user_id}" data-parent-name="${esc(r.full_name||'Parent')}">Edit player links</button>${r.access_method!=='email'?`<button class="inline-action" data-reset-parent-pin="${r.user_id}" data-parent-name="${esc(r.full_name||'Parent')}">Reset legacy PIN</button>`:''}`:''}${canRemove?`<button class="inline-action delete" data-remove-member="${r.user_id}">Remove</button>`:''}</div></div>`;
+     const roleText=r.role==='club_admin'?'Club Admin · Coach':accessRoleLabel(r.role);
+     return `<div class="team-member-row"><div class="team-member-copy">${personNameButton(r.full_name,r.user_id,'team',teamId||'')}<span>${esc(roleText)}</span></div><span class="member-role-pill">${esc(accessRoleLabel(r.role))}</span></div>`;
    };
    const warning=requestsResult.status==='rejected'?'<div class="empty-state compact-empty">Could not load parent requests. Reopen Team access to retry.</div>':'';
    const membersWarning=membersResult.status==='rejected'?'<div class="empty-state compact-empty">Could not load active team members.</div>':'';
@@ -4788,7 +4787,7 @@ async function openParentLinkDialog(userId,parentName='Parent'){
 }
 async function saveParentLinkDialog(e){
  e.preventDefault();if(!requireCoach())return;const userId=document.getElementById('parent-link-user-id')?.value||'',checked=[...document.querySelectorAll('#parent-link-player-list input[type="checkbox"]:checked')].map(el=>({name:el.value,number:Number(el.dataset.shirtNumber)||null}));
- try{await window.ClubHubCloud.saveParentPlayerLinks(userId,checked);auditEvent('player_link_updated','access',userId,checked.length?`Updated this team’s parent links: ${checked.map(x=>x.name).join(', ')}`:'Cleared this team’s parent player links',null,checked);document.getElementById('parent-link-dialog')?.close();toast(checked.length?'Player links saved':'Player links cleared');__teamMembersStamp=0;await refreshTeamMembers(false);}catch(err){alert(err.message||err);}
+ try{await window.ClubHubCloud.saveParentPlayerLinks(userId,checked);auditEvent('player_link_updated','access',userId,checked.length?`Updated this team’s parent links: ${checked.map(x=>x.name).join(', ')}`:'Cleared this team’s parent player links',null,checked);document.getElementById('parent-link-dialog')?.close();toast(checked.length?'Player links saved':'Player links cleared');__teamMembersStamp=0;await refreshTeamMembers(false);if(window.ClubHubPersonProfiles?.isActive())await window.ClubHubPersonProfiles.refresh();}catch(err){alert(err.message||err);}
 }
 function populateTeamPlayerInviteOptions(){
  const wrap=document.getElementById('team-player-invite-section'),sel=document.getElementById('team-player-invite-player');if(!wrap||!sel)return;
@@ -4813,7 +4812,7 @@ async function resetParentPin(userId,parentName='Parent'){
 async function removeTeamMember(userId){
   if(!requireCoach())return;
   if(!confirm("Remove this person\'s access? Their football data is not deleted."))return;
-  try{await window.ClubHubCloud.removeTeamMember(userId);auditEvent('access_removed','access',userId,'Removed team app access');toast('Access removed');await refreshTeamMembers(false);}catch(err){alert(err.message||err);}
+  try{await window.ClubHubCloud.removeTeamMember(userId);auditEvent('access_removed','access',userId,'Removed team app access');toast('Access removed');await refreshTeamMembers(false);if(window.ClubHubPersonProfiles?.isActive())await window.ClubHubPersonProfiles.refresh();}catch(err){alert(err.message||err);}
 }
 let __clubCoachStamp=0;
 async function refreshClubCoaches(quiet=false){
@@ -4822,8 +4821,7 @@ async function refreshClubCoaches(quiet=false){
   if(!quiet)list.innerHTML='<div class="empty-state compact-empty">Loading coaching staff…</div>';
   try{
     const rows=await window.ClubHubCloud.listClubCoaches();__adminCoachRows=rows;
-    const teamCount={};rows.forEach(r=>{teamCount[r.user_id]=(teamCount[r.user_id]||0)+1;});
-    list.innerHTML=rows.map(r=>{const role=r.role==='club_admin'?adminTitleLabel(r.club_title)+' · Coach':r.role==='assistant_coach'?'Assistant Coach':'Coach';const several=teamCount[r.user_id]>1,removeLabel=several?'Unassign from this team':r.role==='club_admin'?'Remove coaching role':'Remove';const removeAttr=several?`data-unassign-coach-team="${r.user_id}" data-team-id="${r.team_id}"`:`data-remove-club-coach="${r.user_id}"`;return `<div class="team-member-row"><div class="team-member-copy"><strong>${esc(r.full_name||role)}</strong><span>${r.age_group?'U'+esc(r.age_group)+' ':''}${r.team_name?clubListingHtml(fullClubResultTeamName({teamName:r.team_name}),r.team_name):'Team not assigned'}</span></div><div class="team-member-actions"><span class="member-role-pill">${role}</span><button type="button" class="secondary-button" data-coach-profile="${esc(r.user_id)}">Qualifications</button><button class="inline-action delete" ${removeAttr}>${removeLabel}</button></div></div>`;}).join('')||'<div class="empty-state compact-empty">No coaching staff accounts currently have access.</div>';
+    list.innerHTML=rows.map(r=>{const role=r.role==='club_admin'?adminTitleLabel(r.club_title)+' · Coach':accessRoleLabel(r.role);return `<div class="team-member-row"><div class="team-member-copy">${personNameButton(r.full_name||role,r.user_id,'club',r.team_id||'')}<span>${r.age_group?'U'+esc(r.age_group)+' ':''}${r.team_name?clubListingHtml(fullClubResultTeamName({teamName:r.team_name}),r.team_name):'Team not assigned'}</span></div><span class="member-role-pill">${esc(role)}</span></div>`;}).join('')||'<div class="empty-state compact-empty">No coaching staff accounts currently have access.</div>';
     await refreshAdminAccessManagement(true);
     populateAssignCoachControls();
   }catch(err){list.innerHTML='<div class="empty-state compact-empty">Coaching staff are temporarily unavailable.</div>';}
@@ -4835,7 +4833,7 @@ function renderAdminAccessManagement(){
   const mode=filter?.value||'all',rows=__adminAccessRows.filter(r=>mode==='all'||(mode==='staff'?['coach','assistant_coach'].includes(r.role):mode==='parent'?r.role==='parent':r.role===mode));
   const counts={admins:__adminAccessRows.filter(r=>r.role==='club_admin').length,staff:__adminAccessRows.filter(r=>['coach','assistant_coach'].includes(r.role)||(r.role==='club_admin'&&r.coach_team_id)).length,parents:__adminAccessRows.filter(r=>r.role==='parent').length,players:__adminAccessRows.filter(r=>r.role==='player').length,pending:__adminAccessRows.filter(r=>r.role==='pending_parent').length};
   if(stats)stats.innerHTML=`<span class="admin-access-stat">${plural(counts.admins,'Admin')}</span><span class="admin-access-stat">${counts.staff} coaching staff</span><span class="admin-access-stat">${plural(counts.parents,'parent')}</span><span class="admin-access-stat">${plural(counts.players,'player')}</span>${counts.pending?`<span class="admin-access-stat">${counts.pending} pending</span>`:''}`;
-  list.innerHTML=rows.map(r=>{const dual=r.role==='club_admin'&&r.coach_team_id,adminBase=r.role==='club_admin'?adminTitleLabel(r.club_title):'',role=dual?adminBase+' · Coach':(r.role==='club_admin'?adminBase:accessRoleLabel(r.role)),team=(r.age_group&&r.team_name)?`U${r.age_group} ${r.team_name}`:(r.role==='club_admin'?'Club-wide':'Team not assigned');return `<div class="team-member-row"><div class="team-member-copy"><strong>${esc(r.full_name||role)}</strong><span>${r.team_name?`${r.age_group?'U'+esc(r.age_group)+' ':''}${clubListingHtml(fullClubResultTeamName({teamName:r.team_name}),r.team_name)}`:esc(team)}</span><div class="admin-access-row-role"><span class="member-role-pill">${esc(role)}</span><span class="access-method-pill">${esc(r.access_method||'access')}</span></div></div><div class="team-member-actions">${['club_admin','coach','assistant_coach'].includes(r.role)?`<button type="button" class="secondary-button" data-coach-profile="${esc(r.user_id)}">Qualifications</button>`:''}</div></div>`;}).join('')||'<div class="empty-state compact-empty">No accounts match this filter.</div>';
+  list.innerHTML=rows.map(r=>{const dual=r.role==='club_admin'&&r.coach_team_id,adminBase=r.role==='club_admin'?adminTitleLabel(r.club_title):'',role=dual?adminBase+' · Coach':(r.role==='club_admin'?adminBase:accessRoleLabel(r.role)),team=(r.age_group&&r.team_name)?`U${r.age_group} ${r.team_name}`:(r.role==='club_admin'?'Club-wide':'Team not assigned');return `<div class="team-member-row"><div class="team-member-copy">${personNameButton(r.full_name||role,r.user_id,'access',r.team_id||'')}<span>${esc(team)}</span></div><span class="member-role-pill">${esc(role)}</span></div>`;}).join('')||'<div class="empty-state compact-empty">No accounts match this filter.</div>';
 }
 async function refreshAdminAccessManagement(quiet=false){
   if(!CLOUD_MODE||!isAdmin())return;const list=document.getElementById('admin-access-list');if(!list)return;if(!quiet)list.innerHTML='<div class="empty-state compact-empty">Loading club access…</div>';
@@ -4857,7 +4855,7 @@ async function assignCoachToTeam(){
   if(!person?.value||!team?.value)return toast('Choose a person and a team');
   const name=person.selectedOptions[0]?.textContent.split(' · ')[0]||'Coach',teamName=team.selectedOptions[0]?.textContent||'team';
   btn.disabled=true;
-  try{await window.ClubHubCloud.assignCoachTeam(person.value,team.value);auditEvent('coach_team_assigned','access',person.value,`Assigned ${name} to ${teamName}`);toast(`${name} assigned to ${teamName}`);team.value='';await refreshClubCoaches(false);await refreshAdminClubOverview(false);}
+  try{await window.ClubHubCloud.assignCoachTeam(person.value,team.value);auditEvent('coach_team_assigned','access',person.value,`Assigned ${name} to ${teamName}`);toast(`${name} assigned to ${teamName}`);team.value='';await refreshClubCoaches(false);await refreshAdminClubOverview(false);if(window.ClubHubPersonProfiles?.isActive())await window.ClubHubPersonProfiles.refresh();}
   catch(err){alert(err.message||err);}
   finally{btn.disabled=false;}
 }
@@ -4865,7 +4863,7 @@ async function unassignCoachFromTeam(userId,teamId){
   if(!isAdmin()||!CLOUD_MODE)return;
   const row=__adminCoachRows.find(r=>String(r.user_id)===String(userId)&&String(r.team_id)===String(teamId));
   if(!confirm(`Take ${row?.full_name||'this person'} off ${row?.age_group?'U'+row.age_group+' ':''}${row?.team_name||'this team'}? They keep their other teams.`))return;
-  try{await window.ClubHubCloud.unassignCoachTeam(userId,teamId);auditEvent('coach_team_unassigned','access',userId,`Removed ${row?.full_name||'coach'} from ${row?.team_name||'a team'}`);toast('Team assignment removed');await refreshClubCoaches(false);await refreshAdminClubOverview(false);}
+  try{await window.ClubHubCloud.unassignCoachTeam(userId,teamId);auditEvent('coach_team_unassigned','access',userId,`Removed ${row?.full_name||'coach'} from ${row?.team_name||'a team'}`);toast('Team assignment removed');await refreshClubCoaches(false);await refreshAdminClubOverview(false);if(window.ClubHubPersonProfiles?.isActive())await window.ClubHubPersonProfiles.refresh();}
   catch(err){alert(err.message||err);}
 }
 async function removeClubCoach(userId){
@@ -4873,7 +4871,7 @@ async function removeClubCoach(userId){
   const row=__adminCoachRows.find(r=>String(r.user_id)===String(userId));const dual=row?.role==='club_admin';
   const question=dual?'Remove this Club Admin\'s coaching assignment? Their Club Admin access will be kept.':"Remove this coach's app access? Team data will not be deleted.";
   if(!confirm(question))return;
-  try{await window.ClubHubCloud.removeClubCoach(userId);auditEvent(dual?'coach_assignment_removed':'coach_access_removed','access',userId,dual?'Removed Club Admin coaching assignment':'Removed coach app access');toast(dual?'Coaching assignment removed':'Coach access removed');await refreshClubCoaches(false);await refreshAdminClubOverview(false);}catch(err){alert(err.message||err);}
+  try{await window.ClubHubCloud.removeClubCoach(userId);auditEvent(dual?'coach_assignment_removed':'coach_access_removed','access',userId,dual?'Removed Club Admin coaching assignment':'Removed coach app access');toast(dual?'Coaching assignment removed':'Coach access removed');await refreshClubCoaches(false);await refreshAdminClubOverview(false);if(window.ClubHubPersonProfiles?.isActive())await window.ClubHubPersonProfiles.refresh();}catch(err){alert(err.message||err);}
 }
 
 let __adminFixtureStamp=0,__adminDirectoryCache=new Map(),__adminFixtureRows=[],__adminFixtureWeekend='';
@@ -5147,6 +5145,9 @@ function contactDetailsForm(contact,label='Edit contact details'){
   return `<details class="contact-edit"><summary>${esc(label)}</summary><form class="contact-details-form" data-contact-user="${esc(contact.user_id)}"><label>Contact email<input name="email" type="email" maxlength="254" autocomplete="off" value="${esc(contact.email||'')}" /></label><label>Phone number<input name="phone" type="tel" maxlength="40" autocomplete="off" value="${esc(contact.phone||'')}" /></label><p class="helper">Leave a field blank to clear it. This does not change the email you use to sign in.</p><p class="helper contact-form-status" role="status" aria-live="polite"></p><button type="submit" class="primary-button">Save contact details</button></form></details>`;
 }
 function memberContactCard(contact,canManage=false){
+  return `<article class="member-contact-card member-contact-summary"><button type="button" class="person-name-button" data-person-profile="${esc(contact.user_id)}" data-profile-source="contact" data-profile-team="${esc(contact.team_id||'')}">${esc(contact.full_name||'Club member')}</button><p class="helper">${esc(inboxContactRoleLabel(contact))}${contact.team_name?` · ${contact.age_group?'U'+esc(contact.age_group)+' ':''}${esc(contact.team_name)}`:''}</p></article>`;
+}
+function memberContactDetails(contact,canManage=false){
   const email=String(contact.email||''),phone=String(contact.phone||''),tel=phone.replace(/[() .-]/g,'');
   const emailLink=email&&/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)?`<a href="mailto:${esc(encodeURIComponent(email))}">${esc(email)}</a>`:'<span>Contact email not added</span>';
   const phoneLink=phone&&/^\+?\d{6,}$/.test(tel)?`<a href="tel:${esc(tel)}">${esc(phone)}</a>`:'<span>Phone number not added</span>';
@@ -5173,7 +5174,7 @@ async function refreshContactDirectory(){
     window.ClubHubContactImport?.show(canManage);
     document.getElementById('member-contacts-team-wrap')?.classList.toggle('hidden',!admin);
     if(admin&&filter){const keep=teamId||'';filter.innerHTML='<option value="">All club teams</option>'+(cloud.visibleTeamList?.()||[]).map(t=>`<option value="${esc(t.id)}">${esc(t.ageGroup||'')} ${esc(t.teamName||t.name||'Team')}</option>`).join('');filter.value=keep;}
-    const self=document.getElementById('member-contacts-self');if(self)self.innerHTML=`<section class="member-contact-card"><h4>My contact details</h4><p class="helper">${esc(data.self.full_name||'Your account')} · Your club’s admins can manage these details. Your team’s ${currentRole==='parent'?'coaches':'parents and staff'} can see them.</p>${contactDetailsForm(data.self,'Update my contact details')}</section>`;
+    const self=document.getElementById('member-contacts-self');if(self)self.innerHTML=`<section class="member-contact-card member-contact-summary"><button type="button" class="person-name-button" data-person-profile="${esc(data.self.user_id)}" data-profile-source="self">${esc(data.self.full_name||'My profile')}</button><p class="helper">My profile and contact details</p></section>`;
     const list=document.getElementById('member-contacts-list');if(list)list.innerHTML=rows.map(c=>memberContactCard(c,canManage)).join('')||'<div class="empty-state compact-empty">No team contacts available yet.</div>';
     if(status)status.textContent=rows.length?`${rows.length} team contact${rows.length===1?'':'s'}`:'Contact details can be added as members receive access.';
   }catch(e){if(valid()&&status)status.textContent='Contact details are unavailable. Please try Refresh contacts later.';}
@@ -5189,7 +5190,8 @@ async function saveContactDetailsForm(form){
   try{
     await cloud.saveMemberContactDetails({userId:form.dataset.contactUser,email,phone});
     if(identity!==contactDirectoryIdentity()||cloud!==window.ClubHubCloud||!form.isConnected)return;
-    await refreshContactDirectory();const out=document.getElementById('member-contacts-status');if(out&&identity===contactDirectoryIdentity())out.textContent='Contact details saved.';
+    if(window.ClubHubPersonProfiles?.isActive()){await window.ClubHubPersonProfiles.refresh();if(identity===contactDirectoryIdentity())toast('Contact details saved.');}
+    else {await refreshContactDirectory();const out=document.getElementById('member-contacts-status');if(out&&identity===contactDirectoryIdentity())out.textContent='Contact details saved.';}
   }catch(e){if(identity===contactDirectoryIdentity()&&form.isConnected&&status)status.textContent=e.message||'Could not save contact details. Please try again.';}
   finally{if(button?.isConnected)button.disabled=false;}
 }
@@ -5203,6 +5205,116 @@ document.getElementById('member-contacts-panel')?.addEventListener('toggle',e=>{
 document.getElementById('refresh-member-contacts')?.addEventListener('click',refreshContactDirectory);
 document.getElementById('member-contacts-team')?.addEventListener('change',refreshContactDirectory);
 document.getElementById('member-contacts-panel')?.addEventListener('submit',e=>{const form=e.target.closest('.contact-details-form');if(form){e.preventDefault();saveContactDetailsForm(form);}});
+
+function personProfileContextKey(){
+  const cloud=window.ClubHubCloud;
+  if(CLOUD_MODE){if(!cloud?.session?.user?.id||cloud.context?.profile?.user_id!==cloud.session.user.id||!['admin','coach','assistant_coach','parent','player'].includes(currentRole)||cloud.role?.()!==currentRole)return '';return [cloud.session.user.id,cloud.context?.profile?.club_id,currentRole,cloud.currentTeam?.()?.id||'',isClubOverviewMode()?'club':isAdminTeamPreviewMode()?'preview':'team',cloud.actingAsParent?.()?'parent':'staff'].join('|');}
+  return ['local',currentRole,state.meta?.teamName,state.meta?.ageGroup].join('|');
+}
+function personNameButton(name,id,source='team',teamId=''){
+  return `<button type="button" class="person-name-button" data-person-profile="${esc(id)}" data-profile-source="${esc(source)}" data-profile-team="${esc(teamId)}">${esc(name||'Member')}</button>`;
+}
+function personTeamSummary(rows){
+  return [...new Set(rows.map(r=>[r.age_group?'U'+r.age_group:'',r.team_name||''].filter(Boolean).join(' ')).filter(Boolean))].map(name=>`<li>${esc(name)}</li>`).join('');
+}
+async function resolveMemberProfile(target){
+  const cloud=window.ClubHubCloud,uid=cloud?.session?.user?.id,teamId=cloud?.currentTeam?.()?.id||null;
+  const admin=currentRole==='admin'&&isClubOverviewMode(),staff=['admin','coach','assistant_coach'].includes(currentRole);
+  if(!CLOUD_MODE||!uid||!target.id)return null;
+  if(!admin&&target.source!=='self'&&!teamId)return null;
+  let person=null,rows=[],contact=null,contactUnavailable=false,contactManage=false,request=null;
+  // Each source re-reads its authorised endpoint. A name button is never an access grant.
+  if(target.source==='request'){
+    if(!staff||!teamId)return null;
+    const requests=await cloud.listPendingParentRequests(teamId);request=requests.find(r=>String(r.request_id)===String(target.id));if(!request)return null;
+    return {name:request.parent_name||'Parent',userId:request.user_id,role:'pending_parent',html:`<section class="panel"><h3>Parent access request</h3><div class="pending-parent-details"><span><b>Child name supplied</b>${esc(request.child_name||'Not supplied')}</span><span><b>Email</b>${esc(request.parent_email||'Not supplied')}</span></div><p class="helper">Awaiting child verification. Review the request before giving team access.</p><button type="button" class="primary-button" data-person-action="review-request">Review request</button></section>`,requestId:request.request_id};
+  }
+  if(target.source==='club'||target.source==='access'){
+    if(!admin)return null;
+    rows=target.source==='club'?await cloud.listClubCoaches():await cloud.listClubAccessAccounts();
+    person=rows.find(r=>r.user_id===target.id);if(!person)return null;
+  }else if(target.source==='team'){
+    if(!staff||!teamId)return null;
+    rows=await cloud.listTeamMembers(teamId);person=rows.find(r=>r.user_id===target.id);if(!person)return null;
+  }else if(!['contact','self'].includes(target.source))return null;
+  if(target.source==='self'&&target.id!==uid)return null;
+  if(target.source==='self'){person={...cloud.context.profile,user_id:uid,role:currentRole==='admin'?'club_admin':currentRole};rows=[person];}
+  if(['club_admin','coach','assistant_coach','parent'].includes(person?.role)||!person){
+    try{
+      const data=await cloud.listContactDirectory(admin?null:teamId);
+      if(data.self?.user_id!==uid||!Array.isArray(data.contacts))throw Error('Invalid contacts');
+      contactManage=admin&&data.can_manage===true;
+      const approved=data.contacts.filter(c=>c&&['club_admin','coach','assistant_coach','parent'].includes(c.role)&&(admin||!teamId||c.team_id===teamId)&&(currentRole!=='parent'||(c.kind==='staff'&&c.role!=='parent')));
+      if(target.id===uid)contact={...data.self,role:currentRole==='admin'?'club_admin':currentRole,kind:currentRole==='parent'?'parent':'staff'};
+      else contact=approved.find(c=>c.user_id===target.id&&(!target.teamId||c.team_id===target.teamId))||(!target.teamId?approved.find(c=>c.user_id===target.id):null);
+      if(!person){person=contact;rows=approved.filter(c=>c.user_id===target.id);}
+    }catch(_){contactUnavailable=true;}
+  }
+  if(!person)return null;
+  if(currentRole==='parent'&&person.user_id!==uid&&(person.role==='parent'||person.kind==='parent'))return null;
+  const own=person.user_id===uid,role=person.role||'parent',parent=role==='parent',coaching=['club_admin','coach','assistant_coach'].includes(role);
+  let html=`<section class="panel"><h3>${esc(accessRoleLabel(role))}</h3>${personTeamSummary(rows.filter(r=>r.user_id===person.user_id))?`<ul class="person-profile-teams">${personTeamSummary(rows.filter(r=>r.user_id===person.user_id))}</ul>`:'<p class="helper">'+(admin?'Club account':'Your team')+'</p>'}${staff&&person.access_method?`<p class="helper">Sign-in method: ${esc(person.access_method)}</p>`:''}</section>`;
+  if(contact)html+=`<section class="panel"><h3>Contact details</h3>${memberContactDetails(contact,contactManage||own)}</section>`;
+  else if(['club_admin','coach','assistant_coach','parent'].includes(role))html+='<section class="panel"><h3>Contact details</h3><p class="helper">Contact details are unavailable. The club can populate these from its spreadsheet once the contact directory is enabled.</p></section>';
+  let links=[];
+  if(parent&&(staff||own)){
+    try{links=await cloud.listParentPlayerLinks(person.user_id);}catch(_){}
+    const names=[...new Set([...(contact?.player_names||[]),...links.filter(l=>l.parent_user_id===person.user_id&&(!teamId||l.team_id===teamId)).map(l=>l.player_name)].filter(n=>typeof n==='string'))];
+    html+=`<section class="panel"><h3>Linked players for this team</h3>${names.length?`<ul class="person-profile-teams">${names.map(n=>`<li>${playerForName(n)?`<button type="button" class="person-name-button" data-player-profile="${esc(n)}">${esc(n)}</button>`:esc(n)}</li>`).join('')}</ul>`:'<p class="helper">No linked players available for this team.</p>'}</section>`;
+  }
+  if(role==='player'&&own){const linked=await cloud.listPlayerAccountLinks(uid);const names=linked.filter(l=>l.user_id===uid&&(!teamId||l.team_id===teamId)).map(l=>l.player_name);html+=`<section class="panel"><h3>Player details</h3>${names.map(name=>`<button type="button" class="person-name-button" data-player-profile="${esc(name)}">${esc(name)}</button>`).join('')||'<p class="helper">No player link is available for this team.</p>'}</section>`;}
+  // Qualifications are private to Club Admin and the staff member; parents see contact details only.
+  let qualifications=false;
+  if(coaching&&(admin||(own&&['coach','assistant_coach','admin'].includes(currentRole)&&!cloud.actingAsParent?.()))){
+    qualifications=true;const api=window.ClubHubCoachQualifications;
+    try{
+      const data=await cloud.getCoachQualifications(person.user_id);
+      if(!api||!Array.isArray(data.records))throw Error('Unavailable');data.records.forEach(r=>api.validate(r));
+      html+=`<section class="panel"><h3>Coaching qualifications</h3>${api.catalogue.map(item=>{const r=data.records.find(r=>r.kind===item.kind),s=api.status(r);return `<article class="coach-qualification-row"><div><h4>${esc(item.label)}</h4><span class="qualification-state ${esc(s.tone)}">${esc(s.label)}</span>${r?`<p>${esc(item.courses[r.course])}</p><p>${esc(item.dateLabel||'Completed')}: ${esc(r.completed_on)}<br>${esc(item.expiryLabel||'Expiry')}: ${esc(r.expires_on||'Not recorded')}</p>`:''}</div></article>`;}).join('')}<button type="button" class="secondary-button" data-person-action="qualifications">${admin?'Manage qualifications':'View qualification record'}</button></section>`;
+    }catch(_){html+='<section class="panel"><h3>Coaching qualifications</h3><p class="helper">Qualification records are unavailable. Ask your Club Admin to check the dates.</p><button type="button" class="secondary-button" data-person-action="qualifications">Open qualification record</button></section>';}
+  }
+  const actions=[];
+  if(parent&&isCoach()&&!isAdminTeamPreviewMode()){
+    actions.push(`<button type="button" class="secondary-button" data-link-parent-player="${esc(person.user_id)}" data-parent-name="${esc(person.full_name||'Parent')}">Edit player links</button>`);
+    if(person.access_method&&person.access_method!=='email')actions.push(`<button type="button" class="secondary-button" data-reset-parent-pin="${esc(person.user_id)}" data-parent-name="${esc(person.full_name||'Parent')}">Reset legacy PIN</button>`);
+  }
+  if(admin&&coaching&&target.source==='club'){
+    const assigned=rows.filter(r=>r.user_id===person.user_id);
+    actions.push(...assigned.map(r=>`<button type="button" class="secondary-button" data-unassign-coach-team="${esc(person.user_id)}" data-team-id="${esc(r.team_id)}">Unassign from ${esc([r.age_group?'U'+r.age_group:'',r.team_name].filter(Boolean).join(' '))}</button>`));
+    actions.push(`<button type="button" class="secondary-button delete" data-remove-club-coach="${esc(person.user_id)}">${role==='club_admin'?'Remove coaching role':'Remove coaching access'}</button>`);
+  }else if(target.source==='team'&&!coaching&&isCoach()&&!isAdminTeamPreviewMode())actions.push(`<button type="button" class="secondary-button delete" data-remove-member="${esc(person.user_id)}">Remove team access</button>`);
+  if(actions.length)html+=`<section class="panel"><h3>Manage access</h3><div class="person-profile-actions">${actions.join('')}</div></section>`;
+  return {name:person.full_name||accessRoleLabel(role),role,userId:person.user_id,html,qualifications,notice:contactUnavailable?'Some contact details could not load.':''};
+}
+async function resolvePlayerProfile(target){
+  const p=playerForName(target.name);if(!p||isClubOverviewMode()||state.squad.filter(row=>row.name&&selkentNorm(row.name)===selkentNorm(p.name)).length!==1)return null;
+  const cloud=window.ClubHubCloud,uid=cloud?.session?.user?.id,restricted=['parent','player'].includes(currentRole);let linked=false;
+  if(restricted){if(!CLOUD_MODE||!uid)return null;const links=currentRole==='player'?await cloud.listPlayerAccountLinks(uid):await cloud.listParentPlayerLinks(uid);linked=links.some(l=>(currentRole==='parent'?l.parent_user_id===uid:l.user_id===uid)&&(!l.team_id||l.team_id===cloud.currentTeam?.()?.id)&&selkentNorm(l.player_name)===selkentNorm(p.name));if(!linked)return null;}
+  else if(!['admin','coach','assistant_coach'].includes(currentRole))return null;
+  const sum=playerSeasonSummary(p.name),ap=sum.appearance||appearanceStatFor(p.name),mini=restricted&&ageGroupNumber()<=11;
+  const stats=[['Appearances',Number(ap.appearances||0)],['Attendance',attendancePercent(ap)+'%'],['Awards',sum.awards],...(!mini?[['Goals',sum.goals],['Assists',sum.assists],['Goal contributions',sum.goals+sum.assists]]:[]),...(!restricted?[['Starts',Number(ap.starts||0)],['No-shows',Number(ap.no_shows||0)]]:[])];
+  let html=`<section class="panel"><div class="player-profile-hero"><div class="player-profile-jersey">${jerseyHTML(p)}</div><div><strong>${esc(p.name)}</strong><span>Shirt ${esc(p.number)} · ${p.role==='goalkeeper'?'Goalkeeper':'Outfield'} · ${esc(state.meta.ageGroup||'')}</span></div></div><div class="player-profile-stats">${stats.map(([label,value])=>`<article><span>${esc(label)}</span><strong>${esc(value)}</strong></article>`).join('')}</div>${isCoach()?`<button type="button" class="secondary-button" data-edit-player="${esc(p.number)}">Edit player details</button>`:''}</section>`;
+  const fixture=nextPublishedFixture();let canRespond=false,notice='';
+  if(restricted&&linked&&fixture){
+    try{const rows=await listFixtureAvailability(fixture),row=rows.find(r=>selkentNorm(r.player_name)===selkentNorm(p.name));canRespond=true;
+      html+=`<section class="panel"><h3>Next match availability</h3><p>${esc(fixtureSummary(fixture))}</p><div class="availability-buttons" role="group" aria-label="Player availability">${['available','unsure','unavailable'].map(status=>`<button type="button" class="availability-btn ${status} ${row?.status===status?'selected':''}" data-profile-availability="${status}">${status[0].toUpperCase()+status.slice(1)}</button>`).join('')}</div><p class="helper">This response is shared for the player, so linked parent accounts do not create duplicates.</p></section>`;
+    }catch(_){notice='Match availability could not load. Return to the list and reopen this profile to retry.';}
+  }
+  return {name:p.name,role:'player',playerName:p.name,html,canRespond,notice,fixtureKey:fixture?fixtureResponseKey(fixture):''};
+}
+window.ClubHubPersonProfiles?.configure({
+  contextKey:personProfileContextKey,currentView:()=>currentView,cloud:()=>window.ClubHubCloud,
+  ownTarget:()=>({kind:'member',id:window.ClubHubCloud?.session?.user?.id,source:'self'}),
+  onLeave:()=>window.ClubHubCoachQualifications?.close(),
+  defaultView:()=>isClubOverviewMode()?'club':'home',route:()=>currentView==='club'?(__clubTab==='overview'?'club':`club-${__clubTab}`):currentView,navigate,
+  resolve:target=>target.kind==='player'?resolvePlayerProfile(target):resolveMemberProfile(target),
+  back:(key,route)=>{if(window.history?.state?.clubhubPerson===key&&key)window.history.back();else navigate(route,false,'replace');},
+  action:(action,person)=>{
+    if(action==='qualifications'&&person.qualifications)window.ClubHubCoachQualifications?.open(person.userId,person.name);
+    if(action==='review-request'&&person.requestId){const identity=personProfileContextKey(),cloud=window.ClubHubCloud;cloud.listPendingParentRequests(cloud.currentTeam?.()?.id).then(rows=>{if(identity===personProfileContextKey()&&window.ClubHubPersonProfiles?.selectedSnapshot()===person){__pendingParentRequests=rows;openParentRequestReview(person.requestId);}}).catch(()=>{if(identity===personProfileContextKey())toast('The request could not load. Reopen this profile to retry.');});}
+  }
+});
+document.getElementById('person-profile-body')?.addEventListener('submit',event=>{const form=event.target.closest('.contact-details-form');if(form){event.preventDefault();saveContactDetailsForm(form);}});
 
 let __inboxStamp=0,__inboxMessages=[],__inboxContacts=[],__inboxSelected='';
 function inboxMyUserId(){return window.ClubHubCloud?.session?.user?.id||'';}
@@ -5628,23 +5740,18 @@ function playerSeasonSummary(name){
   const appearance=appearanceStatFor(name);return {goals,assists,awards,picks,appearance};
 }
 async function openPlayerProfile(name){
-  if(!playerAccountsAllowedForAge(ageGroupNumber()))return toast('Player profiles are not enabled for this age group.');
-  const p=playerForName(name);if(!p)return;
-  const dlg=document.getElementById('player-profile-dialog');if(!dlg)return;
-  const sum=playerSeasonSummary(p.name);document.getElementById('player-profile-name').textContent=p.name;
-  document.getElementById('player-profile-hero').innerHTML=`<div class="player-profile-jersey">${jerseyHTML(p)}</div><div><strong>${esc(p.name)}</strong><span>Shirt ${esc(p.number)} · ${p.role==='goalkeeper'?'Goalkeeper':'Outfield'} · ${esc(state.meta.ageGroup||'')}</span></div>`;
-  const ap=sum.appearance||appearanceStatFor(p.name);const stats=[['Appearances',Number(ap.appearances||0)],...(ageGroupNumber()>=12?[['Starts',Number(ap.starts||0)],['Sub appearances',Number(ap.substitutes||0)]]:[]),['Attendance',attendancePercent(ap)+'%'],['Goals',sum.goals],['Assists',sum.assists],['Goal contributions',sum.goals+sum.assists],['Awards',sum.awards],['No-shows',Number(ap.no_shows||0)]];
-  document.getElementById('player-profile-stats').innerHTML=stats.map(([k,v])=>`<article><span>${k}</span><strong>${v}</strong></article>`).join('');
-  const sec=document.getElementById('player-profile-availability'),note=document.getElementById('player-profile-availability-note');const fixture=nextPublishedFixture();
-  let linked=false;if(CLOUD_MODE&&['parent','player'].includes(currentRole)){try{const uid=window.ClubHubCloud?.session?.user?.id||'';const links=currentRole==='player'?await window.ClubHubCloud.listPlayerAccountLinks(uid):await window.ClubHubCloud.listParentPlayerLinks(uid);linked=links.some(x=>selkentNorm(x.player_name)===selkentNorm(p.name));}catch{}}
-  sec?.classList.toggle('hidden',!(['parent','player'].includes(currentRole)&&linked&&fixture));
-  if(fixture){document.getElementById('player-profile-fixture').textContent=fixtureSummary(fixture);const key=fixtureResponseKey(fixture);try{const rows=await listFixtureAvailability(fixture);if(key===fixtureResponseKey(nextPublishedFixture()||{})){const row=rows.find(r=>selkentNorm(r.player_name)===selkentNorm(p.name));document.querySelectorAll('[data-profile-availability]').forEach(b=>b.classList.toggle('selected',b.dataset.profileAvailability===row?.status));}}catch{}}
-  if(note)note.textContent=linked?'This response is shared for the player, so linked parent accounts will not create duplicates.':'Only a linked parent account can change availability.';
-  dlg.dataset.playerName=p.name;dlg.showModal();
+  window.ClubHubPersonProfiles?.open({kind:'player',name});
 }
 async function saveProfileAvailability(status){
-  if(!['parent','player'].includes(currentRole))return;const dlg=document.getElementById('player-profile-dialog');const name=dlg?.dataset.playerName||'';const fixture=nextPublishedFixture();if(!name||!fixture)return;
-  try{await window.ClubHubCloud.saveMatchAvailability({fixtureKey:fixtureResponseKey(fixture),playerName:name,status});document.querySelectorAll('[data-profile-availability]').forEach(b=>b.classList.toggle('selected',b.dataset.profileAvailability===status));await refreshMatchAvailability(false);toast('Availability updated');}catch(err){toast(err.message||'Could not update availability');}
+  if(!['parent','player'].includes(currentRole)||!['available','unsure','unavailable'].includes(status))return;
+  const profiles=window.ClubHubPersonProfiles,person=profiles?.selectedSnapshot(),identity=personProfileContextKey(),fixture=nextPublishedFixture();
+  if(!person?.canRespond||!person.playerName||!fixture||person.fixtureKey!==fixtureResponseKey(fixture))return;
+  const cloud=window.ClubHubCloud;
+  try{
+    await cloud.saveMatchAvailability({fixtureKey:person.fixtureKey,playerName:person.playerName,status});
+    if(identity!==personProfileContextKey()||profiles.selectedSnapshot()!==person)return;
+    await profiles.refresh();await refreshMatchAvailability(false);toast('Availability updated');
+  }catch(err){if(identity===personProfileContextKey()&&profiles.selectedSnapshot()===person)toast(err.message||'Could not update availability');}
 }
 
 function openPlayerDialog(number=null){
@@ -5670,7 +5777,7 @@ function removePlayerFromSquad(){
   updateTacticsPlayerReferences(original);
   saveState();auditEvent('player_removed','squad',String(original),`Removed ${player.name} from squad`,player,null);
   document.getElementById('player-dialog').close();
-  toast(`${player.name} removed from squad`);
+  toast(`${player.name} removed from squad`);if(window.ClubHubPersonProfiles?.isActive())window.ClubHubPersonProfiles.refresh();
 }
 function savePlayer(e){
   e.preventDefault();
@@ -5689,7 +5796,7 @@ function savePlayer(e){
   const savedPlayer={number,name,status,role:role==='goalkeeper'?'goalkeeper':'outfield'};state.squad.push(savedPlayer);
   saveState();auditEvent(beforePlayer?'player_edited':'player_added','squad',String(number),`${beforePlayer?'Updated':'Added'} ${name} in squad`,beforePlayer,savedPlayer);
   document.getElementById('player-dialog').close();
-  toast('Squad updated');
+  toast('Squad updated');if(window.ClubHubPersonProfiles?.isActive()){const target=window.ClubHubPersonProfiles.selectedTarget();if(target?.kind==='player')target.name=name;window.ClubHubPersonProfiles.refresh();}
 }
 
 function openAwardDialog(){
@@ -5864,7 +5971,7 @@ document.getElementById('matches-next-calendar')?.addEventListener('click',()=>a
 document.getElementById('matches-next-played')?.addEventListener('click',openNextFixtureMatchReport);
 document.getElementById('matchday-add-calendar')?.addEventListener('click',()=>addFixtureToCalendar());
 document.getElementById('matchday-notify-squad')?.addEventListener('click',notifySelectedSquad);
-document.querySelectorAll('[data-profile-availability]').forEach(b=>b.addEventListener('click',()=>saveProfileAvailability(b.dataset.profileAvailability)));
+document.getElementById('person-profile-body')?.addEventListener('click',event=>{const button=event.target.closest('[data-profile-availability]');if(button)saveProfileAvailability(button.dataset.profileAvailability);});
 document.getElementById('match-search').addEventListener('input',applyMatchFilter);
 document.getElementById('match-gf').addEventListener('input',updateGoalCheck);
 document.getElementById('match-status')?.addEventListener('change',updateMatchStatusUI);

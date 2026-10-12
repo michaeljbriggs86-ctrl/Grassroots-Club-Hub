@@ -47,6 +47,28 @@ class CupResultsTests(unittest.TestCase):
         self.assertEqual(set(results), {6})
         fetch.assert_called_once_with('cupspage/6')
 
+    def outcome_source(self):
+        return (ROOT / 'tests/fixtures/selkent_cupspage_8_outcome_2026_10_12.html').read_text()
+
+    def test_live_win_loss_outcome_does_not_stop_numeric_results(self):
+        html = self.outcome_source()
+        rows = parse_published_cup_results(html, 8)
+        self.assertEqual([(r['homeGoals'], r['awayGoals']) for r in rows], [(2, 3), (3, 1), (3, 5)],
+                         'all three neighbouring numeric cup scores are retained')
+        self.assertFalse(any(r['home'] == 'Sporting Club Vista' for r in rows))
+        self.assertTrue(all(isinstance(r['homeGoals'], int) and isinstance(r['awayGoals'], int) for r in rows))
+        for marker in ['L - W', 'W-L', 'L-W']:
+            with self.subTest(marker=marker):
+                self.assertEqual(parse_published_cup_results(html.replace('W - L', marker), 8), rows)
+
+    def test_unknown_outcomes_and_missing_teams_still_fail_closed(self):
+        html = self.outcome_source()
+        for marker in ['W - W', 'L - L', 'W - 0', 'P - P', 'Won on penalties', 'w - l']:
+            with self.subTest(marker=marker), self.assertRaises(UnverifiedPublishedResultsMarkupError):
+                parse_published_cup_results(html.replace('W - L', marker), 8)
+        with self.assertRaises(UnverifiedPublishedResultsMarkupError):
+            parse_published_cup_results(html.replace('Sporting Club Vista ', ''), 8)
+
 
 if __name__ == '__main__':
     unittest.main()

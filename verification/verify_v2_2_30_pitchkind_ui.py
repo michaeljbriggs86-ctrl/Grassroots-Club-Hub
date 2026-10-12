@@ -691,8 +691,8 @@ check(
     and 'list_pending_parent_requests' in cloud
     and '__pendingParentRequests' in app
     and 'pending-parent-details' in app
-    and '<b>Child name supplied</b>${esc(req.child_name' in app
-    and '<b>Email</b>${esc(req.parent_email' in app,
+    and '<b>Child name supplied</b>${esc(request.child_name' in app
+    and '<b>Email</b>${esc(request.parent_email' in app,
 )
 check(
     'staff explicitly select an active squad player before atomic approval',
@@ -756,7 +756,7 @@ check('parent approval client allows authorised access staff',
     and 'async function submitParentRequestReview(e)' in app)
 check('coach-only player controls stay coach-only',
     'playerAccountsAllowedForAge(ageGroupNumber())&&isCoach()' in app
-    and '!preview&&parent&&isCoach()' in app)
+    and 'parent&&isCoach()&&!isAdminTeamPreviewMode()' in app)
 check('parent access notification provides review action',
     'function reviewParentAccessNotification(notificationId)' in app
     and 'data-review-parent-request' in app

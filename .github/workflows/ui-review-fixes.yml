@@ -48,7 +48,7 @@ jobs:
             node "$test"
           done
           python cloudflare/web-app/build.py
-          for asset in index.html app.js cloud.js styles.css app-design-system.css coach-qualifications.js member-contact-import.js; do
+          for asset in index.html app.js cloud.js styles.css app-design-system.css coach-qualifications.js member-contact-import.js person-profiles.js; do
             cmp "app/src/main/assets/$asset" "cloudflare/web-app/dist/$asset"
           done
           cmp app/src/main/assets/inter-variable.woff2 cloudflare/web-app/dist/inter-variable.woff2

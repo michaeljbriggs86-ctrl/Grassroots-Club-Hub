@@ -12,7 +12,7 @@ const events={},entries=[],views=['home','matches','squad','add','league','club'
 const tabs=views.map(v=>({dataset:{nav:v.dataset.view},classList:classes(),attrs:{},setAttribute(k,v){this.attrs[k]=v;},removeAttribute(k){delete this.attrs[k];}}));
 let reduced=false;
 const win={location:{href:'https://example.test/?keep=yes&view=matches#auth_callback'},matchMedia:()=>({matches:reduced}),addEventListener:(name,fn)=>events[name]=fn,scrollTo:()=>{}};
-win.history={pushState(_state,_title,url){entries.push({mode:'push',url});win.location.href=url;},replaceState(_state,_title,url){entries.push({mode:'replace',url});win.location.href=url;}};
+win.history={pushState(_state,_title,url){entries.push({mode:'push',url,state:_state});win.history.state=_state;win.location.href=url;},replaceState(_state,_title,url){entries.push({mode:'replace',url,state:_state});win.history.state=_state;win.location.href=url;}};
 const env={window:win,URL,CLOUD_MODE:true,currentRole:'coach',currentView:'home',__clubTab:'overview',__squadPage:0,__communicationsTab:'inbox',__booting:false,
   isAdmin:()=>env.currentRole==='admin',isCoach:()=>['coach','assistant_coach'].includes(env.currentRole),isPublishedLeagueTeam:()=>false,isClubOverviewMode:()=>env.currentRole==='admin',
   document:{body:{classList:classes()},querySelector:()=>null,querySelectorAll:q=>q==='.view'?views:q==='.top-nav-tabs .nav-item'?tabs:[],getElementById:id=>id==='match-id'?{value:''}:null},
@@ -81,4 +81,13 @@ vm.runInNewContext(slice(cloud,'  function authField(','  function authMainScree
 const field=fields.authField({id:'password',type:'password',placeholder:'Password',value:'already entered'});
 assert.match(field,/<label class="auth-field-label" for="password">Password<\/label>/);assert.match(field,/name="password"/);
 assert.match(fields.authField({id:'child',placeholder:'Child',label:'Child & guardian'}),/Child &amp; guardian/);
+// Individual routes carry an opaque in-memory key, preserving auth fragments and Back.
+let personKey='profile-1',restored='';
+win.ClubHubPersonProfiles={historyKey:()=>personKey,enter(){},leave(){},restore:key=>{restored=key;personKey=key;}};
+env.currentRole='parent';win.location.href='https://example.test/?keep=yes&view=inbox#auth_callback';
+env.navigate('person',false);const firstPerson=entries.at(-1);
+assert.equal(firstPerson.state.clubhubPerson,'profile-1');assert.match(firstPerson.url,/view=person/);assert.match(firstPerson.url,/#auth_callback$/);assert.doesNotMatch(firstPerson.url,/user_id|player_name/);
+personKey='profile-2';env.navigate('person',false);assert.equal(entries.at(-1).state.clubhubPerson,'profile-2','a second person creates a separate history entry');
+win.location.href=firstPerson.url;win.history.state=firstPerson.state;const count=entries.length;events.popstate({state:firstPerson.state});
+assert.equal(restored,'profile-1');assert.equal(env.currentView,'person');assert.equal(entries.length,count,'restoring the same opaque key does not add history');
 console.log('PASS UI review fixes: protected routes/history, reduced-motion scrolling, keyboard tactics, recent form and persistent labels');
