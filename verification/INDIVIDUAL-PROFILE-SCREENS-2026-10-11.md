@@ -86,3 +86,18 @@ Phone review: open names in each list; use Back/Forward; try role/team changes;
 verify parent coaching-contact and own-child screens; check coach qualification
 dates and admin edit dialogs; confirm no restricted records or addresses;
 review long names and text enlargement in both themes.
+
+## PR85 conflict resolution — 12 October 2026
+
+Merged main b8a075f6a3b1eba0f8ed8a9cf72c4e5f8afda52f, preserving the
+compact-clean UI from PR87, the updated Selkent Cup handling and current
+public feeds. The only conflicts were the two service-worker cache
+versions. Both now use `pitchkind-web-person-profiles-compact-20261012`
+and retain `person-profiles.js` in their static cache lists. Individual
+screens, role/team privacy guards, the qualification matrix and the latest
+layout are preserved. No contact permissions or database SQL changed.
+
+The combined tree passed all 100 JavaScript suites, 138 Python regressions,
+191 UI source checks, syntax checks, badge quality, pilot scope, browser
+build, source/build byte comparisons and diff checks. No live deployment,
+PR merge or database application was performed for this resolution.

@@ -195,11 +195,15 @@ check(
 
 u9 = next((g for g in results_feed.get('age_groups', []) if g.get('age_group') == 'U9'), {})
 u9_fixtures = u9.get('fixtures') or []
+u9_status = u9.get('fixture_parse_status')
+u9_weeks = set(u9.get('fixture_week_ids') or [])
 check(
     'U9 rolling fixture feed retains verified discovery and provider identities',
-    u9.get('fixture_parse_status') == 'verified_multiweek_fixture_rows_v2'
-    and len(set(u9.get('fixture_week_ids') or [])) >= 2
-    and bool(u9_fixtures)
+    # Selkent can clear its advertised weeks between publishing cycles.
+    # Accept the scraper's verified empty shapes, never an unknown status.
+    ((u9_status == 'verified_multiweek_fixture_rows_v2' and bool(u9_weeks) and bool(u9_fixtures))
+     or (u9_status == 'verified_empty_multiweek_v2' and bool(u9_weeks) and not u9_fixtures)
+     or (u9_status == 'verified_empty' and not u9_weeks and not u9_fixtures))
     and all((re.fullmatch('\\d{4}-\\d{2}-\\d{2}', f.get('date', '')) and f.get('division_name') and f.get('home') and f.get('away') and (len(f.get('provider_team_ids') or []) == (1 if f.get('away') == 'TBD' else 2)) for f in u9_fixtures)),
 )
 

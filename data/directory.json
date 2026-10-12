@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-10-11T10:42:20.153559+00:00",
+  "last_updated": "2026-10-11T22:14:46.906537+00:00",
   "clubs": [
     {
       "club_id": 514,
@@ -592,10 +592,6 @@
       "logo_source": "official_source_transparency_derivative_private",
       "logo_updated_at": "2026-09-30",
       "logo_sha256": "53facde723259b51ef991c02e37e33b1a475dc21e2e56e489929df2f9410f77c"
-    },
-    {
-      "club_id": 565,
-      "club_name": "Prolific FC"
     },
     {
       "club_id": 473,
@@ -1446,7 +1442,7 @@
         "Dulwich Hamlet JFC Pink",
         "Dulwich Village Orange",
         "Fisher Youth",
-        "Kekoa Navy",
+        "Kekoa",
         "Lewisham Project Gold",
         "London Kickers FC Red",
         "London Legends white",
@@ -1593,7 +1589,7 @@
         "Blackheath Rhinos Black",
         "Blackheath Rhinos Grey",
         "Junior Reds Warriors",
-        "Kidbrooke Kings Kidbrooke Youth",
+        "Kidbrooke Kings",
         "Russellers Yellows",
         "Samuel Montagu Green",
         "Sporting Club Thamesmead Yellow",
@@ -1743,7 +1739,7 @@
         "Blackheath Rhinos Yellow",
         "Junior Reds Spartans",
         "Junior Reds Titans",
-        "Kidbrooke Kings Kidbrooke Youth",
+        "Kidbrooke Kings",
         "KSI Coaching FC Navy",
         "Long Lane Tigers",
         "The Bosco FC Dons"
@@ -2315,12 +2311,11 @@
         "IEXEL F.C Gold",
         "Metrogas FC Black",
         "Phoenix Sports Cobras",
-        "Sutton Athletic Greens",
         "Sutton Athletic Stripes",
         "Swanscombe Tigers Stripes",
         "Welling United Blue"
       ],
-      "team_count_label": "10 teams"
+      "team_count_label": "9 teams"
     },
     {
       "age_group": "U14",
@@ -2442,11 +2437,10 @@
         "Fleetdown United",
         "Hillyfielders Falcons",
         "Omarie Youth Red",
-        "Samuel Montagu",
         "SE Dons Football Club Tigers",
         "Teviot Rangers WHITE"
       ],
-      "team_count_label": "11 teams"
+      "team_count_label": "10 teams"
     },
     {
       "age_group": "U15",
@@ -2548,7 +2542,6 @@
         "Athenlay FC",
         "Baldon Sports Blue",
         "Cray Wanderers Lions",
-        "Dartford Royals Blue",
         "Dulwich Village Orange",
         "Dynamo Youth",
         "Ebbsfleet United White",
@@ -2556,7 +2549,7 @@
         "Red Devils",
         "Welling United Blue"
       ],
-      "team_count_label": "10 teams"
+      "team_count_label": "9 teams"
     },
     {
       "age_group": "U16",
@@ -2621,7 +2614,6 @@
         "Athenlay RYE",
         "Dartford Royals white",
         "Dulwich Village White",
-        "Falconwood FC Black",
         "Halls AFC",
         "Kent United FC",
         "Kingsdale Orange",
@@ -2629,7 +2621,7 @@
         "South Darenth Purples",
         "Woolwich Wanderers FC"
       ],
-      "team_count_label": "10 teams"
+      "team_count_label": "9 teams"
     },
     {
       "age_group": "U17",
@@ -4376,7 +4368,7 @@
       "club_name": "Fisher Youth"
     },
     {
-      "team_name": "Kekoa Navy",
+      "team_name": "Kekoa",
       "club_id": 465,
       "club_name": "Kekoa"
     },
@@ -4791,7 +4783,7 @@
       "club_name": "Junior Reds"
     },
     {
-      "team_name": "Kidbrooke Kings Kidbrooke Youth",
+      "team_name": "Kidbrooke Kings",
       "club_id": 525,
       "club_name": "Kidbrooke Kings"
     },
@@ -5221,7 +5213,7 @@
       "club_name": "Junior Reds"
     },
     {
-      "team_name": "Kidbrooke Kings Kidbrooke Youth",
+      "team_name": "Kidbrooke Kings",
       "club_id": 525,
       "club_name": "Kidbrooke Kings"
     },
@@ -6841,11 +6833,6 @@
       "club_name": "Phoenix Sports"
     },
     {
-      "team_name": "Sutton Athletic Greens",
-      "club_id": 330,
-      "club_name": "Sutton Athletic"
-    },
-    {
       "team_name": "Sutton Athletic Stripes",
       "club_id": 330,
       "club_name": "Sutton Athletic"
@@ -7196,11 +7183,6 @@
       "club_name": "Omarie Youth"
     },
     {
-      "team_name": "Samuel Montagu",
-      "club_id": 447,
-      "club_name": "Samuel Montagu"
-    },
-    {
       "team_name": "SE Dons Football Club Tigers",
       "club_id": 538,
       "club_name": "SE Dons Football Club"
@@ -7486,11 +7468,6 @@
       "club_name": "Cray Wanderers"
     },
     {
-      "team_name": "Dartford Royals Blue",
-      "club_id": 256,
-      "club_name": "Dartford Royals"
-    },
-    {
       "team_name": "Dulwich Village Orange",
       "club_id": 261,
       "club_name": "Dulwich Village"
@@ -7689,11 +7666,6 @@
       "team_name": "Dulwich Village White",
       "club_id": 261,
       "club_name": "Dulwich Village"
-    },
-    {
-      "team_name": "Falconwood FC Black",
-      "club_id": 517,
-      "club_name": "Falconwood FC"
     },
     {
       "team_name": "Halls AFC",
