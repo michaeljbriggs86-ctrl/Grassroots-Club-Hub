@@ -1425,3 +1425,124 @@ html[data-theme="dark"] .club-matches-table .club-fixture-confirmation.confirmed
 .contact-details-form label {display:grid;gap:8px;font-size:14px}
 html[data-theme="dark"] .member-contact-card {background:#151D18;border-color:#35443A}
 html[data-theme="dark"] .member-contact-links a {color:#8EE09A}
+
+/* Compact and clean presentation — Mike, 12 October 2026.
+ * Shared geometry, flat rows and quieter actions replace nested decoration.
+ * Decision: LOG-ENTRY_2026-10-12_0200_chatgpt_compact-clean-ui-approval.md.
+ * Keep readable copy, 44px touch targets, native controls and role visibility. */
+:root{
+  --gch-radius-card:12px;
+  --gch-radius-field:10px;
+  --gch-radius-button:10px;
+  --gch-shadow-card:none;
+  --gch-shadow-action:none;
+  --hero-band:88px;
+}
+@media(min-width:681px){:root{--hero-band:104px}}
+.hero{border-radius:0!important;box-shadow:none}
+.hero-inner{gap:12px!important}
+.club-logo-wrap{background:transparent!important;border:0!important;box-shadow:none!important;border-radius:0!important;overflow:visible}
+.hero-copy h1{font-weight:700!important;letter-spacing:-.025em!important}
+.hero-copy .eyebrow{font-weight:600;letter-spacing:.06em}
+.hero-copy .season-line{font-weight:400}
+.app-utility-bar{min-height:48px;padding-block:2px;gap:8px}
+.app-utility-bar .hero-profile-button,
+.app-utility-bar .hero-notification-button{border-color:transparent!important;background:transparent!important;border-radius:8px;font-weight:600}
+.top-nav-tabs{gap:4px;padding-block:0;box-shadow:none;background:var(--white)!important}
+.top-nav-tabs .top-nav-tab.nav-item{min-height:48px;border-radius:0;border-bottom:2px solid transparent;padding:10px 12px;font-weight:600}
+.top-nav-tabs .top-nav-tab.nav-item.active,
+html[data-theme="dark"] .top-nav-tabs .top-nav-tab.nav-item.active{background:transparent!important;color:var(--gch-control-choice-copy)!important;border-bottom-color:var(--gch-control-focus);box-shadow:none!important}
+.content{padding-top:16px;padding-inline:16px}
+.section-title-row{margin-bottom:16px}
+.section-title-row h2{font-size:24px;line-height:1.2;font-weight:700;letter-spacing:-.025em}
+.view .kicker{font-weight:600;letter-spacing:.05em}
+.view .panel-heading h3,.view .panel>h3{font-size:17px;font-weight:650;line-height:1.4}
+.content .panel{box-shadow:none;padding:16px;margin-bottom:16px}
+.content details.panel{padding:0}
+.content .panel .panel{padding:12px 0;margin:0;border:0!important;border-radius:0!important;background:transparent!important}
+.view .panel-heading{gap:8px 12px;align-items:center}
+.view .panel-heading>div{flex-basis:140px}
+.view .panel p.muted,.view .panel .helper{margin-block:8px;font-size:13px;font-weight:400;line-height:1.45}
+.view :is(.screen-lead-card,.next-match-summary-card,.squad-banner,.league-table-panel,.inbox-card),
+#matches-next-fixture,#view-home #matchday-dashboard,#view-club .club-matches-browser,
+#view-club .admin-coach-centre,#view-inbox .inbox-card{
+  border-top-width:1px!important;
+  border-top-color:var(--gch-control-line)!important;
+  box-shadow:none!important;
+}
+html[data-theme="dark"] body .view :is(.screen-lead-card,.next-match-summary-card,.squad-banner,.league-table-panel,.inbox-card),
+html[data-theme="dark"] #matches-next-fixture,
+html[data-theme="dark"] #view-home #matchday-dashboard,
+html[data-theme="dark"] #view-club .club-matches-browser,
+html[data-theme="dark"] #view-club .admin-coach-centre,
+html[data-theme="dark"] #view-inbox .inbox-card{border-top-color:var(--gch-control-line)!important}
+.content .primary-button,.content .secondary-button{padding:10px 14px;font-size:14px;font-weight:600!important;box-shadow:none!important}
+.content .primary-button{background:var(--gch-green-800)!important}
+/* Secondary actions read as quiet actions, rather than competing green boxes. */
+.content .secondary-button,
+html[data-theme="dark"] .content .secondary-button{background:transparent!important;border:1px solid var(--gch-control-line)!important;color:var(--gch-control-choice-copy)!important}
+.content .secondary-button:disabled{opacity:.5}
+.content :is(.screen-section-nav,.communications-tabs,.club-matches-switch,.squad-view-tabs){background:transparent!important;border:0!important;border-bottom:1px solid var(--gch-control-line)!important;border-radius:0!important;padding:0!important;box-shadow:none!important;gap:4px}
+.content :is(.screen-section-nav,.communications-tabs,.club-matches-switch,.squad-view-tabs) button{min-height:44px!important;border:0!important;border-bottom:2px solid transparent!important;border-radius:0!important;box-shadow:none!important;background:transparent!important;font-weight:600!important}
+.content :is(.screen-section-nav,.communications-tabs,.club-matches-switch,.squad-view-tabs) button:is(.active,[aria-selected="true"]){border-bottom-color:var(--gch-control-focus)!important;color:var(--gch-control-choice-copy)!important;background:transparent!important}
+#view-inbox .communications-tabs button.active,
+html[data-theme="dark"] #view-inbox .communications-tabs button.active{background:transparent!important;box-shadow:none!important}
+.content .empty-state{padding:12px 0;text-align:left}
+.content :is(.team-member-row,.admin-team-card,.member-contact-card){box-shadow:none;border-radius:var(--gch-radius-card);padding:12px}
+.content .panel :is(.team-member-row,.admin-team-card,.member-contact-card){border:0!important;border-bottom:1px solid var(--gch-control-line)!important;border-radius:0;background:transparent!important;padding:12px 0}
+.content :is(.team-members-list,.member-contact-list){gap:0}
+.content .settings-accordion>summary,.content details.panel>summary{min-height:48px;padding:12px 16px;font-weight:600}
+#view-more .settings-accordion{border:0!important;border-bottom:1px solid var(--gch-control-line)!important;border-radius:0;background:transparent!important;margin-bottom:0}
+#view-more .settings-accordion>summary{padding-inline:0}
+#view-more .settings-accordion-body{padding-inline:0}
+#view-club .admin-home{gap:16px}
+#view-club .admin-home .panel-heading .kicker,
+#view-club .section-title-row .kicker{display:none}
+#view-club .admin-home>.panel{padding:0 0 16px;border:0!important;border-bottom:1px solid var(--gch-control-line)!important;border-radius:0!important;background:transparent!important}
+#view-club .admin-home>.panel:last-child{border-bottom:0!important}
+#view-club .admin-home>.panel.admin-home-directory>summary{padding-inline:0}
+#view-club .admin-home-directory-body{padding-inline:0}
+#view-club .admin-home-metrics{gap:12px;padding:12px 0;border-top:0}
+#view-club .admin-home-metrics strong{font-size:24px;font-weight:650}
+#view-club .admin-home-metrics span{font-size:12px;line-height:1.4}
+#view-club .admin-home .helper,#view-club .admin-home p.muted,#view-club .admin-home small{font-size:13px;line-height:1.45}
+#view-club .admin-home-actions{gap:8px;margin-top:12px}
+#view-club .admin-home-fixture{gap:12px;padding:10px 0}
+#view-club .admin-home-fixture strong,#view-club .admin-home-desk-row strong{font-size:14px;font-weight:600}
+#view-club .admin-home-time{flex-basis:76px}
+#view-club .admin-home-finish{padding:12px 0 0;border-top:1px solid var(--gch-control-line);border-radius:0;background:transparent;margin-top:12px}
+#view-club .admin-home-finish h4{font-size:14px;font-weight:600}
+#view-club .admin-home-finish ul{padding-left:16px}
+#view-club .admin-home-desk-row{flex-wrap:nowrap;gap:12px;padding:10px 0}
+#view-club .admin-home-desk-row>div{flex:1 1 0}
+#view-club .admin-home-desk-row>button{flex:0 0 auto;width:auto;max-width:42%;min-width:44px;padding:8px 0;border:0!important;border-radius:0!important;font-weight:600!important;text-align:right}
+#view-club .admin-home-coverage-list{gap:0;margin-top:8px}
+#view-club .admin-home-assign,#view-club .admin-home-team{border:0;border-bottom:1px solid var(--gch-control-line);border-radius:0;background:transparent;padding:10px 0;margin-top:0}
+#view-club .admin-home-directory-body{padding:0 16px 16px}
+#view-home #matchday-dashboard .matchday-dashboard-grid>article{padding:10px 0;border:0!important;border-bottom:1px solid var(--gch-control-line)!important;border-radius:0;background:transparent!important}
+#view-home #matchday-dashboard .matchday-dashboard-grid{gap:8px 16px}
+#view-home #matchday-dashboard .matchday-dashboard-grid>article>span{font-size:12px;font-weight:500;text-transform:none;letter-spacing:0}
+#view-home #matchday-dashboard .matchday-dashboard-grid>article>strong{font-size:14px;font-weight:600}
+.content .matchday-dashboard-actions{gap:8px}
+.bottom-nav{box-shadow:none}
+.bottom-nav .nav-item{font-weight:500}
+.bottom-nav .nav-item.active{background:transparent!important;color:var(--gch-control-choice-copy)!important}
+.bottom-nav .nav-item.active span:last-child{font-weight:650}
+.bottom-nav .nav-item .nav-icon{background:transparent!important;box-shadow:none!important}
+.club-page-watermark{opacity:.02}
+html[data-theme="dark"] .club-page-watermark{opacity:.018}
+.mobile-primary-nav{box-shadow:none}
+.mobile-primary-item{font-weight:500;border-radius:0;border-top:2px solid transparent}
+.mobile-primary-item[aria-current="page"],
+html[data-theme="dark"] .mobile-primary-item[aria-current="page"]{background:transparent;color:var(--gch-control-choice-copy);border-top-color:var(--gch-control-focus);font-weight:650}
+.mobile-more-link{font-weight:600;border-radius:8px}
+/* Visible keyboard focus and pointer feedback survive the flatter treatment. */
+.content button:focus-visible,.top-nav-tab:focus-visible{outline:2px solid var(--gch-control-focus)!important;outline-offset:2px}
+@media(hover:hover){
+  .content .secondary-button:hover,.app-utility-bar button:hover{background:var(--gch-control-choice)!important}
+  .content :is(.admin-home-team,.admin-home-assign):hover{background:var(--gch-control-choice)}
+}
+@media(max-width:374px){
+  #view-club .admin-home-desk-row>button{max-width:40%}
+  #view-club .admin-home-metrics{gap:8px}
+}
