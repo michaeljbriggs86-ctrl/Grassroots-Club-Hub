@@ -20,7 +20,7 @@ const env={window:win,URL,CLOUD_MODE:true,currentRole:'coach',currentView:'home'
   setClubTab(tab){env.__clubTab=tab;env.syncNavigationUrl();}
 };
 vm.createContext(env);
-vm.runInContext(slice(app,'// Screen routes use','function setCommunicationsTab('),env);
+vm.runInContext(slice(app,'// Linked pages keep','function setCommunicationsTab('),env);
 assert.equal(env.navigationViewFromUrl(),'matches','a bookmarked screen is restored after account bootstrap');
 env.navigate('matches',false);assert.equal(entries.length,0,'bootstrap rendering cannot overwrite the pending route');
 vm.runInContext('__navigationReady=true;',env);

@@ -33,7 +33,7 @@
   function same(s=state){const c=context();return !!(s&&c&&c.cloud===s.cloud&&c.user===s.user&&c.club===s.club&&c.role===s.role&&c.editable===s.editable&&el('coach-qualification-dialog')?.open);}
   function message(text,error=false){const node=el('coach-qualification-status');if(node){node.textContent=text;node.classList.toggle('qualification-error',error);}}
   function close(){const target=state?.target;loadVersion++;state=null;el('coach-qualification-editor')?.classList.add('hidden');const list=el('coach-qualification-list');if(list)list.innerHTML='';const name=el('coach-qualification-name');if(name)name.textContent='Coach profile';const form=el('coach-qualification-form');form?.reset?.();const dialog=el('coach-qualification-dialog');if(dialog?.open)dialog.close();if(target&&window.ClubHubPersonProfiles?.selectedSnapshot()?.userId===target)window.ClubHubPersonProfiles.refresh();}
-  function syncAccess(){const c=context(),button=el('coach-profile-self');button?.classList.toggle('hidden',!c);if(state&&!same())close();if(matrix&&!matrixCurrent())clearMatrix();el('coach-document-matrix')?.classList.toggle('hidden',!c?.editable);}
+  function syncAccess(){const c=context(),button=el('coach-profile-self');button?.classList.toggle('hidden',!c);if(state&&!same())close();if(matrix&&!matrixCurrent())clearMatrix();el('coach-document-matrix')?.classList.toggle('hidden',!c?.editable);el('coach-documents-summary')?.classList.toggle('hidden',!c?.editable);}
   function render(){
     if(!same()||!state.loaded)return;
     el('coach-qualification-list').innerHTML=catalogue.map(item=>{const record=state.records.find(r=>r.kind===item.kind),s=status(record);return `<article class="coach-qualification-row"><div><h4>${esc(item.label)}</h4><span class="qualification-state ${s.tone}">${esc(s.label)}</span>${record?`<p>${esc(item.courses[record.course]||'Qualification')}</p><p>${esc(item.dateLabel||'Completed')}: ${esc(record.completed_on)}<br>${esc(item.expiryLabel||'Expiry')}: ${record.expires_on?esc(record.expires_on):'No expiry recorded'}</p><p class="muted">${record.club_checked?'Club checked'+(record.checked_at?' · '+esc(String(record.checked_at).slice(0,10)):''):'Needs club check'}</p>`:''}</div>${state.editable?`<button type="button" class="secondary-button" data-edit-qualification="${item.kind}">${record?'Edit':'Add'}</button>`:''}</article>`;}).join('');
@@ -88,7 +88,7 @@
   // Club-wide overview is admin-only and lives only in this module's current-session memory.
   let matrix=null,matrixVersion=0;
   function matrixCurrent(s=matrix){const c=context();return !!(s&&c?.editable&&c.cloud===s.cloud&&c.user===s.user&&c.club===s.club&&c.role===s.role);}
-  function clearMatrix(){matrixVersion++;matrix=null;for(const id of ['coach-document-table','coach-document-notice'])if(el(id))el(id).innerHTML='';if(el('coach-document-status'))el('coach-document-status').textContent='';if(el('coach-document-notice'))el('coach-document-notice').hidden=true;}
+  function clearMatrix(){matrixVersion++;matrix=null;for(const id of ['coach-document-table','coach-document-notice'])if(el(id))el(id).innerHTML='';if(el('coach-document-status'))el('coach-document-status').textContent='';if(el('coach-document-notice'))el('coach-document-notice').hidden=true;if(el('coach-documents-summary-status'))el('coach-documents-summary-status').textContent='Coach documents unavailable. Open the matrix to refresh.';}
   function documentDate(value){return new Intl.DateTimeFormat('en-GB',{day:'numeric',month:'short',year:'numeric',timeZone:'Europe/London'}).format(new Date(value+'T00:00:00Z'));}
   function matrixSummary(rows,date=today()){
     const due=[],overdue=[];let missing=0,unchecked=0;
@@ -99,6 +99,7 @@
   function renderMatrix(){
     if(!matrixCurrent()||!matrix.loaded)return;
     const date=today(),summary=matrixSummary(matrix.rows,date),notice=el('coach-document-notice'),count=(n,label)=>`${n} ${label}${n===1?'':'s'}`;
+    const compact=el('coach-documents-summary-status');if(compact){compact.textContent=[count(summary.overdue.length,'overdue document'),`${summary.due.length} renewal${summary.due.length===1?'':'s'} due`,count(summary.missing,'missing record'),count(summary.unchecked,'unchecked record')].join(' · ');compact.classList.toggle('qualification-error',!!summary.overdue.length);}
     if(notice){notice.hidden=!summary.overdue.length&&!summary.due.length;notice.classList.toggle('expired',!!summary.overdue.length);notice.classList.toggle('due',!summary.overdue.length);notice.innerHTML=`<strong>${summary.overdue.length?count(summary.overdue.length,'document')+' overdue':count(summary.due.length,'renewal')+' due within 60 days'}</strong>${summary.overdue.length&&summary.due.length?`<p>${esc(count(summary.due.length,'renewal'))} also due within 60 days.</p>`:''}<ul>${[...summary.overdue,...summary.due].slice(0,3).map(e=>`<li>${esc(e.name)} · ${esc(e.item.label)} · ${esc(status(e.record,date).label)} (${esc(documentDate(e.record.expires_on))})</li>`).join('')}</ul>${summary.overdue.length+summary.due.length>3?'<p>Filter to Renewals due for the full list.</p>':''}`;}
     if(el('coach-document-status'))el('coach-document-status').textContent=`${count(matrix.rows.length,'coach')} · ${count(summary.missing,'missing record')} · ${count(summary.unchecked,'unchecked record')}. Updated ${new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/London',hour:'2-digit',minute:'2-digit'}).format(new Date())}.`;
     const mode=el('coach-document-filter')?.value||'all',rank=p=>Math.min(...catalogue.map(item=>{const s=status(p.records.find(r=>r.kind===item.kind),date);return s.tone==='expired'?0:s.tone==='due'?1:s.tone==='missing'?2:3;}));
@@ -109,13 +110,13 @@
   async function refreshMatrix(){
     const c=context();if(!c?.editable){clearMatrix();return;}
     const old=matrix;if(old&&!matrixCurrent(old))clearMatrix();
-    const version=++matrixVersion;matrix={...c,rows:[],loaded:false};
+    const version=++matrixVersion;matrix={...c,rows:[],loaded:false};if(el('coach-documents-summary-status'))el('coach-documents-summary-status').textContent='Loading coach documents…';
     el('coach-document-matrix')?.classList.remove('hidden');if(el('coach-document-table'))el('coach-document-table').innerHTML='';if(el('coach-document-notice')){el('coach-document-notice').innerHTML='';el('coach-document-notice').hidden=true;}if(el('coach-document-status'))el('coach-document-status').textContent='Loading coach documents…';
     try{const rows=await c.cloud.listCoachQualifications();if(version!==matrixVersion||!matrixCurrent())return;
       if(!Array.isArray(rows))throw Error('Invalid matrix');const seen=new Set();
       for(const p of rows){if(!p||typeof p.user_id!=='string'||!p.user_id||seen.has(p.user_id)||!['club_admin','coach','assistant_coach'].includes(p.role)||typeof p.full_name!=='string')throw Error('Invalid coach');response(p);seen.add(p.user_id);}
       matrix.rows=rows;matrix.loaded=true;renderMatrix();
-    }catch(_){if(version===matrixVersion&&matrixCurrent()){matrix.rows=[];matrix.loaded=false;if(el('coach-document-status'))el('coach-document-status').textContent='Coach documents unavailable. Refresh to retry; no expiry status can be confirmed.';}}
+    }catch(_){if(version===matrixVersion&&matrixCurrent()){matrix.rows=[];matrix.loaded=false;if(el('coach-documents-summary-status'))el('coach-documents-summary-status').textContent='Coach documents unavailable. Open the matrix to refresh; no expiry status can be confirmed.';if(el('coach-document-status'))el('coach-document-status').textContent='Coach documents unavailable. Refresh to retry; no expiry status can be confirmed.';}}
   }
   document.addEventListener('click',event=>{
     if(event.target.closest?.('#coach-document-refresh')){refreshMatrix();return;}

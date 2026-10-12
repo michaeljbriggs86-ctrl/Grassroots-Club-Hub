@@ -1562,3 +1562,19 @@ html[data-theme="dark"] .mobile-primary-item[aria-current="page"]{background:tra
   #view-club .admin-home-desk-row>button{max-width:40%}
   #view-club .admin-home-metrics{gap:8px}
 }
+
+/* Full lists live on their own screens; entry links follow the club theme. */
+.page-link{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:64px;padding:16px 18px;margin:8px 0;border:1px solid var(--gch-control-line);border-radius:var(--gch-radius-card);background:var(--gch-control-surface);color:var(--gch-control-copy);text-decoration:none;}
+.page-link>span:first-child{display:grid;gap:5px;min-width:0;}
+.page-link strong{font-size:1rem;line-height:1.4;}
+.page-link small{color:var(--gch-control-muted);line-height:1.5;}
+.page-link>span:last-child{font-size:1.6rem;color:var(--gch-control-focus);flex-shrink:0;}
+.page-link:hover{border-color:var(--gch-control-focus);}
+.page-link:focus-visible,.page-back:focus-visible{outline:3px solid var(--gch-control-focus);outline-offset:3px;}
+.page-back{display:inline-flex;align-items:center;min-height:48px;text-decoration:none;margin-bottom:16px;}
+.linked-page>details>summary{display:none;}
+.linked-page>details>.settings-accordion-body,.linked-page>details>.admin-home-directory-body{padding-top:20px;}
+.linked-page .admin-access-management{margin-top:0;}
+@media(max-width:600px){.page-link{padding:14px;}.linked-page .section-title-row h2{font-size:1.4rem;}}
+
+.page-link[hidden]{display:none!important;}
