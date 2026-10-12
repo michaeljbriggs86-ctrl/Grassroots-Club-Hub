@@ -431,26 +431,7 @@
         <div class="section-title-row"><div><p class="kicker">Private club messaging</p><h2>Inbox</h2></div><button type="button" class="secondary-button compact" id="refresh-club-inbox">Refresh <span class="notification-badge hidden" id="club-inbox-badge">0</span></button></div>
         <nav class="communications-tabs hidden" id="communications-tabs" aria-label="Communications sections"><button type="button" class="secondary-button compact active" data-communications-tab="inbox">Inbox</button><button type="button" class="secondary-button compact" data-communications-tab="notifications">Notifications</button><button type="button" class="secondary-button compact" data-communications-tab="notices">Club notices</button></nav>
         <div id="communications-inbox-panel">
-        <details class="panel settings-accordion hidden" id="member-contacts-panel">
-          <summary><span>Contact details</span><span class="settings-chevron">⌄</span></summary>
-          <div class="settings-accordion-body">
-            <p class="muted" id="member-contacts-help">Team contact details</p>
-            <div class="contact-directory-controls"><label class="hidden" id="member-contacts-team-wrap">Team<select id="member-contacts-team"><option value="">All club teams</option></select></label><button type="button" class="secondary-button" id="refresh-member-contacts">Refresh contacts</button></div>
-            <p class="helper" id="member-contacts-status" role="status" aria-live="polite"></p>
-            <details class="member-contact-card hidden" id="contact-import-panel">
-              <summary id="contact-import-heading">Import contacts from a spreadsheet</summary>
-              <p class="helper">Club Admin only. Download the member template or use columns full_name, team, role, email and phone. Keep phone numbers as text to preserve leading zeroes. Export from Excel or Google Sheets as CSV, then preview the matches.</p>
-              <p class="helper">Blank email or phone cells keep existing details. Use [CLEAR] to remove a detail. One row per person, up to 500 rows. Only approved club members can be matched; team links and access permissions stay as configured. Do not include addresses.</p>
-              <button type="button" class="secondary-button" id="contact-import-template" disabled>Download member template</button>
-              <label>Contact spreadsheet (CSV)<input type="file" id="contact-import-file" accept=".csv,text/csv" disabled /></label>
-              <div class="contact-directory-controls"><button type="button" class="secondary-button" id="contact-import-preview" disabled>Preview import</button><button type="button" class="primary-button" id="contact-import-save" disabled>Import contacts</button><button type="button" class="secondary-button" id="contact-import-cancel">Clear preview</button></div>
-              <p class="helper" id="contact-import-status" role="status" aria-live="polite"></p>
-              <div class="member-contact-list" id="contact-import-results"></div>
-            </details>
-            <div id="member-contacts-self"></div>
-            <div class="member-contact-list" id="member-contacts-list"></div>
-          </div>
-        </details>
+        <a class="page-link" href="?view=contacts" data-page-route="contacts" id="member-contacts-link" hidden><span><strong>Contact details</strong><small>Open your team contacts</small></span><span aria-hidden="true">›</span></a>
         <section class="panel inbox-card screen-lead-card"><div class="panel-heading"><div><p class="kicker">Conversations</p><h3>Messages</h3><p class="muted" id="club-inbox-help">Messages leave the active inbox 60 days after they are sent.</p></div></div>
           <label class="inbox-conversation-label">Conversation<select id="inbox-contact-select"><option value="">Choose…</option></select></label>
           <p class="helper inbox-hint-pill" id="inbox-compose-hint"></p>
@@ -460,7 +441,7 @@
             <div class="inbox-compose-row"><textarea id="inbox-message-body" rows="2" maxlength="4000" placeholder="Write a message…" aria-label="Message"></textarea><button type="button" class="primary-button" id="send-inbox-message">Send</button></div>
           </div>
         </section>
-        <section class="panel concern-panel"><div class="panel-heading"><div><p class="kicker">Complaint / concern</p><h3>Raise an issue</h3></div></div><label>Category<select id="concern-category"><option value="general">General dispute / complaint</option><option value="safeguarding">Safeguarding concern about a child</option></select></label><label>Subject<input id="concern-subject" maxlength="120"/></label><label>Details<textarea id="concern-body" rows="4" maxlength="4000"></textarea></label><p class="muted">Safeguarding concern content is not stored. If Safeguarding is selected, the app records only that you raised a concern and directs you to external safeguarding contacts.</p><button type="button" class="secondary-button" id="submit-concern">Continue</button><div class="provider-summary" id="concern-result"></div></section>
+        <a class="page-link" href="?view=raise-concern" data-page-route="raise-concern" ><span><strong>Raise an issue</strong><small>Contact the club about a complaint or concern</small></span><span aria-hidden="true">›</span></a>
         <section class="panel hidden" id="dispute-reviewer-panel"><div class="panel-heading"><div><p class="kicker">Restricted role</p><h3>Dispute Reviewer</h3><p class="muted">Only assigned reviewers can open retained dispute material. Access is audited.</p></div></div><div id="reviewer-dispute-list"><div class="empty-state compact-empty">No open disputes loaded.</div></div><label>Retained message thread ID<input id="reviewer-thread-id" placeholder="Thread UUID"/></label><button type="button" class="secondary-button" id="load-retained-thread">Open retained thread</button><div id="reviewer-retained-thread" class="inbox-thread"></div></section>
         </div>
         <section class="panel hidden communications-notifications-panel screen-lead-card" id="communications-notifications-panel"><div class="panel-heading"><div><p class="kicker">Notifications</p><h3>Updates</h3></div><button type="button" class="secondary-button compact" id="communications-mark-all">Mark all read</button></div><div class="notification-list" id="communications-notifications-list"></div></section>
@@ -526,7 +507,7 @@
               <div><strong id="admin-home-pending-count">—</strong><span>Details to finish</span></div>
             </div>
             <p class="helper">Ready to share counts confirmed fixtures or cup group starts.</p>
-            <div id="admin-home-weekend-list" class="admin-home-weekend-list"></div>
+            <p id="admin-home-weekend-list" class="helper" role="status"></p>
             <div class="admin-home-actions"><button type="button" class="primary-button" data-admin-home-action="share" id="admin-home-share" disabled>Share weekend</button><button type="button" class="secondary-button" data-admin-home-action="fixtures" data-admin-summary="fixtures">Review fixtures</button></div>
           </section>
 
@@ -534,17 +515,10 @@
             <div class="panel-heading"><div><p class="kicker">People &amp; access</p><h3 id="admin-home-people-title">Coaching staff</h3></div></div>
             <div class="admin-home-desk-row"><div><strong>Staff access requests</strong><p id="admin-home-request-status">Loading requests…</p></div><button type="button" class="secondary-button" data-admin-home-action="requests">Review requests</button></div>
             <div class="admin-home-desk-row"><div><strong>Team coverage</strong><p id="admin-home-coverage-status">Loading staff assignments…</p></div><button type="button" class="secondary-button" data-admin-home-action="staff">Manage staff</button></div>
-            <div id="admin-home-coverage-list" class="admin-home-coverage-list"></div>
+
           </section>
 
-          <section class="panel hidden" id="coach-document-matrix" aria-labelledby="coach-document-title">
-            <div class="panel-heading"><div><p class="kicker">Coaching staff</p><h3 id="coach-document-title">Coach documents</h3></div><button type="button" class="secondary-button" id="coach-document-refresh" aria-label="Refresh coach documents">Refresh</button></div>
-            <p class="helper">Amber: renewal due within 60 days. Red: overdue. Open a coach’s name to update their records.</p>
-            <div id="coach-document-notice" class="coach-document-notice" role="status" aria-live="polite" hidden></div>
-            <div class="coach-document-toolbar"><label>Show<select id="coach-document-filter"><option value="all">All coaches</option><option value="due">Renewals due</option><option value="missing">Missing / unchecked</option></select></label><p id="coach-document-status" class="helper" role="status" aria-live="polite"></p></div>
-            <p class="helper coach-document-scroll-hint">Swipe across the table to view all three documents.</p>
-            <div id="coach-document-table" class="coach-document-scroll" tabindex="0" role="region" aria-label="Coach document matrix, scroll horizontally to view all columns"></div>
-          </section>
+          <section class="panel hidden" id="coach-documents-summary"><a class="page-link" href="?view=coach-documents" data-page-route="coach-documents" ><span><strong>Coach documents</strong><small>Open the document matrix</small></span><span aria-hidden="true">›</span></a><p id="coach-documents-summary-status" class="helper" role="status" aria-live="polite">Loading coach documents…</p></section>
 
           <section class="panel admin-home-communications" aria-labelledby="admin-home-communications-title">
             <div class="panel-heading"><div><p class="kicker">Club desk</p><h3 id="admin-home-communications-title">Communications</h3></div></div>
@@ -553,21 +527,14 @@
             <div class="admin-home-actions"><button type="button" class="text-button" data-admin-summary="results">Club results</button><button type="button" class="text-button" data-admin-home-action="settings">Club settings</button></div>
           </section>
 
-          <details class="panel admin-home-directory" id="admin-home-teams">
-            <summary><span>Club teams</span><span class="muted" id="admin-team-count">—</span></summary>
-            <div class="admin-home-directory-body">
-              <div class="admin-home-team-filters"><label>Find a team<input type="search" id="admin-home-team-search" placeholder="Team or coach name" /></label><label>Age group<select id="admin-home-age-select"><option value="">All age groups</option></select></label></div>
-              <p class="helper">Open a team to view its squad and match information.</p>
-              <div class="admin-team-grid admin-age-group-list" id="admin-team-grid"></div>
-            </div>
-          </details>
+          <section class="panel"><a class="page-link" href="?view=club-teams" data-page-route="club-teams" ><span><strong>Club teams</strong><small>Open the team directory</small></span><span aria-hidden="true">›</span></a><p class="helper" id="admin-team-count">—</p></section>
         </section>
 
         <section class="club-admin-panel hidden" id="club-coaches-panel">
           <section class="panel admin-coach-centre screen-lead-card">
             <div class="panel-heading"><div><p class="kicker">Club staff</p><h3>Coaching Staff</h3></div></div>
             <p class="muted">Approve coach requests and see coaching-staff assignments.</p>
-            <div class="coach-requests hidden" id="coach-requests"><div class="panel-heading"><div><p class="kicker">Waiting for you</p><h3>Coach requests</h3></div><span class="match-section-count" id="coach-requests-count">0</span></div><div class="team-members-list" id="coach-requests-list"></div></div>
+            <a class="page-link" href="?view=staff-requests" data-page-route="staff-requests" ><span><strong>Staff access requests</strong><small>Review coach and Club Admin requests</small></span><span aria-hidden="true">›</span></a>
             <div class="admin-assign-team" id="admin-assign-team">
               <div class="panel-heading"><div><p class="kicker">Coaching teams</p><h3>Assign a coach to a team</h3></div></div>
               <p class="muted">A coach can look after more than one team. They choose which team they are working on from the team switcher.</p>
@@ -575,11 +542,7 @@
               <button type="button" class="primary-button compact" id="assign-coach-button">Assign to team</button>
             </div>
             <div id="club-coaches-list" class="team-members-list admin-coach-list"></div>
-            <div class="admin-access-management">
-              <div class="panel-heading"><div><p class="kicker">Access management</p><h3>All app access</h3></div><label class="admin-access-filter">Show<select id="admin-access-filter"><option value="all">Everyone</option><option value="club_admin">Club Admins</option><option value="staff">Coaching staff</option><option value="parent">Parents</option><option value="pending_parent">Pending parents</option><option value="player">Players</option></select></label></div>
-              <div class="admin-access-stats" id="admin-access-stats"></div>
-              <div class="team-members-list admin-access-list" id="admin-access-list"><div class="empty-state compact-empty">Loading club access…</div></div>
-            </div>
+            <a class="page-link" href="?view=app-access" data-page-route="app-access" ><span><strong>App access</strong><small>Review everyone’s club access</small></span><span aria-hidden="true">›</span></a>
           </section>
         </section>
 
@@ -590,8 +553,8 @@
         <nav class="screen-section-nav settings-section-nav" aria-label="Jump to settings section">
           <button type="button" data-scroll-to="training-session-settings" data-coach-ui-only>Training</button>
           <button type="button" data-scroll-to="match-detail-settings" data-requires-edit data-coach-ui-only>Features</button>
-          <button type="button" data-scroll-to="team-access-settings" data-staff-settings>Team access</button>
-          <button type="button" data-scroll-to="rules-procedures-settings" data-staff-settings>Rules</button>
+          <button type="button" data-page-route="team-access" data-staff-settings>Team access</button>
+          <button type="button" data-page-route="rules" data-staff-settings>Rules</button>
           <button type="button" data-scroll-to="club-admin-access-settings" data-admin-settings-only>Club Admin</button>
           <button type="button" data-scroll-to="admin-season-management-panel" data-admin-settings-only>Season</button>
           <button type="button" data-scroll-to="season-history-settings" data-staff-history>History</button>
@@ -655,41 +618,11 @@
             </div>
           </details>
 
-<details class="panel settings-accordion" id="team-access-settings" data-staff-settings>
-            <summary><span>Team access</span><span class="settings-chevron">⌄</span></summary>
-            <div class="settings-accordion-body">
-              <p class="muted">Parents sign up with email and password, choose the club/team, then type their child’s name. Staff review each request and deliberately select the correct active squad player before approving it. Siblings are approved one request at a time.</p>
-              <div class="team-access-invite-block parent-self-signup-note"><strong>Parent access is request-based</strong><span>Parents do not need an invite code. They use Create Account on the login screen.</span></div>
-              <div class="team-access-invite-block" id="team-player-invite-section">
-                <label>Player profile<select id="team-player-invite-player"><option value="">Choose player…</option></select></label>
-                <button class="primary-button setup-save" id="generate-team-player-invite">Create reusable player code</button>
-                <label class="assignment-output-label">Player Access code<input id="team-player-invite-code" type="text" readonly placeholder="Choose a player and create a reusable code" /></label>
-                <button class="secondary-button setup-save" id="copy-team-player-invite">Copy player code</button>
-                <p class="helper">Player app access is available to U15 squads only. Players can view team information. Football messages, club notices and match alerts go to linked parents; player accounts cannot use the inbox.</p>
-              </div>
-              <div class="panel-heading access-members-heading"><h3>Team members</h3></div>
-              <div id="team-members-list" class="team-members-list"></div>
-            </div>
-          </details>
+<a class="page-link" href="?view=team-access" data-page-route="team-access" data-staff-settings><span><strong>Team access</strong><small>Parent requests, team members and player access</small></span><span aria-hidden="true">›</span></a>
 
 <div class="settings-group-heading" data-staff-settings><span>Rules &amp; safeguarding</span><small>Matchday rules and club responsibilities</small></div>
 
-<details class="panel settings-accordion" id="rules-procedures-settings" data-staff-settings>
-            <summary><span>Rules &amp; procedures</span><span class="settings-chevron">⌄</span></summary>
-            <div class="settings-accordion-body">
-              <p class="muted" id="rules-procedures-intro">Team settings below are for Shooters Hill AFC. Selkent's official match card and fixture updates are completed on the league system.</p>
-              <label class="admin-filter-label hidden" id="club-rule-age-field">Age group<select id="club-rule-age" onchange="renderUniversalClubConfiguration()"><option value="">Choose age group</option></select></label>
-              <div id="universal-config-rules" class="universal-config-rules"></div>
-              <div class="procedure-list">
-                <article><strong>Fixture details · handbook p. 74</strong><span>The Club Fixture Secretary enters home details or acknowledges away details on Selkent's website by the Tuesday before the fixture. The home club gives officials and opposition ground access, kick-off and kit colours at least five clear days before the match; the away club confirms receipt and its kit colours.</span></article>
-                <article><strong>Before kick-off · handbook pp. 14–16, 76–77</strong><span>Check physical player registration cards and complete Selkent's official match-card procedure. Ensure players' shirts have distinct numbers; confirm named substitutes with the referee where the youth-football rule applies. Use the league's emergency paper process if the official app cannot be used; card photographs do not replace physical cards.</span></article>
-                <article class="hidden" id="selkent-mini-playing-time"><strong>Playing time · handbook pp. 45, 47</strong><span>For U8–U11 mini-soccer, aim for equal playing time where possible. Selkent recommends at least 50% of each match for every player as best practice.</span></article>
-                <article><strong>After the match · handbook pp. 17, 20, 78–79</strong><span>Complete the official card, including score, kick-off and end times, referee name and mark, then submit it to Selkent immediately (the handbook allows a 30-minute grace period). For an emergency paper card, tell your Club Fixture Secretary the result for entry on the league website by 18:00 on matchday; do not copy the paper card into Selkent's app later. Postponed, abandoned and unfulfilled matches need separate reporting through the league website by 18:00. Shooters Hill AFC's Match played is only your club's internal record.</span></article>
-              </div>
-              <p class="helper">The handbook gives conflicting receipt deadlines for emergency paper cards; check with your Club Fixture Secretary before relying on one. U9 and U11 registration limits also conflict across sections.</p>
-              <a class="map-link compact" href="https://www.selkent.org.uk/" target="_blank" rel="noopener noreferrer">Open official Selkent website</a>
-            </div>
-          </details>
+<a class="page-link" href="?view=rules" data-page-route="rules" data-staff-settings><span><strong>Rules &amp; procedures</strong><small>Read the team’s matchday guidance</small></span><span aria-hidden="true">›</span></a>
 
 <div class="settings-group-heading hidden" data-admin-settings-only><span>Club administration</span><small>Access, season and compliance</small></div>
 
@@ -730,23 +663,9 @@
 
 <div class="settings-group-heading" data-staff-settings><span>History</span><small>Previous seasons</small></div>
 
-<details class="panel settings-accordion" id="season-history-settings" data-staff-history>
-            <summary><span>Season history</span><span class="settings-chevron">⌄</span></summary>
-            <div class="settings-accordion-body">
-              <p class="muted">Archived seasons are read only and preserve the match record from before rollover.</p>
-              <div class="season-history-controls"><select id="season-history-select" aria-label="Archived season"><option value="">No archived seasons yet</option></select><button type="button" class="secondary-button compact" id="open-season-archive">View archive</button></div>
-              <div id="season-history-summary" class="archive-summary"></div>
-            </div>
-          </details>
+<a class="page-link" href="?view=season-history" data-page-route="season-history" data-staff-history><span><strong>Season history</strong><small>Open previous seasons</small></span><span aria-hidden="true">›</span></a>
 
-<details class="panel settings-accordion hidden" id="audit-history-settings" data-admin-history>
-            <summary><span>Audit history</span><span class="settings-chevron">⌄</span></summary>
-            <div class="settings-accordion-body">
-              <p class="muted">Club-wide player activity and parent access changes. Recent updates only.</p>
-              <button type="button" class="secondary-button compact" id="refresh-audit-history">Refresh history</button>
-              <div id="audit-history-list" class="audit-history-list"><div class="empty-state compact-empty">Open this section to load history.</div></div>
-            </div>
-          </details>
+<a class="page-link" href="?view=audit-history" data-page-route="audit-history" data-admin-history><span><strong>Audit history</strong><small>Review club activity and access changes</small></span><span aria-hidden="true">›</span></a>
 
 <div class="settings-group-heading"><span>App</span><small>Device and account preferences</small></div>
 
@@ -788,6 +707,137 @@
             </div>
           </section>
         </div>
+      </section>
+      <section id="view-contacts" class="view linked-page" data-view="contacts" aria-labelledby="contacts-title">
+        <a class="page-back secondary-button" href="?view=inbox" data-page-route="inbox">← Back to messages</a>
+        <div class="section-title-row"><div><p class="kicker">Your club</p><h2 id="contacts-title" tabindex="-1">Contact details</h2></div></div>
+        <details class="panel settings-accordion hidden" id="member-contacts-panel">
+          <summary><span>Contact details</span><span class="settings-chevron">⌄</span></summary>
+          <div class="settings-accordion-body">
+            <p class="muted" id="member-contacts-help">Team contact details</p>
+            <div class="contact-directory-controls"><label class="hidden" id="member-contacts-team-wrap">Team<select id="member-contacts-team"><option value="">All club teams</option></select></label><button type="button" class="secondary-button" id="refresh-member-contacts">Refresh contacts</button></div>
+            <p class="helper" id="member-contacts-status" role="status" aria-live="polite"></p>
+            <details class="member-contact-card hidden" id="contact-import-panel">
+              <summary id="contact-import-heading">Import contacts from a spreadsheet</summary>
+              <p class="helper">Club Admin only. Download the member template or use columns full_name, team, role, email and phone. Keep phone numbers as text to preserve leading zeroes. Export from Excel or Google Sheets as CSV, then preview the matches.</p>
+              <p class="helper">Blank email or phone cells keep existing details. Use [CLEAR] to remove a detail. One row per person, up to 500 rows. Only approved club members can be matched; team links and access permissions stay as configured. Do not include addresses.</p>
+              <button type="button" class="secondary-button" id="contact-import-template" disabled>Download member template</button>
+              <label>Contact spreadsheet (CSV)<input type="file" id="contact-import-file" accept=".csv,text/csv" disabled /></label>
+              <div class="contact-directory-controls"><button type="button" class="secondary-button" id="contact-import-preview" disabled>Preview import</button><button type="button" class="primary-button" id="contact-import-save" disabled>Import contacts</button><button type="button" class="secondary-button" id="contact-import-cancel">Clear preview</button></div>
+              <p class="helper" id="contact-import-status" role="status" aria-live="polite"></p>
+              <div class="member-contact-list" id="contact-import-results"></div>
+            </details>
+            <div id="member-contacts-self"></div>
+            <div class="member-contact-list" id="member-contacts-list"></div>
+          </div>
+        </details>
+      </section>
+      <section id="view-club-teams" class="view linked-page" data-view="club-teams" aria-labelledby="club-teams-title">
+        <a class="page-back secondary-button" href="?view=club" data-page-route="club">← Back to Club Home</a>
+        <div class="section-title-row"><div><p class="kicker">Club administration</p><h2 id="club-teams-title" tabindex="-1">Club teams</h2></div><button type="button" class="secondary-button compact" data-page-refresh="club-teams">Refresh</button></div>
+        <details class="panel admin-home-directory" id="admin-home-teams">
+            <summary><span>Club teams</span></summary>
+            <div class="admin-home-directory-body">
+              <div class="admin-home-team-filters"><label>Find a team<input type="search" id="admin-home-team-search" placeholder="Team or coach name" /></label><label>Age group<select id="admin-home-age-select"><option value="">All age groups</option></select></label></div>
+              <p class="helper">Open a team to view its squad and match information.</p>
+              <div class="admin-team-grid admin-age-group-list" id="admin-team-grid"></div>
+            </div>
+          </details>
+      </section>
+      <section id="view-coach-documents" class="view linked-page" data-view="coach-documents" aria-labelledby="coach-documents-title">
+        <a class="page-back secondary-button" href="?view=club" data-page-route="club">← Back to Club Home</a>
+        <div class="section-title-row"><div><p class="kicker">Club administration</p><h2 id="coach-documents-title" tabindex="-1">Coach documents</h2></div></div>
+        <section class="panel hidden" id="coach-document-matrix" aria-labelledby="coach-document-title">
+            <div class="panel-heading"><div><p class="kicker">Coaching staff</p><h3 id="coach-document-title">Coach documents</h3></div><button type="button" class="secondary-button" id="coach-document-refresh" aria-label="Refresh coach documents">Refresh</button></div>
+            <p class="helper">Amber: renewal due within 60 days. Red: overdue. Open a coach’s name to update their records.</p>
+            <div id="coach-document-notice" class="coach-document-notice" role="status" aria-live="polite" hidden></div>
+            <div class="coach-document-toolbar"><label>Show<select id="coach-document-filter"><option value="all">All coaches</option><option value="due">Renewals due</option><option value="missing">Missing / unchecked</option></select></label><p id="coach-document-status" class="helper" role="status" aria-live="polite"></p></div>
+            <p class="helper coach-document-scroll-hint">Swipe across the table to view all three documents.</p>
+            <div id="coach-document-table" class="coach-document-scroll" tabindex="0" role="region" aria-label="Coach document matrix, scroll horizontally to view all columns"></div>
+          </section>
+      </section>
+      <section id="view-app-access" class="view linked-page" data-view="app-access" aria-labelledby="app-access-title">
+        <a class="page-back secondary-button" href="?view=club-coaches" data-page-route="club-coaches">← Back to coaching staff</a>
+        <div class="section-title-row"><div><p class="kicker">Club administration</p><h2 id="app-access-title" tabindex="-1">App access</h2></div><button type="button" class="secondary-button compact" data-page-refresh="app-access">Refresh</button></div>
+        <div class="admin-access-management" id="app-access-panel">
+              <div class="panel-heading"><div><p class="kicker">Access management</p><h3>All app access</h3></div><label class="admin-access-filter">Show<select id="admin-access-filter"><option value="all">Everyone</option><option value="club_admin">Club Admins</option><option value="staff">Coaching staff</option><option value="parent">Parents</option><option value="pending_parent">Pending parents</option><option value="player">Players</option></select></label></div>
+              <div class="admin-access-stats" id="admin-access-stats"></div>
+              <div class="team-members-list admin-access-list" id="admin-access-list"><div class="empty-state compact-empty">Loading club access…</div></div>
+            </div>
+      </section>
+      <section id="view-staff-requests" class="view linked-page" data-view="staff-requests" aria-labelledby="staff-requests-title">
+        <a class="page-back secondary-button" href="?view=club-coaches" data-page-route="club-coaches">← Back to coaching staff</a>
+        <div class="section-title-row"><div><p class="kicker">Club administration</p><h2 id="staff-requests-title" tabindex="-1">Staff access requests</h2></div><button type="button" class="secondary-button compact" data-page-refresh="staff-requests">Refresh</button></div>
+        <section class="panel screen-lead-card"><div class="coach-requests hidden" id="coach-requests"><div class="panel-heading"><div><p class="kicker">Waiting for you</p><h3>Coach requests</h3></div><span class="match-section-count" id="coach-requests-count">0</span></div><div class="team-members-list" id="coach-requests-list"></div></div><p class="helper" id="staff-requests-empty" hidden>No staff requests waiting for review.</p></section>
+      </section>
+      <section id="view-team-access" class="view linked-page" data-view="team-access" aria-labelledby="team-access-title">
+        <a class="page-back secondary-button" href="?view=more" data-page-route="more">← Back to settings</a>
+        <div class="section-title-row"><div><p class="kicker">Your club</p><h2 id="team-access-title" tabindex="-1">Team access</h2></div><button type="button" class="secondary-button compact" data-page-refresh="team-access">Refresh</button></div>
+        <details class="panel settings-accordion" id="team-access-settings" data-staff-settings>
+            <summary><span>Team access</span><span class="settings-chevron">⌄</span></summary>
+            <div class="settings-accordion-body">
+              <p class="muted">Parents sign up with email and password, choose the club/team, then type their child’s name. Staff review each request and deliberately select the correct active squad player before approving it. Siblings are approved one request at a time.</p>
+              <div class="team-access-invite-block parent-self-signup-note"><strong>Parent access is request-based</strong><span>Parents do not need an invite code. They use Create Account on the login screen.</span></div>
+              <div class="team-access-invite-block" id="team-player-invite-section">
+                <label>Player profile<select id="team-player-invite-player"><option value="">Choose player…</option></select></label>
+                <button class="primary-button setup-save" id="generate-team-player-invite">Create reusable player code</button>
+                <label class="assignment-output-label">Player Access code<input id="team-player-invite-code" type="text" readonly placeholder="Choose a player and create a reusable code" /></label>
+                <button class="secondary-button setup-save" id="copy-team-player-invite">Copy player code</button>
+                <p class="helper">Player app access is available to U15 squads only. Players can view team information. Football messages, club notices and match alerts go to linked parents; player accounts cannot use the inbox.</p>
+              </div>
+              <div class="panel-heading access-members-heading"><h3>Team members</h3></div>
+              <div id="team-members-list" class="team-members-list"></div>
+            </div>
+          </details>
+      </section>
+      <section id="view-rules" class="view linked-page" data-view="rules" aria-labelledby="rules-title">
+        <a class="page-back secondary-button" href="?view=more" data-page-route="more">← Back to settings</a>
+        <div class="section-title-row"><div><p class="kicker">Your club</p><h2 id="rules-title" tabindex="-1">Rules &amp; procedures</h2></div></div>
+        <details class="panel settings-accordion" id="rules-procedures-settings" data-staff-settings>
+            <summary><span>Rules &amp; procedures</span><span class="settings-chevron">⌄</span></summary>
+            <div class="settings-accordion-body">
+              <p class="muted" id="rules-procedures-intro">Team settings below are for Shooters Hill AFC. Selkent's official match card and fixture updates are completed on the league system.</p>
+              <label class="admin-filter-label hidden" id="club-rule-age-field">Age group<select id="club-rule-age" onchange="renderUniversalClubConfiguration()"><option value="">Choose age group</option></select></label>
+              <div id="universal-config-rules" class="universal-config-rules"></div>
+              <div class="procedure-list">
+                <article><strong>Fixture details · handbook p. 74</strong><span>The Club Fixture Secretary enters home details or acknowledges away details on Selkent's website by the Tuesday before the fixture. The home club gives officials and opposition ground access, kick-off and kit colours at least five clear days before the match; the away club confirms receipt and its kit colours.</span></article>
+                <article><strong>Before kick-off · handbook pp. 14–16, 76–77</strong><span>Check physical player registration cards and complete Selkent's official match-card procedure. Ensure players' shirts have distinct numbers; confirm named substitutes with the referee where the youth-football rule applies. Use the league's emergency paper process if the official app cannot be used; card photographs do not replace physical cards.</span></article>
+                <article class="hidden" id="selkent-mini-playing-time"><strong>Playing time · handbook pp. 45, 47</strong><span>For U8–U11 mini-soccer, aim for equal playing time where possible. Selkent recommends at least 50% of each match for every player as best practice.</span></article>
+                <article><strong>After the match · handbook pp. 17, 20, 78–79</strong><span>Complete the official card, including score, kick-off and end times, referee name and mark, then submit it to Selkent immediately (the handbook allows a 30-minute grace period). For an emergency paper card, tell your Club Fixture Secretary the result for entry on the league website by 18:00 on matchday; do not copy the paper card into Selkent's app later. Postponed, abandoned and unfulfilled matches need separate reporting through the league website by 18:00. Shooters Hill AFC's Match played is only your club's internal record.</span></article>
+              </div>
+              <p class="helper">The handbook gives conflicting receipt deadlines for emergency paper cards; check with your Club Fixture Secretary before relying on one. U9 and U11 registration limits also conflict across sections.</p>
+              <a class="map-link compact" href="https://www.selkent.org.uk/" target="_blank" rel="noopener noreferrer">Open official Selkent website</a>
+            </div>
+          </details>
+      </section>
+      <section id="view-season-history" class="view linked-page" data-view="season-history" aria-labelledby="season-history-title">
+        <a class="page-back secondary-button" href="?view=more" data-page-route="more">← Back to settings</a>
+        <div class="section-title-row"><div><p class="kicker">Your club</p><h2 id="season-history-title" tabindex="-1">Season history</h2></div><button type="button" class="secondary-button compact" data-page-refresh="season-history">Refresh</button></div>
+        <details class="panel settings-accordion" id="season-history-settings" data-staff-history>
+            <summary><span>Season history</span><span class="settings-chevron">⌄</span></summary>
+            <div class="settings-accordion-body">
+              <p class="muted">Archived seasons are read only and preserve the match record from before rollover.</p>
+              <div class="season-history-controls"><select id="season-history-select" aria-label="Archived season"><option value="">No archived seasons yet</option></select><button type="button" class="secondary-button compact" id="open-season-archive">View archive</button></div>
+              <div id="season-history-summary" class="archive-summary"></div>
+            </div>
+          </details>
+      </section>
+      <section id="view-audit-history" class="view linked-page" data-view="audit-history" aria-labelledby="audit-history-title">
+        <a class="page-back secondary-button" href="?view=more" data-page-route="more">← Back to settings</a>
+        <div class="section-title-row"><div><p class="kicker">Club administration</p><h2 id="audit-history-title" tabindex="-1">Audit history</h2></div></div>
+        <details class="panel settings-accordion hidden" id="audit-history-settings" data-admin-history>
+            <summary><span>Audit history</span><span class="settings-chevron">⌄</span></summary>
+            <div class="settings-accordion-body">
+              <p class="muted">Club-wide player activity and parent access changes. Recent updates only.</p>
+              <button type="button" class="secondary-button compact" id="refresh-audit-history">Refresh history</button>
+              <div id="audit-history-list" class="audit-history-list"><div class="empty-state compact-empty">Open this section to load history.</div></div>
+            </div>
+          </details>
+      </section>
+      <section id="view-raise-concern" class="view linked-page" data-view="raise-concern" aria-labelledby="raise-concern-title">
+        <a class="page-back secondary-button" href="?view=inbox" data-page-route="inbox">← Back to messages</a>
+        <div class="section-title-row"><div><p class="kicker">Your club</p><h2 id="raise-concern-title" tabindex="-1">Raise an issue</h2></div></div>
+        <section class="panel concern-panel" id="raise-concern-panel"><div class="panel-heading"><div><p class="kicker">Complaint / concern</p><h3>Raise an issue</h3></div></div><label>Category<select id="concern-category"><option value="general">General dispute / complaint</option><option value="safeguarding">Safeguarding concern about a child</option></select></label><label>Subject<input id="concern-subject" maxlength="120"/></label><label>Details<textarea id="concern-body" rows="4" maxlength="4000"></textarea></label><p class="muted">Safeguarding concern content is not stored. If Safeguarding is selected, the app records only that you raised a concern and directs you to external safeguarding contacts.</p><button type="button" class="secondary-button" id="submit-concern">Continue</button><div class="provider-summary" id="concern-result"></div></section>
       </section>
     </main>
 

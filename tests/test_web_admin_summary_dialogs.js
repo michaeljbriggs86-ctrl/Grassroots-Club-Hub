@@ -23,19 +23,17 @@ c.openAdminSummary('fixtures');c.openAdminSummary('results');
 assert.deepEqual(navigations,['club-fixtures','club-results'],'summaries enter existing routed pages');
 assert.equal(scrolls.length,0,'fixture/results navigation does not scroll overview controls');
 c.openAdminSummary('teams');
-assert.equal(ids['admin-home-teams'].open,true,'team shortcut opens the directory before focusing its filter');
+assert.equal(navigations.at(-1),'club-teams','team shortcut opens the dedicated directory screen');
 reducedMotion=true;c.openAdminSummary('attention');
-assert.deepEqual(scrolls,[{id:'admin-home-age-select',behavior:'smooth',block:'start'},
-  {id:'admin-home-people',behavior:'auto',block:'start'}]);
-assert.deepEqual(focuses,[{id:'admin-home-age-select',preventScroll:true},
-  {id:'admin-home-people',preventScroll:true}]);
+assert.deepEqual(scrolls,[{id:'admin-home-people',behavior:'auto',block:'start'}]);
+assert.deepEqual(focuses,[{id:'admin-home-people',preventScroll:true}]);
 delete ids['admin-home-people'];c.openAdminSummary('attention');
-assert.equal(focuses.length,2,'missing targets are harmless');
+assert.equal(focuses.length,1,'missing targets are harmless');
 overview=false;
 for(const kind of ['fixtures','results','teams','attention'])c.openAdminSummary(kind);
-assert.equal(navigations.length,2,'non-overview roles cannot open club-wide summaries');
-assert.equal(scrolls.length,2);
-assert.equal(focuses.length,2);
+assert.equal(navigations.length,3,'non-overview roles cannot open club-wide summaries');
+assert.equal(scrolls.length,1);
+assert.equal(focuses.length,1);
 for(const kind of ['fixtures','results']){
   assert.match(html,new RegExp(`data-admin-summary="${kind}"`));
   assert.match(html,new RegExp(`id="club-${kind}-panel"`));

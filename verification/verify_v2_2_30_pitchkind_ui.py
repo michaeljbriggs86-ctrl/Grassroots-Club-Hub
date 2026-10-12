@@ -763,7 +763,7 @@ check('parent access notification provides review action',
     and 'Review request' in app)
 check('notification review routes to selected team Team access',
     "adminUiMode='view';localStorage.setItem(ADMIN_UI_MODE_KEY,'view')" in app
-    and "navigate('more',false);applyAccessMode()" in app
+    and "navigate('team-access',false);applyAccessMode()" in app
     and "panel.open=true" in app
     and 'await refreshTeamMembers(false)' in app)
 check('pending parent card wraps identity data without clipping',

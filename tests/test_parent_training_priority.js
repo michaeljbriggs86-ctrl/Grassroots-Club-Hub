@@ -68,5 +68,5 @@ historyCtx.currentRole='coach';
 vm.runInNewContext(`${app.slice(historyStart,historyEnd)}\napplyMatchFilter();`,historyCtx);
 assert.deepEqual(rendered['league-match-list'],['later','past']);
 assert.match(app,/parent\?\[\['Home','home'\],\['Schedule','matches'\],\['Inbox','inbox'\]/);
-assert.match(app,/currentRole==='parent'&&!\['home','matches','inbox','more','person'\]\.includes\(view\)/);
+assert.match(app,/currentRole==='parent'&&!\['home','matches','inbox','more','person','contacts','raise-concern'\]\.includes\(view\)/);
 console.log('PASS parent hub shows training or one match, with no match records');

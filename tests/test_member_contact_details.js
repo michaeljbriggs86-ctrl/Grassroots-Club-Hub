@@ -5,7 +5,7 @@ const elements=new Map(),events={};
 function node(id){if(!elements.has(id)){const flags=new Set();elements.set(id,{id,innerHTML:'',textContent:'',value:'',open:false,isConnected:true,
  classList:{add:k=>flags.add(k),toggle:(k,on)=>on?flags.add(k):flags.delete(k),contains:k=>flags.has(k)},addEventListener:(k,fn)=>{events[id+':'+k]=fn;}});}return elements.get(id);}
 const escape=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const ctx={CLOUD_MODE:true,currentRole:'parent',admin:false,document:{getElementById:node},esc:escape,
+const ctx={CLOUD_MODE:true,currentRole:'parent',currentView:'contacts',admin:false,document:{getElementById:node},esc:escape,
  isClubOverviewMode:()=>ctx.admin,inboxContactRoleLabel:c=>c.role==='parent'?'Parent':c.role==='assistant_coach'?'Assistant Coach':c.role==='club_admin'?'Club Admin':'Coach',
  window:{addEventListener:(type,fn)=>events[type]=fn}};
 const profile={user_id:'me',club_id:'club'};let team='a',calls=[],saved=[];
@@ -36,6 +36,7 @@ const deferred=()=>{let resolve;const promise=new Promise(r=>resolve=r);return{p
  assert.equal(calls.at(-1),null,'club admin can read whole club');assert(list().includes('data-person-profile="parent"'));assert(!node('member-contacts-team-wrap').classList.contains('hidden'));
  assert.equal(importerVisible,true);assert.equal(importerOptions.isAdmin(),true);
  node('member-contacts-team').value='b';await ctx.refreshContactDirectory();assert.equal(calls.at(-1),'b');assert(!list().includes('data-person-profile="parent"'),'admin team filter enforced in UI too');
+ const leave=deferred();const originalList=cloud.listContactDirectory;cloud.listContactDirectory=()=>leave.promise;const leaving=ctx.refreshContactDirectory();ctx.currentView='inbox';node('member-contacts-panel').open=false;ctx.resetContactDirectory();leave.resolve({self,can_manage:true,contacts:[contact('late-parent','parent')]});await leaving;assert.equal(list(),'','leaving Contacts discards late responses');ctx.currentView='contacts';cloud.listContactDirectory=originalList;open();
  const old=cloud.listContactDirectory,late=deferred();cloud.listContactDirectory=()=>late.promise;
  const pending=ctx.refreshContactDirectory();ctx.currentRole='parent';ctx.admin=false;ctx.syncContactDirectoryContext();
  assert.equal(list(),'','changing capacity clears sensitive contact DOM immediately');assert.equal(node('member-contacts-panel').open,false);assert(node('member-contacts-team-wrap').classList.contains('hidden'));
