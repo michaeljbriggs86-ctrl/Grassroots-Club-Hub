@@ -593,7 +593,9 @@ def parse_published_cup_results(html: str, agegroup_id: int) -> list[dict[str, A
     """Verified public cupspage shape, captured 2026-10-11 (U12+ only).
 
     Each competition pane contains dated rounds, four-cell fixture rows and
-    a numeric .vCol score. A date inside .matchRef overrides the round's
+    a numeric .vCol score. The observed W - L outcome (2026-10-12) and its
+    reverse are recognised non-numeric outcomes, not invented goal scores.
+    A date inside .matchRef overrides the round's
     start date; a round date range otherwise uses its published start date.
     """
     soup = BeautifulSoup(html, "html.parser")
@@ -643,8 +645,14 @@ def parse_published_cup_results(html: str, agegroup_id: int) -> list[dict[str, A
                 score = _normalise_text(cells[2].get_text(" ", strip=True))
                 if score in ("v", "n/g", "", "-"):
                     continue
-                scored = re.fullmatch(r"(\d{1,2})\s*-\s*(\d{1,2})", score)
                 home, away = (_normalise_text(cells[i].get_text(" ", strip=True)) for i in (1, 3))
+                if re.fullmatch(r"(?:W\s*-\s*L|L\s*-\s*W)", score):
+                    if not home or not away:
+                        raise UnverifiedPublishedResultsMarkupError("Cup outcome is missing a team")
+                    # The public feed publishes goals only. Keep the provider's
+                    # win/loss marker out of numeric results and league tables.
+                    continue
+                scored = re.fullmatch(r"(\d{1,2})\s*-\s*(\d{1,2})", score)
                 if not scored or not home or not away:
                     raise UnverifiedPublishedResultsMarkupError(f"Unknown cup score/team: {score!r}")
                 ref_text = _normalise_text(cells[0].get_text(" ", strip=True))
