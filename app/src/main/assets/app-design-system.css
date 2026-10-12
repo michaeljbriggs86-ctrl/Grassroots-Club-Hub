@@ -1449,8 +1449,9 @@ html[data-theme="dark"] .member-contact-links a {color:#8EE09A}
 .app-utility-bar .hero-profile-button,
 .app-utility-bar .hero-notification-button{border-color:transparent!important;background:transparent!important;border-radius:8px;font-weight:600}
 .top-nav-tabs{gap:4px;padding-block:0;box-shadow:none;background:var(--white)!important}
-.top-nav-tab{min-height:48px;border-radius:0;border-bottom:2px solid transparent;padding:10px 12px;font-weight:600}
-.top-nav-tab.active{background:transparent!important;color:var(--gch-control-choice-copy)!important;border-bottom-color:var(--gch-control-focus)}
+.top-nav-tabs .top-nav-tab.nav-item{min-height:48px;border-radius:0;border-bottom:2px solid transparent;padding:10px 12px;font-weight:600}
+.top-nav-tabs .top-nav-tab.nav-item.active,
+html[data-theme="dark"] .top-nav-tabs .top-nav-tab.nav-item.active{background:transparent!important;color:var(--gch-control-choice-copy)!important;border-bottom-color:var(--gch-control-focus);box-shadow:none!important}
 .content{padding-top:16px;padding-inline:16px}
 .section-title-row{margin-bottom:16px}
 .section-title-row h2{font-size:24px;line-height:1.2;font-weight:700;letter-spacing:-.025em}
