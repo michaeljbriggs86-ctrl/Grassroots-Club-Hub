@@ -2493,6 +2493,7 @@ function navigateMobileAwards(){
 // Linked pages keep full lists outside the main screens. Routes contain no member identifiers.
 const LINKED_PAGES={
   contacts:{title:'Contact details',parent:'inbox',panel:'member-contacts-panel',access:'contacts'},
+  'player-onboarding':{title:'Player onboarding',parent:'club',panel:'player-onboarding-panel',access:'admin'},
   'club-teams':{title:'Club teams',parent:'club',panel:'admin-home-teams',access:'admin'},
   'coach-documents':{title:'Coach documents',parent:'club',panel:'coach-document-matrix',access:'admin'},
   'app-access':{title:'App access',parent:'club-coaches',panel:'app-access-panel',access:'admin'},
@@ -2512,17 +2513,20 @@ function linkedPageAllowed(view){
   return staff;
 }
 function syncLinkedPageLinks(){
+  window.ClubHubPlayerOnboarding?.syncAccess();
   document.querySelectorAll('[data-page-route]').forEach(link=>{const allowed=linkedPageAllowed(link.dataset.pageRoute);link.hidden=!allowed;link.classList.toggle('hidden',!allowed);});
   if(currentView in LINKED_PAGES&&!linkedPageAllowed(currentView)){navigate(isClubOverviewMode()?'club':'home',false,'replace');return false;}
   return true;
 }
 function leaveLinkedPage(next){
+  if(currentView==='player-onboarding'&&next!=='player-onboarding')window.ClubHubPlayerOnboarding?.leave();
   if(currentView==='contacts'&&next!=='contacts'){const panel=document.getElementById('member-contacts-panel');if(panel)panel.open=false;resetContactDirectory();}
 }
 function enterLinkedPage(view){
   const page=LINKED_PAGES[view];if(!page||!linkedPageAllowed(view))return;
   const panel=document.getElementById(page.panel);if(panel?.tagName==='DETAILS')panel.open=true;
   if(view==='contacts'){syncContactDirectoryContext();if(panel)panel.open=true;refreshContactDirectory();}
+  else if(view==='player-onboarding')window.ClubHubPlayerOnboarding?.enter();
   else if(view==='club-teams')refreshAdminClubOverview(false);
   else if(view==='coach-documents')window.ClubHubCoachQualifications?.refreshMatrix();
   else if(view==='app-access')refreshAdminAccessManagement(false);
@@ -2607,6 +2611,7 @@ function refreshSectionNavigation(){
   document.querySelectorAll('.screen-section-nav').forEach(updateSectionNavigation);
 }
 function navigate(view,scroll=true,historyMode='push'){
+  if(currentView==='player-onboarding'&&view!=='player-onboarding'&&window.ClubHubPlayerOnboarding?.confirmLeave()===false)return false;
   if(currentView==='add'&&view!=='add'&&!confirmDiscardMatchEdits())return false;
   const editor=document.getElementById('match-detail-dialog');
   if(editor?.open&&view!==currentView){if(!confirmDiscardMatchEdits(true))return false;editor.close();}
@@ -6368,6 +6373,14 @@ async function bootTracker(){
     if(!window.__fixtureScanTimer)window.__fixtureScanTimer=setInterval(()=>{if(document.visibilityState==='visible'&&shouldScanFixtures())scanUpcomingFixtures(true);},5*60*1000);
   }finally{__booting=false;finishOpeningSplash();}
 }
+window.ClubHubPlayerOnboarding?.configure({
+  cloud:()=>window.ClubHubCloud,
+  currentView:()=>currentView,
+  allowed:()=>CLOUD_MODE&&isAdmin()&&isClubOverviewMode(),
+  contextKey:()=>[window.ClubHubCloud?.context?.profile?.user_id||'',window.ClubHubCloud?.context?.profile?.club_id||'',currentRole,adminUiMode].join('|'),
+  toast,
+  onSaved:()=>{if(isAdmin()&&isClubOverviewMode())refreshAdminClubOverview(false);}
+});
 window.addEventListener('clubhub-authenticated',()=>{const run=()=>{if(__booting){setTimeout(run,60);return;}bootTracker().catch(err=>console.error('Auth handoff failed',err));};requestAnimationFrame(run);});
 bootTracker().catch(err=>console.error('Tracker boot failed',err));
 

@@ -1,0 +1,37 @@
+const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
+const ui=fs.readFileSync('app/src/main/assets/player-onboarding.js','utf8'),cloud=fs.readFileSync('app/src/main/assets/cloud.js','utf8'),app=fs.readFileSync('app/src/main/assets/app.js','utf8'),html=fs.readFileSync('app/src/main/assets/index.html','utf8');
+const code=cloud.slice(cloud.indexOf('  function requireAdminOnboardingTeam('),cloud.indexOf('  async function saveTeamStateNow('));
+const team={id:'team1',club_id:'club1',active:true,age_group:9,name:'Invented Team'},request={request_id:'request1',parent_name:'Invented Parent',parent_email:'invented@example.invalid',child_name:'Invented Child'};
+const squad=[{name:'Invented Existing',number:1,role:'outfield',status:'active'}],teamData={team:{id:'team1',ageGroup:'U9',teamName:'Invented Team'},players:squad,requests:[request],links:[],limit:10};
+(async()=>{
+ let admin=true;const rpcCalls=[];
+ const c=vm.createContext({canAdmin:()=>admin,session:{user:{id:'admin1'}},context:{profile:{club_id:'club1'}},visibleTeams:[team,{id:'foreign',club_id:'other',active:true}],role:()=>admin?'admin':'parent',clubConfiguration:{rules:[{age_group:9,max_registered:10}]},oldShapeTeam:t=>({id:t.id,ageGroup:'U'+t.age_group,teamName:t.name}),activeTeam:{id:'other-active'},saving:false,pendingState:null,unsyncedState:false,confirmingState:false,
+ rpc:async(name,args)=>{rpcCalls.push({name,args});return name==='get_team_state_for_me'?[{state:{squad}}]:name==='list_pending_parent_requests'?[request]:name==='list_parent_player_links'?[]:{ok:true,team_id:args.p_team_id};}});
+ vm.runInContext(code,c);const loaded=await c.loadAdminPlayerOnboarding('team1');assert.equal(loaded.players[0].name,'Invented Existing');assert.equal(loaded.limit,10);assert.equal(c.activeTeam.id,'other-active');assert(rpcCalls.every(call=>call.args.p_team_id==='team1'));
+ await assert.rejects(()=>c.loadAdminPlayerOnboarding('foreign'),/active team/);admin=false;await assert.rejects(()=>c.onboardAdminPlayer({teamId:'team1'}),/Admin/);admin=true;
+ const before=rpcCalls.length;await c.onboardAdminPlayer({teamId:'team1',name:' Invented Child ',number:2,role:'goalkeeper',parentRequestId:'request1'});assert.equal(rpcCalls.length,before+1);assert.equal(rpcCalls.at(-1).name,'admin_onboard_player');assert.equal(rpcCalls.at(-1).args.p_player_name,'Invented Child');assert.equal(rpcCalls.at(-1).args.p_parent_request_id,'request1');assert.equal(c.activeTeam.id,'other-active');
+ c.activeTeam=team;c.unsyncedState=true;await assert.rejects(()=>c.onboardAdminPlayer({teamId:'team1',name:'Invented New',number:3,role:'outfield'}),/Finish syncing/);c.unsyncedState=false;
+ const original=c.rpc; c.context.profile.club_id='club1';let done;const pending=new Promise(resolve=>done=resolve);c.rpc=()=>pending;const stale=c.loadAdminPlayerOnboarding('team1');c.context.profile.club_id='club2';done([]);await assert.rejects(()=>stale,/access changed/);c.rpc=original;c.context.profile.club_id='club1';
+ const events={},nodes=new Map();
+ class Node{
+  constructor(id){this.id=id;this.value='';this.checked=false;this.disabled=false;this.textContent='';this._html='';this.dataset={};this.classList={toggle(){}};}
+  get innerHTML(){return this._html;}
+  set innerHTML(value){this._html=value;for(const tag of value.match(/<(?:input|select|h3)\b[^>]*\bid="[^"]+"[^>]*>/g)||[]){const id=tag.match(/\bid="([^"]+)"/)[1],n=node(id);n.value=tag.match(/\bvalue="([^"]*)"/)?.[1]||'';n.checked=/\bchecked\b/.test(tag);}}
+  replaceChildren(){this._html='';}focus(){}setAttribute(){}closest(selector){return selector==='.onboarding-form'?this:null;}
+ }
+ const node=id=>{if(!nodes.has(id))nodes.set(id,new Node(id));return nodes.get(id);};
+ let allowed=true,key='admin|club1',view='player-onboarding',confirms=false,saveCalls=0,resolveSave;
+ const api={visibleTeamList:()=>[teamData.team],loadAdminPlayerOnboarding:async()=>teamData,onboardAdminPlayer:async()=>{saveCalls++;return new Promise(resolve=>resolveSave=resolve);},approveParentRequest:async()=>({ok:true})};
+ const w={addEventListener:(kind,fn)=>(events['window:'+kind]??=[]).push(fn),confirm:()=>confirms};
+ const u=vm.createContext({window:w,document:{getElementById:node,addEventListener:(kind,fn)=>(events[kind]??=[]).push(fn)}});vm.runInContext(ui,u);const flow=w.ClubHubPlayerOnboarding;
+ flow.configure({allowed:()=>allowed,currentView:()=>view,contextKey:()=>key,cloud:()=>api,toast(){}});
+ assert.match(flow.validatePlayer({name:'Invented Existing',number:2,role:'outfield'},squad,10),/already/);assert.match(flow.validatePlayer({name:'Invented New',number:1,role:'outfield'},squad,10),/already assigned/);assert.match(flow.validatePlayer({name:'Invented New',number:2.5,role:'outfield'},squad,10),/whole shirt/);assert.match(flow.validatePlayer({name:'Invented New',number:2,role:'outfield'},squad,1),/registration limit/);
+ await flow.enter();node('player-onboarding-team').value='team1';await events.change[0]({target:node('player-onboarding-team')});assert.match(node('player-onboarding-content').innerHTML,/Onboard a new player/);
+ const click=action=>events.click[0]({target:{closest:selector=>selector==='[data-onboard-action]'?{dataset:{onboardAction:action}}:null}});
+ click('new');click('next');assert.match(node('player-onboarding-status').textContent,/player’s name/);node('onboard-player-name').value='Invented Child';node('onboard-player-number').value='2';node('onboard-player-role').value='goalkeeper';click('next');assert.match(node('player-onboarding-content').innerHTML,/Parent access/);
+ node('onboard-parent-request').value='request1';await events.change[0]({target:node('onboard-parent-request')});click('next');assert.match(node('player-onboarding-status').textContent,/relationship/);assert.equal(flow.confirmLeave(),false,'cancelled discard keeps the draft');
+ node('onboard-parent-verified').checked=true;click('next');assert.match(node('player-onboarding-content').innerHTML,/Invented Parent/);assert.match(node('player-onboarding-content').innerHTML,/Add player &amp; approve parent|Add player & approve parent/);click('save');click('save');assert.equal(saveCalls,1,'saving blocks double submission');resolveSave({ok:true});await new Promise(r=>setImmediate(r));assert.match(node('player-onboarding-content').innerHTML,/Parent account linked/);assert.equal(flow.confirmLeave(),true,'successful onboarding clears the dirty guard');
+ click('reload');await new Promise(r=>setImmediate(r));click('new');node('onboard-player-name').value='Private Draft';allowed=false;key='parent|club1';flow.syncAccess();assert.equal(node('player-onboarding-content').innerHTML,'','role changes clear all private markup');
+ assert.match(app,/'player-onboarding':\{title:'Player onboarding'.*access:'admin'/);assert.match(html,/data-page-route="player-onboarding"/);assert(!/localStorage|sessionStorage|location|fetch\(/.test(ui),'private onboarding data never enters URLs/device storage/direct fetches');
+ console.log('PASS Admin onboarding UI: guided steps, explicit parent review, validation, draft protection, double-submit prevention, access changes and scoped cloud requests');
+})().catch(error=>{console.error(error);process.exitCode=1});

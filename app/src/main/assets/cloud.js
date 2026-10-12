@@ -478,6 +478,40 @@
       return {team:oldShapeTeam(t),state:row.state||{},revision:Number(row.revision||0),updatedAt:row.updated_at||''};
     });
   }
+  function requireAdminOnboardingTeam(teamId){
+    if(!canAdmin()||!session)throw new Error('Club Admin access required');
+    const team=visibleTeams.find(t=>t.id===String(teamId||'')&&t.active!==false&&t.club_id===context?.profile?.club_id);
+    if(!team)throw new Error('Choose an active team in this club');
+    return team;
+  }
+  function adminOnboardingIdentity(){return [session?.user?.id,context?.profile?.club_id,role()].join('|');}
+  async function loadAdminPlayerOnboarding(teamId){
+    const team=requireAdminOnboardingTeam(teamId),identity=adminOnboardingIdentity();
+    const [states,requests,links]=await Promise.all([
+      rpc('get_team_state_for_me',{p_team_id:team.id}),
+      rpc('list_pending_parent_requests',{p_team_id:team.id}),
+      rpc('list_parent_player_links',{p_parent_user_id:null,p_team_id:team.id})
+    ]);
+    if(!canAdmin()||identity!==adminOnboardingIdentity())throw new Error('Account access changed. Reopen onboarding.');
+    const row=Array.isArray(states)?states[0]:states,age=Number(team.age_group);
+    const rules=clubConfiguration?.rules||[],rule=rules.find(r=>Number(r.age_group)===age);
+    return {team:oldShapeTeam(team),players:Array.isArray(row?.state?.squad)?row.state.squad:[],requests:Array.isArray(requests)?requests:[],links:Array.isArray(links)?links:[],limit:Number(rule?.max_registered)||null};
+  }
+  async function onboardAdminPlayer({teamId,name,number,role:playerRole,parentRequestId=null}={}){
+    const team=requireAdminOnboardingTeam(teamId),identity=adminOnboardingIdentity();
+    if(activeTeam?.id===team.id&&(saving||pendingState||unsyncedState||confirmingState))throw new Error('Finish syncing this team’s existing edits before onboarding a player.');
+    const clean=String(name||'').trim(),shirt=Number(number);
+    if(clean.length<2||clean.length>80||!Number.isInteger(shirt)||shirt<1||shirt>99||!['outfield','goalkeeper'].includes(playerRole))throw new Error('Check the player name, shirt number and position.');
+    const result=await rpc('admin_onboard_player',{p_team_id:team.id,p_player_name:clean,p_shirt_number:shirt,p_player_role:playerRole,p_parent_request_id:parentRequestId||null});
+    if(!canAdmin()||identity!==adminOnboardingIdentity())throw new Error('Account access changed. Check the squad after signing in again.');
+    if(!result?.ok)throw new Error('The cloud did not confirm this player onboarding.');
+    // Refresh only the already-active team; onboarding never switches a team/context.
+    if(activeTeam?.id===team.id){
+      try{const saved=await fetchTeamState(team.id);if(identity===adminOnboardingIdentity()&&saved?.state&&!pendingState&&!saving&&hooks.onRemoteState)hooks.onRemoteState(saved.state,{reason:'player-onboarded'});}
+      catch(_){emitStatus('Player saved. Refresh this team to see the new squad.','warn');}
+    }
+    return result;
+  }
   async function saveTeamStateNow(nextState,{force=false,preserveOnConflict=false}={}){
     if(!configured()||!session||!activeTeam||!canEdit())return null;
     if(saving){pendingState=nextState;return null;}
@@ -1265,7 +1299,7 @@
   }
 
   window.ClubHubCloud={
-    listContactDirectory,saveMemberContactDetails,importMemberContactDetails,
+    listContactDirectory,saveMemberContactDetails,importMemberContactDetails,loadAdminPlayerOnboarding,onboardAdminPlayer,
     configured,bootstrap,loadInitialState,queueStateSave,confirmStateSave,pullLatest,startPolling,
     role,requestCoachAccess,listPendingCoachRequests,reviewCoachRequest,listMyCoachTeams,switchMyCoachTeam,setMyCapacity,requestChildLink,realRole,isStaffAccount,actingAsParent,assignCoachTeam,unassignCoachTeam,canEdit,canAdmin,assignedTeam,currentTeam,coachTeam,hasDualCoachAccess,visibleTeamList,getClubConfiguration,listLoginClubs,listLoginTeams,listCurrentClubLoginTeams,createInvite,requestParentAccess,listPendingParentRequests,listTeamMembers,listClubCoaches,listCoachQualifications,getCoachQualifications,saveCoachQualifications,listClubAccessAccounts,removeClubCoach,listPublishedClubResults,listParentPlayerLinks,saveParentPlayerLinks,listPlayerAccountLinks,listMatchAvailability,saveMatchAvailability,saveCoachMatchAvailability,listSelkentTeamDirectory,syncSelkentTeamDirectory,getCoachMatchNote,saveCoachMatchNote,listAnnouncements,createAnnouncement,markAnnouncementRead,deleteAnnouncement,listMatchAttendance,saveMatchAttendance,getAvailabilitySettings,setAvailabilityDeadline,sendAvailabilityReminder,listNotifications,markNotificationRead,notifyFixtureChange,notifySelectedSquad,notifyMatchReport,notifyMatchReopened,listPlayerAppearanceStats,recordAuditEvent,listAuditHistory,listSeasonArchives,getSeasonArchive,archiveCurrentSeason,rolloverClubSeason,resetParentPin,setAccessPin,approveParentRequest,removeTeamMember,syncTeamDirectory,switchAdminTeam,switchParentTeam,getClubOverview,signOut,switchToParentSignIn,handleAuthCallback,listMessageContacts,listClubMessages,sendClubMessage,markClubMessagesRead,getClubComplianceStatus,setDisputeReviewers,setClubSafeguardingContacts,getConcernRouting,raiseClubConcern,listGeneralDisputes,listDisputeMessages,upsertU11SafeguardingInfo,exportU11SafeguardingPack,listSafeguardingExportAudit,requestClubCancellation,cancelClubCancellation,
     updateCloudPanel,
