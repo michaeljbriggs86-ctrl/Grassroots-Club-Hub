@@ -120,7 +120,7 @@ let fixtureWrites=0,fixtureHtml='';
 const list={get innerHTML(){return fixtureHtml},set innerHTML(value){fixtureHtml=value;fixtureWrites++}},summary={textContent:''},ageSelect={value:'all'};
 const homeTeam={id:'u12-lions',ageGroup:'U12',teamName:'Lions'};
 const fixtureRows=[{team:homeTeam,source:'Selkent',date:'2099-10-03',time:'10:30',opponent:'Dartford Royals',venue:'H',competition:'Division',groundName:'Oak Field',address:'1 Oak Road',ack:{status:'confirmed',label:'Fixture confirmed'}}];
-const render=new Function('document','populateAdminFixtureAgeFilter','__adminOverviewRows','__adminFixtureRows','__adminPublishedFeed','__adminDirectoryCache','selkentNorm','formatDate','matchTeamLabel','esc','clubResultTeamBadgeHtml','fullClubResultTeamName','uniqueClubFixtures','setStableHtml','adminFixtureKickoffMinutes','adminFixtureTimeConflicts','adminFixtureWeekendKey','clubResultCompetitionKind',`let __adminFixtureWeekend='2099-10-03';${renderBody}\nreturn renderAdminFixtures;`)(
+const render=new Function('document','populateAdminFixtureAgeFilter','__adminOverviewRows','__adminFixtureRows','__adminPublishedFeed','__adminDirectoryCache','selkentNorm','formatDate','matchTeamLabel','esc','clubResultTeamBadgeHtml','fullClubResultTeamName','uniqueClubFixtures','setStableHtml','adminFixtureKickoffMinutes','adminFixtureTimeConflicts','adminFixtureWeekendKey','clubResultCompetitionKind',`let __adminFixtureWeekend='2099-10-03',__adminFixtureCategory='',__adminFixtureDay='',__clubFixtureCards=[];const configuredClubTeams=()=>[],normalizeTeamKey=selkentNorm;${renderBody}\nreturn renderAdminFixtures;`)(
   {getElementById:id=>({'admin-fixture-list':list,'admin-fixtures-age':ageSelect,'admin-fixture-summary':summary})[id]},
   ()=>{},[{team:homeTeam}],
   fixtureRows,
@@ -131,22 +131,22 @@ render();
 assert.equal(fixtureWrites,1,'an unchanged fixture refresh keeps the badge image elements in place');
 assert.equal((list.innerHTML.match(/badge\.svg/g)||[]).length,2,'Admin fixtures show a badge beside both clubs');
 assert.doesNotMatch(list.innerHTML,/Oak Field|1 Oak Road|East Wickham Primary Academy/,'venue and address are absent from the card');
-assert.match(list.innerHTML,/admin-fixture-matchup.*<b class="club-result-v">v<\/b>/,'clubs share one matchup row');
+assert.match(list.innerHTML,/club-match-card-team.*club-card-versus/s,'clubs retain a versus label');
 assert.match(list.innerHTML,/>League</,'division fixtures display as league fixtures');
-assert.match(list.innerHTML,/club-result-team home[^>]*>.*Shooters Hill AFC Lions.*<b class="club-result-v">v<\/b>.*club-result-team away[^>]*>.*badge\.svg.*Dartford Royals/s,'home name and badge are left, away name and badge are right');
+assert(list.innerHTML.indexOf('Shooters Hill AFC Lions')<list.innerHTML.indexOf('Dartford Royals'),'home appears before away');
 assert.doesNotMatch(list.innerHTML,/League · Home|League · Away|Venue unconfirmed/,'venue labels are absent');
 assert.doesNotMatch(list.innerHTML,/Open in Maps|fixture-source-pill|>Selkent</,'redundant links and source labels are omitted');
 fixtureRows[0].venue='A';
 render();
 assert.equal(fixtureWrites,2,'a changed fixture still updates the card');
-assert.match(list.innerHTML,/club-result-team home[^>]*>.*Dartford Royals.*<b class="club-result-v">v<\/b>.*club-result-team away[^>]*>.*badge\.svg.*Shooters Hill AFC Lions/s,'an away fixture puts the opponent and its badge on the left');
+assert(list.innerHTML.indexOf('Dartford Royals')<list.innerHTML.indexOf('Shooters Hill AFC Lions'),'away fixtures retain source home order');
 // Compact weekend rows keep real warnings, without kit or routine status duplication.
 fixtureRows[0].time='25:00';
 fixtureRows[0].kitColours='Green Shirts; Green Shorts';
 fixtureRows[0].ack={status:'awaiting',label:'Awaiting confirmation'};
 const originalFixture=JSON.stringify(fixtureRows[0]);
 render();
-assert.match(list.innerHTML,/<strong class="club-fixture-time">TBC<\/strong>/);
+assert.match(list.innerHTML,/<strong class="club-fixture-time">KO: TBC<\/strong>/);
 assert.doesNotMatch(list.innerHTML,/Opponent kit|Possible kit clash|Green Shirts|Kick-off unconfirmed|Awaiting confirmation/);
 assert.equal(JSON.stringify(fixtureRows[0]),originalFixture,'rendering does not erase saved kit or confirmation evidence');
 fixtureRows[0].time='9.30';
@@ -154,7 +154,7 @@ fixtureRows[0].status='postponed';
 fixtureRows[0].competition='U12 Selkent Cup Two - Round 1';
 fixtureRows[0].ack={status:'changed',label:'Fixture changed'};
 render();
-assert.match(list.innerHTML,/<strong class="club-fixture-time">09:30<\/strong>/);
+assert.match(list.innerHTML,/<strong class="club-fixture-time">KO: 09:30<\/strong>/);
 assert.match(list.innerHTML,/Postponed/);
 assert.match(list.innerHTML,/Fixture changed/);
 assert.match(list.innerHTML,/U12 Selkent Cup Two - Round 1/);
@@ -175,6 +175,6 @@ assert.deepEqual(uniqueClubFixtures([...timeRows].reverse()).map(f=>f.team.id),t
 const clashRows=[...timeRows,{...timeRows[0],team:{id:'clash'},time:'10:00'}];
 assert.equal(adminFixtureTimeConflicts(clashRows).has(timeRows[0]),true,'home-time warnings survive consolidation');
 assert.equal(adminFixtureTimeConflicts(timeRows).size,0,'unknown/invalid times create no false clashes');
-assert.equal((list.innerHTML.match(/<tr class="admin-fixture-row/g)||[]).length,1);
-assert.match(list.innerHTML,/<th>Kick-off<\/th>/);
+assert.equal((list.innerHTML.match(/class="club-match-card admin-fixture-row/g)||[]).length,1);
+assert.match(list.innerHTML,/data-club-fixture-detail/);
 console.log('Club Admin fixture feed and chronological order checks passed');

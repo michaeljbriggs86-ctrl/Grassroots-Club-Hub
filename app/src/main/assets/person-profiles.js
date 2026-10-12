@@ -3,7 +3,7 @@
   'use strict';
   let options,identity='',cloudIdentity=null,sequence=0,version=0,selected='',snapshot=null;
   const targets=new Map(),el=id=>document.getElementById(id);
-  const clear=()=>{version++;snapshot=null;const body=el('person-profile-body');if(body)body.innerHTML='';const title=el('person-profile-name');if(title)title.textContent='Person details';const status=el('person-profile-status');if(status)status.textContent='';};
+  const clear=()=>{version++;snapshot=null;const retry=el('person-profile-retry');if(retry)retry.hidden=true;const body=el('person-profile-body');if(body)body.innerHTML='';const title=el('person-profile-name');if(title)title.textContent='Person details';const status=el('person-profile-status');if(status)status.textContent='';};
   function syncAccess(){const key=options?.contextKey()||'',cloud=options?.cloud();if(key!==identity||cloud!==cloudIdentity){identity=key;cloudIdentity=cloud;targets.clear();selected='';clear();options?.onLeave?.();}return key;}
   function reset(){identity='';cloudIdentity=null;targets.clear();selected='';clear();options?.onLeave?.();}
   function isActive(){return options?.currentView()==='person';}
@@ -20,7 +20,7 @@
       el('person-profile-body').innerHTML=result.html;
       el('person-profile-status').textContent=result.notice||'';
       el('person-profile-name').focus({preventScroll:true});
-    }catch(_){if(same(v,key,target))el('person-profile-status').textContent='These details are unavailable for your current access. Return to the list and try again.';}
+    }catch(_){if(same(v,key,target)){el('person-profile-status').textContent='These details are unavailable for your current access. Return to the list or try again.';const retry=el('person-profile-retry');if(retry)retry.hidden=false;}}
   }
   function open(target){
     if(!syncAccess()||!target)return;
@@ -34,6 +34,7 @@
   function leave(){clear();options?.onLeave?.();}
   function selectedSnapshot(){return isActive()&&syncAccess()&&snapshot?snapshot:null;}
   document.addEventListener('click',event=>{
+    if(event.target.closest?.('#person-profile-retry')){if(isActive())enter();return;}
     const target=event.target.closest?.('[data-person-profile]');
     if(target){open({kind:'member',id:target.dataset.personProfile,source:target.dataset.profileSource||'contact',teamId:target.dataset.profileTeam||''});return;}
     if(event.target.closest?.('#person-profile-self')){open(options?.ownTarget());return;}

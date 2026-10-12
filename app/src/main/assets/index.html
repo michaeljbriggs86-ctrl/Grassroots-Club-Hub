@@ -16,6 +16,7 @@
   <title>Shooters Hill AFC</title>
 </head>
 <body class="splash-active">
+  <a class="skip-link" href="#app">Skip to main content</a>
 
   <div id="app-splash" class="app-splash" aria-hidden="true">
     <img src="shooters-hill-logo.png" alt="" class="app-splash-watermark" />
@@ -87,7 +88,7 @@
       <button type="button" class="top-nav-tab nav-item" data-nav="more">Settings</button>
     </nav>
 
-    <main id="app" class="content" aria-live="polite">
+    <main id="app" class="content" tabindex="-1">
       <section id="view-home" class="view active" data-view="home">
         <div class="section-title-row">
           <div>
@@ -481,6 +482,7 @@
         <button type="button" class="secondary-button person-profile-back" id="person-profile-back">← Back to list</button>
         <div class="section-title-row"><div><p class="kicker">Individual profile</p><h2 id="person-profile-name" tabindex="-1">Person details</h2></div></div>
         <p class="helper" id="person-profile-status" role="status" aria-live="polite"></p>
+        <button type="button" class="secondary-button" id="person-profile-retry" hidden>Retry person details</button>
         <div class="person-profile-body" id="person-profile-body"></div>
       </section>
       <section id="view-club" class="view" data-view="club">
@@ -499,6 +501,7 @@
         <div id="club-results-slot"><section class="club-results-panel hidden" id="club-results-panel">
           <section class="panel club-results-browser club-matches-browser screen-lead-card">
             <p class="muted" id="club-results-source-status" role="status"></p>
+            <div class="club-weekend-navigation" aria-label="Choose results weekend"><button type="button" class="secondary-button compact" id="club-results-weekend-prev" aria-label="Previous results weekend">←</button><strong id="club-results-weekend-label" aria-live="polite"></strong><button type="button" class="secondary-button compact" id="club-results-weekend-next" aria-label="Next results weekend">→</button></div>
             <div class="club-results-filters club-matches-filters"><label class="club-results-age-label">Age group<select id="club-results-age"></select></label><label class="club-results-age-label">Competition<select id="club-results-competition"><option value="league">League</option><option value="friendly">Friendly</option><option value="cup">Cup / tournament</option><option value="other">Other</option><option value="all">All competitions</option></select></label></div>
             <div id="club-results-list" class="club-results-list"></div>
             <div class="club-results-pager">
@@ -506,6 +509,7 @@
               <span id="club-results-page">0 of 0</span>
               <button type="button" class="secondary-button compact" id="club-results-next">Next →</button>
             </div>
+            <button type="button" class="secondary-button club-fixture-category-link" data-club-earlier-results>Earlier results <span aria-hidden="true">›</span></button>
           </section>
         </section></div>
 
@@ -962,6 +966,10 @@
     </div>
   </dialog>
 
+  <dialog id="club-match-summary-dialog" class="modal" aria-labelledby="club-match-summary-title">
+    <div class="modal-heading"><h3 id="club-match-summary-title">Match details</h3><button type="button" class="icon-button small" data-close-dialog aria-label="Close match details">×</button></div>
+    <div id="club-match-summary-body"></div>
+  </dialog>
   <dialog id="match-detail-dialog" class="modal match-detail-modal">
     <form method="dialog" id="match-detail-form">
       <div class="modal-heading"><div><p class="kicker">Match details</p><h3 id="match-detail-title">Add match details</h3></div><button type="button" class="icon-button small" data-close-dialog aria-label="Close">×</button></div>

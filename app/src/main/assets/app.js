@@ -2534,6 +2534,35 @@ function enterLinkedPage(view){
   document.getElementById(view+'-title')?.focus({preventScroll:true});
 }
 
+// Keep only non-sensitive page choices in shareable URLs.
+function restoreMatchPageChoices(){
+  try{
+    const params=new URL(window.location.href).searchParams;
+    const age=value=>value==='all'||/^(?:[7-9]|1[0-9]|2[01])$/.test(value)?value:'all';
+    const weekend=value=>/^\d{4}-\d{2}-\d{2}$/.test(value||'')&&adminFixtureWeekendKey(value)===value?value:'';
+    __adminFixtureWeekend=weekend(params.get('fixture-week'));
+    __adminFixtureAge=age(params.get('fixture-age'));
+    __adminFixtureCategory=['league','cup','friendly','other'].includes(params.get('fixture-category'))?params.get('fixture-category'):'';
+    const day=params.get('fixture-day');__adminFixtureDay=day&&adminFixtureWeekendKey(day)===__adminFixtureWeekend?day:'';
+    __clubResultsWeekend=weekend(params.get('result-week'));
+    __clubResultsAge=age(params.get('result-age'));
+    __clubResultsCompetition=['all','league','cup','friendly','other'].includes(params.get('result-competition'))?params.get('result-competition'):'all';
+    const page=Number(params.get('result-page'));__clubResultsPage=Number.isInteger(page)&&page>=0&&page<10000?page:0;
+    __communicationsTab=['inbox','notifications','notices'].includes(params.get('messages'))?params.get('messages'):'inbox';
+  }catch{}
+}
+function writeMatchPageChoices(url){
+  const choices={'fixture-week':__adminFixtureWeekend,'fixture-age':__adminFixtureAge==='all'?'':__adminFixtureAge,'fixture-category':__adminFixtureCategory,'fixture-day':__adminFixtureDay,'result-week':__clubResultsWeekend,'result-age':__clubResultsAge==='all'?'':__clubResultsAge,'result-competition':__clubResultsCompetition==='all'?'':__clubResultsCompetition,'result-page':__clubResultsPage||'','messages':__communicationsTab==='inbox'?'':__communicationsTab};
+  Object.entries(choices).forEach(([key,value])=>value?url.searchParams.set(key,String(value)):url.searchParams.delete(key));
+}
+// Dirty flags change only in response to user edits, not async directory loads.
+let __matchFormDirty=false,__matchDetailDirty=false;
+function confirmDiscardMatchEdits(detail=false){
+  if(!(detail?__matchDetailDirty:__matchFormDirty))return true;
+  if(!window.confirm('Discard your unsaved match changes?'))return false;
+  if(detail)__matchDetailDirty=false;else __matchFormDirty=false;
+  return true;
+}
 // Screen routes use a query parameter so authentication callback fragments stay intact.
 const NAVIGATION_VIEWS=new Set(['home','matches','squad','add','league','club','club-matches','club-fixtures','club-results','club-coaches','inbox','more','person',...Object.keys(LINKED_PAGES)]);
 let __navigationReady=false;
@@ -2548,15 +2577,16 @@ function syncNavigationUrl(mode='push'){
   try{
     const url=new URL(window.location.href);
     const personKey=view==='person'?(window.ClubHubPersonProfiles?.historyKey()||''):'';
-    if(url.searchParams.get('view')===view&&(!personKey||window.history.state?.clubhubPerson===personKey))return;
     url.searchParams.set('view',view);
+    writeMatchPageChoices(url);
+    if(url.href===window.location.href&&(!personKey||window.history.state?.clubhubPerson===personKey))return;
     // File-based Android clients may not support history updates; screen navigation still works.
     window.history[mode==='replace'?'replaceState':'pushState'](personKey?{clubhubPerson:personKey}:null,'',url.href);
   }catch{}
 }
 function preferredScrollBehavior(){return window.matchMedia?.('(prefers-reduced-motion: reduce)').matches?'auto':'smooth';}
 window.addEventListener('popstate',event=>{
-  if(__navigationReady&&!__booting){window.ClubHubPersonProfiles?.restore(event?.state?.clubhubPerson);navigate(navigationViewFromUrl()||(isClubOverviewMode()?'club':'home'),false,'replace');}
+  if(__navigationReady&&!__booting){window.ClubHubPersonProfiles?.restore(event?.state?.clubhubPerson);if(navigate(navigationViewFromUrl()||(isClubOverviewMode()?'club':'home'),false,'replace')===false)syncNavigationUrl('push');}
 });
 function updateSectionNavigation(nav){
   const max=Math.max(0,nav.scrollWidth-nav.clientWidth);
@@ -2577,6 +2607,11 @@ function refreshSectionNavigation(){
   document.querySelectorAll('.screen-section-nav').forEach(updateSectionNavigation);
 }
 function navigate(view,scroll=true,historyMode='push'){
+  if(currentView==='add'&&view!=='add'&&!confirmDiscardMatchEdits())return false;
+  const editor=document.getElementById('match-detail-dialog');
+  if(editor?.open&&view!==currentView){if(!confirmDiscardMatchEdits(true))return false;editor.close();}
+  if(historyMode==='replace')restoreMatchPageChoices();
+  const summary=document.getElementById('club-match-summary-dialog');if(summary?.open)summary.close();
   if(!NAVIGATION_VIEWS.has(view))view='home';
   if(!linkedPageAllowed(view))view=isClubOverviewMode()?'club':'home';
   leaveLinkedPage(view);
@@ -2647,6 +2682,7 @@ function setCommunicationsTab(tab='inbox'){
   const title=document.querySelector('#view-inbox .section-title-row h2');if(title)title.textContent=admin?'Communications':'Inbox';
   if(admin&&__communicationsTab==='notifications'){refreshAnnouncements(true);refreshNotifications(true);}
   if(admin&&__communicationsTab==='notices')refreshAnnouncements(true);
+  syncNavigationUrl();
 }
 
 let __selkentAgeTeams=[];
@@ -3055,6 +3091,7 @@ function renderUniversalClubConfiguration(){
 function applyMiniResultVisibility(){const restricted=currentRole==='parent'||miniResultsRestrictedView();document.querySelectorAll('.home-season-details').forEach(el=>el.classList.toggle('hidden',restricted));document.querySelector('.record-card')?.classList.toggle('hidden',restricted);document.querySelector('.running-count-grid')?.classList.toggle('hidden',restricted);document.querySelector('#recent-form')?.closest('.panel')?.classList.toggle('hidden',restricted);document.getElementById('league-summary-card')?.classList.toggle('hidden',restricted);document.getElementById('season-player-stats')?.classList.toggle('hidden',restricted);['export-json','export-matches','export-goals'].forEach(id=>document.getElementById(id)?.classList.toggle('hidden',ageGroupNumber()<=11));}
 
 function renderAll(){
+  const summary=document.getElementById('club-match-summary-dialog');if(summary?.open&&summary.dataset.contextKey!==clubMatchPageIdentity())summary.close();
   renderTeamIdentity();
   renderUniversalClubConfiguration();
   if(CLOUD_MODE){refreshAnnouncements(true);refreshNotifications(true);refreshAppearanceStats(true);}
@@ -3069,8 +3106,7 @@ function renderAll(){
   renderMatches();
   renderTournamentEvents();
   renderSquad();
-  renderPlayerSelects();
-  renderScorerInputs();
+  if(!(currentView==='add'&&__matchFormDirty)){renderPlayerSelects();renderScorerInputs();}
   renderAwards();
   renderTeamSettings();
   renderTrainingSessionSettings();
@@ -3511,6 +3547,7 @@ function applyMatchReportStep(){
   if(save){save.classList.toggle('hidden',__matchReportStep<__matchReportSteps.length-1);save.textContent='Save match report';}
 }
 function resetMatchReportMode(){
+  __matchDetailDirty=false;
   __matchReportMode=false;__matchReportStep=0;__matchReportSteps=[];
   document.getElementById('match-detail-dialog')?.classList.remove('report-wizard-mode');
   document.getElementById('match-report-progress')?.classList.add('hidden');
@@ -3534,6 +3571,7 @@ function changeMatchReportStep(delta){
 }
 function openMatchReport(matchId){
   if(!requireCoach())return;
+  __matchDetailDirty=false;
   const m=state.matches.find(x=>x.id===matchId);if(!m)return;
   configureMatchDetailActions(null);
   __matchReportMode=true;__matchReportStep=0;__matchReportSteps=matchReportStepDefinitions(m);
@@ -3820,7 +3858,7 @@ async function saveMatchDetails(e){
     try{await window.ClubHubCloud.saveCoachMatchNote(id,document.getElementById('coach-match-note')?.value||'');}catch(err){toast('Result saved; coaching note could not be saved');}
     try{await saveCurrentMatchAttendance(id);}catch(err){toast('Result saved; attendance could not be saved');}
   }
-  if(reportMode&&matchStatus(beforeMatch)!=='played')auditEvent('match_played','match',id,`Marked match played vs ${savedMatch.opponent}`,beforeMatch,savedMatch);const afterDetails={goals:state.goals.filter(x=>x.matchId===id),assists:(state.assists||[]).filter(x=>x.matchId===id),bookings:(state.bookings||[]).filter(x=>x.matchId===id),awards:state.awards.filter(x=>x.matchId===id),homeKitColours:savedMatch.homeKitColours||'',awayKitColours:savedMatch.awayKitColours||''};auditEvent('match_details_updated','match_details',id,`Updated match details vs ${savedMatch.opponent}`,beforeDetails,afterDetails);document.getElementById('match-detail-dialog').close();resetMatchReportMode();renderNextMatch();toast(reportMode?'Match report synced':'Match details saved');
+  if(reportMode&&matchStatus(beforeMatch)!=='played')auditEvent('match_played','match',id,`Marked match played vs ${savedMatch.opponent}`,beforeMatch,savedMatch);const afterDetails={goals:state.goals.filter(x=>x.matchId===id),assists:(state.assists||[]).filter(x=>x.matchId===id),bookings:(state.bookings||[]).filter(x=>x.matchId===id),awards:state.awards.filter(x=>x.matchId===id),homeKitColours:savedMatch.homeKitColours||'',awayKitColours:savedMatch.awayKitColours||''};auditEvent('match_details_updated','match_details',id,`Updated match details vs ${savedMatch.opponent}`,beforeDetails,afterDetails);__matchDetailDirty=false;document.getElementById('match-detail-dialog').close();resetMatchReportMode();renderNextMatch();toast(reportMode?'Match report synced':'Match details saved');
   // Match report changes no longer notify anyone (Mike, 2026-10-10). Only upcoming fixture changes notify.
 }
 
@@ -4316,7 +4354,9 @@ function clubResultRows(overview=[],teams=[],feed=null,includeInternal=false){
   const published=publishedClubResults(teams,feed);
   if(!includeInternal)return published.sort((a,b)=>String(b.date).localeCompare(String(a.date)));
   const publishedKeys=new Set(published.map(r=>clubResultIdentity(r,teams)));
-  const internal=internalAdminClubResults(overview).filter(r=>{const key=clubResultIdentity(r,teams);if(publishedKeys.has(key))return false;publishedKeys.add(key);return true;});
+  const recorded=internalAdminClubResults(overview);
+  published.forEach(r=>{const match=recorded.find(m=>clubResultIdentity(m,teams)===clubResultIdentity(r,teams));if(match?.report)r.report=match.report;});
+  const internal=recorded.filter(r=>{const key=clubResultIdentity(r,teams);if(publishedKeys.has(key))return false;publishedKeys.add(key);return true;});
   return [...published,...internal].sort((a,b)=>String(b.date).localeCompare(String(a.date))||Number(a.ageGroup)-Number(b.ageGroup));
 }
 function coachClubResultRows(own,ownState,feed,clubTeams=configuredClubTeams()){
@@ -4341,16 +4381,16 @@ function clubResultTeamBadgeHtml(teamName=''){
   const kind=approved||usableOwnBadge?'verified-club-badge':'club-placeholder-badge';
   return `<img class="club-identity-badge ${kind}" data-club-team="${esc(teamName)}" src="${esc(url)}" alt="" aria-hidden="true" loading="lazy" decoding="async" />`;
 }
-/* Club fixtures and results share a compact four-column layout. Scores remain
- * from the club team's side; the home team is always shown on the left. */
+/* Cards preserve source home/away order and put each score beside its team. */
 function clubResultsTableHTML(rows=[]){
-  const body=rows.map(r=>{
-    const rr=resultForNamedTeam(r.home,r.away,r.hg,r.ag,r.teamName),ownHome=resultForNamedTeam(r.home,r.away,1,0,r.teamName)==='W';
+  const body=rows.map((r,i)=>{
+    const rr=resultForNamedTeam(r.home,r.away,r.hg,r.ag,r.teamName);
     const kind=clubResultCompetitionKind(r),label=kind==='league'?(r.divisionName||'League'):(r.competition||({cup:'Cup',friendly:'Friendly'}[kind]||'Other'));
-    const score=ownHome?`${r.hg}–${r.ag}`:`${r.ag}–${r.hg}`;
-    return `<tr class="${resultClass(rr)}"><td>${formatDate(r.date)||esc(r.date)||'Date TBC'}</td><td><b>U${esc(r.ageGroup)}</b><small class="cup-round">${esc(String(label).replace(/_/g,' '))}</small></td><td><span class="club-result-match"><span class="club-result-team home" title="${esc(matchTeamLabel(r.home))}">${clubResultTeamBadgeHtml(r.home)}<span class="club-result-team-name">${esc(matchTeamLabel(r.home))}</span></span><span class="club-result-v">v</span><span class="club-result-team away" title="${esc(matchTeamLabel(r.away))}">${clubResultTeamBadgeHtml(r.away)}<span class="club-result-team-name">${esc(matchTeamLabel(r.away))}</span></span></span></td><td><span class="competition-result-pill ${rr}">${rr?`${rr} `:''}${score}</span></td></tr>`;
+    const index=__clubResultsRows.indexOf(r);
+    const heading=i===0||r.date!==rows[i-1].date?`<h3 class="club-results-day-heading">${r.date?esc(new Date(r.date+'T12:00:00Z').toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'short',timeZone:'Europe/London'})):'Date TBC'}</h3>`:'';
+    return heading+`<article class="club-match-card club-result-card ${resultClass(rr)}"${index>=0?` data-club-result-detail="${index}"`:""}><div class="club-match-card-meta"><span><b>U${esc(r.ageGroup)}</b><small class="cup-round">${esc(String(label).replace(/_/g,' '))}</small></span><span>Full time</span></div><div class="club-match-card-team">${clubResultTeamBadgeHtml(r.home)}<strong>${esc(matchTeamLabel(r.home))} <span class="club-card-versus">v</span></strong><b class="club-card-score" aria-label="Home score ${esc(r.hg)}">${esc(r.hg)}</b></div><div class="club-match-card-team">${clubResultTeamBadgeHtml(r.away)}<strong>${esc(matchTeamLabel(r.away))}</strong><b class="club-card-score" aria-label="Away score ${esc(r.ag)}">${esc(r.ag)}</b></div><div class="club-match-card-footer"><span>${formatDate(r.date)||esc(r.date)||'Date TBC'}</span>${index>=0?`<button type="button" class="club-card-link" data-club-result-detail="${index}" aria-label="${r.report?'Match report':'Match details'}: ${esc(matchTeamLabel(r.home))} versus ${esc(matchTeamLabel(r.away))}">${r.report?'Match report':'Match details'} <span aria-hidden="true">›</span></button>`:''}</div></article>`;
   }).join('');
-  return `<div class="competition-table-scroll match-results-table club-results-table club-matches-table"><table class="competition-games-table"><thead><tr><th>Date</th><th>Age / competition</th><th>Match</th><th>Result</th></tr></thead><tbody>${body}</tbody></table></div>`;
+  return `<div class="club-match-card-grid">${body}</div>`;
 }
 function renderAdminRecentResults(rows=[],feedAvailable=true){
   const box=document.getElementById('admin-recent-results'),count=document.getElementById('admin-results-count'),status=document.getElementById('admin-results-source-status');
@@ -4949,10 +4989,14 @@ async function removeClubCoach(userId){
   try{await window.ClubHubCloud.removeClubCoach(userId);auditEvent(dual?'coach_assignment_removed':'coach_access_removed','access',userId,dual?'Removed Club Admin coaching assignment':'Removed coach app access');toast(dual?'Coaching assignment removed':'Coach access removed');await refreshClubCoaches(false);await refreshAdminClubOverview(false);if(window.ClubHubPersonProfiles?.isActive())await window.ClubHubPersonProfiles.refresh();}catch(err){alert(err.message||err);}
 }
 
-let __adminFixtureStamp=0,__adminDirectoryCache=new Map(),__adminFixtureRows=[],__adminFixtureWeekend='';
+let __adminFixtureIdentity='',__clubResultsIdentity='';
+function clubMatchPageIdentity(){
+  const cloud=window.ClubHubCloud;return [cloud?.context?.profile?.user_id||'',cloud?.currentTeam?.()?.id||'',currentRole,isClubOverviewMode()?'club':'team'].join('|');
+}
+let __adminFixtureStamp=0,__adminDirectoryCache=new Map(),__adminFixtureRows=[],__adminFixtureWeekend='',__adminFixtureCategory='',__adminFixtureDay='',__adminFixtureAge='all',__clubFixtureCards=[];
 function populateAdminFixtureAgeFilter(){
   const sel=document.getElementById('admin-fixtures-age');if(!sel)return;
-  const ages=[...new Set((window.ClubHubCloud?.visibleTeamList?.()||[]).map(t=>Number(String(t.ageGroup||'').replace(/\D/g,''))).filter(Boolean))].sort((a,b)=>a-b);const keep=sel.value||'all';sel.innerHTML='<option value="all">All age groups</option>'+ages.map(a=>`<option value="${a}">Under ${a}s</option>`).join('');sel.value=[...sel.options].some(o=>o.value===keep)?keep:'all';
+  const ages=[...new Set((window.ClubHubCloud?.visibleTeamList?.()||[]).map(t=>Number(String(t.ageGroup||'').replace(/\D/g,''))).filter(Boolean))].sort((a,b)=>a-b);const keep=__adminFixtureAge;sel.innerHTML='<option value="all">All age groups</option>'+ages.map(a=>`<option value="${a}">Under ${a}s</option>`).join('');sel.value=[...sel.options].some(o=>o.value===keep)?keep:'all';
 }
 async function fetchAdminDirectoryDetail(teamName){
   const key=selkentNorm(teamName);if(!key)return null;if(__adminDirectoryCache.has(key))return __adminDirectoryCache.get(key);
@@ -5076,7 +5120,7 @@ function moveAdminFixtureWeekend(step){
   if(!isAdmin()||!isClubOverviewMode()||![-1,1].includes(step))return;
   const current=__adminFixtureWeekend||adminShareWeekendDates()[0],day=new Date(current+'T12:00:00Z');
   day.setUTCDate(day.getUTCDate()+step*7);__adminFixtureWeekend=day.toISOString().slice(0,10);
-  renderAdminFixtures();
+  __adminFixtureCategory='';__adminFixtureDay='';renderAdminFixtures();syncNavigationUrl();
 }
 function bindAdminFixtureWeekendNavigation(){
   document.getElementById('admin-fixtures-weekend-prev')?.addEventListener('click',()=>moveAdminFixtureWeekend(-1));
@@ -5116,41 +5160,54 @@ function renderAdminFixtures(){
   const summary=document.getElementById('admin-fixture-summary');
   if(summary)summary.textContent=`${rows.length} fixture${rows.length===1?'':'s'} this weekend across ${activeIds.size} team${activeIds.size===1?'':'s'}`+(missing>0?` · ${missing} team${missing===1?'':'s'} without a fixture this weekend`:'')+(midweek.length?` · ${midweek.length} midweek`: '')+(undated.length?` · ${undated.length} dates to confirm`:'')+(!__adminPublishedFeed?' · Showing saved fixtures; live feed unavailable':'');
   const conflicts=adminFixtureTimeConflicts(rows);
-  const rowHTML=f=>{
-    const away=String(f.venue||'').toUpperCase()==='A';
-    const ack=f.ack;
+  __clubFixtureCards=[...rows,...midweek,...undated];
+  const cardHTML=f=>{
+    const away=String(f.venue||'').toUpperCase()==='A',ack=f.ack;
     const minutes=adminFixtureKickoffMinutes(f.time);
     const kickoff=minutes===null?'TBC':`${String(Math.floor(minutes/60)).padStart(2,'0')}:${String(minutes%60).padStart(2,'0')}`;
-    const confirmationWarning=ack&&(['issue','changed'].includes(ack.status)||ack.label==='1 of 2 teams confirmed');
+    const warning=ack&&(['issue','changed'].includes(ack.status)||ack.label==='1 of 2 teams confirmed');
     const competition=String(f.competition||'Fixture').toLowerCase()==='division'?'League':f.competition||'Fixture';
-    const clubName=fullClubResultTeamName(f.team),opponent=f.opponent||'Opponent unconfirmed';
-    const homeName=away?opponent:clubName,awayName=away?clubName:opponent;
-    const competitionDetail=/^(league|division|friendly|match|fixture)$/i.test(competition)?'':competition;
-    const notes=[f.status==='postponed'?'Postponed':'',conflicts.has(f)?'Possible home-time conflict':''].filter(Boolean);
-    return `<tr class="admin-fixture-row${f.status==='postponed'?' status-postponed':''}"><td>${f.date?formatDate(f.date):'Date TBC'}</td><td><b>${esc(f.team.ageGroup)}</b>${competitionDetail?`<small class="cup-round">${esc(competitionDetail)}</small>`:''}</td><td><span class="club-result-match admin-fixture-matchup" aria-label="${esc(homeName)} versus ${esc(awayName)}"><span class="club-result-team home" title="${esc(homeName)}">${clubResultTeamBadgeHtml(homeName)}<span class="club-result-team-name">${esc(matchTeamLabel(homeName))}</span></span><b class="club-result-v">v</b><span class="club-result-team away" title="${esc(awayName)}">${clubResultTeamBadgeHtml(awayName)}<span class="club-result-team-name">${esc(matchTeamLabel(awayName))}</span></span></span>${notes.length?`<small class="club-fixture-notes">${esc(notes.join(' · '))}</small>`:''}</td><td><strong class="club-fixture-time">${esc(kickoff)}</strong>${confirmationWarning?`<small class="club-fixture-confirmation ${esc(ack.status)}">${esc(ack.label)}</small>`:''}</td></tr>`;
+    const own=fullClubResultTeamName(f.team),opponent=f.opponent||'Opponent unconfirmed',home=away?opponent:own,visitor=away?own:opponent;
+    const notes=[f.status==='postponed'?'Postponed':'',conflicts.has(f)?'Possible home-time conflict':'',warning?ack.label:''].filter(Boolean);
+    const clubFixture=configuredClubTeams().some(t=>[t.teamName,t.leagueName,t.selkentName].some(n=>n&&normalizeTeamKey(n)===normalizeTeamKey(opponent)));
+    return `<article class="club-match-card admin-fixture-row${f.status==='postponed'?' status-postponed':''}" data-club-fixture-detail="${__clubFixtureCards.indexOf(f)}"><div class="club-match-card-meta"><span>${esc(f.team.ageGroup)} · ${esc(competition)}</span><strong class="club-fixture-time">KO: ${esc(kickoff)}</strong></div><div class="club-match-card-team">${clubResultTeamBadgeHtml(home)}<strong>${esc(matchTeamLabel(home))} <span class="club-card-versus">v</span></strong></div><div class="club-match-card-team">${clubResultTeamBadgeHtml(visitor)}<strong>${esc(matchTeamLabel(visitor))}</strong></div>${notes.length?`<p class="club-fixture-notes">${esc(notes.join(' · '))}</p>`:''}<div class="club-match-card-footer"><span>${clubFixture?'Club fixture':away?'Away':String(f.venue||'').toUpperCase()==='H'?'Home':'Neutral'}${!f.date?' · Date TBC':''}</span><button type="button" class="club-card-link" data-club-fixture-detail="${__clubFixtureCards.indexOf(f)}" aria-label="Match details: ${esc(home)} versus ${esc(visitor)}">Match details <span aria-hidden="true">›</span></button></div></article>`;
   };
   const categories=[['league','League'],['cup','Cup'],['friendly','Friendly'],['other','Other']];
-  const tableHTML=matches=>`<div class="competition-table-scroll match-results-table club-results-table club-matches-table club-fixtures-table"><table class="competition-games-table"><thead><tr><th>Date</th><th>Age</th><th>Match</th><th>Kick-off</th></tr></thead><tbody>${matches.map(rowHTML).join('')}</tbody></table></div>`;
-  const markup=categories.map(([kind,title])=>{
-    const matches=rows.filter(f=>clubResultCompetitionKind(f)===kind);
-    return matches.length?`<section class="club-fixture-group"><h3>${title}</h3>${tableHTML(matches)}</section>`:'';
+  const cards=matches=>`<div class="club-match-card-grid">${matches.map(cardHTML).join('')}</div>`;
+  const action=(kind,date,text)=>`<button type="button" class="secondary-button club-fixture-category-link" data-fixture-category="${kind}" data-fixture-day="${esc(date)}">${esc(text)} <span aria-hidden="true">›</span></button>`;
+  const markup=[...new Set(rows.map(f=>f.date))].filter(date=>!__adminFixtureDay||date===__adminFixtureDay).map(date=>{
+    const dayRows=rows.filter(f=>f.date===date),heading=new Date(date+'T12:00:00Z').toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'short',timeZone:'Europe/London'});
+    const groups=categories.filter(([kind])=>!__adminFixtureCategory||kind===__adminFixtureCategory).map(([kind,title])=>{
+      const matches=dayRows.filter(f=>clubResultCompetitionKind(f)===kind);if(!matches.length)return '';
+      if(!__adminFixtureCategory&&kind==='cup'&&matches.length===2&&matches[0].team.id===matches[1].team.id&&matches[0].competition===matches[1].competition&&Number(String(matches[0].team.ageGroup).replace(/\D/g,''))<=11){
+        return `<section class="club-cup-feature"><p>${esc(matches[0].team.ageGroup)} · ${esc(matches[0].competition)}</p><h3>${esc(matchTeamLabel(fullClubResultTeamName(matches[0].team)))}</h3>${matches.map(f=>`<p>v ${esc(matchTeamLabel(f.opponent))}</p>`).join('')}${action(kind,date,`${matches.length} matches · View fixtures`)}</section>`;
+      }
+      const preview=__adminFixtureCategory?matches:kind==='league'?matches.slice(0,3):[];
+      return `<section class="club-fixture-group"><div class="club-match-day-heading"><h3>${title}</h3><span>${matches.length} fixture${matches.length===1?'':'s'}</span></div>${cards(preview)}${preview.length<matches.length?action(kind,date,`View all ${matches.length} ${title.toLowerCase()} fixtures`):''}</section>`;
+    }).join('');
+    return groups?`<section class="club-match-day"><div class="club-match-day-heading"><h3>${esc(heading)}</h3><span>${dayRows.length} fixture${dayRows.length===1?'':'s'}</span></div>${groups}</section>`:'';
   }).join('');
-  const extras=(midweek.length?`<details class="club-fixture-group"><summary>Midweek fixtures (${midweek.length})</summary>${tableHTML(midweek)}</details>`:'')+(undated.length?`<details class="club-fixture-group"><summary>Dates to confirm (${undated.length})</summary>${tableHTML(undated)}</details>`:'');
-  setStableHtml(list,(markup||'<div class="empty-state compact-empty">No fixtures for this weekend. Move to another weekend or choose a different age group.</div>')+extras);
+  const back=__adminFixtureCategory?'<button type="button" class="secondary-button page-back" data-fixture-category="" data-fixture-day="">← Back to weekend</button>':'';
+  const extras=(midweek.length?`<details class="club-fixture-group"><summary>Midweek fixtures (${midweek.length})</summary>${cards(midweek)}</details>`:'')+(undated.length?`<details class="club-fixture-group"><summary>Dates to confirm (${undated.length})</summary>${cards(undated)}</details>`:'');
+  setStableHtml(list,back+(markup||'<div class="empty-state compact-empty">No fixtures for this weekend. Move to another weekend or choose a different age group.</div>')+extras);
+
 }
 async function refreshAdminFixtures(quiet=false){
   if(!CLOUD_MODE||!isAdmin())return;
   const list=document.getElementById('admin-fixture-list');if(!list)return;
+  const identity=clubMatchPageIdentity();
+  if(identity!==__adminFixtureIdentity){__adminFixtureIdentity=identity;__adminFixtureStamp=0;__adminFixtureRows=[];__clubFixtureCards=[];delete list.__pitchkindMarkup;}
   if(quiet&&Date.now()-__adminFixtureStamp<15000){renderAdminFixtures();return;}
   __adminFixtureStamp=Date.now();if(!quiet&&!list.__pitchkindMarkup)list.innerHTML='<div class="empty-state compact-empty">Loading club fixtures…</div>';
   try{
     const [rows]=await Promise.all([window.ClubHubCloud.getClubOverview(),loadAdminPublishedFeed()]);
+    if(identity!==clubMatchPageIdentity()||!isAdmin())return;
     __adminOverviewRows=rows;
     __adminFixtureRows=buildAdminFixtureRows(rows,__adminPublishedFeed,true);
     renderAdminFixtures();
     const names=[...new Set(__adminFixtureRows.filter(f=>f.opponent).map(f=>f.opponent))].slice(0,20);
-    await Promise.all(names.map(fetchAdminDirectoryDetail));renderAdminFixtures();
-  }catch(err){delete list.__pitchkindMarkup;list.innerHTML=`<div class="empty-state compact-empty">Could not load fixtures: ${esc(err.message||err)}</div>`;}
+    await Promise.all(names.map(fetchAdminDirectoryDetail));if(identity===clubMatchPageIdentity()&&isAdmin())renderAdminFixtures();
+  }catch(err){if(identity!==clubMatchPageIdentity())return;delete list.__pitchkindMarkup;list.innerHTML=`<div class="empty-state compact-empty">Could not load fixtures: ${esc(err.message||err)}<button type="button" class="secondary-button" data-match-page-retry="fixtures">Retry</button></div>`;}
 }
 /** Club Admin: approve or decline coach and assistant coach sign-up requests (email accounts, no invite codes). */
 async function refreshCoachRequests(){
@@ -5468,7 +5525,7 @@ async function refreshInbox(quiet=false){
     __inboxContacts=visibleContacts;__inboxMessages=messages||[];renderInbox();
     const help=document.getElementById('club-inbox-help');
     if(help)help.textContent=isAdmin()?'Message anyone in the club, individually or as private group copies.':['coach','assistant_coach'].includes(currentRole)?'Message Club Admin or parents on your team.':'Message Club Admin or your team coaching staff.';
-  }catch(err){box.innerHTML='<div class="empty-state compact-empty">Inbox is temporarily unavailable.</div>';}
+  }catch(err){box.innerHTML='<div class="empty-state compact-empty">Inbox is temporarily unavailable.<button type="button" class="secondary-button" data-inbox-retry>Retry</button></div>';}
 }
 function existingInboxSubject(recipient){const me=inboxMyUserId();const rows=__inboxMessages.filter(m=>((m.sender_user_id===me&&m.recipient_user_id===recipient)||(m.recipient_user_id===me&&m.sender_user_id===recipient))&&String(m.subject||'').trim());return rows.length?String(rows[rows.length-1].subject).trim():'';}
 function existingInboxThread(recipient){const me=inboxMyUserId();const rows=__inboxMessages.filter(m=>(m.sender_user_id===me&&m.recipient_user_id===recipient)||(m.recipient_user_id===me&&m.sender_user_id===recipient));return rows.length?rows[rows.length-1].thread_id:null;}
@@ -5486,7 +5543,7 @@ async function sendInboxMessage(){
   }catch(err){alert('Could not send message: '+(err.message||err));}finally{if(btn){btn.disabled=false;btn.textContent='Send';}}
 }
 function openCoachInbox(userId){__inboxSelected=String(userId||'');__communicationsTab='inbox';navigate('inbox',false);setTimeout(()=>refreshInbox(false),0);}
-let __clubResultsStamp=0,__clubResultsRows=[],__clubResultsAge='all',__clubResultsCompetition='league',__clubResultsPage=0;const CLUB_RESULTS_PAGE_SIZE=6;
+let __clubResultsStamp=0,__clubResultsRows=[],__clubResultsAge='all',__clubResultsCompetition='all',__clubResultsPage=0,__clubResultsWeekend='';const CLUB_RESULTS_PAGE_SIZE=6;
 function fullClubResultTeamName(team={}){
   const short=String(team.teamName||team.name||'').trim(),league=String(team.leagueName||'').trim(),club=String(clubSettings().display_name||'').trim();
   if(league&&normalizeTeamKey(league)!==normalizeTeamKey(short))return league;
@@ -5503,7 +5560,7 @@ function internalAdminClubResults(rows=[]){
       const gf=Number(m.gf||0),ga=Number(m.ga||0),home=away?String(m.opponent):ownName,awayName=away?ownName:String(m.opponent);
       const key=[team.id||teamName,m.id||'',m.date||'',home,awayName,gf,ga].join('|').toLowerCase();
       if(seen.has(key))return;seen.add(key);
-      out.push({home,away:awayName,hg:away?ga:gf,ag:away?gf:ga,date:m.date||'',competition:m.competition||m.type||'',divisionName:team.division||'',teamName,ageGroup:age,source:'internal'});
+      out.push({home,away:awayName,hg:away?ga:gf,ag:away?gf:ga,date:m.date||'',competition:m.competition||m.type||'',divisionName:team.division||'',teamName,ageGroup:age,source:'internal',report:{notes:m.notes||'',goals:(st.goals||[]).filter(g=>g.matchId===m.id).map(g=>({player:g.player,goals:g.goals})),awards:(st.awards||[]).filter(a=>a.matchId===m.id).map(a=>({player:a.player,type:a.type||a.award||'Award'}))}});
     });
   });
   return out;
@@ -5512,14 +5569,19 @@ function renderClubResultsBrowser(){
   const list=document.getElementById('club-results-list'),ageSel=document.getElementById('club-results-age'),competitionSel=document.getElementById('club-results-competition'),pageEl=document.getElementById('club-results-page');if(!list||!ageSel)return;
   if(currentView==='club'&&__clubTab==='results')document.getElementById('admin-club-overview')?.classList.add('hidden');
   const ages=[...new Set([...(window.ClubHubCloud?.visibleTeamList?.()||[]).map(t=>Number(String(t.ageGroup||'').replace(/\D/g,''))),...__clubResultsRows.map(r=>Number(r.ageGroup))].filter(Boolean))].sort((a,b)=>a-b);if(!ages.length)ages.push(8,9,10,11,12,13,14,15);
-  const prev=ageSel.value||String(__clubResultsAge);ageSel.innerHTML='<option value="all">All age groups</option>'+ages.map(a=>`<option value="${a}">Under ${a}s</option>`).join('');__clubResultsAge=prev==='all'||ages.includes(Number(prev))?prev:'all';ageSel.value=String(__clubResultsAge);
+  const prev=String(__clubResultsAge);ageSel.innerHTML='<option value="all">All age groups</option>'+ages.map(a=>`<option value="${a}">Under ${a}s</option>`).join('');__clubResultsAge=prev==='all'||ages.includes(Number(prev))?prev:'all';ageSel.value=String(__clubResultsAge);
   if(competitionSel)competitionSel.value=__clubResultsCompetition;
-  const filtered=__clubResultsRows.filter(r=>(__clubResultsAge==='all'||Number(r.ageGroup)===Number(__clubResultsAge))&&(__clubResultsCompetition==='all'||clubResultCompetitionKind(r)===__clubResultsCompetition));const pages=Math.max(1,Math.ceil(filtered.length/CLUB_RESULTS_PAGE_SIZE));__clubResultsPage=Math.max(0,Math.min(__clubResultsPage,pages-1));const rows=filtered.slice(__clubResultsPage*CLUB_RESULTS_PAGE_SIZE,(__clubResultsPage+1)*CLUB_RESULTS_PAGE_SIZE);
-  setStableHtml(list,rows.length?clubResultsTableHTML(rows):'<div class="empty-state"><strong>No results in this filter</strong>Choose another competition or age group, or record the completed match in the team profile.</div>');
+  if(!__clubResultsWeekend)__clubResultsWeekend=__clubResultsRows.find(r=>r.date)?.date?adminFixtureWeekendKey(__clubResultsRows.find(r=>r.date).date):adminShareWeekendDates()[0];
+  const resultSunday=new Date(__clubResultsWeekend+'T12:00:00Z');resultSunday.setUTCDate(resultSunday.getUTCDate()+1);
+  const weekendLabel=document.getElementById('club-results-weekend-label');if(weekendLabel)weekendLabel.textContent=`${formatDate(__clubResultsWeekend)} – ${formatDate(resultSunday.toISOString().slice(0,10))}`;
+  const filtered=__clubResultsRows.filter(r=>(!r.date||adminFixtureWeekendKey(r.date)===__clubResultsWeekend)&&(__clubResultsAge==='all'||Number(r.ageGroup)===Number(__clubResultsAge))&&(__clubResultsCompetition==='all'||clubResultCompetitionKind(r)===__clubResultsCompetition));const pages=Math.max(1,Math.ceil(filtered.length/CLUB_RESULTS_PAGE_SIZE));__clubResultsPage=Math.max(0,Math.min(__clubResultsPage,pages-1));const rows=filtered.slice(__clubResultsPage*CLUB_RESULTS_PAGE_SIZE,(__clubResultsPage+1)*CLUB_RESULTS_PAGE_SIZE);
+  setStableHtml(list,rows.length?clubResultsTableHTML(rows):'<div class="empty-state"><strong>No results yet</strong><p>Choose another weekend, competition or age group.</p><button type="button" class="secondary-button" data-club-earlier-results>Earlier results</button></div>');
   if(pageEl)pageEl.textContent=filtered.length?`${__clubResultsPage+1} of ${pages}`:'0 of 0';const p=document.getElementById('club-results-prev'),n=document.getElementById('club-results-next');if(p)p.disabled=__clubResultsPage<=0;if(n)n.disabled=__clubResultsPage>=pages-1;
 }
 async function refreshClubResults(quiet=false){
   const list=document.getElementById('club-results-list');if(!list||!CLOUD_MODE||!['admin','coach','assistant_coach'].includes(currentRole))return;
+  const identity=clubMatchPageIdentity();
+  if(identity!==__clubResultsIdentity){__clubResultsIdentity=identity;__clubResultsStamp=0;__clubResultsRows=[];delete list.__pitchkindMarkup;}
   if(quiet&&Date.now()-__clubResultsStamp<12000){renderClubResultsBrowser();return;}__clubResultsStamp=Date.now();
   const adminInternal=isAdmin()&&isClubOverviewMode();
   if(!quiet&&!list.__pitchkindMarkup)list.innerHTML=`<div class="empty-state compact-empty">Loading ${adminInternal?'club results':'published results'}…</div>`;
@@ -5527,18 +5589,20 @@ async function refreshClubResults(quiet=false){
     const directoryPromise=window.ClubHubStaticSelkent?.loadDirectory?.(!quiet)?.catch(()=>null)||Promise.resolve(null);
     if(adminInternal){
       const [overview,rawFeed]=await Promise.all([window.ClubHubCloud.getClubOverview(),loadAdminPublishedFeed(!quiet),directoryPromise]);
+      if(identity!==clubMatchPageIdentity())return;
       const feed=verifiedClubResultsFeed(rawFeed);
       const status=document.getElementById('club-results-source-status');if(status)status.textContent=feed?'':'Selkent feed unavailable · showing team-recorded matches only';
       __clubResultsRows=clubResultRows(overview,overview.map(r=>r.team),feed,true);
     }else{
       const [rawFeed]=await Promise.all([loadAdminPublishedFeed(!quiet),directoryPromise]);
+      if(identity!==clubMatchPageIdentity())return;
       const feed=verifiedClubResultsFeed(rawFeed);
       const status=document.getElementById('club-results-source-status');if(status)status.textContent=feed?'':'Selkent feed unavailable · showing team-recorded matches only';
       const own=isAdminCoachMode()?dualCoachTeam():window.ClubHubCloud.currentTeam?.();
       __clubResultsRows=coachClubResultRows(own,state,feed);
     }
     renderClubResultsBrowser();
-  }catch(err){delete list.__pitchkindMarkup;list.innerHTML='<div class="empty-state compact-empty">Results are temporarily unavailable.</div>';}
+  }catch(err){if(identity!==clubMatchPageIdentity())return;delete list.__pitchkindMarkup;list.innerHTML='<div class="empty-state compact-empty">Results are temporarily unavailable.<button type="button" class="secondary-button" data-match-page-retry="results">Retry</button></div>';}
 }
 let __clubTab='overview';
 function setClubTab(tab='overview'){
@@ -5560,6 +5624,30 @@ function setClubTab(tab='overview'){
   if(tab==='coaches')refreshClubCoaches(false);
   renderTeamIdentity();
   if(currentView==='club')syncNavigationUrl();
+}
+function openClubMatchSummary(kind,index){
+  if(currentView!=='club'||!['admin','coach','assistant_coach'].includes(currentRole))return;
+  const fixture=kind==='fixture';if((fixture?__adminFixtureIdentity:__clubResultsIdentity)!==clubMatchPageIdentity())return;
+  if(fixture&&(!isAdmin()||!isClubOverviewMode()))return;
+  if(__clubTab!==(fixture?'fixtures':'results'))return;
+  const row=(fixture?__clubFixtureCards:__clubResultsRows)[index];if(!row)return;
+  const away=fixture&&String(row.venue||'').toUpperCase()==='A';
+  const own=fixture?fullClubResultTeamName(row.team):'',home=fixture?(away?row.opponent:own):row.home,visitor=fixture?(away?own:row.opponent):row.away;
+  const dialog=document.getElementById('club-match-summary-dialog'),body=document.getElementById('club-match-summary-body');if(!dialog||!body)return;
+  document.getElementById('club-match-summary-title').textContent=fixture?'Match details':row.report?'Match report':'Result details';
+  const report=!fixture&&row.report;
+  const team=(name,score)=>`<div class="club-match-card-team">${clubResultTeamBadgeHtml(name)}<strong>${esc(matchTeamLabel(name||'Opponent unconfirmed'))}</strong>${score!==undefined?`<b class="club-card-score">${esc(score)}</b>`:''}</div>`;
+  body.innerHTML=`<p class="muted">${esc(fixture?row.team.ageGroup:'U'+row.ageGroup)} · ${esc(row.competition||'League')} · ${formatDate(row.date)||'Date TBC'}</p><section class="club-match-card">${team(home,fixture?undefined:row.hg)}${team(visitor,fixture?undefined:row.ag)}</section>`+(fixture?`<dl class="club-match-summary-meta"><dt>Kick-off</dt><dd>${esc(row.time||'TBC')}</dd><dt>Location</dt><dd>${esc(row.groundName||row.ground||'Ground TBC')}</dd><dt>Status</dt><dd>${esc(row.status==='postponed'?'Postponed':row.ack?.label||'Scheduled')}</dd></dl>`:report?`<section class="club-report-section"><h4>Scorers</h4>${report.goals.length?report.goals.map(g=>`<p>${esc(g.player)} <b>${esc(g.goals)}</b></p>`).join(''):'<p class="muted">No scorers recorded.</p>'}</section><section class="club-report-section"><h4>Awards</h4>${report.awards.length?report.awards.map(a=>`<p>${esc(a.type)} · ${esc(a.player)}</p>`).join(''):'<p class="muted">No awards recorded.</p>'}</section>${report.notes?`<section class="club-report-section"><h4>Match notes</h4><p class="club-report-notes">${esc(report.notes)}</p></section>`:''}`:'<p class="muted">Published result. A club match report has not been recorded for this result.</p>');
+  dialog.dataset.contextKey=clubMatchPageIdentity();dialog.showModal();
+}
+function moveClubResultsWeekend(step){
+  const day=new Date((__clubResultsWeekend||adminShareWeekendDates()[0])+'T12:00:00Z');day.setUTCDate(day.getUTCDate()+step*7);
+  __clubResultsWeekend=day.toISOString().slice(0,10);__clubResultsPage=0;renderClubResultsBrowser();syncNavigationUrl();
+}
+function showEarlierClubResults(){
+  const current=__clubResultsWeekend||adminShareWeekendDates()[0];
+  const earlier=__clubResultsRows.map(r=>r.date&&adminFixtureWeekendKey(r.date)).filter(date=>date&&date<current).sort().at(-1);
+  if(earlier){__clubResultsWeekend=earlier;__clubResultsPage=0;renderClubResultsBrowser();syncNavigationUrl();}else moveClubResultsWeekend(-1);
 }
 function refreshCoachClubResults(quiet=false){return refreshClubResults(quiet);}
 
@@ -5675,6 +5763,7 @@ function setDefaultDate(){
   if(el&&!el.value) el.value=new Date().toISOString().slice(0,10);
 }
 function resetMatchForm(){
+  __matchFormDirty=false;
   setCompetitionOptions('all');
   setDivisionEntryMode(false);
   document.getElementById('match-form').reset();
@@ -5695,7 +5784,7 @@ function resetMatchForm(){
   updateMatchStatusUI();
 }
 function editMatch(id){
-  if(!requireCoach()) return;
+  if(!requireCoach()||!confirmDiscardMatchEdits(true)||!confirmDiscardMatchEdits()) return;
   const m=state.matches.find(x=>x.id===id); if(!m) return;
   document.getElementById('match-detail-dialog')?.close();
   navigate('add');
@@ -5727,6 +5816,7 @@ function editMatch(id){
   document.getElementById('cancel-edit').classList.remove('hidden');
   const deleteEdit=document.getElementById('delete-match-edit');if(deleteEdit){const canDelete=!isProviderOwnedMatch(m);deleteEdit.classList.toggle('hidden',!canDelete);deleteEdit.dataset.deleteMatch=canDelete?m.id:'';}
   updateMatchStatusUI();
+  __matchFormDirty=false;
 }
 let __matchSubmissionInFlight=false;
 async function submitMatch(e){
@@ -5782,7 +5872,7 @@ async function submitMatch(e){
   catch(err){__matchSubmissionInFlight=false;if(submitButton)submitButton.disabled=false;alert('The match is stored on this device but has not synced to the club. Keep this page open and tap Save again. '+(err.message||err));return;}
   __matchSubmissionInFlight=false;if(submitButton)submitButton.disabled=false;
   auditEvent(existing?'match_edited':'match_added','match',id,`${existing?'Edited':'Added'} ${m.competition} vs ${m.opponent}`,existing||null,m);
-  resetMatchForm();
+  __matchFormDirty=false;resetMatchForm();
   navigate('matches');
   toast(CLOUD_MODE?'Match synced':'Match saved');
 }
@@ -6045,7 +6135,7 @@ document.getElementById('next-match-edit')?.addEventListener('click',()=>{const 
 document.getElementById('next-match-share')?.addEventListener('click',shareNextMatchImage);
 document.getElementById('matches-next-share')?.addEventListener('click',shareNextMatchImage);
 bindAdminFixtureWeekendNavigation();
-document.getElementById('admin-fixtures-age')?.addEventListener('change',renderAdminFixtures);
+document.getElementById('admin-fixtures-age')?.addEventListener('change',event=>{__adminFixtureAge=event.target.value||'all';__adminFixtureCategory='';__adminFixtureDay='';renderAdminFixtures();syncNavigationUrl();});
 document.getElementById('admin-fixtures-share')?.addEventListener('click',()=>openAdminWeekendShare(__adminFixtureWeekend));
 document.getElementById('admin-weekend-share-refresh')?.addEventListener('click',()=>openAdminWeekendShare(__adminWeekendShareWeekend));
 document.getElementById('admin-weekend-share-send')?.addEventListener('click',shareAdminWeekend);
@@ -6075,7 +6165,7 @@ document.getElementById('refresh-audit-history')?.addEventListener('click',()=>r
 document.getElementById('archive-current-season')?.addEventListener('click',archiveCurrentSeason);
 document.getElementById('rollover-season')?.addEventListener('click',rolloverSeason);
 document.getElementById('match-form').addEventListener('submit',submitMatch);
-document.getElementById('cancel-edit').addEventListener('click',()=>{resetMatchForm();navigate('matches');});
+document.getElementById('cancel-edit').addEventListener('click',()=>{if(!confirmDiscardMatchEdits())return;resetMatchForm();navigate('matches');});
 document.getElementById('add-player-btn').addEventListener('click',()=>openPlayerDialog());
 document.getElementById('player-form').addEventListener('submit',savePlayer);
 document.getElementById('parent-link-form')?.addEventListener('submit',saveParentLinkDialog);
@@ -6116,6 +6206,17 @@ document.getElementById('parent-home-match-info')?.addEventListener('click',e=>{
 });
 document.getElementById('parent-add-child-form')?.addEventListener('submit',submitParentAddChild);
 document.getElementById('remove-player')?.addEventListener('click',removePlayerFromSquad);
+for(const [id,detail] of [['match-form',false],['match-detail-form',true]]){
+  document.getElementById(id)?.addEventListener('input',()=>{if(detail)__matchDetailDirty=true;else __matchFormDirty=true;});
+  document.getElementById(id)?.addEventListener('change',()=>{if(detail)__matchDetailDirty=true;else __matchFormDirty=true;});
+}
+document.getElementById('match-detail-dialog')?.addEventListener('cancel',event=>{if(!confirmDiscardMatchEdits(true))event.preventDefault();});
+window.addEventListener('beforeunload',event=>{
+  if((currentView==='add'&&__matchFormDirty)||(document.getElementById('match-detail-dialog')?.open&&__matchDetailDirty)){
+    event.preventDefault();event.returnValue='';
+  }
+});
+document.getElementById('club-match-summary-dialog')?.addEventListener('close',()=>{document.getElementById('club-match-summary-body').replaceChildren();});
 document.getElementById('match-detail-form').addEventListener('submit',saveMatchDetails);
 document.getElementById('undo-match-played')?.addEventListener('click',undoMatchPlayed);
 document.getElementById('match-report-back')?.addEventListener('click',()=>changeMatchReportStep(-1));
@@ -6164,7 +6265,7 @@ const copyBtn=document.getElementById('copy-assignment-code');if(copyBtn)copyBtn
 const playerInviteBtn=document.getElementById('generate-team-player-invite');if(playerInviteBtn)playerInviteBtn.addEventListener('click',createTeamPlayerInvite);
 const copyPlayerInviteBtn=document.getElementById('copy-team-player-invite');if(copyPlayerInviteBtn)copyPlayerInviteBtn.addEventListener('click',copyTeamPlayerInvite);
 const refreshMembersBtn=document.getElementById('refresh-team-members');if(refreshMembersBtn)refreshMembersBtn.addEventListener('click',()=>refreshTeamMembers(false));
-document.querySelectorAll('[data-close-dialog]').forEach(btn=>btn.addEventListener('click',()=>btn.closest('dialog')?.close()));
+document.querySelectorAll('[data-close-dialog]').forEach(btn=>btn.addEventListener('click',()=>{const dialog=btn.closest('dialog');if(dialog?.id==='match-detail-dialog'&&!confirmDiscardMatchEdits(true))return;dialog?.close();}));
 
 
 document.getElementById('squad-list-tab')?.addEventListener('click',()=>setSquadPage(0));
@@ -6185,13 +6286,27 @@ document.getElementById('announcement-audience')?.addEventListener('change',popu
 document.getElementById('announcement-send')?.addEventListener('click',publishAnnouncement);
 document.querySelectorAll('[data-club-tab]').forEach(b=>b.addEventListener('click',()=>setClubTab(b.dataset.clubTab)));
 document.getElementById('refresh-club-results')?.addEventListener('click',()=>refreshClubResults(false));
-document.getElementById('club-results-age')?.addEventListener('change',e=>{__clubResultsAge=e.target.value||'all';__clubResultsPage=0;renderClubResultsBrowser();});
-document.getElementById('club-results-competition')?.addEventListener('change',e=>{__clubResultsCompetition=e.target.value||'league';__clubResultsPage=0;renderClubResultsBrowser();});
+document.getElementById('club-results-age')?.addEventListener('change',e=>{__clubResultsAge=e.target.value||'all';__clubResultsPage=0;renderClubResultsBrowser();syncNavigationUrl();});
+document.getElementById('club-results-competition')?.addEventListener('change',e=>{__clubResultsCompetition=e.target.value||'all';__clubResultsPage=0;renderClubResultsBrowser();syncNavigationUrl();});
 document.getElementById('admin-home-age-select')?.addEventListener('change',renderAdminHomeTeams);
 document.getElementById('admin-home-team-search')?.addEventListener('input',renderAdminHomeTeams);
 document.getElementById('admin-home-refresh')?.addEventListener('click',()=>refreshAdminClubOverview(false));
-document.getElementById('club-results-prev')?.addEventListener('click',()=>{__clubResultsPage=Math.max(0,__clubResultsPage-1);renderClubResultsBrowser();});
-document.getElementById('club-results-next')?.addEventListener('click',()=>{__clubResultsPage++;renderClubResultsBrowser();});
+document.getElementById('club-results-weekend-prev')?.addEventListener('click',()=>moveClubResultsWeekend(-1));
+document.getElementById('club-results-weekend-next')?.addEventListener('click',()=>moveClubResultsWeekend(1));
+document.addEventListener('click',event=>{
+  const category=event.target.closest?.('[data-fixture-category]');
+  if(category&&currentView==='club'&&__clubTab==='fixtures'&&isAdmin()&&isClubOverviewMode()){
+    __adminFixtureCategory=category.dataset.fixtureCategory;__adminFixtureDay=category.dataset.fixtureDay;renderAdminFixtures();syncNavigationUrl();document.getElementById('admin-fixtures-viewport')?.focus({preventScroll:true});
+  }
+  const fixture=event.target.closest?.('[data-club-fixture-detail]'),result=event.target.closest?.('[data-club-result-detail]');
+  if(fixture)openClubMatchSummary('fixture',Number(fixture.dataset.clubFixtureDetail));
+  if(result)openClubMatchSummary('result',Number(result.dataset.clubResultDetail));
+  if(event.target.closest?.('[data-club-earlier-results]')&&currentView==='club'&&__clubTab==='results')showEarlierClubResults();
+  if(event.target.closest?.('[data-inbox-retry]')&&currentView==='inbox')refreshInbox(false);
+  const retry=event.target.closest?.('[data-match-page-retry]');if(retry)retry.dataset.matchPageRetry==='fixtures'?refreshAdminFixtures(false):refreshClubResults(false);
+});
+document.getElementById('club-results-prev')?.addEventListener('click',()=>{__clubResultsPage=Math.max(0,__clubResultsPage-1);renderClubResultsBrowser();syncNavigationUrl();});
+document.getElementById('club-results-next')?.addEventListener('click',()=>{__clubResultsPage++;renderClubResultsBrowser();syncNavigationUrl();});
 
 
 // Horizontal navigation remains visible; dialogs no longer manipulate a footer bar.
@@ -6208,7 +6323,7 @@ async function bootTracker(){
     if(CLOUD_MODE){
       const ctx=await window.ClubHubCloud.bootstrap({
         localState:state,
-        onRemoteState:(remote)=>{state=repairStateIdentity(normalizeState(remote));persistLocalState();if(isTeamLocked())enforceAssignedTeam(false);renderAll();resetMatchForm();},
+        onRemoteState:(remote)=>{state=repairStateIdentity(normalizeState(remote));persistLocalState();if(isTeamLocked())enforceAssignedTeam(false);renderAll();if(!(currentView==='add'&&__matchFormDirty))resetMatchForm();},
       });
       if(!ctx)return;
       cloudBootContext=ctx;

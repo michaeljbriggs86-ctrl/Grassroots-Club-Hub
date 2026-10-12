@@ -13,10 +13,10 @@ const tabs=views.map(v=>({dataset:{nav:v.dataset.view},classList:classes(),attrs
 let reduced=false;
 const win={location:{href:'https://example.test/?keep=yes&view=matches#auth_callback'},matchMedia:()=>({matches:reduced}),addEventListener:(name,fn)=>events[name]=fn,scrollTo:()=>{}};
 win.history={pushState(_state,_title,url){entries.push({mode:'push',url,state:_state});win.history.state=_state;win.location.href=url;},replaceState(_state,_title,url){entries.push({mode:'replace',url,state:_state});win.history.state=_state;win.location.href=url;}};
-const env={window:win,URL,CLOUD_MODE:true,currentRole:'coach',currentView:'home',__clubTab:'overview',__squadPage:0,__communicationsTab:'inbox',__booting:false,
+const env={__adminFixtureWeekend:"",__adminFixtureAge:"all",__adminFixtureCategory:"",__adminFixtureDay:"",__clubResultsWeekend:"",__clubResultsAge:"all",__clubResultsCompetition:"all",__clubResultsPage:0,adminFixtureWeekendKey:()=>"",window:win,URL,CLOUD_MODE:true,currentRole:'coach',currentView:'home',__clubTab:'overview',__squadPage:0,__communicationsTab:'inbox',__booting:false,
   isAdmin:()=>env.currentRole==='admin',isCoach:()=>['coach','assistant_coach'].includes(env.currentRole),isPublishedLeagueTeam:()=>false,isClubOverviewMode:()=>env.currentRole==='admin',
   document:{body:{classList:classes()},querySelector:()=>null,querySelectorAll:q=>q==='.view'?views:q==='.top-nav-tabs .nav-item'?tabs:[],getElementById:id=>id==='match-id'?{value:''}:null},
-  localStorage:{setItem(){}},ADMIN_UI_MODE_KEY:'admin-mode',setDefaultDate(){},renderTeamIdentity(){},applyAccessMode(){},syncMobileNavigation(){},applyMiniResultVisibility(){},setCommunicationsTab(){},refreshInbox(){},toast(){},
+  localStorage:{setItem(){}},ADMIN_UI_MODE_KEY:'admin-mode',setDefaultDate(){},renderTeamIdentity(){},applyAccessMode(){},syncMobileNavigation(){},applyMiniResultVisibility(){},setCommunicationsTab(){},refreshInbox(){},toast(){},writeMatchPageChoices(){},restoreMatchPageChoices(){},confirmDiscardMatchEdits:()=>true,
   setClubTab(tab){env.__clubTab=tab;env.syncNavigationUrl();}
 };
 vm.createContext(env);

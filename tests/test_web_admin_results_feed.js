@@ -18,7 +18,7 @@ const lineOf=(name)=>{const a=src.indexOf(`function ${name}(`);return src.slice(
 const resultHelpers=lineOf('resultForNamedTeam')+'\n'+lineOf('resultClass');
 const {verifiedClubResultsFeed,publishedClubTeamData,clubResultRows,coachClubResultRows,renderAdminRecentResults} = new Function(
   'normalizeTeamKey','internalAdminClubResults','document','esc','formatDate','matchTeamLabel','clubListingHtml','setStableHtml','verifiedTeamBadgeUrl','clubSettings','configuredClubTeams','FAILED_BADGE_URLS','clubPlaceholderBadgeHtml',
-  `${resultHelpers}\n${helpers}\nreturn {verifiedClubResultsFeed,publishedClubTeamData,clubResultRows,coachClubResultRows,renderAdminRecentResults};`
+  `const __clubResultsRows=[];${resultHelpers}\n${helpers}\nreturn {verifiedClubResultsFeed,publishedClubTeamData,clubResultRows,coachClubResultRows,renderAdminRecentResults};`
 )(normalizeTeamKey,internalAdminClubResults,document,s=>String(s),(s=>s),(s=>s),(s=>`<span class=\"club-listing\">${s}</span>`),setStableHtml,()=>'',()=>({}),()=>[],new Set(),name=>`<img class="club-identity-badge" alt="${name}">`);
 
 const teams = [
@@ -67,11 +67,11 @@ assert.match(html,/data-admin-summary="results">Club results<\/button>/);
 assert.doesNotMatch(html,/id="admin-results-count"/);
 const recentHtml=elements.get('admin-recent-results').innerHTML;
 assert.doesNotMatch(recentHtml,/Selkent published|Team recorded/);
-assert.match(recentHtml,/<table class="competition-games-table"><thead><tr><th>Date<\/th><th>Age \/ competition<\/th><th>Match<\/th><th>Result<\/th>/,'latest results use the Cups table layout');
-assert.match(recentHtml,/<span class="club-result-team-name">Shooters Hill AFC Valiants<\/span>/);
-assert.match(recentHtml,/<span class="club-result-team-name">Junior Reds Sabres<\/span>/);
-assert.match(recentHtml,/<td><span class="competition-result-pill W">W 4–1<\/span>/,'home win reads from the club side');
-assert.match(recentHtml,/<td><span class="competition-result-pill W">W 3–2<\/span>/,'away win reads from the club side (3–2, not 2–3)');
+assert.match(recentHtml,/club-result-card/,'latest results use the approved result card');
+assert.match(recentHtml,/Shooters Hill AFC Valiants/);
+assert.match(recentHtml,/Junior Reds Sabres/);
+assert.match(recentHtml,/Home score 4/,'home score is attached to its team');
+assert.match(recentHtml,/Home score 2.*Away score 3/s,'away score stays beside the away team');
 assert.ok(html.includes('id="club-results-list"'));
 let resultWrites=0,resultHtml='';
 const list={get innerHTML(){return resultHtml},set innerHTML(value){resultHtml=value;resultWrites++}},ageSelect={value:'',innerHTML:''},competitionSelect={value:'league'},page={textContent:''},previous={},next={};
@@ -91,7 +91,7 @@ assert.match(resultBadge('Cray Wanderers Ambers'),/\/__pilot_badges\/250\/review
 assert.match(resultBadge('Shooters Hill AFC Archers'),/shooters-hill-logo\.png/,'other teams at this club use its configured crest');
 assert.match(resultBadge('Junior Reds Sabres'),/club-badge-unavailable\.svg/,'an unapproved opponent uses the Unavailable badge');
 const browser=new Function('document','window','resultForNamedTeam','resultClass','esc','matchTeamLabel','formatDate','isAdmin','isClubOverviewMode','clubResultCompetitionKind','clubResultTeamBadgeHtml','setStableHtml',
-  `let __clubResultsRows=[],__clubResultsAge='all',__clubResultsCompetition='league',__clubResultsPage=0;const CLUB_RESULTS_PAGE_SIZE=6;const currentView='home',__clubTab='overview';${browserBody}\nreturn {show:renderClubResultsBrowser,setRows:rows=>{__clubResultsRows=rows},setCompetition:value=>{__clubResultsCompetition=value}};`
+  `let __clubResultsRows=[],__clubResultsAge='all',__clubResultsCompetition='league',__clubResultsPage=0,__clubResultsWeekend='2026-09-26';const adminFixtureWeekendKey=()=>__clubResultsWeekend;const CLUB_RESULTS_PAGE_SIZE=6;const currentView='home',__clubTab='overview';${browserBody}\nreturn {show:renderClubResultsBrowser,setRows:rows=>{__clubResultsRows=rows},setCompetition:value=>{__clubResultsCompetition=value},setAge:value=>{__clubResultsAge=value}};`
 )(browserDocument,{ClubHubCloud:{visibleTeamList:()=>teams}},()=> 'W',()=> 'result-W',s=>String(s),s=>s,s=>s,()=>true,()=>true,new Function(`${helpers}\nreturn clubResultCompetitionKind;`)(),resultBadge,setStableHtml);
 browser.setRows(rows);browser.show();
 browser.show();
@@ -105,10 +105,10 @@ assert.doesNotMatch(list.innerHTML,/Selkent published|Team recorded|U9 · Valian
 assert.match(list.innerHTML,/Shooters Hill AFC Cannons/);
 assert.match(list.innerHTML,/Shooters Hill AFC Valiants|Junior Reds Sabres/);
 assert.equal((list.innerHTML.match(/class="club-identity-badge/g)||[]).length,rows.length*2,'each result shows a badge beside both teams');
-ageSelect.value='12';browser.show();
+ageSelect.value='12';browser.setAge('12');browser.show();
 assert.doesNotMatch(list.innerHTML,/Junior Reds Sabres/,'the age selector still filters after the club-wide default');
 browser.setRows([...rows,{home:'Valiants',away:'Friendly Rivals',hg:2,ag:1,date:'2026-09-20',competition:'Friendly',teamName:'Valiants',ageGroup:9},{home:'Cup Rivals',away:'Valiants',hg:0,ag:1,date:'2026-09-21',competition:'Challenge Cup',teamName:'Valiants',ageGroup:9}]);
-ageSelect.value='all';browser.show();
+ageSelect.value='all';browser.setAge('all');browser.show();
 assert.doesNotMatch(list.innerHTML,/Friendly Rivals|Cup Rivals/,'league is the default result category');
 browser.setCompetition('friendly');browser.show();assert.match(list.innerHTML,/Friendly Rivals/);assert.match(list.innerHTML,/<b>U9<\/b><small class="cup-round">Friendly<\/small>/);assert.doesNotMatch(list.innerHTML,/Cup Rivals/);
 browser.setCompetition('cup');browser.show();assert.match(list.innerHTML,/Cup Rivals/);assert.doesNotMatch(list.innerHTML,/Friendly Rivals/);
@@ -146,7 +146,7 @@ assert.equal(publishedClubTeamData(teams[0],cupFeed).standing.rows[0].played,1,'
 browser.setRows(cupRows);browser.setCompetition('cup');browser.show();
 assert.match(list.innerHTML,/IEXEL F.C Gold/);assert.match(list.innerHTML,/Selkent Cup Two/);
 renderAdminRecentResults(cupRows,true);
-assert.match(elements.get('admin-recent-results').innerHTML,/W 3–2/,'the real score helper renders the away club win');
+assert.match(elements.get('admin-recent-results').innerHTML,/Home score 2.*Away score 3/s,'the real score helper retains home/away score order');
 delete cupFeed.coverage.published_results.cup_parser_status;
 assert.equal(publishedClubTeamData(teams[0],cupFeed).results.length,1,'unverified cup feed rows are excluded');
 console.log('Public cup import, competition filter, format identity and privacy checks passed');

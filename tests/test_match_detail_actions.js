@@ -7,7 +7,7 @@ const context=vm.createContext({document:{getElementById:node,querySelectorAll:(
  isCoach:()=>coach,isPlayedMatch:m=>(m.status||'played')==='played',isLeagueMatch:m=>m.competition==='League',isDivisionMatch:m=>m.competition==='Division',
  isProviderOwnedMatch:m=>m.source==='selkent',matchStatus:m=>m.status||'played',matchDayReached:m=>m.date<='2026-10-10',
  resetMatchReportMode(){},formatDate:s=>s,esc:s=>s,matchScoreText:()=>'',statusLabel:()=>'',renderMatchOverview(){},detailPlayerInputs(){},detailBookingInputs(){},renderAwardFields(){},
- refreshMatchOverviewDirectory(){},loadCoachMatchNote(){},loadMatchAttendance(){},requireCoach:()=>coach,navigate(){throw Error('navigation reached');}});
+ refreshMatchOverviewDirectory(){},loadCoachMatchNote(){},loadMatchAttendance(){},requireCoach:()=>coach,confirmDiscardMatchEdits:()=>true,navigate(){throw Error('navigation reached');}});
 vm.runInContext(src.slice(src.indexOf('function configureMatchDetailActions('),src.indexOf('function openMatchReportReview(')),context);
 const scheduled={id:'s1',competition:'Friendly',status:'scheduled',date:'2026-10-10'};
 function open(m){context.state.matches=[m];context.openMatchDetails(m.id);}
