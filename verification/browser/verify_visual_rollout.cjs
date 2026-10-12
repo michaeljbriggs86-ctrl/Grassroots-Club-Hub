@@ -18,7 +18,7 @@ document.getElementById('app-splash').remove();document.body.classList.remove('s
 const server=http.createServer((req,res)=>{
  const pathname=new URL(req.url,'http://localhost').pathname;
  if(pathname==='/__login_review.html'){res.setHeader('Content-Type','text/html');res.end(authFixture);return;}
- if(pathname==='/cloud-config.js'){res.setHeader('Content-Type','text/javascript');res.end('window.CLUB_HUB_CLOUD={enabled:false};');return;}
+ if(pathname==='/cloud-config.js'){res.setHeader('Content-Type','text/javascript');res.end('window.CLUB_HUB_CLOUD={enabled:true,url:"https://visualreview.supabase.co",anonKey:"synthetic-fixture-only-no-service-credentials-0000000000"};');return;}
  if(pathname.startsWith('/data/')){res.setHeader('Content-Type','application/json');res.end(JSON.stringify({last_updated:'2026-10-13T00:00:00Z',clubs:[],divisions:[],results:[],fixtures:[]}));return;}
  const file=path.resolve(root,'.'+(pathname==='/'?'/index.html':decodeURIComponent(pathname)));
  if(!file.startsWith(root+path.sep)||!fs.existsSync(file)){res.writeHead(404);res.end();return;}
@@ -57,6 +57,8 @@ async function prepareTeam(page,theme){
  await page.evaluate(theme=>{
   applyTheme(theme);document.querySelector('#app-splash')?.remove();document.body.classList.remove('splash-active','auth-open');document.querySelector('#activation-gate').classList.add('hidden');document.querySelector('.app-shell').classList.remove('account-locked');
   account={role:'coach',user:'Synthetic coach'};currentRole='coach';
+  // Enable the real connected-coach UI using in-memory fixtures only.
+  Object.assign(window.ClubHubCloud,{currentTeam:()=>({id:'synthetic-team',name:'Example Greens',age_group:9}),canEdit:()=>true,listMatchAttendance:async()=>[],getCoachMatchNote:async()=>({note:''}),listPlayerAppearanceStats:async()=>[]});
   state=normalizeState({meta:{clubName:'Shooters Hill AFC',teamName:'Example Greens',ageGroup:'U9',season:'2026/27'},division:{name:'Example division',teamName:'Shooters Hill AFC Example Greens',meetingsPerOpponent:2,teams:['Example Blues']},squad:[{name:'Alex',number:4,role:'outfield',status:'active'},{name:'Jamie',number:8,role:'outfield',status:'active'}],matches:[{id:'review-fixture',date:'2026-10-18',time:'10:00',opponent:'Example Blues',venue:'H',competition:'Division',status:'scheduled',homeKitColours:'Green',awayKitColours:'Green'},{id:'review-result',date:'2026-10-11',opponent:'Example Blues',venue:'H',competition:'Division',status:'played',gf:2,ga:1}],goals:[{matchId:'review-result',player:'Alex',goals:2}],awards:[{matchId:'review-result',player:'Jamie',type:'Player of the Match'}],features:{goals:true,assists:true,awards:true,bookings:false},attendance:[],assists:[],bookings:[]});renderAll();navigate('home',false);
  },theme);await page.evaluate(()=>document.fonts.ready);
 }
@@ -71,7 +73,8 @@ async function teamChecks(page,theme){
  const modal=await page.locator('#match-detail-dialog').evaluate(el=>({background:getComputedStyle(el).backgroundImage,saveBackground:getComputedStyle(el.querySelector('#save-match-details')).backgroundImage,fixtureBackground:getComputedStyle(el.querySelector('#match-detail-versus')).backgroundImage}));
  assert(modal.background.includes('gradient')&&modal.saveBackground.includes('gradient')&&modal.fixtureBackground.includes('gradient'),'match dialog and its actions use the shared gradients: '+JSON.stringify(modal));
  const attendance=page.locator('#match-attendance-list .attendance-switch').first();
- if(await attendance.count()){const before=await attendance.getAttribute('aria-pressed');await attendance.click();assert.notEqual(await attendance.getAttribute('aria-pressed'),before,'attendance retains its real event handler');}
+ await attendance.waitFor({state:'visible'});const before=await attendance.getAttribute('aria-pressed');await attendance.click();assert.notEqual(await attendance.getAttribute('aria-pressed'),before,'attendance retains its real event handler');
+ assert.equal(await page.locator('#coach-match-note').isVisible(),true,'coach notes must be reviewed in the connected coach view');
  await page.screenshot({path:path.join(out,`match-details-${theme}.png`),fullPage:true});
  page.once('dialog',async dialog=>{assert.match(dialog.message(),/Discard your unsaved match changes/);await dialog.accept();});
  await page.locator('#match-detail-cancel').click();assert.equal(await page.locator('#match-detail-dialog').isVisible(),false);
