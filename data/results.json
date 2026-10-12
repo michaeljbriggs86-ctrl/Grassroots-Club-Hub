@@ -1,8 +1,8 @@
 {
   "schema_version": 2,
   "provider": "Selkent",
-  "last_updated": "2026-10-12T09:42:57.039416+00:00",
-  "cup_results_last_updated": "2026-10-12T09:42:57.039416+00:00",
+  "last_updated": "2026-10-12T13:49:27.311080+00:00",
+  "cup_results_last_updated": "2026-10-12T13:49:27.311080+00:00",
   "fixture_agegroup_discovery_source": "selkent_divisions_all",
   "coverage": {
     "fixtures": {
@@ -13790,7 +13790,7 @@
         },
         {
           "division_name": "Under 16B Navy",
-          "updated_at_text": "11/10/26 17:51:39",
+          "updated_at_text": "12/10/26 14:21:44",
           "source_order_authoritative_for_ties": false,
           "source_disclaimer": "Note: Table does not yet take account of rules for determining winner if teams on equal points",
           "rows": [
@@ -13887,6 +13887,19 @@
             },
             {
               "row_order": 8,
+              "provider_team_id": 315,
+              "provider_division_id": 4287,
+              "team_name": "Samuel Montagu Green",
+              "played": 3,
+              "won": 1,
+              "drawn": 0,
+              "lost": 2,
+              "gf": 12,
+              "ga": 11,
+              "points": 2
+            },
+            {
+              "row_order": 9,
               "provider_team_id": 740,
               "provider_division_id": 4287,
               "team_name": "Teviot Rangers BLUE",
@@ -13899,7 +13912,7 @@
               "points": 2
             },
             {
-              "row_order": 9,
+              "row_order": 10,
               "provider_team_id": 210,
               "provider_division_id": 4287,
               "team_name": "Foots Cray Lions",
@@ -13912,29 +13925,16 @@
               "points": 1
             },
             {
-              "row_order": 10,
+              "row_order": 11,
               "provider_team_id": 871,
               "provider_division_id": 4287,
               "team_name": "Falconwood FC White",
-              "played": 1,
-              "won": 0,
-              "drawn": 0,
-              "lost": 1,
-              "gf": 0,
-              "ga": 3,
-              "points": 0
-            },
-            {
-              "row_order": 11,
-              "provider_team_id": 315,
-              "provider_division_id": 4287,
-              "team_name": "Samuel Montagu Green",
               "played": 2,
               "won": 0,
               "drawn": 0,
               "lost": 2,
               "gf": 4,
-              "ga": 7,
+              "ga": 11,
               "points": 0
             }
           ],
@@ -14220,7 +14220,7 @@
         },
         {
           "division_name": "Under 16C Silver",
-          "updated_at_text": "11/10/26 15:15:13",
+          "updated_at_text": "12/10/26 11:14:29",
           "source_order_authoritative_for_ties": false,
           "source_disclaimer": "Note: Table does not yet take account of rules for determining winner if teams on equal points",
           "rows": [
@@ -14487,6 +14487,15 @@
           "away": "Belvedere Youth",
           "homeGoals": 1,
           "awayGoals": 1,
+          "provider_division_id": 4287,
+          "division_name": "Under 16B Navy"
+        },
+        {
+          "date": "2026-10-11",
+          "home": "Samuel Montagu Green",
+          "away": "Falconwood FC White",
+          "homeGoals": 8,
+          "awayGoals": 4,
           "provider_division_id": 4287,
           "division_name": "Under 16B Navy"
         },
@@ -16078,7 +16087,7 @@
         },
         {
           "division_name": "Senior Division Two",
-          "updated_at_text": "12/10/26 07:53:49",
+          "updated_at_text": "12/10/26 13:57:31",
           "source_order_authoritative_for_ties": false,
           "source_disclaimer": "Note: Table does not yet take account of rules for determining winner if teams on equal points",
           "rows": [
@@ -16091,7 +16100,7 @@
               "won": 2,
               "drawn": 1,
               "lost": 0,
-              "gf": 15,
+              "gf": 16,
               "ga": 4,
               "points": 5
             },
@@ -16196,7 +16205,7 @@
               "drawn": 0,
               "lost": 3,
               "gf": 7,
-              "ga": 20,
+              "ga": 21,
               "points": 0
             },
             {
@@ -16338,7 +16347,7 @@
           "date": "2026-10-11",
           "home": "Hayden Youth Sharks",
           "away": "EWD Eagles Youth",
-          "homeGoals": 8,
+          "homeGoals": 9,
           "awayGoals": 2,
           "provider_division_id": 4296,
           "division_name": "Senior Division Two"
