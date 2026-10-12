@@ -1,7 +1,7 @@
-﻿# PitchKind - Data Architecture Reference
+# PitchKind - Data Architecture Reference
 
 **Document state:** Current governing architecture reference in `00 - CURRENT MASTER`. The GitHub-root copy is a mirror; its presence and byte parity must be checked independently after any Termux push.
-**Last updated:** 2026-09-30
+**Last updated:** 2026-10-13
 **Collaboration rules:** `AI-COLLABORATION-PROTOCOL.md`
 **Product name:** PitchKind (formerly Grassroots Club Hub). Mike authorised the visible PitchKind identity implementation on 2026-09-21. Internal identifiers including `com.grassrootsclubhub.universal`, the `grassrootsclubhub://` scheme, `ClubHubNative`, existing feed/repository paths, localStorage keys and `GCH-PIN` remain unchanged unless separately authorised. Trade-mark clearance is NOT completed.
 **Brand/UI authority:** `APP-UI-DESIGN-GUIDELINES.md` v1.4 governs anything the app shows. `BRAND-GUIDELINES.md` v1.0 is its cross-platform extension; where they conflict on app surfaces, the app guidelines win.
@@ -34,7 +34,7 @@ that conflict with this file must be marked superseded or archived.
 
 ---
 
-# 1. Current evidence-backed status — checked 2026-09-28 for the rows updated below
+# 1. Current evidence-backed status (check date stated per item)
 
 The source-of-truth categories in Section 2 remain unchanged. This section supersedes older dated build/fixture snapshots elsewhere in this document when they describe the same release.
 
@@ -44,7 +44,7 @@ The source-of-truth categories in Section 2 remain unchanged. This section super
 | All-age public fixtures | **TESTED feed; static Android path device-tested in v2.2.11** | The 2026-09-28 06:05 UTC schema-v2 `data/results.json` on GitHub main has 637 currently parsed fixtures across 15 age groups. The earlier 2026-09-22 1,160-row count was a dated snapshot, not a continuing invariant. Provider week IDs are discovered and rows deduplicated. Later Android/device acceptance is not established by this feed read. |
 | U12+ published results | **TESTED and published in the GitHub feed; signed-in website acceptance OPEN** | The scheduled scrape run `36384599407` pushed feed commit `d30ed54719f5d7b246d206d8e9bbf9fbb9af45aa` with `last_updated` 2026-09-28 06:05:30Z, 217 scored public `published_results` (211 U12+ youth and 6 Senior), 53 standings divisions and 546 rows. U8, U8X, U9, U10, U10X and U11 groups have null public scores/standings; U7 is absent. `cloudflare/web-app/build.py` validates and copies the feed into its site bundle, but a current signed-in served-revision/privacy check is open. |
 | Protected Shooters Hill website pilot | **TESTED source and CI; user-observed pages, revision-specific browser acceptance OPEN** | `test.pitchkind.com` is the active test surface; APK releases are not the current pilot surface. Club ID 499 is the permitted account. A successful Wrangler upload that reports `No targets deployed` does not by itself prove a live routing revision. |
-| Private opponent badges | **TESTED exact-hash R2 staging; signed-in display partially observed** | The pilot manifest currently contains Cray Wanderers 250 and Samuel Montagu 447. CI run `36407934538` read back both exact objects from private R2. Mike observed Cray's crest on a protected card; its network source remains unproven. Samuel's actual protected-page display needs acceptance. Rights clearance remains on hold. |
+| Private opponent badges | **TESTED exact-hash R2 staging; signed-in display partially observed** | The pilot manifest currently contains Cray Wanderers 250 and Samuel Montagu 447. CI run `36407934538` read back both exact objects from private R2. Mike observed Cray's crest on a protected card; its network source remains unproven. Samuel's actual protected-page display needs acceptance. Rights-permission checks are bypassed for protected Shooters Hill pilot admission; public/marketing/wider-use permission remains unapproved. |
 | Private Selkent shadow Worker | **TESTED isolated snapshot and parity; non-canonical** | The private R2 snapshot collected 2026-09-28 06:15:49Z passed verifier run `36410917630` at 10:38Z and normalized parity was exact (637 fixtures, 217 results, 546 standings rows). Scheduled checks retain a 120-minute freshness bound; push/manual checks allow 420 minutes to match the six-hour collection cadence. The Worker does not publish or overwrite the GitHub feed. |
 | PitchKind Android v2.2.15 source and CI | **TESTED source / artifact generated; independent BUILT verification pending** | Commit `b42911e566b257ccde2da9d7298a6df75eacdba8`; Actions run `35761515223` succeeded and published artifact `PitchKind-v2.2.15-debug` (ID `10709948783`). Mike's screenshot shows a downloaded APK checksum, but this pass has not directly inspected packaged contents or run installed-device acceptance. Do not infer DEPLOYED/LIVE from CI success. |
 | PitchKind Android v2.2.16 source | **WRITTEN; CI/artifact/device verification not established here** | GitHub main source commit `6389136442bb443aa47527937daa1f04578ac58b` sets versionCode 2216/versionName 2.2.16 and adds further-fixture cards, club/team detail and kit-profile overrides, kit-clash warnings and role-sensitive match programme presentation. A verifier script and APK workflow were updated in source; neither their execution nor a v2.2.16 artifact has been verified in this review. |
@@ -150,18 +150,7 @@ fails closed on unknown populated shapes. The scheduled GitHub Actions run
 payload contains 217 scored public results (211 U12+ youth and 6 Senior). `cloudflare/web-app/build.py`
 validates and bundles this file for the protected website, but this source/CI
 evidence does not prove the revision currently served to signed-in users.
-U7–U11 results and standings must never appear in public JSON or parent APIs.
-
-Public cup results follow the same static feed authority. The scraper reads
-advertised Cups & Vases age-group tabs for 9/11-a-side, intersects them with
-public Results eligibility, and publishes only scored U12+ / Senior rows.
-The verified `cupspage` parser preserves competition, round and match reference,
-uses match date overrides before the round start date, excludes unplayed / n/g
-ties and fails closed on unfamiliar populated markup. Cup rows use
-`provider_cup_id` rather than a league division and never affect standings.
-The client requires `verified_cup_scored_rows_v1` coverage and an exact age-group
-label for cup matches (U12 and U12X remain separate). Signed-in website
-acceptance remains OPEN until the protected served revision is checked.
+Published results are viewable by parents and players (Section 2.10). U7–U11 results and standings must never appear in public JSON or parent APIs.
 
 ## 2.5 Private club-entered results, player, roster and safeguarding data
 
@@ -292,6 +281,7 @@ Mike's decisions D1/D2 (2026-10-08), implementation TESTED locally 2026-10-09; n
 - A genuine real raster badge of 192–511 native pixels on its short edge may receive a per-file D2 exception for a display slot no larger than 128 CSS pixels, in this protected pilot only. Keep q1's global 512px/4x rule. Exact-file exception metadata must contain native dimensions, `below q1`, no upscaling and the protected-pilot rights statement. Image hashes, own-page identity and provenance remain mandatory. Raster SVG wrappers do not qualify as vectors.
 - The former no-initials rules below and in the app/brand placement tables are superseded only within this protected browser-pilot scope. Wider distribution retains the existing standards.
 
+
 Rules:
 
 - canonical `club_id` is the lookup key; club name must never be used as the identity key;
@@ -309,12 +299,14 @@ Rules:
 - logo collection must respect branding/copyright permissions and must not treat an
   arbitrary web image as verified merely because it matches a club name.
 
-Private-pilot badge admission (Mike's decision, 2026-09-26):
+Private-pilot badge admission (Mike's decision, clarified 2026-10-01; see
+`PitchKind-PILOT-RIGHTS-BYPASS-RULE-2026-10-01.md`):
 
-- During the Shooters Hill protected website pilot, Codex may approve a badge
-  for exact club identity, original bytes and technical/visual quality without
-  waiting for rights clearance. Keep its rights status and exact-image provenance
-  for later review. Pilot admission is not public or marketing approval.
+- During the Shooters Hill protected website pilot, rights-permission checks are
+  bypassed and must not block a badge that passes exact club identity, source/
+  provenance, original bytes, technical/visual quality and the private-route /
+  wrong-club / fallback checks. Keep the rights status and exact-image provenance
+  for later review. Pilot admission is not public, marketing or wider-use approval.
 - Mark such metadata `pilot_verified`, joined to the existing directory by
   canonical club ID. Show it only when the Shooters Hill private-pilot runtime
   scope check passes; an API `logo_verified` flag must not make this pilot
@@ -340,7 +332,8 @@ Private-pilot badge admission (Mike's decision, 2026-09-26):
   the Cray card's network source remain open.
 - The Android APK is not the active pilot surface. Any future wider distribution,
   club expansion, catalogue/CDN launch or rights claim needs its own decision.
-  The D1 placeholder fallback must remain when no pilot badge is admitted; it is never a real badge.
+  The protected pilot uses the D1 monogram fallback for a known canonical club;
+  unknown identity and wider distribution retain the neutral PitchKind mark.
 
 Historical status on 2026-09-19 (superseded for the private website pilot by the
 2026-09-28 evidence above):
@@ -379,6 +372,70 @@ private. A parity check is diagnostic only; publishing from the shadow Worker
 requires a separate architecture and privacy decision.
 
 ---
+
+## 2.10 Roles and visibility (decided by Mike, 2026-10-10)
+
+Roles: `club_admin`, `coach`, `assistant_coach`, `parent`, `player`. `pending`, `pending_parent`, `pending_coach`, `pending_player` and `revoked` are intended account states, not roles, and should carry no team-data access. The live schema and RPCs do not yet fully enforce this model; see the verified blockers below.
+
+| Data | Staff (club_admin, coach, assistant_coach) | Parent | Player (U15 only) |
+|---|---|---|---|
+| Published results (public Selkent feed: U12+ and Senior) | Yes | Yes | Yes |
+| Private club-entered results, U12 and above | Yes | Yes | Yes |
+| Private club-entered results, U7-U11 | Yes | No (scoreless) | Not applicable (no player access below U15) |
+| Tactics | Yes | No | No |
+| Training sessions | Yes | Yes | Yes |
+| Safeguarding, medical/allergy, parent contacts, private coach notes, attendance | Per Section 2.5 (staff only) | No | No |
+| Inbox / messaging | Yes | Yes | No |
+
+Rules:
+
+- Any result published on the website is viewable by parents and players. U7-U11 results are never published, so Section 7 is unchanged and takes precedence.
+- Private results for U12 and above are visible to parents and players. This replaces the earlier rule that parents and players never see private results. For U7-U11 they remain hidden, and a team with an unknown age fails closed to hidden.
+- All staff roles can see tactics (club_admin, coach, assistant_coach; confirmed by Mike, 2026-10-10). Parents and players cannot.
+- X teams (for example U9X, U12X) use older squad sizes from before Future Fit and are the same age band as their label (U9X is 7v7, U9 is 5v5). U12X is a published-results group. U8X and U10X are protected youth groups. The public-feed protection and private database age helper are separate paths; the live X-label helper discrepancy below remains open.
+- Sign-in (Mike, 2026-10-10; preserved from rebuild commit 1083e91): club admins, coaches, assistant coaches and parents sign up and log in with email and password only. No invite codes for adults. Only U15 players use a club-issued code through the separate Player Login flow and must await coach approval. A parent chooses a team and types their child’s name in a free-text sign-up box; a coach or club admin approves the request and links the real squad member. Parents are never shown other players’ names. The email-based coach/admin request RPCs are present in the live database; signed-in acceptance of complete onboarding remains OPEN. Retire adult invite paths together with their replacement onboarding so staff can still be added.
+- Player Login is U15 only. Widening it requires a club decision and a safeguarding review first.
+
+Implementation and database status, independently checked 2026-10-10:
+
+| Item | Status | Evidence and limits |
+|---|---|---|
+| Adult email-only requests and owner approval (008) | DEPLOYED-LIVE definitions/schema | claim_invite rejects adult invite types; coach/admin request RPCs and profiles.is_owner exist; review_coach_request requires an owner for a Club Admin approval. History records 008 at 20261010142607. No account approvals/owner changes performed here. |
+| Multiple coaching teams (012) | DEPLOYED-LIVE objects verified | coach_team_assignments has RLS and authenticated SELECT only. The five assignment/list/switch RPCs exist with authenticated/service-role execute and no PUBLIC/anon execute. A migration named 012 is absent from returned history, so object existence is the independent evidence. Profile team fields designate the active team. |
+| Table grants (013) | DEPLOYED-LIVE, catalog verified | History contains 20261010183206. Anon has no public-table or sequence privileges. Authenticated public-table writes are limited to INSERT/UPDATE on match_availability and coach_match_notes; other browser operations use definer RPCs. The wider RLS/policy audit remains open. |
+| Parent projection (014) | DEPLOYED-LIVE, partially correct | History contains 20261010184133; replacement functions are present. The helper strips tactics/cup progress/match notes and filters parent personal records to approved children. NULL age is restricted; the below-U7 gap and context flag discrepancy remain. |
+| Two capacities (015) | WRITTEN on main; TESTED locally; NOT APPLIED | Main e1b09d2431d28d8ceb69d1a949d1554c8c5b8843 contains draft, rollback and hidden app integration. Synthetic SQL test: 23 PASS assertions, including message contacts; full test transaction rolled back. Live acting_as_parent, set_my_capacity and request_child_link are absent. No real signed-in acceptance claimed. |
+| Blank Inbox subject (016) | WRITTEN + TESTED locally; NOT APPLIED | Separate from 015. Empty, space-only and NULL subjects become Message; nonblank subjects retain trimming. Rollback restores previous behaviour. Fingerprints reject function drift and preserve signature, grants and security configuration. |
+| Below-U7/unknown age privacy (017) | WRITTEN + TESTED locally; NOT APPLIED | Restricts parent/player state and both restricted flags for NULL or below-U7 ages. Tested against observed 014 baseline and unchanged 015 draft. Staff state/flags stay unchanged. If both approved, apply 017 after 015, which replaces the public flag functions. |
+| All assigned-team Inbox and existing coach-directed alerts (018) | DECIDED by Mike; WRITTEN + TESTED locally; NOT APPLIED | Mike chose all assigned teams on 2026-10-10. Extends coach/assistant Inbox contacts and parent/child request alerts to assignments, retaining club/active-team checks and effective parent capacity. Requires 015 first. Existing fixture/squad alert recipients and approval/edit permissions are unchanged. |
+| Title setter and last-owner guard (010) | WRITTEN; NOT APPLIED | Owner handover remains conditional on James having his own real login, James approving Jacky and the last-owner guard being applied. No owner flag/account changed here. |
+
+Observed gaps and corrections, from function/schema/grant metadata only:
+
+- The earlier pending_player CHECK mismatch is resolved: the current constraint includes pending_player and pending_coach. History records 006 at 20261010131617. This proves the constraint change, not end-to-end Player Login acceptance.
+- The earlier full-state fallback is replaced by private.state_for_viewer, whose non-staff allowlist denies unrecognised roles. Current parent state is filtered to own children. get_team_state_for_me calls can_read_team; get_my_context still does not call it explicitly. Wider cross-club/team and policy acceptance remains part of G5/G6.
+- 014's comment says ages below 7 are restricted, but the deployed helper uses coalesce(p_age,7). The age helper converts NULL to 0, and teams.age_group permits 5 and 6. Synthetic age-5 tests reproduce scores passing through parent/player views. The current context restricted flag also lacks the NULL guard. This is a verified logic defect, not evidence that any current child's records were exposed. 017 addresses it.
+- team_player_age still subtracts one year for Under 8/10/12/14X labels, contradicting Mike's same-age X-label decision and U12X result visibility. This remains separate and open; 017 does not change it.
+- list_announcements_for_me still lacks an explicit approved-role allowlist before its whole-club audience branch. Review pending/revoked access before wider onboarding.
+- The service-only device-invite path, no-match-report notification draft 007, tautology policy and full signup/approval/UI acceptance remain open review items. Completion is not established by these catalog checks.
+- The statement that coaches receive all football alerts only for the active team was too broad: inspected fixture/squad notification producers target parents/eligible players. The active-team restriction is present in Inbox eligibility and staff-directed parent/child request alerts. 018 implements Mike's all-assigned-team choice for those existing coach paths.
+
+Local verification uses PGlite 0.3.14, copied actual function definitions and catalog-shaped stand-in tables with invented accounts, teams and children. It verifies SQL logic, execute checks, atomic rollback, drift rejection and grant/config preservation. It does not reproduce Supabase JWT validation, production triggers, foreign keys, all RLS policies, Cloudflare delivery or signed-in UI behaviour. No current child/account records were read.
+
+Claude's handoff authorises ChatGPT to continue while Claude is unavailable. Preserve Claude's UI designs, the existing Supabase project/free plan and protected test.pitchkind.com. Shooters Hill only. Vikings and Royals retain independent private result records with no cross-sync. Live database application requires Mike's explicit written instruction naming each change. Keep 015 for capacity switching, 016 for subject fix, 017 for age gap and 018 for assigned-team Inbox/alerts; never reuse 015's rollback for the subject fix.
+
+## 2.11 Admin player onboarding
+
+Mike requested a player onboarding workflow on the Club Admin page on 2026-10-13. This authorises the guided workflow and a narrowly scoped Admin operation; it does not authorise the assistant to create real player records or approve real accounts during implementation.
+
+Authority remains Supabase: existing `team_state.squad`, private U7–U11 season identity mappings, `parent_access_requests` and `parent_player_links`. No roster, parent email, medical information or other private data is added to the public GitHub feeds. The UI keeps drafts and loaded private data in memory, clears them on leaving/access changes, and uses routes without member identifiers.
+
+The dedicated `public.admin_onboard_player(uuid,text,integer,text,uuid)` API delegates to a non-exposed private implementation. It requires an authenticated Club Admin and an active team in that Admin's club, rejects parent capacity, duplicate player names and shirt numbers, validates the configured registration limit, and appends one active squad player. General `can_edit_team` and `save_team_state` permissions remain unchanged. Existing team records, performance data and configuration are retained; the prior stored revision is archived. U7–U11 number/name mappings continue through the existing normalization/hydration helpers.
+
+An optional selected parent request is checked against the same team and club, then approved through the existing `approve_parent_request` function. Any approval failure rolls back the player addition, private identity mapping and history together. The UI requires explicit parent/guardian verification and never grants access from a name match alone. Existing players can continue through the existing approval flow. Adult self-sign-up, U15 account eligibility and the wider release/safeguarding gates above remain unchanged.
+
+Evidence: migration `20261012233918_admin_player_onboarding` was applied on 2026-10-13 (Europe/London); both deployed function bodies match the tested SQL, anonymous execute is denied, authenticated direct access to the private core is denied, and an unauthenticated live guard test passed without creating records. Thirty-five isolated database checks used invented accounts/players only. The security advisor reported no new notices. The client workflow is source-tested; revision-specific signed-in browser acceptance remains OPEN.
+
 
 # 3. Selkent standings contract
 
@@ -585,7 +642,9 @@ Android polling. Temporary fixture/result fallbacks must remain isolated.
 
 ## 9.6 Login and account-entry model
 
-Product direction confirmed 2026-09-19 and represented in v2.2.4 source:
+Current website decision (2026-10-10): all adults use email/password with approved role access; no adult invite codes. Only U15 players use club-issued codes and await coach approval. Parent sign-up uses a free-text child name and staff linkage, without showing other players’ names. The branch-only rebuild owns implementation; Section 2.10 records the current database blockers.
+
+Historical Android direction confirmed 2026-09-19 and represented in v2.2.4 source:
 
 - Club admins, coaches and parents use one common opening login screen with email + password and are redirected according to their authenticated role/context.
 - A separate **Player Login** path is restricted to eligible U15 player accounts. It uses the player's existing name plus a reusable code generated by the club/coach; no player email address or phone credential is required by that login flow.
@@ -668,14 +727,32 @@ Club creation/self-service onboarding and external-club rollout are **ON HOLD** 
 5. **PLANNED** - remove the dead legacy `activateAssignment()` activation path, obsolete activation-gate UI and unused native sign/verify assignment stubs; only graduate the cleanup to BUILT after inspecting a rebuilt APK.
 6. **PLANNED** - add the verified U8/U9 `divisionsspage` captures from Drive into `tests/fixtures/`; they are not present in the current repository fixture folder.
 7. **PLANNED** - re-fetch and verify U10X/U12/U14/Senior `divisionsspage` payloads; current shared evidence does not establish all four as repository fixtures.
-8. **PLANNED GitHub mirror** - the Drive master was promoted in place and updated to this 2026-09-22 status. Restore GitHub-root `ARCHITECTURE.md` from these bytes via the guarded Termux script; verify the remote commit and content checksum. GitHub root returned 404 at this check.
+8. **WRITTEN GitHub mirror; remote reconciliation OPEN** - the Drive master is updated in place on 2026-10-10. GitHub root exists at main e1b09d2 but is older. The prepared package carries the reconciled mirror. Connected branch creation returned HTTP 403 on 2026-10-10; no remote branch/push/PR claimed. Verify remote commit and byte parity after an authorised execution path succeeds.
 9. **PLANNED** - remove duplicate repo files `scripts/scrape (1).py` and `tests/test_selkent_scrape (1).py` after confirming no workflow depends on them.
 10. **PLANNED security hardening** - review current Supabase advisor findings and preserve evidence for each finding resolved or accepted; advisor counts are review targets, not automatically confirmed exploits.
 11. **PLANNED** - build the canonical club-logo catalogue for clubs already in the supported directory, retain provenance, add public logo metadata, implement club-selection auto-population and provide the verified club-admin correction path.
 12. **PLANNED repository hygiene** - review and relocate/remove `.github/workflows/chatgpt-action-main.zip` if it has no current provenance purpose; it is not an executable workflow.
 13. **PLANNED documentation reconciliation** - update `CURRENT-STATUS-MANIFEST.md` and status-only wording in the app/brand guidelines to align with the authorised PitchKind identity and v2.2.15 CI / v2.2.16 source evidence, without changing approved visual rules.
 
-# 11. Legal/documentation working-copy decision
+## 11.1 Release gate: safeguarding and data protection (Mike, 2026-10-10)
+
+No person outside Mike's own team is onboarded until every item below is DONE with recorded evidence. This applies to other coaches, parents, players, clubs and outside testers. Claude's counts-only review on 2026-10-10 reported squad entries in the existing database; limited pilot access does not make children's names test material. No real child data is used in this continuation's tests.
+
+| Gate | Required work and evidence | Current status |
+|---|---|---|
+| G1 | Inventory every child-data field, storage location, access and retention; Mike reviews written inventory. | PLANNED |
+| G2 | Parent privacy notice, lawful basis and DPIA decision/completion as required; review Children's Code implications of U15 access; approved documents in current master. | PLANNED; legal document work ON HOLD |
+| G3 | Welfare Officer sign-off and documented adult vetting against club DBS/FA safeguarding requirements before owner/admin approval; email address alone insufficient. | PLANNED |
+| G4 | Written age/consent rules and tested U15-only signup; verify applicable parental-consent wording. | PLANNED |
+| G5 | Real signed-in parent/coach/player tests using invented children: own-child scope, no tactics/cup/match notes, protected results and no cross-team leakage; screenshots/test log. | OPEN; local SQL tests partial evidence only; 017/018 NOT APPLIED |
+| G6 | Audit grants, every table's RLS/policies and anon-reachable functions; resolve tautology policy and record applied fixes. | PARTIAL: 013 grants verified; policy audit OPEN |
+| G7 | Confirm free-plan backup availability, data/account deletion and incident reporting procedure; test erasure. | PLANNED |
+| G8 | Owner-only additional Club Admin approval, no self-granted owner flag and audit review; last-owner guard before handover. | PARTIAL: 008 definitions verified; 010/acceptance OPEN |
+| G9 | Invented test data only, fake test team excluded from club login list; no real children in tests/demos. | PARTIAL: isolated invented local fixtures used; live hidden fake team NOT CREATED |
+
+This mandatory gate remains OPEN. It records Mike's decision/checklist, not legal compliance or completion through source alone. Player register, payments, DPA/meeting agenda and ICO-detail work remain ON HOLD.
+
+## 11.2 Legal/documentation working-copy decision
 
 Checked 2026-09-19.
 
@@ -709,6 +786,12 @@ must not be represented as a final/deployed agreement.
 
 ---
 
+## 11.3 Cloudflare token maintenance evidence
+
+Correction from LOG-ENTRY_2026-10-04_2005_claude_record-x2-smtp-and-agent-tokens-removed.md: Mike's 4 October screenshots showed the PitchKind Supabase SMTP account token and Cloudflare Agent Token - 2026-09-20 user token no longer listed. Claude did not delete them. These screenshots do not prove no service depended on them; SMTP delivery and connector/deploy health were not verified by deletion.
+
+The 2 October record showed no expiry for rough-dream-2eab; the 4 October screenshot did not show expiry, and build-token expiry was not visible. Current deploy-token identity/expiry remain UNCONFIRMED. Do not invent a renewal date or claim a reminder was scheduled. Confirm current/replacement token expiry without reading token values, then schedule a reminder. No token, repository secret or Cloudflare setting changed here.
+
 # 12. Architectural principles
 
 1. One intended authority per data category.
@@ -730,6 +813,18 @@ must not be represented as a final/deployed agreement.
 ---
 
 # Changelog
+
+## 2026-10-10 - Handoff continuation, database evidence and release gate
+
+Reconciled 008/012/013/014 live catalog evidence, resolved the 015 numbering collision and recorded capacity 015 as locally TESTED but unapplied. Prepared tested drafts 016 (blank subject), 017 (below-U7 privacy gap) and 018 (Mike chose all assigned-team Inbox/existing coach alerts). Added G1-G9, corrected SMTP/Agent token deletion provenance and left token expiry/reminder unconfirmed. No live database/account changes. Remote mirror is blocked by GitHub integration HTTP 403; prepared bytes are not deployment evidence.
+
+## 2026-10-10 - GitHub follow-up and live invite review
+
+Preserved the newer adult email-only sign-in and parent name-privacy decisions from rebuild commit 1083e91. Independently verified the live claim_invite function replacement and recorded the pending_player CHECK mismatch, get_my_context pending-role bypass, announcement role gap and service-only device invite path. No live data rows read, invitations claimed, migrations applied or main changes made by this review.
+
+## 2026-10-10 - Roles and visibility decisions and independent review
+
+Recorded Mike’s published/private results, all-staff tactics, training visibility, X-age format and U15-only Player Login decisions in Section 2.10. Reconciled the authorised D1/D2 badge rules while preserving the 2026-10-01 protected-pilot rights bypass. Independent review of rebuild/domain-core is CHANGES REQUIRED; existing tests pass, but policy and parity gaps remain. Corrected the claimed missing profiles_role_check using live metadata. Database fixes are NOT APPLIED; main and deployment remain unchanged.
 
 ## 2026-09-30 - Historical result-count correction and mirror review
 
