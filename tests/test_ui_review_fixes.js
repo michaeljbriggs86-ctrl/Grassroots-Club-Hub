@@ -16,7 +16,7 @@ win.history={pushState(_state,_title,url){entries.push({mode:'push',url,state:_s
 const env={__adminFixtureWeekend:"",__adminFixtureAge:"all",__adminFixtureCategory:"",__adminFixtureDay:"",__clubResultsWeekend:"",__clubResultsAge:"all",__clubResultsCompetition:"all",__clubResultsPage:0,adminFixtureWeekendKey:()=>"",window:win,URL,CLOUD_MODE:true,currentRole:'coach',currentView:'home',__clubTab:'overview',__squadPage:0,__communicationsTab:'inbox',__booting:false,
   isAdmin:()=>env.currentRole==='admin',isCoach:()=>['coach','assistant_coach'].includes(env.currentRole),isPublishedLeagueTeam:()=>false,isClubOverviewMode:()=>env.currentRole==='admin',
   document:{body:{classList:classes()},querySelector:()=>null,querySelectorAll:q=>q==='.view'?views:q==='.top-nav-tabs .nav-item'?tabs:[],getElementById:id=>id==='match-id'?{value:''}:null},
-  localStorage:{setItem(){}},ADMIN_UI_MODE_KEY:'admin-mode',setDefaultDate(){},renderTeamIdentity(){},applyAccessMode(){},syncMobileNavigation(){},applyMiniResultVisibility(){},setCommunicationsTab(){},refreshInbox(){},toast(){},writeMatchPageChoices(){},restoreMatchPageChoices(){},confirmDiscardMatchEdits:()=>true,
+  localStorage:{setItem(){}},ADMIN_UI_MODE_KEY:'admin-mode',setDefaultDate(){},renderTeamIdentity(){},renderDashboard(){},renderSeasonPlayerStats(){},applyAccessMode(){},syncMobileNavigation(){},applyMiniResultVisibility(){},setCommunicationsTab(){},refreshInbox(){},toast(){},writeMatchPageChoices(){},restoreMatchPageChoices(){},confirmDiscardMatchEdits:()=>true,
   setClubTab(tab){env.__clubTab=tab;env.syncNavigationUrl();}
 };
 vm.createContext(env);
@@ -37,6 +37,10 @@ win.location.href='https://example.test/?view=club-results';const playerEntries=
 env.currentRole='coach';env.navigate('league',false);assert.equal(env.currentView,'matches','unpublished teams route to Matches');
 assert.equal(tabs.find(t=>t.dataset.nav==='matches').attrs['aria-current'],'page','the actual destination receives the active marker');
 env.navigate('<script>',false);assert.equal(env.currentView,'home','unknown URL values never become views');
+env.navigate('team-stats',false);assert.equal(env.currentView,'team-stats','staff reach the dedicated statistics page');
+env.currentRole='parent';env.navigate('team-stats',false);assert.equal(env.currentView,'home','statistics remain unavailable to parents');
+env.currentRole='player';env.navigate('team-stats',false);assert.equal(env.currentView,'team-stats','eligible player access is preserved');
+env.currentRole='coach';
 env.currentRole='admin';env.navigate('club-fixtures',false);assert.equal(new URL(win.location.href).searchParams.get('view'),'club-fixtures');
 assert.equal(entries.at(-1).mode,'push');
 const before=entries.length;env.navigate('club-results',false);assert.equal(entries.length,before+1,'club tab navigation adds one history entry');

@@ -10,7 +10,7 @@ for(const match of html.matchAll(/<\/?([a-z][a-z0-9-]*)\b[^>]*>/gi)){
  if(id){assert(!ids.has(id),`duplicate ID ${id}`);ids.add(id);ancestors.set(id,stack.map(x=>x.id).filter(Boolean));}
  if(!voids.has(key)&&!tag.endsWith('/>'))stack.push({tag:key,id});
 }
-const lists={contacts:['member-contacts-panel','member-contacts-list','contact-import-panel'],
+const lists={'team-stats':['home-player-stats','season-player-stats','top-scorers','award-leaders'],contacts:['member-contacts-panel','member-contacts-list','contact-import-panel'],
  'club-teams':['admin-home-teams','admin-team-grid'], 'coach-documents':['coach-document-matrix','coach-document-table'],
  'app-access':['app-access-panel','admin-access-list'], 'staff-requests':['coach-requests','coach-requests-list'],
  'team-access':['team-access-settings','team-members-list'],rules:['rules-procedures-settings'],
@@ -26,4 +26,4 @@ for(const [view,children] of Object.entries(lists)){
 assert(ancestors.get('coach-documents-summary-status').includes('admin-club-overview'),'Home keeps renewal warnings');
 assert(ancestors.get('admin-team-count').includes('admin-club-overview'),'Home keeps the team count');
 assert(!ids.has('admin-home-coverage-list'),'Home no longer repeats a staff assignment list');
-console.log('PASS ten dedicated pages: unique IDs, correct list placement, entry and Back links, focused titles and compact Home warnings');
+console.log('PASS eleven dedicated pages: unique IDs, correct list placement, entry and Back links, focused titles and compact Home warnings');

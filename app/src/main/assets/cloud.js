@@ -17,7 +17,7 @@
   const LOGIN_CLUB_KEY = 'grassroots_hub_login_club_v1';
   const APP_STATE_STORAGE_KEY = 'grassrootsHub_team_state_v1';
   const AUTH_REDIRECT = location.protocol==='file:'?'grassrootsclubhub://auth-callback':location.origin+'/';
-  const AUTH_DESIGN_REVISION = 'approved-app-ui-2026-09-21-v1.4-pitchkind';
+  const AUTH_DESIGN_REVISION = 'approved-app-ui-2026-09-21-v1.4-pitchkind+figma-login-2026-10-13';
   const INITIAL_AUTH_CALLBACK = new URLSearchParams(location.search).get('auth_callback') ||
     (/^(?:#)(?:.*&)?(?:access_token|error|error_code)=/.test(location.hash)?location.href:'');
   let initialAuthCallbackHandled = false;
@@ -964,16 +964,16 @@
     };return icons[name]||icons.user;
   }
   function authBrand(){
-    return `<div class="auth-brand"><img src="shooters-hill-logo.png" alt="Shooters Hill AFC club badge" class="auth-brand-lockup"/></div>`;
+    return `<div class="auth-brand"><img src="shooters-hill-logo.png" alt="Shooters Hill AFC club badge" class="auth-brand-lockup" width="88" height="88"/><p class="auth-club-name">SHOOTERS HILL AFC</p></div>`;
   }
   function authField({icon='user',id,type='text',placeholder='',label=placeholder,autocomplete='',inputmode='',maxlength='',value='',extra=''}){
     return `<div class="auth-field-group"><label class="auth-field-label" for="${id}">${escapeHtml(label)}</label><div class="auth-field"><span class="auth-field-icon" aria-hidden="true">${authIcon(icon)}</span><input id="${id}" name="${id}" type="${type}" ${autocomplete?`autocomplete="${autocomplete}"`:''} ${inputmode?`inputmode="${inputmode}"`:''} ${maxlength?`maxlength="${maxlength}"`:''} value="${escapeHtml(value)}" placeholder="${escapeHtml(placeholder)}" ${extra}/></div></div>`;
   }
-  function authMainScreen({screen='adult',tagline,heroNote='',title,copy,body,footer='COMMUNITY FUELS BRIGHTER FUTURES',back=false}){
-    return `<div class="auth-showcase auth-${screen}">${authBrand()}<div class="auth-scene" aria-hidden="true"></div><div class="auth-main">${back?'<button type="button" class="auth-back" id="auth-screen-back">‹ Back</button>':''}<h1>${title}</h1><p class="auth-lead">${copy}</p>${body}</div><div class="auth-grass-footer"><span>${footer}</span></div></div>`;
+  function authMainScreen({screen='adult',title,copy,body,after='',footer='Your club, together.',back=false}){
+    return `<div class="auth-showcase auth-${screen} auth-redesign"><div class="auth-welcome">${authBrand()}<h2 class="auth-story-heading">Your club.<br/>All together.</h2><p class="auth-story-copy">Fixtures, team updates and club life.<br/>One place to stay connected.</p></div><div class="auth-content"><div class="auth-main">${back?'<button type="button" class="auth-back" id="auth-screen-back">‹ Back</button>':''}<div class="auth-heading-copy"><h1>${title}</h1><p class="auth-lead">${copy}</p></div>${body}</div>${after}<p class="auth-login-footer">${footer}</p></div></div>`;
   }
-  function authSimple(title,copy,body,tagline='SHOOTERS HILL AFC'){
-    return `<div class="auth-simple">${authBrand()}<div class="auth-simple-card"><h1>${title}</h1>${copy?`<p class="auth-lead">${copy}</p>`:''}${body}</div></div>`;
+  function authSimple(title,copy,body){
+    return authMainScreen({screen:'simple',title,copy,body});
   }
   function bindPasswordToggle(inputId,buttonId){
     const button=document.getElementById(buttonId);
@@ -998,16 +998,16 @@
       const body=`
         <form id="cloud-signin-form" novalidate>
         <div class="auth-fields">
-          ${authField({icon:'mail',id:'cloud-email',type:'email',placeholder:'Email address',autocomplete:'username',value:prefillEmail})}
-          <div class="auth-password-wrap">${authField({icon:'lock',id:'cloud-password',type:'password',placeholder:'Password',autocomplete:'current-password'})}<button type="button" class="auth-eye" id="cloud-password-toggle" aria-label="Show password" aria-controls="cloud-password" aria-pressed="false">Show</button></div>
+          ${authField({icon:'mail',id:'cloud-email',type:'email',placeholder:'you@example.com',label:'Email address',autocomplete:'username',value:prefillEmail})}
+          <div class="auth-password-wrap">${authField({icon:'lock',id:'cloud-password',type:'password',placeholder:'Enter your password',label:'Password',autocomplete:'current-password'})}<button type="button" class="auth-eye" id="cloud-password-toggle" aria-label="Show password" aria-controls="cloud-password" aria-pressed="false">Show</button></div>
         </div>
         <button type="button" class="auth-forgot" id="cloud-forgot-password">Forgot password?</button>
         <p class="auth-notice ${message?'':'hidden'}" id="cloud-auth-notice">${escapeHtml(message)}</p><p class="activation-error hidden" id="cloud-auth-error" role="alert"></p>
-        <button type="submit" class="auth-primary" id="cloud-auth-submit">${parentOnly?'Sign In as Parent':'Log In'} <span>→</span></button>
+        <button type="submit" class="auth-primary" id="cloud-auth-submit">${parentOnly?'Sign in as parent':'Sign in'}</button>
         </form>
-        ${parentOnly?'':`<div class="auth-alternate-routes" role="group" aria-label="Other sign-in options"><button type="button" class="auth-secondary" id="cloud-parent-login"><span class="auth-button-icon">${authIcon('user')}</span><span>Parent Sign In</span></button><button type="button" class="auth-secondary" id="cloud-player-login"><span class="auth-button-icon">${authIcon('user')}</span><span>Player Login</span></button></div>`}
-        <button class="auth-link-strong" id="cloud-parent-signup">Create Account</button>`;
-      gate.innerHTML=authMainScreen({screen:'adult',heroNote:parentOnly?'One<br/>Team<br/>Together':'More<br/>Than<br/>A Game',title:parentOnly?'Parent Sign In':'Welcome Back',copy:parentOnly?'Use your approved parent email and password.':'Sign in with your email and password.',body,back:parentOnly});
+        `;
+      const after=`<button type="button" class="auth-link-strong" id="cloud-parent-signup">New to the club? Create account</button>${parentOnly?'':`<div class="auth-other-options"><div class="auth-alternate-routes" role="group" aria-label="Other sign-in options"><button type="button" class="auth-secondary" id="cloud-parent-login">Parent sign in</button><button type="button" class="auth-secondary" id="cloud-player-login">Player access</button></div><p class="auth-player-eligibility">Player access is for eligible U15 players.</p></div>`}`;
+      gate.innerHTML=authMainScreen({screen:'adult',title:parentOnly?'Parent sign in':'Welcome back',copy:parentOnly?'Use your approved parent email and password.':'Sign in to your club.',body,after,back:parentOnly});
       bindPasswordToggle('cloud-password','cloud-password-toggle');
       document.getElementById('cloud-forgot-password')?.addEventListener('click',()=>setGateHtml('forgot'));
       document.getElementById('cloud-parent-login')?.addEventListener('click',()=>setGateHtml('parentsignin'));

@@ -2492,6 +2492,7 @@ function navigateMobileAwards(){
 }
 // Linked pages keep full lists outside the main screens. Routes contain no member identifiers.
 const LINKED_PAGES={
+  'team-stats':{title:'Player & team stats',parent:'home',panel:'home-player-stats',access:'team-data'},
   contacts:{title:'Contact details',parent:'inbox',panel:'member-contacts-panel',access:'contacts'},
   'player-onboarding':{title:'Player onboarding',parent:'club',panel:'player-onboarding-panel',access:'admin'},
   'club-teams':{title:'Club teams',parent:'club',panel:'admin-home-teams',access:'admin'},
@@ -2509,6 +2510,7 @@ function linkedPageAllowed(view){
   const staff=['admin','coach','assistant_coach'].includes(currentRole);
   if(page.access==='admin')return CLOUD_MODE&&isClubOverviewMode();
   if(page.access==='team-staff')return staff&&!isClubOverviewMode();
+  if(page.access==='team-data')return ['admin','coach','assistant_coach','player'].includes(currentRole)&&!isClubOverviewMode();
   if(page.access==='contacts')return CLOUD_MODE&&['admin','coach','assistant_coach','parent'].includes(currentRole);
   return staff;
 }
@@ -2535,6 +2537,7 @@ function enterLinkedPage(view){
   else if(view==='season-history')refreshSeasonHistory(false);
   else if(view==='audit-history')refreshAuditHistory(false);
   else if(view==='rules')renderUniversalClubConfiguration();
+  else if(view==='team-stats'){renderDashboard();renderSeasonPlayerStats();}
   document.getElementById(view+'-title')?.focus({preventScroll:true});
 }
 

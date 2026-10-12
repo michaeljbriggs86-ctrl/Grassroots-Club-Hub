@@ -23,7 +23,7 @@ const env={
   window:{dispatchEvent:e=>events.push(e)},CustomEvent:class{constructor(type,options){this.type=type;this.detail=options.detail;}},
   localStorage:{removeItem:key=>storage.delete(key),setItem:(key,value)=>storage.set(key,value)},
   authField:({id})=>`<input id="${id}">`,authIcon:()=>'',escapeHtml:s=>String(s),
-  authMainScreen:({title,body,back})=>`<h1>${title}</h1>${back?'<button id="auth-screen-back"></button>':''}${body}`,
+  authMainScreen:({title,body,after='',back})=>`<h1>${title}</h1>${back?'<button id="auth-screen-back"></button>':''}${body}${after}`,
   bindPasswordToggle(){},setInviteAccessLocked(){},
   signIn:async()=>{calls.push('signIn');env.session={access_token:'fake-token'};},
   hydrateSessionUser:async()=>{},getContext:async()=>({profile:{role:env.profileRole}}),
@@ -40,11 +40,11 @@ vm.runInNewContext(`${source.slice(start,end)}\nthis.openGate=setGateHtml;`,env)
   assert.match(gate.innerHTML,/<form id="cloud-signin-form" novalidate>/);
   assert.match(gate.innerHTML,/<button type="submit" class="auth-primary" id="cloud-auth-submit">/);
   assert.ok(nodes.get('cloud-signin-form').listeners.submit,'Enter and the submit button use native form submission');
-  assert.match(gate.innerHTML,/Parent Sign In/,'main login offers an explicit parent route');
+  assert.match(gate.innerHTML,/Parent sign in/i,'main login offers an explicit parent route');
   nodes.get('cloud-parent-login').listeners.click();
   assert.equal(gate.dataset.authMode,'parentsignin');
-  assert.match(gate.innerHTML,/<h1>Parent Sign In<\/h1>/);
-  assert.match(gate.innerHTML,/Create Account/);
+  assert.match(gate.innerHTML,/<h1>Parent sign in<\/h1>/i);
+  assert.match(gate.innerHTML,/Create account/i);
   nodes.get('cloud-email').value='parent@example.test';nodes.get('cloud-password').value='password';
   env.profileRole='coach';
   await submit();
