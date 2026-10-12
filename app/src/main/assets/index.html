@@ -207,47 +207,7 @@
 
 
 
-        <details class="panel home-season-details" id="home-player-stats">
-          <summary><strong>Player &amp; team stats</strong><span>Form, awards and player contribution</span></summary>
-          <div class="home-season-details-body">
-        <div class="dashboard-grid">
-          <section class="panel">
-            <div class="panel-heading"><h3>Overall recent form</h3><button class="text-button" data-nav="matches">All matches</button></div>
-            <div id="recent-form" class="form-row"></div>
-            <div id="recent-matches" class="mini-list"></div>
-          </section>
-
-          <section class="panel" data-feature-panel="goals">
-            <div class="panel-heading"><h3>Top scorers</h3><span class="shield-mini">⚽</span></div>
-            <div id="top-scorers" class="ranking-list"></div>
-          </section>
-
-          <section class="panel" data-feature-panel="assists">
-            <div class="panel-heading"><h3>Top assists</h3><span class="shield-mini">A</span></div>
-            <div id="top-assists" class="ranking-list"></div>
-          </section>
-
-          <section class="panel" data-feature-panel="awards">
-            <div class="panel-heading"><h3>Player awards</h3><span class="shield-mini">★</span></div>
-            <div id="award-leaders" class="ranking-list"></div>
-            <details class="award-history-inline">
-              <summary>Award history</summary>
-              <div class="award-history-actions"><button class="text-button" id="add-award-btn" data-requires-edit>+ Add award</button></div>
-              <div id="awards-list" class="award-list"></div>
-            </details>
-          </section>
-
-          <section class="panel" data-feature-panel="bookings">
-            <div class="panel-heading"><h3>Discipline</h3><span class="shield-mini">▣</span></div>
-            <div id="booking-leaders" class="ranking-list"></div>
-          </section>
-        </div>
-        <section class="panel season-player-stats" id="season-player-stats">
-          <div class="panel-heading"><div><p class="kicker">Player contribution</p><h3>Season player stats</h3></div><span class="helper" id="season-player-stats-helper">Goals · assists · awards · matchday picks</span></div>
-          <div class="season-player-table-wrap"><table class="season-player-table"><thead><tr id="season-player-stats-head"><th>Player</th><th>G</th><th>A</th><th>G+A</th><th>Awards</th><th>Picks</th></tr></thead><tbody id="season-player-stats-body"></tbody></table></div>
-        </section>
-          </div>
-        </details>
+        <a class="page-link" id="home-team-stats-link" href="?view=team-stats" data-page-route="team-stats"><span><strong>Player &amp; team stats</strong><small>Form, awards and season player contribution</small></span><span aria-hidden="true">›</span></a>
       </section>
 
       <section id="view-matches" class="view" data-view="matches">
@@ -745,6 +705,51 @@
             </details>
             <div id="member-contacts-self"></div>
             <div class="member-contact-list" id="member-contacts-list"></div>
+          </div>
+        </details>
+      </section>
+      <section id="view-team-stats" class="view linked-page" data-view="team-stats" aria-labelledby="team-stats-title">
+        <a class="page-back secondary-button" href="?view=home" data-page-route="home">← Back to Home</a>
+        <div class="section-title-row"><div><p class="kicker">This season</p><h2 id="team-stats-title" tabindex="-1">Player &amp; team stats</h2></div></div>
+        <details class="panel home-season-details" id="home-player-stats">
+          <summary><strong>Player &amp; team stats</strong><span>Form, awards and player contribution</span></summary>
+          <div class="home-season-details-body">
+        <div class="dashboard-grid">
+          <section class="panel">
+            <div class="panel-heading"><h3>Overall recent form</h3><button class="text-button" data-nav="matches">All matches</button></div>
+            <div id="recent-form" class="form-row"></div>
+            <div id="recent-matches" class="mini-list"></div>
+          </section>
+
+          <section class="panel" data-feature-panel="goals">
+            <div class="panel-heading"><h3>Top scorers</h3><span class="shield-mini">⚽</span></div>
+            <div id="top-scorers" class="ranking-list"></div>
+          </section>
+
+          <section class="panel" data-feature-panel="assists">
+            <div class="panel-heading"><h3>Top assists</h3><span class="shield-mini">A</span></div>
+            <div id="top-assists" class="ranking-list"></div>
+          </section>
+
+          <section class="panel" data-feature-panel="awards">
+            <div class="panel-heading"><h3>Player awards</h3><span class="shield-mini">★</span></div>
+            <div id="award-leaders" class="ranking-list"></div>
+            <details class="award-history-inline">
+              <summary>Award history</summary>
+              <div class="award-history-actions"><button class="text-button" id="add-award-btn" data-requires-edit>+ Add award</button></div>
+              <div id="awards-list" class="award-list"></div>
+            </details>
+          </section>
+
+          <section class="panel" data-feature-panel="bookings">
+            <div class="panel-heading"><h3>Discipline</h3><span class="shield-mini">▣</span></div>
+            <div id="booking-leaders" class="ranking-list"></div>
+          </section>
+        </div>
+        <section class="panel season-player-stats" id="season-player-stats">
+          <div class="panel-heading"><div><p class="kicker">Player contribution</p><h3>Season player stats</h3></div><span class="helper" id="season-player-stats-helper">Goals · assists · awards · matchday picks</span></div>
+          <div class="season-player-table-wrap"><table class="season-player-table"><thead><tr id="season-player-stats-head"><th>Player</th><th>G</th><th>A</th><th>G+A</th><th>Awards</th><th>Picks</th></tr></thead><tbody id="season-player-stats-body"></tbody></table></div>
+        </section>
           </div>
         </details>
       </section>

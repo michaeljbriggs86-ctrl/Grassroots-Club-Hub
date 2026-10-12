@@ -1,7 +1,7 @@
 // Coach sign up (Mike, 10 Oct 2026): email and password, request, Club Admin approves. No invite code for adults.
 const fs=require('fs'),assert=require('assert');
 const cloud=fs.readFileSync(__dirname+'/../app/src/main/assets/cloud.js','utf8'),app=fs.readFileSync(__dirname+'/../app/src/main/assets/app.js','utf8'),html=fs.readFileSync(__dirname+'/../app/src/main/assets/index.html','utf8');
-assert.ok(/id="cloud-parent-signup">Create Account</.test(cloud),'main login offers one Create Account button');
+assert.ok(/id="cloud-parent-signup">New to the club\? Create account</.test(cloud),'main login offers one Create Account button');
 assert.ok(!/Staff Sign Up With Invite/.test(cloud),'invite wording gone from the main login');
 assert.ok(/setGateHtml\('signup'\)/.test(cloud));
 assert.ok(/rpc\('request_coach_access',\{p_team_id:String\(teamId\|\|''\),p_role:/.test(cloud),'uses the live request RPC');
