@@ -1,8 +1,8 @@
 {
   "schema_version": 2,
   "provider": "Selkent",
-  "last_updated": "2026-10-11T23:09:40.499135+00:00",
-  "cup_results_last_updated": "2026-10-11T23:09:40.499135+00:00",
+  "last_updated": "2026-10-12T03:07:36.881671+00:00",
+  "cup_results_last_updated": "2026-10-12T03:07:36.881671+00:00",
   "fixture_agegroup_discovery_source": "selkent_divisions_all",
   "coverage": {
     "fixtures": {
