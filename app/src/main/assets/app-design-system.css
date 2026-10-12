@@ -1958,4 +1958,6 @@ html body.auth-open #activation-gate .auth-redesign .auth-brand{background:trans
 html body.auth-open #activation-gate .auth-redesign .auth-lead{font-weight:400!important}
 html body.auth-open #activation-gate .auth-redesign input::placeholder{font-weight:400!important}
 html body.auth-open #activation-gate .auth-redesign :is(.auth-player-eligibility,.auth-login-footer){font-weight:500}
+html body dialog.modal .modal-actions{background-color:var(--gch-white)!important}
+html[data-theme="dark"] body dialog.modal .modal-actions{background-color:var(--gch-ink)!important}
 html[data-theme] body .club-page-watermark{opacity:.015!important}

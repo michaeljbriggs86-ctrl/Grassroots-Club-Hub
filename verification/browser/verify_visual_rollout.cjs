@@ -75,7 +75,9 @@ async function teamChecks(page,theme){
  const attendance=page.locator('#match-attendance-list .attendance-switch').first();
  await attendance.waitFor({state:'visible'});const before=await attendance.getAttribute('aria-pressed');await attendance.click();assert.notEqual(await attendance.getAttribute('aria-pressed'),before,'attendance retains its real event handler');
  assert.equal(await page.locator('#coach-match-note').isVisible(),true,'coach notes must be reviewed in the connected coach view');
+ const actionBackground=await page.locator('#match-detail-dialog .modal-actions').evaluate(el=>getComputedStyle(el).backgroundColor);assert(!actionBackground.startsWith('rgba('),'sticky actions need an opaque surface over attendance rows');
  await page.screenshot({path:path.join(out,`match-details-${theme}.png`),fullPage:true});
+ await page.locator('#coach-match-note').scrollIntoViewIfNeeded();await page.screenshot({path:path.join(out,`match-coach-notes-${theme}.png`),fullPage:true});
  page.once('dialog',async dialog=>{assert.match(dialog.message(),/Discard your unsaved match changes/);await dialog.accept();});
  await page.locator('#match-detail-cancel').click();assert.equal(await page.locator('#match-detail-dialog').isVisible(),false);
  return {screen:'team',theme,ranking,modal};
