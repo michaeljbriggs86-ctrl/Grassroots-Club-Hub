@@ -67,10 +67,19 @@ function selkentMinimumPlayers(format){return {'3v3':2,'5v5':4,'7v7':5,'9v9':6,'
 
 function dismissOpeningSplash(){
   const splash=document.getElementById('app-splash');
-  if(!splash)return;
-  splash.remove();document.body.classList.remove('splash-active');
+  if(!splash||splash.classList.contains('is-leaving'))return;
+  document.body.classList.remove('splash-active');
+  if(window.matchMedia?.('(prefers-reduced-motion: reduce)').matches){splash.remove();return;}
+  splash.classList.add('is-leaving');
+  window.setTimeout(()=>splash.remove(),250);
 }
-window.addEventListener('DOMContentLoaded',()=>setTimeout(dismissOpeningSplash,1150));
+function finishOpeningSplash(){
+  // Let the first app frame paint, then reveal it without an artificial minimum wait.
+  const paint=window.requestAnimationFrame?.bind(window)||(callback=>window.setTimeout(callback,0));
+  paint(()=>paint(dismissOpeningSplash));
+}
+// A stalled startup must not leave a decorative overlay blocking the app.
+window.setTimeout(dismissOpeningSplash,4000);
 
 
 const GENERIC_STARTER_TEAMS = [];
@@ -6207,7 +6216,7 @@ async function bootTracker(){
     }
     setTimeout(()=>{if(!assignmentRequired()||account){if(shouldAutoSync())syncSelkent(true);else if(shouldScanFixtures())scanUpcomingFixtures(true);}},700);
     if(!window.__fixtureScanTimer)window.__fixtureScanTimer=setInterval(()=>{if(document.visibilityState==='visible'&&shouldScanFixtures())scanUpcomingFixtures(true);},5*60*1000);
-  }finally{__booting=false;}
+  }finally{__booting=false;finishOpeningSplash();}
 }
 window.addEventListener('clubhub-authenticated',()=>{const run=()=>{if(__booting){setTimeout(run,60);return;}bootTracker().catch(err=>console.error('Auth handoff failed',err));};requestAnimationFrame(run);});
 bootTracker().catch(err=>console.error('Tracker boot failed',err));
