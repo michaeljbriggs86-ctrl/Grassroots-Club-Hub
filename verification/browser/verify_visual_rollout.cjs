@@ -278,13 +278,70 @@ async function registrationChecks(page,width,theme){
  return {screen:'registration-contact-conduct',width,theme};
 }
 
+async function screenshotCorrectionsChecks(page,width,theme){
+ await prepareTeam(page,theme);await page.setViewportSize({width,height:780});
+ const dashboard=await page.evaluate(async()=>{
+  const day=new Date();day.setUTCDate(day.getUTCDate()+7);
+  state.selkent.fixtures=[{date:day.toISOString().slice(0,10),opponent:'Example Blues',venue:'H',competition:'League'}];
+  renderNextMatch();await renderMatchdayDashboard();
+  const card=document.getElementById('next-match-card').getBoundingClientRect(),prep=document.getElementById('matchday-dashboard').getBoundingClientRect();
+  return {gap:prep.top-card.bottom,viewport:innerWidth,document:document.documentElement.scrollWidth};
+ });
+ assert(dashboard.gap>=16,'next match and preparation cards have a visible gap');
+ assert(dashboard.document<=dashboard.viewport+1,'dashboard reflows');
+ await page.screenshot({path:path.join(out,`dashboard-spacing-${width}-${theme}.png`),fullPage:true});
+ await page.evaluate(()=>{
+  currentRole='admin';account={role:'admin',user:'Example Admin'};adminUiMode='club';currentView='club';__clubTab='results';
+  document.querySelectorAll('.view').forEach(el=>el.classList.toggle('active',el.id==='view-club'));
+  document.getElementById('admin-club-overview').classList.add('hidden');document.getElementById('club-results-panel').classList.remove('hidden');
+  const squad=[{number:9,name:'Alex Example'},{number:4,name:'Jamie Example'}];
+  const resultState={squad,matches:[{id:'report',status:'played',venue:'A',date:'2026-10-11',opponent:'Example Blues',gf:3,ga:0,notes:Array(40).fill('Fictional match notes for scrolling review.').join('\n')}],goals:[{matchId:'report',shirtNumber:9,goals:2},{matchId:'report',shirtNumber:4,goals:1}],awards:[{matchId:'report',shirtNumber:4,type:'Player of the Match'}]};
+  __clubResultsRows=internalAdminClubResults([{team:{id:'fictional-team',ageGroup:'U9',teamName:'Example Greens'},state:resultState}]);
+  __clubResultsRows.push({ageGroup:15,home:'Example Whites',away:'Example Blues',hg:4,ag:2,date:'2026-10-11',competition:'League'});
+  __clubResultsIdentity=clubMatchPageIdentity();openClubMatchSummary('result',0);
+ });
+ const dialog=page.locator('#club-match-summary-dialog');await dialog.waitFor({state:'visible'});
+ assert.match(await page.locator('#club-match-summary-body').innerText(),/Alex Example\s+2/);
+ assert.match(await page.locator('#club-match-summary-body').innerText(),/Player of the Match · Jamie Example/);
+ const bounds=await dialog.evaluate(el=>{
+  const r=el.getBoundingClientRect(),heading=el.querySelector('#club-match-summary-body').getBoundingClientRect();
+  return {left:r.left,right:r.right,top:r.top,bottom:r.bottom,padding:heading.left-r.left,scrollable:el.scrollHeight>el.clientHeight,overflow:getComputedStyle(el).overflowY};
+ });
+ assert(bounds.left>=0&&bounds.right<=width+1&&bounds.top>=0&&bounds.bottom<=780,'summary fits the viewport');
+ assert(bounds.padding>=20&&bounds.scrollable&&bounds.overflow==='auto','long report is padded and scrollable');
+ await page.screenshot({path:path.join(out,`report-dialog-${width}-${theme}.png`)});
+ await dialog.evaluate(el=>el.scrollTop=el.scrollHeight);assert(await dialog.locator('[data-close-dialog]').isVisible(),'close stays reachable in long reports');await page.screenshot({path:path.join(out,`report-dialog-end-${width}-${theme}.png`)});
+ await page.evaluate(()=>document.getElementById('club-match-summary-dialog').close());
+ await page.evaluate(()=>openClubMatchSummary('result',1));
+ assert.match(await page.locator('#club-match-summary-body').innerText(),/A club match report has not been recorded/);
+ await page.screenshot({path:path.join(out,`published-dialog-${width}-${theme}.png`)});
+ await page.evaluate(()=>document.getElementById('club-match-summary-dialog').close());
+ // Real native select, placed inside the same translucent staff directory surface.
+ await page.evaluate(()=>{
+  const panel=document.getElementById('club-coaches-panel');panel.classList.remove('hidden');document.getElementById('club-results-panel').classList.add('hidden');
+  const select=document.getElementById('assign-coach-person');select.innerHTML='<option value="">Choose a person</option>'+Array.from({length:15},(_,i)=>`<option value="person-${i}">Example coach ${i+1} · Coach</option>`).join('');
+ });
+ const picker=page.locator('#assign-coach-person');await picker.scrollIntoViewIfNeeded();await picker.click();
+ const surfaces=await picker.evaluate(el=>({open:el.matches(':open'),background:getComputedStyle(el,'::picker(select)').backgroundColor,option:getComputedStyle(el.options[2]).backgroundColor,maxHeight:getComputedStyle(el,'::picker(select)').maxHeight}));
+ assert(surfaces.open,'native picker opens');assert.equal(surfaces.background,theme==='dark'?'rgb(17, 23, 21)':'rgb(255, 255, 255)','floating picker is opaque');
+ assert.equal(surfaces.option,surfaces.background,'unselected options are opaque');
+ const onboarding=await page.evaluate(()=>{const shell=document.createElement('div');shell.className='universal-onboarding';const select=document.createElement('select');select.innerHTML='<option>Example club</option>';shell.append(select);document.body.append(shell);const result={background:getComputedStyle(select,'::picker(select)').backgroundColor,copy:getComputedStyle(select,'::picker(select)').color};shell.remove();return result;});assert.equal(onboarding.background,'rgb(255, 255, 255)','white onboarding form keeps a white picker in either theme');assert.equal(onboarding.copy,'rgb(17, 23, 21)','onboarding picker retains dark readable text');
+ await page.screenshot({path:path.join(out,`staff-dropdown-${width}-${theme}.png`)});
+ await page.keyboard.press('End');await page.keyboard.press('Enter');assert.equal(await picker.inputValue(),'person-14','last option remains reachable by keyboard');
+ await page.evaluate(()=>{document.getElementById('club-coaches-panel').classList.add('hidden');document.getElementById('club-results-panel').classList.remove('hidden');__clubResultsRows.push(...Array.from({length:11},(_,i)=>({...__clubResultsRows[1],ageGroup:i+8})));renderClubResultsBrowser();});
+ const age=page.locator('#club-results-age');await age.scrollIntoViewIfNeeded();await age.click();
+ assert.equal(await age.evaluate(el=>getComputedStyle(el,'::picker(select)').backgroundColor),surfaces.background,'results picker shares the opaque theme');await page.screenshot({path:path.join(out,`age-dropdown-${width}-${theme}.png`)});await page.keyboard.press('End');await page.keyboard.press('Enter');assert.equal(await age.inputValue(),'18','all age options remain reachable');
+ await page.evaluate(()=>currentRole='parent');await page.evaluate(()=>openClubMatchSummary('result',0));assert.equal(await dialog.isVisible(),false,'restricted roles cannot open staff report');
+ return {screen:'screenshot-corrections',width,theme,dashboard,bounds,surfaces};
+}
+
 let base;
 (async()=>{
  await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));base=`http://127.0.0.1:${server.address().port}`;
  const browser=await chromium.launch({headless:true});const page=await browser.newPage();const errors=[];page.on('pageerror',e=>errors.push(String(e)));
  await page.route('**/*',route=>new URL(route.request().url()).origin===base?route.continue():route.fulfill({status:200,contentType:'application/json',body:'[]'}));
  const results=[];
- try{for(const theme of ['dark','light']){for(const width of [360,393,1280])results.push(await loginChecks(page,width,theme));results.push(await teamChecks(page,theme));for(const width of [320,393,1280])results.push(await coachOnboardingChecks(page,width,theme));for(const width of [320,393,1280])results.push(await adminDirectoryChecks(page,width,theme));for(const width of [320,393,1024])results.push(await workspaceChecks(page,width,theme));for(const width of [320,393,1024])results.push(await latestMatchChecks(page,width,theme));for(const width of [320,393,720])results.push(await registrationChecks(page,width,theme));}assert.equal(errors.length,0,errors.join('\n'));fs.writeFileSync(path.join(out,'measurements.json'),JSON.stringify({results,errors},null,2));console.log('PASS rendered login, password/parent routes, text zoom, stats navigation, match details, attendance and coach onboarding, directories, Squad, Match Plan and deliberate parent verification in both themes');}
+ try{if(process.argv[4]==='screenshot-corrections'){for(const theme of ['dark','light'])for(const width of [320,393,680,1024])results.push(await screenshotCorrectionsChecks(page,width,theme));}else for(const theme of ['dark','light']){for(const width of [360,393,1280])results.push(await loginChecks(page,width,theme));results.push(await teamChecks(page,theme));for(const width of [320,393,680,1024])results.push(await screenshotCorrectionsChecks(page,width,theme));for(const width of [320,393,1280])results.push(await coachOnboardingChecks(page,width,theme));for(const width of [320,393,1280])results.push(await adminDirectoryChecks(page,width,theme));for(const width of [320,393,1024])results.push(await workspaceChecks(page,width,theme));for(const width of [320,393,1024])results.push(await latestMatchChecks(page,width,theme));for(const width of [320,393,720])results.push(await registrationChecks(page,width,theme));}assert.equal(errors.length,0,errors.join('\n'));fs.writeFileSync(path.join(out,'measurements.json'),JSON.stringify({results,errors},null,2));console.log(process.argv[4]==='screenshot-corrections'?'PASS built dropdowns, reports, rapid reopen, staff boundaries and dashboard spacing at 320, 393, 680 and 1024px in both themes':'PASS rendered login, password/parent routes, text zoom, stats navigation, match details, attendance and coach onboarding, directories, Squad, Match Plan and deliberate parent verification in both themes');}
  catch(e){await page.screenshot({path:path.join(out,"failed-check.png"),fullPage:true});throw e;}
  finally{await browser.close();server.close();}
 })().catch(error=>{console.error(error);server.close();process.exitCode=1;});
