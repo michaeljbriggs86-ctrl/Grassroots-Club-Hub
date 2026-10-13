@@ -3,7 +3,7 @@
 const CACHE = 'pitchkind-web-coach-onboarding-20261013';
 const STATIC = [
   './', './index.html', './manifest.json', './cloud-config.js', './cloud.js',
-  './onboarding.js', './onboarding.css', './app.js','./coach-qualifications.js','./member-contact-import.js','./person-profiles.js', './static-feed-overlay.js',
+  './onboarding.js', './onboarding.css', './app.js','./coach-qualifications.js','./member-contact-import.js','./person-profiles.js', './player-onboarding.js', './coach-onboarding.js', './static-feed-overlay.js',
   './styles.css', './cloud.css', './app-design-system.css',
   './inter-variable.woff2', './inter-OFL.txt',
   './pilot-rights-runtime.js', './shooters-hill-logo.png', './club-badge-unavailable.svg', './football-login-adult.jpg',
