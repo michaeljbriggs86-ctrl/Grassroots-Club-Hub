@@ -86,7 +86,7 @@
       <button type="button" class="top-nav-tab nav-item hidden" data-nav="club-results" data-results-global-nav>Results</button>
       <button type="button" class="top-nav-tab nav-item hidden" data-nav="club-coaches" data-admin-global-nav>Staff</button>
       <button type="button" class="top-nav-tab nav-item hidden" data-nav="inbox"><span id="communications-nav-label">Inbox</span><span class="notification-badge hidden" id="global-inbox-badge">0</span></button>
-      <button type="button" class="top-nav-tab nav-item" data-nav="more">Settings</button>
+      <button type="button" class="top-nav-tab nav-item" data-nav="more">More</button>
     </nav>
 
     <main id="app" class="content" tabindex="-1">
@@ -539,26 +539,16 @@
 
       </section>
 
-      <section id="view-more" class="view" data-view="more">
-        <div class="section-title-row"><div><p class="kicker">Team &amp; app</p><h2>Settings</h2></div></div>
-        <nav class="screen-section-nav settings-section-nav" aria-label="Jump to settings section">
-          <button type="button" data-scroll-to="training-session-settings" data-coach-ui-only>Training</button>
-          <button type="button" data-scroll-to="match-detail-settings" data-requires-edit data-coach-ui-only>Features</button>
-          <button type="button" data-page-route="team-access" data-staff-settings>Team access</button>
-          <button type="button" data-page-route="rules" data-staff-settings>Rules</button>
-          <button type="button" data-scroll-to="club-admin-access-settings" data-admin-settings-only>Club Admin</button>
-          <button type="button" data-scroll-to="admin-season-management-panel" data-admin-settings-only>Season</button>
-          <button type="button" data-scroll-to="season-history-settings" data-staff-history>History</button>
-          <button type="button" data-scroll-to="appearance-settings">Appearance</button>
-          <button type="button" data-scroll-to="access-panel">My account</button>
-        </nav>
-        <button type="button" class="secondary-button hidden" id="coach-profile-self">My coaching profile</button>
-        <button type="button" class="secondary-button hidden" id="person-profile-self">My profile</button>
-        <div class="settings-accordion-list">
-
-<div class="settings-group-heading" data-coach-ui-only><span>Team</span><small>Tools and access for this team</small></div>
-
-<details class="panel settings-accordion" id="training-session-settings" data-requires-edit data-coach-ui-only>
+      <section id="view-more" class="view more-hub" data-view="more" aria-labelledby="more-title">
+        <div class="section-title-row"><div><p class="kicker" id="more-kicker">Team &amp; app</p><h2 id="more-title" tabindex="-1">More</h2></div></div>
+        <p class="muted more-intro" id="more-intro">Tools, preferences and your account.</p>
+        <div class="more-tool-grid"><section class="more-tool-group" data-more-role="admin" aria-labelledby="more-admin-0" hidden><h3 id="more-admin-0">Club tools</h3><div class="more-link-list"><a class="page-link" href="?view=inbox" data-page-route="inbox"><span><strong>Communications</strong><small>Messages and club notices</small></span><span aria-hidden="true">›</span></a><a class="page-link" href="?view=contacts" data-page-route="contacts"><span><strong>Contacts</strong><small>Club and team contacts</small></span><span aria-hidden="true">›</span></a><a class="page-link" href="?view=club-teams" data-page-route="club-teams"><span><strong>Club teams</strong><small>Open a team workspace</small></span><span aria-hidden="true">›</span></a><a class="page-link" href="?view=player-onboarding" data-page-route="player-onboarding"><span><strong>Player onboarding</strong><small>Registration and parent links</small></span><span aria-hidden="true">›</span></a><a class="page-link" href="?view=coach-onboarding" data-page-route="coach-onboarding"><span><strong>Coach onboarding</strong><small>Staff registration and checks</small></span><span aria-hidden="true">›</span></a><a class="page-link" href="?view=coach-documents" data-page-route="coach-documents"><span><strong>Coach documents</strong><small>DBS, safeguarding and first aid</small></span><span aria-hidden="true">›</span></a><a class="page-link" href="?view=app-access" data-page-route="app-access"><span><strong>App access</strong><small>Account roles and team access</small></span><span aria-hidden="true">›</span></a><a class="page-link" href="?view=staff-requests" data-page-route="staff-requests"><span><strong>Staff access requests</strong><small>Review pending staff accounts</small></span><span aria-hidden="true">›</span></a></div></section><section class="more-tool-group" data-more-role="admin" aria-labelledby="more-admin-1" hidden><h3 id="more-admin-1">Club settings</h3><div class="more-link-list"><a class="page-link" href="?view=rules" data-page-route="rules"><span><strong>Rules & procedures</strong><small>Club matchday guidance</small></span><span aria-hidden="true">›</span></a><a class="page-link" href="?view=season-control" data-page-route="season-control"><span><strong>Season control</strong><small>Archive and start a season</small></span><span aria-hidden="true">›</span></a><a class="page-link" href="?view=club-compliance" data-page-route="club-compliance"><span><strong>Data protection & safeguarding</strong><small>Reviewers and welfare contacts</small></span><span aria-hidden="true">›</span></a><a class="page-link" href="?view=season-history" data-page-route="season-history"><span><strong>Season history</strong><small>View previous seasons</small></span><span aria-hidden="true">›</span></a><a class="page-link" href="?view=audit-history" data-page-route="audit-history"><span><strong>Audit history</strong><small>Club activity and access changes</small></span><span aria-hidden="true">›</span></a></div></section><section class="more-tool-group" data-more-role="coach" aria-labelledby="more-coach-0" hidden><h3 id="more-coach-0">Team tools</h3><div class="more-link-list"><a class="page-link" href="?view=inbox" data-page-route="inbox"><span><strong>Inbox</strong><small>Team messages and club notices</small></span><span aria-hidden="true">›</span></a><a class="page-link" href="?view=contacts" data-page-route="contacts"><span><strong>Contacts</strong><small>Your team’s approved contacts</small></span><span aria-hidden="true">›</span></a><a class="page-link" href="?view=training-settings" data-page-route="training-settings"><span><strong>Training schedule</strong><small>Weekly and one-off sessions</small></span><span aria-hidden="true">›</span></a><a class="page-link" href="?view=team-access" data-page-route="team-access"><span><strong>Team access</strong><small>Parent requests and team members</small></span><span aria-hidden="true">›</span></a><a class="page-link" href="?view=club-results" data-page-route="club-results"><span><strong>Club results</strong><small>Published results across the club</small></span><span aria-hidden="true">›</span></a><button type="button" class="page-link" data-more-awards><span><strong>Player awards</strong><small>Awards recorded for your team</small></span><span aria-hidden="true">›</span></button></div></section><section class="more-tool-group" data-more-role="coach" aria-labelledby="more-coach-1" hidden><h3 id="more-coach-1">Team settings</h3><div class="more-link-list"><a class="page-link" href="?view=feature-settings" data-page-route="feature-settings"><span><strong>Features & awards</strong><small>Optional tools and award types</small></span><span aria-hidden="true">›</span></a><a class="page-link" href="?view=rules" data-page-route="rules"><span><strong>Rules & procedures</strong><small>Team matchday guidance</small></span><span aria-hidden="true">›</span></a><a class="page-link" href="?view=season-history" data-page-route="season-history"><span><strong>Season history</strong><small>View previous seasons</small></span><span aria-hidden="true">›</span></a></div></section><section class="more-tool-group" data-more-role="parent" aria-labelledby="more-parent-0" hidden><h3 id="more-parent-0">Your team</h3><div class="more-link-list"><a class="page-link" href="?view=contacts" data-page-route="contacts"><span><strong>Contacts</strong><small>Coaches and club contacts</small></span><span aria-hidden="true">›</span></a><a class="page-link" href="?view=raise-concern" data-page-route="raise-concern"><span><strong>Raise an issue</strong><small>Contact the appropriate club person</small></span><span aria-hidden="true">›</span></a></div></section><section class="more-tool-group" aria-labelledby="more-account-heading"><h3 id="more-account-heading">Your account</h3><div class="more-link-list"><button type="button" class="page-link hidden" id="mobile-notification-bell"><span><strong>Notifications</strong><small>Updates and reminders</small></span><span class="notification-badge hidden" id="mobile-notification-badge">0</span><span aria-hidden="true">›</span></button><button type="button" class="page-link hidden" id="coach-profile-self"><span><strong>My profile</strong><small>Your details and coaching documents</small></span><span aria-hidden="true">›</span></button><button type="button" class="page-link hidden" id="person-profile-self"><span><strong>My profile</strong><small>Your own profile details</small></span><span aria-hidden="true">›</span></button><button type="button" class="page-link hidden" id="mobile-context-switch"><span><strong>Switch team or profile</strong><small>Choose an approved linked context</small></span><span aria-hidden="true">›</span></button><a class="page-link" href="?view=appearance" data-page-route="appearance"><span><strong>Appearance</strong><small>Light, dark or device setting</small></span><span aria-hidden="true">›</span></a><a class="page-link" href="?view=my-account" data-page-route="my-account"><span><strong>My account</strong><small>Account details and sign out</small></span><span aria-hidden="true">›</span></a></div></section></div>
+        <p class="muted more-footer">Shooters Hill AFC · Club and team hub</p>
+      </section>
+      <section id="view-training-settings" class="view linked-page more-settings-page" data-view="training-settings" aria-labelledby="training-settings-title">
+        <a class="page-back secondary-button" href="?view=more" data-page-route="more">← Back to More</a>
+        <div class="section-title-row"><div><p class="kicker">Settings</p><h2 id="training-settings-title" tabindex="-1">Training schedule</h2></div></div>
+        <details class="panel settings-accordion" id="training-session-settings" data-requires-edit data-coach-ui-only>
             <summary><span>Training schedule</span><span class="settings-chevron">⌄</span></summary>
             <div class="settings-accordion-body">
               <p class="muted">Set a weekly pattern and add one-off sessions. Parents see upcoming training on Schedule; it leads their Home page until matchday is confirmed.</p>
@@ -588,8 +578,11 @@
               <div id="training-skipped-list" class="training-session-list"></div>
             </div>
           </details>
-
-<details class="panel settings-accordion" id="match-detail-settings" data-requires-edit data-coach-ui-only>
+      </section>
+      <section id="view-feature-settings" class="view linked-page more-settings-page" data-view="feature-settings" aria-labelledby="feature-settings-title">
+        <a class="page-back secondary-button" href="?view=more" data-page-route="more">← Back to More</a>
+        <div class="section-title-row"><div><p class="kicker">Settings</p><h2 id="feature-settings-title" tabindex="-1">Features & awards</h2></div></div>
+        <details class="panel settings-accordion" id="match-detail-settings" data-requires-edit data-coach-ui-only>
             <summary><span>Features</span><span class="settings-chevron">⌄</span></summary>
             <div class="settings-accordion-body">
               <p class="muted">Choose the optional coaching tools this team uses. Turning a feature off does not delete information already recorded.</p>
@@ -608,23 +601,11 @@
               </div>
             </div>
           </details>
-
-<a class="page-link" href="?view=team-access" data-page-route="team-access" data-staff-settings><span><strong>Team access</strong><small>Parent requests, team members and player access</small></span><span aria-hidden="true">›</span></a>
-
-<div class="settings-group-heading" data-staff-settings><span>Rules &amp; safeguarding</span><small>Matchday rules and club responsibilities</small></div>
-
-<a class="page-link" href="?view=rules" data-page-route="rules" data-staff-settings><span><strong>Rules &amp; procedures</strong><small>Read the team’s matchday guidance</small></span><span aria-hidden="true">›</span></a>
-
-<div class="settings-group-heading hidden" data-admin-settings-only><span>Club administration</span><small>Access, season and compliance</small></div>
-
-<details class="panel settings-accordion hidden" id="club-admin-access-settings" data-admin-settings-only>
-            <summary><span>Club Admin access</span><span class="settings-chevron">⌄</span></summary>
-            <div class="settings-accordion-body">
-              <p class="muted">New Club Admins create an account from the login screen and choose Club Admin. The club owner approves the request under Coach requests in Club Overview.</p>
-            </div>
-          </details>
-
-<details class="panel settings-accordion hidden" id="admin-season-management-panel" data-admin-settings-only>
+      </section>
+      <section id="view-season-control" class="view linked-page more-settings-page" data-view="season-control" aria-labelledby="season-control-title">
+        <a class="page-back secondary-button" href="?view=more" data-page-route="more">← Back to More</a>
+        <div class="section-title-row"><div><p class="kicker">Settings</p><h2 id="season-control-title" tabindex="-1">Season control</h2></div></div>
+        <details class="panel settings-accordion hidden" id="admin-season-management-panel" data-admin-settings-only>
             <summary><span>Season control</span><span class="settings-chevron">⌄</span></summary>
             <div class="settings-accordion-body">
               <p class="muted">Archive the current season before starting the next one. Squads and account links carry forward; current-season matches, awards and attendance reset only after a confirmed rollover.</p>
@@ -636,8 +617,11 @@
               <p class="helper">U8–U14 move up one age group. U15 remains U15 while the app scope is capped at U15.</p>
             </div>
           </details>
-
-<details class="panel settings-accordion hidden" id="club-compliance-settings" data-admin-settings-only>
+      </section>
+      <section id="view-club-compliance" class="view linked-page more-settings-page" data-view="club-compliance" aria-labelledby="club-compliance-title">
+        <a class="page-back secondary-button" href="?view=more" data-page-route="more">← Back to More</a>
+        <div class="section-title-row"><div><p class="kicker">Settings</p><h2 id="club-compliance-title" tabindex="-1">Data protection & safeguarding</h2></div></div>
+        <details class="panel settings-accordion hidden" id="club-compliance-settings" data-admin-settings-only>
             <summary><span>Data protection & safeguarding</span><span class="settings-chevron">⌄</span></summary>
             <div class="settings-accordion-body">
               <p class="muted" id="compliance-status">Loading compliance status…</p>
@@ -646,21 +630,11 @@
               <hr/><p class="muted" id="club-cancel-status">Club active</p><div class="season-management-actions"><button type="button" class="secondary-button" id="request-club-cancellation">Cancel club · start 30-day deletion window</button><button type="button" class="text-button" id="cancel-club-cancellation">Withdraw cancellation</button></div>
             </div>
           </details>
-
-<details class="panel settings-accordion hidden" id="u11-safeguarding-panel">
-            <summary><span>U7–U11 emergency / medical information</span><span class="settings-chevron">⌄</span></summary>
-            <div class="settings-accordion-body"><p class="muted">This is the only U7–U11 export route. Performance stats, squad history and name-to-shirt mappings cannot be exported.</p><label>Player<select id="u11-safeguarding-player"></select></label><label>Emergency contact name<input id="u11-emergency-name"/></label><label>Emergency contact phone<input id="u11-emergency-phone"/></label><label>Medical / allergy information<textarea id="u11-medical-info" rows="3"></textarea></label><div class="season-management-actions"><button type="button" class="primary-button" id="save-u11-safeguarding">Save information</button><button type="button" class="secondary-button" id="export-u11-safeguarding">Export safeguarding pack</button></div><p class="helper">Every export is logged and visible to Club Admin.</p><div id="safeguarding-export-audit" class="audit-history-list"></div></div>
-          </details>
-
-<div class="settings-group-heading" data-staff-settings><span>History</span><small>Previous seasons</small></div>
-
-<a class="page-link" href="?view=season-history" data-page-route="season-history" data-staff-history><span><strong>Season history</strong><small>Open previous seasons</small></span><span aria-hidden="true">›</span></a>
-
-<a class="page-link" href="?view=audit-history" data-page-route="audit-history" data-admin-history><span><strong>Audit history</strong><small>Review club activity and access changes</small></span><span aria-hidden="true">›</span></a>
-
-<div class="settings-group-heading"><span>App</span><small>Device and account preferences</small></div>
-
-<details class="panel settings-accordion" id="appearance-settings">
+      </section>
+      <section id="view-appearance" class="view linked-page more-settings-page" data-view="appearance" aria-labelledby="appearance-title">
+        <a class="page-back secondary-button" href="?view=more" data-page-route="more">← Back to More</a>
+        <div class="section-title-row"><div><p class="kicker">Settings</p><h2 id="appearance-title" tabindex="-1">Appearance</h2></div></div>
+        <details class="panel settings-accordion" id="appearance-settings">
             <summary><span>Appearance</span><span class="settings-chevron">⌄</span></summary>
             <div class="settings-accordion-body">
               <p class="muted">Choose how the app looks on this device.</p>
@@ -673,8 +647,11 @@
               </label>
             </div>
           </details>
-
-<details class="panel settings-accordion" id="access-panel">
+      </section>
+      <section id="view-my-account" class="view linked-page more-settings-page" data-view="my-account" aria-labelledby="my-account-title">
+        <a class="page-back secondary-button" href="?view=more" data-page-route="more">← Back to More</a>
+        <div class="section-title-row"><div><p class="kicker">Settings</p><h2 id="my-account-title" tabindex="-1">My account</h2></div></div>
+        <details class="panel settings-accordion" id="access-panel">
             <summary><span>My account</span><span class="settings-chevron">⌄</span></summary>
             <div class="settings-accordion-body">
               <div class="panel-heading"><span class="account-role-badge" id="account-role-badge">Club Admin</span></div>
@@ -688,8 +665,7 @@
              <button type="button" class="secondary-button setup-save hidden" id="account-context-switch">Switch team or profile</button>
             </div>
           </details>
-
-<section class="panel gch-about-card" id="gch-about-card" aria-label="About Shooters Hill AFC">
+        <section class="panel gch-about-card" id="gch-about-card" aria-label="About Shooters Hill AFC">
             <img src="shooters-hill-logo.png" alt="Shooters Hill AFC club badge" class="gch-about-banner" />
             <div class="gch-about-copy">
               <strong>Shooters Hill AFC</strong>
@@ -697,7 +673,6 @@
               <small>App version 2.2.35 · Build 2235</small>
             </div>
           </section>
-        </div>
       </section>
       <section id="view-contacts" class="view linked-page" data-view="contacts" aria-labelledby="contacts-title">
         <a class="page-back secondary-button" href="?view=inbox" data-page-route="inbox">← Back to messages</a>
@@ -838,7 +813,7 @@
       <section id="view-team-access" class="view linked-page team-workspace" data-view="team-access" aria-labelledby="team-access-title">
         <div class="section-title-row"><div><p class="kicker" id="team-access-kicker">Your team · staff</p><h2 id="team-access-title" tabindex="-1">Team access</h2></div></div>
         <p class="muted">Review parent requests and open individual accounts.</p>
-        <a class="page-back secondary-button" href="?view=more" data-page-route="more">← Back to settings</a>
+        <a class="page-back secondary-button" href="?view=more" data-page-route="more">← Back to More</a>
         <section id="team-access-settings" data-staff-settings>
               <section class="panel parent-self-signup-note"><h3>Parent access is request-based</h3><p>Parents create their own email account and type their child’s name. Staff verify and link the correct active player. Review siblings one request at a time.</p></section>
               <div class="team-access-invite-block" id="team-player-invite-section">
@@ -854,7 +829,7 @@
           </section>
       </section>
       <section id="view-rules" class="view linked-page" data-view="rules" aria-labelledby="rules-title">
-        <a class="page-back secondary-button" href="?view=more" data-page-route="more">← Back to settings</a>
+        <a class="page-back secondary-button" href="?view=more" data-page-route="more">← Back to More</a>
         <div class="section-title-row"><div><p class="kicker">Your club</p><h2 id="rules-title" tabindex="-1">Rules &amp; procedures</h2></div></div>
         <details class="panel settings-accordion" id="rules-procedures-settings" data-staff-settings>
             <summary><span>Rules &amp; procedures</span><span class="settings-chevron">⌄</span></summary>
@@ -874,7 +849,7 @@
           </details>
       </section>
       <section id="view-season-history" class="view linked-page" data-view="season-history" aria-labelledby="season-history-title">
-        <a class="page-back secondary-button" href="?view=more" data-page-route="more">← Back to settings</a>
+        <a class="page-back secondary-button" href="?view=more" data-page-route="more">← Back to More</a>
         <div class="section-title-row"><div><p class="kicker">Your club</p><h2 id="season-history-title" tabindex="-1">Season history</h2></div><button type="button" class="secondary-button compact" data-page-refresh="season-history">Refresh</button></div>
         <details class="panel settings-accordion" id="season-history-settings" data-staff-history>
             <summary><span>Season history</span><span class="settings-chevron">⌄</span></summary>
@@ -886,7 +861,7 @@
           </details>
       </section>
       <section id="view-audit-history" class="view linked-page" data-view="audit-history" aria-labelledby="audit-history-title">
-        <a class="page-back secondary-button" href="?view=more" data-page-route="more">← Back to settings</a>
+        <a class="page-back secondary-button" href="?view=more" data-page-route="more">← Back to More</a>
         <div class="section-title-row"><div><p class="kicker">Club administration</p><h2 id="audit-history-title" tabindex="-1">Audit history</h2></div></div>
         <details class="panel settings-accordion hidden" id="audit-history-settings" data-admin-history>
             <summary><span>Audit history</span><span class="settings-chevron">⌄</span></summary>
@@ -918,22 +893,9 @@
       <button type="button" class="mobile-primary-item" data-mobile-tab="1"><svg aria-hidden="true"><use href="#mobile-icon-calendar"/></svg><span>Matches</span></button>
       <button type="button" class="mobile-primary-item" data-mobile-tab="3" hidden><svg aria-hidden="true"><use href="#mobile-icon-table"/></svg><span>Table</span></button>
       <button type="button" class="mobile-primary-item" data-mobile-tab="2"><svg aria-hidden="true"><use href="#mobile-icon-team"/></svg><span>Squad</span></button>
-      <button type="button" class="mobile-primary-item" data-mobile-tab="more" aria-haspopup="dialog" aria-expanded="false" aria-controls="mobile-more-sheet"><svg aria-hidden="true"><use href="#mobile-icon-menu"/></svg><span>More</span></button>
+      <button type="button" class="mobile-primary-item" data-mobile-tab="more"><svg aria-hidden="true"><use href="#mobile-icon-menu"/></svg><span>More</span></button>
     </nav>
-    <button type="button" class="mobile-more-scrim" id="mobile-more-scrim" aria-label="Close More menu" hidden></button>
-    <section class="mobile-more-sheet" id="mobile-more-sheet" role="dialog" aria-modal="true" aria-labelledby="mobile-more-title" hidden>
-      <div class="mobile-more-heading"><h2 id="mobile-more-title">More</h2><button type="button" class="mobile-more-close" id="mobile-more-close" aria-label="Close More menu"><svg aria-hidden="true"><use href="#mobile-icon-close"/></svg></button></div>
-      <button type="button" class="mobile-more-link" data-mobile-menu-target="league">League</button>
-      <button type="button" class="mobile-more-link" data-mobile-menu-target="awards">Awards</button>
-      <button type="button" class="mobile-more-link" data-mobile-menu-target="club-results">Club results</button>
-      <button type="button" class="mobile-more-link" data-mobile-menu-target="club-coaches">Coaches</button>
-      <button type="button" class="mobile-more-link" data-mobile-menu-target="inbox">Inbox <span class="notification-badge hidden" id="mobile-inbox-badge">0</span></button>
-      <button type="button" class="mobile-more-link" data-mobile-menu-target="more">Settings</button>
-      <div class="mobile-more-account" role="group" aria-label="Account and notifications">
-        <button type="button" class="mobile-more-link hidden" id="mobile-notification-bell">Notifications <span class="notification-badge hidden" id="mobile-notification-badge">0</span></button>
-        <button type="button" class="mobile-more-link hidden" id="mobile-context-switch">Switch team or profile</button>
-      </div>
-    </section>
+
   </div>
 
   <dialog id="context-switch-dialog" class="modal club-list-modal" aria-labelledby="context-switch-title">

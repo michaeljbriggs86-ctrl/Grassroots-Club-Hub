@@ -53,5 +53,5 @@ for (const [kind, competition] of [['league', 'League'], ['friendly', 'Friendly'
 for (const [kind, competition] of [['cup', 'Cup'], ['vase', 'Vase'], ['shield', 'Shield']])
   assert.deepEqual(tables[kind], [`${competition}-later`, `${competition}-past`]);
 assert.match(app, /parent\?\[\['Home','home'\],\['Schedule','matches'\],\['Inbox','inbox'\]/);
-assert.match(app, /currentRole==='parent'&&!\['home','matches','inbox','more','person','contacts','raise-concern'\]\.includes\(view\)/);
+assert.match(app, /currentRole==='parent'&&!\['home','matches','inbox','more','person','contacts','raise-concern','appearance','my-account'\]\.includes\(view\)/);
 console.log('PASS independent parent match-record privacy and coach controls');

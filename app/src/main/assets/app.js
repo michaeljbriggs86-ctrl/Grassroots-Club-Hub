@@ -2416,7 +2416,7 @@ function applyAccessMode(){
   if(clubKick)clubKick.textContent=isAdmin()?'Club administration':roleLabel();
   if(coaching&&__clubTab!=='results')__clubTab='results';
   if(['parent','player'].includes(currentRole)&&currentView==='club'){currentView='home';document.body.classList.remove('view-club');document.body.classList.add('view-home');}
-  if(parent&&!['home','matches','inbox','more','person','contacts','raise-concern'].includes(currentView)){navigate('home',false);return;}
+  if(parent&&!['home','matches','inbox','more','person','contacts','raise-concern','appearance','my-account'].includes(currentView)){navigate('home',false);return;}
   if(currentView==='club')setClubTab(__clubTab);
   renderMatches();
   renderTournamentEvents();
@@ -2424,15 +2424,20 @@ function applyAccessMode(){
   syncMobileNavigation();
 }
 
-function closeMobileMore(restoreFocus=false){
-  const sheet=document.getElementById('mobile-more-sheet');
-  if(!sheet||sheet.hidden)return;
-  sheet.hidden=true;
-  document.getElementById('mobile-more-scrim').hidden=true;
-  const more=document.querySelector('[data-mobile-tab="more"]');
-  more?.setAttribute('aria-expanded','false');
-  document.body.classList.remove('mobile-more-open');
-  if(restoreFocus)more?.focus();
+// Compatibility for existing notifications/context-switch callers; More is now a page.
+function closeMobileMore(){}
+function syncMoreHub(){
+  const hub=document.getElementById('view-more');if(!hub)return;
+  const club=isClubOverviewMode(),coach=isCoach(),parent=CLOUD_MODE&&currentRole==='parent';
+  hub.querySelectorAll('[data-more-role]').forEach(group=>{
+    const visible=group.dataset.moreRole==='admin'?club:group.dataset.moreRole==='coach'?coach&&!club:parent;
+    group.hidden=!visible;
+  });
+  const kicker=document.getElementById('more-kicker'),intro=document.getElementById('more-intro');
+  if(kicker)kicker.textContent=club?'Club & app':'Team & app';
+  if(intro)intro.textContent=club?'Club tools, preferences and your account.':coach?'Team tools, preferences and your account.':'Your team, preferences and your account.';
+  hub.querySelectorAll('[data-more-awards]').forEach(button=>button.hidden=!coach||club||!featureEnabled('awards'));
+  hub.querySelectorAll('[data-page-route="rules"]').forEach(link=>link.hidden=!linkedPageAllowed('rules')||providerType()!=='selkent');
 }
 function syncMobileNavigation(selectedView=currentView){
   const nav=document.getElementById('mobile-primary-nav');
@@ -2456,30 +2461,9 @@ function syncMobileNavigation(selectedView=currentView){
     if(active)button.setAttribute('aria-current','page');
     else button.removeAttribute('aria-current');
   });
-  const allowed={
-    league:showTable,
-    awards:!club&&!parent&&featureEnabled('awards'),
-    'club-results':!club&&(['coach','assistant_coach'].includes(currentRole)||isAdminCoachMode()),
-    'club-coaches':false,
-    inbox:!parent&&['admin','coach','assistant_coach'].includes(currentRole),
-    more:true,
-  };
-  document.querySelectorAll('[data-mobile-menu-target]').forEach(button=>{
-    const target=button.dataset.mobileMenuTarget;
-    button.hidden=!allowed[target];
-    if(target==='inbox')button.firstChild.textContent=club?'Communications ':'Inbox ';
-  });
+  syncMoreHub();
 }
-function openMobileMore(){
-  syncMobileNavigation();
-  const sheet=document.getElementById('mobile-more-sheet');
-  if(!sheet)return;
-  sheet.hidden=false;
-  document.getElementById('mobile-more-scrim').hidden=false;
-  document.querySelector('[data-mobile-tab="more"]')?.setAttribute('aria-expanded','true');
-  document.body.classList.add('mobile-more-open');
-  sheet.querySelector('.mobile-more-link:not([hidden])')?.focus();
-}
+function openMobileMore(){navigate('more');}
 function navigateMobileAwards(){
   if(!featureEnabled('awards')||isClubOverviewMode())return;
   navigate('home',false);
@@ -2494,6 +2478,12 @@ function navigateMobileAwards(){
 }
 // Linked pages keep full lists outside the main screens. Routes contain no member identifiers.
 const LINKED_PAGES={
+  'training-settings':{title:"Training schedule",parent:'more',panel:'training-session-settings',access:'team-edit'},
+  'feature-settings':{title:"Features & awards",parent:'more',panel:'match-detail-settings',access:'team-edit'},
+  'season-control':{title:"Season control",parent:'more',panel:'admin-season-management-panel',access:'admin'},
+  'club-compliance':{title:"Data protection & safeguarding",parent:'more',panel:'club-compliance-settings',access:'admin'},
+  'appearance':{title:"Appearance",parent:'more',panel:'appearance-settings',access:'account'},
+  'my-account':{title:"My account",parent:'more',panel:'access-panel',access:'account'},
   'team-stats':{title:'Player & team stats',parent:'home',panel:'home-player-stats',access:'team-data'},
   contacts:{title:'Contact details',parent:'inbox',panel:'member-contacts-panel',access:'contacts'},
   'coach-onboarding':{title:'Coach onboarding',parent:'club',panel:'coach-onboarding-panel',access:'admin'},
@@ -2512,6 +2502,8 @@ const LINKED_PAGES={
 function linkedPageAllowed(view){
   const page=LINKED_PAGES[view];if(!page)return true;
   const staff=['admin','coach','assistant_coach'].includes(currentRole);
+  if(page.access==='account')return ['admin','coach','assistant_coach','parent','player'].includes(currentRole);
+  if(page.access==='team-edit')return isCoach()&&!isClubOverviewMode()&&(!CLOUD_MODE||!!window.ClubHubCloud?.canEdit?.());
   if(page.access==='admin')return CLOUD_MODE&&isClubOverviewMode();
   if(page.access==='team-staff')return staff&&!isClubOverviewMode();
   if(page.access==='team-data')return ['admin','coach','assistant_coach','player'].includes(currentRole)&&!isClubOverviewMode();
@@ -2637,8 +2629,7 @@ function navigate(view,scroll=true,historyMode='push'){
   if(!NAVIGATION_VIEWS.has(view))view='home';
   if(!linkedPageAllowed(view))view=isClubOverviewMode()?'club':'home';
   leaveLinkedPage(view);
-  if(CLOUD_MODE&&currentRole==='parent'&&!['home','matches','inbox','more','person','contacts','raise-concern'].includes(view))view='home';
-  if(view==='more'){const h=document.querySelector('#view-more .section-title-row h2'),k=document.querySelector('#view-more .section-title-row .kicker');if(h)h.textContent=isClubOverviewMode()?'Club settings':'Settings';if(k)k.textContent=isClubOverviewMode()?'Club administration':'Team & app';}
+  if(CLOUD_MODE&&currentRole==='parent'&&!['home','matches','inbox','more','person','contacts','raise-concern','appearance','my-account'].includes(view))view='home';
   if(view==='club'&&isAdmin()&&!isClubOverviewMode()){adminUiMode='club';localStorage.setItem(ADMIN_UI_MODE_KEY,'club');}
   if(view==='club'){__clubTab='overview';view='club';}
   else if(view==='club-matches'){if(!['fixtures','results'].includes(__clubTab))__clubTab='fixtures';view='club';}
@@ -3067,7 +3058,7 @@ function notificationPresentation(row){
 }
 function renderNotificationCenter(){
   const allowed=!!syncNotificationContext(),bell=document.getElementById('notification-bell'),mobileBell=document.getElementById('mobile-notification-bell');
-  bell?.classList.toggle('hidden',!allowed);mobileBell?.classList.toggle('hidden',!allowed);syncHeaderUtilityBar();
+  bell?.classList.toggle('hidden',!allowed);mobileBell?.classList.toggle('hidden',!allowed||currentRole==='player');syncHeaderUtilityBar();
   const rows=allowed?notificationRows():[],unread=rows.filter(r=>!r.read_at).length;
   for(const id of ['notification-badge','mobile-notification-badge']){const b=document.getElementById(id);if(b){b.textContent=unread>99?'99+':String(unread);b.classList.toggle('hidden',!unread);}}
   if(bell){bell.setAttribute('aria-label',unread?'Notifications, '+unread+' unread':'Notifications');if(isClubOverviewMode())bell.removeAttribute('aria-haspopup');else bell.setAttribute('aria-haspopup','dialog');}
@@ -3244,7 +3235,7 @@ function renderTeamIdentity(){
   const meta=state.meta;
   const adminClub=isClubOverviewMode();
   document.getElementById('hero-club-name').textContent=(meta.clubName||clubSettings().display_name||'Club').toUpperCase();
-  const adminHero=LINKED_PAGES[currentView]?.title.toUpperCase()||(currentView==='more'?'CLUB SETTINGS':currentView==='club'?(__clubTab==='coaches'?'CLUB STAFF':__clubTab==='overview'?'CLUB HOME':'MATCHES'):currentView==='inbox'?'MESSAGES':'CLUB HOME');
+  const adminHero=LINKED_PAGES[currentView]?.title.toUpperCase()||(currentView==='more'?'MORE':currentView==='club'?(__clubTab==='coaches'?'CLUB STAFF':__clubTab==='overview'?'CLUB HOME':'MATCHES'):currentView==='inbox'?'MESSAGES':'CLUB HOME');
   const pill=document.getElementById('hero-mode-pill');
   if(pill){const acting=CLOUD_MODE&&cloudActingParent();const label=acting?'Parent view':!isAdmin()?'':adminClub?'Club Admin':isAdminCoachMode()?'Coach mode':isAdminTeamPreviewMode()?'Read only':'';pill.textContent=label;pill.classList.toggle('hidden',!label);pill.dataset.mode=acting?'parent':adminClub?'club':isAdminCoachMode()?'coach':'preview';}
   document.getElementById('hero-team-name').textContent=matchTeamLabel(adminClub?adminHero:(meta.teamName||'Team').toUpperCase());
@@ -6289,20 +6280,10 @@ refreshSectionNavigation();
 document.addEventListener('click',e=>{
   const mobileTab=e.target.closest('[data-mobile-tab]');
   if(mobileTab){
-    if(mobileTab.dataset.mobileTab==='more'){
-      document.getElementById('mobile-more-sheet')?.hidden?openMobileMore():closeMobileMore(true);
-    }else{closeMobileMore();navigate(mobileTab.dataset.mobileTarget);}
+    navigate(mobileTab.dataset.mobileTab==='more'?'more':mobileTab.dataset.mobileTarget);
     return;
   }
-  const mobileMenu=e.target.closest('[data-mobile-menu-target]');
-  if(mobileMenu){
-    const target=mobileMenu.dataset.mobileMenuTarget;
-    closeMobileMore();
-    if(target==='awards')navigateMobileAwards();
-    else navigate(target);
-    return;
-  }
-  if(e.target.closest('#mobile-more-scrim,#mobile-more-close')){closeMobileMore(true);return;}
+  if(e.target.closest('[data-more-awards]')){navigateMobileAwards();return;}
   const pageRefresh=e.target.closest('[data-page-refresh]');
   if(pageRefresh){if(currentView===pageRefresh.dataset.pageRefresh)enterLinkedPage(currentView);return;}
   const pageLink=e.target.closest('[data-page-route]');
@@ -6357,14 +6338,6 @@ document.addEventListener('click',e=>{
   const delNotice=e.target.closest('[data-delete-announcement]');if(delNotice){deleteAnnouncement(delNotice.dataset.deleteAnnouncement);return;}
   const reviewCoachNote=e.target.closest('[data-review-coach-request]');if(reviewCoachNote){markAppNotificationRead(reviewCoachNote.dataset.reviewCoachRequest);reviewCoachAccessNotification();return;}const reviewParentRequest=e.target.closest('[data-review-parent-request]');if(reviewParentRequest){reviewParentAccessNotification(reviewParentRequest.dataset.reviewParentRequest);return;}
   const readNotification=e.target.closest('[data-read-notification]');if(readNotification){markAppNotificationRead(readNotification.dataset.readNotification);return;}
-});
-document.getElementById('mobile-more-sheet')?.addEventListener('keydown',e=>{
-  if(e.key==='Escape'){e.preventDefault();closeMobileMore(true);return;}
-  if(e.key!=='Tab')return;
-  const visible=[...e.currentTarget.querySelectorAll('button:not([hidden]):not(.hidden)')];
-  const first=visible[0],last=visible[visible.length-1];
-  if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}
-  else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}
 });
 document.getElementById('appearance-theme')?.addEventListener('change',e=>applyTheme(e.target.value));
 document.getElementById('notification-bell')?.addEventListener('click',openNotifications);

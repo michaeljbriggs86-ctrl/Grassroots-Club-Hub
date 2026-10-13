@@ -2322,3 +2322,24 @@ html body #view-home .home-next-match+#matchday-dashboard{margin-top:0;border-ra
 html body #view-home .home-next-match:has(+#matchday-dashboard:not(.hidden)) .next-match-summary-card{border-radius:20px!important}
 html body #view-home .matchday-dashboard-heading{gap:12px;flex-wrap:wrap}
 html body #view-home .matchday-dashboard-status{max-width:100%;white-space:normal;overflow-wrap:anywhere}
+
+/* More is a role-specific directory. Existing forms open on linked pages. */
+.more-hub .more-intro{margin:0 0 24px;max-width:65ch}
+.more-tool-grid{display:grid;grid-template-columns:minmax(0,1fr);gap:24px;align-items:start}
+.more-tool-group{min-width:0}
+.more-tool-group[hidden],.more-link-list [hidden]{display:none!important}
+.more-tool-group h3{margin:0 0 12px;font-size:20px;line-height:1.4}
+.more-link-list{display:grid;gap:8px}
+.more-link-list .page-link{width:100%;min-width:0;min-height:64px;margin:0;padding:12px 16px;text-align:left;gap:12px;font-family:inherit}
+.more-link-list .page-link>span:first-child{flex:1;min-width:0}
+.more-link-list .page-link strong{font-size:16px;line-height:1.4;overflow-wrap:anywhere}
+.more-link-list .page-link small{display:block;font-size:14px;line-height:1.4;overflow-wrap:anywhere}
+.more-link-list .notification-badge{position:static;flex:none;line-height:20px}
+.more-footer{margin:24px 0 0;font-size:14px}
+.more-settings-page{max-width:960px;margin-inline:auto}
+.more-settings-page>.settings-accordion{margin-top:20px}
+.more-settings-page>.settings-accordion>summary{display:none}
+.more-settings-page>.settings-accordion>.settings-accordion-body{border-top:0;padding-top:20px}
+.more-settings-page .page-back{margin-bottom:16px}
+@media(min-width:700px){.more-tool-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(min-width:1000px){.more-tool-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
