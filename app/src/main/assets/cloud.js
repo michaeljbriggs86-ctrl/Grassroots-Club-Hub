@@ -1300,8 +1300,16 @@
     document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')pullLatest({quiet:true});});
   }
 
+  async function getRegistrationContactConduct({teamId,playerName,season}){return rpc('get_registration_contact_conduct',{p_team_id:teamId,p_player_name:playerName,p_season:season});}
+  async function submitRegistrationContactConduct({teamId,playerName,season,mobile,documentVersion,agree}){return rpc('submit_registration_contact_conduct',{p_team_id:teamId,p_player_name:playerName,p_season:season,p_mobile:mobile,p_document_version:documentVersion,p_agree:agree===true});}
+  async function readRegistrationConductDocument({teamId,playerName,season}){
+    if(!await ensureFreshSession())throw Error('Sign in first');
+    const url=new URL('/__registration_document',location.href);url.searchParams.set('team',teamId);url.searchParams.set('player',playerName);url.searchParams.set('season',season);
+    const response=await fetch(url,{headers:{Authorization:'Bearer '+session.access_token},cache:'no-store'});
+    if(!response.ok)throw Error('Code of conduct unavailable');return response.blob();
+  }
   window.ClubHubCloud={
-    listContactDirectory,saveMemberContactDetails,importMemberContactDetails,loadAdminPlayerOnboarding,onboardAdminPlayer,
+    getRegistrationContactConduct,submitRegistrationContactConduct,readRegistrationConductDocument,listContactDirectory,saveMemberContactDetails,importMemberContactDetails,loadAdminPlayerOnboarding,onboardAdminPlayer,
     configured,bootstrap,loadInitialState,queueStateSave,confirmStateSave,pullLatest,startPolling,
     role,requestCoachAccess,listPendingCoachRequests,reviewCoachRequest,listMyCoachTeams,switchMyCoachTeam,setMyCapacity,requestChildLink,realRole,isStaffAccount,actingAsParent,assignCoachTeam,unassignCoachTeam,canEdit,canAdmin,assignedTeam,currentTeam,coachTeam,hasDualCoachAccess,visibleTeamList,getClubConfiguration,listLoginClubs,listLoginTeams,listCurrentClubLoginTeams,createInvite,requestParentAccess,listPendingParentRequests,listTeamMembers,listClubCoaches,listCoachQualifications,getCoachQualifications,saveCoachQualifications,listClubAccessAccounts,removeClubCoach,listPublishedClubResults,listParentPlayerLinks,saveParentPlayerLinks,listPlayerAccountLinks,listMatchAvailability,saveMatchAvailability,saveCoachMatchAvailability,listSelkentTeamDirectory,syncSelkentTeamDirectory,getCoachMatchNote,saveCoachMatchNote,listAnnouncements,createAnnouncement,markAnnouncementRead,deleteAnnouncement,listMatchAttendance,saveMatchAttendance,getAvailabilitySettings,setAvailabilityDeadline,sendAvailabilityReminder,listNotifications,markNotificationRead,notifyFixtureChange,notifySelectedSquad,notifyMatchReport,notifyMatchReopened,listPlayerAppearanceStats,recordAuditEvent,listAuditHistory,listSeasonArchives,getSeasonArchive,archiveCurrentSeason,rolloverClubSeason,resetParentPin,setAccessPin,approveParentRequest,removeTeamMember,syncTeamDirectory,switchAdminTeam,switchParentTeam,getClubOverview,signOut,switchToParentSignIn,handleAuthCallback,listMessageContacts,listClubMessages,sendClubMessage,markClubMessagesRead,getClubComplianceStatus,setDisputeReviewers,setClubSafeguardingContacts,getConcernRouting,raiseClubConcern,listGeneralDisputes,listDisputeMessages,upsertU11SafeguardingInfo,exportU11SafeguardingPack,listSafeguardingExportAudit,requestClubCancellation,cancelClubCancellation,
     updateCloudPanel,

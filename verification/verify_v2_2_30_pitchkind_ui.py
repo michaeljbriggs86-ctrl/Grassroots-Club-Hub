@@ -356,8 +356,8 @@ check(
 )
 check(
     'match played scoreline is Home Away with correct team-relative storage',
-    '<label>Home<input id="match-report-gf"' in index
-    and '<label>Away<input id="match-report-ga"' in index
+    'id="match-report-home-label">Home</span><input id="match-report-gf"' in index
+    and 'id="match-report-away-label">Away</span><input id="match-report-ga"' in index
     and 'm.gf=away?awayScore:homeScore' in app
     and 'm.ga=away?homeScore:awayScore' in app
     and 'reportAway?m.ga:m.gf' in app,
@@ -365,7 +365,7 @@ check(
 check(
     'manual add/edit scoreline is Home Away and goals target our side',
     '<span id="our-score-label">Home</span>' in index
-    and '<label>Away<input id="match-ga"' in index
+    and 'id="away-score-label">Away</span><input id="match-ga"' in index
     and "const target=Number(document.getElementById(away?'match-ga':'match-gf').value||0)" in app
     and 'gf:isAway?awayScore:homeScore' in app
     and 'ga:isAway?homeScore:awayScore' in app,
@@ -454,7 +454,7 @@ check(
     'data-club-details-team' in app
     and 'openClubDetails(clubDetail.dataset.clubDetailsTeam)' in app
     and 'openMatchReportReview(reportReview.dataset.matchReportReview)' in app
-    and "title.textContent='Match report'" in app,
+    and "getElementById('match-detail-title').textContent='Match report'" in app,
 )
 
 check(

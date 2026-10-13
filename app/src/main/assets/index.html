@@ -307,7 +307,7 @@
       <section id="view-add" class="view" data-view="add">
         <div class="section-title-row">
           <div><p class="kicker" id="form-kicker">Matchday entry</p><h2 id="form-title">Add Match</h2></div>
-          <button class="text-button hidden" id="cancel-edit">Cancel edit</button>
+          <button class="secondary-button" id="match-entry-back" type="button">← Matches</button><button class="text-button hidden" id="cancel-edit">Cancel edit</button>
         </div>
         <div class="read-only-card hidden" id="read-only-card">Parent mode is read-only. Switch to coach mode to add or edit records.</div>
         <form id="match-form" class="form-stack">
@@ -333,15 +333,15 @@
               <label id="match-tournament-wrap" class="hidden">Tournament event<select id="match-tournament"><option value="">Choose tournament</option></select></label>
               <label>Round / stage <span class="optional">optional</span><input id="match-stage" type="text" placeholder="e.g. Group A · Semi Final" /></label>
             </div>
-            <div class="score-entry">
-              <label><span id="our-score-label">Home</span><input id="match-gf" type="number" min="0" required value="0" /></label>
-              <span>–</span>
-              <label>Away<input id="match-ga" type="number" min="0" required value="0" /></label>
-            </div>
-            <label>Notes<textarea id="match-notes" rows="3" placeholder="Key moments or coaching notes..."></textarea></label>
+            <label>Match notes <span class="optional">optional</span><textarea id="match-notes" rows="3" placeholder="Fixture or general match information"></textarea><small class="helper">Private coaching observations belong in the match report.</small></label>
+          </div>
+          <div class="panel form-panel score-entry" id="match-entry-score">
+            <h3>Final score</h3>
+            <label><span id="our-score-label">Home</span><input id="match-gf" type="number" min="0" step="1" required value="0" /></label>
+            <label><span id="away-score-label">Away</span><input id="match-ga" type="number" min="0" step="1" required value="0" /></label>
           </div>
 
-          <div class="panel form-panel">
+          <div class="panel form-panel" id="match-entry-goals">
             <div class="panel-heading"><h3>Goalscorers</h3><span class="helper">Total should match GF</span></div>
             <div id="scorer-inputs" class="scorer-grid"></div>
             <div class="goal-check" id="goal-check">0 of 0 goals assigned</div>
@@ -352,7 +352,9 @@
             <div class="form-grid" id="match-award-fields"></div>
           </div>
 
-          <button class="primary-button large" type="submit">Save Match</button>
+          <p class="panel helper hidden" id="match-entry-scheduled">The score and report open when this match is played. Scheduled and postponed matches have no result.</p>
+          <button class="primary-button large" type="submit">Save match</button>
+          <button class="secondary-button large" type="button" id="match-entry-cancel">Cancel</button>
           <button class="danger-button large hidden" type="button" id="delete-match-edit" data-delete-match="">Delete match</button>
         </form>
       </section>
@@ -1014,6 +1016,7 @@
     <div class="modal-heading"><h3 id="club-match-summary-title">Match details</h3><button type="button" class="icon-button small" data-close-dialog aria-label="Close match details">×</button></div>
     <div id="club-match-summary-body"></div>
   </dialog>
+  <dialog id="match-entry-chooser" class="modal" aria-labelledby="match-entry-chooser-title"><div class="modal-heading"><h2 id="match-entry-chooser-title">Choose a match</h2><button type="button" class="icon-button" data-close-dialog aria-label="Close match chooser">×</button></div><p>Start from the fixture you played.</p><section class="panel"><h3>Use the existing fixture</h3><p>Open the match you played to keep its fixture and result together.</p></section><div id="match-entry-choices"></div><button type="button" class="secondary-button" id="match-entry-manual">Add a match</button><p class="helper">For a friendly or another match you need to record manually.</p></dialog>
   <dialog id="match-detail-dialog" class="modal match-detail-modal">
     <form method="dialog" id="match-detail-form">
       <div class="modal-heading"><div><p class="kicker">Match details</p><h3 id="match-detail-title">Add match details</h3></div><button type="button" class="icon-button small" data-close-dialog aria-label="Close">×</button></div>
@@ -1030,13 +1033,16 @@
         <div class="fixture-kit-toggle-host hidden" id="match-detail-kit-toggle"></div>
       </section>
       <div class="match-report-progress hidden" id="match-report-progress" aria-label="Match report progress"></div>
+      <p class="helper hidden" id="match-report-step-label" aria-live="polite"></p>
+      <section id="match-report-hub" class="hidden" aria-label="Edit match report"></section>
+      <section id="match-report-outcome" class="hidden" role="status" aria-live="polite" tabindex="-1"></section>
       <section class="detail-feature-section match-report-score-section hidden" id="match-report-score-section">
-        <div class="panel-heading"><div><h3>Scoreline</h3><span class="helper">Enter the final score</span></div></div>
+        <div class="panel-heading"><div><h3>Final score</h3><span class="helper">Enter the final score</span></div></div>
         <div class="match-report-score-grid">
-          <label>Home<input id="match-report-gf" type="number" min="0" inputmode="numeric" value="0" /></label>
-          <span aria-hidden="true">–</span>
-          <label>Away<input id="match-report-ga" type="number" min="0" inputmode="numeric" value="0" /></label>
+          <label><span id="match-report-home-label">Home</span><input id="match-report-gf" type="number" min="0" step="1" inputmode="numeric" value="0" /></label>
+          <label><span id="match-report-away-label">Away</span><input id="match-report-ga" type="number" min="0" step="1" inputmode="numeric" value="0" /></label>
         </div>
+        <div class="report-club-record"><h4>Club record</h4><p id="match-report-club-score"></p><p class="helper" id="match-report-score-privacy"></p></div>
       </section>
       <section class="detail-feature-section" id="detail-goals-section" data-detail-feature="goals"><div class="panel-heading"><h3>Goalscorers</h3><span class="helper">Goals</span></div><div id="detail-goals-inputs" class="detail-player-grid"></div></section>
       <section class="detail-feature-section" id="detail-assists-section" data-detail-feature="assists"><div class="panel-heading"><h3>Assists</h3><span class="helper">Assists</span></div><div id="detail-assists-inputs" class="detail-player-grid"></div></section>
@@ -1047,6 +1053,7 @@
       <div class="empty-detail-options detail-before-match hidden" id="detail-before-match-note"></div>
       <div class="empty-detail-options hidden" id="empty-detail-options">All match detail options are switched off. Enable the options you want under Settings → Features.</div>
       <div class="modal-actions match-report-actions">
+        <button type="button" class="secondary-button hidden" id="match-report-return">← Back to report</button>
         <button type="button" class="secondary-button hidden" id="match-report-back">Back</button>
         <button type="button" class="secondary-button hidden" id="edit-match-detail" data-edit-match="">Edit fixture</button>
         <button type="button" class="primary-button hidden" id="play-match-detail" data-match-played="">Match played</button>
@@ -1059,6 +1066,11 @@
     </form>
   </dialog>
 
+  <dialog id="registration-conduct-dialog" class="modal registration-conduct" aria-labelledby="registration-conduct-title">
+    <div class="modal-heading"><h2 id="registration-conduct-title" tabindex="-1">Registration details</h2></div>
+    <button type="button" class="secondary-button" id="registration-conduct-close">← Player profile</button>
+    <div id="registration-conduct-body"></div><p class="helper" id="registration-conduct-status" role="status" aria-live="polite" aria-atomic="true"></p>
+  </dialog>
   <dialog id="club-detail-dialog" class="modal club-detail-modal">
     <div class="club-detail-shell">
       <div class="modal-heading"><div><p class="kicker">Club details</p><h3 id="club-detail-title">Club</h3></div><button type="button" class="icon-button small" data-close-dialog aria-label="Close">×</button></div>
@@ -1216,6 +1228,7 @@
   <script src="coach-qualifications.js"></script>
   <script src="member-contact-import.js"></script>
   <script src="person-profiles.js"></script>
+  <script src="registration-conduct.js"></script>
   <script src="player-onboarding.js"></script>
   <script src="coach-onboarding.js"></script>
   <script src="app.js"></script>
