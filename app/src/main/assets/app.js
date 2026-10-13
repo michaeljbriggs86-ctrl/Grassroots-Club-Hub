@@ -3071,7 +3071,7 @@ function renderNotificationCenter(){
     const kind=r.source==='announcement'?'Club notice':String(r.type||'update').replace(/_/g,' ');
     return `<article class="notification-item ${r.read_at?'read':'unread'} ${r.important?'important':''}"><div class="notification-item-head"><div><strong>${esc(r.title||'Notification')}</strong><small>${r.read_at?'Read':'Unread'} · ${esc(kind)}${r.important?' · Important':''}</small></div><time>${notificationDate(r.created_at)}</time></div><p>${esc(r.body||'')}</p>${review||coachReview||mark?`<div class="notification-item-actions">${review}${coachReview}${mark}</div>`:''}</article>`;
   }).join(''):`<div class="notification-empty"><strong>${__notificationLoading||(!__notificationStamp&&!__notificationError)?'Loading notifications':__notificationError?'Could not load notifications':'No notifications yet'}</strong><p>${__notificationError?'Your notifications are temporarily unavailable. Try again.':__notificationLoading||!__notificationStamp?'Checking your latest updates…':'Your club notices and updates will appear here.'}</p></div>`;
-  for(const id of ['notification-list','communications-notifications-list']){const n=document.getElementById(id);if(n){n.innerHTML=html;n.setAttribute('aria-busy',String(__notificationLoading));}}
+  for(const id of ['notification-list','communications-notifications-list']){const n=document.getElementById(id);if(n){const focused=n.contains?.(document.activeElement);if(n.innerHTML!==html){n.innerHTML=html;if(focused)(n.querySelector('button:not(:disabled)')||document.getElementById('notifications-refresh'))?.focus();}n.setAttribute('aria-busy',String(__notificationLoading));}}
 }
 async function refreshNotifications(quiet=true){
   const key=syncNotificationContext();if(!key||!window.ClubHubCloud?.listNotifications){renderNotificationCenter();return;}
@@ -6352,7 +6352,13 @@ document.getElementById('appearance-theme')?.addEventListener('change',e=>applyT
 document.getElementById('notification-bell')?.addEventListener('click',openNotifications);
 document.getElementById('notifications-refresh')?.addEventListener('click',refreshNotificationFeed);
 document.getElementById('communications-notifications-refresh')?.addEventListener('click',refreshNotificationFeed);
-document.getElementById('notification-dialog')?.addEventListener('close',()=>{const bell=document.getElementById('notification-bell');if(bell&&!bell.classList.contains('hidden'))bell.focus({preventScroll:true});});
+document.getElementById('notification-dialog')?.addEventListener('close',()=>queueMicrotask(()=>{const bell=document.getElementById('notification-bell');if(bell&&!bell.classList.contains('hidden'))bell.focus({preventScroll:true});}));
+document.getElementById('notification-dialog')?.addEventListener('keydown',event=>{
+  if(event.key!=='Tab')return;
+  const dialog=event.currentTarget,controls=[...dialog.querySelectorAll('button:not(:disabled),a[href],input:not(:disabled),select:not(:disabled),textarea:not(:disabled),[tabindex="0"]')].filter(n=>n.getClientRects().length&&!n.hidden),first=controls[0],last=controls.at(-1),active=document.activeElement;
+  if(!first){event.preventDefault();dialog.focus();return;}
+  if(!dialog.contains(active)||active===dialog||(!event.shiftKey&&active===last)||(event.shiftKey&&active===first)){event.preventDefault();(event.shiftKey?last:first).focus();}
+});
 window.addEventListener('clubhub-contacts-clear',()=>{__notificationScopeKey='';++__notificationLoadVersion;__appNotifications=[];__notificationStamp=0;__announcementRows=[];__announcementStamp=0;__announcementScopeKey='';++__announcementLoadVersion;__notificationLoading=false;__notificationReadBusy=new Set();__notificationBulkBusy=false;__notificationActionError='';__notificationError='';document.getElementById('notification-dialog')?.close();renderNotificationCenter();});
 document.getElementById('mobile-notification-bell')?.addEventListener('click',()=>{closeMobileMore();openNotifications();});
 document.getElementById('communications-mark-all')?.addEventListener('click',markAllNotificationsRead);

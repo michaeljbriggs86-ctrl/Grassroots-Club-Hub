@@ -27,7 +27,7 @@
 .notification-list .notification-item p{font-size:14px;line-height:1.4;margin:0;white-space:pre-wrap}
 .notification-list .notification-item-actions{display:grid;gap:12px;grid-template-columns:1fr;justify-content:stretch}
 .notification-list .notification-item.important .notification-item-head small{font-weight:600}
-.notification-modal .modal-actions{position:static;display:grid;grid-template-columns:1fr;background:transparent!important;padding:0!important;margin:0}
-.notification-modal .modal-actions button{min-height:52px;font-size:14px}
+.notification-modal .modal-actions{position:static;display:grid!important;grid-template-columns:minmax(0,1fr)!important;width:100%;background:transparent!important;padding:0!important;margin:0}
+.notification-modal .modal-actions button{width:100%!important;min-height:52px;font-size:14px}
 .notification-toolbar button[hidden],.notification-item-actions button[hidden]{display:none!important}
 @media(min-width:760px){.communications-notifications-panel{max-width:720px;margin-inline:auto}}
