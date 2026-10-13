@@ -344,4 +344,9 @@ let base;
  try{if(process.argv[4]==='screenshot-corrections'){for(const theme of ['dark','light'])for(const width of [320,393,680,1024])results.push(await screenshotCorrectionsChecks(page,width,theme));}else for(const theme of ['dark','light']){for(const width of [360,393,1280])results.push(await loginChecks(page,width,theme));results.push(await teamChecks(page,theme));for(const width of [320,393,680,1024])results.push(await screenshotCorrectionsChecks(page,width,theme));for(const width of [320,393,1280])results.push(await coachOnboardingChecks(page,width,theme));for(const width of [320,393,1280])results.push(await adminDirectoryChecks(page,width,theme));for(const width of [320,393,1024])results.push(await workspaceChecks(page,width,theme));for(const width of [320,393,1024])results.push(await latestMatchChecks(page,width,theme));for(const width of [320,393,720])results.push(await registrationChecks(page,width,theme));}assert.equal(errors.length,0,errors.join('\n'));fs.writeFileSync(path.join(out,'measurements.json'),JSON.stringify({results,errors},null,2));console.log(process.argv[4]==='screenshot-corrections'?'PASS built dropdowns, reports, rapid reopen, staff boundaries and dashboard spacing at 320, 393, 680 and 1024px in both themes':'PASS rendered login, password/parent routes, text zoom, stats navigation, match details, attendance and coach onboarding, directories, Squad, Match Plan and deliberate parent verification in both themes');}
  catch(e){await page.screenshot({path:path.join(out,"failed-check.png"),fullPage:true});throw e;}
  finally{await browser.close();server.close();}
-})().catch(error=>{console.error(error);server.close();process.exitCode=1;});
+})().then(()=>{
+ if(process.argv[4]==='screenshot-corrections')return;
+ const result=require('node:child_process').spawnSync(process.execPath,[path.join(__dirname,'verify_more.cjs'),process.argv[2]||'playwright',path.join(out,'more')],{stdio:'inherit'});
+ if(result.error)throw result.error;
+ if(result.status!==0)throw Error('More browser verification failed');
+}).catch(error=>{console.error(error);server.close();process.exitCode=1;});
