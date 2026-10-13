@@ -5,7 +5,7 @@
   const coachingRoles=['coach','assistant_coach'],roleLabel=r=>r==='assistant_coach'?'Assistant Coach':r==='club_admin'?'Club Admin · Coach':'Coach';
   let options,identity='',cloudIdentity=null,version=0,data=null,selected=null,step=0,busy=false,dirty=false;
   function active(){return !!options?.allowed()&&options.currentView()==='coach-onboarding';}
-  function clear(){version++;data=null;selected=null;step=0;busy=false;dirty=false;el('coach-onboarding-content')?.replaceChildren();status('');}
+  function clear(){version++;data=null;selected=null;step=0;busy=false;dirty=false;el('coach-onboarding-content')?.replaceChildren();el('coach-onboarding-content')?.setAttribute('aria-busy','false');status('');}
   function syncAccess(){const key=options?.allowed()?options.contextKey():'',cloud=options?.cloud();if(identity!==key||cloudIdentity!==cloud){clear();identity=key;cloudIdentity=cloud;}return key;}
   function valid(v,key){return v===version&&key===identity&&key===options.contextKey()&&cloudIdentity===options.cloud()&&active();}
   function status(message,error=false){const node=el('coach-onboarding-status');if(node){node.textContent=message;node.classList.toggle('is-error',error);}}
@@ -49,7 +49,7 @@
   function panel(title,content){return `<section class="panel"><h3>${esc(title)}</h3>${content}</section>`;}
   function qualificationCards(){const api=window.ClubHubCoachQualifications;return (api?.catalogue||[{kind:'dbs',label:'Enhanced DBS'},{kind:'safeguarding',label:'Safeguarding Children'},{kind:'first_aid',label:'First aid in football'}]).map(item=>{const r=selected.records.find(x=>x.kind===item.kind),s=selected.qualAvailable?api.status(r):{tone:'missing',label:'Not confirmed'};return panel(item.label,`<p><span class="qualification-state ${s.tone}">${esc(s.label)}</span></p><p class="helper">${selected.qualAvailable?(r?`${r.club_checked?'Club checked':'Needs club check'} · ${item.kind==='dbs'?'FA renewal':'Expiry'}: ${esc(r.expires_on)}`:'Add this qualification to the coach profile.'):(selected.qualPending?'Qualification recording is awaiting activation.':'Qualification records are unavailable. Refresh to retry.')}</p>`);}).join('');}
   function render(){
-    if(!active()||!data)return;const body=el('coach-onboarding-content');if(!step||!selected){body.innerHTML=queue();return;}
+    if(!active()||!data)return;const body=el('coach-onboarding-content');if(!step||!selected){body.innerHTML=queue();body.setAttribute('aria-busy','false');return;}
     const labels=['Account approval','Team assignment','Qualification review','Review setup'],p=selected.person,r=selected.request,q=qualificationSummary(selected.records,selected.qualAvailable),teamIds=p?.teamIds||[];
     const progress=`<ol class="onboarding-progress" aria-label="Coach onboarding progress">${labels.map((label,i)=>`<li${step===i+1?' aria-current="step"':''}><span>${i+1}</span>${label}</li>`).join('')}</ol>`;
     let content='';
