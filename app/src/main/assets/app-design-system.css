@@ -2028,3 +2028,66 @@ html[data-theme="dark"] #coach-onboarding-status.is-error{color:#ffb8b8}
 #coach-onboarding-content .onboarding-progress{grid-template-columns:repeat(auto-fit,minmax(min(100%,3.5rem),1fr))}
 #coach-onboarding-content .onboarding-progress li{overflow-wrap:normal}
 @media(max-width:560px){#coach-onboarding-content .onboarding-review{grid-template-columns:minmax(0,1fr);gap:6px}#coach-onboarding-content .onboarding-review dd{margin-bottom:12px}}
+
+/* October 13 Figma Admin directories: 95:921/928/929/930/931 and light equivalents.
+   Use existing theme surfaces and original shared header/navigation assets. */
+html body .content .admin-people-page{max-width:680px;margin-inline:auto;min-width:0;color:var(--gch-control-copy);overflow-wrap:anywhere}
+html body .admin-people-page .section-title-row{margin:16px 0}
+html body .admin-people-page .section-title-row h2{font-size:1.875rem!important;line-height:1.2;font-weight:700}
+html body .admin-people-page .section-title-row .kicker{font-size:.75rem;line-height:1.4;font-weight:500}
+html body .admin-people-page>.muted{font-size:.875rem;line-height:1.45;margin:0 0 20px}
+html body .content .admin-people-page .panel{padding:16px!important;margin:0 0 16px!important;border-radius:20px!important}
+html body .admin-people-page .panel h3{font-size:1.25rem;line-height:1.3;font-weight:600;margin:0 0 12px}
+html body .admin-people-page .panel p{font-size:.875rem;line-height:1.45;margin:0 0 4px}
+html body .admin-people-page .panel p:last-child{margin-bottom:0}
+html body .admin-people-page :is(.admin-home-team-filters,.admin-assign-row){display:grid;grid-template-columns:minmax(0,1fr);gap:12px;margin:12px 0 0}
+html body .admin-people-page :is(label,.admin-filter-label,.admin-access-filter){display:grid;gap:8px;min-width:0;font-size:.875rem;line-height:1.4;font-weight:600;color:var(--gch-control-copy)}
+html body .admin-people-page :is(input,select){width:100%;min-width:0;min-height:52px;padding:12px 16px;border-radius:12px;font-size:1rem;line-height:1.5;font-weight:400}
+html body .admin-people-page :is(.admin-directory-refresh,.admin-review-actions>button,#assign-coach-button){display:flex;align-items:center;justify-content:center;min-height:52px;width:100%;margin:16px 0 0;white-space:normal;text-align:center;text-decoration:none;font-size:1rem;line-height:1.5}
+html body .admin-people-page :is(.admin-access-management,.admin-home-directory){padding:0;border:0;background:transparent;box-shadow:none}
+html body .admin-people-page :is(.admin-coach-list,.admin-access-list,#coach-requests-list,.admin-team-grid){display:grid;gap:16px;margin:0;min-width:0}
+html body .admin-people-page .admin-home-team-group{display:grid;gap:16px;min-width:0}
+html body .admin-people-page .admin-home-team-group>h4{position:absolute;width:1px;height:1px;padding:0;margin:-1px;clip-path:inset(50%);overflow:hidden;white-space:nowrap}
+html body .content .admin-people-page :is(.admin-directory-row,.admin-request-row,.admin-home-team,.page-link){position:relative;display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;min-width:0;min-height:88px;margin:0;padding:12px!important;border:0!important;border-radius:8px!important;background:var(--gch-control-surface)!important;box-shadow:none!important;text-align:left;color:var(--gch-control-copy)!important}
+html body .admin-people-page :is(.admin-request-row,.admin-home-team)>span:first-child{display:grid;gap:2px;flex:1;min-width:0}
+html body .admin-people-page :is(.team-member-copy,.page-link>span:first-child){display:grid;gap:2px;flex:1;min-width:0}
+html body .admin-people-page :is(.admin-request-row,.admin-home-team,.page-link) strong{font-size:.875rem;line-height:1.45;font-weight:600}
+html body .admin-people-page :is(.team-member-copy>span,.admin-request-row small,.admin-home-team small,.page-link small){font-size:.75rem;line-height:1.4;color:var(--gch-control-muted);overflow-wrap:anywhere}
+html body .admin-people-page :is(.admin-directory-arrow,.admin-request-row>span:last-child,.admin-home-team-size,.page-link>span:last-child){flex:0 0 20px;font-size:1.25rem;line-height:1.3;color:var(--gch-control-focus)}
+html body .admin-people-page .person-name-button{position:static;min-height:0;margin:0;padding:0;border:0;background:transparent;font-size:.875rem;line-height:1.45;font-weight:600;text-align:left;white-space:normal;color:var(--gch-control-copy)}
+html body .admin-people-page .person-name-button::after{content:"";position:absolute;inset:0;border-radius:8px}
+html body .admin-people-page :is(.admin-request-row,.admin-home-team,.person-name-button):focus-visible{outline:3px solid var(--gch-control-focus);outline-offset:3px}
+html body .admin-people-page .admin-directory-row:focus-within{outline:3px solid var(--gch-control-focus);outline-offset:3px}
+html body .admin-coach-centre.admin-people-page>.page-link{margin-top:16px}
+html body .admin-people-page>.helper{font-size:.75rem;line-height:1.4;margin:16px 0}
+html body #staff-request-review-panel{display:grid;gap:0;min-width:0}
+html body .admin-review-actions{display:grid;gap:12px}
+html body .admin-review-actions>button{margin:0!important}
+html body #staff-request-review-status.is-error{color:var(--gch-error);font-weight:600}
+html[data-theme="dark"] body #staff-request-review-status.is-error{color:#ffb8b8}
+html body .content .admin-people-page .primary-button{background:linear-gradient(180deg,var(--gch-white),var(--gch-info-green))!important;color:var(--gch-green-950)!important;border:1px solid var(--gch-control-line)!important;font-weight:600}
+@media(min-width:900px){html body .admin-people-page .admin-home-team-filters{grid-template-columns:minmax(0,1.5fr) minmax(0,1fr)}}
+
+html body .content .admin-people-page .admin-profile-row{min-height:88px;max-width:none;text-decoration:none;font-weight:600}
+html body .admin-people-page .admin-profile-row::after{content:none}
+html body .admin-people-page .admin-profile-row>span:first-child{display:grid;gap:2px;min-width:0;flex:1}
+html body .admin-people-page .admin-profile-row strong{font-size:.875rem;line-height:1.45;color:var(--gch-control-copy)}
+html body .admin-people-page .admin-profile-row small{font-size:.75rem;line-height:1.4;color:var(--gch-control-muted)}
+html[data-theme] body #view-club .admin-coach-centre.admin-people-page{padding:0!important;border:0!important;border-top:0!important;box-shadow:none!important;background:transparent!important}
+html body .admin-people-page .admin-access-filter select{max-width:none;width:100%}
+/* Finish reviewed directory geometry without changing shared routes or controls. */
+html body .admin-people-page :is(input,select){inline-size:100%!important;max-width:none!important;min-height:52px!important;background:var(--gch-control-surface)!important;color:var(--gch-control-copy)!important;border-color:var(--gch-control-line)!important}
+html body .admin-people-page .admin-access-filter{width:100%;justify-items:stretch}
+html body .admin-people-page .admin-filter-label{margin:0}
+html body .admin-people-page h2[tabindex="-1"]:focus-visible{outline:none}
+html body .admin-people-page .section-title-row .kicker{display:block!important}
+html body #view-club:has(#club-coaches-panel:not(.hidden))>.section-title-row{display:none}
+@media(max-width:899px){
+ html body .content:has(>.admin-people-page.active),
+ html body .content:has(>#view-club.active #club-coaches-panel:not(.hidden)){padding-inline:20px!important}
+ html body:has(.admin-people-page.active) .mobile-primary-item>span,
+ html body:has(#view-club.active #club-coaches-panel:not(.hidden)) .mobile-primary-item>span{max-width:100%;white-space:normal;overflow-wrap:anywhere;text-align:center}
+}
+
+html body .admin-people-page label{grid-template-columns:minmax(0,1fr);justify-content:stretch}
+html[data-theme="dark"] body .admin-people-page{--gch-control-surface:rgba(255,255,255,.05);--gch-control-copy:var(--gch-white);--gch-control-muted:rgba(255,255,255,.67);--gch-control-line:rgba(255,255,255,.12);--gch-control-choice-copy:var(--gch-info-green)}

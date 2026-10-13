@@ -509,18 +509,19 @@
         </section>
 
         <section class="club-admin-panel hidden" id="club-coaches-panel">
-          <section class="panel admin-coach-centre screen-lead-card">
-            <div class="panel-heading"><div><p class="kicker">Club staff</p><h3>Coaching Staff</h3></div></div>
-            <p class="muted">Approve coach requests and see coaching-staff assignments.</p>
-            <a class="page-link" href="?view=staff-requests" data-page-route="staff-requests" ><span><strong>Staff access requests</strong><small>Review coach and Club Admin requests</small></span><span aria-hidden="true">›</span></a>
-            <div class="admin-assign-team" id="admin-assign-team">
-              <div class="panel-heading"><div><p class="kicker">Coaching teams</p><h3>Assign a coach to a team</h3></div></div>
-              <p class="muted">A coach can look after more than one team. They choose which team they are working on from the team switcher.</p>
+          <section class="admin-coach-centre admin-people-page">
+            <div class="section-title-row"><div><p class="kicker">Club admin · People &amp; access</p><h2 tabindex="-1">Coaching staff</h2></div></div>
+            <p class="muted">See team assignments and open each person’s profile.</p>
+            <section class="panel admin-assign-team" id="admin-assign-team">
+              <h3>Team assignment</h3>
+              <p class="muted">A coach can look after more than one team.</p>
               <div class="admin-assign-row"><label class="admin-filter-label">Coach<select id="assign-coach-person"><option value="">Choose a person</option></select></label><label class="admin-filter-label">Team<select id="assign-coach-team"><option value="">Choose a team</option></select></label></div>
               <button type="button" class="primary-button compact" id="assign-coach-button">Assign to team</button>
-            </div>
+            </section>
             <div id="club-coaches-list" class="team-members-list admin-coach-list"></div>
+            <a class="page-link" href="?view=staff-requests" data-page-route="staff-requests" ><span><strong>Staff access requests</strong><small>Review waiting requests</small></span><span aria-hidden="true">›</span></a>
             <a class="page-link" href="?view=app-access" data-page-route="app-access" ><span><strong>App access</strong><small>Review everyone’s club access</small></span><span aria-hidden="true">›</span></a>
+            <p class="helper">Open a coach’s profile for DBS, safeguarding and first aid records.</p>
           </section>
         </section>
 
@@ -773,17 +774,15 @@
           <div id="player-onboarding-content"></div>
         </section>
       </section>
-      <section id="view-club-teams" class="view linked-page" data-view="club-teams" aria-labelledby="club-teams-title">
+      <section id="view-club-teams" class="view linked-page admin-people-page" data-view="club-teams" aria-labelledby="club-teams-title">
         <a class="page-back secondary-button" href="?view=club" data-page-route="club">← Back to Club Home</a>
-        <div class="section-title-row"><div><p class="kicker">Club administration</p><h2 id="club-teams-title" tabindex="-1">Club teams</h2></div><button type="button" class="secondary-button compact" data-page-refresh="club-teams">Refresh</button></div>
-        <details class="panel admin-home-directory" id="admin-home-teams">
-            <summary><span>Club teams</span></summary>
-            <div class="admin-home-directory-body">
-              <div class="admin-home-team-filters"><label>Find a team<input type="search" id="admin-home-team-search" placeholder="Team or coach name" /></label><label>Age group<select id="admin-home-age-select"><option value="">All age groups</option></select></label></div>
-              <p class="helper">Open a team to view its squad and match information.</p>
+        <div class="section-title-row"><div><p class="kicker">Club admin · People &amp; access</p><h2 id="club-teams-title" tabindex="-1">Club teams</h2></div></div>
+        <p class="muted">Open a team to see its own workspace.</p>
+        <section class="admin-home-directory" id="admin-home-teams">
+              <section class="panel admin-directory-filter"><h3>Find a team</h3><div class="admin-home-team-filters"><label>Search teams<input type="search" id="admin-home-team-search" placeholder="Team name or coaching staff" /></label><label>Age group<select id="admin-home-age-select"><option value="">All age groups</option></select></label></div></section>
               <div class="admin-team-grid admin-age-group-list" id="admin-team-grid"></div>
-            </div>
-          </details>
+        </section>
+        <button type="button" class="secondary-button admin-directory-refresh" data-page-refresh="club-teams">Refresh teams</button>
       </section>
       <section id="view-coach-documents" class="view linked-page" data-view="coach-documents" aria-labelledby="coach-documents-title">
         <a class="page-back secondary-button" href="?view=club" data-page-route="club">← Back to Club Home</a>
@@ -797,19 +796,32 @@
             <div id="coach-document-table" class="coach-document-scroll" tabindex="0" role="region" aria-label="Coach document matrix, scroll horizontally to view all columns"></div>
           </section>
       </section>
-      <section id="view-app-access" class="view linked-page" data-view="app-access" aria-labelledby="app-access-title">
+      <section id="view-app-access" class="view linked-page admin-people-page" data-view="app-access" aria-labelledby="app-access-title">
         <a class="page-back secondary-button" href="?view=club-coaches" data-page-route="club-coaches">← Back to coaching staff</a>
-        <div class="section-title-row"><div><p class="kicker">Club administration</p><h2 id="app-access-title" tabindex="-1">App access</h2></div><button type="button" class="secondary-button compact" data-page-refresh="app-access">Refresh</button></div>
+        <div class="section-title-row"><div><p class="kicker">Club admin · People &amp; access</p><h2 id="app-access-title" tabindex="-1">App access</h2></div></div>
+        <p class="muted">Review each account’s existing role and team scope.</p>
         <div class="admin-access-management" id="app-access-panel">
-              <div class="panel-heading"><div><p class="kicker">Access management</p><h3>All app access</h3></div><label class="admin-access-filter">Show<select id="admin-access-filter"><option value="all">Everyone</option><option value="club_admin">Club Admins</option><option value="staff">Coaching staff</option><option value="parent">Parents</option><option value="pending_parent">Pending parents</option><option value="player">Players</option></select></label></div>
-              <div class="admin-access-stats" id="admin-access-stats"></div>
+              <section class="panel admin-directory-filter"><h3>Account filter</h3><label class="admin-access-filter">Show accounts<select id="admin-access-filter"><option value="all">Everyone</option><option value="club_admin">Club Admins</option><option value="staff">Coaching staff</option><option value="parent">Parents</option><option value="pending_parent">Pending parents</option><option value="player">Players</option></select></label></section>
               <div class="team-members-list admin-access-list" id="admin-access-list"><div class="empty-state compact-empty">Loading club access…</div></div>
             </div>
+        <button type="button" class="secondary-button admin-directory-refresh" data-page-refresh="app-access">Refresh access</button>
+        <p class="helper">Open a name to view its relevant profile and team access.</p>
       </section>
-      <section id="view-staff-requests" class="view linked-page" data-view="staff-requests" aria-labelledby="staff-requests-title">
+      <section id="view-staff-requests" class="view linked-page admin-people-page" data-view="staff-requests" aria-labelledby="staff-requests-title">
         <a class="page-back secondary-button" href="?view=club-coaches" data-page-route="club-coaches">← Back to coaching staff</a>
-        <div class="section-title-row"><div><p class="kicker">Club administration</p><h2 id="staff-requests-title" tabindex="-1">Staff access requests</h2></div><button type="button" class="secondary-button compact" data-page-refresh="staff-requests">Refresh</button></div>
-        <section class="panel screen-lead-card"><div class="coach-requests hidden" id="coach-requests"><div class="panel-heading"><div><p class="kicker">Waiting for you</p><h3>Coach requests</h3></div><span class="match-section-count" id="coach-requests-count">0</span></div><div class="team-members-list" id="coach-requests-list"></div></div><p class="helper" id="staff-requests-empty" hidden>No staff requests waiting for review.</p></section>
+        <div class="section-title-row"><div><p class="kicker">Club admin · People &amp; access</p><h2 id="staff-requests-title" tabindex="-1">Staff access requests</h2></div></div>
+        <p class="muted">Review the person, role and team before approval.</p>
+        <div class="coach-requests hidden" id="coach-requests"><p class="helper"><span id="coach-requests-count">0</span> waiting for review</p><div class="team-members-list" id="coach-requests-list"></div></div><p class="helper" id="staff-requests-empty" role="status" aria-live="polite" hidden>No staff requests waiting for review.</p>
+        <button type="button" class="secondary-button admin-directory-refresh" data-page-refresh="staff-requests">Refresh requests</button>
+        <p class="helper">An email address alone is not an approval decision.</p>
+      </section>
+      <section id="view-staff-request-review" class="view linked-page admin-people-page" data-view="staff-request-review" aria-labelledby="staff-request-review-title">
+        <div class="section-title-row"><div><p class="kicker">Club admin · People &amp; access</p><h2 id="staff-request-review-title" tabindex="-1">Review staff request</h2></div></div>
+        <p class="muted">Confirm the requested access before taking action.</p>
+        <p id="staff-request-review-status" class="helper" role="status" aria-live="polite" aria-atomic="true"></p>
+        <div id="staff-request-review-panel"></div>
+        <a class="secondary-button admin-directory-refresh" href="?view=staff-requests" data-page-route="staff-requests">Back to requests</a>
+        <p class="helper">Only the club owner can approve Club Admin requests.</p>
       </section>
       <section id="view-team-access" class="view linked-page" data-view="team-access" aria-labelledby="team-access-title">
         <a class="page-back secondary-button" href="?view=more" data-page-route="more">← Back to settings</a>

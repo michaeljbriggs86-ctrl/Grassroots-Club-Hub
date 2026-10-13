@@ -110,12 +110,57 @@ async function coachOnboardingChecks(page,width,theme){
  await page.evaluate(()=>{currentRole='parent';ClubHubCoachOnboarding.syncAccess();});assert.equal(await page.locator('#coach-onboarding-content').innerText(),'','parent capacity clears private onboarding');
  return {screen:'coach-onboarding',width,theme,geometry:g};
 }
+async function adminDirectoryChecks(page,width,theme){
+ await page.setViewportSize({width,height:900});await page.goto(base+'/');await page.waitForFunction(()=>typeof renderAll==='function');
+ await page.evaluate(theme=>{
+  applyTheme(theme);document.querySelector('#app-splash')?.remove();document.body.classList.remove('splash-active','auth-open');document.querySelector('#activation-gate').classList.add('hidden');document.querySelector('.app-shell').classList.remove('account-locked');
+  account={role:'admin',user:'Example Admin'};currentRole='admin';adminUiMode='club';state.meta.clubName='Shooters Hill AFC';
+  const teams=[{id:'review-greens',ageGroup:'U9',teamName:'Example Greens'},{id:'review-blues',ageGroup:'U10',teamName:'Example Blues'}];
+  const coaches=[{user_id:'review-coach',full_name:'Alex Example',role:'coach',team_id:'review-greens',team_name:'Example Greens',age_group:9}];
+  const accounts=[...coaches,{user_id:'review-parent',full_name:'Jordan Example',role:'parent',team_id:'review-greens',team_name:'Example Greens',age_group:9}];
+  const requests=[{request_id:'review-request',user_id:'review-applicant',person_name:'Morgan Example',person_email:'morgan@example.invalid',requested_role:'assistant_coach',team_id:'review-blues',team_name:'Example Blues',age_group:10}];
+  const api={role:()=>currentRole,actingAsParent:()=>false,session:{user:{id:'review-admin'}},context:{profile:{user_id:'review-admin',club_id:'review-club',full_name:'Admin Example',role:'club_admin',is_owner:true}},currentTeam:()=>null,visibleTeamList:()=>teams,
+   getClubOverview:async()=>teams.map(team=>({team,state:{squad:[{name:'Invented player',status:'active'}],matches:[],selkent:{fixtures:[]}}})),listClubCoaches:async()=>coaches,listClubAccessAccounts:async()=>accounts,listPendingCoachRequests:async()=>requests,listClubMessages:async()=>[],listAnnouncements:async()=>[],
+   reviewCoachRequest:async(id,approve)=>{window.__staffDecision={id,approve};requests.splice(0);return {ok:true};}};
+  window.ClubHubCloud=api;window.ClubHubStaticSelkent={loadResults:async()=>({age_groups:[]}),loadDirectory:async()=>({clubs:[]})};
+  window.__staffDecision=null;navigate('club-teams',false);
+ },theme);
+ await page.waitForFunction(()=>document.querySelectorAll('#admin-team-grid [data-admin-open-team]').length===2);await page.evaluate(()=>document.fonts.ready);
+ await page.locator('#admin-home-team-search').fill('Alex');assert.equal(await page.locator('#admin-team-grid [data-admin-open-team]').count(),1);
+ await page.locator('#admin-home-team-search').fill('');await page.locator('#admin-home-age-select').selectOption('U10');assert.equal(await page.locator('#admin-team-grid [data-admin-open-team]').count(),1);
+ await page.locator('#admin-home-age-select').selectOption('');
+ const results=[];
+ for(const view of ['club-teams','club-coaches','app-access','staff-requests']){
+  await page.evaluate(view=>navigate(view,false),view);
+  if(view==='club-coaches')await page.locator('#club-coaches-list [data-person-profile]').waitFor({state:'visible'});
+  if(view==='app-access'){await page.waitForFunction(()=>document.querySelectorAll('#admin-access-list [data-person-profile]').length===2);await page.locator('#admin-access-filter').selectOption('parent');assert.equal(await page.locator('#admin-access-list [data-person-profile]').count(),1);await page.locator('#admin-access-filter').selectOption('all');}
+  if(view==='staff-requests')await page.locator('[data-coach-request-open]').waitFor({state:'visible'});
+  const g=await geometry(page);assert(g.documentWidth<=g.viewport+1,view+' cannot overflow');
+  const target=view==='club-coaches'?'#club-coaches-panel .admin-people-page':'#view-'+view;
+  const measures=await page.locator(target).evaluate(el=>({heading:getComputedStyle(el.querySelector('h2')).fontSize,controls:[...el.querySelectorAll('input,select,button')].filter(x=>x.getBoundingClientRect().width>0).map(x=>({tag:x.tagName,height:x.getBoundingClientRect().height})),font:getComputedStyle(el).fontFamily}));
+  console.log('Admin geometry',view,width,theme,JSON.stringify(measures));await page.screenshot({path:path.join(out,view+'-'+width+'-'+theme+'.png'),fullPage:true});assert.equal(measures.heading,'30px');assert(measures.font.includes('Inter'));
+  if(width===393){const card=await page.locator(target+' .panel, '+target+' .admin-request-row').first().boundingBox();assert(Math.abs(card.x-20)<1&&Math.abs(card.width-353)<1,'Figma phone card keeps 20px gutters: '+JSON.stringify(card));}
+  if(view==='app-access'){const widths=await page.locator('#admin-access-filter').evaluate(el=>({field:el.getBoundingClientRect().width,label:el.parentElement.getBoundingClientRect().width}));assert(Math.abs(widths.field-widths.label)<1,'access filter fills its reviewed slot');}
+  assert(measures.controls.every(x=>x.height>=44),view+' controls meet touch size');
+  await page.evaluate(()=>window.scrollTo(0,0));await page.screenshot({path:path.join(out,view+'-'+width+'-'+theme+'.png'),fullPage:true});results.push({view,width,theme,geometry:g,...measures});
+ }
+ await page.locator('[data-coach-request-open]').click();await page.locator('#staff-request-review-title').waitFor({state:'visible'});assert.match(await page.locator('#staff-request-review-panel').innerText(),/Assistant Coach/);assert.match(await page.locator('#staff-request-review-panel').innerText(),/U10 Example Blues/);
+ await page.screenshot({path:path.join(out,'staff-request-review-'+width+'-'+theme+'.png'),fullPage:true});
+ if(width===320){await page.evaluate(()=>document.documentElement.style.fontSize='200%');assert((await geometry(page)).documentWidth<=width+1,'request review reflows at 200%');await page.screenshot({path:path.join(out,'staff-request-review-text200-'+theme+'.png'),fullPage:true});await page.evaluate(()=>document.documentElement.style.fontSize='');}
+ await page.locator('[data-coach-request-approve]').click();await page.locator('#app-confirm-cancel').click();assert.equal(await page.evaluate(()=>window.__staffDecision),null);
+ await page.locator('[data-coach-request-approve]').click();await page.locator('#app-confirm-accept').click();await page.waitForFunction(()=>window.__staffDecision!==null);assert.deepEqual(await page.evaluate(()=>window.__staffDecision),{id:'review-request',approve:true});
+ await page.waitForFunction(()=>currentView==='staff-requests');await page.waitForFunction(()=>document.querySelector('#staff-requests-empty').textContent.includes('No staff requests'));
+ await page.evaluate(()=>{currentRole='parent';syncStaffRequestContext();});assert.equal(await page.locator('#coach-requests-list').innerText(),'');assert.equal(await page.locator('#staff-request-review-panel').innerText(),'');
+ return {screen:'admin-directories',width,theme,results};
+}
+
+
 let base;
 (async()=>{
  await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));base=`http://127.0.0.1:${server.address().port}`;
  const browser=await chromium.launch({headless:true});const page=await browser.newPage();const errors=[];page.on('pageerror',e=>errors.push(String(e)));
  await page.route('**/*',route=>new URL(route.request().url()).origin===base?route.continue():route.fulfill({status:200,contentType:'application/json',body:'[]'}));
  const results=[];
- try{for(const theme of ['dark','light']){for(const width of [360,393,1280])results.push(await loginChecks(page,width,theme));results.push(await teamChecks(page,theme));for(const width of [320,393,1280])results.push(await coachOnboardingChecks(page,width,theme));}assert.equal(errors.length,0,errors.join('\n'));fs.writeFileSync(path.join(out,'measurements.json'),JSON.stringify({results,errors},null,2));console.log('PASS rendered login, password/parent routes, text zoom, stats navigation, match details, attendance and coach onboarding in both themes');}
+ try{for(const theme of ['dark','light']){for(const width of [360,393,1280])results.push(await loginChecks(page,width,theme));results.push(await teamChecks(page,theme));for(const width of [320,393,1280])results.push(await coachOnboardingChecks(page,width,theme));for(const width of [320,393,1280])results.push(await adminDirectoryChecks(page,width,theme));}assert.equal(errors.length,0,errors.join('\n'));fs.writeFileSync(path.join(out,'measurements.json'),JSON.stringify({results,errors},null,2));console.log('PASS rendered login, password/parent routes, text zoom, stats navigation, match details, attendance and coach onboarding in both themes');}
  finally{await browser.close();server.close();}
 })().catch(error=>{console.error(error);server.close();process.exitCode=1;});
