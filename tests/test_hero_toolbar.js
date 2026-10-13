@@ -9,7 +9,7 @@ const source=fs.readFileSync(path.join(root,'app.js'),'utf8');
 const headerEnd=html.indexOf('</header>'),toolbar=html.indexOf('id="app-utility-bar"'),nav=html.indexOf('id="top-nav-tabs"');
 assert.ok(headerEnd>0&&headerEnd<toolbar&&toolbar<nav,'the controls sit between the shared hero and navigation');
 assert.ok(html.indexOf('id="notification-bell"')<headerEnd,'notification bell is inside the shared hero');
-for(const id of ['hero-profile-switch','hero-admin-preview-back']){const index=html.indexOf(`id="${id}"`,toolbar);assert.ok(index>toolbar&&index<nav,`${id} is in the utility bar`);}
+for(const id of ['hero-profile-switch','hero-admin-preview-back','hero-team-switch']){const index=html.indexOf(`id="${id}"`);assert.ok(index>0&&index<headerEnd,`${id} is in the shared hero`);}
 assert.doesNotMatch(css,/body\.match-plan-active \.hero[\s{.:]/,'Match plan uses the same hero as other pages');
 
 const buttons=[{classList:{contains:()=>true}},{classList:{contains:()=>true}}];

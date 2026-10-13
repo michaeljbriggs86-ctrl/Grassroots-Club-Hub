@@ -1,10 +1,9 @@
 /* Reviewed notifications: shared hero entry and readable notification cards. */
-.hero>.hero-notification-button{position:absolute;z-index:5;inset-block-start:calc(16px + var(--android-inset-top,0px));inset-inline-end:20px;width:44px;height:44px;min-height:44px;min-width:44px;padding:10px;border-radius:12px;border:1px solid rgba(255,255,255,.35);background:rgba(8,32,21,.5);color:#fff;overflow:visible;box-shadow:none}
-.hero>.hero-notification-button.hidden{display:none!important}
-.hero:has(>.hero-notification-button:not(.hidden)) .hero-copy{padding-inline-end:56px!important}
-.hero>.hero-notification-button svg{display:block;flex:0 0 24px}
-.hero>.hero-notification-button .notification-badge{top:-6px;right:-6px;background:var(--gch-green-900,#064526);border-color:#fff;font-size:12px}
-.hero>.hero-notification-button:focus-visible{outline:3px solid #fff;outline-offset:3px}
+.hero-context-actions .hero-notification-button{position:relative;width:48px;height:48px;min-height:48px;min-width:48px;padding:10px;border-radius:12px;border:1px solid rgba(255,255,255,.35);background:var(--gch-green-950);color:#fff;overflow:visible;box-shadow:none}
+.hero-context-actions .hero-notification-button.hidden{display:none!important}
+.hero-context-actions .hero-notification-button svg{display:block;flex:0 0 24px}
+.hero-context-actions .hero-notification-button .notification-badge{top:-6px;right:-6px;background:var(--gch-green-900,#064526);border-color:#fff;font-size:12px}
+.hero-context-actions .hero-notification-button:focus-visible{outline:3px solid #fff;outline-offset:3px}
 .notification-modal{box-sizing:border-box;width:min(720px,calc(100vw - 24px))!important;max-width:calc(100vw - 24px)!important;max-height:calc(100dvh - 24px)!important;padding:20px!important;overflow:auto!important;background:var(--white)!important;color:var(--ink)!important}
 .notification-shell{gap:16px;min-width:0}
 .notification-modal .modal-heading{display:flex;flex-wrap:nowrap;align-items:flex-start;gap:12px}

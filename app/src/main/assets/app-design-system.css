@@ -2343,3 +2343,32 @@ html body #view-home .matchday-dashboard-status{max-width:100%;white-space:norma
 .more-settings-page .page-back{margin-bottom:16px}
 @media(min-width:700px){.more-tool-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(min-width:1000px){.more-tool-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+
+/* Reviewed hero profile/team controls: visible at phone widths as well. */
+html body .hero{
+  height:auto!important;min-height:var(--hero-band)!important;
+  flex-direction:column;align-items:stretch;gap:12px;
+  padding:calc(16px + var(--android-inset-top,0px)) clamp(16px,4vw,28px) 20px!important;
+}
+.hero-context-actions{position:relative;z-index:5;display:flex;justify-content:flex-end;align-items:center;gap:8px;min-width:0}
+html body .hero-context-actions .hero-profile-button,
+html body .hero-coaching-teams .hero-profile-button{
+  min-height:48px;max-width:none;white-space:normal;line-height:1.4;
+  font-weight:600;font-family:inherit;font-size:.875rem;
+  border:1px solid rgba(255,255,255,.35);border-radius:12px;
+  padding:10px 16px;background:var(--gch-green-950)!important;color:var(--gch-white)!important;
+  box-shadow:none;backdrop-filter:none;
+}
+html body .hero-copy{padding-inline-end:0!important}
+html body .hero-inner{position:relative;flex:none;min-width:0}
+.hero-coaching-teams{position:relative;z-index:4;display:grid;gap:8px;min-width:0;width:100%;max-width:720px}
+.hero-coaching-teams label{font-size:.875rem;font-weight:600;color:var(--gch-white)}
+html body .hero-coaching-teams .hero-team-select{
+  appearance:auto;-webkit-appearance:auto;text-align:start;
+  width:100%;min-width:0;max-width:100%;font-size:1rem;padding:12px;
+}
+.hero-coaching-teams p{margin:0;font-size:.875rem;line-height:1.5;color:var(--gch-white);overflow-wrap:anywhere}
+.hero-coaching-teams p:empty{display:none}
+.hero-coaching-teams #hero-team-retry{justify-self:start}
+.hero-context-actions button:focus-visible,.hero-coaching-teams :is(button,select):focus-visible{outline:3px solid var(--gch-white);outline-offset:3px}
+.hero-context-actions button:disabled,.hero-coaching-teams :is(button,select):disabled{opacity:.65;cursor:wait}

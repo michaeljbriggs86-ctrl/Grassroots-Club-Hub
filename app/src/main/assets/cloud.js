@@ -677,9 +677,9 @@
     return Array.isArray(data)?data:[];
   }
   // Several coaching teams for one person (draft 012): list the teams I am assigned to and switch the one I am working on.
-  async function listMyCoachTeams(){
+  async function listMyCoachTeams(strict=false){
     if(!['admin','coach','assistant_coach'].includes(role()))return [];
-    try{const data=await rpc('list_my_coach_teams',{});return Array.isArray(data)?data:[];}catch{return [];}
+    try{const data=await rpc('list_my_coach_teams',{});return Array.isArray(data)?data:[];}catch(err){if(strict)throw err;return [];}
   }
   async function switchMyCoachTeam(teamId){
     await rpc('switch_my_active_team',{p_team_id:String(teamId||'')});

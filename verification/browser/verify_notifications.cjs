@@ -47,7 +47,7 @@ async function checks(page,width,theme){
  assert.match(await page.locator('#notification-unread').innerText(),/1 unread/);await page.screenshot({path:path.join(out,'partial-read-'+width+'-'+theme+'.png'),fullPage:false});
  await page.evaluate(()=>__notesFixture.failRead=false);await page.locator('#notifications-mark-all').click();await page.waitForFunction(()=>document.getElementById('notification-unread').textContent==='All caught up');
  assert.deepEqual(await page.evaluate(()=>__notesFixture.marks),['fixture-a','fixture-b','fixture-b']);assert.equal(await page.locator('#notifications-mark-all').isVisible(),false);
- await page.locator('.notification-close').click();assert.equal(await page.evaluate(()=>document.activeElement.id),'notification-bell');
+ await page.locator('.notification-close').click();await page.waitForFunction(()=>document.activeElement.id==='notification-bell');
  await page.evaluate(()=>{__notesFixture.rows=[];__notesFixture.failLoad=true;__appNotifications=[];__announcementRows=[];__notificationStamp=0;});await bell.click();await page.waitForFunction(()=>document.getElementById('notification-list').textContent.includes('Could not load'));
  assert.doesNotMatch(await page.locator('#notification-list').innerText(),/No notifications yet/);await page.screenshot({path:path.join(out,'load-error-'+width+'-'+theme+'.png'),fullPage:false});
  await page.evaluate(()=>__notesFixture.failLoad=false);await page.locator('#notifications-refresh').click();await page.waitForFunction(()=>document.getElementById('notification-list').textContent.includes('No notifications yet'));
@@ -56,7 +56,7 @@ async function checks(page,width,theme){
 }
 (async()=>{
  await new Promise(r=>server.listen(0,'127.0.0.1',r));base='http://127.0.0.1:'+server.address().port;
- const browser=await chromium.launch({headless:true});const page=await browser.newPage(),errors=[];page.on('pageerror',e=>errors.push(String(e)));
+ const browser=await chromium.launch({headless:true,...(process.env.PITCHKIND_CHROMIUM?{executablePath:process.env.PITCHKIND_CHROMIUM}:{}),args:['--no-sandbox']});const page=await browser.newPage(),errors=[];page.on('pageerror',e=>errors.push(String(e)));
  await page.route('**/*',r=>new URL(r.request().url()).origin===base?r.continue():r.fulfill({status:200,contentType:'application/json',body:'[]'}));
  const results=[];
  try{

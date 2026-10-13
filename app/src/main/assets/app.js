@@ -156,9 +156,14 @@ function isClubOverviewMode(){ return CLOUD_MODE && isAdmin() && adminUiMode==='
 function dualCoachTeam(){ return CLOUD_MODE ? (window.ClubHubCloud?.coachTeam?.()||null) : null; }
 function hasDualAdminCoach(){ return CLOUD_MODE && isAdmin() && !!dualCoachTeam(); }
 let __coachTeamsLoaded=false,__coachTeams=[];
+let __coachTeamsLoading=null,__heroContextBusy=false;
 async function loadCoachTeams(force){
   if(!CLOUD_MODE||!window.ClubHubCloud?.listMyCoachTeams)return [];
-  if(force||!__coachTeamsLoaded){__coachTeamsLoaded=true;__coachTeams=await window.ClubHubCloud.listMyCoachTeams();}
+  if(__coachTeamsLoading)return __coachTeamsLoading;
+  if(force||!__coachTeamsLoaded){
+    __coachTeamsLoading=window.ClubHubCloud.listMyCoachTeams(true).then(rows=>{__coachTeams=rows;__coachTeamsLoaded=true;return rows;}).finally(()=>{__coachTeamsLoading=null;});
+    return __coachTeamsLoading;
+  }
   return __coachTeams;
 }
 const coachTeamTitle=t=>matchTeamLabel(`U${String(t.age_group||'').replace(/^U/i,'')} ${t.name||''}`.trim());
@@ -212,7 +217,7 @@ function renderAccountContextControls(){
 async function openAccountContextSwitch(){
   if(!CLOUD_MODE)return;
   closeMobileMore();
-  await loadCoachTeams();
+  try{await loadCoachTeams();}catch{toast('Could not load coaching teams. Try again.');return;}
   const dialog=document.getElementById('context-switch-dialog'),list=document.getElementById('context-switch-list');
   const choices=availableAccountContexts();
   if(!dialog||!list||(choices.length<2&&!choices.some(choice=>choice.kind==='parent-signin')))return;
@@ -276,6 +281,7 @@ async function switchAccountContext(choice,button){
 }
 async function setAdminUiMode(mode){
   if(!isAdmin())return;
+  if(!confirmHeroContextLeave())return false;
   const next=mode==='coach'?'coach':mode==='view'?'view':'club';
   const previous=adminUiMode;
   adminUiMode=next;
@@ -321,19 +327,49 @@ function isTeamLocked(){
 }
 function plural(n,one,many){return `${n} ${Number(n)===1?one:(many||one+'s')}`;}
 /** Coaches (and Club Admins who coach) assigned to more than one team pick the team they are working on. */
-async function refreshCoachTeamSwitch(preview){
-  const sel=document.getElementById('hero-team-switch');if(!sel)return;
-  if(!CLOUD_MODE||!window.ClubHubCloud?.listMyCoachTeams){sel.classList.add('hidden');return;}
-  await loadCoachTeams();renderAccountContextControls();
-  const show=__coachTeams.length>1&&!preview&&(!isAdmin()||isAdminCoachMode());
-  sel.classList.toggle('hidden',!show);if(!show)return;
-  sel.innerHTML=__coachTeams.map(t=>`<option value="${esc(t.team_id)}"${t.is_active?' selected':''}>U${esc(t.age_group)} ${esc(t.name)}</option>`).join('');
-  if(!sel.dataset.bound){sel.dataset.bound='1';sel.addEventListener('change',async()=>{
-    const id=sel.value;sel.disabled=true;
-    try{await window.ClubHubCloud.switchMyCoachTeam(id);location.reload();}
-    catch(err){sel.disabled=false;toast(err?.message||'Could not switch team.');__coachTeamsLoaded=false;refreshCoachTeamSwitch(false);}
-  });}
-  sel.disabled=false;
+function heroCoachingContext(){return CLOUD_MODE&&(['coach','assistant_coach'].includes(currentRole)||isAdminCoachMode())&&!isAdminTeamPreviewMode();}
+function confirmHeroContextLeave(){
+  if(currentView==='staff-request-review'&&__staffRequestBusy){toast('Wait for the request action to finish.');return false;}
+  if(currentView==='coach-onboarding'&&window.ClubHubCoachOnboarding?.confirmLeave()===false)return false;
+  if(currentView==='player-onboarding'&&window.ClubHubPlayerOnboarding?.confirmLeave()===false)return false;
+  if(currentView==='add'&&!confirmDiscardMatchEdits())return false;
+  if(document.getElementById('match-detail-dialog')?.open&&!confirmDiscardMatchEdits(true))return false;
+  return true;
+}
+function setHeroContextBusy(busy){
+  __heroContextBusy=busy;
+  ['hero-profile-switch','hero-admin-preview-back','hero-team-switch','hero-team-retry'].forEach(id=>{const el=document.getElementById(id);if(el)el.disabled=busy;});
+}
+async function refreshCoachTeamSwitch(preview,force=false){
+  const sel=document.getElementById('hero-team-switch'),box=document.getElementById('hero-coaching-teams'),status=document.getElementById('hero-team-status'),retry=document.getElementById('hero-team-retry');
+  if(!sel||!box||!status||!retry)return;
+  const allowed=()=>heroCoachingContext()&&!preview;
+  if(!allowed()){box.classList.add('hidden');sel.classList.add('hidden');return;}
+  if(!__coachTeamsLoaded||force){box.classList.remove('hidden');sel.classList.add('hidden');status.textContent='Loading coaching teams…';retry.classList.add('hidden');}
+  try{await loadCoachTeams(force);}catch{
+    if(!allowed())return;
+    box.classList.remove('hidden');sel.classList.add('hidden');status.textContent='Could not load coaching teams. Your current team is still open.';retry.classList.remove('hidden');return;
+  }
+  if(!allowed())return;
+  renderAccountContextControls();
+  const show=__coachTeams.length>1&&!preview;
+  box.classList.toggle('hidden',!show);sel.classList.toggle('hidden',!show);retry.classList.add('hidden');status.textContent='';
+  if(!show)return;
+  sel.innerHTML=__coachTeams.map(t=>`<option value="${esc(t.team_id)}"${t.is_active?' selected':''}>${esc(coachTeamTitle(t))}</option>`).join('');
+  sel.dataset.activeTeam=String(__coachTeams.find(t=>t.is_active)?.team_id||window.ClubHubCloud?.currentTeam?.()?.id||'');
+  sel.value=sel.dataset.activeTeam;sel.disabled=__heroContextBusy;
+}
+async function switchHeroCoachingTeam(){
+  const sel=document.getElementById('hero-team-switch'),status=document.getElementById('hero-team-status');
+  if(!sel||!status||__heroContextBusy||!heroCoachingContext())return;
+  const id=sel.value,previous=sel.dataset.activeTeam;
+  if(id===previous)return;
+  if(!__coachTeams.some(t=>String(t.team_id)===id)){sel.value=previous;return;}
+  if(!confirmHeroContextLeave()){sel.value=previous;return;}
+  setHeroContextBusy(true);status.textContent='Switching team…';
+  try{await window.ClubHubCloud.switchMyCoachTeam(id);location.reload();}
+  catch(err){sel.value=previous;status.textContent='Could not switch team. Your previous team is still selected. Try again.';toast(err?.message||'Could not switch team.');}
+  finally{setHeroContextBusy(false);}
 }
 function adminTitleLabel(title){const t=String(title||'').trim();return t?`${t} · Admin`:'Club Admin';}
 function roleLabel(){ return currentRole==='admin'?adminTitleLabel(window.ClubHubCloud?.context?.profile?.club_title):currentRole==='assistant_coach'?'Assistant Coach':currentRole==='parent'?(cloudActingParent()?`Parent view (${staffRoleTitle()})`:'Parent'):currentRole==='player'?'Player':currentRole==='pending_parent'?'Parent awaiting approval':'Coach'; }
@@ -2376,7 +2412,7 @@ function applyAccessMode(){
   if(profileSwitch){
     const show=hasDualAdminCoach()&&!preview;
     profileSwitch.classList.toggle('hidden',!show);
-    if(show){const own=dualCoachTeam();profileSwitch.textContent=isAdminCoachMode()?'Club Admin':`Coach · ${own?.ageGroup||''} ${matchTeamLabel(own?.teamName||'')}`.trim();}
+    if(show){profileSwitch.textContent=isAdminCoachMode()?'Admin view':'Coach view';profileSwitch.setAttribute('aria-label',isAdminCoachMode()?'Switch to Admin profile':'Switch to Coach profile');}
   }
   refreshCoachTeamSwitch(!!preview);
   const previewBack=document.getElementById('hero-admin-preview-back');if(previewBack)previewBack.classList.toggle('hidden',!preview);
@@ -6483,7 +6519,13 @@ document.getElementById('admin-mode-club')?.addEventListener('click',()=>setAdmi
 document.getElementById('admin-mode-coach')?.addEventListener('click',()=>setAdminUiMode('coach'));
 document.getElementById('account-context-switch')?.addEventListener('click',openAccountContextSwitch);
 document.getElementById('mobile-context-switch')?.addEventListener('click',openAccountContextSwitch);
-document.getElementById('hero-profile-switch')?.addEventListener('click',()=>setAdminUiMode(isAdminCoachMode()?'club':'coach'));
+document.getElementById('hero-profile-switch')?.addEventListener('click',async()=>{
+  if(__heroContextBusy)return;
+  setHeroContextBusy(true);
+  try{await setAdminUiMode(isAdminCoachMode()?'club':'coach');}finally{setHeroContextBusy(false);}
+});
+document.getElementById('hero-team-switch')?.addEventListener('change',switchHeroCoachingTeam);
+document.getElementById('hero-team-retry')?.addEventListener('click',()=>refreshCoachTeamSwitch(false,true));
 document.getElementById('hero-admin-preview-back')?.addEventListener('click',()=>setAdminUiMode('club'));
 document.getElementById('settings-team-name')?.addEventListener('change',()=>{if(!isTeamLocked())applySelectedClubTeamToForm();});
 const refreshClubTeamsBtn=document.getElementById('refresh-club-teams');if(refreshClubTeamsBtn)refreshClubTeamsBtn.addEventListener('click',()=>syncProviderClubTeams(false));
