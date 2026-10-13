@@ -2010,3 +2010,21 @@ html[data-theme="dark"] #player-onboarding-status.is-error{color:#ffb8b8}
   .onboarding-actions>.primary-button{min-width:180px}
   .onboarding-review{grid-template-columns:minmax(5rem,.5fr) minmax(0,1fr)}
 }
+
+/* Coach onboarding shares the reviewed Admin onboarding components. */
+#coach-onboarding-status.is-error{color:var(--gch-error);font-weight:600}
+.coach-onboarding-form{display:grid;gap:20px}
+.coach-onboarding-form>.panel{margin:0;min-width:0}
+.coach-onboarding-form h3{margin-bottom:12px}
+.coach-onboarding-form select{min-height:52px;width:100%}
+.coach-onboarding-form .checkbox-line{display:flex;gap:12px;align-items:flex-start;font-weight:500}
+.coach-onboarding-form .checkbox-line input{width:22px;height:22px;flex:0 0 22px;margin-top:2px}
+#coach-onboarding-content{min-width:0;overflow-wrap:anywhere}
+#coach-onboarding-content>.panel{margin-bottom:20px}
+html[data-theme="dark"] #coach-onboarding-status.is-error{color:#ffb8b8}
+#coach-onboarding-panel{width:100%;max-width:680px;margin-inline:auto}
+.coach-onboarding-form .checkbox-line{min-height:44px}
+@media(max-width:560px){#coach-onboarding-content .onboarding-queue article{flex-direction:column;align-items:stretch}#coach-onboarding-content .onboarding-queue button{width:100%;white-space:normal}}
+#coach-onboarding-content .onboarding-progress{grid-template-columns:repeat(auto-fit,minmax(min(100%,3.5rem),1fr))}
+#coach-onboarding-content .onboarding-progress li{overflow-wrap:normal}
+@media(max-width:560px){#coach-onboarding-content .onboarding-review{grid-template-columns:minmax(0,1fr);gap:6px}#coach-onboarding-content .onboarding-review dd{margin-bottom:12px}}

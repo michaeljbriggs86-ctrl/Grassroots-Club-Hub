@@ -82,12 +82,40 @@ async function teamChecks(page,theme){
  await page.locator('#match-detail-cancel').click();assert.equal(await page.locator('#match-detail-dialog').isVisible(),false);
  return {screen:'team',theme,ranking,modal};
 }
+async function coachOnboardingChecks(page,width,theme){
+ await page.setViewportSize({width,height:900});await page.goto(base+'/');await page.waitForFunction(()=>typeof renderAll==='function');
+ await page.evaluate(theme=>{
+  applyTheme(theme);document.querySelector('#app-splash')?.remove();document.body.classList.remove('splash-active','auth-open');document.querySelector('#activation-gate').classList.add('hidden');document.querySelector('.app-shell').classList.remove('account-locked');
+  account={role:'admin',user:'Synthetic Admin'};currentRole='admin';adminUiMode='club';state.meta.clubName='Shooters Hill AFC';
+  const people=[{user_id:'example-coach',full_name:'Taylor Example',role:'assistant_coach',team_id:'example-team'}],requests=[{request_id:'example-request',user_id:'example-applicant',person_name:'Morgan Example',person_email:'morgan@example.invalid',requested_role:'coach',team_id:'example-team'}],assignments=[{user_id:'example-coach',role:'assistant_coach',team_id:'example-team'}];
+  const api={role:()=>currentRole,actingAsParent:()=>false,session:{user:{id:'synthetic-admin'}},context:{profile:{user_id:'synthetic-admin',club_id:'synthetic-club',full_name:'Admin Example',role:'club_admin'}},visibleTeamList:()=>[{id:'example-team',ageGroup:'U9',teamName:'Example Greens'},{id:'extra-team',ageGroup:'U10',teamName:'Example Blues'}],listPendingCoachRequests:async()=>requests,listClubAccessAccounts:async()=>people,listClubCoaches:async()=>assignments,
+   getCoachQualifications:async()=>{throw {data:{code:'PGRST202'}};},reviewCoachRequest:async(id,approve)=>{if(approve){people.push({user_id:'example-applicant',full_name:'Morgan Example',role:'coach',team_id:'example-team'});assignments.push({user_id:'example-applicant',role:'coach',team_id:'example-team'});}requests.splice(0);return {ok:true};},assignCoachTeam:async(user_id,team_id)=>{assignments.push({user_id,team_id,role:'coach'});return {ok:true};}};
+  window.ClubHubCloud=api;window.__coachFixture=api;
+  // Run the real route/module while keeping unrelated club overview requests outside this isolated fixture.
+  ClubHubCoachOnboarding.configure({cloud:()=>api,currentView:()=>currentView,allowed:()=>currentRole==='admin'&&adminUiMode==='club',contextKey:()=>currentRole+'|'+adminUiMode,confirm:appConfirm,toast});
+  navigate('coach-onboarding',false);
+ },theme);
+ await page.getByRole('button',{name:'Review request',exact:true}).waitFor({state:'visible'});await page.evaluate(()=>document.fonts.ready);
+ let g=await geometry(page);assert(g.documentWidth<=g.viewport+1,'coach onboarding queue must reflow');
+ await page.evaluate(()=>window.scrollTo(0,0));await page.screenshot({path:path.join(out,`coach-onboarding-queue-${width}-${theme}.png`),fullPage:true});
+ await page.getByRole('button',{name:'Review request',exact:true}).click();await page.getByRole('button',{name:'Approve account & continue'}).click();assert.match(await page.locator('#coach-onboarding-status').innerText(),/identity/);
+ await page.locator('#coach-onboard-verified').check();await page.getByRole('button',{name:'Approve account & continue'}).click();await page.getByRole('button',{name:'Continue to qualifications'}).waitFor({state:'visible'});
+ await page.locator('#coach-onboard-team').selectOption('extra-team');await page.getByRole('button',{name:'Add team',exact:true}).click();await page.locator('#app-confirm-accept').click();await page.waitForFunction(()=>document.querySelector('.coach-onboarding-form').innerText.includes('Example Blues'));
+ await page.getByRole('button',{name:'Continue to qualifications'}).click();await page.waitForFunction(()=>!document.querySelector('[data-coach-onboard-action="next"]').disabled);assert.equal(await page.getByRole('button',{name:'Review qualification records'}).isDisabled(),true);
+ assert.match(await page.locator('#coach-onboarding-content').innerText(),/awaiting activation/);
+ await page.getByRole('button',{name:'Review setup',exact:true}).click();await page.waitForFunction(()=>!document.querySelector('[data-coach-onboard-action="finish"]').disabled);
+ assert.match(await page.locator('#coach-onboarding-content').innerText(),/Onboarding in progress/);assert.match(await page.locator('#coach-onboarding-content').innerText(),/Example Blues/);
+ g=await geometry(page);assert(g.documentWidth<=g.viewport+1,'coach setup review must reflow');await page.evaluate(()=>window.scrollTo(0,0));assert(await page.locator('.skip-link').evaluate(el=>el.getBoundingClientRect().bottom<=0),'unfocused skip link stays outside the viewport');await page.screenshot({path:path.join(out,`coach-onboarding-summary-${width}-${theme}.png`),fullPage:true});
+ if(width===320){await page.evaluate(()=>document.documentElement.style.fontSize='200%');g=await geometry(page);assert(g.documentWidth<=g.viewport+1,'coach onboarding supports 200% text');assert(await page.locator('.onboarding-progress li').first().evaluate(el=>el.getBoundingClientRect().width>=100),'enlarged progress labels reflow into wider columns');assert.equal(await page.locator('.onboarding-review').evaluate(el=>getComputedStyle(el).gridTemplateColumns.split(' ').length),1,'narrow summary labels and values stack');await page.evaluate(()=>window.scrollTo(0,0));await page.screenshot({path:path.join(out,`coach-onboarding-text200-${theme}.png`),fullPage:true});}
+ await page.evaluate(()=>{currentRole='parent';ClubHubCoachOnboarding.syncAccess();});assert.equal(await page.locator('#coach-onboarding-content').innerText(),'','parent capacity clears private onboarding');
+ return {screen:'coach-onboarding',width,theme,geometry:g};
+}
 let base;
 (async()=>{
  await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));base=`http://127.0.0.1:${server.address().port}`;
  const browser=await chromium.launch({headless:true});const page=await browser.newPage();const errors=[];page.on('pageerror',e=>errors.push(String(e)));
  await page.route('**/*',route=>new URL(route.request().url()).origin===base?route.continue():route.fulfill({status:200,contentType:'application/json',body:'[]'}));
  const results=[];
- try{for(const theme of ['dark','light']){for(const width of [360,393,1280])results.push(await loginChecks(page,width,theme));results.push(await teamChecks(page,theme));}assert.equal(errors.length,0,errors.join('\n'));fs.writeFileSync(path.join(out,'measurements.json'),JSON.stringify({results,errors},null,2));console.log('PASS rendered login, password/parent routes, text zoom, stats navigation, match details and attendance in both themes');}
+ try{for(const theme of ['dark','light']){for(const width of [360,393,1280])results.push(await loginChecks(page,width,theme));results.push(await teamChecks(page,theme));for(const width of [320,393,1280])results.push(await coachOnboardingChecks(page,width,theme));}assert.equal(errors.length,0,errors.join('\n'));fs.writeFileSync(path.join(out,'measurements.json'),JSON.stringify({results,errors},null,2));console.log('PASS rendered login, password/parent routes, text zoom, stats navigation, match details, attendance and coach onboarding in both themes');}
  finally{await browser.close();server.close();}
 })().catch(error=>{console.error(error);server.close();process.exitCode=1;});

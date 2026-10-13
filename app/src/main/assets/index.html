@@ -502,6 +502,7 @@
             <div class="admin-home-desk-row"><div><strong>Club notices</strong><p id="admin-home-notice-status">Loading notices…</p></div><button type="button" class="secondary-button" data-admin-home-action="notice">Write a notice</button></div>
           </section>
 
+          <a class="page-link admin-home-directory-link" href="?view=coach-onboarding" data-page-route="coach-onboarding"><span><strong>Coach onboarding</strong><small>Review staff access, teams and qualification checks</small></span><span aria-hidden="true">›</span></a>
           <a class="page-link admin-home-directory-link" href="?view=player-onboarding" data-page-route="player-onboarding"><span><strong>Player onboarding</strong><small>Add players and review parent access</small></span><span aria-hidden="true">›</span></a>
           <a class="page-link admin-home-directory-link" href="?view=club-teams" data-page-route="club-teams"><span><strong>Club teams</strong><small>Open the team directory</small><small id="admin-team-count"></small></span><span aria-hidden="true">›</span></a>
           <nav class="admin-home-footer" aria-label="More club tools"><button type="button" class="text-button" data-admin-summary="results">Club results</button><button type="button" class="text-button" data-admin-home-action="settings">Club settings</button></nav>
@@ -754,6 +755,15 @@
           </div>
         </details>
       </section>
+      <section id="view-coach-onboarding" class="view linked-page" data-view="coach-onboarding" aria-labelledby="coach-onboarding-title">
+        <a class="page-back secondary-button" href="?view=club" data-page-route="club">← Back to Club Home</a>
+        <div class="section-title-row"><div><p class="kicker">Club administration</p><h2 id="coach-onboarding-title" tabindex="-1">Coach onboarding</h2></div></div>
+        <section id="coach-onboarding-panel">
+          <p id="coach-onboarding-status" class="helper" role="status" aria-live="polite" aria-atomic="true"></p>
+          <div id="coach-onboarding-content"></div>
+        </section>
+      </section>
+
       <section id="view-player-onboarding" class="view linked-page" data-view="player-onboarding" aria-labelledby="player-onboarding-title">
         <a class="page-back secondary-button" href="?view=club" data-page-route="club">← Back to Club Home</a>
         <div class="section-title-row"><div><p class="kicker">Club administration</p><h2 id="player-onboarding-title" tabindex="-1">Player onboarding</h2></div></div>
@@ -1185,6 +1195,7 @@
   <script src="member-contact-import.js"></script>
   <script src="person-profiles.js"></script>
   <script src="player-onboarding.js"></script>
+  <script src="coach-onboarding.js"></script>
   <script src="app.js"></script>
   <script src="static-feed-overlay.js"></script>
 </body>

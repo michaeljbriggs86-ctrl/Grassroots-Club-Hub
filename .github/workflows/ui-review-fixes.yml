@@ -45,6 +45,7 @@ jobs:
           node --check app/src/main/assets/app.js
           node --check app/src/main/assets/cloud.js
           node --check app/src/main/assets/player-onboarding.js
+          node --check app/src/main/assets/coach-onboarding.js
           python verification/verify_v2_2_30_pitchkind_ui.py
           python verification/verify_club_logo_quality.py
           for test in tests/test_*.js; do
@@ -52,7 +53,7 @@ jobs:
             node "$test"
           done
           python cloudflare/web-app/build.py
-          for asset in index.html app.js cloud.js styles.css app-design-system.css coach-qualifications.js member-contact-import.js person-profiles.js player-onboarding.js; do
+          for asset in index.html app.js cloud.js styles.css app-design-system.css coach-qualifications.js member-contact-import.js person-profiles.js player-onboarding.js coach-onboarding.js; do
             cmp "app/src/main/assets/$asset" "cloudflare/web-app/dist/$asset"
           done
           cmp app/src/main/assets/inter-variable.woff2 cloudflare/web-app/dist/inter-variable.woff2
@@ -76,6 +77,9 @@ jobs:
           if-no-files-found: ignore
           retention-days: 7
 
+
+      - name: Check coach qualification draft in throwaway PostgreSQL
+        run: node web/db-drafts/test/run-coach-qualifications.cjs "$RUNNER_TEMP/member-contact-sql/node_modules/@electric-sql/pglite"
 
       - name: Check Admin onboarding with invented players
         run: node web/db-drafts/test/run-player-onboarding.cjs "$RUNNER_TEMP/member-contact-sql/node_modules/@electric-sql/pglite"
