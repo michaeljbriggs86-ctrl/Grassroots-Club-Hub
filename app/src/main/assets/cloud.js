@@ -542,8 +542,10 @@
   function queueStateSave(nextState){
     if(!configured()||!canEdit()||!activeTeam)return;
     pendingState=JSON.parse(JSON.stringify(nextState));
+    unsyncedState=true;
+    emitStatus('Changes queued…','working');
     clearTimeout(saveTimer);
-    saveTimer=setTimeout(()=>{const p=pendingState;pendingState=null;if(p)saveTeamStateNow(p).catch(()=>{});},700);
+    saveTimer=setTimeout(()=>{const p=pendingState;pendingState=null;if(p)saveTeamStateNow(p,{preserveOnConflict:true}).catch(()=>{});},700);
   }
   async function confirmStateSave(nextState){
     // A local match report must stay protected from background pulls until a write is confirmed.

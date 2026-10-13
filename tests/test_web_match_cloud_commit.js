@@ -7,7 +7,7 @@ const start=source.indexOf('  async function saveTeamStateNow('),end=source.inde
 assert.ok(start>=0&&end>start,'cloud save functions are present');
 const saveFunctions=source.slice(start,end);
 
-function cloudHarness(rpc,{editable=true,team=true,session=true}={}){
+function cloudHarness(rpc,{editable=true,team=true,session=true,timers=null}={}){
   const updates=[],statuses=[];
   const api=new Function('rpc','fetchTeamState','emitStatus','setTimeout','clearTimeout','updates','statuses',`
     let saveTimer=null,saving=false,pendingState=null,unsyncedState=false,confirmingState=false;
@@ -17,7 +17,7 @@ function cloudHarness(rpc,{editable=true,team=true,session=true}={}){
     if(!${session})session=null;
     ${saveFunctions}
     return {queueStateSave,confirmStateSave,pullLatest};
-  `)(rpc,async()=>({state:{matches:[]},revision:2}),(...args)=>statuses.push(args),setTimeout,clearTimeout,updates,statuses);
+  `)(rpc,async()=>({state:{matches:[]},revision:2}),(...args)=>statuses.push(args),(timers?fn=>{timers.push(fn);return fn;}:setTimeout),(timers?()=>{}:clearTimeout),updates,statuses);
   return {api,updates,statuses};
 }
 
@@ -48,5 +48,16 @@ function cloudHarness(rpc,{editable=true,team=true,session=true}={}){
   const empty=cloudHarness(async()=>null);
   await assert.rejects(()=>empty.api.confirmStateSave(report),/did not confirm/);
   assert.equal(await empty.api.pullLatest({quiet:true}),null,'an unconfirmed write must not be replaced by polling');
-  console.log('Coach match commit and conflict preservation checks passed');
+  // Match-plan edits use the same automatic queue. Pending or failed writes must
+  // not look synced, and a conflict/empty reply must not replace the local plan.
+  for(const result of ['success','conflict','unconfirmed']){
+    const timers=[];const queued=cloudHarness(async()=>{if(result==='conflict')throw Error('STALE_STATE');return result==='unconfirmed'?null:{revision:2};},{timers});
+    queued.api.queueStateSave({tactics:{matchPlanByFixture:{general:{focus:'Keep local focus'}}}});
+    assert.deepEqual(queued.statuses.at(-1),['Changes queued…','working']);
+    assert.equal(await queued.api.pullLatest({quiet:true}),null);
+    timers.shift()();await new Promise(resolve=>setImmediate(resolve));
+    if(result==='success'){assert.equal(queued.statuses.at(-1)[0],'Cloud synced');assert.equal(queued.updates.length,1);}
+    else{assert.equal(queued.updates.length,0);assert(!queued.statuses.some(([text])=>text==='Cloud synced'));assert.equal(await queued.api.pullLatest({quiet:true}),null);}
+  }
+  console.log('Coach match commit and automatic plan queue: queued/saving/confirmed states, conflict and unconfirmed preservation checks passed');
 })().catch(err=>{console.error(err);process.exitCode=1});
