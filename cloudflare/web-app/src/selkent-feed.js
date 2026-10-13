@@ -1,6 +1,6 @@
 // Access-protected Selkent feed route. The R2 source is activated only after
 // scheduled publication checks; GitHub remains the current public authority.
-const HOST = 'test.pitchkind.com';
+import { isPilotOrigin } from './pilot-hosts.js';
 const GITHUB_FEED = 'https://raw.githubusercontent.com/michaeljbriggs86-ctrl/Grassroots-Club-Hub/main/data/results.json';
 const R2_KEY = 'feed/results.json';
 const MAX_AGE_MS = 18 * 60 * 60_000;
@@ -82,7 +82,7 @@ async function readBundled(request, env, now) {
 
 export async function selkentFeed(request, env, now = Date.now(), remoteFetch = fetch) {
   const url = new URL(request.url);
-  if (url.protocol !== 'https:' || url.hostname !== HOST || url.pathname !== '/data/results.json') {
+  if (!isPilotOrigin(url) || url.pathname !== '/data/results.json') {
     return new Response(JSON.stringify({ error: 'Not found' }), { status: 404, headers: HEADERS });
   }
   if (request.method !== 'GET' && request.method !== 'HEAD') {

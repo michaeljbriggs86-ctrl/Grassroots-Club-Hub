@@ -12,6 +12,22 @@ it does **not** start loading web content as a consequence of this deploy.
 
 ## Develop in the browser first
 
+### Shooters Hill domain (13 October 2026)
+
+Mike connected `shootershillafc.app` to the existing `grassroots-club-hub`
+Worker and confirmed the address opens. An unauthenticated request was also
+observed redirecting to Cloudflare Access. Keep Worker Access on **all traffic**
+and retain `test.pitchkind.com` during the transition. The private badge,
+review and feed routes admit only these two exact HTTPS origins; this adds no
+public badge permissions. Badge requests stay on the address currently in use.
+
+In Supabase Auth > URL Configuration, add `https://shootershillafc.app/` to
+Redirect URLs, preserving the existing browser and Android callbacks. Use it
+as Site URL when making this the primary browser address. The client already
+requests email redirects to its current origin. These dashboard settings and
+email confirmation/reset flows require separate verification; a successful
+domain connection does not prove them.
+
 Edit the shared UI in `app/src/main/assets/`. `build.py` copies only the
 approved files into the Worker build. Push reviewed changes to the connected
 Git branch to update the protected browser pilot; no APK build is needed for

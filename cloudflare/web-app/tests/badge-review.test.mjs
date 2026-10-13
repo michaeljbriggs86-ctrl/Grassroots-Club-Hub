@@ -12,9 +12,11 @@ const env = {
   ASSETS: { fetch: async () => Response.json(directory) },
   PILOT_BADGES: { head: async key => ['250/' + 'b'.repeat(64), '447/' + 'a'.repeat(64)].includes(key) ? {} : null },
 };
-const base = 'https://test.pitchkind.com/__badge_review';
+for (const host of ['test.pitchkind.com', 'shootershillafc.app']) {
+const hostTest = (name, fn) => test(`${host}: ${name}`, fn);
+const base = `https://${host}/__badge_review`;
 
-test('direct review shows the actual approved badge at hero and card sizes', async () => {
+hostTest('direct review shows the actual approved badge at hero and card sizes', async () => {
   const response = await badgeReview(new Request(base + '?club=447&size=foldable&theme=dark'), env);
   assert.equal(response.status, 200);
   assert.equal(response.headers.get('Cache-Control'), 'private, no-store');
@@ -35,14 +37,14 @@ test('direct review shows the actual approved badge at hero and card sizes', asy
   assert.match(html, /\.review-stage\.foldable \.hero \.club-logo-wrap\{width:86px;height:86px\}/);
 });
 
-test('phone review fits the whole crest inside its badge slot', async () => {
+hostTest('phone review fits the whole crest inside its badge slot', async () => {
   const html = await (await badgeReview(new Request(base + '?club=447&size=phone'), env)).text();
   assert.match(html, /\.review-stage\.phone \.hero \.club-logo-wrap\{width:64px;height:64px\}/);
   assert.match(html, /\.review-stage \.hero img\.club-logo\{[^}]+object-fit:contain!important;object-position:center;clip-path:none!important/);
   assert.doesNotMatch(html, /\.review-stage \.hero \.club-logo-wrap\{[^}]+overflow:hidden/);
 });
 
-test('unavailable approved image shows a preparing response instead of broken images', async () => {
+hostTest('unavailable approved image shows a preparing response instead of broken images', async () => {
   const response = await badgeReview(new Request(base + '?club=447'), {
     ...env, PILOT_BADGES: { head: async () => null },
   });
@@ -50,8 +52,8 @@ test('unavailable approved image shows a preparing response instead of broken im
   assert.match(await response.text(), /still being prepared/);
 });
 
-test('review remains confined to the protected host and exact feed approvals', async () => {
-  for (const url of [base.replace('test.pitchkind.com', 'pitchkind.com'),
+hostTest('review remains confined to the protected host and exact feed approvals', async () => {
+  for (const url of [base.replace(host, 'pitchkind.com'),
     base.replace('https:', 'http:'), base.replace('__badge_review', '__badge_review/more'),
     base + '?club=466', base + '?club=999']) {
     assert.equal((await badgeReview(new Request(url), env)).status, 404);
@@ -68,3 +70,5 @@ test('review remains confined to the protected host and exact feed approvals', a
   assert.equal(safe.status, 200);
   assert.doesNotMatch(await safe.text(), /<img src=x onerror=/);
 });
+
+}
