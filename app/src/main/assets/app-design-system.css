@@ -2207,3 +2207,6 @@ html body #view-squad .squad-format-details summary::after{content:none}
 html body #view-squad .squad-format-details summary small{font-weight:400}
 html body #view-squad .tactics-fixture{background:transparent!important;border:0!important}
 html body #view-squad .tactics-formation-card .tactics-heading{order:0}
+html body #view-team-access .member-group-label{text-transform:none;letter-spacing:normal}
+html body #parent-request-review-dialog .parent-request-player{flex-direction:row;align-items:center;text-align:left}
+html[data-theme] body :is(#view-squad,#view-team-access,#parent-request-review-dialog) .secondary-button{background:var(--workspace-info)!important;color:var(--gch-control-copy)!important;border:1px solid var(--gch-control-line)!important}

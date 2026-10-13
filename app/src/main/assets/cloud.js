@@ -519,7 +519,7 @@
     try{
       const data=await rpc('save_team_state',{p_team_id:activeTeam.id,p_state:nextState,p_expected_revision:force?-2:activeRevision});
       const row=Array.isArray(data)?data[0]:data;
-      if(!row&&preserveOnConflict)throw new Error('The cloud did not confirm this match save.');
+      if(!row&&preserveOnConflict)throw new Error('The cloud did not confirm these changes.');
       if(row){activeRevision=Number(row.revision);lastRemoteUpdatedAt=row.updated_at||lastRemoteUpdatedAt;}
       // Read back the server-normalized state. For U7-U11 this removes name-keyed performance data.
       const saved=await fetchTeamState(activeTeam.id);
@@ -567,7 +567,7 @@
       const saved=await saveTeamStateNow(snapshot,{preserveOnConflict:true});
       if(!saved){
         unsyncedState=true;
-        throw new Error('The cloud did not confirm this match save. Your match is still on this device; tap Save again.');
+        throw new Error('The cloud did not confirm these changes. Your match is still on this device; tap Save again.');
       }
       return saved;
     }catch(err){unsyncedState=true;throw err;}
