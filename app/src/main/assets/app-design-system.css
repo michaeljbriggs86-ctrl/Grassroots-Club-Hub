@@ -2291,6 +2291,7 @@ html body #match-detail-dialog.report-wizard-mode::backdrop{background:var(--gch
  * surface even when their page's fields use translucent depth tokens. */
 :root{--gch-picker-surface:var(--gch-white);--gch-picker-choice:var(--gch-soft-green)}
 html[data-theme="dark"]{--gch-picker-surface:var(--gch-ink);--gch-picker-choice:#17311f}
+.universal-onboarding{--gch-picker-surface:var(--gch-white);--gch-picker-choice:var(--gch-soft-green)}
 @supports (appearance:base-select) and selector(select::picker(select)){
   html body select::picker(select){
     background:var(--gch-picker-surface)!important;
