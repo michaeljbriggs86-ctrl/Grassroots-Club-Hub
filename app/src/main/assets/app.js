@@ -4952,8 +4952,8 @@ let __staffDirectoryLoad=0,__accessDirectoryLoad=0;
 async function refreshClubCoaches(quiet=false){
   const list=document.getElementById('club-coaches-list');if(!list||!CLOUD_MODE||!isAdmin())return;
   const key=staffRequestContext(),cloud=window.ClubHubCloud;if(!key)return;
-  const version=++__staffDirectoryLoad,current=()=>key===staffRequestContext()&&cloud===window.ClubHubCloud&&version===__staffDirectoryLoad;
   if(quiet&&Date.now()-__clubCoachStamp<12000)return;__clubCoachStamp=Date.now();
+  const version=++__staffDirectoryLoad,current=()=>key===staffRequestContext()&&cloud===window.ClubHubCloud&&version===__staffDirectoryLoad;
   if(!quiet)list.innerHTML='<div class="empty-state compact-empty">Loading coaching staff…</div>';
   try{
     const rows=await cloud.listClubCoaches();if(!current())return;__adminCoachRows=rows;

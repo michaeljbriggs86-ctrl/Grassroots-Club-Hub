@@ -2085,5 +2085,6 @@ html body #view-club:has(#club-coaches-panel:not(.hidden))>.section-title-row{di
 @media(max-width:899px){
  html body .content:has(>.admin-people-page.active),
  html body .content:has(>#view-club.active #club-coaches-panel:not(.hidden)){padding-inline:20px}
- html body:has(.admin-people-page:where(.active,#club-coaches-panel:not(.hidden) .admin-people-page)) .mobile-primary-item>span{max-width:100%;white-space:normal;overflow-wrap:anywhere;text-align:center}
+ html body:has(.admin-people-page.active) .mobile-primary-item>span,
+ html body:has(#view-club.active #club-coaches-panel:not(.hidden)) .mobile-primary-item>span{max-width:100%;white-space:normal;overflow-wrap:anywhere;text-align:center}
 }
