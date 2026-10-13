@@ -2073,3 +2073,5 @@ html body .admin-people-page .admin-profile-row::after{content:none}
 html body .admin-people-page .admin-profile-row>span:first-child{display:grid;gap:2px;min-width:0;flex:1}
 html body .admin-people-page .admin-profile-row strong{font-size:.875rem;line-height:1.45;color:var(--gch-control-copy)}
 html body .admin-people-page .admin-profile-row small{font-size:.75rem;line-height:1.4;color:var(--gch-control-muted)}
+html[data-theme] body #view-club .admin-coach-centre.admin-people-page{padding:0!important;border:0!important;border-top:0!important;box-shadow:none!important;background:transparent!important}
+html body .admin-people-page .admin-access-filter select{max-width:none;width:100%}
