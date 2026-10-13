@@ -23,6 +23,8 @@ async function prepare(page,width,theme,admin=false){
    listNotifications:async()=>{if(__notesFixture.failLoad)throw Error('Fictional offline');return JSON.parse(JSON.stringify(__notesFixture.rows));},
    markNotificationRead:async id=>{__notesFixture.marks.push(id);if(__notesFixture.failRead&&id==='fixture-b')throw Error('Fictional write failure');__notesFixture.rows.find(n=>n.id===id).read_at=new Date().toISOString();}});
   state=normalizeState({meta:{clubName:'Shooters Hill AFC',teamName:'Example Greens with a long team name',ageGroup:'U9',season:'2026/27'},squad:[],matches:[],goals:[],awards:[]});
+  __notesFixture.rows[0].important=true;
+  api.listAnnouncements=async()=>__notesFixture.rows.length?[{id:'notice-read',title:'Training reminder',body:'Training is at Example Sports Ground this Monday.',read_at:'2026-10-13T10:00:00Z',created_at:'2026-10-13T09:00:00Z'}]:[];
   __notificationScopeKey='';__appNotifications=[];__notificationStamp=0;__announcementRows=[];renderAll();navigate('home',false);renderNotificationCenter();
  },{theme,admin});await page.evaluate(()=>document.fonts.ready);
 }
@@ -32,11 +34,13 @@ async function checks(page,width,theme){
  const geometry=await bell.evaluate(el=>{const b=el.getBoundingClientRect(),h=el.closest('.hero').getBoundingClientRect(),copy=document.querySelector('.hero-copy').getBoundingClientRect();return {bell:b.toJSON(),hero:h.toJSON(),copy:copy.toJSON(),overflow:document.documentElement.scrollWidth>innerWidth};});
  assert.equal(geometry.overflow,false);assert(geometry.bell.width>=44&&geometry.bell.height>=44);assert(geometry.bell.right<=geometry.hero.right&&geometry.bell.top>=geometry.hero.top);assert(geometry.copy.right-56<=geometry.bell.left+1,'hero copy reserves room for corner bell');
  await page.screenshot({path:path.join(out,'hero-'+width+'-'+theme+'.png'),fullPage:false});
- await bell.click();await page.waitForFunction(()=>document.querySelectorAll('#notification-list .notification-item').length===2);
+ await bell.click();await page.waitForFunction(()=>document.querySelectorAll('#notification-list .notification-item').length===3);
  assert.match(await bell.getAttribute('aria-label'),/2 unread/);assert.equal(await page.evaluate(()=>__notesFixture.marks.length),0,'opening never marks read');
  const modal=page.locator('#notification-dialog');assert(await modal.isVisible());
  const bounds=await modal.evaluate(el=>({overflow:el.scrollWidth>el.clientWidth+1,box:el.getBoundingClientRect().toJSON(),surface:getComputedStyle(el).backgroundColor,item:getComputedStyle(el.querySelector('.notification-item')).backgroundColor,copy:getComputedStyle(el.querySelector('.notification-item p')).color,buttons:[...el.querySelectorAll('button')].filter(n=>n.getBoundingClientRect().height).map(n=>n.getBoundingClientRect().height)}));
  assert.equal(bounds.overflow,false);assert(bounds.box.width<=width&&bounds.box.height<=900);assert(bounds.buttons.every(h=>h>=44));assert.notEqual(bounds.surface,bounds.copy);
+ const distinction=await modal.evaluate(el=>{const a=el.querySelector('.notification-item.unread'),b=el.querySelector('.notification-item.read'),ac=getComputedStyle(a),bc=getComputedStyle(b),cards=[...el.querySelectorAll('.notification-item')];return {unreadSurface:ac.backgroundColor,readSurface:bc.backgroundColor,unreadEdge:ac.borderInlineStartWidth,readEdge:bc.borderInlineStartWidth,gap:getComputedStyle(el.querySelector('.notification-list')).rowGap,labels:cards.map(c=>c.querySelector('.notification-type').textContent.trim()),icons:cards.every(c=>c.querySelector('.notification-type svg[aria-hidden="true"]')),state:cards.map(c=>c.querySelector('.notification-read-state').textContent.trim())};});
+ assert.notEqual(distinction.unreadSurface,distinction.readSurface,'read and unread have distinct surfaces');assert.equal(distinction.unreadEdge,'4px');assert.equal(distinction.readEdge,'1px');assert.equal(distinction.gap,'20px');assert.deepEqual(distinction.labels,['Fixture update','Availability reminder','Club notice']);assert(distinction.icons);assert.match(distinction.state[0],/Unread · Important/);assert.match(distinction.state[2],/Read/);
  for(let i=0;i<14;i++){await page.keyboard.press('Tab');assert(await page.evaluate(()=>document.getElementById('notification-dialog').contains(document.activeElement)),'native dialog traps keyboard focus');}
  await page.screenshot({path:path.join(out,'notifications-'+width+'-'+theme+'.png'),fullPage:false});
  await page.evaluate(()=>__notesFixture.failRead=true);await page.locator('#notifications-mark-all').click();await page.waitForFunction(()=>document.getElementById('notification-status').textContent.includes('Some updates'));
@@ -44,11 +48,11 @@ async function checks(page,width,theme){
  await page.evaluate(()=>__notesFixture.failRead=false);await page.locator('#notifications-mark-all').click();await page.waitForFunction(()=>document.getElementById('notification-unread').textContent==='All caught up');
  assert.deepEqual(await page.evaluate(()=>__notesFixture.marks),['fixture-a','fixture-b','fixture-b']);assert.equal(await page.locator('#notifications-mark-all').isVisible(),false);
  await page.locator('.notification-close').click();assert.equal(await page.evaluate(()=>document.activeElement.id),'notification-bell');
- await page.evaluate(()=>{__notesFixture.rows=[];__notesFixture.failLoad=true;__appNotifications=[];__notificationStamp=0;});await bell.click();await page.waitForFunction(()=>document.getElementById('notification-list').textContent.includes('Could not load'));
+ await page.evaluate(()=>{__notesFixture.rows=[];__notesFixture.failLoad=true;__appNotifications=[];__announcementRows=[];__notificationStamp=0;});await bell.click();await page.waitForFunction(()=>document.getElementById('notification-list').textContent.includes('Could not load'));
  assert.doesNotMatch(await page.locator('#notification-list').innerText(),/No notifications yet/);await page.screenshot({path:path.join(out,'load-error-'+width+'-'+theme+'.png'),fullPage:false});
  await page.evaluate(()=>__notesFixture.failLoad=false);await page.locator('#notifications-refresh').click();await page.waitForFunction(()=>document.getElementById('notification-list').textContent.includes('No notifications yet'));
  await page.screenshot({path:path.join(out,'empty-'+width+'-'+theme+'.png'),fullPage:false});await page.locator('.notification-close').click();
- return {width,theme,geometry,bounds};
+ return {width,theme,geometry,bounds,distinction};
 }
 (async()=>{
  await new Promise(r=>server.listen(0,'127.0.0.1',r));base='http://127.0.0.1:'+server.address().port;

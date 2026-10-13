@@ -3051,6 +3051,19 @@ function notificationRows(){
   return [...app,...notices].sort((a,b)=>String(b.created_at||'').localeCompare(String(a.created_at||'')));
 }
 function syncHeaderUtilityBar(){const bar=document.getElementById('app-utility-bar');if(bar)bar.classList.toggle('hidden',![...bar.querySelectorAll('button,select')].some(control=>!control.classList.contains('hidden')));}
+function notificationPresentation(row){
+  const icons={
+    notice:'<path d="m3 11 17-6v14L3 13zM7 14l1 6h3l-1-5M20 9h2v6h-2"/>',
+    fixture:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 11h18"/>',
+    reminder:'<rect x="5" y="4" width="14" height="18" rx="2"/><path d="M9 4V2h6v2M8 13l3 3 5-6"/>',
+    access:'<circle cx="9" cy="8" r="3"/><path d="M3 21v-2a6 6 0 0 1 12 0v2M17 10h5M19.5 7.5v5"/>',
+    update:'<path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/>'
+  };
+  const known={fixture_change:['Fixture update','fixture'],availability_reminder:['Availability reminder','reminder'],parent_access_request:['Parent access request','access'],coach_access_request:['Coach access request','access'],child_access_request:['Child access request','access'],match_report:['Match report','fixture']};
+  const raw=String(row.type||'update').replace(/_/g,' ');
+  const [label,icon]=row.source==='announcement'?['Club notice','notice']:known[row.type]||[raw.charAt(0).toUpperCase()+raw.slice(1),'update'];
+  return {label,icon:`<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${icons[icon]}</svg>`};
+}
 function renderNotificationCenter(){
   const allowed=!!syncNotificationContext(),bell=document.getElementById('notification-bell'),mobileBell=document.getElementById('mobile-notification-bell');
   bell?.classList.toggle('hidden',!allowed);mobileBell?.classList.toggle('hidden',!allowed);syncHeaderUtilityBar();
@@ -3068,8 +3081,8 @@ function renderNotificationCenter(){
     const mark=!r.read_at?`<button type="button" class="secondary-button notification-read-action" ${busy?'disabled aria-busy="true"':''} ${r.source==='announcement'?`data-read-announcement="${esc(r.id)}"`:`data-read-notification="${esc(r.id)}"`}>Mark read</button>`:'';
     const review=parentReview?`<button type="button" class="secondary-button notification-review-action" data-review-parent-request="${esc(r.id)}">Review request</button>`:'';
     const coachReview=r.source==='app'&&r.type==='coach_access_request'&&currentRole==='admin'?`<button type="button" class="secondary-button notification-review-action" data-review-coach-request="${esc(r.id)}">Review request</button>`:'';
-    const kind=r.source==='announcement'?'Club notice':String(r.type||'update').replace(/_/g,' ');
-    return `<article class="notification-item ${r.read_at?'read':'unread'} ${r.important?'important':''}"><div class="notification-item-head"><div><strong>${esc(r.title||'Notification')}</strong><small>${r.read_at?'Read':'Unread'} · ${esc(kind)}${r.important?' · Important':''}</small></div><time>${notificationDate(r.created_at)}</time></div><p>${esc(r.body||'')}</p>${review||coachReview||mark?`<div class="notification-item-actions">${review}${coachReview}${mark}</div>`:''}</article>`;
+    const presentation=notificationPresentation(r);
+    return `<article class="notification-item ${r.read_at?'read':'unread'} ${r.important?'important':''}"><div class="notification-type">${presentation.icon}<span>${esc(presentation.label)}</span></div><div class="notification-item-head"><strong>${esc(r.title||'Notification')}</strong></div><p>${esc(r.body||'')}</p><div class="notification-item-meta"><span class="notification-read-state"><span aria-hidden="true">${r.read_at?'✓':'●'}</span> ${r.read_at?'Read':'Unread'}${r.important?' · Important':''}</span><time>${notificationDate(r.created_at)}</time></div>${review||coachReview||mark?`<div class="notification-item-actions">${review}${coachReview}${mark}</div>`:''}</article>`;
   }).join(''):`<div class="notification-empty"><strong>${__notificationLoading||(!__notificationStamp&&!__notificationError)?'Loading notifications':__notificationError?'Could not load notifications':'No notifications yet'}</strong><p>${__notificationError?'Your notifications are temporarily unavailable. Try again.':__notificationLoading||!__notificationStamp?'Checking your latest updates…':'Your club notices and updates will appear here.'}</p></div>`;
   for(const id of ['notification-list','communications-notifications-list']){const n=document.getElementById(id);if(n){const focused=n.contains?.(document.activeElement);if(n.innerHTML!==html){n.innerHTML=html;if(focused)(n.querySelector('button:not(:disabled)')||document.getElementById('notifications-refresh'))?.focus();}n.setAttribute('aria-busy',String(__notificationLoading));}}
 }
