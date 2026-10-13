@@ -139,6 +139,8 @@ async function adminDirectoryChecks(page,width,theme){
   const target=view==='club-coaches'?'#club-coaches-panel .admin-people-page':'#view-'+view;
   const measures=await page.locator(target).evaluate(el=>({heading:getComputedStyle(el.querySelector('h2')).fontSize,controls:[...el.querySelectorAll('input,select,button')].filter(x=>x.getBoundingClientRect().width>0).map(x=>({tag:x.tagName,height:x.getBoundingClientRect().height})),font:getComputedStyle(el).fontFamily}));
   console.log('Admin geometry',view,width,theme,JSON.stringify(measures));await page.screenshot({path:path.join(out,view+'-'+width+'-'+theme+'.png'),fullPage:true});assert.equal(measures.heading,'30px');assert(measures.font.includes('Inter'));
+  if(width===393){const card=await page.locator(target+' .panel').first().boundingBox();assert(Math.abs(card.x-20)<1&&Math.abs(card.width-353)<1,'Figma phone card keeps 20px gutters: '+JSON.stringify(card));}
+  if(view==='app-access'){const widths=await page.locator('#admin-access-filter').evaluate(el=>({field:el.getBoundingClientRect().width,label:el.parentElement.getBoundingClientRect().width}));assert(Math.abs(widths.field-widths.label)<1,'access filter fills its reviewed slot');}
   assert(measures.controls.every(x=>x.height>=44),view+' controls meet touch size');
   await page.evaluate(()=>window.scrollTo(0,0));await page.screenshot({path:path.join(out,view+'-'+width+'-'+theme+'.png'),fullPage:true});results.push({view,width,theme,geometry:g,...measures});
  }

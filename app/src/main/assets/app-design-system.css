@@ -2084,7 +2084,10 @@ html body .admin-people-page .section-title-row .kicker{display:block!important}
 html body #view-club:has(#club-coaches-panel:not(.hidden))>.section-title-row{display:none}
 @media(max-width:899px){
  html body .content:has(>.admin-people-page.active),
- html body .content:has(>#view-club.active #club-coaches-panel:not(.hidden)){padding-inline:20px}
+ html body .content:has(>#view-club.active #club-coaches-panel:not(.hidden)){padding-inline:20px!important}
  html body:has(.admin-people-page.active) .mobile-primary-item>span,
  html body:has(#view-club.active #club-coaches-panel:not(.hidden)) .mobile-primary-item>span{max-width:100%;white-space:normal;overflow-wrap:anywhere;text-align:center}
 }
+
+html body .admin-people-page label{grid-template-columns:minmax(0,1fr);justify-content:stretch}
+html[data-theme="dark"] body .admin-people-page{--gch-control-surface:rgba(255,255,255,.05);--gch-control-copy:var(--gch-white);--gch-control-muted:rgba(255,255,255,.67);--gch-control-line:rgba(255,255,255,.12);--gch-control-choice-copy:var(--gch-info-green)}
