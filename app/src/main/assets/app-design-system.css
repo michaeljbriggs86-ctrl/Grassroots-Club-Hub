@@ -1301,7 +1301,7 @@ input:-webkit-autofill{
     align-items:center;gap:12px;white-space:normal;overflow-wrap:anywhere;
   }
   select:not([multiple]):not([size])::picker(select),select[size="1"]::picker(select){
-    appearance:base-select;background:var(--gch-control-surface);color:var(--gch-control-copy);
+    appearance:base-select;background:var(--gch-picker-surface);color:var(--gch-control-copy);
     border:1px solid var(--gch-control-line);border-radius:var(--gch-radius-field);
     box-shadow:var(--gch-shadow-card);padding:6px;
     min-width:anchor-size(width);max-width:calc(100vw - 24px);
@@ -1312,7 +1312,7 @@ input:-webkit-autofill{
   select:open{outline:2px solid var(--gch-control-focus);outline-offset:2px}
   select option{
     min-height:48px;padding:12px;gap:12px;border-radius:8px;
-    background:var(--gch-control-surface)!important;color:var(--gch-control-copy)!important;
+    background:var(--gch-picker-surface)!important;color:var(--gch-control-copy)!important;
     font:inherit;white-space:normal;overflow-wrap:anywhere;
   }
   select option:is(:checked,:hover,:focus){background:var(--gch-control-choice)!important;color:var(--gch-control-choice-copy)!important}
@@ -2286,3 +2286,38 @@ html body dialog#match-detail-dialog.report-wizard-mode #match-detail-form{width
 html body dialog#match-detail-dialog.report-wizard-mode .detail-feature-section{flex:none!important;width:100%;box-sizing:border-box}
 html body dialog#match-detail-dialog.report-wizard-mode .match-report-actions{margin-top:0!important}
 html body #match-detail-dialog.report-wizard-mode::backdrop{background:var(--gch-depth-canvas)}
+
+/* Screenshot corrections, 13 October 2026: floating controls need an opaque
+ * surface even when their page's fields use translucent depth tokens. */
+:root{--gch-picker-surface:var(--gch-white);--gch-picker-choice:var(--gch-soft-green)}
+html[data-theme="dark"]{--gch-picker-surface:var(--gch-ink);--gch-picker-choice:#17311f}
+@supports (appearance:base-select) and selector(select::picker(select)){
+  html body select::picker(select){
+    background:var(--gch-picker-surface)!important;
+    max-height:min(360px,calc(100dvh - 120px));
+    overflow-y:auto;scrollbar-gutter:stable;scroll-padding-block:6px;
+  }
+  html body select option{background:var(--gch-picker-surface)!important}
+  html body select option:is(:checked,:hover,:focus){background:var(--gch-picker-choice)!important}
+}
+/* This summary has no form wrapper, so the generic form padding/scroll rules
+ * never reached it. Match the existing dialog shell without clipping reports. */
+html body #club-match-summary-dialog{
+  padding:20px;max-height:calc(100dvh - 32px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  overflow-y:auto;overscroll-behavior:contain;scrollbar-gutter:stable;
+}
+#club-match-summary-dialog .modal-heading{position:sticky;top:-20px;z-index:1;gap:16px;align-items:flex-start;margin:-20px -20px 16px;padding:20px;background:var(--gch-picker-surface)}
+#club-match-summary-dialog .modal-heading h3{padding-block:12px;min-width:0}
+#club-match-summary-dialog .modal-heading button{flex:0 0 48px;min-width:48px}
+#club-match-summary-body{min-width:0;overflow-wrap:anywhere}
+#club-match-summary-body>.muted{margin:0 0 16px}
+#club-match-summary-body>.club-match-card{margin:0}
+#club-match-summary-body>.club-match-card+.muted{margin:16px 0 0}
+#club-match-summary-body .club-report-section p{display:flex;align-items:baseline;justify-content:space-between;gap:16px;line-height:1.5}
+#club-match-summary-body .club-report-section p b{flex-shrink:0;font-variant-numeric:tabular-nums}
+/* Keep the shared rounded cards from colliding with the older joined-card rule. */
+html body #view-home .home-next-match:has(+#matchday-dashboard:not(.hidden)){margin-bottom:16px!important}
+html body #view-home .home-next-match+#matchday-dashboard{margin-top:0;border-radius:20px!important}
+html body #view-home .home-next-match:has(+#matchday-dashboard:not(.hidden)) .next-match-summary-card{border-radius:20px!important}
+html body #view-home .matchday-dashboard-heading{gap:12px;flex-wrap:wrap}
+html body #view-home .matchday-dashboard-status{max-width:100%;white-space:normal;overflow-wrap:anywhere}

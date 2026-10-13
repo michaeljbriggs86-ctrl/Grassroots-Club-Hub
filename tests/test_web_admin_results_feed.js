@@ -10,7 +10,8 @@ const html = fs.readFileSync(path.join(root, 'app/src/main/assets/index.html'), 
 const designCss = fs.readFileSync(path.join(root, 'app/src/main/assets/app-design-system.css'), 'utf8');
 const normalizeTeamKey = s => String(s || '').toLowerCase().replace(/&/g, 'and').replace(/[^a-z0-9]+/g, ' ').trim().replace(/\s+/g, ' ');
 const internalBody = src.slice(src.indexOf('function fullClubResultTeamName(team={}){'), src.indexOf('function renderClubResultsBrowser(){'));
-const internalAdminClubResults = new Function('clubSettings','normalizeTeamKey',`${internalBody}\nreturn internalAdminClubResults;`)(()=>({display_name:'Shooters Hill AFC'}),normalizeTeamKey);
+const identityBody=src.slice(src.indexOf('function resolveMiniPerformanceDisplay('),src.indexOf('function loadState(){'));
+const internalAdminClubResults = new Function('clubSettings','normalizeTeamKey',`${identityBody}\n${internalBody}\nreturn internalAdminClubResults;`)(()=>({display_name:'Shooters Hill AFC'}),normalizeTeamKey);
 const elements = new Map(['admin-recent-results','admin-results-count','admin-results-breakdown','admin-results-source-status'].map(id => [id,{innerHTML:'',textContent:''}]));
 const document = {getElementById:id => elements.get(id)};
 const helpers = src.slice(src.indexOf('function verifiedClubResultsFeed(feed){'), src.indexOf('function nextWeekendDates(){'));
@@ -150,3 +151,25 @@ assert.match(elements.get('admin-recent-results').innerHTML,/Home score 2.*Away 
 delete cupFeed.coverage.published_results.cup_parser_status;
 assert.equal(publishedClubTeamData(teams[0],cupFeed).results.length,1,'unverified cup feed rows are excluded');
 console.log('Public cup import, competition filter, format identity and privacy checks passed');
+
+// The staff RPC hydrates shirt numbers in squad, not names in goal/award rows.
+// Resolve within each team's squad, even when two teams use the same number.
+const staffReportState=name=>({
+ squad:[{name,number:9}],
+ matches:[{id:'shared-match-id',opponent:'Example Blues',venue:'A',status:'played',gf:3,ga:0}],
+ goals:[{matchId:'shared-match-id',shirtNumber:9,goals:2},{matchId:'other-match',shirtNumber:9,goals:4},{matchId:'shared-match-id',shirtNumber:88,goals:1}],
+ awards:[{matchId:'shared-match-id',shirtNumber:9,type:'Player of the Match'}]
+});
+const reportRows=internalAdminClubResults([
+ {team:{id:'example-u9',ageGroup:'U9',teamName:'Example Greens'},state:staffReportState('Alex Example')},
+ {team:{id:'example-u10',ageGroup:'U10',teamName:'Example Whites'},state:staffReportState('Jamie Example')}
+]);
+assert.equal(reportRows[0].report.goals[0].player,'Alex Example');
+assert.equal(reportRows[1].report.goals[0].player,'Jamie Example');
+assert.equal(reportRows[0].report.goals.length,2,'other match goals stay excluded');
+assert.equal(reportRows[0].report.goals[1].player,'#88','unmapped shirt stays visible without inventing a name');
+assert.equal(reportRows[0].report.awards[0].player,'Alex Example');
+assert.equal(reportRows[0].hg,0);assert.equal(reportRows[0].ag,3,'away score order retained');
+const legacy=staffReportState('Alex Example');legacy.goals=[{matchId:'shared-match-id',player:'Legacy Example',goals:3}];
+assert.equal(internalAdminClubResults([{team:teams[2],state:legacy}])[0].report.goals[0].player,'Legacy Example','existing named records still render');
+console.log('PASS team-scoped mini-soccer scorer and award identity resolution');
