@@ -1,0 +1,15 @@
+{
+  "confirm-signup.html": "Confirm your Shooters Hill AFC email",
+  "invite-user.html": "Your invitation to Shooters Hill AFC",
+  "magic-link.html": "Your Shooters Hill AFC sign-in link",
+  "change-email.html": "Confirm your Shooters Hill AFC email change",
+  "reset-password.html": "Set your Shooters Hill AFC password",
+  "reauthentication.html": "Your Shooters Hill AFC verification code",
+  "password-changed.html": "Your Shooters Hill AFC password was changed",
+  "email-changed.html": "Your Shooters Hill AFC email was changed",
+  "phone-changed.html": "Your Shooters Hill AFC phone number was changed",
+  "sign-in-method-linked.html": "A sign-in method was added to your Shooters Hill AFC account",
+  "sign-in-method-removed.html": "A sign-in method was removed from your Shooters Hill AFC account",
+  "mfa-method-added.html": "A verification method was added to your Shooters Hill AFC account",
+  "mfa-method-removed.html": "A verification method was removed from your Shooters Hill AFC account"
+}
