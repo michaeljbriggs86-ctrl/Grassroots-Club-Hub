@@ -158,7 +158,7 @@ async function adminDirectoryChecks(page,width,theme){
 async function workspaceChecks(page,width,theme){
  await prepareTeam(page,theme);await page.setViewportSize({width,height:900});
  await page.evaluate(()=>{
-  CLUB_CONFIGURATION={settings:{...UNIVERSAL_FALLBACK_SETTINGS,display_name:'Shooters Hill AFC',short_name:'Shooters Hill AFC'},rules:[]};
+  CLUB_CONFIGURATION={settings:{...UNIVERSAL_FALLBACK_SETTINGS,display_name:'Shooters Hill AFC',short_name:'Shooters Hill AFC'},rules:[{age_group:15,format:'11v11',players_on_pitch:11,max_registered:18,matchday_max:16,rolling_substitutions:false,player_accounts_allowed:true}]};
   const names=['Alex','Jamie','Casey','Riley','Taylor','Robin','Drew','Jules','Charlie','Jordan'];
   state=normalizeState({meta:{clubName:'Shooters Hill AFC',teamName:'Example Greens',ageGroup:'U9',season:'2026/27'},division:{name:'Example division',teamName:'Shooters Hill AFC Example Greens'},squad:names.map((name,i)=>({name:name+' Example',number:i+1,role:i===0?'goalkeeper':'outfield',status:i===9?'inactive':'active'})),matches:[],features:{tactics:true},selkent:{fixtures:[]}});
   const requests=[{request_id:'parent-review',user_id:'review-parent',parent_name:'Morgan Example',parent_email:'morgan@example.invalid',child_name:'Jamie'}];
