@@ -138,7 +138,7 @@ async function adminDirectoryChecks(page,width,theme){
   const g=await geometry(page);assert(g.documentWidth<=g.viewport+1,view+' cannot overflow');
   const target=view==='club-coaches'?'#club-coaches-panel .admin-people-page':'#view-'+view;
   const measures=await page.locator(target).evaluate(el=>({heading:getComputedStyle(el.querySelector('h2')).fontSize,controls:[...el.querySelectorAll('input,select,button')].filter(x=>x.getBoundingClientRect().width>0).map(x=>({tag:x.tagName,height:x.getBoundingClientRect().height})),font:getComputedStyle(el).fontFamily}));
-  assert.equal(measures.heading,'30px');assert(measures.font.includes('Inter'));
+  console.log('Admin geometry',view,width,theme,JSON.stringify(measures));await page.screenshot({path:path.join(out,view+'-'+width+'-'+theme+'.png'),fullPage:true});assert.equal(measures.heading,'30px');assert(measures.font.includes('Inter'));
   assert(measures.controls.every(x=>x.height>=44),view+' controls meet touch size');
   await page.evaluate(()=>window.scrollTo(0,0));await page.screenshot({path:path.join(out,view+'-'+width+'-'+theme+'.png'),fullPage:true});results.push({view,width,theme,geometry:g,...measures});
  }
