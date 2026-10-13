@@ -2025,3 +2025,6 @@ html[data-theme="dark"] #coach-onboarding-status.is-error{color:#ffb8b8}
 #coach-onboarding-panel{width:100%;max-width:680px;margin-inline:auto}
 .coach-onboarding-form .checkbox-line{min-height:44px}
 @media(max-width:560px){#coach-onboarding-content .onboarding-queue article{flex-direction:column;align-items:stretch}#coach-onboarding-content .onboarding-queue button{width:100%;white-space:normal}}
+#coach-onboarding-content .onboarding-progress{grid-template-columns:repeat(auto-fit,minmax(min(100%,3.5rem),1fr))}
+#coach-onboarding-content .onboarding-progress li{overflow-wrap:normal}
+@media(max-width:560px){#coach-onboarding-content .onboarding-review{grid-template-columns:minmax(0,1fr);gap:6px}#coach-onboarding-content .onboarding-review dd{margin-bottom:12px}}
