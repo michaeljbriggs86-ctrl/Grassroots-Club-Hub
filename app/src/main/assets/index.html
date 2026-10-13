@@ -13,6 +13,7 @@
   <link rel="stylesheet" href="cloud.css" />
   <link rel="stylesheet" href="onboarding.css" />
   <link rel="stylesheet" href="app-design-system.css" />
+  <link rel="stylesheet" href="notifications.css" />
   <title>Shooters Hill AFC</title>
 </head>
 <body class="splash-active">
@@ -66,10 +67,10 @@
           <p class="season-line" id="hero-season-line">U9 · 2026/27</p>
         </div>
       </div>
+      <button type="button" class="hero-notification-button hidden" id="notification-bell" aria-label="Notifications" aria-haspopup="dialog"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg><span class="notification-badge hidden" id="notification-badge" aria-hidden="true">0</span></button>
     </header>
 
     <div class="hero-profile-actions app-utility-bar hidden" id="app-utility-bar" role="group" aria-label="Account and notifications">
-      <button type="button" class="hero-notification-button hidden" id="notification-bell" aria-label="Notifications">🔔<span class="notification-badge hidden" id="notification-badge">0</span></button>
       <button type="button" class="hero-profile-button hidden" id="hero-profile-switch">Coach view</button>
       <select class="hero-profile-button hero-team-select hidden" id="hero-team-switch" aria-label="Coaching team"></select>
       <button type="button" class="hero-profile-button hidden" id="hero-admin-preview-back">Club overview</button>
@@ -428,7 +429,7 @@
         <a class="page-link" href="?view=raise-concern" data-page-route="raise-concern" ><span><strong>Raise an issue</strong><small>Contact the club about a complaint or concern</small></span><span aria-hidden="true">›</span></a>
         <section class="panel hidden" id="dispute-reviewer-panel"><div class="panel-heading"><div><p class="kicker">Restricted role</p><h3>Dispute Reviewer</h3><p class="muted">Only assigned reviewers can open retained dispute material. Access is audited.</p></div></div><div id="reviewer-dispute-list"><div class="empty-state compact-empty">No open disputes loaded.</div></div><label>Retained message thread ID<input id="reviewer-thread-id" placeholder="Thread UUID"/></label><button type="button" class="secondary-button" id="load-retained-thread">Open retained thread</button><div id="reviewer-retained-thread" class="inbox-thread"></div></section>
         </div>
-        <section class="panel hidden communications-notifications-panel screen-lead-card" id="communications-notifications-panel"><div class="panel-heading"><div><p class="kicker">Notifications</p><h3>Updates</h3></div><button type="button" class="secondary-button compact" id="communications-mark-all">Mark all read</button></div><div class="notification-list" id="communications-notifications-list"></div></section>
+        <section class="panel hidden communications-notifications-panel screen-lead-card" id="communications-notifications-panel"><div class="panel-heading"><div><p class="kicker">Notifications</p><h3>Updates</h3><p>Club notices and updates in one place.</p></div></div><div class="notification-toolbar"><strong id="communications-notification-unread">Updates</strong><button type="button" class="secondary-button" id="communications-notifications-refresh">Refresh</button><button type="button" class="secondary-button" id="communications-mark-all">Mark all read</button></div><p id="communications-notification-status" class="notification-status" role="status" aria-live="polite" hidden></p><div class="notification-list" id="communications-notifications-list"></div></section>
         <div class="hidden" id="communications-notices-panel">
           <section class="panel admin-announcement-centre screen-lead-card">
             <div class="panel-heading"><div><p class="kicker">Notifications</p><h3>Club notices</h3><p class="muted">Broadcast a read-only notification to the relevant members.</p></div></div>
@@ -1181,11 +1182,14 @@
     </div>
   </dialog>
 
-  <dialog id="notification-dialog" class="modal notification-modal">
+  <dialog id="notification-dialog" class="modal notification-modal" aria-labelledby="notification-title">
     <div class="notification-shell">
-      <div class="modal-heading"><div><p class="kicker">Updates</p><h3>Notifications</h3></div><button type="button" class="icon-button small" data-close-dialog aria-label="Close">×</button></div>
+      <div class="modal-heading"><div><p class="kicker">Updates</p><h3 id="notification-title">Notifications</h3></div><button type="button" class="icon-button notification-close" data-close-dialog aria-label="Close notifications">×</button></div>
+      <p class="notification-intro">Club notices and updates in one place.</p>
+      <div class="notification-toolbar"><strong id="notification-unread">Updates</strong><button type="button" class="secondary-button" id="notifications-refresh">Refresh</button><button type="button" class="secondary-button" id="notifications-mark-all">Mark all read</button></div>
+      <p id="notification-status" class="notification-status" role="status" aria-live="polite" hidden></p>
       <div class="notification-list" id="notification-list"></div>
-      <div class="modal-actions"><button type="button" class="secondary-button" id="notifications-mark-all">Mark all read</button><button type="button" class="primary-button" data-close-dialog>Done</button></div>
+      <div class="modal-actions"><button type="button" class="primary-button" data-close-dialog>Done</button></div>
     </div>
   </dialog>
 

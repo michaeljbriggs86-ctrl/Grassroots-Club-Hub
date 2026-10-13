@@ -1,0 +1,33 @@
+/* Reviewed notifications: shared hero entry and readable notification cards. */
+.hero>.hero-notification-button{position:absolute;z-index:5;inset-block-start:calc(16px + var(--android-inset-top,0px));inset-inline-end:20px;width:44px;height:44px;min-height:44px;min-width:44px;padding:10px;border-radius:12px;border:1px solid rgba(255,255,255,.35);background:rgba(8,32,21,.5);color:#fff;overflow:visible;box-shadow:none}
+.hero>.hero-notification-button.hidden{display:none!important}
+.hero:has(>.hero-notification-button:not(.hidden)) .hero-copy{padding-inline-end:56px!important}
+.hero>.hero-notification-button svg{display:block;flex:0 0 24px}
+.hero>.hero-notification-button .notification-badge{top:-6px;right:-6px;background:var(--gch-green-900,#064526);border-color:#fff;font-size:12px}
+.hero>.hero-notification-button:focus-visible{outline:3px solid #fff;outline-offset:3px}
+.notification-modal{box-sizing:border-box;width:min(720px,calc(100vw - 24px))!important;max-width:calc(100vw - 24px)!important;max-height:calc(100dvh - 24px)!important;padding:20px!important;overflow:auto!important;background:var(--white)!important;color:var(--ink)!important}
+.notification-shell{gap:16px;min-width:0}
+.notification-modal .modal-heading{display:flex;flex-wrap:nowrap;align-items:flex-start;gap:12px}
+.notification-modal .modal-heading>div{flex:1 1 auto;min-width:0}
+.notification-modal .modal-heading h3{font-size:30px;line-height:1.2}
+.notification-modal .notification-close{width:44px;height:44px;min-width:44px;min-height:44px;flex:0 0 44px;font-size:24px;border:1px solid var(--gch-control-line,var(--gch-line));border-radius:12px;background:transparent;color:var(--ink)}
+.notification-intro{margin:0;font-size:14px;line-height:1.4;color:var(--muted)}
+.notification-toolbar{display:grid;gap:12px;grid-template-columns:1fr;align-items:center;min-width:0}
+.notification-toolbar>strong{font-size:20px;line-height:1.3}
+.notification-toolbar button,.notification-item-actions button{width:100%;min-height:52px!important;padding:12px 16px!important;font-size:14px!important;white-space:normal!important;line-height:1.4!important}
+.notification-status,.notification-empty{margin:0;padding:16px;border:1px solid var(--gch-control-line,var(--gch-line));border-radius:20px;background:var(--gch-control-choice,#edf6f0);color:var(--ink);font-size:14px;line-height:1.4;overflow-wrap:anywhere}
+.notification-empty strong{font-size:20px;line-height:1.3}
+.notification-empty p{margin:12px 0 0}
+.notification-status[hidden]{display:none!important}
+.notification-modal .notification-list,.communications-notifications-panel .notification-list{display:grid;gap:16px;max-height:none;overflow:visible;padding:0;min-width:0}
+.notification-list .notification-item{min-width:0;padding:16px!important;gap:12px!important;border:1px solid var(--gch-control-line,var(--gch-line))!important;border-radius:20px!important;background:var(--gch-surface,var(--white))!important;color:var(--ink)!important;box-shadow:none}
+.notification-list .notification-item-head{display:flex;flex-direction:column;gap:8px;align-items:stretch}
+.notification-list .notification-item-head strong{display:block;font-size:20px;line-height:1.3;color:var(--ink)}
+.notification-list .notification-item-head small,.notification-list .notification-item-head time{font-size:12px;line-height:1.4;color:var(--muted)}
+.notification-list .notification-item p{font-size:14px;line-height:1.4;margin:0;white-space:pre-wrap}
+.notification-list .notification-item-actions{display:grid;gap:12px;grid-template-columns:1fr;justify-content:stretch}
+.notification-list .notification-item.important .notification-item-head small{font-weight:600}
+.notification-modal .modal-actions{position:static;display:grid!important;grid-template-columns:minmax(0,1fr)!important;width:100%;background:transparent!important;padding:0!important;margin:0}
+.notification-modal .modal-actions button{width:100%!important;min-height:52px;font-size:14px}
+.notification-toolbar button[hidden],.notification-item-actions button[hidden]{display:none!important}
+@media(min-width:760px){.communications-notifications-panel{max-width:720px;margin-inline:auto}}

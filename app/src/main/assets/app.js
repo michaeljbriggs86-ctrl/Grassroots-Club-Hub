@@ -3025,26 +3025,100 @@ async function publishAnnouncement(){
   }catch(err){alert('Could not publish club notice: '+(err.message||err));}
   finally{if(button){button.disabled=false;button.textContent='Publish notice';}}
 }
-async function markAnnouncementRead(id){try{await window.ClubHubCloud.markAnnouncementRead(id);const row=__announcementRows.find(a=>a.id===id);if(row)row.read_at=new Date().toISOString();renderAnnouncements();}catch(err){toast('Could not update notice');}}
+async function markAnnouncementRead(id){return markNotificationNoticeRead(id);}
 async function deleteAnnouncement(id){if(!isAdmin()||!confirm('Remove this club announcement?'))return;try{await window.ClubHubCloud.deleteAnnouncement(id);toast('Announcement removed');await refreshAnnouncements(false);}catch(err){alert(err.message||err);}}
 
-let __appNotifications=[],__notificationStamp=0;
-function notificationDate(v){try{return new Date(v).toLocaleString('en-GB',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});}catch{return '';} }
-function syncHeaderUtilityBar(){const bar=document.getElementById('app-utility-bar');if(bar)bar.classList.toggle('hidden',![...bar.querySelectorAll('button')].some(button=>!button.classList.contains('hidden')));}
-function renderNotificationCenter(){
-  const bell=document.getElementById('notification-bell'),mobileBell=document.getElementById('mobile-notification-bell'),badge=document.getElementById('notification-badge'),mobileBadge=document.getElementById('mobile-notification-badge'),list=document.getElementById('notification-list');const allowed=CLOUD_MODE&&['admin','coach','assistant_coach','parent','player'].includes(currentRole);bell?.classList.toggle('hidden',!allowed);mobileBell?.classList.toggle('hidden',!allowed);syncHeaderUtilityBar();if(!allowed)return;
-  const noticeRows=__announcementRows.filter(a=>(!a.expires_at||new Date(a.expires_at).getTime()>Date.now())).map(a=>({source:'announcement',id:a.id,title:a.title,body:a.body,created_at:a.created_at,read_at:a.read_at,important:a.important,type:'club_announcement'}));
-  const appRows=__appNotifications.filter(n=>!(n.type==='match_report'&&/restricted for this age group/i.test(String(n.body||'')))).map(n=>({...n,source:'app'}));const rows=[...appRows,...noticeRows].sort((a,b)=>String(b.created_at||'').localeCompare(String(a.created_at||'')));const unread=rows.filter(r=>!r.read_at).length;
-  if(badge){badge.textContent=unread>99?'99+':String(unread);badge.classList.toggle('hidden',!unread);}
-  if(mobileBadge){mobileBadge.textContent=unread>99?'99+':String(unread);mobileBadge.classList.toggle('hidden',!unread);}
-  const html=rows.length?rows.map(r=>{const parentReview=r.source==='app'&&r.type==='parent_access_request'&&['admin','coach','assistant_coach'].includes(currentRole);const mark=!r.read_at?`<button type="button" class="text-button compact" ${r.source==='announcement'?`data-read-announcement="${r.id}"`:`data-read-notification="${r.id}"`}>Mark read</button>`:'';const review=parentReview?`<button type="button" class="secondary-button compact notification-review-action" data-review-parent-request="${r.id}">Review request</button>`:'';const coachReview=r.source==='app'&&r.type==='coach_access_request'&&currentRole==='admin'?`<button type="button" class="secondary-button compact notification-review-action" data-review-coach-request="${r.id}">Review request</button>`:'';return `<article class="notification-item ${r.read_at?'read':'unread'} ${r.important?'important':''}"><div class="notification-item-head"><div><strong>${esc(r.title||'Notification')}</strong><small>${r.source==='announcement'?'Club notice':String(r.type||'update').replace(/_/g,' ')}</small></div><time>${notificationDate(r.created_at)}</time></div><p>${esc(r.body||'')}</p>${review||coachReview||mark?`<div class="notification-item-actions">${review}${coachReview}${mark}</div>`:''}</article>`;}).join(''):'<div class="empty-state compact-empty">No notifications yet.</div>';
-  if(list)list.innerHTML=html;
-  const adminList=document.getElementById('communications-notifications-list');if(adminList)adminList.innerHTML=html;
+
+let __appNotifications=[],__notificationStamp=0,__notificationLoadVersion=0,__notificationScopeKey='',__notificationLoading=false,__notificationError='',__notificationActionError='',__notificationReadBusy=new Set(),__notificationBulkBusy=false;
+function notificationDate(v){const d=new Date(v);return Number.isNaN(d.getTime())?'':d.toLocaleString('en-GB',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});}
+function notificationContextKey(){
+  const cloud=window.ClubHubCloud,uid=cloud?.session?.user?.id;
+  if(!CLOUD_MODE||!uid||!['admin','coach','assistant_coach','parent','player'].includes(currentRole))return '';
+  return [uid,cloud.context?.profile?.club_id||'',currentRole,cloud.currentTeam?.()?.id||'',cloud.actingAsParent?.()?'parent':'staff',isClubOverviewMode()?'club':'team'].join('|');
 }
-async function refreshNotifications(quiet=true){if(!CLOUD_MODE||!['admin','coach','assistant_coach','parent','player'].includes(currentRole)||!window.ClubHubCloud?.listNotifications)return;if(quiet&&Date.now()-__notificationStamp<15000){renderNotificationCenter();return;}__notificationStamp=Date.now();try{__appNotifications=await window.ClubHubCloud.listNotifications();renderNotificationCenter();}catch(_){if(!quiet)toast('Notifications are temporarily unavailable');}}
-function openNotifications(){if(isClubOverviewMode()){__communicationsTab='notifications';navigate('inbox',false);refreshNotifications(false);return;}renderNotificationCenter();document.getElementById('notification-dialog')?.showModal();}
-async function markAppNotificationRead(id){try{await window.ClubHubCloud.markNotificationRead(id);const row=__appNotifications.find(n=>n.id===id);if(row)row.read_at=new Date().toISOString();renderNotificationCenter();}catch(_){toast('Could not update notification');}}
-async function markAllNotificationsRead(){const app=__appNotifications.filter(n=>!n.read_at),ann=__announcementRows.filter(a=>!a.read_at);try{await Promise.all([...app.map(n=>window.ClubHubCloud.markNotificationRead(n.id)),...ann.map(a=>window.ClubHubCloud.markAnnouncementRead(a.id))]);const now=new Date().toISOString();app.forEach(n=>n.read_at=now);ann.forEach(a=>a.read_at=now);renderAnnouncements();renderNotificationCenter();toast('Notifications marked read');}catch(_){toast('Could not mark all notifications read');}}
+function syncNotificationContext(){
+  const key=notificationContextKey();
+  if(key!==__notificationScopeKey){
+    const previous=__notificationScopeKey;__notificationScopeKey=key;__appNotifications=[];__notificationStamp=0;++__notificationLoadVersion;__notificationLoading=false;__notificationError='';__notificationActionError='';__notificationReadBusy=new Set();__notificationBulkBusy=false;
+    if(previous){__announcementRows=[];__announcementStamp=0;__announcementScopeKey='';++__announcementLoadVersion;}
+    document.getElementById('notification-dialog')?.close();
+  }
+  return key;
+}
+function notificationRows(){
+  const notices=__announcementRows.filter(a=>!a.expires_at||new Date(a.expires_at).getTime()>Date.now()).map(a=>({...a,source:'announcement',type:'club_announcement'}));
+  const app=__appNotifications.filter(n=>!(n.type==='match_report'&&/restricted for this age group/i.test(String(n.body||'')))&&!(n.type==='parent_access_request'&&!['admin','coach','assistant_coach'].includes(currentRole))&&!(n.type==='coach_access_request'&&currentRole!=='admin')).map(n=>({...n,source:'app'}));
+  return [...app,...notices].sort((a,b)=>String(b.created_at||'').localeCompare(String(a.created_at||'')));
+}
+function syncHeaderUtilityBar(){const bar=document.getElementById('app-utility-bar');if(bar)bar.classList.toggle('hidden',![...bar.querySelectorAll('button,select')].some(control=>!control.classList.contains('hidden')));}
+function renderNotificationCenter(){
+  const allowed=!!syncNotificationContext(),bell=document.getElementById('notification-bell'),mobileBell=document.getElementById('mobile-notification-bell');
+  bell?.classList.toggle('hidden',!allowed);mobileBell?.classList.toggle('hidden',!allowed);syncHeaderUtilityBar();
+  const rows=allowed?notificationRows():[],unread=rows.filter(r=>!r.read_at).length;
+  for(const id of ['notification-badge','mobile-notification-badge']){const b=document.getElementById(id);if(b){b.textContent=unread>99?'99+':String(unread);b.classList.toggle('hidden',!unread);}}
+  if(bell){bell.setAttribute('aria-label',unread?'Notifications, '+unread+' unread':'Notifications');if(isClubOverviewMode())bell.removeAttribute('aria-haspopup');else bell.setAttribute('aria-haspopup','dialog');}
+  const message=__notificationActionError||__notificationError||(__notificationLoading?'Checking your latest updates…':'');
+  for(const id of ['notification-status','communications-notification-status']){const n=document.getElementById(id);if(n){n.textContent=allowed?message:'';n.hidden=!allowed||!message;}}
+  for(const id of ['notification-unread','communications-notification-unread']){const n=document.getElementById(id);if(n)n.textContent=!allowed?'':unread?unread+' unread':__notificationLoading?'Checking updates…':__notificationStamp?'All caught up':'Updates';}
+  for(const id of ['notifications-refresh','communications-notifications-refresh']){const n=document.getElementById(id);if(n)n.disabled=!allowed||__notificationLoading;}
+  for(const id of ['notifications-mark-all','communications-mark-all']){const n=document.getElementById(id);if(n){n.hidden=!unread;n.disabled=!allowed||__notificationBulkBusy||__notificationReadBusy.size>0;}}
+  const html=!allowed?'':rows.length?rows.map(r=>{
+    const parentReview=r.source==='app'&&r.type==='parent_access_request'&&['admin','coach','assistant_coach'].includes(currentRole);
+    const busy=__notificationReadBusy.has(r.source+':'+r.id);
+    const mark=!r.read_at?`<button type="button" class="secondary-button notification-read-action" ${busy?'disabled aria-busy="true"':''} ${r.source==='announcement'?`data-read-announcement="${esc(r.id)}"`:`data-read-notification="${esc(r.id)}"`}>Mark read</button>`:'';
+    const review=parentReview?`<button type="button" class="secondary-button notification-review-action" data-review-parent-request="${esc(r.id)}">Review request</button>`:'';
+    const coachReview=r.source==='app'&&r.type==='coach_access_request'&&currentRole==='admin'?`<button type="button" class="secondary-button notification-review-action" data-review-coach-request="${esc(r.id)}">Review request</button>`:'';
+    const kind=r.source==='announcement'?'Club notice':String(r.type||'update').replace(/_/g,' ');
+    return `<article class="notification-item ${r.read_at?'read':'unread'} ${r.important?'important':''}"><div class="notification-item-head"><div><strong>${esc(r.title||'Notification')}</strong><small>${r.read_at?'Read':'Unread'} · ${esc(kind)}${r.important?' · Important':''}</small></div><time>${notificationDate(r.created_at)}</time></div><p>${esc(r.body||'')}</p>${review||coachReview||mark?`<div class="notification-item-actions">${review}${coachReview}${mark}</div>`:''}</article>`;
+  }).join(''):`<div class="notification-empty"><strong>${__notificationLoading||(!__notificationStamp&&!__notificationError)?'Loading notifications':__notificationError?'Could not load notifications':'No notifications yet'}</strong><p>${__notificationError?'Your notifications are temporarily unavailable. Try again.':__notificationLoading||!__notificationStamp?'Checking your latest updates…':'Your club notices and updates will appear here.'}</p></div>`;
+  for(const id of ['notification-list','communications-notifications-list']){const n=document.getElementById(id);if(n){const focused=n.contains?.(document.activeElement);if(n.innerHTML!==html){n.innerHTML=html;if(focused)(n.querySelector('button:not(:disabled)')||document.getElementById('notifications-refresh'))?.focus();}n.setAttribute('aria-busy',String(__notificationLoading));}}
+}
+async function refreshNotifications(quiet=true){
+  const key=syncNotificationContext();if(!key||!window.ClubHubCloud?.listNotifications){renderNotificationCenter();return;}
+  if(__notificationLoading||quiet&&Date.now()-__notificationStamp<15000){renderNotificationCenter();return;}
+  const version=++__notificationLoadVersion;__notificationLoading=true;__notificationError='';renderNotificationCenter();
+  try{const rows=await window.ClubHubCloud.listNotifications();if(key!==notificationContextKey()||version!==__notificationLoadVersion)return;__appNotifications=Array.isArray(rows)?rows:[];__notificationStamp=Date.now();}
+  catch(_){if(key!==notificationContextKey()||version!==__notificationLoadVersion)return;__notificationError='Could not load notifications. Try again.';__notificationStamp=0;}
+  finally{if(key===notificationContextKey()&&version===__notificationLoadVersion){__notificationLoading=false;renderNotificationCenter();}}
+}
+function refreshNotificationFeed(){syncNotificationContext();__notificationActionError='';refreshAnnouncements(false);return refreshNotifications(false);}
+function openNotifications(){
+  if(!syncNotificationContext())return;
+  if(isClubOverviewMode()){__communicationsTab='notifications';navigate('inbox',false);refreshNotificationFeed();return;}
+  renderNotificationCenter();const dialog=document.getElementById('notification-dialog');if(dialog&&!dialog.open)dialog.showModal();refreshNotificationFeed();
+}
+async function confirmNotificationRead(row,source,key){
+  const token=source+':'+row.id;if(__notificationReadBusy.has(token)||key!==notificationContextKey())return false;
+  __notificationReadBusy.add(token);renderNotificationCenter();
+  try{
+    if(source==='announcement')await window.ClubHubCloud.markAnnouncementRead(row.id);else await window.ClubHubCloud.markNotificationRead(row.id);
+    if(key!==notificationContextKey())return false;
+    const rows=source==='announcement'?__announcementRows:__appNotifications;
+    const latest=rows.find(r=>String(r.id)===String(row.id));if(latest)latest.read_at=new Date().toISOString();
+    return true;
+  }catch(_){return false;}
+  finally{if(key===notificationContextKey()){__notificationReadBusy.delete(token);renderNotificationCenter();}}
+}
+async function markAppNotificationRead(id){
+  const key=syncNotificationContext(),row=__appNotifications.find(n=>String(n.id)===String(id));if(!key||!row||row.read_at||__notificationReadBusy.has('app:'+row.id))return;
+  __notificationActionError='';const ok=await confirmNotificationRead(row,'app',key);if(key!==notificationContextKey())return;
+  if(!ok)__notificationActionError='Could not mark this update read. Try again.';renderNotificationCenter();
+}
+async function markNotificationNoticeRead(id){
+  const key=syncNotificationContext(),row=__announcementRows.find(n=>String(n.id)===String(id));if(!key||!row||row.read_at||__notificationReadBusy.has('announcement:'+row.id))return;
+  __notificationActionError='';const ok=await confirmNotificationRead(row,'announcement',key);if(key!==notificationContextKey())return;
+  if(!ok)__notificationActionError='Could not mark this notice read. Try again.';renderAnnouncements();renderNotificationCenter();
+}
+async function markAllNotificationsRead(){
+  const key=syncNotificationContext();if(!key||__notificationBulkBusy||__notificationReadBusy.size)return;
+  const rows=notificationRows().filter(r=>!r.read_at);if(!rows.length)return;
+  __notificationBulkBusy=true;__notificationActionError='';renderNotificationCenter();
+  const results=await Promise.all(rows.map(r=>confirmNotificationRead(r,r.source,key)));
+  if(key!==notificationContextKey())return;
+  __notificationBulkBusy=false;__notificationActionError=results.some(ok=>!ok)?'Some updates could not be marked read. Confirmed updates stay read. Try again for the remaining updates.':'';
+  renderAnnouncements();renderNotificationCenter();if(!__notificationActionError)toast('Notifications marked read');
+}
+
 
 async function reviewCoachAccessNotification(){
   if(currentRole!=='admin')return;
@@ -6276,6 +6350,16 @@ document.getElementById('mobile-more-sheet')?.addEventListener('keydown',e=>{
 });
 document.getElementById('appearance-theme')?.addEventListener('change',e=>applyTheme(e.target.value));
 document.getElementById('notification-bell')?.addEventListener('click',openNotifications);
+document.getElementById('notifications-refresh')?.addEventListener('click',refreshNotificationFeed);
+document.getElementById('communications-notifications-refresh')?.addEventListener('click',refreshNotificationFeed);
+document.getElementById('notification-dialog')?.addEventListener('close',()=>queueMicrotask(()=>{const bell=document.getElementById('notification-bell');if(bell&&!bell.classList.contains('hidden'))bell.focus({preventScroll:true});}));
+document.getElementById('notification-dialog')?.addEventListener('keydown',event=>{
+  if(event.key!=='Tab')return;
+  const dialog=event.currentTarget,controls=[...dialog.querySelectorAll('button:not(:disabled),a[href],input:not(:disabled),select:not(:disabled),textarea:not(:disabled),[tabindex="0"]')].filter(n=>n.getClientRects().length&&!n.hidden),first=controls[0],last=controls.at(-1),active=document.activeElement;
+  if(!first){event.preventDefault();dialog.focus();return;}
+  if(!dialog.contains(active)||active===dialog||(!event.shiftKey&&active===last)||(event.shiftKey&&active===first)){event.preventDefault();(event.shiftKey?last:first).focus();}
+});
+window.addEventListener('clubhub-contacts-clear',()=>{__notificationScopeKey='';++__notificationLoadVersion;__appNotifications=[];__notificationStamp=0;__announcementRows=[];__announcementStamp=0;__announcementScopeKey='';++__announcementLoadVersion;__notificationLoading=false;__notificationReadBusy=new Set();__notificationBulkBusy=false;__notificationActionError='';__notificationError='';document.getElementById('notification-dialog')?.close();renderNotificationCenter();});
 document.getElementById('mobile-notification-bell')?.addEventListener('click',()=>{closeMobileMore();openNotifications();});
 document.getElementById('communications-mark-all')?.addEventListener('click',markAllNotificationsRead);
 document.querySelectorAll('[data-communications-tab]').forEach(button=>button.addEventListener('click',()=>{setCommunicationsTab(button.dataset.communicationsTab);if(__communicationsTab==='inbox')refreshInbox(false);}));
