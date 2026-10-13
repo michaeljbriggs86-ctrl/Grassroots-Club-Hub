@@ -11,11 +11,13 @@
   ],
   "vars": {
     "SELKENT_CANDIDATE_KEY": "staging/022b20efb1cc5fbc1a912bd685d6bcd9d5a31acd/results.json",
-    "SELKENT_FEED_R2_ENABLED": "false"
+    "SELKENT_FEED_R2_ENABLED": "false",
+    "REGISTRATION_SUPABASE_URL":"https://obntycksmkcnkprrcutg.supabase.co",
+    "REGISTRATION_SUPABASE_PUBLISHABLE_KEY":"sb_publishable_xkIxuY-mJ87qLWtEupEAPw_gIc1LMyC"
   },
   "assets": {
     "directory": "./dist",
     "binding": "ASSETS",
-    "run_worker_first": ["/__health", "/__pilot_badges/*", "/__badge_review", "/__selkent_candidate", "/data/results.json"]
+    "run_worker_first": ["/__registration_document", "/_private_documents/*", "/__health", "/__pilot_badges/*", "/__badge_review", "/__selkent_candidate", "/data/results.json"]
   }
 }

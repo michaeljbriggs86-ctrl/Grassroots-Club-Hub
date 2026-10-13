@@ -18,6 +18,9 @@ on:
       - 'tests/**'
       - 'web/db-drafts/019_member_contact*.sql'
       - 'web/db-drafts/admin_player_onboarding_candidate.sql'
+      - 'web/db-drafts/registration_contact_conduct_candidate.sql'
+      - 'web/db-drafts/test/*registration*'
+      - 'cloudflare/web-app/src/registration-document.js'
       - 'web/db-drafts/test/*player-onboarding*'
       - 'supabase/migrations/*admin_player_onboarding.sql'
       - 'web/db-drafts/test/*contact*.sql'
@@ -47,6 +50,7 @@ jobs:
           node --check app/src/main/assets/cloud.js
           node --check app/src/main/assets/player-onboarding.js
           node --check app/src/main/assets/coach-onboarding.js
+          node --check app/src/main/assets/registration-conduct.js
           python verification/verify_v2_2_30_pitchkind_ui.py
           python verification/verify_club_logo_quality.py
           for test in tests/test_*.js; do
@@ -84,3 +88,6 @@ jobs:
 
       - name: Check Admin onboarding with invented players
         run: node web/db-drafts/test/run-player-onboarding.cjs "$RUNNER_TEMP/member-contact-sql/node_modules/@electric-sql/pglite"
+
+      - name: Check registration contact and conduct with invented data
+        run: node web/db-drafts/test/run-registration-contact-conduct.cjs "$RUNNER_TEMP/member-contact-sql/node_modules/@electric-sql/pglite"

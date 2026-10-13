@@ -1,0 +1,41 @@
+const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
+const {PGlite}=require(process.argv[2]||'@electric-sql/pglite');
+(async()=>{
+ const db=new PGlite(),root=path.resolve(__dirname,'../../..');
+ await db.exec(fs.readFileSync(path.join(__dirname,'019_contacts_stub.sql'),'utf8'));
+ await db.exec(`create table public.clubs(id uuid primary key,name text);alter table public.teams add column season text;
+ create table private.player_season_identity(club_id uuid,team_id uuid,season text,player_name text,player_status text);
+ create table public.team_state(team_id uuid primary key,state jsonb);`);
+ const club='00c2b0d4-b636-44bb-b4ca-6ba43305f494',uid=n=>'00000000-0000-0000-0000-'+String(n).padStart(12,'0'),parent=uid(1),otherParent=uid(2),admin=uid(3),coach=uid(4),pending=uid(5),player=uid(6),foreign=uid(7),team=uid(20),otherTeam=uid(21),foreignClub=uid(10),otherClubTeam=uid(22);
+ const q=(sql,args=[])=>db.query(sql,args);let checks=0;
+ await q('insert into public.clubs values($1,$2),($3,$4)',[club,'Shooters Hill AFC',foreignClub,'Invented other club']);
+ for(const [id,role,cid] of [[parent,'parent',club],[otherParent,'parent',club],[admin,'club_admin',club],[coach,'coach',club],[pending,'pending_parent',club],[player,'player',club],[foreign,'club_admin',foreignClub]]){await q('insert into auth.users values($1)',[id]);await q('insert into public.profiles(user_id,club_id,full_name,role) values($1,$2,$3,$4)',[id,cid,'Invented adult '+id.slice(-1),role]);}
+ for(const [id,cid] of [[team,club],[otherTeam,club],[otherClubTeam,foreignClub]])await q('insert into public.teams(id,club_id,name,age_group,active,season) values($1,$2,$3,9,true,$4)',[id,cid,'Invented Greens','2026/27']);
+ await q('insert into private.player_season_identity values($1,$2,$3,$4,$5),($1,$2,$3,$6,$5)',[club,team,'2026/27','Invented Own Child','active','Invented Other Child']);
+ await q('insert into public.parent_player_links values($1,$2,$3,$4),($5,$2,$3,$6)',[parent,team,club,'Invented Own Child',otherParent,'Invented Other Child']);
+ await db.exec(fs.readFileSync(path.join(root,'web/db-drafts/019_member_contact_details.sql'),'utf8'));
+ await db.exec(fs.readFileSync(path.join(root,'web/db-drafts/registration_contact_conduct_candidate.sql'),'utf8'));
+ const as=async id=>{await db.exec('reset role');await q("select set_config('app.uid',$1,false)",[id||'']);await db.exec('set role authenticated');};
+ const read=(child='Invented Own Child',tid=team,season='2026/27')=>q('select public.get_registration_contact_conduct($1,$2,$3) as r',[tid,child,season]);
+ await as(parent);const initial=(await read()).rows[0].r,version=initial.document.version;assert.equal(initial.can_submit,true);assert.equal(initial.evidence.length,0);checks+=2;
+ const submit=(phone='07700 900123',v=version,agree=true,child='Invented Own Child')=>q('select public.submit_registration_contact_conduct($1,$2,$3,$4,$5,$6) as r',[team,child,'2026/27',phone,v,agree]);
+ const fail=async(fn,re)=>{await assert.rejects(fn,re);checks++;};
+ await fail(()=>read('Invented Other Child'),/Own linked child/);await fail(()=>read('Missing'),/Player not available/);await fail(()=>read('Invented Own Child',otherClubTeam),/Registration not available/);await fail(()=>read('Invented Own Child',team,'2027/28'),/Registration not available/);
+ for(const phone of ['','123','07700 abc123','++447700900123','07700900123\n','+000123456789','07700\t900123'])await fail(()=>submit(phone),/valid mobile/);
+ await fail(()=>submit('07700 900123','forged'),/current code/);await fail(()=>submit('07700 900123',version,false),/current code/);
+ await db.exec('reset role');await q("insert into private.member_contact_details(user_id,email,phone) values($1,'invented@example.invalid','')",[parent]);await as(parent);
+ const saved=(await submit()).rows[0].r;assert.equal(saved.mobile,'07700900123');assert.equal(saved.submitted,true);assert.equal(saved.evidence.length,1);assert.equal(saved.evidence[0].adult_user_id,parent);assert.equal(saved.evidence[0].document_sha256,initial.document.sha256);assert(!Number.isNaN(Date.parse(saved.evidence[0].accepted_at)));checks+=6;
+ const retry=(await submit('+44 7700 900123')).rows[0].r;assert.equal(retry.evidence[0].accepted_at,saved.evidence[0].accepted_at);assert.equal(retry.mobile,'+447700900123');checks+=2;
+ await as(otherParent);const ownOther=(await read('Invented Other Child')).rows[0].r;assert.equal(ownOther.evidence.length,0);assert.equal(ownOther.mobile,'');checks+=2;await fail(()=>read(),/Own linked child/);
+ for(const id of [coach,pending,player]){await as(id);await fail(()=>read(),/Approved parent or Club Admin/);await fail(()=>submit(),/Approved parent or Club Admin/);}
+ await as(foreign);await fail(()=>read(),/Registration not available/);
+ await as(null);await fail(()=>read(),/Sign in/);
+ await as(admin);const adminRead=(await read()).rows[0].r;assert.equal(adminRead.can_submit,false);assert.equal(adminRead.evidence[0].adult_user_id,parent);checks+=2;await fail(()=>submit(),/Only the linked parent/);
+ await db.exec('reset role');assert.equal((await q('select email from private.member_contact_details where user_id=$1',[parent])).rows[0].email,'invented@example.invalid');checks++;
+ await q('update private.registration_conduct_documents set available=false');await as(parent);await fail(()=>submit(),/unavailable/);
+ await db.exec('reset role');await q("update public.profiles set role='pending_parent' where user_id=$1",[parent]);await as(parent);await fail(()=>read(),/Approved parent/);
+ await as(admin);await fail(()=>q('select * from private.registration_conduct_acceptances'),/permission denied/);
+ await db.exec('reset role');const grants=(await q("select has_function_privilege('anon','public.get_registration_contact_conduct(uuid,text,text)','execute') as anon,has_function_privilege('authenticated','public.get_registration_contact_conduct(uuid,text,text)','execute') as auth")).rows[0];assert.deepEqual(grants,{anon:false,auth:true});checks++;
+ assert.equal((await q('select count(*)::int n from private.registration_conduct_acceptances')).rows[0].n,1);checks++;
+ await db.close();console.log('PASS registration contact/conduct: '+checks+' throwaway PostgreSQL checks; no live data changed');
+})().catch(e=>{console.error(e);process.exitCode=1;});
