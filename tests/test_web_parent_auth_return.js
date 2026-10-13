@@ -15,6 +15,9 @@ async function main(){
   const location={protocol:'https:',origin:'https://test.pitchkind.com',pathname:'/',search:'',hash:'#access_token=abc&refresh_token=refresh&type=signup',href:'https://test.pitchkind.com/#access_token=abc&refresh_token=refresh&type=signup'};
   assert.equal(constants(location).AUTH_REDIRECT,'https://test.pitchkind.com/');
   assert.equal(constants(location).INITIAL_AUTH_CALLBACK,location.href);
+  const newDomain={...location,origin:'https://shootershillafc.app',href:'https://shootershillafc.app/'+location.hash};
+  assert.equal(constants(newDomain).AUTH_REDIRECT,'https://shootershillafc.app/');
+  assert.equal(constants(newDomain).INITIAL_AUTH_CALLBACK,newDomain.href);
   assert.equal(constants({protocol:'file:',origin:'null',pathname:'/index.html',search:'',hash:'',href:'file:///android_asset/index.html'}).AUTH_REDIRECT,'grassrootsclubhub://auth-callback');
 
   const start=source.indexOf('async function handleAuthCallback(');

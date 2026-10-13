@@ -1,5 +1,5 @@
 // Metadata-only comparison of a private R2 staging object and the packaged feed.
-const HOST = 'test.pitchkind.com';
+import { isPilotOrigin } from './pilot-hosts.js';
 const RESTRICTED = new Set(['U7', 'U8', 'U8X', 'U9', 'U10', 'U10X', 'U11']);
 const MAX_AGE_MS = 18 * 60 * 60_000;
 const headers = {
@@ -33,7 +33,7 @@ function count(ageGroups) {
 
 export async function selkentCandidate(request, env, now = Date.now()) {
   const url = new URL(request.url);
-  if (url.protocol !== 'https:' || url.hostname !== HOST || url.pathname !== '/__selkent_candidate') {
+  if (!isPilotOrigin(url) || url.pathname !== '/__selkent_candidate') {
     return response(404, { status: 'not_found' });
   }
   if (request.method !== 'GET') return response(405, { status: 'method_not_allowed' });

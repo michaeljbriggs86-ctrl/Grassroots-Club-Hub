@@ -1,12 +1,13 @@
 // Badge bytes are private R2 objects. The canonical directory controls which
 // exact club ID and reviewed hash the protected website may serve.
+import { isPilotOrigin } from './pilot-hosts.js';
 const PATH = /^\/__pilot_badges\/([1-9]\d*)\/([a-f0-9]{64})$/;
 const MIME = new Set(['image/png', 'image/jpeg', 'image/webp', 'image/avif']);
 
 export async function pilotBadge(request, env) {
   const url = new URL(request.url);
   const match = PATH.exec(url.pathname);
-  if (!match || url.hostname !== 'test.pitchkind.com' || url.protocol !== 'https:') {
+  if (!match || !isPilotOrigin(url)) {
     return new Response('Not found', { status: 404 });
   }
   if (request.method !== 'GET' && request.method !== 'HEAD') {

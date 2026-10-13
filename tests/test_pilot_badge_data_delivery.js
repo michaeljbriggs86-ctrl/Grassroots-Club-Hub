@@ -52,6 +52,29 @@ overlay.attachDirectoryBadges(revokedOwn);
 assert.notEqual(hero.src, `/__pilot_badges/499/${ownBadge.logo_sha256}`);
 window.ClubHubNative = { isDebugBuild: () => true };
 
+// The new domain keeps private images on its own Access-protected origin.
+window.ClubHubNative = undefined;
+for (const host of ['test.pitchkind.com','shootershillafc.app']) {
+  window.location = { protocol:'https:', hostname:host };
+  overlay.attachDirectoryBadges(original);
+  assert.equal(app.privatePilotOwnBadgeUrl(), `/__pilot_badges/499/${ownBadge.logo_sha256}`);
+  assert.equal(app.verifiedTeamBadgeUrl(crayTeam), `/__pilot_badges/250/${cray.logo_sha256}`);
+  const reissued = structuredClone(original);
+  reissued.clubs.find(c=>c.club_id===499).logo_url = `https://${host}/__pilot_badges/499/${ownBadge.logo_sha256}`;
+  overlay.attachDirectoryBadges(reissued);
+  assert.equal(app.privatePilotOwnBadgeUrl(), `/__pilot_badges/499/${ownBadge.logo_sha256}`);
+}
+for (const host of ['www.shootershillafc.app','test.shootershillafc.app','shootershillafc.app.evil.test']) {
+  window.location.hostname=host;
+  assert.equal(app.privatePilotOwnBadgeUrl(), '');
+  assert.equal(app.verifiedTeamBadgeUrl(crayTeam), '');
+}
+window.location.hostname='shootershillafc.app';
+window.location.protocol='http:';
+assert.equal(app.privatePilotOwnBadgeUrl(), '');
+assert.equal(app.verifiedTeamBadgeUrl(crayTeam), '');
+window.ClubHubNative = { isDebugBuild: () => true };
+
 // A second approval enters through directory data with the same installed app code.
 const second = structuredClone(original);
 const another = second.clubs.find(c => c.club_id === 261);

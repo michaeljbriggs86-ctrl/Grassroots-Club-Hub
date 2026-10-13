@@ -1,6 +1,6 @@
 // An Access-protected visual test of badges already admitted to the pilot feed.
 // No source URLs are exposed and no badge can be selected outside the feed.
-const HOST = 'test.pitchkind.com';
+import { isPilotOrigin } from './pilot-hosts.js';
 const HASH = /^[a-f0-9]{64}$/i;
 const escapeHtml = value => String(value).replace(/[&<>"']/g, char => ({
   '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
@@ -18,7 +18,7 @@ const HEADERS = {
 
 export async function badgeReview(request, env) {
   const url = new URL(request.url);
-  if (url.pathname !== '/__badge_review' || url.hostname !== HOST || url.protocol !== 'https:') {
+  if (url.pathname !== '/__badge_review' || !isPilotOrigin(url)) {
     return new Response('Not found', { status: 404 });
   }
   if (request.method !== 'GET') return new Response('Method not allowed', {

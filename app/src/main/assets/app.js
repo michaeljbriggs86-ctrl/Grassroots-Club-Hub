@@ -1767,7 +1767,7 @@ function pilotVerifiedBadgeScopeAllowed(){
     if(active.length!==1||active[0]!==499||!permitted.includes(499))return false;
     const androidPilot=window.ClubHubNative?.isDebugBuild?.()===true;
     const browserPilot=!window.ClubHubNative&&window.location?.protocol==='https:'&&
-      window.location?.hostname==='test.pitchkind.com';
+      ['test.pitchkind.com','shootershillafc.app'].includes(window.location?.hostname);
     if(!(androidPilot||browserPilot)||providerType()!=='selkent')return false;
     const urls=[primaryProvider()?.config?.club_url,state?.selkent?.clubUrl].filter(Boolean);
     if(!urls.length)return false;
@@ -1782,7 +1782,8 @@ function privatePilotOwnBadgeUrl(){
   if(!badge||!pilotVerifiedBadgeScopeAllowed()||window.ClubHubNative)return '';
   const hash=String(badge.logo_sha256||'').toLowerCase();
   return Number(badge.club_id)===499&&badge.logo_source==='club_supplied_private'&&
-    /^[a-f0-9]{64}$/.test(hash)&&badge.logo_url===`https://test.pitchkind.com/__pilot_badges/499/${hash}`
+    /^[a-f0-9]{64}$/.test(hash)&&['test.pitchkind.com','shootershillafc.app'].some(host=>
+      badge.logo_url===`https://${host}/__pilot_badges/499/${hash}`)
     ?`/__pilot_badges/499/${hash}`:'';
 }
 window.applyPilotOwnClubBadge=function(){
