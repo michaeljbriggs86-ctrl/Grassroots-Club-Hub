@@ -78,8 +78,8 @@ async function teamChecks(page,theme){
  const actionBackground=await page.locator('#match-detail-dialog .modal-actions').evaluate(el=>getComputedStyle(el).backgroundColor);assert(!actionBackground.startsWith('rgba('),'sticky actions need an opaque surface over attendance rows');
  await page.screenshot({path:path.join(out,`match-details-${theme}.png`),fullPage:true});
  await page.locator('#coach-match-note').scrollIntoViewIfNeeded();await page.screenshot({path:path.join(out,`match-coach-notes-${theme}.png`),fullPage:true});
- page.once('dialog',async dialog=>{assert.match(dialog.message(),/Discard your unsaved match changes/);await dialog.accept();});
- await page.locator('#match-detail-cancel').click();assert.equal(await page.locator('#match-detail-dialog').isVisible(),false);
+ const discardHandler=async dialog=>{assert.match(dialog.message(),/Discard your unsaved match changes/);await dialog.accept();};page.once('dialog',discardHandler);
+ await page.locator('#match-detail-cancel').click();page.removeListener('dialog',discardHandler);assert.equal(await page.locator('#match-detail-dialog').isVisible(),false);
  return {screen:'team',theme,ranking,modal};
 }
 async function coachOnboardingChecks(page,width,theme){
