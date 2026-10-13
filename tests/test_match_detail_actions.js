@@ -28,7 +28,7 @@ assert.equal(node('delete-match-detail').classList.hidden,true,'provider fixture
 coach=false;open(scheduled);
 for(const id of ['edit-match-detail','delete-match-detail','play-match-detail'])assert.equal(node(id).classList.hidden,true,'non-coaches get no management actions');
 coach=true;open(scheduled);
-Object.assign(context,{matchReportStepDefinitions:()=>[],cupProgressKey:()=>'',cupNameAndRound:()=>({name:'Friendly',round:''}),matchTeamLabel:String,
+Object.assign(context,{__matchReportSaveBusy:false,reportScoreLabels(){},homeFixtureTeamNames:()=>({home:'Example',away:'Own team'}),matchReportStepDefinitions:()=>[],cupProgressKey:()=>'',cupNameAndRound:()=>({name:'Friendly',round:''}),matchTeamLabel:String,
  loadCoachMatchNote:()=>Promise.resolve(),loadMatchAttendance:()=>Promise.resolve(),applyMatchReportStep(){}});
 vm.runInContext(src.slice(src.indexOf('function openMatchReport('),src.indexOf('function linkedFixtureForMatch(')),context);
 context.openMatchReport('s1');
