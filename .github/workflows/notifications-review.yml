@@ -1,0 +1,41 @@
+name: Notification screen review
+on:
+  pull_request:
+    paths:
+      - 'app/src/main/assets/**'
+      - 'tests/test_notifications_review.js'
+      - 'verification/browser/verify_notifications.cjs'
+      - '.github/workflows/notifications-review.yml'
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  notification-browser:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Build and check notifications
+        run: |
+          node --check app/src/main/assets/app.js
+          node tests/test_notifications_review.js
+          node tests/test_hero_toolbar.js
+          python cloudflare/web-app/build.py
+          npm install --prefix "$RUNNER_TEMP/notification-browser" --no-audit --no-fund playwright@1.64.0
+          "$RUNNER_TEMP/notification-browser/node_modules/.bin/playwright" install --with-deps chromium
+          node verification/browser/verify_notifications.cjs "$RUNNER_TEMP/notification-browser/node_modules/playwright" "$RUNNER_TEMP/notification-review"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: notification-review-${{ github.run_id }}
+          path: ${{ runner.temp }}/notification-review
+          if-no-files-found: ignore
+          retention-days: 7
+
