@@ -4,7 +4,7 @@ const app=fs.readFileSync(d+'app/src/main/assets/app.js','utf8'),cloud=fs.readFi
 assert.ok(/id="hero-team-switch"/.test(html)&&/class="hero-profile-button hero-team-select hidden"/.test(html),'switcher exists and starts hidden');
 assert.ok(/listMyCoachTeams,switchMyCoachTeam,/.test(cloud),'client exports both calls');
 assert.ok(/rpc\('switch_my_active_team',\{p_team_id:/.test(cloud)&&/clearAccountLocalData\(\);\/\/ nothing from the previous team/.test(cloud),'switching clears local team data');
-assert.ok(/try\{const data=await rpc\('list_my_coach_teams',\{\}\);return Array\.isArray\(data\)\?data:\[\];\}catch\{return \[\];\}/.test(cloud),'missing database function hides the switcher instead of erroring');
+assert.ok(/catch\(err\)\{if\(strict\)throw err;return \[\];\}/.test(cloud),'strict hero loading exposes unavailable assignments while legacy callers retain fallback');
 assert.ok(/__coachTeams\.length>1&&!preview/.test(app),'only shows with more than one team');
 // the draft never widens who may see anything: reads stay with the person and Club Admins of the same club
 assert.ok(/enable row level security/.test(sql)&&/revoke all on table public\.coach_team_assignments from anon, authenticated/.test(sql));
