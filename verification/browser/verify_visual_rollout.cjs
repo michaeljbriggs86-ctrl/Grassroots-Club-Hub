@@ -158,7 +158,7 @@ async function adminDirectoryChecks(page,width,theme){
 async function workspaceChecks(page,width,theme){
  await prepareTeam(page,theme);await page.setViewportSize({width,height:900});
  await page.evaluate(()=>{
-  CLUB_CONFIGURATION=null;
+  CLUB_CONFIGURATION={settings:{...UNIVERSAL_FALLBACK_SETTINGS,display_name:'Shooters Hill AFC',short_name:'Shooters Hill AFC'},rules:[]};
   const names=['Alex','Jamie','Casey','Riley','Taylor','Robin','Drew','Jules','Charlie','Jordan'];
   state=normalizeState({meta:{clubName:'Shooters Hill AFC',teamName:'Example Greens',ageGroup:'U9',season:'2026/27'},division:{name:'Example division',teamName:'Shooters Hill AFC Example Greens'},squad:names.map((name,i)=>({name:name+' Example',number:i+1,role:i===0?'goalkeeper':'outfield',status:i===9?'inactive':'active'})),matches:[],features:{tactics:true},selkent:{fixtures:[]}});
   const requests=[{request_id:'parent-review',user_id:'review-parent',parent_name:'Morgan Example',parent_email:'morgan@example.invalid',child_name:'Jamie'}];
@@ -176,14 +176,14 @@ async function workspaceChecks(page,width,theme){
  assert.match(await page.locator('#squad-list').innerText(),/Inactive/);
  const bounds=await row.boundingBox();assert(bounds.height>=76,'profile action occupies the whole row');
  if(width===393)assert(Math.abs(bounds.x-20)<1&&Math.abs(bounds.width-353)<1,'squad uses reviewed phone gutters');
- assert.equal(await page.locator('#squad-team-name').innerText(),'Squad');
+ assert.equal(await page.locator('#squad-team-name').innerText(),'Squad');assert.equal(await row.evaluate(el=>getComputedStyle(el).textDecorationLine),'none');
  await page.screenshot({path:path.join(out,`squad-${width}-${theme}.png`),fullPage:true});
  await row.click();await page.waitForFunction(()=>document.querySelector('#person-profile-name').textContent==='Alex Example');await page.locator('#person-profile-back').click();
  await page.locator('#squad-tactics-tab').click();assert.equal(await page.locator('#squad-team-name').innerText(),'Match plan');assert.equal(await page.locator('#squad-list-page').isVisible(),false);assert.equal(await page.locator('#add-player-btn').isVisible(),false);
  assert.equal(await page.locator('#tactics-pitch .tactics-player').count(),5);assert.equal(await page.locator('#tactics-bench .tactics-bench-player').count(),4);
  assert.equal(await page.locator('#matchday-squad-picker').isVisible(),false,'rolling squad does not show a capped picker');
  const layout=await page.locator('.tactics-panel').evaluate(el=>({columns:getComputedStyle(el).gridTemplateColumns.split(' ').length,heading:getComputedStyle(document.querySelector('#squad-team-name')).fontSize,pitch:document.querySelector('#tactics-pitch').getBoundingClientRect().toJSON()}));
- assert.equal(layout.columns,width>=900?2:1);assert.equal(layout.heading,'30px');
+ const formationOrder=await page.locator('.tactics-formation-card').evaluate(el=>({heading:el.querySelector('h3').getBoundingClientRect().top,field:el.querySelector('select').getBoundingClientRect().top,reset:el.querySelector('button').getBoundingClientRect().top}));assert(formationOrder.heading<formationOrder.field&&formationOrder.field<formationOrder.reset,'formation heading, field and reset follow the review');assert.equal(layout.columns,width>=900?2:1);assert.equal(layout.heading,'30px');
  const controls=await page.locator('#squad-tactics-page :is(button,input,select)').evaluateAll(els=>els.filter(el=>el.getBoundingClientRect().width>0).map(el=>({height:el.getBoundingClientRect().height,tag:el.tagName})));assert(controls.every(el=>el.height>=52),'plan controls are at least 52px: '+JSON.stringify(controls));
  assert((await geometry(page)).documentWidth<=width+1);
  await page.screenshot({path:path.join(out,`match-plan-5v5-${width}-${theme}.png`),fullPage:true});

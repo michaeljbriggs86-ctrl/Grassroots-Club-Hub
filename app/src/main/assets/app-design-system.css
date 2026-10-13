@@ -2194,3 +2194,16 @@ html body #parent-request-review-dialog .modal-actions button{min-height:52px;wi
 @media(prefers-reduced-motion:reduce){html body .team-workspace *{scroll-behavior:auto}}
 
 html body :is(#view-squad,#view-team-access,#parent-request-review-dialog) .hidden,html body :is(#view-squad,#view-team-access,#parent-request-review-dialog) [hidden]{display:none!important}
+/* Resolve older shared card/link rules within the reviewed workspace only. */
+html[data-theme] body:has(.team-workspace.view.active){--gch-depth-canvas:#F3F6F4}
+html[data-theme="dark"] body:has(.team-workspace.view.active){--gch-depth-canvas:#111715}
+html body:has(.team-workspace.view.active) .club-page-watermark{display:none!important}
+html[data-theme] body :is(#view-squad,#view-team-access,#parent-request-review-dialog){--workspace-paper:#fff}
+html[data-theme="dark"] body :is(#view-squad,#view-team-access,#parent-request-review-dialog){--workspace-paper:#1f2623}
+html[data-theme] body :is(#view-squad,#view-team-access,#parent-request-review-dialog) .panel{background:var(--workspace-paper)!important;border:1px solid var(--gch-control-line)!important;box-shadow:none!important}
+html[data-theme] body :is(#view-squad,#view-team-access,#parent-request-review-dialog) :is(.squad-banner,.parent-self-signup-note,.parent-verification-guidance){background:var(--workspace-info)!important;border-top:1px solid var(--gch-control-line)!important}
+html[data-theme] body .team-workspace .person-name-button{color:var(--gch-control-copy)!important;text-decoration:none!important}
+html body #view-squad .squad-format-details summary::after{content:none}
+html body #view-squad .squad-format-details summary small{font-weight:400}
+html body #view-squad .tactics-fixture{background:transparent!important;border:0!important}
+html body #view-squad .tactics-formation-card .tactics-heading{order:0}
