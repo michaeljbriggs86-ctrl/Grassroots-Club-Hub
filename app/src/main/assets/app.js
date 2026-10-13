@@ -3160,7 +3160,9 @@ function renderTeamIdentity(){
   document.getElementById('hero-season-line').textContent=adminClub?[`${window.ClubHubCloud?.visibleTeamList?.().length||clubTeams().length} active teams`,meta.season].filter(Boolean).join(' · '):[meta.ageGroup,state.division.name,meta.season].filter(Boolean).join(' · ');
   document.getElementById('dashboard-season-kicker').textContent=(meta.season||'Season')+' season';
   const homeTitle=document.getElementById('home-screen-title');if(homeTitle)homeTitle.textContent=currentRole==='parent'?'Family home':'Dashboard';
-  document.getElementById('squad-team-name').textContent=matchTeamLabel(meta.teamName||'Team');
+  document.getElementById('squad-team-name').textContent=__squadPage===1?'Match plan':'Squad';
+  const workspaceKicker=[meta.ageGroup,matchTeamLabel(meta.teamName||'Team')].filter(Boolean).join(' ')+' · staff';
+  for(const id of ['squad-workspace-kicker','team-access-kicker']){const el=document.getElementById(id);if(el)el.textContent=workspaceKicker;}
   document.getElementById('matches-division-kicker').textContent=currentRole==='parent'?'Your next activity':state.division.name||'League';
   const matchesTitle=document.querySelector('#view-matches .section-title-row h2');if(matchesTitle)matchesTitle.textContent=currentRole==='parent'?'Schedule':'Matches';
   document.getElementById('league-summary-name').textContent=state.division.name||'League';
@@ -4041,6 +4043,9 @@ let __squadPage=0;
 function setSquadPage(page){
   const requested=Number(page)===1?1:0,target=requested===1&&!featureEnabled('tactics')?0:requested;
   __squadPage=target;
+  const title=document.getElementById('squad-team-name'),description=document.getElementById('squad-workspace-description');
+  if(title)title.textContent=target===1?'Match plan':'Squad';
+  if(description)description.textContent=target===1?'Arrange your starting team and rotation order.':'Your registered players, with space to open each profile.';
   document.body.classList.toggle('match-plan-active',currentView==='squad'&&target===1);
   document.getElementById('add-player-btn')?.classList.toggle('hidden',target===1);
   document.querySelectorAll('[data-squad-view]').forEach(el=>el.classList.toggle('hidden',Number(el.dataset.squadView)!==target));
@@ -4103,8 +4108,8 @@ function renderTacticsBoard(){
   const hint=document.getElementById('tactics-availability-hint');if(hint)hint.classList.toggle('hidden',!state.tactics.lineup.some(id=>['unavailable','unsure'].includes(statusFor(id))));
   const formation=document.getElementById('tactics-formation');if(formation){const names=Object.keys(formationOptionsFor(f.onPitch));formation.innerHTML=names.map(name=>`<option value="${esc(name)}">${esc(name)}</option>`).join('');formation.value=state.tactics.formation;formation.disabled=!isCoach();formation.setAttribute('aria-label',f.format==='3v3'?'Shape':'Formation');}
   const heading=document.getElementById('tactics-formation-title'),formationLabel=document.getElementById('tactics-formation-label');if(heading)heading.textContent=f.format==='3v3'?'Starting shape':'Formation and positions';if(formationLabel)formationLabel.firstChild.textContent=f.format==='3v3'?'Shape':'Formation';
-  state.tactics.lineup.slice(0,f.onPitch).forEach((id,i)=>{const p=byId.get(id);if(!p)return;if(!state.tactics.positions[id])state.tactics.positions[id]=slotPos(slots[i]);const pos=slotPos(state.tactics.positions[id]),status=statusFor(id),b=document.createElement('button'),role=f.format==='3v3'?'outfield':p.role;b.type='button';b.className=`tactics-player ${role==='goalkeeper'?'goalkeeper':''} ${__tacticsSelected===id?'selected':''} ${status==='unavailable'||status==='unsure'?`availability-${status}`:''}`;b.dataset.tacticsId=id;b.style.left=pos.x+'%';b.style.top=pos.y+'%';b.setAttribute('aria-label',`${p.name}${status==='unavailable'?' · unavailable':status==='unsure'?' · unsure':''}`);b.innerHTML=`${miniJerseyHTML(p.number,role,'tactics-shirt')}<span>${esc(p.name)}</span>${statusFlag(status)}`;b.addEventListener('click',e=>{if(b.__ignoreNextClick){b.__ignoreNextClick=false;e.preventDefault();return;}selectTacticsPlayer(id);});if(isCoach()){enableTacticsDrag(b,id,pitch);enableTacticsKeyboard(b,id);}pitch.appendChild(b);});
-  const otherGame=f.format==='3v3',benchIds=state.tactics.lineup.slice(f.onPitch);bench.innerHTML=benchIds.map((id,i)=>{const p=byId.get(id),status=statusFor(id);return p?`<button type="button" class="tactics-bench-player ${__tacticsSelected===id?'selected':''} ${status==='unavailable'||status==='unsure'?`availability-${status}`:''}" data-tactics-bench="${id}" aria-label="${esc(p.name)} · ${otherGame?'other game':'rotation'} ${i+1}${status==='unavailable'?' · unavailable':status==='unsure'?' · unsure':''}"><small>${otherGame?`Game ${Math.floor(i/f.onPitch)+2}`:i===0?'Next on':`#${i+1}`}</small>${miniJerseyHTML(p.number,otherGame?'outfield':p.role,'compact')}<span>${esc(p.name)}</span>${statusFlag(status)}</button>`:'';}).join('')||`<span class="muted">${otherGame?'No other players in this plan.':'No substitutes selected.'}</span>`;bench.querySelectorAll('[data-tactics-bench]').forEach(b=>b.addEventListener('click',()=>selectTacticsPlayer(b.dataset.tacticsBench)));
+  state.tactics.lineup.slice(0,f.onPitch).forEach((id,i)=>{const p=byId.get(id);if(!p)return;if(!state.tactics.positions[id])state.tactics.positions[id]=slotPos(slots[i]);const pos=slotPos(state.tactics.positions[id]),status=statusFor(id),b=document.createElement('button'),role=f.format==='3v3'?'outfield':p.role;b.type='button';b.className=`tactics-player ${role==='goalkeeper'?'goalkeeper':''} ${__tacticsSelected===id?'selected':''} ${status==='unavailable'||status==='unsure'?`availability-${status}`:''}`;b.dataset.tacticsId=id;b.style.left=pos.x+'%';b.style.top=pos.y+'%';b.setAttribute('aria-label',`${p.name}${status==='unavailable'?' · unavailable':status==='unsure'?' · unsure':''}`);b.innerHTML=`<b>#${esc(p.number)}</b><span class="tactics-player-name">${esc(String(p.name).trim().split(/\s+/)[0])}</span>${statusFlag(status)}`;b.addEventListener('click',e=>{if(b.__ignoreNextClick){b.__ignoreNextClick=false;e.preventDefault();return;}selectTacticsPlayer(id);});if(isCoach()){enableTacticsDrag(b,id,pitch);enableTacticsKeyboard(b,id);}pitch.appendChild(b);});
+  const otherGame=f.format==='3v3',benchIds=state.tactics.lineup.slice(f.onPitch);bench.innerHTML=benchIds.map((id,i)=>{const p=byId.get(id),status=statusFor(id);return p?`<button type="button" class="tactics-bench-player ${__tacticsSelected===id?'selected':''} ${status==='unavailable'||status==='unsure'?`availability-${status}`:''}" data-tactics-bench="${id}" aria-label="${esc(p.name)} · ${otherGame?'other game':'rotation'} ${i+1}${status==='unavailable'?' · unavailable':status==='unsure'?' · unsure':''}"><span class="workspace-row-copy"><strong>#${esc(p.number)} ${esc(p.name)}</strong><small>${otherGame?`Game ${Math.floor(i/f.onPitch)+2}`:i===0?'Next on':`Rotation ${i+1}`}</small></span>${statusFlag(status)}</button>`:'';}).join('')||`<span class="muted">${otherGame?'No other players in this plan.':'No substitutes selected.'}</span>`;bench.querySelectorAll('[data-tactics-bench]').forEach(b=>b.addEventListener('click',()=>selectTacticsPlayer(b.dataset.tacticsBench)));
   if(focusedId)[...pitch.querySelectorAll('[data-tactics-id]'),...bench.querySelectorAll('[data-tactics-bench]')].find(b=>(b.dataset.tacticsId||b.dataset.tacticsBench)===focusedId)?.focus({preventScroll:true});
   const benchTitle=document.getElementById('tactics-bench-title'),benchHelp=document.getElementById('tactics-rotation-help');if(benchTitle)benchTitle.textContent=otherGame?'Other game groups':'Rotation order';if(benchHelp)benchHelp.textContent=otherGame?'Each 3v3 game has its own players, with no goalkeeper or substitutes. Tap two to swap between groups.':'First player is next on. Tap two players to change the order or swap with the pitch.';
   const selectedCount=(state.tactics.matchdaySelections[currentTacticsFixtureKey()]||[]).length;document.getElementById('tactics-matchday-limit').textContent=requiresMatchdaySelection()?`${f.format} · ${selectedCount}/${f.matchday} selected`:`${f.format} · ${state.tactics.lineup.length} active`;pitch.classList.toggle('tactics-readonly',!isCoach());
@@ -4176,8 +4181,9 @@ function resetTactics(){if(!requireCoach())return;ensureTacticsState();const key
 
 function renderSquad(){
   const squad=rosterPlayers(),f=footballFormat();document.getElementById('squad-count').textContent=squad.length;const space=Math.max(0,f.registered-squad.length);const sc=document.getElementById('squad-space-count');if(sc)sc.textContent=`${space} registration space${space===1?'':'s'} remaining`;
+  const preview=document.getElementById('squad-limits-preview');if(preview)preview.textContent=`${f.format} · ${f.onPitch} on pitch · limits from configuration`;
   const summary=document.getElementById('squad-format-summary');if(summary)summary.innerHTML=`<span>${f.format}</span><span>${f.onPitch} on pitch</span><span>Max registered ${f.registered}</span><span>Matchday ${f.matchday}</span>`;
-  document.getElementById('squad-list').innerHTML=squad.map(p=>{const role=p.role==='goalkeeper'?'Goalkeeper':'Outfield',status=p.status==='inactive'?' · Inactive':'';const ownPlayer=currentRole!=='player'||selkentNorm(window.ClubHubCloud?.context?.profile?.full_name||'')===selkentNorm(p.name);return `<article class="player-card player-profile-card">${jerseyHTML(p)}<div>${ownPlayer?`<button type="button" class="person-name-button player-name" data-player-profile="${esc(p.name)}">${esc(p.name)}</button>`:`<div class="player-name">${esc(p.name)}</div>`}<div class="player-sub">${role}${status}</div></div></article>`;}).join('')||'<div class="empty-state"><strong>No players yet</strong>Add players to build the squad.</div>';
+  document.getElementById('squad-list').innerHTML=squad.map(p=>{const role=p.role==='goalkeeper'?'Goalkeeper':'Outfield',status=p.status==='inactive'?' · Inactive':'';const ownPlayer=currentRole!=='player'||selkentNorm(window.ClubHubCloud?.context?.profile?.full_name||'')===selkentNorm(p.name);const copy=`<span class="workspace-row-copy"><strong>#${esc(p.number)} ${esc(p.name)}</strong><small>${role}${status}</small></span>`;return ownPlayer?`<button type="button" class="person-name-button workspace-directory-row" data-player-profile="${esc(p.name)}">${copy}<span aria-hidden="true">›</span></button>`:`<article class="workspace-directory-row">${copy}</article>`;}).join('')||'<div class="empty-state"><strong>No players yet</strong>Add players to build the squad.</div>';
   if(featureEnabled('tactics'))renderTacticsBoard();else setSquadPage(0);
 }
 
@@ -4789,38 +4795,45 @@ let __teamMembersStamp=0;
 let __teamParentLinks=[];
 let __teamPlayerAccountLinks=[];
 let __pendingParentRequests=[];
+let __teamMembersLoadVersion=0;
+let __teamMembersContext='';
 async function refreshTeamMembers(quiet=false){
  const list=document.getElementById('team-members-list');
  if(!list||!CLOUD_MODE||!['admin','coach','assistant_coach'].includes(currentRole))return null;
- if(quiet&&Date.now()-__teamMembersStamp<12000)return __pendingParentRequests.length;
+ const cloud=window.ClubHubCloud,teamId=cloud?.currentTeam?.()?.id||null,userId=cloud?.session?.user?.id||'',role=currentRole;
+ const contextKey=[teamId,userId,role].join('|');
+ if(quiet&&__teamMembersContext===contextKey&&Date.now()-__teamMembersStamp<12000)return __pendingParentRequests.length;
+ const version=++__teamMembersLoadVersion;
+ const current=()=>version===__teamMembersLoadVersion&&window.ClubHubCloud===cloud&&cloud?.currentTeam?.()?.id===teamId&&(cloud?.session?.user?.id||'')===userId&&currentRole===role;
+ if(__teamMembersContext!==contextKey){__pendingParentRequests=[];__teamParentLinks=[];__teamPlayerAccountLinks=[];list.innerHTML='';}
+ __teamMembersContext=contextKey;
  __teamMembersStamp=Date.now();
  if(!quiet)list.innerHTML='<div class="empty-state compact-empty">Loading team access…</div>';
  try{
-   const teamId=window.ClubHubCloud?.currentTeam?.()?.id||null;
    const [membersResult,linksResult,playerLinksResult,requestsResult]=await Promise.allSettled([
-     window.ClubHubCloud.listTeamMembers(teamId),
-     window.ClubHubCloud.listParentPlayerLinks(null),
-     window.ClubHubCloud.listPlayerAccountLinks(null),
-     window.ClubHubCloud.listPendingParentRequests(teamId)
+     cloud.listTeamMembers(teamId),
+     cloud.listParentPlayerLinks(null),
+     cloud.listPlayerAccountLinks(null),
+     cloud.listPendingParentRequests(teamId)
    ]);
+   if(!current())return null;
    const rows=membersResult.status==='fulfilled'?membersResult.value:[];
    const parentLinksAvailable=linksResult.status==='fulfilled';
    __teamParentLinks=parentLinksAvailable?(linksResult.value||[]):[];
    __teamPlayerAccountLinks=playerLinksResult.status==='fulfilled'?(playerLinksResult.value||[]):[];
    __pendingParentRequests=requestsResult.status==='fulfilled'?(requestsResult.value||[]):[];
-   const preview=isAdminTeamPreviewMode();
-   const requestHtml=__pendingParentRequests.map(req=>`<div class="team-member-row pending"><div class="team-member-copy">${personNameButton(req.parent_name||'Parent',req.request_id,'request',teamId||'')}<span>Parent · awaiting child verification</span></div><span class="member-role-pill">Pending</span></div>`).join('');
+   const requestHtml=__pendingParentRequests.map(req=>personNameButton(req.parent_name||'Parent',req.request_id,'request',teamId||'','Parent · pending verification')).join('');
    const active=(rows||[]).filter(r=>r.role!=='pending_parent');
    const rowHtml=r=>{
-     const roleText=r.role==='club_admin'?'Club Admin · Coach':accessRoleLabel(r.role);
-     return `<div class="team-member-row"><div class="team-member-copy">${personNameButton(r.full_name,r.user_id,'team',teamId||'')}<span>${esc(roleText)}</span></div><span class="member-role-pill">${esc(accessRoleLabel(r.role))}</span></div>`;
+     const roleText=r.role==='club_admin'?'Club Admin · Coach':r.role==='parent'?'Parent · own-child information only':accessRoleLabel(r.role);
+     return personNameButton(r.full_name,r.user_id,'team',teamId||'',roleText);
    };
    const warning=requestsResult.status==='rejected'?'<div class="empty-state compact-empty">Could not load parent requests. Reopen Team access to retry.</div>':'';
    const membersWarning=membersResult.status==='rejected'?'<div class="empty-state compact-empty">Could not load active team members.</div>':'';
    const linksWarning=!parentLinksAvailable?'<div class="empty-state compact-empty">Could not load parent player links. Reopen Team access to retry.</div>':'';
    list.innerHTML=warning+membersWarning+linksWarning+((requestHtml?`<div class="member-group-label">Awaiting child verification</div>${requestHtml}`:'')+(active.length?`<div class="member-group-label">Active access</div>${active.map(rowHtml).join('')}`:'')||(!warning&&!membersWarning&&!linksWarning?'<div class="empty-state compact-empty">No team access accounts yet.</div>':''));
    return requestsResult.status==='fulfilled'?__pendingParentRequests.length:null;
- }catch(err){list.innerHTML='<div class="empty-state compact-empty">Team access is temporarily unavailable. Reopen to retry.</div>';return null;}
+ }catch(err){if(current())list.innerHTML='<div class="empty-state compact-empty">Team access is temporarily unavailable. Reopen to retry.</div>';return null;}
 }
 let __appConfirmPending=false;
 function appConfirm({title='Confirm',body='',detail='',confirmLabel='Confirm',cancelLabel='Cancel',tone='default'}={}){
@@ -4872,7 +4885,7 @@ function openParentRequestReview(requestId){
  document.getElementById('parent-request-review-parent').textContent=req.parent_name||'Parent';
  document.getElementById('parent-request-review-child').textContent=req.child_name||'Not supplied';
  document.getElementById('parent-request-review-email').textContent=req.parent_email||'Not supplied';
- list.innerHTML=activePlayers().map(p=>`<label class="parent-link-player parent-request-player"><input type="radio" name="parent-request-player" value="${esc(p.name)}"/><span>${miniJerseyHTML(p.number,p.role,'compact')}</span><span>${esc(p.name)}</span></label>`).join('')||'<div class="empty-state compact-empty">Add an active player to the squad before approving this request.</div>';
+ list.innerHTML=activePlayers().map(p=>`<label class="parent-link-player parent-request-player"><input type="radio" name="parent-request-player" value="${esc(p.name)}"/><span class="workspace-row-copy"><strong>#${esc(p.number)} ${esc(p.name)}</strong><small>Active · ${p.role==='goalkeeper'?'Goalkeeper':'Outfield'}</small></span></label>`).join('')||'<div class="empty-state compact-empty">Add an active player to the squad before approving this request.</div>';
  dlg.showModal();
 }
 let __parentRequestApprovalPending=false;
@@ -4909,7 +4922,8 @@ async function submitParentRequestReview(e){
    if(document.getElementById('parent-request-review-id')?.value===requestId)document.getElementById('parent-request-review-dialog')?.close();
    toast(`Parent access approved for ${selected}`);
    __teamMembersStamp=0;await refreshTeamMembers(false);await refreshNotifications(false);
- }catch(err){alert(err.message||err);}
+   if(currentView==='person'&&window.ClubHubPersonProfiles?.selectedSnapshot()?.requestId===requestId)navigate('team-access',false);
+ }catch(err){alert('Parent access was not confirmed. Reopen Team access to check the current request before retrying. '+(err.message||err));}
  finally{__parentRequestApprovalPending=false;if(button)button.disabled=false;}
 }
 async function openParentLinkDialog(userId,parentName='Parent'){

@@ -18,7 +18,8 @@ const lists={'team-stats':['home-player-stats','season-player-stats','top-scorer
  'raise-concern':['raise-concern-panel','concern-body']};
 for(const [view,children] of Object.entries(lists)){
  for(const id of children)assert(ancestors.get(id)?.includes('view-'+view),`${id} belongs to ${view}`);
- const body=html.slice(html.indexOf(`id="view-${view}"`),html.indexOf(`id="${view}-title"`));
+ const start=html.indexOf(`id="view-${view}"`),next=html.indexOf('<section id="view-',start+1);
+ const body=html.slice(start,next<0?html.length:next);
  assert.match(body,/class="page-back secondary-button"[^>]*href="\?view=/,`${view} has a real Back link`);
  assert(html.includes(`data-page-route="${view}"`),`${view} has an entry link`);
  assert.match(html,new RegExp(`id="${view}-title" tabindex="-1"`),`${view} announces its focused title`);

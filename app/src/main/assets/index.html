@@ -357,11 +357,11 @@
         </form>
       </section>
 
-      <section id="view-squad" class="view" data-view="squad">
+      <section id="view-squad" class="view team-workspace" data-view="squad">
         <div class="section-title-row">
-          <div><p class="kicker">Current squad</p><h2 id="squad-team-name">Our team</h2></div>
-          <button class="primary-button compact" id="add-player-btn" data-requires-edit>+ Player</button>
+          <div><p class="kicker" id="squad-workspace-kicker">Your team · staff</p><h2 id="squad-team-name">Squad</h2></div>
         </div>
+        <p class="muted" id="squad-workspace-description">Your registered players, with space to open each profile.</p>
         <div class="squad-view-tabs" role="tablist" aria-label="Squad view">
           <button type="button" class="squad-view-tab active" id="squad-list-tab" data-squad-page="0" role="tab" aria-controls="squad-list-page" aria-selected="true">Squad</button>
           <button type="button" class="squad-view-tab" id="squad-tactics-tab" data-squad-page="1" role="tab" aria-controls="squad-tactics-page" aria-selected="false">Match plan</button>
@@ -370,20 +370,25 @@
           <section class="squad-view-page" id="squad-list-page" data-squad-view="0" role="tabpanel" aria-labelledby="squad-list-tab">
             <div class="panel squad-banner compact-squad-banner screen-lead-card">
               <div class="squad-count"><strong id="squad-count">0</strong><span>registered players</span></div>
-              <div class="squad-space-count" id="squad-space-count"></div>
+              <p>Open a name to view the player profile. Squad limits use the configured competition rules.</p>
             </div>
-            <details class="squad-format-details"><summary>Squad limits</summary><div class="squad-format-summary" id="squad-format-summary"></div></details>
+            <details class="squad-format-details"><summary><span><strong>Squad limits</strong><small id="squad-limits-preview">Limits from configuration</small></span><span aria-hidden="true">›</span></summary><div class="squad-format-summary" id="squad-format-summary"></div><p class="helper" id="squad-space-count"></p></details>
             <div id="squad-list" class="squad-list"></div>
+            <p class="helper">Open a profile to see the player’s details.</p>
+            <button class="primary-button" id="add-player-btn" data-requires-edit>+ Player</button>
           </section>
           <section class="squad-view-page hidden" id="squad-tactics-page" data-squad-view="1" role="tabpanel" aria-labelledby="squad-tactics-tab">
-            <div class="panel tactics-panel">
+            <div class="tactics-panel">
+             <section class="panel tactics-board-card">
+              <div class="tactics-fixture" aria-live="polite"><strong id="tactics-fixture-name">General setup</strong><span id="tactics-fixture-meta">No upcoming fixture published</span><small id="tactics-plan-summary">Your squad plan</small><small class="tactics-match-guide" id="tactics-match-guide"></small></div>
               <div class="tactics-pitch" id="tactics-pitch" aria-label="Football tactics board">
                 <span class="pitch-halfway"></span><span class="pitch-circle"></span><span class="pitch-box pitch-box-top"></span><span class="pitch-box pitch-box-bottom"></span>
                 <span class="tactics-empty hidden" id="tactics-empty"></span>
               </div>
               <div class="tactics-board-hint"><p class="helper" id="tactics-help">Drag to move a player. Tap two to swap, or select a pitch player and tap an empty spot to move. Use arrow keys to move a focused player; hold Shift for larger steps.</p><span class="a11y-only" id="tactics-position-status" role="status" aria-live="polite" aria-atomic="true"></span><p class="tactics-availability-hint hidden" id="tactics-availability-hint">Out = unavailable · Unsure = awaiting confirmation. Adjust the lineup if needed.</p></div>
-              <div class="tactics-fixture" aria-live="polite"><strong id="tactics-fixture-name">General setup</strong><span id="tactics-fixture-meta">No upcoming fixture published</span><small id="tactics-plan-summary">Your squad plan</small><small class="tactics-match-guide" id="tactics-match-guide"></small></div>
-              <details class="matchday-squad-picker tactics-squad-options" id="matchday-squad-picker">
+             </section>
+             <div class="tactics-plan-controls">
+              <details class="panel matchday-squad-picker tactics-squad-options" id="matchday-squad-picker" open>
                 <summary class="matchday-squad-summary"><div><strong id="matchday-squad-title">Matchday squad</strong><span id="matchday-squad-fixture">Current setup</span></div><b id="matchday-squad-count">0 / 0</b></summary>
                 <div class="tactics-squad-options-body">
                   <small id="matchday-readiness-summary"></small>
@@ -391,10 +396,14 @@
                   <div class="matchday-squad-options" id="matchday-squad-options"></div>
                 </div>
               </details>
-              <div class="panel-heading tactics-heading"><h3 id="tactics-formation-title">Formation and positions</h3><button type="button" class="secondary-button compact" id="reset-tactics" data-requires-edit>Reset positions</button></div>
+             <section class="panel tactics-formation-card">
+              <div class="panel-heading tactics-heading"><h3 id="tactics-formation-title">Formation and positions</h3></div>
               <label class="formation-control" id="tactics-formation-label">Formation<select id="tactics-formation" aria-label="Formation"></select></label>
-              <div class="tactics-bench-wrap"><div class="panel-heading"><h3 id="tactics-bench-title">Rotation order</h3><span class="helper" id="tactics-matchday-limit"></span></div><p class="helper tactics-rotation-help" id="tactics-rotation-help">First player is next on. Tap two players to change the order or swap with the pitch.</p><div class="tactics-bench" id="tactics-bench"></div></div>
-              <div class="tactics-coach-plan"><div class="panel-heading"><div><p class="kicker">Coach notes</p><h3>What we are working on</h3></div></div><div class="tactics-plan-fields"><label>One team focus<input id="tactics-focus" data-tactics-plan="focus" maxlength="120" placeholder="e.g. Look up before passing" /></label><label>When we lose the ball<input id="tactics-defending" data-tactics-plan="defending" maxlength="120" placeholder="e.g. Recover together" /></label><label id="tactics-rotation-label">Rotation reminder<input id="tactics-rotation" data-tactics-plan="rotation" maxlength="120" placeholder="e.g. Give everyone a turn in each half" /></label></div><p class="helper">Saved for this fixture. Keep it short enough to share with the team.</p></div>
+              <button type="button" class="secondary-button" id="reset-tactics" data-requires-edit>Reset positions</button>
+             </section>
+              <section class="panel tactics-bench-wrap"><div class="panel-heading"><h3 id="tactics-bench-title">Rotation order</h3></div><p class="helper tactics-rotation-help" id="tactics-rotation-help">First player is next on. Tap two players to change the order or swap with the pitch.</p><span class="helper" id="tactics-matchday-limit"></span><div class="tactics-bench" id="tactics-bench"></div></section>
+              <section class="panel tactics-coach-plan"><div class="panel-heading"><h3>What we are working on</h3></div><div class="tactics-plan-fields"><label>One team focus<input id="tactics-focus" data-tactics-plan="focus" maxlength="120" placeholder="e.g. Look up before passing" /></label><label>When we lose the ball<input id="tactics-defending" data-tactics-plan="defending" maxlength="120" placeholder="e.g. Recover together" /></label><label id="tactics-rotation-label">Rotation reminder<input id="tactics-rotation" data-tactics-plan="rotation" maxlength="120" placeholder="e.g. Give everyone a turn in each half" /></label></div><p class="helper">Changes save automatically for this setup. Wait for save confirmation before leaving.</p></section>
+             </div>
             </div>
           </section>
         </div>
@@ -823,14 +832,12 @@
         <a class="secondary-button admin-directory-refresh" href="?view=staff-requests" data-page-route="staff-requests">Back to requests</a>
         <p class="helper">Only the club owner can approve Club Admin requests.</p>
       </section>
-      <section id="view-team-access" class="view linked-page" data-view="team-access" aria-labelledby="team-access-title">
+      <section id="view-team-access" class="view linked-page team-workspace" data-view="team-access" aria-labelledby="team-access-title">
+        <div class="section-title-row"><div><p class="kicker" id="team-access-kicker">Your team · staff</p><h2 id="team-access-title" tabindex="-1">Team access</h2></div></div>
+        <p class="muted">Review parent requests and open individual accounts.</p>
         <a class="page-back secondary-button" href="?view=more" data-page-route="more">← Back to settings</a>
-        <div class="section-title-row"><div><p class="kicker">Your club</p><h2 id="team-access-title" tabindex="-1">Team access</h2></div><button type="button" class="secondary-button compact" data-page-refresh="team-access">Refresh</button></div>
-        <details class="panel settings-accordion" id="team-access-settings" data-staff-settings>
-            <summary><span>Team access</span><span class="settings-chevron">⌄</span></summary>
-            <div class="settings-accordion-body">
-              <p class="muted">Parents sign up with email and password, choose the club/team, then type their child’s name. Staff review each request and deliberately select the correct active squad player before approving it. Siblings are approved one request at a time.</p>
-              <div class="team-access-invite-block parent-self-signup-note"><strong>Parent access is request-based</strong><span>Parents do not need an invite code. They use Create Account on the login screen.</span></div>
+        <section id="team-access-settings" data-staff-settings>
+              <section class="panel parent-self-signup-note"><h3>Parent access is request-based</h3><p>Parents create their own email account and type their child’s name. Staff verify and link the correct active player. Review siblings one request at a time.</p></section>
               <div class="team-access-invite-block" id="team-player-invite-section">
                 <label>Player profile<select id="team-player-invite-player"><option value="">Choose player…</option></select></label>
                 <button class="primary-button setup-save" id="generate-team-player-invite">Create reusable player code</button>
@@ -838,10 +845,10 @@
                 <button class="secondary-button setup-save" id="copy-team-player-invite">Copy player code</button>
                 <p class="helper">Player app access is available to U15 squads only. Players can view team information. Football messages, club notices and match alerts go to linked parents; player accounts cannot use the inbox.</p>
               </div>
-              <div class="panel-heading access-members-heading"><h3>Team members</h3></div>
               <div id="team-members-list" class="team-members-list"></div>
-            </div>
-          </details>
+              <button type="button" class="secondary-button workspace-refresh" data-page-refresh="team-access">Refresh</button>
+              <p class="helper">Parents use their own email account. Player accounts are available to eligible U15 teams only.</p>
+          </section>
       </section>
       <section id="view-rules" class="view linked-page" data-view="rules" aria-labelledby="rules-title">
         <a class="page-back secondary-button" href="?view=more" data-page-route="more">← Back to settings</a>
@@ -1078,14 +1085,17 @@
     </form>
   </dialog>
 
-  <dialog id="parent-request-review-dialog" class="modal parent-link-modal">
+  <dialog id="parent-request-review-dialog" class="modal parent-link-modal team-workspace" aria-labelledby="parent-request-review-title">
    <form method="dialog" id="parent-request-review-form">
-     <div class="modal-heading"><div><p class="kicker">Parent access request</p><h3>Verify child</h3></div><button type="button" class="icon-button small" data-close-dialog aria-label="Close">×</button></div>
-     <p class="muted">The parent’s typed name is identification only. Select the correct active squad player yourself before approval.</p>
+     <div class="modal-heading"><div><p class="kicker">Parent access request</p><h3 id="parent-request-review-title">Verify child</h3></div></div>
+     <p class="muted">Match the request to the correct active squad player.</p>
+     <button type="button" class="secondary-button" data-close-dialog>← Team access</button>
      <input type="hidden" id="parent-request-review-id" />
-     <div class="parent-request-summary"><span><b>Parent</b><strong id="parent-request-review-parent">Parent</strong></span><span><b>Submitted child name</b><strong id="parent-request-review-child">—</strong></span><span><b>Email</b><strong id="parent-request-review-email">—</strong></span></div>
-     <fieldset class="parent-request-player-fieldset"><legend>Choose the correct player</legend><div class="parent-link-player-list" id="parent-request-player-list"></div></fieldset>
-     <div class="modal-actions"><button type="button" class="secondary-button" data-close-dialog>Cancel</button><button type="submit" class="primary-button" id="parent-request-approve">Approve & link</button></div>
+     <section class="panel parent-request-summary"><h3 id="parent-request-review-parent">Parent</h3><p class="muted">Parent access request</p><p>Email: <span id="parent-request-review-email">—</span></p><p>Submitted child name: <span id="parent-request-review-child">—</span></p></section>
+     <section class="panel parent-verification-guidance"><h3>Verify child</h3><p>The submitted name is identification only. Select the correct active squad player yourself.</p></section>
+     <fieldset class="panel parent-request-player-fieldset"><legend class="a11y-only">Choose the correct player</legend><h3 aria-hidden="true">Choose the correct player</h3><div class="parent-link-player-list" id="parent-request-player-list"></div></fieldset>
+     <div class="modal-actions"><button type="submit" class="primary-button" id="parent-request-approve">Approve & link</button><button type="button" class="secondary-button" data-close-dialog>Cancel</button></div>
+     <p class="helper">No player is selected automatically. Approval opens the existing shared confirmation; cancel changes no access.</p>
    </form>
  </dialog>
 

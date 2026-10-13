@@ -527,7 +527,7 @@ check(
 )
 check(
     'Matchday squad controls are collapsible after the board',
-    '<details class="matchday-squad-picker tactics-squad-options" id="matchday-squad-picker">' in index
+    '<details class="panel matchday-squad-picker tactics-squad-options" id="matchday-squad-picker" open>' in index
     and 'matchday-squad-summary' in index
     and 'tactics-squad-options-body' in index,
 )
@@ -680,7 +680,7 @@ check(
 )
 check(
     'coach Team access no longer creates parent invite codes',
-    'Parents do not need an invite code' in index
+    'Parents create their own email account and type their child’s name.' in index
     and 'id="generate-team-parent-invite"' not in index
     and 'id="team-parent-invite-code"' not in index
     and 'createTeamParentInvite' not in app,

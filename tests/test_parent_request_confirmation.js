@@ -29,7 +29,7 @@ function fixture(){
  let team='team',user='staff',effectiveRole='coach';
  const cloud={currentTeam:()=>({id:team}),session:{user:{get id(){return user;}}},role:()=>effectiveRole,approveParentRequest:async(...args)=>calls.push(args)};
  const players=[{name:'Lindi'}];
- const ctx={document,window:{ClubHubCloud:cloud},currentRole:'coach',__pendingParentRequests:[{request_id:'request',user_id:'parent',child_name:'Lindi'}],__teamMembersStamp:10,
+ const ctx={document,window:{ClubHubCloud:cloud},currentRole:'coach',currentView:'team-access',__pendingParentRequests:[{request_id:'request',user_id:'parent',child_name:'Lindi'}],__teamMembersStamp:10,
    activePlayers:()=>players,toast:x=>messages.push(x),alert:x=>alerts.push(x),auditEvent:(...x)=>audits.push(x),refreshTeamMembers:async()=>refreshes.push('members'),refreshNotifications:async()=>refreshes.push('notifications')};
  vm.createContext(ctx);vm.runInContext(helper+approval,ctx);
  return {ctx,nodes,selected,cloud,players,calls,messages,alerts,audits,refreshes,document,
@@ -80,7 +80,7 @@ const tick=()=>new Promise(resolve=>setImmediate(resolve));
  // The guard covers both the dialog and the in-flight RPC, and recovers after errors.
  f=fixture();let release;f.cloud.approveParentRequest=(...args)=>{f.calls.push(args);return new Promise(resolve=>release=resolve);};
  pending=f.submit();await f.submit();f.accept();await tick();assert.equal(f.nodes['parent-request-approve'].disabled,true);await f.submit();assert.equal(f.calls.length,1);release();await pending;
- f=fixture();f.cloud.approveParentRequest=async()=>{throw Error('Retry');};pending=f.submit();f.accept();await pending;assert.deepEqual(f.alerts,['Retry']);assert.equal(f.nodes['parent-request-approve'].disabled,false);
+ f=fixture();f.cloud.approveParentRequest=async()=>{throw Error('Retry');};pending=f.submit();f.accept();await pending;assert.match(f.alerts[0],/not confirmed.*check the current request.*Retry/);assert.equal(f.nodes['parent-request-approve'].disabled,false);
  f.cloud.approveParentRequest=async(...args)=>f.calls.push(args);pending=f.submit();f.accept();await pending;assert.equal(f.calls.length,1);
  // Switching teams during an accepted RPC must not audit, close or refresh the new team.
  f=fixture();f.cloud.approveParentRequest=()=>new Promise(resolve=>release=resolve);pending=f.submit();f.accept();await tick();f.team('other');release();await pending;

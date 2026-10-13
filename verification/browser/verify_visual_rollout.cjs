@@ -4,7 +4,7 @@ const fs=require('node:fs');
 const path=require('node:path');
 const http=require('node:http');
 const {chromium}=require(process.argv[2]||'playwright');
-const root=path.resolve('app/src/main/assets'),out=path.resolve(process.argv[3]||'visual-review');
+const root=path.resolve('cloudflare/web-app/dist'),out=path.resolve(process.argv[3]||'visual-review');
 fs.mkdirSync(out,{recursive:true});
 const html=fs.readFileSync(path.join(root,'index.html'),'utf8');
 const cloud=fs.readFileSync(path.join(root,'cloud.js'),'utf8');
@@ -155,12 +155,75 @@ async function adminDirectoryChecks(page,width,theme){
 }
 
 
+async function workspaceChecks(page,width,theme){
+ await prepareTeam(page,theme);await page.setViewportSize({width,height:900});
+ await page.evaluate(()=>{
+  CLUB_CONFIGURATION=null;
+  const names=['Alex','Jamie','Casey','Riley','Taylor','Robin','Drew','Jules','Charlie','Jordan'];
+  state=normalizeState({meta:{clubName:'Shooters Hill AFC',teamName:'Example Greens',ageGroup:'U9',season:'2026/27'},division:{name:'Example division',teamName:'Shooters Hill AFC Example Greens'},squad:names.map((name,i)=>({name:name+' Example',number:i+1,role:i===0?'goalkeeper':'outfield',status:i===9?'inactive':'active'})),matches:[],features:{tactics:true},selkent:{fixtures:[]}});
+  const requests=[{request_id:'parent-review',user_id:'review-parent',parent_name:'Morgan Example',parent_email:'morgan@example.invalid',child_name:'Jamie'}];
+  const members=[{user_id:'review-coach',full_name:'Taylor Example',role:'coach'},{user_id:'review-assistant',full_name:'Sam Example',role:'assistant_coach'},{user_id:'review-existing-parent',full_name:'Chris Example',role:'parent'}];
+  const links=[{parent_user_id:'review-parent',player_name:'Alex Example',team_id:'synthetic-team'}];
+  window.__workspace={requests,members,links,saves:[],approvals:[],failRequests:false};
+  Object.assign(window.ClubHubCloud,{role:()=>currentRole,actingAsParent:()=>false,session:{user:{id:'synthetic-coach'}},context:{profile:{user_id:'synthetic-coach',full_name:'Taylor Example',club_id:'synthetic-club',role:'coach'}},currentTeam:()=>({id:'synthetic-team',name:'Example Greens',ageGroup:state.meta.ageGroup,age_group:ageGroupNumber()}),visibleTeamList:()=>[],
+   listTeamMembers:async()=>members,listParentPlayerLinks:async()=>links,listPlayerAccountLinks:async()=>[],listPendingParentRequests:async()=>{if(window.__workspace.failRequests)throw Error('Fixture failure');return requests;},listContactDirectory:async()=>({self:{user_id:'synthetic-coach'},contacts:[]}),
+   listNotifications:async()=>[],listAnnouncements:async()=>[],listMatchAvailability:async()=>[],listPlayerAppearanceStats:async()=>[],recordAuditEvent:async()=>{},
+   queueStateSave:s=>window.__workspace.saves.push(JSON.parse(JSON.stringify(s))),approveParentRequest:async(id,player)=>{window.__workspace.approvals.push({id,player});links.push({parent_user_id:'review-parent',player_name:player,team_id:'synthetic-team'});members.push({user_id:'review-parent',full_name:'Morgan Example',role:'parent'});requests.splice(0);}});
+  renderAll();navigate('squad',false);setSquadPage(0);
+ });
+ await page.evaluate(()=>document.fonts.ready);
+ const row=page.locator('#squad-list [data-player-profile]').first();assert.equal(await page.locator('#squad-list [data-player-profile]').count(),10);
+ assert.match(await page.locator('#squad-list').innerText(),/Inactive/);
+ const bounds=await row.boundingBox();assert(bounds.height>=76,'profile action occupies the whole row');
+ if(width===393)assert(Math.abs(bounds.x-20)<1&&Math.abs(bounds.width-353)<1,'squad uses reviewed phone gutters');
+ assert.equal(await page.locator('#squad-team-name').innerText(),'Squad');
+ await page.screenshot({path:path.join(out,`squad-${width}-${theme}.png`),fullPage:true});
+ await row.click();await page.waitForFunction(()=>document.querySelector('#person-profile-name').textContent==='Alex Example');await page.locator('#person-profile-back').click();
+ await page.locator('#squad-tactics-tab').click();assert.equal(await page.locator('#squad-team-name').innerText(),'Match plan');assert.equal(await page.locator('#squad-list-page').isVisible(),false);assert.equal(await page.locator('#add-player-btn').isVisible(),false);
+ assert.equal(await page.locator('#tactics-pitch .tactics-player').count(),5);assert.equal(await page.locator('#tactics-bench .tactics-bench-player').count(),4);
+ assert.equal(await page.locator('#matchday-squad-picker').isVisible(),false,'rolling squad does not show a capped picker');
+ const layout=await page.locator('.tactics-panel').evaluate(el=>({columns:getComputedStyle(el).gridTemplateColumns.split(' ').length,heading:getComputedStyle(document.querySelector('#squad-team-name')).fontSize,pitch:document.querySelector('#tactics-pitch').getBoundingClientRect().toJSON()}));
+ assert.equal(layout.columns,width>=900?2:1);assert.equal(layout.heading,'30px');
+ const controls=await page.locator('#squad-tactics-page :is(button,input,select)').evaluateAll(els=>els.filter(el=>el.getBoundingClientRect().width>0).map(el=>({height:el.getBoundingClientRect().height,tag:el.tagName})));assert(controls.every(el=>el.height>=52),'plan controls are at least 52px: '+JSON.stringify(controls));
+ assert((await geometry(page)).documentWidth<=width+1);
+ await page.screenshot({path:path.join(out,`match-plan-5v5-${width}-${theme}.png`),fullPage:true});
+ const first=page.locator('[data-tactics-id="p1"]');await first.focus();const before=await page.evaluate(()=>state.tactics.positions.p1.x);await first.press('ArrowRight');assert.equal(await page.evaluate(()=>state.tactics.positions.p1.x),before+1);await page.locator('[data-tactics-id="p1"]').press('Shift+ArrowRight');assert.equal(await page.evaluate(()=>state.tactics.positions.p1.x),before+6);
+ const drag=await page.locator('[data-tactics-id="p1"]').boundingBox();await page.mouse.move(drag.x+drag.width/2,drag.y+drag.height/2);await page.mouse.down();await page.mouse.move(drag.x+drag.width/2+15,drag.y+drag.height/2-15,{steps:3});await page.mouse.up();assert(await page.evaluate(()=>state.tactics.positions.p1.y<91),'pointer drag changes the real position');
+ await page.locator('[data-tactics-id="p2"]').click();await page.locator('[data-tactics-bench="p6"]').click();assert.equal(await page.locator('[data-tactics-id="p6"]').count(),1,'bench/pitch swap works');
+ await page.locator('#tactics-formation').selectOption('2-1-1');assert.equal(await page.evaluate(()=>state.tactics.formation),'2-1-1');await page.locator('#reset-tactics').click();assert.equal(await page.evaluate(()=>state.tactics.lineup.length),9,'reset retains lineup');
+ await page.locator('#tactics-focus').fill('Look up before passing');await page.locator('#tactics-focus').blur();assert.equal(await page.evaluate(()=>tacticsMatchPlan().focus),'Look up before passing');assert(await page.evaluate(()=>window.__workspace.saves.some(s=>s.tactics.matchPlanByFixture.general?.focus==='Look up before passing')),'notes reach existing automatic save queue');
+ await page.evaluate(()=>{state.meta.ageGroup='U7';state.tactics=null;renderAll();setSquadPage(1);});assert.equal(await page.locator('#tactics-pitch .tactics-player').count(),3);assert.match(await page.locator('#tactics-bench-title').innerText(),/Other game/);assert.equal(await page.locator('#tactics-bench .tactics-bench-player').count(),6);assert.equal(await page.locator('#tactics-pitch .pitch-box').first().isVisible(),false);
+ await page.evaluate(()=>window.scrollTo(0,0));await page.screenshot({path:path.join(out,`match-plan-3v3-${width}-${theme}.png`),fullPage:true});
+ await page.evaluate(()=>{state.meta.ageGroup='U15';state.squad=Array.from({length:18},(_,i)=>({name:['Alex','Jamie','Casey','Riley','Taylor','Robin','Drew','Jules','Charlie','Jordan','Avery','Morgan','Pat','Lee','Sam','Chris','Quinn','Sky'][i]+' Example',number:i+1,role:i===0?'goalkeeper':'outfield',status:'active'}));state.tactics=null;state.matches=[{id:'plan-fixture',date:'2099-10-20',time:'10:00',opponent:'Example Blues',venue:'H',competition:'Friendly',status:'scheduled'}];renderAll();setSquadPage(1);__availabilityFixture=fixtureResponseKey(nextPublishedFixture());__availabilityTeamId='synthetic-team';__availabilityUserId='synthetic-coach';__availabilityRows=[{player_name:'Jamie Example',status:'available'},{player_name:'Casey Example',status:'unsure'},{player_name:'Lee Example',status:'unavailable'}];renderTacticsBoard();});
+ assert.equal(await page.locator('#matchday-squad-picker').isVisible(),true);assert.equal(await page.locator('#tactics-pitch .tactics-player').count(),0,'standard squad never silently selects a roster');
+ page.once('dialog',async d=>{assert.match(d.message(),/marked unavailable/);await d.dismiss();});await page.locator('[data-matchday-player="p14"]').check();assert.equal(await page.locator('[data-matchday-player="p14"]').isChecked(),false,'unavailable cancel preserves selection');
+ page.once('dialog',async d=>{assert.match(d.message(),/marked unavailable/);await d.accept();});await page.locator('[data-matchday-player="p14"]').check();assert.equal(await page.locator('[data-matchday-player="p14"]').isChecked(),true);
+ await page.locator('#select-all-available').click();assert.equal(await page.locator('[data-matchday-player="p2"]').isChecked(),true);assert.equal(await page.locator('[data-matchday-player="p14"]').isChecked(),false);
+ await page.evaluate(()=>{const key=currentTacticsFixtureKey();state.tactics.matchdaySelections[key]=activePlayers().slice(0,13).map(tacticsPlayerId);state.tactics.matchdayAutoPrepared[key]=true;state.tactics.lineup=[];renderTacticsBoard();});assert.equal(await page.locator('#tactics-pitch .tactics-player').count(),11);assert.equal(await page.locator('#tactics-bench .tactics-bench-player').count(),2);
+ await page.evaluate(()=>window.scrollTo(0,0));await page.screenshot({path:path.join(out,`match-plan-11v11-${width}-${theme}.png`),fullPage:true});
+ await page.evaluate(()=>{state.meta.ageGroup='U9';state.squad=state.squad.slice(0,3);state.matches=[];state.tactics=null;renderAll();navigate('team-access',false);});await page.locator('[data-profile-source="request"]').waitFor({state:'visible'});assert.equal(await page.locator('#team-player-invite-section').isVisible(),false,'U9 player codes stay hidden');
+ await page.evaluate(()=>window.scrollTo(0,0));await page.screenshot({path:path.join(out,`team-access-${width}-${theme}.png`),fullPage:true});
+ await page.locator('[data-profile-source="request"]').click();await page.locator('[data-person-action="review-request"]').click();await page.locator('#parent-request-review-dialog').waitFor({state:'visible'});
+ assert.equal(await page.locator('#parent-request-player-list input:checked').count(),0,'submitted name never preselects a player');assert.match(await page.locator('#parent-request-review-child').innerText(),/^Jamie$/);
+ await page.screenshot({path:path.join(out,`parent-verification-unselected-${width}-${theme}.png`),fullPage:true});
+ page.once('dialog',async d=>{assert.match(d.message(),/Select the correct active squad player/);await d.accept();});await page.locator('#parent-request-approve').click();assert.equal(await page.evaluate(()=>window.__workspace.approvals.length),0);
+ await page.locator('#parent-request-player-list input[value="Jamie Example"]').check();await page.locator('#parent-request-approve').click();await page.locator('#app-confirm-dialog').waitFor({state:'visible'});assert.match(await page.locator('#app-confirm-body').innerText(),/typed “Jamie”.*chose Jamie Example/);
+ await page.screenshot({path:path.join(out,`parent-confirm-matching-${width}-${theme}.png`),fullPage:true});await page.locator('#app-confirm-cancel').click();assert.equal(await page.evaluate(()=>window.__workspace.approvals.length),0);assert.equal(await page.locator('#parent-request-review-dialog').isVisible(),true);
+ await page.locator('#parent-request-player-list input[value="Casey Example"]').check();await page.locator('#parent-request-approve').click();assert.match(await page.locator('#app-confirm-body').innerText(),/typed “Jamie”.*chose Casey Example/);await page.screenshot({path:path.join(out,`parent-confirm-mismatch-${width}-${theme}.png`),fullPage:true});await page.locator('#app-confirm-accept').click();await page.waitForFunction(()=>currentView==='team-access'&&!document.querySelector('#parent-request-review-dialog').open);
+ assert.deepEqual(await page.evaluate(()=>window.__workspace.approvals),[{id:'parent-review',player:'Casey Example'}]);assert.deepEqual(await page.evaluate(()=>window.__workspace.links.map(l=>l.player_name)),['Alex Example','Casey Example']);await page.waitForFunction(()=>document.querySelectorAll('#team-members-list [data-profile-source="request"]').length===0);assert.match(await page.locator('#team-members-list').innerText(),/Morgan Example/);
+ await page.screenshot({path:path.join(out,`team-access-approved-${width}-${theme}.png`),fullPage:true});
+ await page.evaluate(async()=>{window.__workspace.failRequests=true;await refreshTeamMembers(false);});assert.match(await page.locator('#team-members-list').innerText(),/Could not load parent requests/);assert.match(await page.locator('#team-members-list').innerText(),/Morgan Example/);await page.screenshot({path:path.join(out,`team-access-partial-error-${width}-${theme}.png`),fullPage:true});
+ if(width===320){await page.evaluate(()=>document.documentElement.style.fontSize='200%');assert((await geometry(page)).documentWidth<=width+1,'Team Access reflows at 200%');await page.screenshot({path:path.join(out,`team-access-text200-${theme}.png`),fullPage:true});await page.evaluate(()=>{document.documentElement.style.fontSize='';window.__workspace.failRequests=false;window.__workspace.requests.push({request_id:'parent-zoom',user_id:'review-parent',parent_name:'Morgan Example',parent_email:'morgan@example.invalid',child_name:'Jamie'});__pendingParentRequests=window.__workspace.requests;openParentRequestReview('parent-zoom');document.documentElement.style.fontSize='200%';});assert((await geometry(page)).documentWidth<=width+1,'parent verification reflows at 200%');assert(await page.locator('#parent-request-review-form').evaluate(el=>el.scrollWidth<=el.clientWidth+1),'parent review form does not overflow');await page.screenshot({path:path.join(out,`parent-verification-text200-${theme}.png`),fullPage:true});await page.evaluate(()=>{document.querySelector('#parent-request-review-dialog').close();document.documentElement.style.fontSize='';});}
+ await page.evaluate(()=>{state.squad=[];renderSquad();navigate('squad',false);setSquadPage(1);});assert.match(await page.locator('#tactics-empty').innerText(),/add players/);assert.equal(await page.locator('#tactics-pitch .tactics-player').count(),0);await page.screenshot({path:path.join(out,`match-plan-empty-${width}-${theme}.png`),fullPage:true});
+ return {screen:'team-workspace',width,theme,bounds,layout,controls};
+}
+
 let base;
 (async()=>{
  await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));base=`http://127.0.0.1:${server.address().port}`;
  const browser=await chromium.launch({headless:true});const page=await browser.newPage();const errors=[];page.on('pageerror',e=>errors.push(String(e)));
  await page.route('**/*',route=>new URL(route.request().url()).origin===base?route.continue():route.fulfill({status:200,contentType:'application/json',body:'[]'}));
  const results=[];
- try{for(const theme of ['dark','light']){for(const width of [360,393,1280])results.push(await loginChecks(page,width,theme));results.push(await teamChecks(page,theme));for(const width of [320,393,1280])results.push(await coachOnboardingChecks(page,width,theme));for(const width of [320,393,1280])results.push(await adminDirectoryChecks(page,width,theme));}assert.equal(errors.length,0,errors.join('\n'));fs.writeFileSync(path.join(out,'measurements.json'),JSON.stringify({results,errors},null,2));console.log('PASS rendered login, password/parent routes, text zoom, stats navigation, match details, attendance and coach onboarding in both themes');}
+ try{for(const theme of ['dark','light']){for(const width of [360,393,1280])results.push(await loginChecks(page,width,theme));results.push(await teamChecks(page,theme));for(const width of [320,393,1280])results.push(await coachOnboardingChecks(page,width,theme));for(const width of [320,393,1280])results.push(await adminDirectoryChecks(page,width,theme));for(const width of [320,393,1024])results.push(await workspaceChecks(page,width,theme));}assert.equal(errors.length,0,errors.join('\n'));fs.writeFileSync(path.join(out,'measurements.json'),JSON.stringify({results,errors},null,2));console.log('PASS rendered login, password/parent routes, text zoom, stats navigation, match details, attendance and coach onboarding, directories, Squad, Match Plan and deliberate parent verification in both themes');}
  finally{await browser.close();server.close();}
 })().catch(error=>{console.error(error);server.close();process.exitCode=1;});
