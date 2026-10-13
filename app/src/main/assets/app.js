@@ -6379,7 +6379,7 @@ document.getElementById('appearance-theme')?.addEventListener('change',e=>applyT
 document.getElementById('notification-bell')?.addEventListener('click',openNotifications);
 document.getElementById('notifications-refresh')?.addEventListener('click',refreshNotificationFeed);
 document.getElementById('communications-notifications-refresh')?.addEventListener('click',refreshNotificationFeed);
-document.getElementById('notification-dialog')?.addEventListener('close',()=>queueMicrotask(()=>{const bell=document.getElementById('notification-bell');if(bell&&!bell.classList.contains('hidden'))bell.focus({preventScroll:true});}));
+document.getElementById('notification-dialog')?.addEventListener('close',()=>requestAnimationFrame(()=>{const dialog=document.getElementById('notification-dialog'),bell=document.getElementById('notification-bell');if(!dialog?.open&&bell&&!bell.classList.contains('hidden')&&!document.querySelector('dialog[open]'))bell.focus({preventScroll:true});}));
 document.getElementById('notification-dialog')?.addEventListener('keydown',event=>{
   if(event.key!=='Tab')return;
   const dialog=event.currentTarget,controls=[...dialog.querySelectorAll('button:not(:disabled),a[href],input:not(:disabled),select:not(:disabled),textarea:not(:disabled),[tabindex="0"]')].filter(n=>n.getClientRects().length&&!n.hidden),first=controls[0],last=controls.at(-1),active=document.activeElement;
