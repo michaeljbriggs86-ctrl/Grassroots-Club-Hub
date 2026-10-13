@@ -165,10 +165,10 @@ async function workspaceChecks(page,width,theme){
   const members=[{user_id:'review-coach',full_name:'Taylor Example',role:'coach'},{user_id:'review-assistant',full_name:'Sam Example',role:'assistant_coach'},{user_id:'review-existing-parent',full_name:'Chris Example',role:'parent'}];
   const links=[{parent_user_id:'review-parent',player_name:'Alex Example',team_id:'synthetic-team'}];
   window.__workspace={requests,members,links,saves:[],approvals:[],failRequests:false};
-  Object.assign(window.ClubHubCloud,{role:()=>currentRole,actingAsParent:()=>false,session:{user:{id:'synthetic-coach'}},context:{profile:{user_id:'synthetic-coach',full_name:'Taylor Example',club_id:'synthetic-club',role:'coach'}},currentTeam:()=>({id:'synthetic-team',name:'Example Greens',ageGroup:state.meta.ageGroup,age_group:ageGroupNumber()}),visibleTeamList:()=>[],
+  window.ClubHubCloud={...window.ClubHubCloud,role:()=>currentRole,actingAsParent:()=>false,session:{user:{id:'synthetic-coach'}},context:{profile:{user_id:'synthetic-coach',full_name:'Taylor Example',club_id:'synthetic-club',role:'coach'}},currentTeam:()=>({id:'synthetic-team',name:'Example Greens',ageGroup:state.meta.ageGroup,age_group:ageGroupNumber()}),visibleTeamList:()=>[],
    listTeamMembers:async()=>members,listParentPlayerLinks:async()=>links,listPlayerAccountLinks:async()=>[],listPendingParentRequests:async()=>{if(window.__workspace.failRequests)throw Error('Fixture failure');return requests;},listContactDirectory:async()=>({self:{user_id:'synthetic-coach'},contacts:[]}),
    listNotifications:async()=>[],listAnnouncements:async()=>[],listMatchAvailability:async()=>[],listPlayerAppearanceStats:async()=>[],recordAuditEvent:async()=>{},
-   queueStateSave:s=>window.__workspace.saves.push(JSON.parse(JSON.stringify(s))),approveParentRequest:async(id,player)=>{window.__workspace.approvals.push({id,player});links.push({parent_user_id:'review-parent',player_name:player,team_id:'synthetic-team'});members.push({user_id:'review-parent',full_name:'Morgan Example',role:'parent'});requests.splice(0);}});
+   queueStateSave:s=>window.__workspace.saves.push(JSON.parse(JSON.stringify(s))),approveParentRequest:async(id,player)=>{window.__workspace.approvals.push({id,player});links.push({parent_user_id:'review-parent',player_name:player,team_id:'synthetic-team'});members.push({user_id:'review-parent',full_name:'Morgan Example',role:'parent'});requests.splice(0);}};
   renderAll();navigate('squad',false);setSquadPage(0);
  });
  await page.evaluate(()=>document.fonts.ready);

@@ -23,6 +23,7 @@ on:
       - 'web/db-drafts/test/*contact*.sql'
       - 'web/db-drafts/test/run-member-contact-import.cjs'
       - 'verification/verify_v2_2_30_pitchkind_ui.py'
+      - 'verification/browser/**'
       - '.github/workflows/ui-review-fixes.yml'
   workflow_dispatch:
 permissions:
