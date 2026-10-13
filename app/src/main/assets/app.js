@@ -6487,7 +6487,7 @@ for(const id of ['match-entry-back','match-entry-cancel'])document.getElementByI
 
 window.ClubHubRegistrationConduct?.configure({cloud:()=>window.ClubHubCloud,contextKey:personProfileContextKey,role:()=>currentRole,season:()=>state.meta.season,teamLabel:()=>[state.meta.ageGroup,state.meta.teamName].filter(Boolean).join(' '),toast});
 
-document.getElementById('match-detail-dialog')?.addEventListener('close',resetMatchReportMode);
+document.getElementById('match-detail-dialog')?.addEventListener('close',event=>{if(!event.target.open)resetMatchReportMode();});
 document.getElementById('save-club-kit-profile')?.addEventListener('click',saveClubKitProfile);
 document.getElementById('add-award-btn').addEventListener('click',openAwardDialog);
 document.getElementById('award-form').addEventListener('submit',saveStandaloneAward);
