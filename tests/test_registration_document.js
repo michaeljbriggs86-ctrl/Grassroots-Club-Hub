@@ -20,6 +20,7 @@ const metadata=()=>new Response(JSON.stringify({ok:true,document:{available:true
  response=metadata();objectBytes=bytes;const pdf=await handler(request(),env);assert.equal(pdf.status,200);assert.equal(pdf.headers.get('Content-Type'),'application/pdf');assert.match(pdf.headers.get('Cache-Control'),/no-store/);assert.equal(crypto.createHash('sha256').update(new Uint8Array(await pdf.arrayBuffer())).digest('hex'),hash);
  assert.equal(calls.at(-1).init.headers.Authorization,'Bearer synthetic-authenticated-token');assert.deepEqual(JSON.parse(calls.at(-1).init.body),{p_team_id:'synthetic',p_player_name:'Invented',p_season:'2026/27'});
  const config=JSON.parse(fs.readFileSync('cloudflare/web-app/wrangler.jsonc','utf8'));assert(config.assets.run_worker_first.includes('/__registration_document'));assert(config.assets.run_worker_first.includes('/_private_documents/*'));
- assert(!fs.readdirSync('cloudflare/web-app/dist').some(x=>x.endsWith('.pdf')));
+ if(fs.existsSync('cloudflare/web-app/dist'))assert(!fs.readdirSync('cloudflare/web-app/dist').some(x=>x.endsWith('.pdf')));
+ assert(!fs.readFileSync('cloudflare/web-app/build.py','utf8').includes('.pdf'),'original PDF cannot enter public asset allowlist');
  console.log('PASS protected PDF: anonymous/revoked access, registry/R2 absence, content SHA, authenticated whole document and no-store');
 })().catch(e=>{console.error(e);process.exitCode=1;});
