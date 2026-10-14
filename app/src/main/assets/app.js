@@ -4643,7 +4643,11 @@ function buildAdminWeekendDigest(rows,feed,now=new Date()){
     if(f.source!=='Selkent'||!representative||blocked||conflicting||(!group&&f.ack?.status!=='confirmed')||fixtures.some(x=>!x.opponent||!['H','A'].includes(String(x.venue).toUpperCase()))){pending++;
       const related=[f,...all.filter(x=>x.team.id!==f.team.id&&x.date===f.date&&x.team.ageGroup===f.team.ageGroup&&selkentNorm(fullClubResultTeamName(x.team))===selkentNorm(f.opponent)&&selkentNorm(x.opponent)===selkentNorm(fullClubResultTeamName(f.team)))];
       for(const x of related){const teamLabel=`${x.team.ageGroup} ${x.team.teamName||fullClubResultTeamName(x.team)}`;
-        if(!pendingRows.some(p=>p.date===x.date&&p.teamLabel===teamLabel))pendingRows.push({date:x.date,teamLabel,opponents:(x===f?fixtures:[x]).map(v=>adminWeekendClean(v.opponent)),reason:blocked||conflicting?'Confirmation needs review':'Kick-off unconfirmed'});
+        const saved=states.get(x.team.id)?.selkent?.fixtureOverrides?.[fixtureKitSelectionKey(x)]||{};
+        // A provider-assigned time is still useful while the away club confirms.
+        // Never promote it to a confirmed event or expose a time flagged as stale.
+        const assigned=!group&&!blocked&&!conflicting&&!saved.confirmedAt&&adminWeekendTime(saved.time)&&/^Waiting for (?:away|other) club to confirm$/i.test(adminWeekendClean(saved.sourceFixtureStatus));
+        if(!pendingRows.some(p=>p.date===x.date&&p.teamLabel===teamLabel))pendingRows.push({date:x.date,teamLabel,opponents:(x===f?fixtures:[x]).map(v=>adminWeekendClean(v.opponent)),time:assigned?saved.time:'',ground:assigned?adminWeekendClean(saved.groundName):'',address:assigned?adminWeekendClean(saved.address):'',reason:blocked||conflicting?'Confirmation needs review':assigned?'Awaiting away club confirmation':'Kick-off unconfirmed'});
       }continue;}
     const override=representative.override,own=fullClubResultTeamName(f.team);
     const ground=adminWeekendClean(override.groundName),address=adminWeekendClean(override.address);
@@ -4668,7 +4672,7 @@ function adminWeekendEventLines(e){
 function adminWeekendDigestText(digest,clubName){
   const lines=[`*${adminWeekendClean(clubName)||'Club'} — weekend fixtures*`,`${shareDateText(digest.dates[0])} – ${shareDateText(digest.dates[1])}`,`${digest.events.length} confirmed fixture / group start${digest.events.length===1?'':'s'} · Times: UK local`,digest.pending?`${digest.pending} fixture / group${digest.pending===1?'':'s'} awaiting confirmed details — listed below.`:'',''];
   for(const date of digest.dates){const events=digest.events.filter(e=>e.date===date);if(!events.length)continue;lines.push(`*${shareDateText(date)}*`,'');for(const e of events)lines.push(...adminWeekendEventLines(e),'');}
-  if(digest.pendingRows?.length){lines.push('*KICK-OFFS TO CONFIRM*','');for(const p of digest.pendingRows)lines.push(`*${p.teamLabel}* · ${shareDateText(p.date)}`,`v ${p.opponents.join(' / ')}`,p.reason,'');}
+  if(digest.pendingRows?.length){lines.push('*AWAITING CONFIRMATION*','');for(const p of digest.pendingRows)lines.push(`*${p.teamLabel}${p.time?' · '+p.time:''}* · ${shareDateText(p.date)}`,`v ${p.opponents.join(' / ')}`,p.reason,...(p.ground?[`Ground: ${p.ground}`]:[]),...(p.address?[`Address: ${p.address}`]:[]),'');}
   lines.push('Please check the Shooters Hill app for any later changes.');return lines.filter((line,i)=>line||lines[i-1]).join('\n');
 }
 function adminWeekendGraphicLayout(digest,clubName,g,family){
@@ -4746,14 +4750,18 @@ function adminWeekendGraphicLayout(digest,clubName,g,family){
     }
   }
   if(digest.pendingRows?.length){
-    y+=16;text('KICK-OFFS TO CONFIRM',margin,y+40,36,700,mint);y+=66;rect(margin,y,width-margin*2,2,'#80947D');y+=42;
+    y+=16;text('AWAITING CONFIRMATION',margin,y+40,36,700,mint);y+=66;rect(margin,y,width-margin*2,2,'#80947D');y+=42;
     for(let i=0;i<digest.pendingRows.length;i+=2){let bottom=y;
       digest.pendingRows.slice(i,i+2).forEach((p,j)=>{const x=margin+j*(col+gap),top=y;let py=top;
-        py+=block(p.teamLabel,x,py,42,col,800,ink,52)+8;
+        const timeLabel=p.time||(p.reason==='Confirmation needs review'?'Time needs review':'Kick-off TBC');
+        py+=block(`${p.teamLabel} · ${timeLabel}`,x,py,42,col,800,ink,52)+8;
         py+=block(shareDateText(p.date),x,py,30,col,500,muted,40)+8;
         py+=block(`v ${p.opponents.join(' / ')}`,x,py,32,col,600,ink,42)+8;
-        py+=block(p.reason,x,py,32,col,600,'#F1D6A2',42);bottom=Math.max(bottom,py);
-        anchors.push({label:`${p.teamLabel} · unconfirmed`,date:p.date,top,teamLabel:p.teamLabel,pending:true});
+        py+=block(p.reason,x,py,32,col,600,'#F1D6A2',42);
+        if(p.ground)py+=8+block(p.ground,x,py+8,32,col,500,muted,42);
+        if(p.address)py+=8+block(p.address,x,py+8,30,col,400,muted,40);
+        bottom=Math.max(bottom,py);
+        anchors.push({label:`${p.teamLabel} · ${p.time||'unconfirmed'}`,date:p.date,top,teamLabel:p.teamLabel,pending:true});
       });y=bottom+42;
     }
   }
