@@ -115,7 +115,7 @@ async function geometry(page,selector){return page.locator(selector).evaluate(el
   }
   await seed('parent','dark',393);
   await page.evaluate(()=>{Object.assign(window.ClubHubCloud,{isStaffAccount:()=>true,actingAsParent:()=>true,realRole:()=> 'club_admin'});renderTeamIdentity();});
-  assert.equal(await page.locator('#hero-mode-pill').innerText(),'Parent view');assert.equal(await page.locator('#hero-profile-switch').isVisible(),false);assert.equal(await page.locator('#hero-team-switch').isVisible(),false);
+  assert.equal(await page.locator('#hero-mode-pill').innerText(),'Parent');assert.equal(await page.locator('#hero-profile-switch').isVisible(),false);assert.equal(await page.locator('#hero-team-switch').isVisible(),false);
   await seed('admin','dark',320,2,true);
   await page.evaluate(()=>{currentView='add';__matchFormDirty=true;});
   page.once('dialog',d=>d.dismiss());await page.locator('#hero-profile-switch').click();
