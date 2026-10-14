@@ -36,9 +36,9 @@ manually. Its Linux job reruns the tests and Wrangler dry run, creates the
 private R2 bucket if missing, then deploys the scheduled Worker. A main-branch parser repair invokes this same deployment workflow after its
 public scrape finishes. A provider failure must not prevent the parser repair
 from reaching the Worker. Routine scheduled scrapes retain the existing Worker cron.
-The deployment workflow also runs the same scheduled handler once against
-the private R2 binding and verifies the readback and same-capture parser parity.
-This on-demand check is recorded separately from a production Cron Event. Do not put token values in this repository.
+The deployment log records the Worker version and unchanged cron triggers.
+Fresh collection and parser parity remain separate checks in the existing
+private snapshot verification workflow. Do not put token values in this repository.
 
 ## Alternative: authenticated Cloudflare shell
 
