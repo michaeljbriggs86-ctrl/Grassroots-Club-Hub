@@ -6,7 +6,7 @@ from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
-from scrape import collect_cup_results, parse_published_cup_results, UnverifiedPublishedResultsMarkupError
+from scrape import build_payload, collect_cup_results, parse_published_cup_results, SelkentFeedError, UnverifiedPublishedResultsMarkupError
 
 
 class CupResultsTests(unittest.TestCase):
@@ -49,6 +49,42 @@ class CupResultsTests(unittest.TestCase):
 
     def outcome_source(self):
         return (ROOT / 'tests/fixtures/selkent_cupspage_8_outcome_2026_10_12.html').read_text()
+
+    def test_u12x_cups_are_deferred_without_skipping_neighbouring_ages(self):
+        tabs = '<ul id="cupTabs"><a data-agegroup-id="6">U12</a><a data-agegroup-id="22">U12X</a><a data-agegroup-id="8">U13</a></ul>'
+        ages = {6: {'age_group': 'U12', 'format_type': '9'},
+                22: {'age_group': 'U12X', 'format_type': '9'},
+                8: {'age_group': 'U13', 'format_type': '9'}}
+        with patch('scrape.fetch_text', side_effect=[tabs, '<ul id="cupTabs"><a data-agegroup-id="11">U17</a></ul>']), patch('scrape.fetch_json', return_value=self.source(6)) as fetch, patch('scrape._sleep_between_requests'):
+            results = collect_cup_results(ages)
+        self.assertEqual(set(results), {6, 8})
+        self.assertEqual([call.args[0] for call in fetch.call_args_list], ['cupspage/6', 'cupspage/8'])
+        with patch('scrape.fetch_text', return_value=tabs), patch('scrape.fetch_json', side_effect=SelkentFeedError('provider failure')):
+            with self.assertRaises(SelkentFeedError):
+                collect_cup_results(ages)
+
+    def test_deferred_cups_still_validate_provider_metadata(self):
+        tabs = '<ul id="cupTabs"><a data-agegroup-id="22">U12</a></ul>'
+        with patch('scrape.fetch_text', return_value=tabs), patch('scrape.fetch_json') as fetch:
+            with self.assertRaises(SelkentFeedError):
+                collect_cup_results({22: {'age_group': 'U12X', 'format_type': '9'}})
+            fetch.assert_not_called()
+
+    def test_payload_marks_deferred_cups_and_preserves_u12x_league_data(self):
+        fixture = {'age_group': 'U12X', 'fixtures': [{'home': 'Home', 'away': 'Away'}],
+                   'fixture_parse_status': 'verified_populated', 'fixture_week_ids': [1]}
+        league = {'age_group': 'U12X', 'format_type': '9', 'standings': [{'rows': []}],
+                  'published_results': [{'home': 'Home', 'away': 'Away', 'homeGoals': 1, 'awayGoals': 0}],
+                  'published_results_status': 'verified_scored_rows_v1'}
+        with patch('scrape.discover_fixture_agegroups', return_value=({22: 'U12X'}, 'public')), patch('scrape.discover_public_results_agegroups', return_value={22: {'age_group': 'U12X', 'format_type': '9'}}), patch('scrape.collect_fixtures', return_value={22: fixture}), patch('scrape.collect_standings', return_value={22: league}), patch('scrape.collect_cup_results', return_value={}):
+            payload = build_payload()
+        age = payload['age_groups'][0]
+        self.assertEqual(age['fixtures'], fixture['fixtures'])
+        self.assertEqual(age['standings'], league['standings'])
+        self.assertEqual(age['published_results'], league['published_results'])
+        self.assertEqual(age['cup_results_status'], 'deferred')
+        self.assertEqual(payload['coverage']['published_results']['deferred_cup_age_groups'],
+                         [{'agegroup_id': 22, 'age_group': 'U12X', 'reason': age['cup_results_deferred_reason']}])
 
     def test_live_win_loss_outcome_does_not_stop_numeric_results(self):
         html = self.outcome_source()
