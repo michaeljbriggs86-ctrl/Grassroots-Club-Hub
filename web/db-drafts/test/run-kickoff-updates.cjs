@@ -49,6 +49,7 @@ try{
  state.selkent.fixtureOverrides[key].confirmedAt=new Date().toISOString();await save();assert.equal(await count('kickoff_updates'),3,'timestamp alone is not a new version');
  await sql(`select public.configure_kickoff_delivery('${'A'.repeat(87)}',true,true)`);
  await assert.rejects(rpc(3,'register_kickoff_push',['https://attacker.example/push','A'.repeat(87),'A'.repeat(22)]),/Invalid push/);
+ await assert.rejects(rpc(3,'register_kickoff_push',['https://fcmXgoogleapisYcom/device','A'.repeat(87),'A'.repeat(22)]),/Invalid push/);
  await rpc(3,'register_kickoff_push',['https://fcm.googleapis.com/example-device','A'.repeat(87),'A'.repeat(22)]);
  await assert.rejects(rpc(1,'register_kickoff_push',['https://fcm.googleapis.com/example-device','A'.repeat(87),'A'.repeat(22)]),/another account/);
  assert.equal((await rpc(1,'get_kickoff_push_settings',['https://fcm.googleapis.com/example-device'])).subscribed,false,'device ownership hidden');

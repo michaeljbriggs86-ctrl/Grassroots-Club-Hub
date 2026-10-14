@@ -141,7 +141,7 @@ declare result uuid;
 begin
  if not exists(select 1 from public.profiles where user_id=auth.uid() and role in ('coach','assistant_coach','club_admin','parent')) then raise exception 'Approved adult access required' using errcode='42501'; end if;
  -- Prevent server-side requests to arbitrary hosts. Expand only for reviewed vendor endpoints.
- if length(p_endpoint)>2048 or p_endpoint!~'^https://(fcm.googleapis.com|updates.push.services.mozilla.com|web.push.apple.com|[a-z0-9-]+\.notify.windows.com)/[^[:space:]]+$' or p_endpoint~'[#@]' or p_p256dh!~'^[A-Za-z0-9_-]{87}$' or p_auth!~'^[A-Za-z0-9_-]{22}$' then raise exception 'Invalid push subscription' using errcode='22023'; end if;
+ if length(p_endpoint)>2048 or p_endpoint!~'^https://(fcm\.googleapis\.com|updates\.push\.services\.mozilla\.com|web\.push\.apple\.com|[a-z0-9-]+\.notify.windows.com)/[^[:space:]]+$' or p_endpoint~'[#@]' or p_p256dh!~'^[A-Za-z0-9_-]{87}$' or p_auth!~'^[A-Za-z0-9_-]{22}$' then raise exception 'Invalid push subscription' using errcode='22023'; end if;
  if not exists(select 1 from private.kickoff_delivery_config where push_enabled and length(vapid_public_key)=87) then raise exception 'Push is not configured' using errcode='55000'; end if;
  insert into private.kickoff_push_subscriptions(user_id,endpoint,p256dh,auth_secret) values(auth.uid(),p_endpoint,p_p256dh,p_auth)
  on conflict(endpoint) do update set p256dh=excluded.p256dh,auth_secret=excluded.auth_secret,renewed_at=now() where private.kickoff_push_subscriptions.user_id=auth.uid() returning id into result;
