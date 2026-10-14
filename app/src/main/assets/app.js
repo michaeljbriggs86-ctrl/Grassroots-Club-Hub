@@ -3848,7 +3848,7 @@ function teamKitIconHtml(teamName='',colours='TBC'){return pilotKitDefaults(team
 function shirtColoursOnly(text=''){
   const raw=String(text||'').replace(/\s+/g,' ').trim();if(!raw)return'TBC';
   const first=raw.split(/[;,]/)[0].trim();
-  const clean=first.replace(/(?:shirts?|jerseys?|tops?)/ig,'').replace(/\s{2,}/g,' ').replace(/[\s:-]+$/,'').trim();
+  const clean=first.replace(/\b(?:shirts?|jerseys?|tops?)\b/ig,'').replace(/\s{2,}/g,' ').replace(/[\s:-]+$/,'').trim();
   return clean||first||'TBC';
 }
 function ownTeamDisplayName(){return state.division?.teamName||[clubSettings().display_name,state.meta?.teamName].filter(Boolean).join(' ')||'Our team';}
@@ -3973,19 +3973,20 @@ function clubDetailContext(teamName=''){
   const ground=detail.groundName||'Ground TBC',address=detail.address||'Address TBC';
   return {teamName,clubName:detail.clubName||teamName,profile,ground,address,mapHref:mapsHref(ground,address),mapEmbedHref:mapsEmbedHref(ground,address),sourceUrl:detail.sourceUrl||''};
 }
-function renderClubDetails(teamName=''){
-  const ctx=clubDetailContext(teamName),dlg=document.getElementById('club-detail-dialog');if(!dlg)return;dlg.dataset.teamName=teamName;
+function renderClubDetails(teamName='',{preserveDraft=false}={}){
+  const ctx=clubDetailContext(teamName),dlg=document.getElementById('club-detail-dialog');if(!dlg)return;const sameTeam=dlg.dataset.teamName===teamName;dlg.dataset.teamName=teamName;
   const title=document.getElementById('club-detail-title'),club=document.getElementById('club-detail-club-name'),kits=document.getElementById('club-detail-kits'),ground=document.getElementById('club-detail-ground'),address=document.getElementById('club-detail-address'),map=document.getElementById('club-detail-map'),admin=document.getElementById('club-kit-admin');
-  if(title)title.innerHTML=clubListingHtml(teamName||'Club details');if(club){club.textContent=matchTeamLabel(ctx.clubName||teamName);club.classList.toggle('hidden',selkentNorm(ctx.clubName||teamName)===selkentNorm(teamName));}
-  if(kits)kits.innerHTML=`<article><span>Home shirt</span>${teamKitIconHtml(ctx.teamName,ctx.profile.home)}<strong>${esc(ctx.profile.home||'TBC')}</strong></article><article><span>Away shirt</span>${teamKitIconHtml(ctx.teamName,ctx.profile.away)}<strong>${esc(knownKit(ctx.profile.away)?ctx.profile.away:'Not recorded')}</strong></article>`;
+  if(title)title.textContent=matchTeamLabel(teamName||'Club details');const badge=document.getElementById('club-detail-badge');if(badge)setStableHtml(badge,clubIdentityBadgeHtml(teamName));
+  if(club){club.textContent=matchTeamLabel(ctx.clubName||teamName);const clubKey=selkentNorm(ctx.clubName||teamName),teamKey=selkentNorm(teamName);club.classList.toggle('hidden',teamKey===clubKey||teamKey.startsWith(`${clubKey} `));}
+  if(kits)kits.innerHTML=[['Home shirt',ctx.profile.home],['Away shirt',ctx.profile.away]].map(([label,colours])=>{const known=knownKit(colours);return `<article class="${known?'':'club-kit-unrecorded'}"><span class="club-kit-visual" aria-hidden="true">${known?teamKitIconHtml(ctx.teamName,colours):'<span class="club-kit-unknown">—</span>'}</span><div class="club-kit-copy"><span>${label}</span><strong>${esc(known?colours:'Not recorded')}</strong></div></article>`;}).join('');
   if(ground)ground.textContent=ctx.ground;if(address)address.textContent=ctx.address;
   if(map){map.classList.toggle('hidden',!ctx.mapHref);if(ctx.mapHref)map.href=ctx.mapHref;else map.removeAttribute('href');}
   setMapPreview('club-detail-map-preview','club-detail-map-frame',ctx.mapEmbedHref);
-  if(admin){admin.classList.toggle('hidden',!(isAdmin()||isCoach()));const home=document.getElementById('club-kit-home-override'),away=document.getElementById('club-kit-away');if(home)home.value=shirtColoursOnly(ctx.profile.homeOverride||ctx.profile.home);if(away)away.value=knownKit(ctx.profile.away)?shirtColoursOnly(ctx.profile.away):'';}
+  if(admin){admin.classList.toggle('hidden',!(isAdmin()||isCoach()));const home=ctx.profile.homeOverride||ctx.profile.home;for(const [id,value] of [['club-kit-home-override',knownKit(home)?shirtColoursOnly(home):''],['club-kit-away',knownKit(ctx.profile.away)?shirtColoursOnly(ctx.profile.away):'']]){const input=document.getElementById(id);if(!input)continue;const changed=preserveDraft&&sameTeam&&input.value!==input.dataset.kitBaseline;if(!changed)input.value=value;input.dataset.kitBaseline=value;}}
 }
 async function openClubDetails(teamName=''){
-  const name=String(teamName||'').trim();if(!name)return;renderClubDetails(name);document.getElementById('club-detail-dialog')?.showModal();
-  try{await fetchClubDirectoryDetails(name);persistLocalState();if(document.getElementById('club-detail-dialog')?.open&&document.getElementById('club-detail-dialog')?.dataset.teamName===name)renderClubDetails(name);}catch(_){}
+  const name=String(teamName||'').trim();if(!name)return;const dlg=document.getElementById('club-detail-dialog');document.getElementById('club-kit-admin')?.removeAttribute('open');renderClubDetails(name);const body=dlg?.querySelector('.club-detail-body');if(body)body.scrollTop=0;dlg?.showModal();
+  try{await fetchClubDirectoryDetails(name);persistLocalState();if(dlg?.open&&dlg.dataset.teamName===name)renderClubDetails(name,{preserveDraft:true});}catch(_){}
 }
 function saveClubKitProfile(){
   if(!(isAdmin()||isCoach()))return toast('Club staff access is required');

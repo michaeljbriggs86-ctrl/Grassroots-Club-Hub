@@ -1040,19 +1040,24 @@
     <button type="button" class="secondary-button" id="registration-conduct-close">← Player profile</button>
     <div id="registration-conduct-body"></div><p class="helper" id="registration-conduct-status" role="status" aria-live="polite" aria-atomic="true"></p>
   </dialog>
-  <dialog id="club-detail-dialog" class="modal club-detail-modal">
+  <dialog id="club-detail-dialog" class="modal club-detail-modal" aria-labelledby="club-detail-title">
     <div class="club-detail-shell">
-      <div class="modal-heading"><div><p class="kicker">Club details</p><h3 id="club-detail-title">Club</h3></div><button type="button" class="icon-button small" data-close-dialog aria-label="Close">×</button></div>
+      <div class="modal-heading"><span id="club-detail-badge" aria-hidden="true"></span><div><p class="kicker">Club details</p><h3 id="club-detail-title" tabindex="0">Club</h3></div><button type="button" class="icon-button small" data-close-dialog aria-label="Close" autofocus>×</button></div>
+      <div class="club-detail-body">
       <p class="club-detail-club-name" id="club-detail-club-name"></p>
       <div class="club-kit-grid" id="club-detail-kits"></div>
-      <div class="match-venue-card club-detail-venue"><div><span>Home ground</span><strong id="club-detail-ground">Ground TBC</strong><small id="club-detail-address">Address TBC</small></div><a class="map-link hidden" id="club-detail-map" href="#">Open in Maps</a></div>
-      <div class="fixture-map-preview hidden" id="club-detail-map-preview"><iframe id="club-detail-map-frame" title="Club home ground map" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe></div>
+      <div class="match-venue-card club-detail-venue">
+        <div class="club-detail-ground-copy"><span>Home ground</span><strong id="club-detail-ground">Ground TBC</strong><small id="club-detail-address">Address TBC</small></div>
+        <div class="fixture-map-preview hidden" id="club-detail-map-preview"><iframe id="club-detail-map-frame" title="Club home ground map" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe></div>
+        <a class="map-link hidden" id="club-detail-map">Open in Maps</a>
+      </div>
       <details class="club-kit-admin club-shirt-editor hidden" id="club-kit-admin">
         <summary>Edit shirt colours</summary>
-        <p class="helper">Club Admin and Coaches · shirt colours only</p>
+        <p class="helper">Use the shirt colours confirmed for this team. Leave an unknown kit blank.</p>
         <div class="form-grid two"><label>Home shirt colours<input id="club-kit-home-override" maxlength="60" placeholder="e.g. Green and white" /></label><label>Away shirt colours<input id="club-kit-away" maxlength="60" placeholder="e.g. Navy blue" /></label></div>
         <button type="button" class="primary-button" id="save-club-kit-profile">Save shirt colours</button>
       </details>
+      </div>
       <div class="modal-actions"><button type="button" class="primary-button" data-close-dialog>Done</button></div>
     </div>
   </dialog>
