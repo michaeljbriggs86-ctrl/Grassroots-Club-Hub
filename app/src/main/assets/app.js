@@ -2073,6 +2073,74 @@ async function shareCardBadge(g,x,y,name,colours){
   g.save();g.translate(x,y);g.scale(.72,.72);
   try{await drawShareClubIdentity(g,0,0,name,colours);}finally{g.restore();}
 }
+// Figma 239:6031: full names wrap at a readable size and determine export height.
+function matchdayImageText(g,text,width,size,weight=400){
+  const font=`${weight} ${size}px ${shareCardFontFamily()}`,lines=[];
+  g.font=font;
+  for(const paragraph of String(text||'').split('\n')){
+    let line='';
+    for(const word of paragraph.trim().split(/\s+/).filter(Boolean)){
+      const next=line?`${line} ${word}`:word;
+      if(line&&g.measureText(next).width>width){lines.push(line);line=word;}else line=next;
+      while(g.measureText(line).width>width&&line.length>1){
+        let cut=line.length-1;while(cut>1&&g.measureText(line.slice(0,cut)).width>width)cut--;
+        lines.push(line.slice(0,cut));line=line.slice(cut);
+      }
+    }
+    if(line)lines.push(line);
+  }
+  const lineHeight=Math.round(size*1.3);
+  return {font,lines,lineHeight,height:lines.length*lineHeight};
+}
+function drawMatchdayImageText(g,block,x,y,colour,align='left'){
+  g.save();g.font=block.font;g.fillStyle=colour;g.textAlign=align;g.textBaseline='top';
+  block.lines.forEach((line,i)=>g.fillText(line,x,y+i*block.lineHeight));g.restore();
+}
+async function renderMatchdayShareCanvas(canvas,f,fixture,group,d,ctx,arrival,theme){
+  canvas.width=1080;const g=canvas.getContext('2d'),dark=theme!=='light';
+  const palette={bg:dark?'#111715':'#F3F6F4',ink:dark?'#FFFFFF':'#111715',muted:dark?'rgba(255,255,255,.67)':'#66756D',accent:dark?'#E8F7ED':'#0D6A3A',pale:'#E8F7ED',forest:'#064526'};
+  const title=matchdayImageText(g,'Matchday details',720,72,700),date=matchdayImageText(g,shareDateText(f.date),720,48,600),competition=matchdayImageText(g,fixtureCompetitionLabel(fixture),720,42);
+  const headerHeight=Math.max(192,title.height+12+date.height+12+competition.height),rows=group?group.fixtures:[fixture];
+  const games=rows.map((row,i)=>{const names=homeFixtureTeamNames(row);return {row,names,context:fixtureOverviewContext(row),label:group?matchdayImageText(g,`Group game ${i+1}`,960,42,600):null,home:matchdayImageText(g,names.home,432,54,700),away:matchdayImageText(g,names.away,432,54,700)};});
+  const side=matchdayImageText(g,'Home',432,36,600),awaySide=matchdayImageText(g,'Away',432,36,600),versus=matchdayImageText(g,'v',96,54,600);
+  games.forEach(game=>game.height=(game.label?game.label.height+24:0)+144+24+side.height+24+Math.max(game.home.height,game.away.height));
+  const arrivalLabel=matchdayImageText(g,'Arrival',432,42,600),startLabel=matchdayImageText(g,group?'Group start':'Kick-off',432,42,600),arrivalText=matchdayImageText(g,arrival,432,108,700),startText=matchdayImageText(g,d.time,432,108,700),clockHeight=96+arrivalLabel.height+12+arrivalText.height;
+  const venueLabel=matchdayImageText(g,'Venue',960,42,600),ground=matchdayImageText(g,d.groundName,960,54,700),address=matchdayImageText(g,d.address,960,42),choice=fixtureKitChoice(fixture),kit=matchdayImageText(g,choice==='away'?'Wear away kit':'Wear home kit',960,48,600),note=group?matchdayImageText(g,'Games are back-to-back. Order may change.',960,42):null;
+  const venueHeight=venueLabel.height+12+ground.height+12+address.height;
+  canvas.height=120+headerHeight+48+games.reduce((sum,game)=>sum+game.height+48,0)+clockHeight+48+venueHeight+48+kit.height+(note?48+note.height:0);
+  g.fillStyle=palette.bg;g.fillRect(0,0,canvas.width,canvas.height);
+  const backdrop=g.createLinearGradient(0,0,0,720);
+  backdrop.addColorStop(0,dark?'rgba(6,69,38,.65)':'#E8F7ED');backdrop.addColorStop(1,dark?'rgba(6,69,38,0)':'rgba(232,247,237,0)');
+  g.fillStyle=backdrop;g.fillRect(0,0,canvas.width,canvas.height);
+  const badgeSrc=typeof verifiedTeamBadgeUrl==='function'?verifiedTeamBadgeUrl(ctx.ownTeam):'',watermark=badgeSrc?await loadShareBadgeImage(badgeSrc):null;
+  if(watermark){
+    const scale=2160/Math.max(watermark.naturalWidth,watermark.naturalHeight),w=watermark.naturalWidth*scale,h=watermark.naturalHeight*scale;
+    g.save();g.globalAlpha=dark?.045:.035;g.translate(864,canvas.height*.60);
+    if(badgeSrc==='shooters-hill-logo.png'){g.beginPath();g.arc(0,0,Math.min(w,h)/2,0,Math.PI*2);g.clip();}
+    g.rotate(reviewedBadgeRotation(badgeSrc)*Math.PI/180);g.drawImage(watermark,-w/2,-h/2,w,h);g.restore();
+  }
+  const heroHeight=60+headerHeight+24,hero=g.createLinearGradient(0,0,1080,heroHeight);hero.addColorStop(0,'#0B5D35');hero.addColorStop(1,palette.forest);g.fillStyle=hero;g.fillRect(0,0,1080,heroHeight);
+  let y=60;drawMatchdayImageText(g,title,60,y,'#FFFFFF');y+=title.height+12;drawMatchdayImageText(g,date,60,y,'#FFFFFF');y+=date.height+12;drawMatchdayImageText(g,competition,60,y,'rgba(255,255,255,.8)');
+  g.save();g.translate(924,156);g.scale(192/188,192/188);try{await drawShareClubIdentity(g,0,0,ctx.ownTeam,ctx.ownProfile?.home);}finally{g.restore();}
+  y=60+headerHeight+48;
+  const clock=()=>{
+    const surface=g.createLinearGradient(60,y,1020,y+clockHeight);surface.addColorStop(0,'#FFFFFF');surface.addColorStop(1,palette.pale);
+    g.save();g.shadowColor=dark?'rgba(6,69,38,.30)':'rgba(6,69,38,.14)';g.shadowBlur=60;g.shadowOffsetY=24;
+    g.beginPath();g.roundRect(60,y,960,clockHeight,60);g.fillStyle=surface;g.fill();g.restore();
+    drawMatchdayImageText(g,arrivalLabel,324,y+48,palette.forest,'center');drawMatchdayImageText(g,startLabel,756,y+48,palette.forest,'center');drawMatchdayImageText(g,arrivalText,324,y+48+arrivalLabel.height+12,palette.forest,'center');drawMatchdayImageText(g,startText,756,y+48+startLabel.height+12,palette.forest,'center');y+=clockHeight+48;
+  };
+  if(group)clock();
+  for(const game of games){
+    const top=y;if(game.label){drawMatchdayImageText(g,game.label,60,y,palette.accent);y+=game.label.height+24;}
+    for(const [x,name,colours] of [[276,game.names.home,game.context.homeKit],[804,game.names.away,game.context.awayKit]]){g.save();g.translate(x,y+72);g.scale(144/188,144/188);try{await drawShareClubIdentity(g,0,0,name,colours);}finally{g.restore();}}
+    drawMatchdayImageText(g,versus,540,y+168,palette.accent,'center');y+=168;drawMatchdayImageText(g,side,276,y,palette.muted,'center');drawMatchdayImageText(g,awaySide,804,y,palette.muted,'center');y+=side.height+24;
+    drawMatchdayImageText(g,game.home,276,y,palette.ink,'center');drawMatchdayImageText(g,game.away,804,y,palette.ink,'center');y=top+game.height+48;
+  }
+  if(!group)clock();
+  drawMatchdayImageText(g,venueLabel,60,y,palette.accent);y+=venueLabel.height+12;drawMatchdayImageText(g,ground,60,y,palette.ink);y+=ground.height+12;drawMatchdayImageText(g,address,60,y,palette.muted);y+=address.height+48;drawMatchdayImageText(g,kit,60,y,palette.ink);y+=kit.height;
+  if(note){y+=48;drawMatchdayImageText(g,note,60,y,palette.muted);y+=note.height;}
+  return {width:canvas.width,height:canvas.height,contentBottom:y,games:games.length,theme:dark?'dark':'light'};
+}
 let pendingMatchdayWebShare=null,matchdayWebShareBusy=false,matchdaySharePreparing=false;
 async function openMatchdayWebShare(data){
   if(matchdayWebShareBusy)return toast('Share options are already open');
@@ -2091,47 +2159,15 @@ async function shareNextMatchImage(){
   if(!canConfirmFixtureDetails()){pendingMatchdayWebShare=null;return toast('Coach access is required');}
   const f=nextPublishedFixture();if(!f){pendingMatchdayWebShare=null;return toast('No fixture available');}const {fixture,group,confirmed,details:d}=matchdayShareFixture(f);if(!confirmed||!matchdayArrivalTime(d.time)||!d.groundName||!d.address){pendingMatchdayWebShare=null;toast(group?'Confirm group start time, venue and kit before sharing matchday info':'Confirm kick-off, venue and kit before sharing matchday info');document.getElementById('next-match-confirm-time')?.focus();return;}
   const ctx=fixtureOverviewContext(d),names=homeFixtureTeamNames(fixture),arrival=matchdayArrivalTime(d.time),caption=matchdayShareCaption(fixture,d,names,ctx);
-  const shareKey=JSON.stringify([caption,(group?group.fixtures:[fixture]).map(row=>{const n=homeFixtureTeamNames(row);return typeof verifiedTeamBadgeUrl==='function'?[verifiedTeamBadgeUrl(n.home),verifiedTeamBadgeUrl(n.away)]:[];})]);
+  const theme=document.documentElement?.dataset?.theme||'dark';
+  const shareKey=JSON.stringify([theme,caption,(group?group.fixtures:[fixture]).map(row=>{const n=homeFixtureTeamNames(row);return typeof verifiedTeamBadgeUrl==='function'?[verifiedTeamBadgeUrl(n.home),verifiedTeamBadgeUrl(n.away)]:[];})]);
   if(matchdayWebShareBusy)return toast('Share options are already open');
   if(matchdaySharePreparing)return toast('Preparing match image');
   if(!window.ClubHubNative&&pendingMatchdayWebShare?.key===shareKey&&Date.now()-pendingMatchdayWebShare.created<60000)return await openMatchdayWebShare(pendingMatchdayWebShare.data);
   pendingMatchdayWebShare=null;matchdaySharePreparing=true;ownsPreparation=true;
-  const canvas=document.createElement('canvas');canvas.width=1080;canvas.height=group?1500:1080;const g=canvas.getContext('2d'),family=shareCardFontFamily();
+  const canvas=document.createElement('canvas');
   if(document.fonts?.ready)await document.fonts.ready;
-  const venueTop=group?1038:706,venueBottom=shareCardTextBlock(g,d.groundName,84,venueTop+76,912,40,2,40,30,600,'left',null,true);
-  const addressBottom=shareCardTextBlock(g,d.address,84,venueBottom+34,912,33,group?3:2,29,23,400,'left',null,true),venueHeight=Math.ceil(addressBottom-venueTop+26),kitTop=venueTop+venueHeight+20;
-  canvas.height=kitTop+(group?146:126)+40;
-  // A family-facing information card: when to arrive, who plays, where and what to wear.
-  g.fillStyle='#0D1913';g.fillRect(0,0,1080,canvas.height);
-  g.fillStyle='#075B35';g.fillRect(0,0,1080,246);g.fillStyle='#C8F59B';g.fillRect(0,0,12,246);
-  await shareCardBadge(g,940,110,ctx.ownTeam,ctx.ownProfile?.home);
-  g.textAlign='left';g.fillStyle='#FFFFFF';shareCardTextBlock(g,'MATCHDAY DETAILS',56,90,784,64,1,64,50,700);
-  shareCardTextBlock(g,shareDateText(f.date),56,150,784,44,1,40,30,600);
-  g.fillStyle='#D7EEDF';shareCardTextBlock(g,fixtureCompetitionLabel(fixture),56,198,784,36,2,32,26,500);
-  shareCardPanel(g,56,274,474,166,'#C8F59B');shareCardPanel(g,550,274,474,166,'#F2F6EF');
-  g.textAlign='center';g.fillStyle='#153C28';g.font=`600 27px ${family}`;g.fillText('ARRIVAL',293,318);g.fillText(group?'GROUP START':'KICK-OFF',787,318);
-  g.font=`700 92px ${family}`;g.fillText(arrival,293,414);g.fillText(d.time,787,414);g.textAlign='left';
-  const rows=group?group.fixtures:[fixture],rowHeight=group?244:220,rowStart=group?492:472;
-  for(let i=0;i<rows.length;i++){
-    const row=rows[i],n=homeFixtureTeamNames(row),rowCtx=fixtureOverviewContext(row),top=rowStart+i*(rowHeight+22);
-    shareCardPanel(g,56,top,968,rowHeight,'#182B20','#344F3D');
-    g.fillStyle='#C8F59B';g.font=`600 25px ${family}`;g.fillText(group?`GROUP GAME ${i+1}`:'THE MATCH',84,top+38);
-    g.fillStyle='#B8CEBD';g.font=`600 21px ${family}`;g.fillText('HOME',222,top+70);g.textAlign='right';g.fillText('AWAY',858,top+70);g.textAlign='left';
-    const centerY=top+(group?158:142);
-    await shareCardBadge(g,140,centerY,n.home,rowCtx.homeKit);
-    await shareCardBadge(g,940,centerY,n.away,rowCtx.awayKit);
-    g.fillStyle='#FFFFFF';shareCardTextBlock(g,n.home,222,0,280,40,group?4:3,38,30,700,'left',centerY);
-    shareCardTextBlock(g,n.away,858,0,280,40,group?4:3,38,30,700,'right',centerY);
-    g.fillStyle='#C8F59B';shareCardTextBlock(g,'v',540,0,36,40,1,34,34,600,'center',centerY);
-  }
-  shareCardPanel(g,56,venueTop,968,venueHeight,'#F2F6EF');
-  g.fillStyle='#396148';g.font=`600 25px ${family}`;g.fillText('VENUE',84,venueTop+36);
-  g.fillStyle='#153C28';shareCardTextBlock(g,d.groundName,84,venueTop+76,912,40,2,40,30,600);
-  g.fillStyle='#396148';shareCardTextBlock(g,d.address,84,venueBottom+34,912,33,group?3:2,29,23,400);
-  shareCardPanel(g,56,kitTop,968,group?146:126,'#182B20','#344F3D');
-  const choice=fixtureKitChoice(fixture),kit=ctx.ownProfile?.[choice]||ctx.ownProfile?.home||'TBC';
-  drawShareJersey(g,118,kitTop+(group?75:64),kit,.48);
-  g.fillStyle='#FFFFFF';shareCardTextBlock(g,choice==='away'?'Away kit':'Home kit',194,0,802,42,1,40,40,600,'left',kitTop+(group?75:64));
+  await renderMatchdayShareCanvas(canvas,f,fixture,group,d,ctx,arrival,theme);
   const dataUrl=canvas.toDataURL('image/png');
   try{
     if(window.ClubHubNative?.shareMatchCard){
