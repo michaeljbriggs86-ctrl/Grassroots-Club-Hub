@@ -713,15 +713,10 @@ html[data-theme="dark"] .club-page-watermark{opacity:.07}
 #view-home .next-match-summary-card{position:relative;padding:16px 16px 14px;border:1px solid var(--gch-line);border-top:4px solid var(--gch-green-600);border-radius:var(--gch-radius-card);box-shadow:var(--gch-shadow-card)}
 #view-home .next-match-summary-card:not(:disabled)::after{content:"Details \203A";justify-self:center;font-size:12px;font-weight:800;letter-spacing:.02em;color:var(--gch-green-700)}
 #view-home .next-match-summary-date{display:inline-block;justify-self:center;padding:6px 12px;border-radius:999px;background:var(--gch-soft-green);color:var(--gch-green-900);font-size:15px;line-height:1.3}
-#view-home .home-next-match:has(+#matchday-dashboard:not(.hidden)){margin-bottom:0!important}
-#view-home .home-next-match+#matchday-dashboard{margin-top:0;border-top-left-radius:0;border-top-right-radius:0;border-top:1px dashed var(--gch-line);padding-top:18px}
-#view-home .home-next-match:has(+#matchday-dashboard:not(.hidden)) .next-match-summary-card{margin-bottom:0;border-bottom-left-radius:0!important;border-bottom-right-radius:0!important;box-shadow:none}
-#view-home:has(#next-match-card:not(.hidden):not(.no-fixture)) #matchday-dashboard .matchday-dashboard-fixtures{display:none}
-#view-home #matchday-dashboard{margin-bottom:18px}
-#view-home #matchday-dashboard .matchday-dashboard-heading{margin-bottom:12px}
-#view-home #matchday-dashboard .matchday-dashboard-grid>article{border-radius:var(--gch-radius-field)}
-#view-home #matchday-dashboard .matchday-dashboard-actions{margin-top:12px}
-#view-home .home-next-match:not(:has(+#matchday-dashboard:not(.hidden))){margin-bottom:18px}
+#view-matches #matchday-dashboard{margin-bottom:18px}
+#view-matches #matchday-dashboard .matchday-dashboard-heading{margin-bottom:12px}
+#view-matches #matchday-dashboard .matchday-dashboard-grid>article{border-radius:var(--gch-radius-field)}
+#view-matches #matchday-dashboard .matchday-dashboard-actions{margin-top:12px}
 #view-home .club-notices-panel,#view-home .parent-home-family{margin-bottom:18px}
 #view-home .home-season-group-label{margin:22px 0 8px 2px}
 body.role-parent #view-home .home-season-group-label{display:none}
@@ -744,8 +739,8 @@ html[data-theme="dark"] body.role-parent #view-home .parent-home-match-info{bord
 html[data-theme="dark"] #view-home .next-match-summary-date{background:#17311f;color:#8ee09a}
 html[data-theme="dark"] #view-home .next-match-summary-card:not(:disabled)::after{color:#8ee09a}
 @media(max-width:480px){
-  #view-home #matchday-dashboard .matchday-dashboard-grid>article:nth-child(2),
-  #view-home #matchday-dashboard .matchday-dashboard-grid>article:nth-child(3){grid-column:1/-1}
+  #view-matches #matchday-dashboard .matchday-dashboard-grid>article:nth-child(2),
+  #view-matches #matchday-dashboard .matchday-dashboard-grid>article:nth-child(3){grid-column:1/-1}
   #view-home .next-match-summary-card{padding:14px 12px 12px}
 }
 /* Parent cup-group matchday: the panel lists every group game, so the one-game summary card above it is redundant. */
@@ -933,24 +928,24 @@ html[data-theme="dark"] #view-inbox .inbox-message.mine .inbox-bubble{background
 }
 
 /* Frontend polish: one preparation surface, with values and supporting details. */
-#view-home #matchday-dashboard .matchday-dashboard-grid{gap:0 16px}
-#view-home #matchday-dashboard .matchday-dashboard-grid>article{
+#view-matches #matchday-dashboard .matchday-dashboard-grid{gap:0 16px}
+#view-matches #matchday-dashboard .matchday-dashboard-grid>article{
   padding:12px 0;background:transparent;border:0;border-bottom:1px solid var(--gch-line);border-radius:0;
 }
-#view-home #matchday-dashboard .matchday-dashboard-grid>article>span{
+#view-matches #matchday-dashboard .matchday-dashboard-grid>article>span{
   font-size:12px;font-weight:600;text-transform:none;letter-spacing:normal;
 }
-#view-home #matchday-dashboard .matchday-dashboard-grid>article>strong{font-size:15px}
-#view-home #matchday-dashboard .matchday-dashboard-grid>article>small{font-size:13px;font-weight:400}
-#view-home #matchday-dashboard .matchday-dashboard-heading{flex-wrap:wrap;gap:8px}
-#view-home #matchday-dashboard .matchday-dashboard-status{font-size:12px;line-height:1.4;font-weight:600;white-space:normal}
-#view-home #matchday-dashboard .matchday-dashboard-alert{font-size:14px;font-weight:600}
-#view-home #matchday-dashboard .canonical-match-fixture-label{font-size:12px}
-#view-home #matchday-dashboard .matchday-dashboard-actions{align-items:stretch}
-#view-home #matchday-dashboard #matchday-open-tactics{flex-basis:100%;min-height:48px}
-#view-home #matchday-dashboard .matchday-dashboard-actions>.secondary-button{min-height:44px;font-size:14px;flex:1 1 140px}
+#view-matches #matchday-dashboard .matchday-dashboard-grid>article>strong{font-size:15px}
+#view-matches #matchday-dashboard .matchday-dashboard-grid>article>small{font-size:13px;font-weight:400}
+#view-matches #matchday-dashboard .matchday-dashboard-heading{flex-wrap:wrap;gap:8px}
+#view-matches #matchday-dashboard .matchday-dashboard-status{font-size:12px;line-height:1.4;font-weight:600;white-space:normal}
+#view-matches #matchday-dashboard .matchday-dashboard-alert{font-size:14px;font-weight:600}
+#view-matches #matchday-dashboard .canonical-match-fixture-label{font-size:12px}
+#view-matches #matchday-dashboard .matchday-dashboard-actions{align-items:stretch}
+#view-matches #matchday-dashboard #matchday-open-tactics{flex-basis:100%;min-height:48px}
+#view-matches #matchday-dashboard .matchday-dashboard-actions>.secondary-button{min-height:44px;font-size:14px;flex:1 1 140px}
 .competition-games-table .cup-round{font-size:12px;line-height:1.4}
-html[data-theme="dark"] #view-home #matchday-dashboard .matchday-dashboard-grid>article{
+html[data-theme="dark"] #view-matches #matchday-dashboard .matchday-dashboard-grid>article{
   background:transparent!important;border-color:#344239!important;
 }
 
@@ -1480,7 +1475,7 @@ html[data-theme="dark"] .top-nav-tabs .top-nav-tab.nav-item.active{background:tr
 .view .panel-heading>div{flex-basis:140px}
 .view .panel p.muted,.view .panel .helper{margin-block:8px;font-size:0.8125rem;font-weight:400;line-height:1.45}
 .view :is(.screen-lead-card,.next-match-summary-card,.squad-banner,.league-table-panel,.inbox-card),
-#matches-next-fixture,#view-home #matchday-dashboard,#view-club .club-matches-browser,
+#matches-next-fixture,#view-matches #matchday-dashboard,#view-club .club-matches-browser,
 #view-club .admin-coach-centre,#view-inbox .inbox-card{
   border-top-width:1px!important;
   border-top-color:var(--gch-control-line)!important;
@@ -1488,7 +1483,7 @@ html[data-theme="dark"] .top-nav-tabs .top-nav-tab.nav-item.active{background:tr
 }
 html[data-theme="dark"] body .view :is(.screen-lead-card,.next-match-summary-card,.squad-banner,.league-table-panel,.inbox-card),
 html[data-theme="dark"] #matches-next-fixture,
-html[data-theme="dark"] #view-home #matchday-dashboard,
+html[data-theme="dark"] #view-matches #matchday-dashboard,
 html[data-theme="dark"] #view-club .club-matches-browser,
 html[data-theme="dark"] #view-club .admin-coach-centre,
 html[data-theme="dark"] #view-inbox .inbox-card{border-top-color:var(--gch-control-line)!important}
@@ -1535,10 +1530,10 @@ html[data-theme="dark"] #view-inbox .communications-tabs button.active{backgroun
 #view-club .admin-home-coverage-list{gap:0;margin-top:8px}
 #view-club .admin-home-assign,#view-club .admin-home-team{border:0;border-bottom:1px solid var(--gch-control-line);border-radius:0;background:transparent;padding:10px 0;margin-top:0}
 #view-club .admin-home-directory-body{padding:0 16px 16px}
-#view-home #matchday-dashboard .matchday-dashboard-grid>article{padding:10px 0;border:0!important;border-bottom:1px solid var(--gch-control-line)!important;border-radius:0;background:transparent!important}
-#view-home #matchday-dashboard .matchday-dashboard-grid{gap:8px 16px}
-#view-home #matchday-dashboard .matchday-dashboard-grid>article>span{font-size:0.75rem;font-weight:500;text-transform:none;letter-spacing:0}
-#view-home #matchday-dashboard .matchday-dashboard-grid>article>strong{font-size:0.875rem;font-weight:600}
+#view-matches #matchday-dashboard .matchday-dashboard-grid>article{padding:10px 0;border:0!important;border-bottom:1px solid var(--gch-control-line)!important;border-radius:0;background:transparent!important}
+#view-matches #matchday-dashboard .matchday-dashboard-grid{gap:8px 16px}
+#view-matches #matchday-dashboard .matchday-dashboard-grid>article>span{font-size:0.75rem;font-weight:500;text-transform:none;letter-spacing:0}
+#view-matches #matchday-dashboard .matchday-dashboard-grid>article>strong{font-size:0.875rem;font-weight:600}
 .content .matchday-dashboard-actions{gap:8px}
 .bottom-nav{box-shadow:none}
 .bottom-nav .nav-item{font-weight:500}
@@ -1636,7 +1631,7 @@ html body .content .primary-button{
   background:linear-gradient(145deg,var(--gch-green-800),var(--gch-green-950))!important;
   box-shadow:var(--gch-shadow-action)!important;
 }
-html body .content .view :is(#view-home #next-match-card,#view-matches #matches-next-fixture,#view-home #matchday-dashboard,#view-club .admin-home-weekend){
+html body .content .view :is(#view-home #next-match-card,#view-matches #matches-next-fixture,#view-matches #matchday-dashboard,#view-club .admin-home-weekend){
   --ink:var(--gch-white);--muted:rgba(255,255,255,.75);
   background:var(--gch-depth-feature)!important;
   color:var(--gch-white)!important;
@@ -1647,23 +1642,23 @@ html body .content .view :is(#view-home #next-match-card,#view-matches #matches-
 html body #view-club .admin-home-weekend :is(h3,strong,.kicker),
 html body #view-home #next-match-card .next-match-summary-team strong,
 html body #matches-next-fixture :is(.canonical-match-team strong,.canonical-v11-side strong),
-html body #view-home #matchday-dashboard :is(h3,.kicker,.matchday-dashboard-grid>article>strong){color:var(--gch-white)!important}
+html body #view-matches #matchday-dashboard :is(h3,.kicker,.matchday-dashboard-grid>article>strong){color:var(--gch-white)!important}
 html body #view-club .admin-home-weekend :is(.muted,.helper,.admin-home-metrics span),
-html body #view-home #matchday-dashboard .matchday-dashboard-grid>article>span{color:rgba(255,255,255,.75)!important}
-html body .content .view :is(#view-matches #matches-next-fixture,#view-home #matchday-dashboard,#view-club .admin-home-weekend) .primary-button{
+html body #view-matches #matchday-dashboard .matchday-dashboard-grid>article>span{color:rgba(255,255,255,.75)!important}
+html body .content .view :is(#view-matches #matches-next-fixture,#view-matches #matchday-dashboard,#view-club .admin-home-weekend) .primary-button{
   background:linear-gradient(180deg,var(--gch-white),var(--gch-info-green))!important;
   color:var(--gch-green-950)!important;border:1px solid rgba(255,255,255,.35)!important;
 }
-html body .content .view :is(#view-matches #matches-next-fixture,#view-home #matchday-dashboard,#view-club .admin-home-weekend) .secondary-button{
+html body .content .view :is(#view-matches #matches-next-fixture,#view-matches #matchday-dashboard,#view-club .admin-home-weekend) .secondary-button{
   color:var(--gch-info-green)!important;border-color:rgba(255,255,255,.3)!important;
 }
-html body .content .view :is(#view-home #next-match-card,#view-matches #matches-next-fixture,#view-home #matchday-dashboard,#view-club .admin-home-weekend) :is(.kicker,.muted,.helper,.canonical-match-fixture-label,.canonical-match-v,.canonical-v11-label,.canonical-v11-v,.matchday-dashboard-kits){color:rgba(255,255,255,.75)!important}
-html body .content .view :is(#view-matches #matches-next-fixture,#view-home #matchday-dashboard) :is(.next-match-grid>div,.next-match-kits,.match-venue-card,.match-kit-correction){
+html body .content .view :is(#view-home #next-match-card,#view-matches #matches-next-fixture,#view-matches #matchday-dashboard,#view-club .admin-home-weekend) :is(.kicker,.muted,.helper,.canonical-match-fixture-label,.canonical-match-v,.canonical-v11-label,.canonical-v11-v,.matchday-dashboard-kits){color:rgba(255,255,255,.75)!important}
+html body .content .view :is(#view-matches #matches-next-fixture,#view-matches #matchday-dashboard) :is(.next-match-grid>div,.next-match-kits,.match-venue-card,.match-kit-correction){
   background:linear-gradient(145deg,rgba(255,255,255,.08),rgba(255,255,255,.025))!important;
   border-color:rgba(255,255,255,.16)!important;color:var(--gch-white)!important;
 }
-html body .content .view :is(#view-matches #matches-next-fixture,#view-home #matchday-dashboard) :is(.next-match-grid strong,.next-match-kits strong,.match-venue-card strong,.match-kit-correction>summary,.canonical-match-team strong,.canonical-v11-side strong){color:var(--gch-white)!important}
-html body .content .view :is(#view-matches #matches-next-fixture,#view-home #matchday-dashboard) :is(.next-match-grid span,.next-match-kits span,.match-venue-card span,.match-venue-card small,.match-team-kit){color:rgba(255,255,255,.75)!important}
+html body .content .view :is(#view-matches #matches-next-fixture,#view-matches #matchday-dashboard) :is(.next-match-grid strong,.next-match-kits strong,.match-venue-card strong,.match-kit-correction>summary,.canonical-match-team strong,.canonical-v11-side strong){color:var(--gch-white)!important}
+html body .content .view :is(#view-matches #matches-next-fixture,#view-matches #matchday-dashboard) :is(.next-match-grid span,.next-match-kits span,.match-venue-card span,.match-venue-card small,.match-team-kit){color:rgba(255,255,255,.75)!important}
 html body :is(.bottom-nav,.mobile-primary-nav,.top-nav-tabs){
   background:var(--gch-depth-navigation)!important;border-color:var(--gch-depth-line)!important;
   box-shadow:0 -4px 18px -5px rgba(6,69,38,.12),inset 0 1px 1px rgba(255,255,255,.08)!important;
@@ -2316,12 +2311,9 @@ html body #club-match-summary-dialog{
 #club-match-summary-body>.club-match-card+.muted{margin:16px 0 0}
 #club-match-summary-body .club-report-section p{display:flex;align-items:baseline;justify-content:space-between;gap:16px;line-height:1.5}
 #club-match-summary-body .club-report-section p b{flex-shrink:0;font-variant-numeric:tabular-nums}
-/* Keep the shared rounded cards from colliding with the older joined-card rule. */
-html body #view-home .home-next-match:has(+#matchday-dashboard:not(.hidden)){margin-bottom:16px!important}
-html body #view-home .home-next-match+#matchday-dashboard{margin-top:0;border-radius:20px!important}
-html body #view-home .home-next-match:has(+#matchday-dashboard:not(.hidden)) .next-match-summary-card{border-radius:20px!important}
-html body #view-home .matchday-dashboard-heading{gap:12px;flex-wrap:wrap}
-html body #view-home .matchday-dashboard-status{max-width:100%;white-space:normal;overflow-wrap:anywhere}
+/* Preparation heading and status reflow in the Matches tab. */
+html body #view-matches .matchday-dashboard-heading{gap:12px;flex-wrap:wrap}
+html body #view-matches .matchday-dashboard-status{max-width:100%;white-space:normal;overflow-wrap:anywhere}
 
 /* More is a role-specific directory. Existing forms open on linked pages. */
 .more-hub .more-intro{margin:0 0 24px;max-width:65ch}
@@ -2381,3 +2373,37 @@ html body .hero-coaching-teams .hero-team-select{
   .hero-context-actions{flex-direction:column;align-items:flex-end}
   html body .hero-context-actions .hero-profile-button{width:max(84px,4em)}
 }
+
+/* Coach Home & Matches review: Figma 281:6327, 14 October 2026. */
+html body .content #view-home #next-match-card.next-match-summary-card{
+  --ink:var(--gch-ink);--muted:var(--gch-muted);
+  background:var(--gch-depth-panel)!important;color:var(--gch-ink)!important;
+  border:1px solid var(--gch-depth-line)!important;
+  border-radius:var(--gch-radius-card)!important;box-shadow:var(--gch-shadow-card)!important;
+}
+html[data-theme="dark"] body .content #view-home #next-match-card.next-match-summary-card{
+  --ink:var(--gch-white);--muted:rgba(255,255,255,.75);color:var(--gch-white)!important;
+}
+html body .content #view-home #next-match-card.next-match-summary-card .next-match-summary-team strong{color:inherit!important}
+html body .content #view-home #next-match-card.next-match-summary-card:not(:disabled)::after{color:var(--gch-green-800)!important;font-size:.875rem}
+html[data-theme="dark"] body .content #view-home #next-match-card.next-match-summary-card:not(:disabled)::after{color:var(--gch-info-green)!important}
+#view-matches #matchday-dashboard{margin-top:16px}
+#view-matches:has(#matches-next-fixture:not(.hidden)) #matchday-dashboard .matchday-dashboard-fixtures{display:none}
+html body :is(.content,#next-fixture-dialog,#match-detail-dialog) .kit-clash-warning{
+  display:flex;align-items:center;justify-content:space-between;gap:8px 16px;
+  padding:8px 12px;border:1px solid var(--gch-depth-line)!important;border-radius:12px!important;
+  background:transparent!important;color:var(--muted)!important;box-shadow:none!important;
+  font-size:.875rem!important;font-weight:400!important;line-height:1.5;
+}
+html body :is(.content,#next-fixture-dialog,#match-detail-dialog) .kit-clash-warning>span{min-width:0;overflow-wrap:anywhere}
+html body :is(.content,#next-fixture-dialog,#match-detail-dialog) .kit-clash-warning .text-button{
+  min-height:44px;flex:0 0 auto;color:var(--ink)!important;font-size:.875rem;font-weight:600;
+}
+html body .content #view-matches :is(.next-match-card,.matchday-dashboard) .kit-clash-warning{border-color:rgba(255,255,255,.12)!important}
+@media(max-width:480px){
+  html body :is(.content,#next-fixture-dialog,#match-detail-dialog) .kit-clash-warning{flex-direction:column;align-items:stretch;gap:4px}
+  html body :is(.content,#next-fixture-dialog,#match-detail-dialog) .kit-clash-warning .text-button{width:100%;text-align:left}
+}
+
+/* Keep the reviewed light-on-dark fixture identity readable in both themes. */
+html body .content #view-matches #matches-next-fixture .next-fixture-versus{background:rgba(17,23,21,.38)!important;border-color:rgba(255,255,255,.13)!important}

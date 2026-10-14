@@ -284,12 +284,31 @@ async function screenshotCorrectionsChecks(page,width,theme){
   const day=new Date();day.setUTCDate(day.getUTCDate()+7);
   state.selkent.fixtures=[{date:day.toISOString().slice(0,10),opponent:'Example Blues',venue:'H',competition:'League'}];
   renderNextMatch();await renderMatchdayDashboard();
-  const card=document.getElementById('next-match-card').getBoundingClientRect(),prep=document.getElementById('matchday-dashboard').getBoundingClientRect();
-  return {gap:prep.top-card.bottom,viewport:innerWidth,document:document.documentElement.scrollWidth};
+  const card=document.getElementById('next-match-card'),prep=document.getElementById('matchday-dashboard'),other=document.querySelector('#home-team-stats-link');
+  const c=card.getBoundingClientRect(),style=getComputedStyle(card),otherStyle=getComputedStyle(other);
+  return {homePrep:!!document.querySelector('#view-home #matchday-dashboard'),matchesPrep:!!document.querySelector('#view-matches #matchday-dashboard'),sameSurface:style.backgroundImage===otherStyle.backgroundImage,sharedCardRadius:style.borderRadius===getComputedStyle(document.documentElement).getPropertyValue('--gch-radius-card').trim(),sameShadow:style.boxShadow===otherStyle.boxShadow,cardLeft:c.left,cardRight:c.right,otherLeft:other.getBoundingClientRect().left,otherRight:other.getBoundingClientRect().right,viewport:innerWidth,document:document.documentElement.scrollWidth};
  });
- assert(dashboard.gap>=16,'next match and preparation cards have a visible gap');
+ assert.equal(dashboard.homePrep,false,'Home contains one summary and no preparation panel');
+ assert.equal(dashboard.matchesPrep,true,'preparation belongs to Matches');
+ assert(dashboard.sameSurface&&dashboard.sameShadow&&dashboard.sharedCardRadius,'Home next match shares the adjacent surface, shadow and standard card radius');
+ assert(Math.abs(dashboard.cardLeft-dashboard.otherLeft)<1&&Math.abs(dashboard.cardRight-dashboard.otherRight)<1,'Home cards align on both edges');
  assert(dashboard.document<=dashboard.viewport+1,'dashboard reflows');
  await page.screenshot({path:path.join(out,`dashboard-spacing-${width}-${theme}.png`),fullPage:true});
+ await page.evaluate(()=>navigate('matches',false));
+ assert(await page.locator('#matchday-dashboard').isVisible(),'coach can use preparation in Matches');
+ assert.equal(await page.locator('#matchday-dashboard-title').innerText(),'Next match prep');
+ assert(await page.locator('#matchday-open-tactics').isVisible());
+ assert.equal(await page.locator('#matches-next-versus').evaluate(el=>getComputedStyle(el).backgroundColor),'rgba(17, 23, 21, 0.38)','fixture identity stays dark behind white text in both themes');
+ await page.evaluate(()=>{const host=document.getElementById('matches-next-kit-warning');host.innerHTML=kitWarningHtml({kitWarning:'Kit clash likely. Confirm shirt colours with the opposition before kick-off.',awayTeam:'Example Blues'});host.classList.remove('hidden');});
+ assert.equal(await page.locator('#matches-next-kit-warning .kit-clash-warning').count(),1,'one warning surface');
+ assert.equal(await page.locator('#matches-next-kit-warning.kit-clash-warning').count(),0,'warning host is unstyled');
+ const warning=await page.locator('#matches-next-kit-warning .kit-clash-warning').evaluate(el=>{const s=getComputedStyle(el),b=el.querySelector('button');return {background:s.backgroundColor,image:s.backgroundImage,buttonHeight:b.getBoundingClientRect().height,overflow:el.scrollWidth>el.clientWidth+1};});
+ assert.equal(warning.background,'rgba(0, 0, 0, 0)');assert.equal(warning.image,'none');assert(warning.buttonHeight>=44);assert.equal(warning.overflow,false);
+ await page.screenshot({path:path.join(out,`matches-prep-${width}-${theme}.png`),fullPage:true});
+ if(width===320){await page.evaluate(()=>document.documentElement.style.fontSize='200%');assert((await geometry(page)).documentWidth<=width+1);assert(await page.locator('#matches-next-kit-warning .kit-clash-warning').evaluate(el=>el.scrollWidth<=el.clientWidth+1));await page.screenshot({path:path.join(out,`matches-prep-text200-${theme}.png`),fullPage:true});await page.evaluate(()=>document.documentElement.style.fontSize='');}
+ await page.evaluate(async()=>{currentRole='parent';await renderMatchdayDashboard();});assert.equal(await page.locator('#matchday-dashboard').isVisible(),false,'parent cannot see staff prep');
+ await page.evaluate(async()=>{currentRole='coach';state.selkent.fixtures=[];state.matches=state.matches.filter(m=>m.status==='played');await renderMatchdayDashboard();});assert.equal(await page.locator('#matchday-dashboard').isVisible(),false,'no fixture hides prep');
+
  await page.evaluate(()=>{
   currentRole='admin';account={role:'admin',user:'Example Admin'};adminUiMode='club';currentView='club';__clubTab='results';
   document.querySelectorAll('.view').forEach(el=>el.classList.toggle('active',el.id==='view-club'));
@@ -338,7 +357,7 @@ async function screenshotCorrectionsChecks(page,width,theme){
 let base;
 (async()=>{
  await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));base=`http://127.0.0.1:${server.address().port}`;
- const browser=await chromium.launch({headless:true});const page=await browser.newPage();const errors=[];page.on('pageerror',e=>errors.push(String(e)));
+ const browser=await chromium.launch({headless:true,...(process.env.PITCHKIND_CHROMIUM?{executablePath:process.env.PITCHKIND_CHROMIUM}:{}),args:['--no-sandbox']});const page=await browser.newPage();const errors=[];page.on('pageerror',e=>errors.push(String(e)));
  await page.route('**/*',route=>new URL(route.request().url()).origin===base?route.continue():route.fulfill({status:200,contentType:'application/json',body:'[]'}));
  const results=[];
  try{if(process.argv[4]==='screenshot-corrections'){for(const theme of ['dark','light'])for(const width of [320,393,680,1024])results.push(await screenshotCorrectionsChecks(page,width,theme));}else for(const theme of ['dark','light']){for(const width of [360,393,1280])results.push(await loginChecks(page,width,theme));results.push(await teamChecks(page,theme));for(const width of [320,393,680,1024])results.push(await screenshotCorrectionsChecks(page,width,theme));for(const width of [320,393,1280])results.push(await coachOnboardingChecks(page,width,theme));for(const width of [320,393,1280])results.push(await adminDirectoryChecks(page,width,theme));for(const width of [320,393,1024])results.push(await workspaceChecks(page,width,theme));for(const width of [320,393,1024])results.push(await latestMatchChecks(page,width,theme));for(const width of [320,393,720])results.push(await registrationChecks(page,width,theme));}assert.equal(errors.length,0,errors.join('\n'));fs.writeFileSync(path.join(out,'measurements.json'),JSON.stringify({results,errors},null,2));console.log(process.argv[4]==='screenshot-corrections'?'PASS built dropdowns, reports, rapid reopen, staff boundaries and dashboard spacing at 320, 393, 680 and 1024px in both themes':'PASS rendered login, password/parent routes, text zoom, stats navigation, match details, attendance and coach onboarding, directories, Squad, Match Plan and deliberate parent verification in both themes');}

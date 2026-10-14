@@ -420,7 +420,7 @@ check(
 check(
     'kit clash warning and coach shirt selection are wired',
     'function kitsClash' in app
-    and '⚠️ Kit clash likely.' in app
+    and 'Kit clash likely.' in app
     and 'function fixtureKitChoice(f={})' in app
     and 'function setFixtureKitChoice(key,choice)' in app
     and 'id="next-match-kit-warning"' in index

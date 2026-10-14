@@ -2987,7 +2987,7 @@ async function renderMatchdayDashboard(){
   const cup=!!group||/\b(?:cup|vase)\b/i.test(String(f.competition||'')),neutral=cup&&/\bmarathon\b/i.test(ground);
   const location=neutral||f.venue==='N'?'Neutral':f.venue==='H'?'Home':f.venue==='A'?'Away':'';
   const venue={ground,address:address==='Address TBC'?'':address,location};
-  set('matchday-dashboard-kicker',isToday?'MATCHDAY':'NEXT FIXTURE PREP');set('matchday-dashboard-title',isToday?'Today’s match':'Matchday dashboard');
+  set('matchday-dashboard-kicker',isToday?'Matchday':'Preparation');set('matchday-dashboard-title','Next match prep');
   setStableHtml(document.getElementById('matchday-dashboard-opponent'),canonicalMatchRowsHtml(f));
   set('matchday-dashboard-kickoff',[f.date?formatDate(f.date):'Date TBC',(resolved.time||f.time)?`${group?'Group starts':'Kick-off'} ${resolved.time||f.time}`:group?'Group start TBC':'Kick-off TBC'].join(' · '));
   set('matchday-dashboard-confirmation',confirmedFixture?'Match details confirmed':'Match details awaiting confirmation');
@@ -2995,7 +2995,6 @@ async function renderMatchdayDashboard(){
   set('matchday-dashboard-availability',counts['no-response']?`${counts['no-response']} awaiting a reply`:`${counts.available||0} available`);set('matchday-dashboard-availability-breakdown',`${counts.available||0} available · ${counts.unsure||0} unsure · ${counts.unavailable||0} unavailable · ${counts['no-response']||0} awaiting`);set('matchday-dashboard-squad',requiresMatchdaySelection()?`${selection.length}/${footballFormat().matchday} selected`:`${activePlayers().length} active players`);set('matchday-dashboard-formation',state.tactics.formationByFixture?.[key]||state.tactics.formation||'TBC');
   const status=document.getElementById('matchday-dashboard-status');if(status){status.textContent=ack.status==='confirmed'?'Fixture acknowledged':ack.status==='changed'?'Fixture changed: reconfirm':ack.status==='issue'?'Fixture issue reported':'Fixture acknowledgement pending';status.className=`matchday-dashboard-status ${ack.status}`;}
   const alertEl=document.getElementById('matchday-dashboard-alert');if(alertEl){alertEl.classList.toggle('hidden',ack.status!=='changed'&&ack.status!=='issue');alertEl.textContent=ack.status==='changed'?ack.detail:(ack.note||ack.detail);}
-  const kitWarn=document.getElementById('matchday-dashboard-kit-warning');if(kitWarn){kitWarn.innerHTML=kitWarningHtml(ctx);kitWarn.classList.toggle('hidden',!kitWarn.innerHTML);}
   const map=document.getElementById('matchday-dashboard-map'),href=confirmedFixture&&!/\b(?:TBC|awaiting)\b/i.test(venue.ground)?mapsHref(venue.ground,venue.address):'';if(map){map.classList.toggle('hidden',!href);if(href)map.href=href;else map.removeAttribute('href');}
   document.getElementById('matchday-add-calendar')?.classList.toggle('hidden',!!group);
   const notifyBtn=document.getElementById('matchday-notify-squad');if(notifyBtn)notifyBtn.classList.toggle('hidden',!isCoach()||!requiresMatchdaySelection());
@@ -3866,10 +3865,10 @@ function matchOverviewContext(m={}){
   const homeKitType=isOwnTeamName(homeTeam)?(choice==='away'?'Away shirt':'Home shirt'):'Home shirt',awayKitType=isOwnTeamName(awayTeam)?(choice==='away'?'Away shirt':'Home shirt'):'Home shirt';
   const clash=kitsClash(homeKit,awayKit);let kitWarning='';
   if(clash){
-    if(choice==='home'&&knownKit(ownProfile.away)&&!kitsClash(ownProfile.away,oppKit))kitWarning=`⚠️ Kit clash likely. Switch ${ownTeam} to the away shirt before kick-off.`;
-    else if(choice==='away')kitWarning='⚠️ The selected away shirt still appears to clash. Agree an alternative before kick-off.';
-    else if(!knownKit(ownProfile.away))kitWarning=`⚠️ Kit clash likely. ${ownTeam} away shirt is not recorded yet.`;
-    else kitWarning='⚠️ Kit clash likely. Confirm shirt colours with the opposition before kick-off.';
+    if(choice==='home'&&knownKit(ownProfile.away)&&!kitsClash(ownProfile.away,oppKit))kitWarning=`Kit clash likely. Switch ${ownTeam} to the away shirt before kick-off.`;
+    else if(choice==='away')kitWarning='The selected away shirt still appears to clash. Agree an alternative before kick-off.';
+    else if(!knownKit(ownProfile.away))kitWarning=`Kit clash likely. ${ownTeam} away shirt is not recorded yet.`;
+    else kitWarning='Kit clash likely. Confirm shirt colours with the opposition before kick-off.';
   }
   const venueDetail=away?oppDetail:ownDetail,override=fixtureOverride(fixtureLike),grounds=Array.isArray(venueDetail.groundOptions)?venueDetail.groundOptions:[],one=grounds.length===1?grounds[0]:null;
   let candidateGround=m.groundName||fixture.groundName||'',candidateAddress=m.address||fixture.address||'';if(!override.confirmedAt&&grounds.length>1&&selkentNorm(candidateGround)===selkentNorm(venueDetail.groundName||'')){candidateGround='';candidateAddress='';}
