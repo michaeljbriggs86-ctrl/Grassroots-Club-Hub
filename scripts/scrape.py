@@ -837,14 +837,87 @@ def collect_standings(
     return collected
 
 
-def build_payload() -> dict[str, Any]:
+def temporary_cup_transport_error(exc: requests.RequestException) -> bool:
+    """Recover outages only; TLS/auth/contract failures are never treated as empty."""
+    if isinstance(exc, requests.exceptions.SSLError):
+        return False
+    if isinstance(exc, requests.HTTPError):
+        return exc.response is not None and exc.response.status_code in {429, 500, 502, 503, 504}
+    return isinstance(exc, (requests.Timeout, requests.ConnectionError))
+
+
+def retained_cup_results(previous: Any, results_agegroups: dict[int, dict[str, str]],
+                         now: str) -> tuple[dict[int, list[dict[str, Any]]], str]:
+    """Retain only validated public cup rows from the canonical previous snapshot."""
+    if not isinstance(previous, dict) or previous.get("schema_version") != SCHEMA_VERSION or previous.get("provider") != "Selkent":
+        raise SelkentFeedError("No verified previous cup snapshot")
+    coverage = previous.get("coverage", {}).get("published_results", {})
+    if coverage.get("cup_parser_status") != "verified_cup_scored_rows_v1" or previous.get("cup_results_status") not in {None, "verified_current", "stale_retained"}:
+        raise SelkentFeedError("Previous cup parser provenance is unverified")
+    stamp = previous.get("cup_results_last_updated")
+    try:
+        checked = datetime.fromisoformat(stamp.replace("Z", "+00:00"))
+        if checked.tzinfo is None or checked > datetime.fromisoformat(now):
+            raise ValueError("Invalid check date")
+    except (AttributeError, TypeError, ValueError) as exc:
+        raise SelkentFeedError("Previous cup check date is invalid") from exc
+    ages = previous.get("age_groups")
+    if not isinstance(ages, list) or any(not isinstance(a, dict) for a in ages):
+        raise SelkentFeedError("Previous cup age groups are invalid")
+    indexed = {a.get("agegroup_id"): a for a in ages}
+    if len(indexed) != len(ages):
+        raise SelkentFeedError("Previous cup age-group identity is ambiguous")
+    fields = {"date", "home", "away", "homeGoals", "awayGoals", "competition",
+              "round", "provider_cup_id", "provider_match_ref"}
+    cups = {}
+    for age_id, metadata in results_agegroups.items():
+        label = metadata["age_group"]
+        youth = re.fullmatch(r"U(\d+)X?", label, re.I)
+        if label.lower() != "senior" and (not youth or int(youth.group(1)) < 12):
+            continue
+        if (age_id, label) in DEFERRED_CUP_AGEGROUPS:
+            continue
+        age = indexed.get(age_id)
+        if not age or age.get("age_group") != label or age.get("results_format_type") != metadata["format_type"] or age.get("published_results_status") != "verified_scored_rows_v1" or not isinstance(age.get("published_results"), list):
+            raise SelkentFeedError(f"Previous cup identity/provenance mismatch for {label}")
+        rows = []
+        for row in age["published_results"]:
+            if not isinstance(row, dict):
+                raise SelkentFeedError("Previous public result row is invalid")
+            if "provider_cup_id" not in row:
+                continue  # League rows come only from this run, never the baseline.
+            if set(row) != fields or not re.fullmatch(rf"cupCombined{age_id}-\d+", str(row.get("provider_cup_id", ""))):
+                raise SelkentFeedError("Previous cup fields/identity are unsafe")
+            if any(not isinstance(row[k], str) or not row[k].strip() or len(row[k]) > 300 or re.search(r"[\x00-\x1f\x7f]", row[k]) for k in fields - {"homeGoals", "awayGoals"}):
+                raise SelkentFeedError("Previous cup text is invalid")
+            if not re.search(r"cup|vase", row["competition"], re.I) or any(type(row[k]) is not int or not 0 <= row[k] <= 99 for k in ("homeGoals", "awayGoals")):
+                raise SelkentFeedError("Previous cup score/competition is invalid")
+            try:
+                if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", row["date"]):
+                    raise ValueError("Invalid date format")
+                datetime.strptime(row["date"], "%Y-%m-%d")
+            except ValueError as exc:
+                raise SelkentFeedError("Previous cup match date is invalid") from exc
+            rows.append(dict(row))
+        cups[age_id] = rows
+    return cups, stamp
+
+
+def build_payload(previous_payload: Any = None) -> dict[str, Any]:
     fixture_agegroups, fixture_discovery_source = discover_fixture_agegroups()
     results_agegroups = discover_public_results_agegroups()
 
     fixtures_by_age = collect_fixtures(fixture_agegroups)
     standings_by_age = collect_standings(results_agegroups)
-    cups_by_age = collect_cup_results(results_agegroups)
     generated_at = datetime.now(timezone.utc).isoformat()
+    cup_status, cup_checked_at = "verified_current", generated_at
+    try:
+        cups_by_age = collect_cup_results(results_agegroups)
+    except requests.RequestException as exc:
+        if not temporary_cup_transport_error(exc):
+            raise
+        cups_by_age, cup_checked_at = retained_cup_results(previous_payload, results_agegroups, generated_at)
+        cup_status = "stale_retained"
 
     all_age_ids = sorted(set(fixtures_by_age) | set(standings_by_age))
     age_groups: list[dict[str, Any]] = []
@@ -904,7 +977,9 @@ def build_payload() -> dict[str, Any]:
         "schema_version": SCHEMA_VERSION,
         "provider": "Selkent",
         "last_updated": generated_at,
-        "cup_results_last_updated": generated_at,
+        "cup_results_last_updated": cup_checked_at,
+        "cup_results_last_attempted": generated_at,
+        "cup_results_status": cup_status,
         "fixture_agegroup_discovery_source": fixture_discovery_source,
         "coverage": {
             "fixtures": {
@@ -938,7 +1013,9 @@ def build_payload() -> dict[str, Any]:
         "age_groups": age_groups,
         "notes": [
             (
-                "cup_results_last_updated applies to collected cup age groups; "
+                "last_updated applies to fixtures and league data. "
+                "cup_results_last_updated is the last complete verified cup collection; "
+                "stale_retained preserves that original date during a transport outage; "
                 "deferred cup data has not been checked and is not confirmed empty."
             ),
             (
@@ -979,7 +1056,11 @@ def write_atomic_json(path: Path, payload: dict[str, Any]) -> None:
 
 def main() -> None:
     try:
-        payload = build_payload()
+        previous = json.loads(OUTPUT_PATH.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        previous = None
+    try:
+        payload = build_payload(previous)
         write_atomic_json(OUTPUT_PATH, payload)
     except Exception:
         # The previous data/results.json remains untouched because write happens
@@ -1007,6 +1088,9 @@ def main() -> None:
         f"{standings_division_count} standings divisions, "
         f"{standings_row_count} standings rows."
     )
+    if payload["cup_results_status"] == "stale_retained":
+        print("WARNING: Cup provider temporarily unavailable; retained verified cups checked "
+              + payload["cup_results_last_updated"])
 
 
 if __name__ == "__main__":

@@ -1,4 +1,4 @@
-const CACHE = 'pitchkind-web-linked-pages-20261012';
+const CACHE = 'pitchkind-web-cup-freshness-20261014';
 const ASSETS=['./','./index.html','./styles.css','./app-design-system.css','./cloud.css','./cloud-config.js','./cloud.js','./app.js','./coach-qualifications.js','./member-contact-import.js','./person-profiles.js','./onboarding.js','./onboarding.css','./manifest.json','./shooters-hill-logo.png', './club-badge-unavailable.svg','./football-login-adult.jpg','./football-login-player.jpg','./football-login-club.jpg','./football-pitch-hero.jpg','./football-pitch-hero-illustration.png','./static-feed-overlay.js'];
 self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)).then(()=>self.skipWaiting())));
 self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
