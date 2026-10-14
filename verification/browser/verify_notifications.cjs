@@ -32,7 +32,7 @@ async function checks(page,width,theme){
  await prepare(page,width,theme);
  const bell=page.locator('#notification-bell');assert(await bell.isVisible(),'hero bell stays visible on phones');
  const geometry=await bell.evaluate(el=>{const b=el.getBoundingClientRect(),h=el.closest('.hero').getBoundingClientRect(),copy=document.querySelector('.hero-copy').getBoundingClientRect();return {bell:b.toJSON(),hero:h.toJSON(),copy:copy.toJSON(),overflow:document.documentElement.scrollWidth>innerWidth};});
- assert.equal(geometry.overflow,false);assert(geometry.bell.width>=44&&geometry.bell.height>=44);assert(geometry.bell.right<=geometry.hero.right&&geometry.bell.top>=geometry.hero.top);assert(geometry.copy.right-56<=geometry.bell.left+1,'hero copy reserves room for corner bell');
+ assert.equal(geometry.overflow,false);assert(geometry.bell.width>=44&&geometry.bell.height>=44);assert(geometry.bell.right<=geometry.hero.right&&geometry.bell.top>=geometry.hero.top);assert(geometry.copy.right<=geometry.bell.left+1,'hero text stays to the left of the aligned actions');
  await page.screenshot({path:path.join(out,'hero-'+width+'-'+theme+'.png'),fullPage:false});
  await bell.click();await page.waitForFunction(()=>document.querySelectorAll('#notification-list .notification-item').length===3);
  assert.match(await bell.getAttribute('aria-label'),/2 unread/);assert.equal(await page.evaluate(()=>__notesFixture.marks.length),0,'opening never marks read');
