@@ -88,9 +88,9 @@ jobs:
           git pull --rebase origin main
           git push
   repair-shadow:
-    # Code-triggered repairs update both normalizers after the public refresh.
+    # Deploy a code repair even when a provider outage blocks the public refresh.
     # Routine scheduled feed updates retain the existing Worker cron schedule.
-    if: github.event_name == 'push'
+    if: always() && github.event_name == 'push' && needs.scrape.result != 'cancelled'
     needs: scrape
     uses: ./.github/workflows/deploy-selkent-shadow.yml
     secrets: inherit
