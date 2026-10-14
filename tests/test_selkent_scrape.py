@@ -120,6 +120,39 @@ class GeneralizedSelkentFeedTests(unittest.TestCase):
         self.assertEqual(fixtures, [])
         self.assertEqual(status, "verified_empty")
 
+    def test_real_status_only_week_is_verified_empty(self):
+        # Unchanged public HTML from fixturespage/2/6, captured 14 October 2026.
+        html = (ROOT / "tests/fixtures/selkent_fixturespage_2_6_2026_10_14.html").read_text()
+        self.assertEqual(parse_fixtures(html), ([], "verified_empty"))
+
+    def test_status_only_week_does_not_mask_unknown_or_malformed_content(self):
+        html = (ROOT / "tests/fixtures/selkent_fixturespage_2_6_2026_10_14.html").read_text()
+        cases = [
+            html.replace("No Game", "Unverified status", 1),
+            html.replace('data-team-ids="807;"', 'data-team-ids="807;999;"', 1),
+            html.replace('<div id="fixtureContainer">', '<div id="fixtureContainer"><div>Unknown match row</div>', 1),
+            html.replace('fixtureRow nonFixture', 'unknownRow', 1),
+            html.replace('No Game</div>', 'No Game</div><div>Unknown score</div>', 1),
+        ]
+        for changed in cases:
+            with self.subTest(change=cases.index(changed)):
+                with self.assertRaises(UnverifiedFixtureMarkupError):
+                    parse_fixtures(changed)
+
+    def test_multiweek_collection_keeps_matches_when_another_week_has_no_games(self):
+        no_games = (ROOT / "tests/fixtures/selkent_fixturespage_2_6_2026_10_14.html").read_text()
+        matches = '''<div id="fixtureContainer"><h2 class="subHead">18/10/26 - Week 5</h2>
+          <div class="panel-title">Under 8 Test</div><div class="fixtureRow" data-team-ids="10;11;">
+          <div class="col-xs-5">Example Home</div><div class="col-xs-5">Example Away</div></div></div>'''
+        payloads = {"fixturespage/2": '<a data-week-id="5"></a><a data-week-id="6"></a>',
+                    "fixturespage/2/5": matches, "fixturespage/2/6": no_games}
+        with patch.object(scrape, "fetch_json", side_effect=lambda path: payloads[path]), \
+             patch.object(scrape, "_sleep_between_requests", return_value=None):
+            result = collect_fixtures({2: "U8"})[2]
+        self.assertEqual(result["fixture_week_ids"], [5, 6])
+        self.assertEqual(len(result["fixtures"]), 1)
+        self.assertEqual(result["fixtures"][0]["date"], "2026-10-18")
+
     def test_verified_populated_fixture_rows_parse(self):
         html = """
         <div id="fixtureContainer">

@@ -38,6 +38,9 @@ export async function parseFixtures(html) {
   let date = '';
   let division = '';
   let activeRow = null;
+  let nonFixtureRows = 0;
+  let verifiedNonFixtureRows = 0;
+  let recognizedContent = '';
   const fixtures = [];
   const rewriter = new HTMLRewriter()
     .on('#fixtureContainer', {
@@ -54,22 +57,33 @@ export async function parseFixtures(html) {
           date = `${String(year).padStart(4, '0')}-${match[2].padStart(2, '0')}-${match[1].padStart(2, '0')}`;
         });
       },
-      text(chunk) { this.heading += chunk.text; },
+      text(chunk) { this.heading += chunk.text; recognizedContent += chunk.text; },
     })
     .on('#fixtureContainer .panel-title', {
       element(element) {
         this.value = '';
         element.onEndTag(() => { division = normalize(this.value); });
       },
-      text(chunk) { this.value += chunk.text; },
+      text(chunk) { this.value += chunk.text; recognizedContent += chunk.text; },
     })
     .on('#fixtureContainer .fixtureRow', {
       element(element) {
-        if ((element.getAttribute('class') || '').split(/\s+/).includes('nonFixture')) return;
-        const row = { date, division_name: division, columns: [],
+        const nonFixture = (element.getAttribute('class') || '').split(/\s+/).includes('nonFixture');
+        if (nonFixture) nonFixtureRows++;
+        const row = { date, division_name: division, columns: [], content: '',
           provider_team_ids: (element.getAttribute('data-team-ids') || '').split(';').filter(Boolean) };
         activeRow = row;
         element.onEndTag(() => {
+          if (nonFixture) {
+            if (row.columns.length === 2 && row.columns[0] && row.date && row.division_name &&
+                ['no game', 'on standby'].includes(row.columns[1].toLowerCase()) &&
+                row.provider_team_ids.length === 1 && /^[1-9]\d*$/.test(row.provider_team_ids[0]) &&
+                normalize(row.content).replace(/\s/gu, '') === row.columns.join('').replace(/\s/gu, '')) {
+              verifiedNonFixtureRows++;
+            }
+            activeRow = null;
+            return;
+          }
           if (row.columns.length < 2 || !row.date || !row.division_name) {
             throw new Error('Unsupported private fixture row');
           }
@@ -78,6 +92,7 @@ export async function parseFixtures(html) {
           activeRow = null;
         });
       },
+      text(chunk) { recognizedContent += chunk.text; if (activeRow) activeRow.content += chunk.text; },
     })
     .on('#fixtureContainer .fixtureRow > div.col-xs-5', {
       element(element) {
@@ -92,7 +107,14 @@ export async function parseFixtures(html) {
   await rewriter.transform(new Response(html, { headers: { 'content-type': 'text/html' } })).text();
   if (!found) throw new Error('Missing private fixture container');
   if (!normalize(content)) return { fixtures: [], status: 'verified_empty' };
-  if (!fixtures.length) throw new Error('Unsupported populated private fixture container');
+  if (!fixtures.length) {
+    const compact = value => normalize(value).replace(/\s/gu, '');
+    if (nonFixtureRows && nonFixtureRows === verifiedNonFixtureRows &&
+        compact(content) === compact(recognizedContent)) {
+      return { fixtures: [], status: 'verified_empty' };
+    }
+    throw new Error('Unsupported populated private fixture container');
+  }
   return { fixtures, status: 'verified_fixture_rows_v1' };
 }
 

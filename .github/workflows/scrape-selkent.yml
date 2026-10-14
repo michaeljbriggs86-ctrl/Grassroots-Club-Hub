@@ -87,3 +87,10 @@ jobs:
           # Replay this one-file feed commit on the new main before pushing.
           git pull --rebase origin main
           git push
+  repair-shadow:
+    # Code-triggered repairs update both normalizers after the public refresh.
+    # Routine scheduled feed updates retain the existing Worker cron schedule.
+    if: github.event_name == 'push'
+    needs: scrape
+    uses: ./.github/workflows/deploy-selkent-shadow.yml
+    secrets: inherit

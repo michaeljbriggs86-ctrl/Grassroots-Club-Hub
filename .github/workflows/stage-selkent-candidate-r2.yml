@@ -28,6 +28,8 @@ jobs:
       BUCKET: pitchkind-selkent-feed-stage
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: main
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -53,7 +55,9 @@ jobs:
             --remote --file "$RUNNER_TEMP/selkent-shadow-latest.json"
       - name: Verify and build private candidate
         env:
-          FRESHNESS_LIMIT: ${{ github.event_name == 'schedule' && '120' || '420' }}
+          # The collector runs every six hours. GitHub can start this :55 job
+          # hours late; keep the existing seven-hour bound between collections.
+          FRESHNESS_LIMIT: '420'
         run: |
           node cloudflare/selkent-shadow/verify-snapshot.mjs \
             "$RUNNER_TEMP/selkent-shadow-latest.json" data/results.json "$FRESHNESS_LIMIT"

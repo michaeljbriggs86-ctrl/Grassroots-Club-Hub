@@ -352,6 +352,8 @@ def parse_fixtures(html: str) -> tuple[list[dict[str, Any]], str]:
       .fixtureRow[data-team-ids]       -> home / away fixture
       .fixtureRow.nonFixture           -> status row; ignore
 
+    A verified status-only No Game / On Standby week returns verified_empty.
+
     Unknown populated shapes still fail closed.
     """
     soup = BeautifulSoup(html, "html.parser")
@@ -364,6 +366,8 @@ def parse_fixtures(html: str) -> tuple[list[dict[str, Any]], str]:
         return [], "verified_empty"
 
     fixtures: list[dict[str, Any]] = []
+    non_fixture_rows = []
+    verified_non_fixture_rows = []
     current_date = ""
     current_division = ""
 
@@ -399,14 +403,22 @@ def parse_fixtures(html: str) -> tuple[list[dict[str, Any]], str]:
         if "fixtureRow" not in classes:
             continue
 
-        if "nonFixture" in classes:
-            continue
-
         columns = [
             _normalise_text(child.get_text(" ", strip=True))
             for child in element.find_all("div", recursive=False)
             if "col-xs-5" in child.get("class", [])
         ]
+
+        if "nonFixture" in classes:
+            non_fixture_rows.append(element)
+            # Real provider status-only weeks contain one team and No Game.
+            # On Standby is the other previously verified non-match status.
+            if (len(columns) == 2 and columns[0] and current_date and current_division
+                    and columns[1].casefold() in {"no game", "on standby"}
+                    and re.fullmatch(r"[1-9][0-9]*;?", str(element.get("data-team-ids", "")))
+                    and re.sub(r"\s", "", element.get_text()) == re.sub(r"\s", "", "".join(columns))):
+                verified_non_fixture_rows.append(element)
+            continue
 
         if len(columns) < 2 or not current_date or not current_division:
             raise UnverifiedFixtureMarkupError(
@@ -430,6 +442,12 @@ def parse_fixtures(html: str) -> tuple[list[dict[str, Any]], str]:
         )
 
     if not fixtures:
+        if non_fixture_rows and len(verified_non_fixture_rows) == len(non_fixture_rows):
+            # Do not let one known status row mask unknown populated content.
+            for element in container.select("h2.subHead, .panel-title, .fixtureRow"):
+                element.extract()
+            if not container.get_text(" ", strip=True):
+                return [], "verified_empty"
         sample = _normalise_text(container.get_text(" ", strip=True))[:500]
         raise UnverifiedFixtureMarkupError(
             "Fixture container is populated but no verified fixture rows "
