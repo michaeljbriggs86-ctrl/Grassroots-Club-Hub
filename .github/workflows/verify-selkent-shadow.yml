@@ -3,6 +3,7 @@ name: Verify private Selkent shadow snapshot
 on:
   workflow_dispatch:
   push:
+    branches: [main]
     paths:
       - '.github/workflows/verify-selkent-shadow.yml'
       - 'cloudflare/selkent-shadow/verify-snapshot.mjs'
@@ -41,6 +42,8 @@ jobs:
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: main
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -67,7 +70,7 @@ jobs:
         run: |
           node cloudflare/selkent-shadow/verify-snapshot.mjs \
             "$RUNNER_TEMP/selkent-shadow-latest.json" data/results.json \
-            "${{ github.event_name == 'schedule' && '120' || '420' }}"
+            "${{ github.event_name == 'schedule' && github.event.schedule == '50 8-19 * * SUN' && '120' || '420' }}"
       - name: Compare normalized private and public data
         run: |
           python cloudflare/selkent-shadow/compare_snapshot.py \

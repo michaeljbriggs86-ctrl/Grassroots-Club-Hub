@@ -2,6 +2,7 @@ name: Deploy private Selkent shadow collector
 
 on:
   workflow_dispatch:
+  workflow_call:
 
 permissions:
   contents: read
@@ -19,9 +20,15 @@ jobs:
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          # The calling scrape has just committed the fresh public feed.
+          ref: main
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
       - name: Check Cloudflare credentials
         run: |
           test -n "$CLOUDFLARE_API_TOKEN" || { echo 'Set CLOUDFLARE_API_TOKEN repository secret'; exit 1; }
@@ -42,3 +49,49 @@ jobs:
       - name: Deploy scheduled Worker
         working-directory: cloudflare/selkent-shadow
         run: npx --yes wrangler@4.142.0 deploy
+      - name: Collect once with the same Worker and verify private R2 readback
+        working-directory: cloudflare/selkent-shadow
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          config = json.loads(Path('wrangler.jsonc').read_text())
+          config['main'] = str(Path('src/index.mjs').resolve())
+          config['r2_buckets'][0]['remote'] = True
+          Path(os.environ['RUNNER_TEMP'], 'shadow-collection.json').write_text(json.dumps(config))
+          PY
+          npx --yes wrangler@4.142.0 dev \
+            --config "$RUNNER_TEMP/shadow-collection.json" \
+            --test-scheduled --ip 127.0.0.1 --port 8787 \
+            --show-interactive-dev-session=false >"$RUNNER_TEMP/shadow-collection.log" 2>&1 &
+          collector_pid=$!
+          trap 'kill "$collector_pid" 2>/dev/null || true' EXIT
+          python - <<'PY'
+          import time, urllib.request, urllib.error
+          for attempt in range(60):
+              try:
+                  urllib.request.urlopen('http://127.0.0.1:8787/', timeout=2)
+                  break
+              except urllib.error.HTTPError as error:
+                  if error.code == 404:
+                      break
+                  raise
+              except (urllib.error.URLError, TimeoutError):
+                  time.sleep(1)
+          else:
+              raise RuntimeError('Private collector did not start')
+          with urllib.request.urlopen('http://127.0.0.1:8787/cdn-cgi/local/scheduled', timeout=600) as response:
+              if response.status != 200:
+                  raise RuntimeError('Private collection was not confirmed')
+          print('On-demand scheduled-handler collection confirmed; no provider HTML logged')
+          PY
+          npx --yes wrangler@4.142.0 r2 object get \
+            pitchkind-selkent-shadow/shadow/latest.json --remote \
+            --file "$RUNNER_TEMP/selkent-shadow-readback.json"
+          python -m pip install requests beautifulsoup4
+          node verify-snapshot.mjs "$RUNNER_TEMP/selkent-shadow-readback.json" ../../data/results.json 120
+          node compare_fixture_preview.mjs "$RUNNER_TEMP/selkent-shadow-readback.json" ../../data/results.json
+          python compare_snapshot.py "$RUNNER_TEMP/selkent-shadow-readback.json" ../../data/results.json
+          node build-candidate.mjs "$RUNNER_TEMP/selkent-shadow-readback.json" ../../data/results.json "$RUNNER_TEMP/selkent-candidate.json"
+          python compare_snapshot.py "$RUNNER_TEMP/selkent-shadow-readback.json" ../../data/results.json "$RUNNER_TEMP/selkent-candidate.json"

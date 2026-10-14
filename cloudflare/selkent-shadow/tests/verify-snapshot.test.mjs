@@ -71,6 +71,16 @@ test('allows an on-demand comparison between six-hour collections', () => {
   assert.throws(() => verifySnapshot(value, FEED, NOW, 421), /Unsupported/);
 });
 
+test('delayed six-hour checks accept the last collection but reject a missed cycle', () => {
+  const value = snapshot();
+  value.collected_at = '2026-09-27T08:00:00Z';
+  value.scheduled_at = '2026-09-27T07:59:00Z';
+  assert.equal(verifySnapshot(value, FEED, NOW, 420).snapshot_age_minutes, 420);
+  assert.throws(() => verifySnapshot(value, FEED, NOW + 1, 420), /snapshot is stale/);
+  // The Sunday matchday check keeps its existing two-hour limit.
+  assert.throws(() => verifySnapshot(value, FEED, NOW, 120), /snapshot is stale/);
+});
+
 test('does not compare target sets against a newer Sunday feed', () => {
   const newerFeed = { ...FEED, last_updated: '2026-09-27T14:50:00Z' };
   assert.equal(verifySnapshot(snapshot(), newerFeed, NOW).feed_target_match,

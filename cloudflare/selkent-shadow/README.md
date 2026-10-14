@@ -33,8 +33,12 @@ under GitHub Settings > Secrets and variables > Actions. Scope the Cloudflare
 token to this account with Workers Scripts Edit and Workers R2 Storage Edit.
 From the GitHub Actions tab, run **Deploy private Selkent shadow collector**
 manually. Its Linux job reruns the tests and Wrangler dry run, creates the
-private R2 bucket if missing, then deploys the scheduled Worker. Source push
-alone does not trigger deployment. Do not put token values in this repository.
+private R2 bucket if missing, then deploys the scheduled Worker. A main-branch parser repair invokes this same deployment workflow after its
+public scrape finishes. A provider failure must not prevent the parser repair
+from reaching the Worker. Routine scheduled scrapes retain the existing Worker cron.
+The deployment workflow also runs the same scheduled handler once against
+the private R2 binding and verifies the readback and same-capture parser parity.
+This on-demand check is recorded separately from a production Cron Event. Do not put token values in this repository.
 
 ## Alternative: authenticated Cloudflare shell
 
@@ -68,16 +72,16 @@ Push the verifier source to start **Verify private Selkent shadow snapshot**
 once, or run it manually under GitHub Actions. It uses the existing Cloudflare
 repository secrets to download `shadow/latest.json` to the job's temporary
 directory with `wrangler r2 object get --remote`, checks that it was collected
-within two hours, checks every named payload and its count, and compares exact
+within the applicable collection cadence, checks every named payload and its count, and compares exact
 targets to `data/results.json` when their feed timestamps match. The job prints
 only counts and timestamps; it does not upload the private HTML as an artifact.
 On Sundays a public feed may update after the private snapshot, so a newer feed
 defers the exact target-list comparison without hiding a stale or incomplete
 snapshot. The job fails if any required structural or freshness check fails.
-Scheduled runs require a collection no more than two hours old. Push and
-manual runs allow seven hours because the collector normally runs every six
-hours; this permits an on-demand parser comparison between collection times
-without relaxing the scheduled freshness gate.
+The normal six-hour scheduled checks, push and manual runs allow seven hours
+because GitHub cron starts can be delayed until near the next collection. A
+missed six-hour collection still fails after the one-hour grace period. The
+Sunday hourly matchday verification retains the stricter two-hour limit.
 For a stale snapshot the failure prints only the collection and scheduled
 timestamps and its age in minutes, so the failure can be compared with the
 Worker's Cron Events without exposing provider HTML.
@@ -163,8 +167,9 @@ expanding this pilot to feed publication.
 
 **Publish verified Selkent candidate privately in R2** runs at :55 every six
 hours, after the shadow collector and public feed schedules. It also runs on a
-workflow change or manually. The scheduled run requires a snapshot collected
-within 120 minutes; on-demand runs allow 420 minutes. It rebuilds the candidate,
+workflow change or manually. All runs use the seven-hour bound for the six-hour collection cadence,
+including delayed GitHub cron starts. Sunday matchday snapshot verification
+remains separately bounded at two hours. It rebuilds the candidate,
 compares it independently against Python, then requires the full candidate to
 match the current GitHub public feed except for its collection timestamp.
 Restricted U7–U11 results fail the gate. This deliberately pauses publication
