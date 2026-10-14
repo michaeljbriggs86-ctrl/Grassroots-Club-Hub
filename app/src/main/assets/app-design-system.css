@@ -2407,3 +2407,48 @@ html body .content #view-matches :is(.next-match-card,.matchday-dashboard) .kit-
 
 /* Keep the reviewed light-on-dark fixture identity readable in both themes. */
 html body .content #view-matches #matches-next-fixture .next-fixture-versus{background:rgba(17,23,21,.38)!important;border-color:rgba(255,255,255,.13)!important}
+
+/* Club details review: Figma 305:6450, 14 October 2026. */
+html body #club-detail-dialog{width:min(calc(100vw - 24px),720px);max-width:calc(100vw - 24px);max-height:calc(100dvh - var(--android-inset-bottom,0px) - 24px)}
+html body #club-detail-dialog .club-detail-shell{display:grid;grid-template-rows:auto minmax(0,1fr) auto;gap:0;padding:0;max-height:calc(100dvh - var(--android-inset-bottom,0px) - 26px);overflow:hidden}
+html body #club-detail-dialog .modal-heading{display:flex;flex-wrap:nowrap;gap:12px;padding:20px 20px 16px;align-items:center;margin:0}
+html body #club-detail-dialog .modal-heading>div{flex:1 1 0;min-width:0}
+html body #club-detail-dialog .kicker{margin:0 0 8px;text-transform:none;letter-spacing:0;font-weight:400}
+html body #club-detail-dialog #club-detail-badge{flex:0 0 48px;display:grid;place-items:center}
+html body #club-detail-dialog #club-detail-badge .club-identity-badge{width:48px!important;height:48px!important;max-height:none!important;object-fit:contain}
+html body #club-detail-dialog .modal-heading .icon-button{flex:0 0 48px;width:48px;height:48px;min-width:48px;padding:0;font-size:1.5rem}
+html body #club-detail-dialog h3{font-size:1.125rem;line-height:1.5;overflow-wrap:anywhere;max-height:30dvh;overflow-y:auto;overscroll-behavior:contain}
+html body #club-detail-dialog .club-detail-body{display:flex;flex-direction:column;gap:16px;min-height:0;min-width:0;overflow-y:auto;overscroll-behavior:contain;padding:0 20px 20px}
+html body #club-detail-dialog .club-detail-body>*{flex:0 0 auto}
+html body #club-detail-dialog .club-detail-club-name{margin:0;color:var(--gch-control-muted);font-size:.875rem;font-weight:400}
+html body #club-detail-dialog .club-kit-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+html body #club-detail-dialog :is(.club-kit-grid article,.club-detail-venue,.club-shirt-editor){background:var(--gch-depth-panel)!important;color:var(--gch-control-copy)!important;border:1px solid var(--gch-depth-line)!important;border-radius:20px}
+html body #club-detail-dialog .club-kit-grid article{display:grid;grid-template-columns:56px minmax(0,1fr);align-items:center;justify-items:stretch;gap:12px;padding:16px;text-align:left;min-width:0}
+html body #club-detail-dialog .club-kit-visual{display:grid;place-items:center;width:56px;height:56px}
+html body #club-detail-dialog .match-team-kit{width:56px;height:56px;margin:0}
+html body #club-detail-dialog .club-kit-unknown{font-size:1.5rem;color:var(--gch-control-muted)}
+html body #club-detail-dialog .club-kit-copy{display:grid;gap:8px;min-width:0}
+html body #club-detail-dialog .club-kit-copy>span{color:var(--gch-control-muted);font-size:.8125rem;line-height:1.5}
+html body #club-detail-dialog .club-kit-copy strong{font-size:1rem;line-height:1.5;font-weight:600;overflow-wrap:anywhere}
+html body #club-detail-dialog .club-kit-unrecorded strong{color:var(--gch-control-muted)}
+html body #club-detail-dialog .club-detail-venue{display:grid;grid-template-columns:minmax(0,1fr);justify-content:stretch;gap:12px;padding:16px;align-items:stretch}
+html body #club-detail-dialog .club-detail-ground-copy{display:grid;gap:8px}
+html body #club-detail-dialog .club-detail-ground-copy>span{font-size:.8125rem;line-height:1.5;font-weight:400;text-transform:none;letter-spacing:0;color:var(--gch-control-muted)!important}
+html body #club-detail-dialog .club-detail-ground-copy strong{font-size:1rem;line-height:1.5;font-weight:600;overflow-wrap:anywhere}
+html body #club-detail-dialog .club-detail-ground-copy small{font-size:.875rem;line-height:1.5;color:var(--gch-control-muted)!important}
+html body #club-detail-dialog .fixture-map-preview{height:140px;border-radius:12px;border:0;display:block}
+html body #club-detail-dialog .map-link{display:grid;place-items:center;min-height:52px;width:100%;box-sizing:border-box;margin:0;padding:12px 16px;border:1px solid var(--gch-control-line);border-radius:12px;background:var(--gch-control-surface)!important;color:var(--gch-control-copy)!important;font-size:.875rem;line-height:1.5;font-weight:600;text-decoration:none}
+html body #club-detail-dialog .club-shirt-editor{display:block;padding:0}
+html body #club-detail-dialog .club-shirt-editor>summary{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:48px;padding:16px;font-size:.875rem;line-height:1.5;font-weight:600;color:var(--gch-control-copy)!important;box-sizing:content-box}
+html body #club-detail-dialog .club-shirt-editor>summary::after{content:"";width:8px;height:8px;flex:0 0 8px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg);margin-right:4px}
+html body #club-detail-dialog .club-shirt-editor[open]>summary::after{transform:rotate(225deg)}
+html body #club-detail-dialog .club-shirt-editor[open]{padding-bottom:16px}
+html body #club-detail-dialog .club-shirt-editor[open]>*:not(summary){margin:0 16px 16px}
+html body #club-detail-dialog .club-shirt-editor .form-grid{gap:16px}
+html body #club-detail-dialog .club-shirt-editor label{font-size:.875rem;line-height:1.5;font-weight:600;color:var(--gch-control-copy)!important}
+html body #club-detail-dialog .club-shirt-editor input{min-height:52px;margin-top:8px;padding:12px 16px;font-size:.875rem;line-height:1.5;background:var(--gch-control-surface)!important;color:var(--gch-control-copy)!important;border:1px solid var(--gch-control-line)!important;border-radius:12px}
+html body #club-detail-dialog .club-shirt-editor .primary-button{width:calc(100% - 32px);min-height:52px;margin-bottom:0}
+html body #club-detail-dialog .modal-actions{position:static;grid-template-columns:minmax(0,1fr);margin:0;padding:12px 20px;gap:0}
+html body #club-detail-dialog .modal-actions .primary-button{width:100%;min-height:52px}
+html body #club-detail-dialog :is(h3,summary,a,button,input):focus-visible{outline:3px solid var(--gch-control-choice-copy);outline-offset:3px}
+@media(max-width:600px){html body #club-detail-dialog .club-kit-grid,html body #club-detail-dialog .form-grid.two{grid-template-columns:minmax(0,1fr)}}
