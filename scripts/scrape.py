@@ -50,6 +50,13 @@ DELAY_BETWEEN_REQUESTS_SECONDS = 0.35
 
 SCHEMA_VERSION = 2
 
+# Temporary club scope agreed by Mike on 2026-10-14: Shooters Hill has no
+# U12X team. Remove this entry and verify cupspage/22 before adding one.
+# This excludes cup collection only; fixture and league collection stay intact.
+DEFERRED_CUP_AGEGROUPS = {
+    (22, "U12X"): "Shooters Hill AFC has no U12X team; cup collection deferred",
+}
+
 
 class SelkentFeedError(RuntimeError):
     """Base error for public feed generation."""
@@ -710,6 +717,8 @@ def collect_cup_results(results_agegroups: dict[int, dict[str, str]]) -> dict[in
                 continue
             if _normalise_text(tab.get_text(" ", strip=True)) != label or metadata["format_type"] != format_type:
                 raise SelkentFeedError("Cup/Results age-group metadata conflict")
+            if (age_id, label) in DEFERRED_CUP_AGEGROUPS:
+                continue
             collected[age_id] = parse_published_cup_results(fetch_json(f"cupspage/{age_id}"), age_id)
             _sleep_between_requests()
     return collected
@@ -884,6 +893,11 @@ def build_payload() -> dict[str, Any]:
             entry["published_results"] = None
             entry["published_results_status"] = "not_publicly_published"
 
+        deferred_reason = DEFERRED_CUP_AGEGROUPS.get((agegroup_id, label))
+        if deferred_reason is not None:
+            entry["cup_results_status"] = "deferred"
+            entry["cup_results_deferred_reason"] = deferred_reason
+
         age_groups.append(entry)
 
     return {
@@ -909,10 +923,24 @@ def build_payload() -> dict[str, Any]:
                 "scope": "Selkent-public Results age groups only",
                 "parser_status": "verified_scored_rows_v1",
                 "cup_parser_status": "verified_cup_scored_rows_v1",
+                "cup_scope": "Advertised public cups excluding explicitly deferred age groups",
+                "deferred_cup_age_groups": [
+                    {
+                        "agegroup_id": entry["agegroup_id"],
+                        "age_group": entry["age_group"],
+                        "reason": entry["cup_results_deferred_reason"],
+                    }
+                    for entry in age_groups
+                    if entry.get("cup_results_status") == "deferred"
+                ],
             },
         },
         "age_groups": age_groups,
         "notes": [
+            (
+                "cup_results_last_updated applies to collected cup age groups; "
+                "deferred cup data has not been checked and is not confirmed empty."
+            ),
             (
                 "U7-U11/private club-entered results are intentionally excluded "
                 "from this public feed."
