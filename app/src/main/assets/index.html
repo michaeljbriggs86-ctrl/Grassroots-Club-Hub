@@ -118,34 +118,6 @@
           <div class="panel parent-home-match-info screen-lead-card hidden" id="parent-home-match-info"></div>
         </section>
 
-        <section class="panel matchday-dashboard canonical-match-card-active hidden" id="matchday-dashboard">
-          <div class="panel-heading matchday-dashboard-heading">
-            <div><p class="kicker" id="matchday-dashboard-kicker">Next fixture prep</p><h3 id="matchday-dashboard-title">Matchday dashboard</h3></div>
-            <span class="matchday-dashboard-status" id="matchday-dashboard-status"></span>
-          </div>
-          <div class="matchday-dashboard-grid">
-            <article class="matchday-dashboard-fixtures"><span>Matches</span><div class="canonical-match-rows" id="matchday-dashboard-opponent">TBC</div></article>
-            <article><span>Date &amp; time</span><strong id="matchday-dashboard-kickoff">TBC</strong><small id="matchday-dashboard-confirmation"></small></article>
-            <article><span>Venue</span><strong id="matchday-dashboard-venue">TBC</strong><small id="matchday-dashboard-address"></small></article>
-            <article><span>Availability</span><strong id="matchday-dashboard-availability">0 available</strong><small id="matchday-dashboard-availability-breakdown"></small></article>
-            <article><span>Squad</span><strong id="matchday-dashboard-squad">0 selected</strong></article>
-            <article><span>Formation</span><strong id="matchday-dashboard-formation">TBC</strong></article>
-          </div>
-          <div class="matchday-dashboard-alert hidden" id="matchday-dashboard-alert"></div>
-          <div class="kit-clash-warning hidden" id="matchday-dashboard-kit-warning"></div>
-          <div class="matchday-dashboard-actions">
-            <button type="button" class="primary-button compact" id="matchday-open-tactics">Open squad &amp; tactics</button>
-            <a class="secondary-button compact hidden" id="matchday-dashboard-map" href="#">Open in Maps</a>
-            <button type="button" class="secondary-button compact" id="matchday-add-calendar">Add to calendar</button>
-            <button type="button" class="secondary-button compact hidden" id="matchday-notify-squad">Notify selected squad</button>
-          </div>
-          <details class="matchday-dashboard-note">
-            <summary>Private coaching note</summary>
-            <textarea id="matchday-dashboard-note-input" aria-label="Private coaching note" rows="3" maxlength="4000" placeholder="Match plan, reminders or coaching focus..."></textarea>
-            <p class="coach-note-readonly hidden" id="matchday-dashboard-note-readonly"></p>
-            <button type="button" class="secondary-button compact" id="save-matchday-dashboard-note">Save note</button>
-          </details>
-        </section>
 
         <section class="panel club-notices-panel hidden" id="home-club-notices">
           <div class="panel-heading"><div><p class="kicker">Notifications</p><h3>Club notices</h3></div><span class="notice-unread-badge hidden" id="home-notices-unread">0 unread</span></div>
@@ -238,9 +210,37 @@
           <div class="next-match-grid matches-fixture-time-row"><div class="fixture-date-with-calendar"><div class="fixture-date-copy"><span>Date / time</span><strong id="matches-next-when">Date / kick-off TBC</strong></div><button type="button" class="text-button compact hidden" id="matches-next-calendar">Add to calendar</button></div><div><span>Competition</span><strong id="matches-next-venue">Venue TBC</strong></div></div>
           <div class="match-venue-card next-fixture-venue"><div><span>Venue</span><strong id="matches-next-ground">Ground TBC</strong><small id="matches-next-address">Address TBC</small></div></div>
           <div class="fixture-map-preview hidden" id="matches-next-map-preview"><iframe id="matches-next-map-frame" title="Next fixture venue map" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe><a class="map-link hidden" id="matches-next-map" href="#" aria-label="Open next fixture venue in Maps">Open in Maps</a></div>
-          <div class="kit-clash-warning hidden" id="matches-next-kit-warning"></div>
+          <div class="hidden" id="matches-next-kit-warning"></div>
           <div class="next-match-kits hidden"><span>Match details</span><strong id="matches-next-kits">Kit colours and away details will appear when confirmed.</strong></div>
           <div class="next-match-links matches-next-actions"><button type="button" class="primary-button compact match-played-action hidden" id="matches-next-played" data-requires-edit>Match played</button><button type="button" class="secondary-button compact" id="matches-next-details">Match details</button><button type="button" class="secondary-button compact hidden match-share-icon" id="matches-next-share" aria-label="Share match details" title="Share match details"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8.7 10.5l6.6-4M8.7 13.5l6.6 4"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="5" r="3"/><circle cx="18" cy="19" r="3"/></svg></button><button type="button" class="secondary-button compact hidden" id="matches-next-copy">Copy match details</button></div>
+        </section>
+
+        <section class="panel matchday-dashboard canonical-match-card-active hidden" id="matchday-dashboard">
+          <div class="panel-heading matchday-dashboard-heading">
+            <div><p class="kicker" id="matchday-dashboard-kicker">Preparation</p><h3 id="matchday-dashboard-title">Next match prep</h3></div>
+            <span class="matchday-dashboard-status" id="matchday-dashboard-status"></span>
+          </div>
+          <div class="matchday-dashboard-grid">
+            <article class="matchday-dashboard-fixtures"><span>Matches</span><div class="canonical-match-rows" id="matchday-dashboard-opponent">TBC</div></article>
+            <article><span>Date &amp; time</span><strong id="matchday-dashboard-kickoff">TBC</strong><small id="matchday-dashboard-confirmation"></small></article>
+            <article><span>Venue</span><strong id="matchday-dashboard-venue">TBC</strong><small id="matchday-dashboard-address"></small></article>
+            <article><span>Availability</span><strong id="matchday-dashboard-availability">0 available</strong><small id="matchday-dashboard-availability-breakdown"></small></article>
+            <article><span>Squad</span><strong id="matchday-dashboard-squad">0 selected</strong></article>
+            <article><span>Formation</span><strong id="matchday-dashboard-formation">TBC</strong></article>
+          </div>
+          <div class="matchday-dashboard-alert hidden" id="matchday-dashboard-alert"></div>
+          <div class="matchday-dashboard-actions">
+            <button type="button" class="primary-button compact" id="matchday-open-tactics">Open squad &amp; tactics</button>
+            <a class="secondary-button compact hidden" id="matchday-dashboard-map" href="#">Open in Maps</a>
+            <button type="button" class="secondary-button compact" id="matchday-add-calendar">Add to calendar</button>
+            <button type="button" class="secondary-button compact hidden" id="matchday-notify-squad">Notify selected squad</button>
+          </div>
+          <details class="matchday-dashboard-note">
+            <summary>Private coaching note</summary>
+            <textarea id="matchday-dashboard-note-input" aria-label="Private coaching note" rows="3" maxlength="4000" placeholder="Match plan, reminders or coaching focus..."></textarea>
+            <p class="coach-note-readonly hidden" id="matchday-dashboard-note-readonly"></p>
+            <button type="button" class="secondary-button compact" id="save-matchday-dashboard-note">Save note</button>
+          </details>
         </section>
 
         <section class="panel parent-home-training screen-lead-card hidden" id="parent-matches-training" aria-label="Upcoming training sessions"></section>
@@ -934,7 +934,7 @@
       </section>
       <div class="match-venue-card next-fixture-venue"><div><span>Venue</span><strong id="next-match-ground">Awaiting confirmation</strong><small id="next-match-address">Coach will confirm the match venue.</small></div></div>
       <div class="fixture-map-preview hidden" id="next-match-map-preview"><iframe id="next-match-map-frame" title="Next match venue map" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe><a class="map-link hidden" id="next-match-map" href="#" aria-label="Open match venue in Maps">Open in Maps</a></div>
-      <div class="kit-clash-warning hidden" id="next-match-kit-warning"></div>
+      <div class="hidden" id="next-match-kit-warning"></div>
       <details class="selkent-task-guide hidden" id="next-match-selkent-tasks">
         <summary>Selkent staff steps</summary>
         <div>
@@ -998,7 +998,7 @@
           <a class="map-link hidden" id="match-detail-map" href="#">Open in Maps</a>
         </div>
         <div class="fixture-map-preview hidden" id="match-detail-map-preview"><iframe id="match-detail-map-frame" title="Match venue map" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe></div>
-        <div class="kit-clash-warning hidden" id="match-detail-kit-warning"></div>
+        <div class="hidden" id="match-detail-kit-warning"></div>
         <div class="fixture-kit-toggle-host hidden" id="match-detail-kit-toggle"></div>
       </section>
       <div class="match-report-progress hidden" id="match-report-progress" aria-label="Match report progress"></div>
