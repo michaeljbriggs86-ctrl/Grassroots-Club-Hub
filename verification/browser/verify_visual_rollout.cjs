@@ -368,4 +368,7 @@ let base;
  const result=require('node:child_process').spawnSync(process.execPath,[path.join(__dirname,'verify_more.cjs'),process.argv[2]||'playwright',path.join(out,'more')],{stdio:'inherit'});
  if(result.error)throw result.error;
  if(result.status!==0)throw Error('More browser verification failed');
+ const shareResult=require('node:child_process').spawnSync(process.execPath,[path.join(__dirname,'verify_matchday_share.cjs'),process.argv[2]||'playwright',path.join(out,'matchday-share')],{stdio:'inherit'});
+ if(shareResult.error)throw shareResult.error;
+ if(shareResult.status!==0)throw Error('Matchday share browser verification failed');
 }).catch(error=>{console.error(error);server.close();process.exitCode=1;});
