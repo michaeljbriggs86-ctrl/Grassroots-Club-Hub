@@ -20,9 +20,9 @@ assert.equal(JSON.stringify(rows),before,'neutral labels never rewrite provider 
 digest.events.forEach((e,i)=>e.kits=[`${e.teamLabel}: ${i%2?'away':'home'} shirt — ${i%2?'Blue':'Green'}`]);
 const layout=c.adminWeekendGraphicLayout(digest,'Example Juniors FC',g,'Arial'),words=layout.commands.filter(x=>x.kind==='text').map(x=>x.value).join('\n'),copy=c.adminWeekendDigestText(digest,'Example Juniors FC');
 assert(!/Kit:|shirt —|Kit for all/i.test(words+copy),'kit decisions omitted from both image and copied text');assert(!/https?:\/\/|Map:/.test(words+copy));
-assert(words.includes('NEUTRAL'));assert(words.includes('Cup North'));assert(words.includes('Cup South'));assert(words.includes('KICK-OFFS TO CONFIRM'));
+assert(words.includes('NEUTRAL'));assert(words.includes('Cup North'));assert(words.includes('Cup South'));assert(words.includes('AWAITING CONFIRMATION'));
 for(const name of ['U12 Cannons','U10 Vipers']){assert(words.includes(name));assert(copy.includes(name));assert(layout.anchors.some(x=>x.teamLabel===name&&x.pending),'unconfirmed teams remain navigable');}
-assert(digest.pendingRows.every(x=>!('time' in x)),'no guessed time on unconfirmed fixtures');
+assert(digest.pendingRows.every(x=>!x.time),'no guessed time on fixtures without an assigned kick-off');
 const groupAnchor=layout.anchors.find(x=>x.teamLabel==='U9 Valiants'),sunday=layout.anchors.find(x=>x.day&&x.date==='2026-10-11');assert(sunday.top-groupAnchor.top<500,'two-game Saturday section is compact');
 assert(layout.badge.size>=220);assert(layout.badge.x+layout.badge.size/2<=layout.width-64);assert(layout.badge.y-layout.badge.size/2>=0);
 const heading=layout.commands.filter(x=>x.kind==='text'&&x.size===84);for(const h of heading){g.font=`${h.weight} ${h.size}px Arial`;assert(h.x+g.measureText(h.value).width<layout.badge.x-layout.badge.size/2,'header reserves room for enlarged crest');}
