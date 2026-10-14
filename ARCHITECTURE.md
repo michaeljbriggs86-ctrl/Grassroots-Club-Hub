@@ -2,6 +2,7 @@
 
 **Document state:** Current governing architecture reference in `00 - CURRENT MASTER`. The GitHub-root copy is a mirror; its presence and byte parity must be checked independently after any Termux push.
 **Last updated:** 2026-10-13
+**Refresh recovery contract added:** 2026-10-14; implementation/acceptance pending at design review.
 **Collaboration rules:** `AI-COLLABORATION-PROTOCOL.md`
 **Product name:** PitchKind (formerly Grassroots Club Hub). Mike authorised the visible PitchKind identity implementation on 2026-09-21. Internal identifiers including `com.grassrootsclubhub.universal`, the `grassrootsclubhub://` scheme, `ClubHubNative`, existing feed/repository paths, localStorage keys and `GCH-PIN` remain unchanged unless separately authorised. Trade-mark clearance is NOT completed.
 **Brand/UI authority:** `APP-UI-DESIGN-GUIDELINES.md` v1.4 governs anything the app shows. `BRAND-GUIDELINES.md` v1.0 is its cross-platform extension; where they conflict on app surfaces, the app guidelines win.
@@ -151,6 +152,14 @@ payload contains 217 scored public results (211 U12+ youth and 6 Senior). `cloud
 validates and bundles this file for the protected website, but this source/CI
 evidence does not prove the revision currently served to signed-in users.
 Published results are viewable by parents and players (Section 2.10). U7–U11 results and standings must never appear in public JSON or parent APIs.
+
+Cup transport recovery (Mike's continuation, 2026-10-14; Figma review 299:6414):
+
+- The existing public feed may refresh complete fixtures, league results and standings while retaining the previous verified complete cup segment on a temporary provider transport failure (timeout/connection failure or HTTP 429/500/502/503/504). No second authority is introduced.
+- Retained cup rows must match canonical age-group identity, public U12+/Senior eligibility, verified parser metadata, safe public field shape and a valid original check timestamp. Missing/unsafe baseline data still aborts publication. Unknown populated markup, metadata conflicts, other HTTP errors and incomplete fixture/league collection still abort publication atomically.
+- `last_updated` describes the complete fixture/league collection. `cup_results_last_updated` retains the original verified cup check date on recovery; `cup_results_status` is `stale_retained` and the results view shows an explicit dated warning. A complete successful cup collection sets `verified_current` and clears the warning. The U12X deferral remains separately labelled and is never reported as checked empty.
+- The private shadow collects fixtures/league results/standings only. Its comparison must not claim independent cup verification. A private candidate must preserve canonical cup bytes and their original date/status rather than discard them or report them freshly collected.
+- Status at design review: PLANNED implementation; TESTED editable dark/light status states at 320/393/1024px. Production refresh, independent verification and signed-in acceptance remain OPEN.
 
 ## 2.5 Private club-entered results, player, roster and safeguarding data
 

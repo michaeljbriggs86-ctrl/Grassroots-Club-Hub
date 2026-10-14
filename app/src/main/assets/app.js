@@ -4541,6 +4541,13 @@ async function loadAdminPublishedFeed(force=false){
   catch(_){return __adminPublishedFeed;}
 }
 function verifiedClubResultsFeed(feed){return feed?.coverage?.published_results?.parser_status==='verified_scored_rows_v1'?feed:null;}
+function clubResultsSourceStatus(feed){
+  if(!feed)return 'Selkent feed unavailable · showing team-recorded matches only';
+  if(feed.cup_results_status!=='stale_retained')return '';
+  const checked=new Date(feed.cup_results_last_updated);
+  const date=Number.isFinite(checked.getTime())?checked.toLocaleString('en-GB',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit',timeZone:'Europe/London'}):'date unavailable';
+  return `Cup results could not refresh. Showing results last checked ${date}.`;
+}
 function publishedClubTeamData(team,feed){
   const age=Number(String(team?.ageGroup||'').match(/\d+/)?.[0]||0),name=normalizeTeamKey(team?.leagueName||team?.selkentName||team?.teamName||'');
   if(age<12||!name||!Array.isArray(feed?.age_groups))return{results:[],standing:null};
@@ -5890,13 +5897,13 @@ async function refreshClubResults(quiet=false){
       const [overview,rawFeed]=await Promise.all([window.ClubHubCloud.getClubOverview(),loadAdminPublishedFeed(!quiet),directoryPromise]);
       if(identity!==clubMatchPageIdentity())return;
       const feed=verifiedClubResultsFeed(rawFeed);
-      const status=document.getElementById('club-results-source-status');if(status)status.textContent=feed?'':'Selkent feed unavailable · showing team-recorded matches only';
+      const status=document.getElementById('club-results-source-status');if(status)status.textContent=clubResultsSourceStatus(feed);
       __clubResultsRows=clubResultRows(overview,overview.map(r=>r.team),feed,true);
     }else{
       const [rawFeed]=await Promise.all([loadAdminPublishedFeed(!quiet),directoryPromise]);
       if(identity!==clubMatchPageIdentity())return;
       const feed=verifiedClubResultsFeed(rawFeed);
-      const status=document.getElementById('club-results-source-status');if(status)status.textContent=feed?'':'Selkent feed unavailable · showing team-recorded matches only';
+      const status=document.getElementById('club-results-source-status');if(status)status.textContent=clubResultsSourceStatus(feed);
       const own=isAdminCoachMode()?dualCoachTeam():window.ClubHubCloud.currentTeam?.();
       __clubResultsRows=coachClubResultRows(own,state,feed);
     }

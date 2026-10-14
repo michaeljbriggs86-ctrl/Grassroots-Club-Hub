@@ -216,7 +216,10 @@ def compare_candidate_feed(snapshot: dict, feed: dict, candidate: dict) -> dict:
                 results.extend({**row, "provider_division_id": division_id,
                                 "division_name": current["division_name"]}
                                for row in parsed_results)
-            entry.update(standings=tables, published_results=results,
+            # The shadow independently collects league data only. Cup bytes and
+            # their freshness remain those of the canonical public snapshot.
+            cups = [dict(row) for row in age["published_results"] if "provider_cup_id" in row]
+            entry.update(standings=tables, published_results=results + cups,
                          published_results_status="verified_scored_rows_v1")
         expected_ages.append(entry)
     expected["age_groups"] = expected_ages
@@ -289,7 +292,8 @@ def compare_snapshot(snapshot: dict, feed: dict) -> dict:
         counts["published_results"] += len(parsed_results)
         if same_feed_version and parsed_standings != standings:
             differences["standings_age_groups"] += 1
-        if same_feed_version and parsed_results != age["published_results"]:
+        canonical_league_results = [row for row in age["published_results"] if "provider_cup_id" not in row]
+        if same_feed_version and parsed_results != canonical_league_results:
             differences["results_age_groups"] += 1
     counts["age_groups"] = len(feed["age_groups"])
     return {

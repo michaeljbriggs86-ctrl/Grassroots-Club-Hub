@@ -20,6 +20,31 @@ function exactKeys(object, expected, label) {
   }
 }
 
+function canonicalCupRows(feed, age, collectedAt) {
+  const rows = age.published_results?.filter(row => Object.hasOwn(row || {}, 'provider_cup_id')) || [];
+  if (!rows.length) return [];
+  const checkedAt = Date.parse(feed.cup_results_last_updated);
+  if (feed.coverage?.published_results?.cup_parser_status !== 'verified_cup_scored_rows_v1' ||
+      !Number.isFinite(checkedAt) || checkedAt > collectedAt ||
+      (feed.cup_results_status != null && !['verified_current', 'stale_retained'].includes(feed.cup_results_status))) {
+    throw new Error('Unverified canonical cup snapshot');
+  }
+  const fields = ['date', 'home', 'away', 'homeGoals', 'awayGoals', 'competition', 'round', 'provider_cup_id', 'provider_match_ref'];
+  for (const row of rows) {
+    exactKeys(row, fields, 'canonical cup');
+    if (!new RegExp(`^cupCombined${age.agegroup_id}-\\d+$`, 'u').test(row.provider_cup_id) ||
+        ![row.homeGoals, row.awayGoals].every(value => Number.isInteger(value) && value >= 0 && value <= 99) ||
+        !/cup|vase/iu.test(row.competition) ||
+        fields.filter(key => !['homeGoals', 'awayGoals'].includes(key)).some(key =>
+          typeof row[key] !== 'string' || !row[key].trim() || row[key].length > 300 || /[\x00-\x1f\x7f]/u.test(row[key])) ||
+        !/^\d{4}-\d{2}-\d{2}$/u.test(row.date) || new Date(row.date).toISOString().slice(0, 10) !== row.date) {
+      throw new Error('Unsafe canonical cup row');
+    }
+  }
+  // These exact rows are retained from the canonical feed, not privately collected.
+  return rows.map(row => ({ ...row }));
+}
+
 export function buildCandidateFeed(snapshot, feed) {
   if (snapshot?.schema !== 'pitchkind-selkent-shadow-v1' ||
       feed?.schema_version !== 2 || feed?.provider !== 'Selkent' ||
@@ -84,7 +109,7 @@ export function buildCandidateFeed(snapshot, feed) {
       throw new Error(`Candidate results coverage is incomplete for age group ${key}`);
     }
     entry.standings = standings;
-    entry.published_results = results;
+    entry.published_results = [...results, ...canonicalCupRows(feed, age, collectedAt)];
     entry.published_results_status = 'verified_scored_rows_v1';
     return entry;
   });
