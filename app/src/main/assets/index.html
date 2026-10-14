@@ -435,7 +435,7 @@
         <a class="page-link" href="?view=raise-concern" data-page-route="raise-concern" ><span><strong>Raise an issue</strong><small>Contact the club about a complaint or concern</small></span><span aria-hidden="true">›</span></a>
         <section class="panel hidden" id="dispute-reviewer-panel"><div class="panel-heading"><div><p class="kicker">Restricted role</p><h3>Dispute Reviewer</h3><p class="muted">Only assigned reviewers can open retained dispute material. Access is audited.</p></div></div><div id="reviewer-dispute-list"><div class="empty-state compact-empty">No open disputes loaded.</div></div><label>Retained message thread ID<input id="reviewer-thread-id" placeholder="Thread UUID"/></label><button type="button" class="secondary-button" id="load-retained-thread">Open retained thread</button><div id="reviewer-retained-thread" class="inbox-thread"></div></section>
         </div>
-        <section class="panel hidden communications-notifications-panel screen-lead-card" id="communications-notifications-panel"><div class="panel-heading"><div><p class="kicker">Notifications</p><h3>Updates</h3><p>Club notices and updates in one place.</p></div></div><div class="notification-toolbar"><strong id="communications-notification-unread">Updates</strong><button type="button" class="secondary-button" id="communications-notifications-refresh">Refresh</button><button type="button" class="secondary-button" id="communications-mark-all">Mark all read</button></div><p id="communications-notification-status" class="notification-status" role="status" aria-live="polite" hidden></p><div class="notification-list" id="communications-notifications-list"></div></section>
+        <section class="panel hidden communications-notifications-panel screen-lead-card" id="communications-notifications-panel"><div class="panel-heading"><div><p class="kicker">Notifications</p><h3>Updates</h3><p>Club notices and updates in one place.</p></div></div><div class="notification-toolbar"><strong id="communications-notification-unread">Updates</strong><button type="button" class="secondary-button" id="communications-notifications-refresh">Refresh</button><button type="button" class="secondary-button" id="communications-mark-all">Mark all read</button></div><p id="communications-notification-status" class="notification-status" role="status" aria-live="polite" hidden></p><section class="kickoff-push-panel" data-kickoff-push-panel hidden></section><div class="notification-list" id="communications-notifications-list"></div></section>
         <div class="hidden" id="communications-notices-panel">
           <section class="panel admin-announcement-centre screen-lead-card">
             <div class="panel-heading"><div><p class="kicker">Notifications</p><h3>Club notices</h3><p class="muted">Broadcast a read-only notification to the relevant members.</p></div></div>
@@ -1156,7 +1156,7 @@
       <p class="notification-intro">Club notices and updates in one place.</p>
       <div class="notification-toolbar"><strong id="notification-unread">Updates</strong><button type="button" class="secondary-button" id="notifications-refresh">Refresh</button><button type="button" class="secondary-button" id="notifications-mark-all">Mark all read</button></div>
       <p id="notification-status" class="notification-status" role="status" aria-live="polite" hidden></p>
-      <div class="notification-list" id="notification-list"></div>
+      <section class="kickoff-push-panel" data-kickoff-push-panel hidden></section><div class="notification-list" id="notification-list"></div>
       <div class="modal-actions"><button type="button" class="primary-button" data-close-dialog>Done</button></div>
     </div>
   </dialog>
@@ -1203,6 +1203,7 @@
   <script src="registration-conduct.js"></script>
   <script src="player-onboarding.js"></script>
   <script src="coach-onboarding.js"></script>
+  <script src="kickoff-updates.js"></script>
   <script src="app.js"></script>
   <script src="static-feed-overlay.js"></script>
 </body>

@@ -1929,7 +1929,7 @@ function groundOptionsForFixture(f={}){
   if(!cupGround.name||!cupGround.address)return grounds;
   return [cupGround,...grounds.filter(g=>selkentNorm(g.name)!==selkentNorm(cupGround.name)||selkentNorm(g.address)!==selkentNorm(cupGround.address))];
 }
-let __fixtureEditingKey='';
+let __fixtureEditingKey='',__fixtureSaveBusy=false;
 function matchTeamLabel(name=''){return String(name||'').replace(/_/g,' ').replace(/\s+/g,' ').trim();}
 function renderCompactNextMatchTeams(f={}){
   const host=document.getElementById('next-match-home-teams');if(!host)return;
@@ -1957,7 +1957,8 @@ async function openNextFixtureDetails(){
   const names=homeFixtureTeamNames(f);try{await Promise.all([fetchClubDirectoryDetails(names.home),fetchClubDirectoryDetails(names.away)]);persistLocalState();renderNextMatch();}catch(_){}
   renderFixtureConfirmationEditor(f);
 }
-function saveFixtureConfirmation(){
+async function saveFixtureConfirmation(){
+  if(__fixtureSaveBusy)return;
   if(!canConfirmFixtureDetails())return toast('Club staff access is required');const f=nextPublishedFixture();if(!f)return toast('No fixture available');
   const time=String(document.getElementById('next-match-confirm-time')?.value||'').trim(),select=document.getElementById('next-match-ground-select'),grounds=groundOptionsForFixture(f);let groundName='',address='';
   if(!/^\d{2}:\d{2}$/.test(time)||!matchdayArrivalTime(time))return toast(miniCupGroup(f)?'Enter a valid group start time':'Enter a valid kick-off time');
@@ -1967,7 +1968,13 @@ function saveFixtureConfirmation(){
   state.selkent=state.selkent||{};state.selkent.fixtureOverrides=state.selkent.fixtureOverrides||{};state.selkent.fixtureKitSelections=state.selkent.fixtureKitSelections||{};
   const before=state.selkent.fixtureOverrides[key]||null,after={...before,time,groundName,address,confirmedAt:new Date().toISOString()};state.selkent.fixtureOverrides[key]=after;state.selkent.fixtureKitSelections[key]=choice;
   state.selkent.fixtureAcknowledgement={status:'confirmed',fingerprint:fixtureFingerprint(f),key:fixtureStableKey(f),note:'',at:new Date().toISOString()};if(state.selkent.fixtureTracking){state.selkent.fixtureTracking.changed=false;state.selkent.fixtureTracking.previousSummary='';state.selkent.fixtureTracking.changes=[];}
-  saveState();auditEvent('fixture_details_confirmed','fixture',key,`Confirmed ${time} at ${groundName}`,before,{...after,shirt:choice});__fixtureEditingKey='';renderNextMatch();renderMatchPageNextFixture();renderSelkentFixtures();renderMatchdayDashboard();toast('Match details confirmed for parents');
+  __fixtureEditingKey=key;persistLocalState();renderAll();
+  const saveButton=document.getElementById('fixture-confirm-details'),teamId=window.ClubHubCloud?.currentTeam?.()?.id;__fixtureSaveBusy=true;if(saveButton){saveButton.disabled=true;saveButton.textContent='Saving…';}
+  try{if(CLOUD_MODE)await window.ClubHubCloud.confirmStateSave(state);}
+  catch(_){toast('Could not save match details. Your edits are still on this device; try again.');return;}
+  finally{__fixtureSaveBusy=false;if(saveButton)saveButton.disabled=false;const current=nextPublishedFixture();if(current&&(!CLOUD_MODE||teamId===window.ClubHubCloud?.currentTeam?.()?.id))renderFixtureConfirmationEditor(current);}
+  if(CLOUD_MODE&&teamId!==window.ClubHubCloud?.currentTeam?.()?.id)return;
+  auditEvent('fixture_details_confirmed','fixture',key,`Confirmed ${time} at ${groundName}`,before,{...after,shirt:choice});__fixtureEditingKey='';renderNextMatch();renderMatchPageNextFixture();renderSelkentFixtures();renderMatchdayDashboard();toast(CLOUD_MODE?'Match details saved':'Match details saved on this device');refreshNotifications(false);
 }
 function shareCardWrap(ctx,text,x,y,maxWidth,lineHeight){const words=String(text||'').split(/\s+/),lines=[];let line='';for(const word of words){const test=line?line+' '+word:word;if(ctx.measureText(test).width>maxWidth&&line){lines.push(line);line=word;}else line=test;}if(line)lines.push(line);lines.slice(0,3).forEach((l,i)=>ctx.fillText(l,x,y+i*lineHeight));return y+Math.min(lines.length,3)*lineHeight;}
 function drawShareJersey(ctx,x,y,colours='TBC',scale=1){
@@ -3087,12 +3094,13 @@ function notificationPresentation(row){
     access:'<circle cx="9" cy="8" r="3"/><path d="M3 21v-2a6 6 0 0 1 12 0v2M17 10h5M19.5 7.5v5"/>',
     update:'<path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/>'
   };
-  const known={fixture_change:['Fixture update','fixture'],availability_reminder:['Availability reminder','reminder'],parent_access_request:['Parent access request','access'],coach_access_request:['Coach access request','access'],child_access_request:['Child access request','access'],match_report:['Match report','fixture']};
+  const known={fixture_change:['Fixture update','fixture'],kickoff_update:['Kick-off update','fixture'],availability_reminder:['Availability reminder','reminder'],parent_access_request:['Parent access request','access'],coach_access_request:['Coach access request','access'],child_access_request:['Child access request','access'],match_report:['Match report','fixture']};
   const raw=String(row.type||'update').replace(/_/g,' ');
   const [label,icon]=row.source==='announcement'?['Club notice','notice']:known[row.type]||[raw.charAt(0).toUpperCase()+raw.slice(1),'update'];
   return {label,icon:`<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${icons[icon]}</svg>`};
 }
 function renderNotificationCenter(){
+  window.ClubHubKickoffUpdates?.renderPush?.();
   const allowed=!!syncNotificationContext(),bell=document.getElementById('notification-bell'),mobileBell=document.getElementById('mobile-notification-bell');
   bell?.classList.toggle('hidden',!allowed);mobileBell?.classList.toggle('hidden',!allowed||currentRole==='player');syncHeaderUtilityBar();
   const rows=allowed?notificationRows():[],unread=rows.filter(r=>!r.read_at).length;
@@ -3110,7 +3118,7 @@ function renderNotificationCenter(){
     const review=parentReview?`<button type="button" class="secondary-button notification-review-action" data-review-parent-request="${esc(r.id)}">Review request</button>`:'';
     const coachReview=r.source==='app'&&r.type==='coach_access_request'&&currentRole==='admin'?`<button type="button" class="secondary-button notification-review-action" data-review-coach-request="${esc(r.id)}">Review request</button>`:'';
     const presentation=notificationPresentation(r);
-    return `<article class="notification-item ${r.read_at?'read':'unread'} ${r.important?'important':''}"><div class="notification-type">${presentation.icon}<span>${esc(presentation.label)}</span></div><div class="notification-item-head"><strong>${esc(r.title||'Notification')}</strong></div><p>${esc(r.body||'')}</p><div class="notification-item-meta"><span class="notification-read-state"><span aria-hidden="true">${r.read_at?'✓':'●'}</span> ${r.read_at?'Read':'Unread'}${r.important?' · Important':''}</span><time>${notificationDate(r.created_at)}</time></div>${review||coachReview||mark?`<div class="notification-item-actions">${review}${coachReview}${mark}</div>`:''}</article>`;
+    return `<article class="notification-item ${r.read_at?'read':'unread'} ${r.important?'important':''}"><div class="notification-type">${presentation.icon}<span>${esc(presentation.label)}</span></div><div class="notification-item-head"><strong>${esc(r.title||'Notification')}</strong></div><p>${esc(r.body||'')}</p>${window.ClubHubKickoffUpdates?.renderAcknowledgement?.(r)||''}<div class="notification-item-meta"><span class="notification-read-state"><span aria-hidden="true">${r.read_at?'✓':'●'}</span> ${r.read_at?'Read':'Unread'}${r.important?' · Important':''}</span><time>${notificationDate(r.created_at)}</time></div>${review||coachReview||mark?`<div class="notification-item-actions">${review}${coachReview}${mark}</div>`:''}</article>`;
   }).join(''):`<div class="notification-empty"><strong>${__notificationLoading||(!__notificationStamp&&!__notificationError)?'Loading notifications':__notificationError?'Could not load notifications':'No notifications yet'}</strong><p>${__notificationError?'Your notifications are temporarily unavailable. Try again.':__notificationLoading||!__notificationStamp?'Checking your latest updates…':'Your club notices and updates will appear here.'}</p></div>`;
   for(const id of ['notification-list','communications-notifications-list']){const n=document.getElementById(id);if(n){const focused=n.contains?.(document.activeElement);if(n.innerHTML!==html){n.innerHTML=html;if(focused)(n.querySelector('button:not(:disabled)')||document.getElementById('notifications-refresh'))?.focus();}n.setAttribute('aria-busy',String(__notificationLoading));}}
 }
@@ -3122,7 +3130,7 @@ async function refreshNotifications(quiet=true){
   catch(_){if(key!==notificationContextKey()||version!==__notificationLoadVersion)return;__notificationError='Could not load notifications. Try again.';__notificationStamp=0;}
   finally{if(key===notificationContextKey()&&version===__notificationLoadVersion){__notificationLoading=false;renderNotificationCenter();}}
 }
-function refreshNotificationFeed(){syncNotificationContext();__notificationActionError='';refreshAnnouncements(false);return refreshNotifications(false);}
+function refreshNotificationFeed(){window.ClubHubKickoffUpdates?.refreshPush?.();syncNotificationContext();__notificationActionError='';refreshAnnouncements(false);return refreshNotifications(false);}
 function openNotifications(){
   if(!syncNotificationContext())return;
   if(isClubOverviewMode()){__communicationsTab='notifications';navigate('inbox',false);refreshNotificationFeed();return;}
@@ -6656,6 +6664,7 @@ async function bootTracker(){
     }
     setTimeout(()=>{if(!assignmentRequired()||account){if(shouldAutoSync())syncSelkent(true);else if(shouldScanFixtures())scanUpcomingFixtures(true);}},700);
     if(!window.__fixtureScanTimer)window.__fixtureScanTimer=setInterval(()=>{if(document.visibilityState==='visible'&&shouldScanFixtures())scanUpcomingFixtures(true);},5*60*1000);
+  if(new URLSearchParams(location.search).get('kickoff_update')){history.replaceState(null,'',location.pathname+location.hash);openNotifications();}
   }finally{__booting=false;finishOpeningSplash();}
 }
 window.ClubHubCoachOnboarding?.configure({

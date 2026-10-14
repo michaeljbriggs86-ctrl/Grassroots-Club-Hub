@@ -1,10 +1,10 @@
 // Browser pilot: cache reviewed same-origin application files only.
 // Never intercept Supabase responses, Selkent feeds, or private API calls.
-const CACHE = 'pitchkind-web-domain-20261013';
+const CACHE = 'pitchkind-web-kickoff-20261014';
 const STATIC = [
   './', './index.html', './manifest.json', './cloud-config.js', './cloud.js',
-  './onboarding.js', './onboarding.css', './app.js','./coach-qualifications.js','./member-contact-import.js','./person-profiles.js', './registration-conduct.js', './player-onboarding.js', './coach-onboarding.js', './static-feed-overlay.js',
-  './styles.css', './cloud.css', './app-design-system.css',
+  './onboarding.js', './onboarding.css', './app.js','./kickoff-updates.js','./coach-qualifications.js','./member-contact-import.js','./person-profiles.js', './registration-conduct.js', './player-onboarding.js', './coach-onboarding.js', './static-feed-overlay.js',
+  './notifications.css','./styles.css', './cloud.css', './app-design-system.css',
   './inter-variable.woff2', './inter-OFL.txt',
   './pilot-rights-runtime.js', './shooters-hill-logo.png', './club-badge-unavailable.svg', './football-login-adult.jpg',
   './football-login-player.jpg', './football-login-club.jpg',
@@ -26,4 +26,17 @@ self.addEventListener('fetch', event => {
     if (response.ok) caches.open(CACHE).then(cache => cache.put(request, response.clone()));
     return response;
   }).catch(() => caches.match(request)));
+});
+
+// Generic lock-screen content. Notification clicks only open the signed-in app.
+self.addEventListener('push',event=>{
+  let updateId='';try{const p=event.data?.json();if(/^[0-9a-f-]{36}$/i.test(p?.update_id||''))updateId=p.update_id;}catch(_){}
+  const url=new URL('./',self.registration.scope);url.searchParams.set('kickoff_update',updateId||'latest');
+  event.waitUntil(self.registration.showNotification('Shooters Hill AFC',{body:'New match details are ready. Open the app to review and confirm.',icon:new URL('./shooters-hill-logo.png',self.registration.scope).href,tag:'kickoff-update:'+updateId,data:{url:url.href}}));
+});
+self.addEventListener('notificationclick',event=>{
+  event.notification.close();
+  const url=new URL('./',self.registration.scope);
+  try{const requested=new URL(event.notification.data?.url);if(requested.origin===url.origin&&requested.pathname===url.pathname&&requested.searchParams.has('kickoff_update'))url.search=requested.search;}catch(_){}
+  event.waitUntil(self.clients.openWindow(url.href));
 });
