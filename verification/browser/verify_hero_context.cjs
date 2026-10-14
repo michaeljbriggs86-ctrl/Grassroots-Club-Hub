@@ -50,6 +50,18 @@ async function geometry(page,selector){return page.locator(selector).evaluate(el
    await seed('admin',theme,width,2,true);
    assert(await page.locator('#hero-profile-switch').isVisible());
    assert.equal(await page.locator('#hero-profile-switch').innerText(),'Coach view');
+   const compact=await page.locator('.hero').evaluate(el=>{
+    const hero=el.getBoundingClientRect(),identity=el.querySelector('.hero-inner').getBoundingClientRect(),actions=el.querySelector('.hero-context-actions').getBoundingClientRect(),label=el.querySelector('#hero-mode-pill'),title=el.querySelector('h1').getBoundingClientRect();
+    const copy=el.querySelector('.hero-copy'),range=document.createRange();range.selectNodeContents(copy);
+    const textFits=[...range.getClientRects()].every(r=>r.right<=actions.left+1);
+    return {height:hero.height,textFits,aligned:Math.abs(identity.top+identity.height/2-actions.top-actions.height/2)<2,roleBelowTitle:label.getBoundingClientRect().top>=title.bottom-1,roleBackground:getComputedStyle(label).backgroundColor,roleBorder:getComputedStyle(label).borderTopWidth};
+   });
+   assert(compact.aligned,'actions share the identity row and vertical centre');
+   assert(compact.textFits,'all identity text stays clear of the controls');
+   assert(compact.roleBelowTitle,'role is metadata below the heading');
+   assert.equal(compact.roleBackground,'rgba(0, 0, 0, 0)');assert.equal(compact.roleBorder,'0px');
+   assert(compact.height<180,'ordinary Admin hero no longer spends a row on buttons');
+   await page.screenshot({path:path.join(out,'compact-admin-'+width+'-'+theme+'.png')});
    await page.locator('#hero-profile-switch').click();
    assert.equal(await page.evaluate(()=>adminUiMode),'coach');
    await page.evaluate(()=>refreshCoachTeamSwitch(false));
@@ -73,7 +85,7 @@ async function geometry(page,selector){return page.locator(selector).evaluate(el
     await page.screenshot({path:path.join(out,role+'-'+width+'-'+theme+'.png')});
     await seed(role,theme,width,1);assert.equal(await page.locator('#hero-coaching-teams').isVisible(),false);
    }
-   results.push({theme,width,bounds:b});
+   results.push({theme,width,bounds:b,compact});
   }
   for(const role of ['admin','parent','player','pending_parent']){
    await seed(role,'dark',320,2,false);assert.equal(await page.locator('#hero-profile-switch').isVisible(),false);assert.equal(await page.locator('#hero-team-switch').isVisible(),false);
@@ -88,6 +100,22 @@ async function geometry(page,selector){return page.locator(selector).evaluate(el
   await page.locator('#hero-team-retry').click();await page.waitForFunction(()=>!document.getElementById('hero-team-switch').classList.contains('hidden'));
   await page.evaluate(()=>{document.documentElement.style.fontSize='200%';renderAll();});assert.equal((await geometry(page,'.hero')).pageOverflow,false);
   await page.screenshot({path:path.join(out,'coach-320-200percent.png')});
+  await seed('admin','dark',320,2,true);
+  await page.evaluate(()=>{document.documentElement.style.fontSize='200%';renderAll();});
+  assert.equal((await geometry(page,'.hero')).pageOverflow,false);
+  assert(await page.locator('#hero-profile-switch').evaluate(el=>el.scrollWidth<=el.clientWidth+1),'enlarged button text remains inside its target');
+  await page.screenshot({path:path.join(out,'compact-admin-320-200percent.png')});
+  for(const width of [320,393]){
+   await seed('admin','light',width,1,true);
+   await page.evaluate(()=>{adminUiMode='view';window.ClubHubCloud.currentTeam=()=>({id:'fictional-team',name:'Example United Youth Development Greens',teamName:'Example United Youth Development Greens',ageGroup:'U9'});renderAll();});
+   assert.equal(await page.locator('#hero-mode-pill').innerText(),'Read only');assert(await page.locator('#hero-admin-preview-back').isVisible());
+   assert.equal((await geometry(page,'.hero')).pageOverflow,false);
+   assert.match(await page.locator('#hero-team-name').innerText(),/DEVELOPMENT/);
+   await page.screenshot({path:path.join(out,'compact-preview-long-'+width+'.png')});
+  }
+  await seed('parent','dark',393);
+  await page.evaluate(()=>{Object.assign(window.ClubHubCloud,{isStaffAccount:()=>true,actingAsParent:()=>true,realRole:()=> 'club_admin'});renderTeamIdentity();});
+  assert.equal(await page.locator('#hero-mode-pill').innerText(),'Parent view');assert.equal(await page.locator('#hero-profile-switch').isVisible(),false);assert.equal(await page.locator('#hero-team-switch').isVisible(),false);
   await seed('admin','dark',320,2,true);
   await page.evaluate(()=>{currentView='add';__matchFormDirty=true;});
   page.once('dialog',d=>d.dismiss());await page.locator('#hero-profile-switch').click();
