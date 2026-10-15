@@ -9,6 +9,7 @@
     { "binding": "PILOT_BADGES", "bucket_name": "pitchkind-pilot-badges" },
     { "binding": "SELKENT_CANDIDATE", "bucket_name": "pitchkind-selkent-feed-stage" }
   ],
+  "send_email": [{"name":"REGISTRATION_EMAIL","allowed_sender_addresses":["Hello@pitchkind.com"]}],
   "vars": {
     "SELKENT_CANDIDATE_KEY": "staging/022b20efb1cc5fbc1a912bd685d6bcd9d5a31acd/results.json",
     "SELKENT_FEED_R2_ENABLED": "false",
@@ -18,6 +19,6 @@
   "assets": {
     "directory": "./dist",
     "binding": "ASSETS",
-    "run_worker_first": ["/__registration_document", "/_private_documents/*", "/__health", "/__pilot_badges/*", "/__badge_review", "/__selkent_candidate", "/data/results.json"]
+    "run_worker_first": ["/__registration_mail", "/__registration_document", "/_private_documents/*", "/__health", "/__pilot_badges/*", "/__badge_review", "/__selkent_candidate", "/data/results.json"]
   }
 }

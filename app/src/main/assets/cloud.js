@@ -1109,9 +1109,10 @@
     }
 
     if(mode==='approval'||context?.profile?.role==='pending_parent'){
-      const body=`<p class="auth-notice ${message?'':'hidden'}" id="cloud-auth-notice">${escapeHtml(message)}</p><p class="activation-error hidden" id="cloud-auth-error" role="alert"></p><button class="auth-primary" id="cloud-check-approval">Check Approval <span>→</span></button><button class="auth-link-strong" id="cloud-reset-device">Back to Main Login</button>`;
-      gate.innerHTML=authSimple('Waiting for Approval','Your parent account is set up. Team data will appear once a coach approves access.',body,'PARENT ACCESS');
-      document.getElementById('cloud-check-approval')?.addEventListener('click',async()=>{try{context=await getContext();if(context?.profile?.role==='parent')location.reload();else showNotice('Still waiting for a coach to approve access.');}catch(e){authError(e.message||String(e));}});document.getElementById('cloud-reset-device')?.addEventListener('click',()=>{clearInviteAccess();setGateHtml('signin');});return;
+      const body=`<p class="auth-notice ${message?'':'hidden'}" id="cloud-auth-notice">${escapeHtml(message)}</p><p class="activation-error hidden" id="cloud-auth-error" role="alert"></p><button class="auth-link-strong" id="cloud-continue-registration">Continue registration</button><button class="auth-primary" id="cloud-check-approval">Check Approval <span>→</span></button><button class="auth-link-strong" id="cloud-reset-device">Back to Main Login</button>`;
+      gate.innerHTML=authSimple('Waiting for Approval','Your parent account is set up. Complete your registration or wait for the club to review access.',body,'PARENT ACCESS');
+      document.getElementById('cloud-continue-registration')?.addEventListener('click',()=>location.href='register.html');
+      document.getElementById('cloud-check-approval')?.addEventListener('click',async()=>{try{context=await getContext();if(context?.profile?.role==='parent')location.reload();else showNotice('Still waiting for the club to approve access.');}catch(e){authError(e.message||String(e));}});document.getElementById('cloud-reset-device')?.addEventListener('click',()=>{clearInviteAccess();setGateHtml('signin');});return;
     }
 
     if(mode==='revoked'||context?.profile?.role==='revoked'){
