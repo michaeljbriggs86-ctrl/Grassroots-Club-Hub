@@ -2,11 +2,15 @@
 const assert=require('node:assert/strict'),http=require('node:http'),net=require('node:net'),{spawn}=require('node:child_process'),crypto=require('node:crypto');
 const webpush=require(process.env.KICKOFF_NODE_MODULES?process.env.KICKOFF_NODE_MODULES+'/web-push':'web-push');
 (async()=>{
- const requests=[],secret=crypto.randomBytes(32).toString('hex'),keys=webpush.generateVAPIDKeys();let installed=null;
+ const requests=[],secret=crypto.randomBytes(32).toString('hex'),keys=webpush.generateVAPIDKeys();let installed=null,failInstall=false,rejectedPrivateKey='';
  const api=http.createServer(async(req,res)=>{
   let raw='';for await(const c of req)raw+=c;const data=JSON.parse(raw);requests.push({url:req.url,auth:req.headers.authorization});let result=[];
   if(req.url.endsWith('kickoff_dispatch_configuration'))result=data.p_token===secret?(installed||{needs_key:true}):null;
-  if(req.url.endsWith('install_kickoff_signing')){assert.equal(data.p_token,secret);assert.equal(data.p_credentials.subject,'mailto:secretary@shootershillfc.com');assert.equal(data.p_credentials.publicKey.length,87);assert.equal(data.p_credentials.privateKey.length,43);installed=data.p_credentials;result=true;}
+  if(req.url.endsWith('install_kickoff_signing')){
+   assert.equal(data.p_token,secret);assert.equal(data.p_credentials.subject,'mailto:secretary@shootershillfc.com');assert.equal(data.p_credentials.publicKey.length,87);assert.equal(data.p_credentials.privateKey.length,43);
+   if(failInstall){rejectedPrivateKey=data.p_credentials.privateKey;res.statusCode=400;result={error:'fictional-private-response-payload',token:secret,private_key:rejectedPrivateKey};}
+   else{installed=data.p_credentials;result=true;}
+  }
   res.setHeader('Content-Type','application/json');res.end(JSON.stringify(result));
  });await new Promise(r=>api.listen(0,'127.0.0.1',r));
  const socket=net.createServer();await new Promise(r=>socket.listen(0,'127.0.0.1',r));const port=socket.address().port;await new Promise(r=>socket.close(r));
@@ -21,6 +25,16 @@ const webpush=require(process.env.KICKOFF_NODE_MODULES?process.env.KICKOFF_NODE_
   assert.equal((await fetch(origin,{method:'POST',headers:{Authorization:'Bearer '+('0'.repeat(64))}})).status,401);assert.equal(requests.length,1,'wrong well-formed token reaches only configuration guard');
   const response=await fetch(origin,{method:'POST',headers:{Authorization:'Bearer '+secret}});assert.equal(response.status,200);assert.deepEqual(await response.json(),{claimed:0,sent:0,retrying:0,failed:0,cancelled:0,expired:0});
   assert.deepEqual(requests.map(r=>r.url),['/rest/v1/rpc/kickoff_dispatch_configuration','/rest/v1/rpc/kickoff_dispatch_configuration','/rest/v1/rpc/install_kickoff_signing','/rest/v1/rpc/kickoff_dispatch_configuration','/rest/v1/rpc/claim_kickoff_deliveries']);assert(requests.every(r=>r.auth==='Bearer fictional-service-key'));
-  console.log('PASS real Deno dispatcher: bearer boundary, Vault token guard, in-runtime key bootstrap, service-only RPC and empty queue, zero external sends.');
+  // An upstream bootstrap failure must be diagnosable without logging its
+  // credentials or raw response, and must never proceed to claim recipients.
+  installed=null;failInstall=true;const requestStart=requests.length,errorStart=errors.length;
+  const failed=await fetch(origin,{method:'POST',headers:{Authorization:'Bearer '+secret}});assert.equal(failed.status,503);
+  const failedBody=await failed.text();assert.deepEqual(JSON.parse(failedBody),{error:'Delivery run incomplete; queued updates will retry'});
+  for(let n=0;n<100&&!errors.slice(errorStart).includes('kickoff-dispatch failed at signing bootstrap');n++)await new Promise(r=>setTimeout(r,50));
+  const diagnostics=errors.slice(errorStart);
+  assert.deepEqual(diagnostics.trim().split(/\r?\n/),['kickoff-dispatch RPC failed install_kickoff_signing 400','kickoff-dispatch failed at signing bootstrap']);
+  for(const privateValue of [secret,rejectedPrivateKey,'fictional-service-key','fictional-private-response-payload']){assert(privateValue);assert(!diagnostics.includes(privateValue),'diagnostics redact private upstream data');assert(!failedBody.includes(privateValue),'response redacts private upstream data');}
+  assert.deepEqual(requests.slice(requestStart).map(r=>r.url),['/rest/v1/rpc/kickoff_dispatch_configuration','/rest/v1/rpc/install_kickoff_signing']);assert.equal(installed,null);
+  console.log('PASS real Deno dispatcher: bearer boundary, Vault token guard, in-runtime key bootstrap, service-only RPC and empty queue, sanitized bootstrap failure diagnostics, zero external sends.');
  }finally{worker.kill('SIGTERM');await new Promise(r=>api.close(r));}
 })().catch(e=>{console.error(e);process.exitCode=1;});
