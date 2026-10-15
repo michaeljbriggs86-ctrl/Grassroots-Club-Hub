@@ -83,7 +83,9 @@ try{
  await query("update auth.users set banned_until=now()+interval '1 day' where id=$1",[id(9)]);const banned=claimed.find(r=>r.email==='fictional9@example.invalid');assert.equal((await query('select public.validate_kickoff_delivery($1,$2) ok',[banned.id,banned.claim_token]))[0].ok,false,'banned account is not a send target');await query('update auth.users set banned_until=null where id=$1',[id(9)]);
  const badDates=[{date:'2026-02-30',time:'10:30'},{date:'not-a-date',time:'10:30'},{date,time:'25:90'},{}];for(const d of badDates)assert.equal((await query('select private.kickoff_upcoming($1) ok',[d]))[0].ok,false,'malformed date/time fails closed');
  const past=(await query("select jsonb_build_object('date',((now() at time zone 'Europe/London')::date-1)::text,'time','10:30') d"))[0].d;assert.equal((await query('select private.kickoff_upcoming($1) ok',[past]))[0].ok,false,'past local fixture fails closed');
- const row=claimed[0];assert.equal((await query('select public.validate_kickoff_delivery($1,$2) as ok',[row.id,row.claim_token]))[0].ok,true);
+ // Claim aggregation has no ordering guarantee. Keep the valid target distinct
+ // from the fictional2 lease deliberately expired above.
+ const row=emailJob;assert.equal((await query('select public.validate_kickoff_delivery($1,$2) as ok',[row.id,row.claim_token]))[0].ok,true);
  await query('select public.finish_kickoff_delivery($1,$2,$3)',[row.id,id(99),'sent']);assert.equal((await query('select status from private.kickoff_deliveries where id=$1',[row.id]))[0].status,'sending','wrong lease cannot finish');
  await query('select public.finish_kickoff_delivery($1,$2,$3)',[row.id,row.claim_token,'retrying']);assert.equal((await query('select status from private.kickoff_deliveries where id=$1',[row.id]))[0].status,'retrying');
  await query("update public.profiles set role='revoked' where user_id=$1",[id(3)]);assert.equal((await rpc(3,'list_kickoff_updates_for_me')).length,0,'revocation hides old details');
