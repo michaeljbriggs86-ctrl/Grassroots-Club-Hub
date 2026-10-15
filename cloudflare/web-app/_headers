@@ -3,3 +3,15 @@
   X-Frame-Options: DENY
   Referrer-Policy: no-referrer
   X-Robots-Tag: noindex, nofollow, noarchive
+
+/register
+  Cache-Control: private, no-store, no-transform
+  Content-Security-Policy: default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; connect-src 'self' https://obntycksmkcnkprrcutg.supabase.co; form-action 'self'; frame-ancestors 'none'; base-uri 'none'; object-src 'none'
+
+/register.html
+  Cache-Control: private, no-store, no-transform
+  Content-Security-Policy: default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; connect-src 'self' https://obntycksmkcnkprrcutg.supabase.co; form-action 'self'; frame-ancestors 'none'; base-uri 'none'; object-src 'none'
+
+/register/
+  Cache-Control: private, no-store, no-transform
+  Content-Security-Policy: default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; connect-src 'self' https://obntycksmkcnkprrcutg.supabase.co; form-action 'self'; frame-ancestors 'none'; base-uri 'none'; object-src 'none'

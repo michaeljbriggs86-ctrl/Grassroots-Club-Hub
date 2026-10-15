@@ -22,6 +22,8 @@ on:
       - 'web/db-drafts/admin_player_onboarding_candidate.sql'
       - 'web/db-drafts/registration_contact_conduct_candidate.sql'
       - 'web/db-drafts/test/*registration*'
+      - 'supabase/migrations/*parent_led_registration.sql'
+      - 'supabase/functions/registration-invite/**'
       - 'cloudflare/web-app/src/registration-document.js'
       - 'web/db-drafts/test/*player-onboarding*'
       - 'supabase/migrations/*admin_player_onboarding.sql'
@@ -53,6 +55,7 @@ jobs:
           node --check app/src/main/assets/player-onboarding.js
           node --check app/src/main/assets/coach-onboarding.js
           node --check app/src/main/assets/registration-conduct.js
+          node --check app/src/main/assets/registration.js
           node --test cloudflare/web-app/tests/*.test.mjs
           python verification/verify_v2_2_30_pitchkind_ui.py
           python verification/verify_club_logo_quality.py
@@ -75,8 +78,11 @@ jobs:
         run: |
           npm install --prefix "$RUNNER_TEMP/visual-review" --no-audit --no-fund playwright@1.64.0
           "$RUNNER_TEMP/visual-review/node_modules/.bin/playwright" install --with-deps chromium
+          node verification/browser/verify_parent_registration.cjs "$RUNNER_TEMP/visual-review/node_modules/playwright" "$RUNNER_TEMP/visual-review-output/parent-registration" "$RUNNER_TEMP/member-contact-sql/node_modules/@electric-sql/pglite"
           node verification/browser/verify_visual_rollout.cjs "$RUNNER_TEMP/visual-review/node_modules/playwright" "$RUNNER_TEMP/visual-review-output"
           node verification/browser/verify_hero_context.cjs "$RUNNER_TEMP/visual-review/node_modules/playwright" "$RUNNER_TEMP/visual-review-output/hero-context"
+          node verification/browser/verify_cup_freshness.cjs "$RUNNER_TEMP/visual-review/node_modules/playwright" "$RUNNER_TEMP/visual-review-output/cup-freshness"
+          node verification/browser/verify_club_details.cjs "$RUNNER_TEMP/visual-review/node_modules/playwright" "$RUNNER_TEMP/visual-review-output/club-details"
       - name: Preserve visual review evidence
         if: always()
         uses: actions/upload-artifact@v4
@@ -95,3 +101,6 @@ jobs:
 
       - name: Check registration contact and conduct with invented data
         run: node web/db-drafts/test/run-registration-contact-conduct.cjs "$RUNNER_TEMP/member-contact-sql/node_modules/@electric-sql/pglite"
+
+      - name: Check parent-led registration privacy and approval
+        run: node web/db-drafts/test/run-parent-led-registration.cjs "$RUNNER_TEMP/member-contact-sql/node_modules/@electric-sql/pglite"

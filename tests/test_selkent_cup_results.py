@@ -1,11 +1,17 @@
 """Public cupspage captures fetched 2026-10-11; whitespace normalized only."""
 import sys
 import unittest
+import copy
+import json
+import tempfile
+from contextlib import ExitStack
 from pathlib import Path
 from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
+import requests
+import scrape
 from scrape import build_payload, collect_cup_results, parse_published_cup_results, SelkentFeedError, UnverifiedPublishedResultsMarkupError
 
 
@@ -104,6 +110,90 @@ class CupResultsTests(unittest.TestCase):
                 parse_published_cup_results(html.replace('W - L', marker), 8)
         with self.assertRaises(UnverifiedPublishedResultsMarkupError):
             parse_published_cup_results(html.replace('Sporting Club Vista ', ''), 8)
+
+
+class CupRecoveryTests(unittest.TestCase):
+    def setUp(self):
+        self.ages = {6: {'age_group': 'U12', 'format_type': '9'}}
+        self.fixture = {'age_group': 'U12', 'fixtures': [{'date': '2026-10-18', 'home': 'Home', 'away': 'Away'}],
+                        'fixture_parse_status': 'verified_populated', 'fixture_week_ids': [1]}
+        self.league = {'age_group': 'U12', 'format_type': '9', 'standings': [],
+                       'published_results': [{'date': '2026-10-11', 'home': 'Home', 'away': 'Away', 'homeGoals': 2, 'awayGoals': 0}],
+                       'published_results_status': 'verified_scored_rows_v1'}
+        self.cups = parse_published_cup_results(CupResultsTests().source(6), 6)
+        self.previous = {'schema_version': 2, 'provider': 'Selkent', 'last_updated': '2026-10-12T13:49:27Z',
+                         'cup_results_last_updated': '2026-10-12T13:49:27Z',
+                         'coverage': {'published_results': {'cup_parser_status': 'verified_cup_scored_rows_v1'}},
+                         'age_groups': [{'agegroup_id': 6, 'age_group': 'U12', 'results_format_type': '9',
+                                         'published_results_status': 'verified_scored_rows_v1',
+                                         'published_results': self.cups}]}
+
+    def error(self, status=500):
+        response = requests.Response()
+        response.status_code = status
+        return requests.HTTPError('Synthetic provider failure', response=response)
+
+    def build(self, previous=None, error=None):
+        with ExitStack() as stack:
+            for name, value in [('discover_fixture_agegroups', ({6: 'U12'}, 'public')),
+                                ('discover_public_results_agegroups', self.ages),
+                                ('collect_fixtures', {6: self.fixture}), ('collect_standings', {6: self.league})]:
+                stack.enter_context(patch('scrape.' + name, return_value=value))
+            stack.enter_context(patch('scrape.collect_cup_results', side_effect=error, return_value={6: self.cups}))
+            return build_payload(previous)
+
+    def test_temporary_outage_keeps_cups_and_date_with_fresh_fixture_and_league(self):
+        for error in [self.error(code) for code in [429, 500, 502, 503, 504]] + [requests.Timeout(), requests.ConnectionError()]:
+            with self.subTest(error=repr(error)):
+                result = self.build(self.previous, error)
+                self.assertEqual(result['cup_results_status'], 'stale_retained')
+                self.assertEqual(result['cup_results_last_updated'], self.previous['cup_results_last_updated'])
+                self.assertGreater(result['last_updated'], self.previous['last_updated'])
+                self.assertEqual(result['age_groups'][0]['fixtures'], self.fixture['fixtures'])
+                self.assertEqual(result['age_groups'][0]['published_results'], self.league['published_results'] + self.cups)
+                again = self.build(result, self.error())
+                self.assertEqual(again['cup_results_last_updated'], self.previous['cup_results_last_updated'])
+                self.assertEqual(again['age_groups'][0]['published_results'], result['age_groups'][0]['published_results'])
+
+    def test_recovery_clears_stale_status_and_replaces_old_cups(self):
+        stale = self.build(self.previous, self.error())
+        self.cups = [{**self.cups[0], 'homeGoals': 9}]
+        result = self.build(stale)
+        self.assertEqual(result['cup_results_status'], 'verified_current')
+        self.assertEqual(result['cup_results_last_updated'], result['last_updated'])
+        self.assertEqual(result['age_groups'][0]['published_results'][-1]['homeGoals'], 9)
+        self.cups = []
+        empty = self.build(stale)
+        self.assertEqual(empty['cup_results_status'], 'verified_current')
+        self.assertEqual(empty['age_groups'][0]['published_results'], self.league['published_results'])
+
+    def test_contract_auth_tls_and_other_http_failures_do_not_recover(self):
+        errors = [self.error(code) for code in [400, 401, 403, 404, 501]] + [requests.exceptions.SSLError(),
+                  SelkentFeedError('metadata conflict'), UnverifiedPublishedResultsMarkupError('unknown populated shape')]
+        for error in errors:
+            with self.subTest(error=repr(error)), self.assertRaises(type(error)):
+                self.build(self.previous, error)
+
+    def test_missing_corrupt_wrong_age_and_private_baselines_fail_closed(self):
+        baselines = [None, {}, {**self.previous, 'cup_results_last_updated': None},
+                     {**self.previous, 'cup_results_last_updated': '2099-01-01T00:00:00Z'}]
+        for field, value in [('age_group', 'U9'), ('results_format_type', '11'), ('published_results_status', 'unverified')]:
+            p = copy.deepcopy(self.previous); p['age_groups'][0][field] = value; baselines.append(p)
+        for field, value in [('medical', 'private'), ('provider_cup_id', 'cupCombined7-1'), ('homeGoals', True), ('date', '2026-02-30')]:
+            p = copy.deepcopy(self.previous); p['age_groups'][0]['published_results'][0][field] = value; baselines.append(p)
+        p = copy.deepcopy(self.previous); p['age_groups'].append(p['age_groups'][0]); baselines.append(p)
+        for previous in baselines:
+            with self.subTest(previous=str(previous)[:80]), self.assertRaises(SelkentFeedError):
+                self.build(previous, self.error())
+
+    def test_failed_refresh_keeps_actual_output_bytes(self):
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory) / 'results.json'
+            original = json.dumps(self.previous).encode(); output.write_bytes(original)
+            with patch.object(scrape, 'OUTPUT_PATH', output), patch('scrape.build_payload', side_effect=UnverifiedPublishedResultsMarkupError('new markup')):
+                with self.assertRaises(UnverifiedPublishedResultsMarkupError):
+                    scrape.main()
+            self.assertEqual(output.read_bytes(), original)
 
 
 if __name__ == '__main__':

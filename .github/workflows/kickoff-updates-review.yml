@@ -4,13 +4,13 @@ on:
     paths:
       - 'app/src/main/assets/**'
       - 'cloudflare/web-app/**'
-      - 'supabase/migrations/20261014105830_kickoff_updates.sql'
+      - 'supabase/migrations/*kickoff_updates.sql'
       - 'supabase/functions/kickoff-dispatch/**'
       - 'tests/kickoff*.mjs'
       - 'web/db-drafts/test/run-kickoff-updates.cjs'
       - 'verification/browser/verify_kickoff_updates.cjs'
       - 'verification/browser/check_kickoff_dispatcher.cjs'
-      - 'supabase/migrations/20261014111626_kickoff_dispatch_schedule.sql'
+      - 'supabase/migrations/*kickoff_dispatch_schedule.sql'
       - '.github/workflows/kickoff-updates-review.yml'
   workflow_dispatch:
 permissions:
@@ -28,7 +28,7 @@ jobs:
           python-version: '3.12'
       - name: Check committed updates, receipt permissions and transport logic
         run: |
-          npm install --prefix "$RUNNER_TEMP/kickoff-test" --no-audit --no-fund @electric-sql/pglite@0.3.14 web-push@3.6.7 nodemailer@10.1.1 deno@2.9.6
+          npm install --prefix "$RUNNER_TEMP/kickoff-test" --no-audit --no-fund @electric-sql/pglite@0.3.14 web-push@3.6.7 deno@2.9.6
           node --check app/src/main/assets/kickoff-updates.js
           node web/db-drafts/test/run-kickoff-updates.cjs "$RUNNER_TEMP/kickoff-test/node_modules/@electric-sql/pglite"
           KICKOFF_NODE_MODULES="$RUNNER_TEMP/kickoff-test/node_modules" node --test tests/kickoff_delivery.test.mjs tests/kickoff_save_commit.test.mjs

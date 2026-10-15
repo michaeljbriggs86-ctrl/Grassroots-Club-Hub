@@ -173,3 +173,12 @@ assert.equal(reportRows[0].hg,0);assert.equal(reportRows[0].ag,3,'away score ord
 const legacy=staffReportState('Alex Example');legacy.goals=[{matchId:'shared-match-id',player:'Legacy Example',goals:3}];
 assert.equal(internalAdminClubResults([{team:teams[2],state:legacy}])[0].report.goals[0].player,'Legacy Example','existing named records still render');
 console.log('PASS team-scoped mini-soccer scorer and award identity resolution');
+
+const clubResultsSourceStatus=new Function(`${helpers}\nreturn clubResultsSourceStatus;`)();
+assert.equal(clubResultsSourceStatus(null),'Selkent feed unavailable · showing team-recorded matches only');
+assert.equal(clubResultsSourceStatus(feed),'');
+assert.equal(clubResultsSourceStatus({...feed,cup_results_status:'verified_current'}),'');
+const staleCupFeed={...cupFeed,cup_results_status:'stale_retained',cup_results_last_updated:'2026-10-12T13:49:27Z'};
+assert.match(clubResultsSourceStatus(staleCupFeed),/Cup results could not refresh.*12 Oct.*14:49/);
+assert.match(clubResultsSourceStatus({...staleCupFeed,cup_results_last_updated:'invalid'}),/date unavailable/);
+assert.equal((src.match(/status.textContent=clubResultsSourceStatus\(feed\)/g)||[]).length,2,'Admin and Coach results display the same source warning');

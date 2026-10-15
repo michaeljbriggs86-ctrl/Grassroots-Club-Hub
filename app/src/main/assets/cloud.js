@@ -504,7 +504,7 @@
     if(clean.length<2||clean.length>80||!Number.isInteger(shirt)||shirt<1||shirt>99||!['outfield','goalkeeper'].includes(playerRole))throw new Error('Check the player name, shirt number and position.');
     const result=await rpc('admin_onboard_player',{p_team_id:team.id,p_player_name:clean,p_shirt_number:shirt,p_player_role:playerRole,p_parent_request_id:parentRequestId||null});
     if(!canAdmin()||identity!==adminOnboardingIdentity())throw new Error('Account access changed. Check the squad after signing in again.');
-    if(!result?.ok)throw new Error('The cloud did not confirm this player onboarding.');
+    if(!result?.ok)throw new Error('The cloud did not confirm this parent onboarding.');
     // Refresh only the already-active team; onboarding never switches a team/context.
     if(activeTeam?.id===team.id){
       try{const saved=await fetchTeamState(team.id);if(identity===adminOnboardingIdentity()&&saved?.state&&!pendingState&&!saving&&hooks.onRemoteState)hooks.onRemoteState(saved.state,{reason:'player-onboarded'});}
@@ -1120,9 +1120,10 @@
     }
 
     if(mode==='approval'||context?.profile?.role==='pending_parent'){
-      const body=`<p class="auth-notice ${message?'':'hidden'}" id="cloud-auth-notice">${escapeHtml(message)}</p><p class="activation-error hidden" id="cloud-auth-error" role="alert"></p><button class="auth-primary" id="cloud-check-approval">Check Approval <span>→</span></button><button class="auth-link-strong" id="cloud-reset-device">Back to Main Login</button>`;
-      gate.innerHTML=authSimple('Waiting for Approval','Your parent account is set up. Team data will appear once a coach approves access.',body,'PARENT ACCESS');
-      document.getElementById('cloud-check-approval')?.addEventListener('click',async()=>{try{context=await getContext();if(context?.profile?.role==='parent')location.reload();else showNotice('Still waiting for a coach to approve access.');}catch(e){authError(e.message||String(e));}});document.getElementById('cloud-reset-device')?.addEventListener('click',()=>{clearInviteAccess();setGateHtml('signin');});return;
+      const body=`<p class="auth-notice ${message?'':'hidden'}" id="cloud-auth-notice">${escapeHtml(message)}</p><p class="activation-error hidden" id="cloud-auth-error" role="alert"></p><button class="auth-link-strong" id="cloud-continue-registration">Continue registration</button><button class="auth-primary" id="cloud-check-approval">Check Approval <span>→</span></button><button class="auth-link-strong" id="cloud-reset-device">Back to Main Login</button>`;
+      gate.innerHTML=authSimple('Waiting for Approval','Your parent account is set up. Complete your registration or wait for the club to review access.',body,'PARENT ACCESS');
+      document.getElementById('cloud-continue-registration')?.addEventListener('click',()=>location.href='register.html');
+      document.getElementById('cloud-check-approval')?.addEventListener('click',async()=>{try{context=await getContext();if(context?.profile?.role==='parent')location.reload();else showNotice('Still waiting for the club to approve access.');}catch(e){authError(e.message||String(e));}});document.getElementById('cloud-reset-device')?.addEventListener('click',()=>{clearInviteAccess();setGateHtml('signin');});return;
     }
 
     if(mode==='revoked'||context?.profile?.role==='revoked'){
