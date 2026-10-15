@@ -504,7 +504,7 @@
     if(clean.length<2||clean.length>80||!Number.isInteger(shirt)||shirt<1||shirt>99||!['outfield','goalkeeper'].includes(playerRole))throw new Error('Check the player name, shirt number and position.');
     const result=await rpc('admin_onboard_player',{p_team_id:team.id,p_player_name:clean,p_shirt_number:shirt,p_player_role:playerRole,p_parent_request_id:parentRequestId||null});
     if(!canAdmin()||identity!==adminOnboardingIdentity())throw new Error('Account access changed. Check the squad after signing in again.');
-    if(!result?.ok)throw new Error('The cloud did not confirm this player onboarding.');
+    if(!result?.ok)throw new Error('The cloud did not confirm this parent onboarding.');
     // Refresh only the already-active team; onboarding never switches a team/context.
     if(activeTeam?.id===team.id){
       try{const saved=await fetchTeamState(team.id);if(identity===adminOnboardingIdentity()&&saved?.state&&!pendingState&&!saving&&hooks.onRemoteState)hooks.onRemoteState(saved.state,{reason:'player-onboarded'});}

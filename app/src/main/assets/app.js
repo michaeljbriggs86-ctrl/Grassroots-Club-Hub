@@ -2559,9 +2559,9 @@ const LINKED_PAGES={
   'team-stats':{title:'Player & team stats',parent:'home',panel:'home-player-stats',access:'team-data'},
   contacts:{title:'Contact details',parent:'inbox',panel:'member-contacts-panel',access:'contacts'},
   'coach-onboarding':{title:'Coach onboarding',parent:'club',panel:'coach-onboarding-panel',access:'admin'},
-  'player-onboarding':{title:'Player onboarding',parent:'club',panel:'player-onboarding-panel',access:'admin'},
+  'player-onboarding':{title:'Parent onboarding',parent:'club',panel:'player-onboarding-panel',access:'admin'},
   'club-teams':{title:'Club teams',parent:'club',panel:'admin-home-teams',access:'admin'},
-  'coach-documents':{title:'Coach documents',parent:'club',panel:'coach-document-matrix',access:'admin'},
+  'coach-documents':{title:'Coach documents',parent:'club-coaches',panel:'coach-document-matrix',access:'admin'},
   'app-access':{title:'App access',parent:'club-coaches',panel:'app-access-panel',access:'admin'},
   'staff-requests':{title:'Staff access requests',parent:'club-coaches',panel:'coach-requests',access:'admin'},
   'staff-request-review':{title:'Review staff request',parent:'staff-requests',panel:'staff-request-review-panel',access:'admin'},
@@ -4984,7 +4984,6 @@ async function refreshAdminClubOverview(quiet=false){
   const show=CLOUD_MODE&&isAdmin()&&isClubOverviewMode();panel.classList.toggle('hidden',!show||__clubTab!=='overview');if(!show)return;
   const identity=adminWeekendShareIdentity();if(!identity)return;
   if(quiet&&identity===__adminHomeIdentity&&Date.now()-__adminOverviewStamp<15000)return;
-  window.ClubHubCoachQualifications?.refreshMatrix();
   const changed=identity!==__adminHomeIdentity;__adminHomeIdentity=identity;__adminOverviewStamp=Date.now();
   if(changed)clearAdminHome(true);
   const version=++__adminHomeLoadVersion,cloud=window.ClubHubCloud;
@@ -5928,7 +5927,7 @@ function setClubTab(tab='overview'){
   if(tab==='overview')refreshAdminClubOverview(true);
   if(tab==='fixtures')refreshAdminFixtures(false);
   if(tab==='results')refreshClubResults(false);
-  if(tab==='coaches')refreshClubCoaches(false);
+  if(tab==='coaches'){refreshClubCoaches(false);window.ClubHubCoachQualifications?.refreshMatrix();}
   renderTeamIdentity();
   if(currentView==='club')syncNavigationUrl();
 }
