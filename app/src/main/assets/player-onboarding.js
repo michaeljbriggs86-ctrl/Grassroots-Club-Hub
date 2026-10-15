@@ -1,4 +1,4 @@
-/* Admin player onboarding. Drafts and private team data stay in memory. */
+/* Admin parent onboarding. Drafts and private team data stay in memory. */
 (()=>{
   'use strict';
   let options,identity='',cloudIdentity=null,version=0,teamId='',data=null,step=0,draft=null,busy=false,dirty=false;
@@ -10,7 +10,7 @@
   function syncAccess(){const key=options?.allowed()?options.contextKey():'';const cloud=options?.cloud();if(key!==identity||cloud!==cloudIdentity){clearPrivate();teamId='';identity=key;cloudIdentity=cloud;}return key;}
   function valid(v,key){return v===version&&key===identity&&key===options?.contextKey()&&cloudIdentity===options?.cloud()&&active();}
   function leave(){clearPrivate();}
-  function confirmLeave(){if(busy){options?.toast('Wait for the onboarding save to finish.');return false;}if(!dirty)return true;if(!window.confirm('Discard this unsaved player onboarding?'))return false;dirty=false;return true;}
+  function confirmLeave(){if(busy){options?.toast('Wait for the onboarding save to finish.');return false;}if(!dirty)return true;if(!window.confirm('Discard this unsaved parent onboarding?'))return false;dirty=false;return true;}
   function status(message,error=false){const node=el('player-onboarding-status');if(node){node.textContent=message;node.classList.toggle('is-error',error);}}
   function linksFor(player){return (data?.links||[]).filter(l=>norm(l.player_name)===norm(player.name));}
   function validatePlayer(player,squad=[],limit=null){
@@ -36,7 +36,7 @@
     const key=syncAccess();if(!key||!active()||!teamId)return;
     clearPrivate();const v=version;status('Loading squad and parent requests…');el('player-onboarding-team').disabled=true;
     try{const result=await options.cloud().loadAdminPlayerOnboarding(teamId);if(!valid(v,key))return;data=result;status('');render();}
-    catch(error){if(valid(v,key)){status(error.message||'Player onboarding could not load.',true);el('player-onboarding-content').innerHTML='<div class="empty-state"><button type="button" class="secondary-button" data-onboard-action="reload">Retry</button></div>';}}
+    catch(error){if(valid(v,key)){status(error.message||'Parent onboarding could not load.',true);el('player-onboarding-content').innerHTML='<div class="empty-state"><button type="button" class="secondary-button" data-onboard-action="reload">Retry</button></div>';}}
     finally{if(valid(v,key))el('player-onboarding-team').disabled=false;}
   }
   function queue(){
@@ -57,7 +57,7 @@
     if(!active()||!data)return;const body=el('player-onboarding-content');
     if(!step){body.innerHTML=queue();return;}
     const labels=['Player details','Parent access','Review','Complete'];
-    const progress=`<ol class="onboarding-progress" aria-label="Player onboarding progress">${labels.map((name,i)=>`<li${i+1===step?' aria-current="step"':''}><span>${i+1}</span>${name}</li>`).join('')}</ol>`;
+    const progress=`<ol class="onboarding-progress" aria-label="Parent onboarding progress">${labels.map((name,i)=>`<li${i+1===step?' aria-current="step"':''}><span>${i+1}</span>${name}</li>`).join('')}</ol>`;
     let content='';
     if(step===1)content=draft.existing?`<p class="helper">Continue onboarding for an existing squad player.</p><dl class="onboarding-review"><dt>Player</dt><dd>${esc(draft.name)}</dd><dt>Shirt</dt><dd>#${esc(draft.number)}</dd></dl>`:`<div class="onboarding-fields"><label>Player’s name<input id="onboard-player-name" name="player_name" aria-describedby="player-onboarding-status" value="${esc(draft.name)}" maxlength="80" autocomplete="off" required /></label><label>Shirt number<input id="onboard-player-number" name="shirt_number" autocomplete="off" aria-describedby="player-onboarding-status" type="number" min="1" max="99" step="1" inputmode="numeric" value="${esc(draft.number)}" required /></label><label>Position<select id="onboard-player-role" name="position" autocomplete="off"><option value="outfield"${draft.role==='outfield'?' selected':''}>Outfield</option><option value="goalkeeper"${draft.role==='goalkeeper'?' selected':''}>Goalkeeper</option></select></label></div><p class="helper">Use the name recognised by the club. Shirt numbers must be unique within this squad.</p>`;
     if(step===2)content=`<label>Parent request<select id="onboard-parent-request" name="parent_request" autocomplete="off" aria-describedby="player-onboarding-status"><option value="">Complete parent access later</option>${data.requests.map(r=>`<option value="${esc(r.request_id)}"${r.request_id===draft.requestId?' selected':''}>${esc(r.parent_name)} · ${esc(r.child_name)}</option>`).join('')}</select></label><p class="helper">Parents create their own email account. Choose a request only after checking this is the player’s parent or guardian.</p><div id="onboard-parent-confirmation">${parentConfirmation()}</div>`;
@@ -77,13 +77,13 @@
     const r=request();if(draft.existing&&!r){status('Choose a parent request to complete this player’s onboarding.',true);step=2;render();return;}
     if(r&&!draft.verified){status('Confirm the parent or guardian relationship before approving access.',true);step=2;render();return;}
     if(!draft.existing){const problem=validatePlayer(draft,data.players,data.limit);if(problem){status(problem,true);step=1;render();return;}}
-    const key=identity,v=version;busy=true;status('Saving player onboarding…');render();
+    const key=identity,v=version;busy=true;status('Saving parent onboarding…');render();
     try{
       let result;
       if(draft.existing)result=await options.cloud().approveParentRequest(r.request_id,draft.name);
       else result=await options.cloud().onboardAdminPlayer({teamId,name:draft.name,number:Number(draft.number),role:draft.role,parentRequestId:r?.request_id||null});
       if(!valid(v,key))return;if(!result?.ok)throw Error('The cloud did not confirm this onboarding. Refresh before trying again.');
-      draft.parentLinked=!!r;dirty=false;busy=false;step=4;status('Player onboarding saved.');render();options.onSaved?.();
+      draft.parentLinked=!!r;dirty=false;busy=false;step=4;status('Parent onboarding saved.');render();options.onSaved?.();
     }catch(error){if(valid(v,key)){busy=false;status((error.message||'Could not save onboarding.')+' Your entries are still here. Refresh the squad before retrying if the connection was interrupted.',true);render();}}
   }
   document.addEventListener('input',event=>{if(active()&&event.target.closest?.('.onboarding-form'))dirty=true;});
