@@ -2559,7 +2559,7 @@ const LINKED_PAGES={
   'team-stats':{title:'Player & team stats',parent:'home',panel:'home-player-stats',access:'team-data'},
   contacts:{title:'Contact details',parent:'inbox',panel:'member-contacts-panel',access:'contacts'},
   'coach-onboarding':{title:'Coach onboarding',parent:'club',panel:'coach-onboarding-panel',access:'admin'},
-  'player-onboarding':{title:'Player onboarding',parent:'club',panel:'player-onboarding-panel',access:'admin'},
+  'player-onboarding':{title:'Parent onboarding',parent:'club',panel:'player-onboarding-panel',access:'admin'},
   'club-teams':{title:'Club teams',parent:'club',panel:'admin-home-teams',access:'admin'},
   'coach-documents':{title:'Coach documents',parent:'club-coaches',panel:'coach-document-matrix',access:'admin'},
   'app-access':{title:'App access',parent:'club-coaches',panel:'app-access-panel',access:'admin'},
