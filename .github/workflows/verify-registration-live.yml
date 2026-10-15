@@ -1,0 +1,45 @@
+name: Verify parent registration live readback
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/verify-registration-live.yml'
+      - 'scripts/verify_registration_live.py'
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/verify-registration-live.yml'
+      - 'scripts/verify_registration_live.py'
+  workflow_run:
+    workflows: [Store reviewed pilot badges privately in R2]
+    types: [completed]
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  readback:
+    if: >-
+      github.repository == 'michaeljbriggs86-ctrl/Grassroots-Club-Hub' &&
+      (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) &&
+      (github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success')
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.event.workflow_run.head_sha || github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Compare served bytes and reject invalid unauthenticated requests
+        run: python scripts/verify_registration_live.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: registration-live-readback-${{ github.run_id }}
+          path: registration-live-review
+          retention-days: 14
