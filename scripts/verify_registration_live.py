@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import hashlib
+import difflib
 import json
 import os
 import subprocess
@@ -33,6 +34,8 @@ def main():
     evidence = {"source_commit": subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip(),
                 "event_commit": os.environ.get("GITHUB_SHA", "local"), "assets": [], "guards": []}
     problems = []
+    out = ROOT / "registration-live-review"
+    out.mkdir(exist_ok=True)
     for name in ("register.html", "registration.js", "registration.css", "cloud.js",
                  "player-onboarding.js", "service-worker.js", "index.html", "shooters-hill-logo.png"):
         source = ROOT / ("cloudflare/web-app/service-worker.js" if name == "service-worker.js"
@@ -44,6 +47,11 @@ def main():
                                    "sha256": digest, "source_match": match})
         if not match:
             problems.append(name + ": deployed bytes differ")
+            if name.endswith(".html"):
+                (out / name).write_bytes(body)
+                difference = "".join(difflib.unified_diff(source.read_text().splitlines(True), body.decode().splitlines(True), fromfile="source/" + name, tofile="served/" + name))
+                (out / (name + ".diff")).write_text(difference)
+                print(difference[:12000])
         print(("PASS" if match else "FAIL"), name, status, digest)
 
     # Invalid tickets are rejected before redemption; no delivery job is created.
@@ -64,8 +72,6 @@ def main():
             problems.append(name + ": unexpected response")
         print(("PASS" if passed else "FAIL"), name, status)
 
-    out = ROOT / "registration-live-review"
-    out.mkdir(exist_ok=True)
     (out / "readback.json").write_text(json.dumps(evidence, indent=2) + "\n")
     if problems:
         raise SystemExit("; ".join(problems))
