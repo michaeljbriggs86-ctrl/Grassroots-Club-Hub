@@ -78,10 +78,10 @@ jobs:
         run: |
           npm install --prefix "$RUNNER_TEMP/visual-review" --no-audit --no-fund playwright@1.64.0
           "$RUNNER_TEMP/visual-review/node_modules/.bin/playwright" install --with-deps chromium
+          node verification/browser/verify_parent_registration.cjs "$RUNNER_TEMP/visual-review/node_modules/playwright" "$RUNNER_TEMP/visual-review-output/parent-registration" "$RUNNER_TEMP/member-contact-sql/node_modules/@electric-sql/pglite"
           node verification/browser/verify_visual_rollout.cjs "$RUNNER_TEMP/visual-review/node_modules/playwright" "$RUNNER_TEMP/visual-review-output"
           node verification/browser/verify_hero_context.cjs "$RUNNER_TEMP/visual-review/node_modules/playwright" "$RUNNER_TEMP/visual-review-output/hero-context"
           node verification/browser/verify_cup_freshness.cjs "$RUNNER_TEMP/visual-review/node_modules/playwright" "$RUNNER_TEMP/visual-review-output/cup-freshness"
-          node verification/browser/verify_parent_registration.cjs "$RUNNER_TEMP/visual-review/node_modules/playwright" "$RUNNER_TEMP/visual-review-output/parent-registration" "$RUNNER_TEMP/member-contact-sql/node_modules/@electric-sql/pglite"
           node verification/browser/verify_club_details.cjs "$RUNNER_TEMP/visual-review/node_modules/playwright" "$RUNNER_TEMP/visual-review-output/club-details"
       - name: Preserve visual review evidence
         if: always()
