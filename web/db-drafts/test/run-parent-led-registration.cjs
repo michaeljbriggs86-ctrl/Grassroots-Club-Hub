@@ -63,5 +63,6 @@ const assert=require('node:assert/strict');const {registrationFixture}=require('
  await api('resend',third.id,c.revision);c=await api('get',third.id);await fail(()=>api('resend',third.id,c.revision),/minute/);await api('cancel',third.id,c.revision);eq((await api('get',third.id)).status,'cancelled');
  await as(null,'service_role');eq((await delivery('lease',third.id)).skipped,true);
  await owner();eq((await q('select token_hash from private.registration_applications where id=$1',[id])).rows[0].token_hash,null,'consumed claim token is removed');
+ await owner();await q('delete from public.profiles where user_id=$1',[other]);eq((await q('select count(*)::int n from private.registration_applications where id=$1',[second.id])).rows[0].n,0,'authorised profile erasure cascades private intake');eq((await q('select count(*)::int n from private.registration_submissions where application_id=$1',[second.id])).rows[0].n,0,'erasure removes submitted medical evidence too');
  await db.close();console.log('PASS parent-led registration:',count(),'isolated PostgreSQL checks; invented records only');
 })().catch(e=>{console.error(e);process.exitCode=1;});

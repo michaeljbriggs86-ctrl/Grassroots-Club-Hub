@@ -1,22 +1,22 @@
 -- Reviewed in Figma 222:5414 and 348:6674. No real applications or pack content seeded.
 create table private.registration_packs (
- id uuid primary key default gen_random_uuid(), club_id uuid not null references public.clubs(id),
+ id uuid primary key default gen_random_uuid(), club_id uuid not null references public.clubs(id) on delete cascade,
  season text not null, version text not null, documents jsonb not null,
  enabled boolean not null default false, created_at timestamptz not null default now(),
  unique(club_id,season,version), check(jsonb_typeof(documents)='object')
 );
 create table private.registration_pack_teams (
- pack_id uuid references private.registration_packs(id), team_id uuid references public.teams(id),
+ pack_id uuid references private.registration_packs(id) on delete cascade, team_id uuid references public.teams(id) on delete cascade,
  primary key(pack_id,team_id)
 );
 create table private.registration_applications (
- id uuid primary key default gen_random_uuid(), club_id uuid not null references public.clubs(id),
- team_id uuid not null references public.teams(id), pack_id uuid not null references private.registration_packs(id),
- email text not null, applicant_id uuid references public.profiles(user_id), creator_id uuid not null references public.profiles(user_id),
+ id uuid primary key default gen_random_uuid(), club_id uuid not null references public.clubs(id) on delete cascade,
+ team_id uuid not null references public.teams(id) on delete cascade, pack_id uuid not null references private.registration_packs(id) on delete cascade,
+ email text not null, applicant_id uuid references public.profiles(user_id) on delete cascade, creator_id uuid references public.profiles(user_id) on delete set null,
  request_key uuid not null, token_hash text, expires_at timestamptz not null default now()+interval '7 days',
  status text not null default 'invited' check(status in ('invited','draft','submitted','corrections','approved','declined','cancelled')),
  answers jsonb not null default '{}', revision bigint not null default 0,
- feedback text not null default '', player_name text, parent_request_id uuid references public.parent_access_requests(id), reviewed_by uuid references public.profiles(user_id),
+ feedback text not null default '', player_name text, parent_request_id uuid references public.parent_access_requests(id) on delete set null, reviewed_by uuid references public.profiles(user_id) on delete set null,
  created_at timestamptz not null default now(), updated_at timestamptz not null default now(),
  unique(creator_id,request_key), check(jsonb_typeof(answers)='object')
 );
@@ -24,19 +24,19 @@ create unique index registration_unclaimed_email_team on private.registration_ap
 create index registration_own on private.registration_applications(applicant_id,updated_at);
 create index registration_club on private.registration_applications(club_id,updated_at);
 create table private.registration_submissions (
- application_id uuid references private.registration_applications(id), revision bigint,
- answers jsonb not null, applicant_id uuid not null references public.profiles(user_id),
- email text not null, pack_id uuid not null references private.registration_packs(id),
+ application_id uuid references private.registration_applications(id) on delete cascade, revision bigint,
+ answers jsonb not null, applicant_id uuid not null references public.profiles(user_id) on delete cascade,
+ email text not null, pack_id uuid not null references private.registration_packs(id) on delete cascade,
  document_hashes jsonb not null, submitted_at timestamptz not null default clock_timestamp(),
  primary key(application_id,revision)
 );
 create table private.registration_document_reads (
- application_id uuid references private.registration_applications(id), user_id uuid references public.profiles(user_id),
+ application_id uuid references private.registration_applications(id) on delete cascade, user_id uuid references public.profiles(user_id) on delete cascade,
  kind text, sha256 text not null, read_at timestamptz not null default clock_timestamp(),
  primary key(application_id,user_id,kind,sha256)
 );
 create table private.registration_delivery_jobs (
- id uuid primary key default gen_random_uuid(), application_id uuid not null references private.registration_applications(id),
+ id uuid primary key default gen_random_uuid(), application_id uuid not null references private.registration_applications(id) on delete cascade,
  status text not null default 'queued' check(status in ('queued','sending','sent','failed','uncertain','cancelled')),
  ticket_hash text, ack_hash text, leased_at timestamptz, redeemed_at timestamptz,
  receipt text, error_code text, created_at timestamptz not null default clock_timestamp(),
@@ -61,8 +61,9 @@ begin
  (to_jsonb(new)-'enabled')=(to_jsonb(old)-'enabled') then return new; end if;
  raise exception 'Registration evidence is immutable; create a new version';
 end $$;
-create trigger registration_pack_immutable before update or delete on private.registration_packs for each row execute function private.registration_immutable();
-create trigger registration_submission_immutable before update or delete on private.registration_submissions for each row execute function private.registration_immutable();
+-- Private records have no browser DML grants. Privileged account/club erasure may cascade; updates cannot rewrite submitted evidence.
+create trigger registration_pack_immutable before update on private.registration_packs for each row execute function private.registration_immutable();
+create trigger registration_submission_immutable before update on private.registration_submissions for each row execute function private.registration_immutable();
 
 create function private.registration_validate(p jsonb,p_complete boolean default false) returns jsonb
 language plpgsql set search_path='' as $$
@@ -157,7 +158,7 @@ begin
  select * into a from private.registration_applications where id=p_id for update;
  if a.id is null or not (a.applicant_id is not distinct from me.user_id or (is_admin and a.club_id=me.club_id)) then raise exception 'Application unavailable for this account'; end if;
  if a.applicant_id=me.user_id and em<>a.email then raise exception 'Use the original invited and verified email for this application'; end if;
- select * into tm from public.teams where id=a.team_id and club_id=a.club_id and active for share;
+ select * into tm from public.teams where id=a.team_id and club_id=a.club_id and (active or p_action in ('get','document')) for share;
  select * into pack from private.registration_packs where id=a.pack_id;
  if tm.id is null then raise exception 'Team no longer available'; end if;
  if p_action='get' then
