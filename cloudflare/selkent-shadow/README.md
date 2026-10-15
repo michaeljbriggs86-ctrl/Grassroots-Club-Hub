@@ -182,3 +182,11 @@ readback, and refuses to replace a newer object. A failed gate leaves the
 previous object untouched. The private bucket has no public domain; the
 website still reads its packaged GitHub feed. Check repeated scheduled job
 results and exact metadata before routing `/data/results.json` to this key.
+# Cup freshness boundary (14 October 2026)
+
+The shadow collects fixture, league-result and standings HTML only. Public cup
+rows are preserved from the canonical GitHub snapshot in a private candidate,
+with their original `cup_results_last_updated` and status. League parity compares
+league rows only; it is not independent cup verification. Temporary public cup
+transport failures may retain a verified prior cup segment while fixtures and
+league data refresh. Unknown markup and unsafe/missing baseline data still abort.

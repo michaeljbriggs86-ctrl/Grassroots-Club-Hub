@@ -71,3 +71,22 @@ test('rejects mismatched feed version and extra restricted result preview', () =
   snapshot.published_results_preview[3] = [];
   assert.throws(() => buildCandidateFeed(snapshot, feed), /Incomplete private results preview/);
 });
+
+test('retains canonical cups without changing their check date or claiming private collection', () => {
+  const { feed, snapshot } = example();
+  feed.coverage.published_results = {cup_parser_status:'verified_cup_scored_rows_v1'};
+  feed.cup_results_status = 'stale_retained';
+  feed.cup_results_last_updated = '2026-09-28T12:00:00Z';
+  const cup = {date:'2026-09-27',home:'Home',away:'Away',homeGoals:2,awayGoals:1,
+    competition:'Selkent Cup One',round:'Round One',provider_cup_id:'cupCombined6-1',provider_match_ref:'A'};
+  feed.age_groups[1].published_results.push(cup);
+  const candidate = buildCandidateFeed(snapshot, feed);
+  assert.deepEqual(candidate.age_groups[1].published_results,[...snapshot.published_results_preview[6],cup]);
+  assert.equal(candidate.cup_results_last_updated,feed.cup_results_last_updated);
+  assert.equal(candidate.cup_results_status,'stale_retained');
+  assert.notEqual(candidate.age_groups[1].published_results.at(-1),cup,'retained rows are copied');
+  cup.medical = 'private';
+  assert.throws(()=>buildCandidateFeed(snapshot,feed),/Incomplete private canonical cup/);
+  delete cup.medical;cup.provider_cup_id='cupCombined7-1';
+  assert.throws(()=>buildCandidateFeed(snapshot,feed),/Unsafe canonical cup/);
+});

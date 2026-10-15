@@ -143,6 +143,24 @@ class ShadowParityTests(unittest.TestCase):
         self.assertEqual(summary["parsed_counts"]["fixtures"], 1)
         self.assertEqual(summary["parsed_counts"]["standings_rows"],
                          len(feed["age_groups"][1]["standings"][0]["rows"]))
+
+    def test_cup_retention_is_not_mistaken_for_independent_league_drift(self):
+        snapshot, feed = examples()
+        cup = {"date": "2026-09-27", "home": "Example Home", "away": "Example Away",
+               "homeGoals": 2, "awayGoals": 1, "competition": "Selkent Cup One",
+               "round": "Round One", "provider_cup_id": "cupCombined12-1", "provider_match_ref": "A"}
+        feed["age_groups"][1]["published_results"] = [cup]
+        feed["cup_results_status"] = "stale_retained"
+        feed["cup_results_last_updated"] = "2026-09-27T12:00:00Z"
+        summary = compare.compare_snapshot(snapshot, feed)
+        self.assertEqual(summary["status"], "exact")
+        self.assertEqual(summary["parsed_counts"]["published_results"], 0)
+        import copy
+        candidate = copy.deepcopy(feed)
+        candidate["last_updated"] = snapshot["collected_at"]
+        self.assertEqual(compare.compare_candidate_feed(snapshot, feed, candidate)["status"], "exact")
+        candidate["age_groups"][1]["published_results"][0]["homeGoals"] = 3
+        self.assertEqual(compare.compare_candidate_feed(snapshot, feed, candidate)["status"], "drift")
         self.assertNotIn("Example Home", str(summary))
 
     def test_private_candidate_matches_python_on_same_pages(self):

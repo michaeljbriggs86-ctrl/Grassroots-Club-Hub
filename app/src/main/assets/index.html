@@ -118,34 +118,6 @@
           <div class="panel parent-home-match-info screen-lead-card hidden" id="parent-home-match-info"></div>
         </section>
 
-        <section class="panel matchday-dashboard canonical-match-card-active hidden" id="matchday-dashboard">
-          <div class="panel-heading matchday-dashboard-heading">
-            <div><p class="kicker" id="matchday-dashboard-kicker">Next fixture prep</p><h3 id="matchday-dashboard-title">Matchday dashboard</h3></div>
-            <span class="matchday-dashboard-status" id="matchday-dashboard-status"></span>
-          </div>
-          <div class="matchday-dashboard-grid">
-            <article class="matchday-dashboard-fixtures"><span>Matches</span><div class="canonical-match-rows" id="matchday-dashboard-opponent">TBC</div></article>
-            <article><span>Date &amp; time</span><strong id="matchday-dashboard-kickoff">TBC</strong><small id="matchday-dashboard-confirmation"></small></article>
-            <article><span>Venue</span><strong id="matchday-dashboard-venue">TBC</strong><small id="matchday-dashboard-address"></small></article>
-            <article><span>Availability</span><strong id="matchday-dashboard-availability">0 available</strong><small id="matchday-dashboard-availability-breakdown"></small></article>
-            <article><span>Squad</span><strong id="matchday-dashboard-squad">0 selected</strong></article>
-            <article><span>Formation</span><strong id="matchday-dashboard-formation">TBC</strong></article>
-          </div>
-          <div class="matchday-dashboard-alert hidden" id="matchday-dashboard-alert"></div>
-          <div class="kit-clash-warning hidden" id="matchday-dashboard-kit-warning"></div>
-          <div class="matchday-dashboard-actions">
-            <button type="button" class="primary-button compact" id="matchday-open-tactics">Open squad &amp; tactics</button>
-            <a class="secondary-button compact hidden" id="matchday-dashboard-map" href="#">Open in Maps</a>
-            <button type="button" class="secondary-button compact" id="matchday-add-calendar">Add to calendar</button>
-            <button type="button" class="secondary-button compact hidden" id="matchday-notify-squad">Notify selected squad</button>
-          </div>
-          <details class="matchday-dashboard-note">
-            <summary>Private coaching note</summary>
-            <textarea id="matchday-dashboard-note-input" aria-label="Private coaching note" rows="3" maxlength="4000" placeholder="Match plan, reminders or coaching focus..."></textarea>
-            <p class="coach-note-readonly hidden" id="matchday-dashboard-note-readonly"></p>
-            <button type="button" class="secondary-button compact" id="save-matchday-dashboard-note">Save note</button>
-          </details>
-        </section>
 
         <section class="panel club-notices-panel hidden" id="home-club-notices">
           <div class="panel-heading"><div><p class="kicker">Notifications</p><h3>Club notices</h3></div><span class="notice-unread-badge hidden" id="home-notices-unread">0 unread</span></div>
@@ -238,9 +210,37 @@
           <div class="next-match-grid matches-fixture-time-row"><div class="fixture-date-with-calendar"><div class="fixture-date-copy"><span>Date / time</span><strong id="matches-next-when">Date / kick-off TBC</strong></div><button type="button" class="text-button compact hidden" id="matches-next-calendar">Add to calendar</button></div><div><span>Competition</span><strong id="matches-next-venue">Venue TBC</strong></div></div>
           <div class="match-venue-card next-fixture-venue"><div><span>Venue</span><strong id="matches-next-ground">Ground TBC</strong><small id="matches-next-address">Address TBC</small></div></div>
           <div class="fixture-map-preview hidden" id="matches-next-map-preview"><iframe id="matches-next-map-frame" title="Next fixture venue map" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe><a class="map-link hidden" id="matches-next-map" href="#" aria-label="Open next fixture venue in Maps">Open in Maps</a></div>
-          <div class="kit-clash-warning hidden" id="matches-next-kit-warning"></div>
+          <div class="hidden" id="matches-next-kit-warning"></div>
           <div class="next-match-kits hidden"><span>Match details</span><strong id="matches-next-kits">Kit colours and away details will appear when confirmed.</strong></div>
           <div class="next-match-links matches-next-actions"><button type="button" class="primary-button compact match-played-action hidden" id="matches-next-played" data-requires-edit>Match played</button><button type="button" class="secondary-button compact" id="matches-next-details">Match details</button><button type="button" class="secondary-button compact hidden match-share-icon" id="matches-next-share" aria-label="Share match details" title="Share match details"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8.7 10.5l6.6-4M8.7 13.5l6.6 4"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="5" r="3"/><circle cx="18" cy="19" r="3"/></svg></button><button type="button" class="secondary-button compact hidden" id="matches-next-copy">Copy match details</button></div>
+        </section>
+
+        <section class="panel matchday-dashboard canonical-match-card-active hidden" id="matchday-dashboard">
+          <div class="panel-heading matchday-dashboard-heading">
+            <div><p class="kicker" id="matchday-dashboard-kicker">Preparation</p><h3 id="matchday-dashboard-title">Next match prep</h3></div>
+            <span class="matchday-dashboard-status" id="matchday-dashboard-status"></span>
+          </div>
+          <div class="matchday-dashboard-grid">
+            <article class="matchday-dashboard-fixtures"><span>Matches</span><div class="canonical-match-rows" id="matchday-dashboard-opponent">TBC</div></article>
+            <article><span>Date &amp; time</span><strong id="matchday-dashboard-kickoff">TBC</strong><small id="matchday-dashboard-confirmation"></small></article>
+            <article><span>Venue</span><strong id="matchday-dashboard-venue">TBC</strong><small id="matchday-dashboard-address"></small></article>
+            <article><span>Availability</span><strong id="matchday-dashboard-availability">0 available</strong><small id="matchday-dashboard-availability-breakdown"></small></article>
+            <article><span>Squad</span><strong id="matchday-dashboard-squad">0 selected</strong></article>
+            <article><span>Formation</span><strong id="matchday-dashboard-formation">TBC</strong></article>
+          </div>
+          <div class="matchday-dashboard-alert hidden" id="matchday-dashboard-alert"></div>
+          <div class="matchday-dashboard-actions">
+            <button type="button" class="primary-button compact" id="matchday-open-tactics">Open squad &amp; tactics</button>
+            <a class="secondary-button compact hidden" id="matchday-dashboard-map" href="#">Open in Maps</a>
+            <button type="button" class="secondary-button compact" id="matchday-add-calendar">Add to calendar</button>
+            <button type="button" class="secondary-button compact hidden" id="matchday-notify-squad">Notify selected squad</button>
+          </div>
+          <details class="matchday-dashboard-note">
+            <summary>Private coaching note</summary>
+            <textarea id="matchday-dashboard-note-input" aria-label="Private coaching note" rows="3" maxlength="4000" placeholder="Match plan, reminders or coaching focus..."></textarea>
+            <p class="coach-note-readonly hidden" id="matchday-dashboard-note-readonly"></p>
+            <button type="button" class="secondary-button compact" id="save-matchday-dashboard-note">Save note</button>
+          </details>
         </section>
 
         <section class="panel parent-home-training screen-lead-card hidden" id="parent-matches-training" aria-label="Upcoming training sessions"></section>
@@ -512,7 +512,6 @@
 
           </section>
 
-          <section class="panel hidden" id="coach-documents-summary"><a class="page-link" href="?view=coach-documents" data-page-route="coach-documents" ><span><strong>Coach documents</strong><small>Open the document matrix</small></span><span aria-hidden="true">›</span></a><p id="coach-documents-summary-status" class="helper" role="status" aria-live="polite">Loading coach documents…</p></section>
 
           <section class="panel admin-home-communications" aria-labelledby="admin-home-communications-title">
             <div class="panel-heading"><div><p class="kicker">Club desk</p><h3 id="admin-home-communications-title">Communications</h3></div></div>
@@ -521,7 +520,7 @@
           </section>
 
           <a class="page-link admin-home-directory-link" href="?view=coach-onboarding" data-page-route="coach-onboarding"><span><strong>Coach onboarding</strong><small>Review staff access, teams and qualification checks</small></span><span aria-hidden="true">›</span></a>
-          <a class="page-link admin-home-directory-link" href="?view=player-onboarding" data-page-route="player-onboarding"><span><strong>Player onboarding</strong><small>Add players and review parent access</small></span><span aria-hidden="true">›</span></a>
+          <a class="page-link admin-home-directory-link" href="?view=player-onboarding" data-page-route="player-onboarding"><span><strong>Parent onboarding</strong><small>Add players and review parent access</small></span><span aria-hidden="true">›</span></a>
           <a class="page-link admin-home-directory-link" href="?view=club-teams" data-page-route="club-teams"><span><strong>Club teams</strong><small>Open the team directory</small><small id="admin-team-count"></small></span><span aria-hidden="true">›</span></a>
           <nav class="admin-home-footer" aria-label="More club tools"><button type="button" class="text-button" data-admin-summary="results">Club results</button><button type="button" class="text-button" data-admin-home-action="settings">Club settings</button></nav>
         </section>
@@ -530,6 +529,7 @@
           <section class="admin-coach-centre admin-people-page">
             <div class="section-title-row"><div><p class="kicker">Club admin · People &amp; access</p><h2 tabindex="-1">Coaching staff</h2></div></div>
             <p class="muted">See team assignments and open each person’s profile.</p>
+            <section class="panel hidden" id="coach-documents-summary"><a class="page-link" href="?view=coach-documents" data-page-route="coach-documents" ><span><strong>Coach documents</strong><small>Open the document matrix</small></span><span aria-hidden="true">›</span></a><p id="coach-documents-summary-status" class="helper" role="status" aria-live="polite">Loading coach documents…</p></section>
             <section class="panel admin-assign-team" id="admin-assign-team">
               <h3>Team assignment</h3>
               <p class="muted">A coach can look after more than one team.</p>
@@ -548,7 +548,7 @@
       <section id="view-more" class="view more-hub" data-view="more" aria-labelledby="more-title">
         <div class="section-title-row"><div><p class="kicker" id="more-kicker">Team &amp; app</p><h2 id="more-title" tabindex="-1">More</h2></div></div>
         <p class="muted more-intro" id="more-intro">Tools, preferences and your account.</p>
-        <div class="more-tool-grid"><section class="more-tool-group" data-more-role="admin" aria-labelledby="more-admin-0" hidden><h3 id="more-admin-0">Club tools</h3><div class="more-link-list"><a class="page-link" href="?view=inbox" data-page-route="inbox"><span><strong>Communications</strong><small>Messages and club notices</small></span><span aria-hidden="true">›</span></a><a class="page-link" href="?view=contacts" data-page-route="contacts"><span><strong>Contacts</strong><small>Club and team contacts</small></span><span aria-hidden="true">›</span></a><a class="page-link" href="?view=club-teams" data-page-route="club-teams"><span><strong>Club teams</strong><small>Open a team workspace</small></span><span aria-hidden="true">›</span></a><a class="page-link" href="?view=player-onboarding" data-page-route="player-onboarding"><span><strong>Player onboarding</strong><small>Registration and parent links</small></span><span aria-hidden="true">›</span></a><a class="page-link" href="?view=coach-onboarding" data-page-route="coach-onboarding"><span><strong>Coach onboarding</strong><small>Staff registration and checks</small></span><span aria-hidden="true">›</span></a><a class="page-link" href="?view=coach-documents" data-page-route="coach-documents"><span><strong>Coach documents</strong><small>DBS, safeguarding and first aid</small></span><span aria-hidden="true">›</span></a><a class="page-link" href="?view=app-access" data-page-route="app-access"><span><strong>App access</strong><small>Account roles and team access</small></span><span aria-hidden="true">›</span></a><a class="page-link" href="?view=staff-requests" data-page-route="staff-requests"><span><strong>Staff access requests</strong><small>Review pending staff accounts</small></span><span aria-hidden="true">›</span></a></div></section><section class="more-tool-group" data-more-role="admin" aria-labelledby="more-admin-1" hidden><h3 id="more-admin-1">Club settings</h3><div class="more-link-list"><a class="page-link" href="?view=rules" data-page-route="rules"><span><strong>Rules & procedures</strong><small>Club matchday guidance</small></span><span aria-hidden="true">›</span></a><a class="page-link" href="?view=season-control" data-page-route="season-control"><span><strong>Season control</strong><small>Archive and start a season</small></span><span aria-hidden="true">›</span></a><a class="page-link" href="?view=club-compliance" data-page-route="club-compliance"><span><strong>Data protection & safeguarding</strong><small>Reviewers and welfare contacts</small></span><span aria-hidden="true">›</span></a><a class="page-link" href="?view=season-history" data-page-route="season-history"><span><strong>Season history</strong><small>View previous seasons</small></span><span aria-hidden="true">›</span></a><a class="page-link" href="?view=audit-history" data-page-route="audit-history"><span><strong>Audit history</strong><small>Club activity and access changes</small></span><span aria-hidden="true">›</span></a></div></section><section class="more-tool-group" data-more-role="coach" aria-labelledby="more-coach-0" hidden><h3 id="more-coach-0">Team tools</h3><div class="more-link-list"><a class="page-link" href="?view=inbox" data-page-route="inbox"><span><strong>Inbox</strong><small>Team messages and club notices</small></span><span aria-hidden="true">›</span></a><a class="page-link" href="?view=contacts" data-page-route="contacts"><span><strong>Contacts</strong><small>Your team’s approved contacts</small></span><span aria-hidden="true">›</span></a><a class="page-link" href="?view=training-settings" data-page-route="training-settings"><span><strong>Training schedule</strong><small>Weekly and one-off sessions</small></span><span aria-hidden="true">›</span></a><a class="page-link" href="?view=team-access" data-page-route="team-access"><span><strong>Team access</strong><small>Parent requests and team members</small></span><span aria-hidden="true">›</span></a><a class="page-link" href="?view=club-results" data-page-route="club-results"><span><strong>Club results</strong><small>Published results across the club</small></span><span aria-hidden="true">›</span></a><button type="button" class="page-link" data-more-awards><span><strong>Player awards</strong><small>Awards recorded for your team</small></span><span aria-hidden="true">›</span></button></div></section><section class="more-tool-group" data-more-role="coach" aria-labelledby="more-coach-1" hidden><h3 id="more-coach-1">Team settings</h3><div class="more-link-list"><a class="page-link" href="?view=feature-settings" data-page-route="feature-settings"><span><strong>Features & awards</strong><small>Optional tools and award types</small></span><span aria-hidden="true">›</span></a><a class="page-link" href="?view=rules" data-page-route="rules"><span><strong>Rules & procedures</strong><small>Team matchday guidance</small></span><span aria-hidden="true">›</span></a><a class="page-link" href="?view=season-history" data-page-route="season-history"><span><strong>Season history</strong><small>View previous seasons</small></span><span aria-hidden="true">›</span></a></div></section><section class="more-tool-group" data-more-role="parent" aria-labelledby="more-parent-0" hidden><h3 id="more-parent-0">Your team</h3><div class="more-link-list"><a class="page-link" href="?view=contacts" data-page-route="contacts"><span><strong>Contacts</strong><small>Coaches and club contacts</small></span><span aria-hidden="true">›</span></a><a class="page-link" href="?view=raise-concern" data-page-route="raise-concern"><span><strong>Raise an issue</strong><small>Contact the appropriate club person</small></span><span aria-hidden="true">›</span></a></div></section><section class="more-tool-group" aria-labelledby="more-account-heading"><h3 id="more-account-heading">Your account</h3><div class="more-link-list"><button type="button" class="page-link hidden" id="mobile-notification-bell"><span><strong>Notifications</strong><small>Updates and reminders</small></span><span class="notification-badge hidden" id="mobile-notification-badge">0</span><span aria-hidden="true">›</span></button><button type="button" class="page-link hidden" id="coach-profile-self"><span><strong>My profile</strong><small>Your details and coaching documents</small></span><span aria-hidden="true">›</span></button><button type="button" class="page-link hidden" id="person-profile-self"><span><strong>My profile</strong><small>Your own profile details</small></span><span aria-hidden="true">›</span></button><button type="button" class="page-link hidden" id="mobile-context-switch"><span><strong>Switch team or profile</strong><small>Choose an approved linked context</small></span><span aria-hidden="true">›</span></button><a class="page-link" href="?view=appearance" data-page-route="appearance"><span><strong>Appearance</strong><small>Light, dark or device setting</small></span><span aria-hidden="true">›</span></a><a class="page-link" href="?view=my-account" data-page-route="my-account"><span><strong>My account</strong><small>Account details and sign out</small></span><span aria-hidden="true">›</span></a></div></section></div>
+        <div class="more-tool-grid"><section class="more-tool-group" data-more-role="admin" aria-labelledby="more-admin-0" hidden><h3 id="more-admin-0">Club tools</h3><div class="more-link-list"><a class="page-link" href="?view=inbox" data-page-route="inbox"><span><strong>Communications</strong><small>Messages and club notices</small></span><span aria-hidden="true">›</span></a><a class="page-link" href="?view=contacts" data-page-route="contacts"><span><strong>Contacts</strong><small>Club and team contacts</small></span><span aria-hidden="true">›</span></a><a class="page-link" href="?view=club-teams" data-page-route="club-teams"><span><strong>Club teams</strong><small>Open a team workspace</small></span><span aria-hidden="true">›</span></a><a class="page-link" href="?view=player-onboarding" data-page-route="player-onboarding"><span><strong>Parent onboarding</strong><small>Registration and parent links</small></span><span aria-hidden="true">›</span></a><a class="page-link" href="?view=coach-onboarding" data-page-route="coach-onboarding"><span><strong>Coach onboarding</strong><small>Staff registration and checks</small></span><span aria-hidden="true">›</span></a><a class="page-link" href="?view=app-access" data-page-route="app-access"><span><strong>App access</strong><small>Account roles and team access</small></span><span aria-hidden="true">›</span></a><a class="page-link" href="?view=staff-requests" data-page-route="staff-requests"><span><strong>Staff access requests</strong><small>Review pending staff accounts</small></span><span aria-hidden="true">›</span></a></div></section><section class="more-tool-group" data-more-role="admin" aria-labelledby="more-admin-1" hidden><h3 id="more-admin-1">Club settings</h3><div class="more-link-list"><a class="page-link" href="?view=rules" data-page-route="rules"><span><strong>Rules & procedures</strong><small>Club matchday guidance</small></span><span aria-hidden="true">›</span></a><a class="page-link" href="?view=season-control" data-page-route="season-control"><span><strong>Season control</strong><small>Archive and start a season</small></span><span aria-hidden="true">›</span></a><a class="page-link" href="?view=club-compliance" data-page-route="club-compliance"><span><strong>Data protection & safeguarding</strong><small>Reviewers and welfare contacts</small></span><span aria-hidden="true">›</span></a><a class="page-link" href="?view=season-history" data-page-route="season-history"><span><strong>Season history</strong><small>View previous seasons</small></span><span aria-hidden="true">›</span></a><a class="page-link" href="?view=audit-history" data-page-route="audit-history"><span><strong>Audit history</strong><small>Club activity and access changes</small></span><span aria-hidden="true">›</span></a></div></section><section class="more-tool-group" data-more-role="coach" aria-labelledby="more-coach-0" hidden><h3 id="more-coach-0">Team tools</h3><div class="more-link-list"><a class="page-link" href="?view=inbox" data-page-route="inbox"><span><strong>Inbox</strong><small>Team messages and club notices</small></span><span aria-hidden="true">›</span></a><a class="page-link" href="?view=contacts" data-page-route="contacts"><span><strong>Contacts</strong><small>Your team’s approved contacts</small></span><span aria-hidden="true">›</span></a><a class="page-link" href="?view=training-settings" data-page-route="training-settings"><span><strong>Training schedule</strong><small>Weekly and one-off sessions</small></span><span aria-hidden="true">›</span></a><a class="page-link" href="?view=team-access" data-page-route="team-access"><span><strong>Team access</strong><small>Parent requests and team members</small></span><span aria-hidden="true">›</span></a><a class="page-link" href="?view=club-results" data-page-route="club-results"><span><strong>Club results</strong><small>Published results across the club</small></span><span aria-hidden="true">›</span></a><button type="button" class="page-link" data-more-awards><span><strong>Player awards</strong><small>Awards recorded for your team</small></span><span aria-hidden="true">›</span></button></div></section><section class="more-tool-group" data-more-role="coach" aria-labelledby="more-coach-1" hidden><h3 id="more-coach-1">Team settings</h3><div class="more-link-list"><a class="page-link" href="?view=feature-settings" data-page-route="feature-settings"><span><strong>Features & awards</strong><small>Optional tools and award types</small></span><span aria-hidden="true">›</span></a><a class="page-link" href="?view=rules" data-page-route="rules"><span><strong>Rules & procedures</strong><small>Team matchday guidance</small></span><span aria-hidden="true">›</span></a><a class="page-link" href="?view=season-history" data-page-route="season-history"><span><strong>Season history</strong><small>View previous seasons</small></span><span aria-hidden="true">›</span></a></div></section><section class="more-tool-group" data-more-role="parent" aria-labelledby="more-parent-0" hidden><h3 id="more-parent-0">Your team</h3><div class="more-link-list"><a class="page-link" href="?view=contacts" data-page-route="contacts"><span><strong>Contacts</strong><small>Coaches and club contacts</small></span><span aria-hidden="true">›</span></a><a class="page-link" href="?view=raise-concern" data-page-route="raise-concern"><span><strong>Raise an issue</strong><small>Contact the appropriate club person</small></span><span aria-hidden="true">›</span></a></div></section><section class="more-tool-group" aria-labelledby="more-account-heading"><h3 id="more-account-heading">Your account</h3><div class="more-link-list"><button type="button" class="page-link hidden" id="mobile-notification-bell"><span><strong>Notifications</strong><small>Updates and reminders</small></span><span class="notification-badge hidden" id="mobile-notification-badge">0</span><span aria-hidden="true">›</span></button><button type="button" class="page-link hidden" id="coach-profile-self"><span><strong>My profile</strong><small>Your details and coaching documents</small></span><span aria-hidden="true">›</span></button><button type="button" class="page-link hidden" id="person-profile-self"><span><strong>My profile</strong><small>Your own profile details</small></span><span aria-hidden="true">›</span></button><button type="button" class="page-link hidden" id="mobile-context-switch"><span><strong>Switch team or profile</strong><small>Choose an approved linked context</small></span><span aria-hidden="true">›</span></button><a class="page-link" href="?view=appearance" data-page-route="appearance"><span><strong>Appearance</strong><small>Light, dark or device setting</small></span><span aria-hidden="true">›</span></a><a class="page-link" href="?view=my-account" data-page-route="my-account"><span><strong>My account</strong><small>Account details and sign out</small></span><span aria-hidden="true">›</span></a></div></section></div>
         <p class="muted more-footer">Shooters Hill AFC · Club and team hub</p>
       </section>
       <section id="view-training-settings" class="view linked-page more-settings-page" data-view="training-settings" aria-labelledby="training-settings-title">
@@ -760,7 +760,7 @@
 
       <section id="view-player-onboarding" class="view linked-page" data-view="player-onboarding" aria-labelledby="player-onboarding-title">
         <a class="page-back secondary-button" href="?view=club" data-page-route="club">← Back to Club Home</a>
-        <div class="section-title-row"><div><p class="kicker">Club administration</p><h2 id="player-onboarding-title" tabindex="-1">Player onboarding</h2></div></div>
+        <div class="section-title-row"><div><p class="kicker">Club administration</p><h2 id="player-onboarding-title" tabindex="-1">Parent onboarding</h2></div></div>
         <section id="player-onboarding-panel">
           <label class="onboarding-team-choice">Team<select id="player-onboarding-team" name="onboarding_team" autocomplete="off"><option value="">Choose a team</option></select></label>
           <p id="player-onboarding-status" class="helper" role="status" aria-live="polite" aria-atomic="true"></p>
@@ -778,8 +778,8 @@
         <button type="button" class="secondary-button admin-directory-refresh" data-page-refresh="club-teams">Refresh teams</button>
       </section>
       <section id="view-coach-documents" class="view linked-page" data-view="coach-documents" aria-labelledby="coach-documents-title">
-        <a class="page-back secondary-button" href="?view=club" data-page-route="club">← Back to Club Home</a>
-        <div class="section-title-row"><div><p class="kicker">Club administration</p><h2 id="coach-documents-title" tabindex="-1">Coach documents</h2></div></div>
+        <a class="page-back secondary-button" href="?view=club-coaches" data-page-route="club-coaches">← Back to Staff</a>
+        <div class="section-title-row"><div><p class="kicker">Staff</p><h2 id="coach-documents-title" tabindex="-1">Coach documents</h2></div></div>
         <section class="panel hidden" id="coach-document-matrix" aria-labelledby="coach-document-title">
             <div class="panel-heading"><div><p class="kicker">Coaching staff</p><h3 id="coach-document-title">Coach documents</h3></div><button type="button" class="secondary-button" id="coach-document-refresh" aria-label="Refresh coach documents">Refresh</button></div>
             <p class="helper">Amber: renewal due within 60 days. Red: overdue. Open a coach’s name to update their records.</p>
@@ -934,7 +934,7 @@
       </section>
       <div class="match-venue-card next-fixture-venue"><div><span>Venue</span><strong id="next-match-ground">Awaiting confirmation</strong><small id="next-match-address">Coach will confirm the match venue.</small></div></div>
       <div class="fixture-map-preview hidden" id="next-match-map-preview"><iframe id="next-match-map-frame" title="Next match venue map" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe><a class="map-link hidden" id="next-match-map" href="#" aria-label="Open match venue in Maps">Open in Maps</a></div>
-      <div class="kit-clash-warning hidden" id="next-match-kit-warning"></div>
+      <div class="hidden" id="next-match-kit-warning"></div>
       <details class="selkent-task-guide hidden" id="next-match-selkent-tasks">
         <summary>Selkent staff steps</summary>
         <div>
@@ -998,7 +998,7 @@
           <a class="map-link hidden" id="match-detail-map" href="#">Open in Maps</a>
         </div>
         <div class="fixture-map-preview hidden" id="match-detail-map-preview"><iframe id="match-detail-map-frame" title="Match venue map" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe></div>
-        <div class="kit-clash-warning hidden" id="match-detail-kit-warning"></div>
+        <div class="hidden" id="match-detail-kit-warning"></div>
         <div class="fixture-kit-toggle-host hidden" id="match-detail-kit-toggle"></div>
       </section>
       <div class="match-report-progress hidden" id="match-report-progress" aria-label="Match report progress"></div>
@@ -1040,19 +1040,24 @@
     <button type="button" class="secondary-button" id="registration-conduct-close">← Player profile</button>
     <div id="registration-conduct-body"></div><p class="helper" id="registration-conduct-status" role="status" aria-live="polite" aria-atomic="true"></p>
   </dialog>
-  <dialog id="club-detail-dialog" class="modal club-detail-modal">
+  <dialog id="club-detail-dialog" class="modal club-detail-modal" aria-labelledby="club-detail-title">
     <div class="club-detail-shell">
-      <div class="modal-heading"><div><p class="kicker">Club details</p><h3 id="club-detail-title">Club</h3></div><button type="button" class="icon-button small" data-close-dialog aria-label="Close">×</button></div>
+      <div class="modal-heading"><span id="club-detail-badge" aria-hidden="true"></span><div><p class="kicker">Club details</p><h3 id="club-detail-title" tabindex="0">Club</h3></div><button type="button" class="icon-button small" data-close-dialog aria-label="Close" autofocus>×</button></div>
+      <div class="club-detail-body">
       <p class="club-detail-club-name" id="club-detail-club-name"></p>
       <div class="club-kit-grid" id="club-detail-kits"></div>
-      <div class="match-venue-card club-detail-venue"><div><span>Home ground</span><strong id="club-detail-ground">Ground TBC</strong><small id="club-detail-address">Address TBC</small></div><a class="map-link hidden" id="club-detail-map" href="#">Open in Maps</a></div>
-      <div class="fixture-map-preview hidden" id="club-detail-map-preview"><iframe id="club-detail-map-frame" title="Club home ground map" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe></div>
+      <div class="match-venue-card club-detail-venue">
+        <div class="club-detail-ground-copy"><span>Home ground</span><strong id="club-detail-ground">Ground TBC</strong><small id="club-detail-address">Address TBC</small></div>
+        <div class="fixture-map-preview hidden" id="club-detail-map-preview"><iframe id="club-detail-map-frame" title="Club home ground map" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe></div>
+        <a class="map-link hidden" id="club-detail-map">Open in Maps</a>
+      </div>
       <details class="club-kit-admin club-shirt-editor hidden" id="club-kit-admin">
         <summary>Edit shirt colours</summary>
-        <p class="helper">Club Admin and Coaches · shirt colours only</p>
+        <p class="helper">Use the shirt colours confirmed for this team. Leave an unknown kit blank.</p>
         <div class="form-grid two"><label>Home shirt colours<input id="club-kit-home-override" maxlength="60" placeholder="e.g. Green and white" /></label><label>Away shirt colours<input id="club-kit-away" maxlength="60" placeholder="e.g. Navy blue" /></label></div>
         <button type="button" class="primary-button" id="save-club-kit-profile">Save shirt colours</button>
       </details>
+      </div>
       <div class="modal-actions"><button type="button" class="primary-button" data-close-dialog>Done</button></div>
     </div>
   </dialog>

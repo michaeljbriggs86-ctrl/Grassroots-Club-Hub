@@ -24,7 +24,8 @@ for(const [view,children] of Object.entries(lists)){
  assert(html.includes(`data-page-route="${view}"`),`${view} has an entry link`);
  assert.match(html,new RegExp(`id="${view}-title" tabindex="-1"`),`${view} announces its focused title`);
 }
-assert(ancestors.get('coach-documents-summary-status').includes('admin-club-overview'),'Home keeps renewal warnings');
+assert(ancestors.get('coach-documents-summary-status').includes('club-coaches-panel'),'Staff keeps renewal warnings');
+assert(!ancestors.get('coach-documents-summary-status').includes('admin-club-overview'),'Home no longer owns coach documents');
 assert(ancestors.get('admin-team-count').includes('admin-club-overview'),'Home keeps the team count');
 assert(!ids.has('admin-home-coverage-list'),'Home no longer repeats a staff assignment list');
-console.log('PASS eleven dedicated pages: unique IDs, correct list placement, entry and Back links, focused titles and compact Home warnings');
+console.log('PASS eleven dedicated pages: unique IDs, correct list placement, entry and Back links, focused titles and Staff document warnings');

@@ -17,7 +17,7 @@ DIST = HERE / "dist"
 # Only these public client assets are eligible for upload. Keep source and
 # verification files, diagnostics and other future additions out of the site.
 ASSETS = (
-    "index.html", "manifest.json", "cloud-config.js", "cloud.js",
+    "index.html", "register.html", "registration.js", "registration.css", "manifest.json", "cloud-config.js", "cloud.js",
     "onboarding.js", "onboarding.css", "app.js", "coach-qualifications.js", "member-contact-import.js", "person-profiles.js", "registration-conduct.js", "player-onboarding.js", "coach-onboarding.js", "static-feed-overlay.js", "kickoff-updates.js",
     "styles.css", "cloud.css", "app-design-system.css", "notifications.css",
     "inter-variable.woff2", "inter-OFL.txt",
