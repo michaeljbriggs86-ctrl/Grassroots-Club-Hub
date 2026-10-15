@@ -505,6 +505,12 @@
             <div class="admin-home-actions"><button type="button" class="primary-button" data-admin-home-action="share" id="admin-home-share" disabled>Share weekend</button><button type="button" class="secondary-button" data-admin-home-action="fixtures" data-admin-summary="fixtures">Review fixtures</button></div>
           </section>
 
+          <section class="panel kickoff-admin-panel" id="kickoff-admin-panel" aria-labelledby="kickoff-admin-title" hidden>
+            <div class="panel-heading"><div><p class="kicker">Club matchday</p><h3 id="kickoff-admin-title">Kick-off responses</h3></div><button type="button" class="secondary-button" data-kickoff-admin-refresh>Refresh responses</button></div>
+            <p id="kickoff-admin-status" class="kickoff-helper" data-kickoff-admin-status role="status" aria-live="polite">Loading latest responses…</p>
+            <div id="kickoff-admin-list" class="kickoff-admin-list" data-kickoff-admin-list></div>
+          </section>
+
           <section class="panel admin-home-people" id="admin-home-people" tabindex="-1" aria-labelledby="admin-home-people-title">
             <div class="panel-heading"><div><p class="kicker">People &amp; access</p><h3 id="admin-home-people-title">Coaching staff</h3></div></div>
             <div class="admin-home-desk-row"><div><strong>Staff access requests</strong><p id="admin-home-request-status">Loading requests…</p></div><button type="button" class="secondary-button" data-admin-home-action="requests">Review requests</button></div>

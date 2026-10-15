@@ -6,7 +6,7 @@ import {dispatchBatch,emailMessage,validPushEndpoint,failureOutcome} from '../su
 const require=createRequire(import.meta.url);
 test('email uses approved club identity, escaped public details and an authenticated review link',()=>{
  const m=emailMessage({update_id:'fictional-update',title:'Kick-off added\nInjected header',body:'U12 Green\nProvisional\n<script>bad</script>'});
- assert.match(m.subject,/Shooters Hill AFC/);assert.doesNotMatch(m.subject,/[\r\n]/);assert.match(m.html,/&lt;script&gt;/);assert.doesNotMatch(m.html,/<script>/);assert.match(m.html,/shooters-hill-logo.png/);assert.match(m.text,/kickoff_update=fictional-update/);assert.match(m.text,/does not confirm seen/);
+ assert.match(m.subject,/Shooters Hill AFC/);assert.doesNotMatch(m.subject,/[\r\n]/);assert.match(m.html,/&lt;script&gt;/);assert.doesNotMatch(m.html,/<script>/);assert.match(m.html,/shooters-hill-logo.png/);assert.match(m.text,/kickoff_update=fictional-update/);assert.match(m.text,/does not acknowledge the update/);assert.match(m.text,/child’s availability/);assert.doesNotMatch(m.text,/tick|checkbox/);assert.match(m.html,/Review and respond/);
 });
 test('push endpoint allowlist rejects arbitrary HTTPS and credentials/ports',()=>{
  for(const u of ['https://fcm.googleapis.com/device','https://web.push.apple.com/device','https://updates.push.services.mozilla.com/device','https://wns.notify.windows.com/device'])assert(validPushEndpoint(u));

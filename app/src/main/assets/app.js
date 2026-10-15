@@ -2408,6 +2408,7 @@ async function submitParentAddChild(e){
 
 function applyAccessMode(){
   syncContactDirectoryContext();
+  window.ClubHubKickoffUpdates?.renderAdmin?.();
   window.ClubHubPersonProfiles?.syncAccess();
   window.ClubHubRegistrationConduct?.syncAccess();
   document.getElementById('person-profile-self')?.classList.toggle('hidden',!CLOUD_MODE||!['parent','player'].includes(currentRole));
@@ -2991,7 +2992,7 @@ async function refreshMatchAvailability(quiet=true){
 }
 async function saveParentAvailability(status){
   if(!['parent','player'].includes(currentRole)||!__availabilityFixture)return;const player=document.getElementById('availability-player')?.value||'';if(!player)return toast('No player is linked to this account');
-  try{await window.ClubHubCloud.saveMatchAvailability({fixtureKey:__availabilityFixture,playerName:player,status});toast('Availability saved');await refreshMatchAvailability(false);}catch(err){alert(err.message||err);}
+  try{await window.ClubHubCloud.saveMatchAvailability({fixtureKey:__availabilityFixture,playerName:player,status});toast('Availability saved');await refreshMatchAvailability(false);__notificationStamp=0;void refreshNotifications(false);}catch(err){alert(err.message||err);}
 }
 async function saveCoachAvailability(select){
   if(!isCoach()||!window.ClubHubCloud?.canEdit?.()||!__availabilityFixture)return;
@@ -3003,11 +3004,16 @@ async function saveCoachAvailability(select){
   try{
     await window.ClubHubCloud.saveCoachMatchAvailability({fixtureKey:__availabilityFixture,playerName:player.name,status});
     auditEvent('availability_updated','player',player.name,`Updated ${player.name} availability: ${before} → ${status}`,before,status);
-    toast('Player availability updated');await refreshMatchAvailability(false);
+    toast('Player availability updated');await refreshMatchAvailability(false);__notificationStamp=0;void refreshNotifications(false);
   }catch(err){select.disabled=false;toast(err.message||'Could not update availability');await refreshMatchAvailability(true);}
 }
 
 async function sendAvailabilityReminder(){if(!requireCoach()||!__availabilityFixture)return;try{const sent=await window.ClubHubCloud.sendAvailabilityReminder(__availabilityFixture);toast(sent?`Reminder sent to ${sent} account${sent===1?'':'s'}`:'Everyone linked has responded');await refreshNotifications(false);}catch(err){alert(err.message||err);}}
+
+window.addEventListener('clubhub-kickoff-response-saved',event=>{
+  if(event.detail?.capacity==='parent'&&CLOUD_MODE&&currentRole==='parent')void refreshMatchAvailability(false);
+  if(CLOUD_MODE&&isAdmin()&&isClubOverviewMode())void window.ClubHubKickoffUpdates?.refreshAdmin?.(false);
+});
 
 function matchdayFixtureNoteKey(){const f=nextPublishedFixture();return f?`fixture:${currentTacticsFixtureKey()}`:'';}
 let __matchdayNoteStamp='';
@@ -3149,7 +3155,7 @@ function renderNotificationCenter(){
   const html=!allowed?'':rows.length?rows.map(r=>{
     const parentReview=r.source==='app'&&r.type==='parent_access_request'&&['admin','coach','assistant_coach'].includes(currentRole);
     const busy=__notificationReadBusy.has(r.source+':'+r.id);
-    const mark=!r.read_at?`<button type="button" class="secondary-button notification-read-action" ${busy?'disabled aria-busy="true"':''} ${r.source==='announcement'?`data-read-announcement="${esc(r.id)}"`:`data-read-notification="${esc(r.id)}"`}>Mark read</button>`:'';
+    const mark=!r.read_at&&r.type!=='kickoff_update'?`<button type="button" class="secondary-button notification-read-action" ${busy?'disabled aria-busy="true"':''} ${r.source==='announcement'?`data-read-announcement="${esc(r.id)}"`:`data-read-notification="${esc(r.id)}"`}>Mark read</button>`:'';
     const review=parentReview?`<button type="button" class="secondary-button notification-review-action" data-review-parent-request="${esc(r.id)}">Review request</button>`:'';
     const coachReview=r.source==='app'&&r.type==='coach_access_request'&&currentRole==='admin'?`<button type="button" class="secondary-button notification-review-action" data-review-coach-request="${esc(r.id)}">Review request</button>`:'';
     const presentation=notificationPresentation(r);
@@ -4930,6 +4936,7 @@ function buildAdminHomeSnapshot(rows,coaches,requests,messages,notices,feed,dire
     notices:notices===null?null:notices.filter(n=>n&&(!n.expires_at||Date.parse(n.expires_at)>now.getTime())).length};
 }
 function clearAdminHome(resetSearch=false){
+  if(resetSearch)window.ClubHubKickoffUpdates?.resetAdmin?.();
   __adminHomeSnapshot=null;
   for(const id of ['admin-home-fixture-count','admin-home-ready-count','admin-home-pending-count'])adminHomeText(id,'—');
   adminHomeText('admin-team-count','');
@@ -4989,11 +4996,13 @@ function openAdminHomeAction(action,teamId=''){
 }
 async function refreshAdminClubOverview(quiet=false){
   const panel=document.getElementById('admin-club-overview');if(!panel)return;
-  const show=CLOUD_MODE&&isAdmin()&&isClubOverviewMode();panel.classList.toggle('hidden',!show||__clubTab!=='overview');if(!show)return;
+  const show=CLOUD_MODE&&isAdmin()&&isClubOverviewMode();panel.classList.toggle('hidden',!show||__clubTab!=='overview');if(!show){window.ClubHubKickoffUpdates?.resetAdmin?.();return;}
   const identity=adminWeekendShareIdentity();if(!identity)return;
   if(quiet&&identity===__adminHomeIdentity&&Date.now()-__adminOverviewStamp<15000)return;
   const changed=identity!==__adminHomeIdentity;__adminHomeIdentity=identity;__adminOverviewStamp=Date.now();
   if(changed)clearAdminHome(true);
+  window.ClubHubKickoffUpdates?.renderAdmin?.();
+  void window.ClubHubKickoffUpdates?.refreshAdmin?.(quiet);
   const version=++__adminHomeLoadVersion,cloud=window.ClubHubCloud;
   const current=()=>version===__adminHomeLoadVersion&&cloud===window.ClubHubCloud&&identity===adminWeekendShareIdentity()&&isClubOverviewMode();
   const meta=document.getElementById('admin-overview-meta');if(meta){meta.textContent='Refreshing club data…';meta.classList.remove('hidden');}
