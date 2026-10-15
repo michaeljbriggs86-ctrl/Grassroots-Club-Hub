@@ -20,7 +20,7 @@ async function prepare(page,role,width,theme){
   const api=window.ClubHubCloud;
   Object.defineProperty(api,'session',{configurable:true,value:{user:{id:'fictional-user',email:'reviewer@example.invalid'}}});
   Object.defineProperty(api,'context',{configurable:true,value:{profile:{user_id:'fictional-user',club_id:'fictional-club',role}}});
-  Object.assign(api,{currentTeam:()=>({id:'fictional-team',name:'Example Greens',teamName:'Example Greens',ageGroup:'U9',age_group:9}),role:()=>currentRole,canEdit:()=>['admin','coach','assistant_coach'].includes(currentRole),actingAsParent:()=>false,visibleTeamList:()=>[],getClubOverview:async()=>({teams:[],coaches:[]}),listMessageContacts:async()=>[],listClubMessages:async()=>[],listAnnouncements:async()=>[],listNotifications:async()=>[],listMyCoachTeams:async()=>[]});
+  Object.assign(api,{currentTeam:()=>({id:'fictional-team',name:'Example Greens',teamName:'Example Greens',ageGroup:'U9',age_group:9}),role:()=>currentRole,canEdit:()=>['admin','coach','assistant_coach'].includes(currentRole),actingAsParent:()=>false,visibleTeamList:()=>[],getClubOverview:async()=>({teams:[],coaches:[]}),listMessageContacts:async()=>[],listClubMessages:async()=>[],listAnnouncements:async()=>[],listNotifications:async()=>[],listMyCoachTeams:async()=>[],listCoachQualifications:async()=>[]});
   CLUB_CONFIGURATION={settings:{...UNIVERSAL_FALLBACK_SETTINGS,display_name:'Shooters Hill AFC',default_provider_key:'selkent'},providers:[],rules:[],teams:[]};
   state=normalizeState({meta:{clubName:'Shooters Hill AFC',teamName:'Example Greens',ageGroup:role==='player'?'U15':'U9',season:'2026/27'},squad:[],matches:[],goals:[],awards:[]});
   renderAll();renderNotificationCenter();navigate('home',false);
@@ -42,7 +42,7 @@ async function geometry(page,selector){return page.locator(selector).evaluate(el
    const routes=await page.locator('#view-more [data-page-route]:visible').evaluateAll(nodes=>nodes.map(n=>n.dataset.pageRoute));
    if(['parent','player'].includes(role))assert(routes.every(r=>['appearance','my-account','contacts','raise-concern'].includes(r)));
    if(role==='player'){assert.deepEqual(routes,['appearance','my-account']);assert.equal(await page.locator('#mobile-notification-bell').isVisible(),false);assert.equal(await page.locator('#mobile-context-switch').isVisible(),false);}
-   if(role==='admin')assert(routes.includes('coach-documents')&&routes.includes('season-control')&&routes.includes('app-access'));
+   if(role==='admin')assert(!routes.includes('coach-documents')&&routes.includes('season-control')&&routes.includes('app-access'));
    if(['coach','assistant_coach'].includes(role))assert(routes.includes('training-settings')&&routes.includes('feature-settings')&&!routes.includes('season-control'));
    await page.screenshot({path:path.join(out,role+'-'+width+'-'+theme+'.png'),fullPage:true});
    await page.locator('#view-more [data-page-route="appearance"]').click();
@@ -66,6 +66,16 @@ async function geometry(page,selector){return page.locator(selector).evaluate(el
     await page.locator('#view-season-control [data-page-route="more"]').click();
     await page.locator('#view-more [data-page-route="club-compliance"]').click();assert(await page.locator('#compliance-welfare-name').isVisible());
     await page.locator('#view-club-compliance [data-page-route="more"]').click();
+    await page.evaluate(()=>navigate('club-coaches',false));
+    assert(await page.locator('#club-coaches-panel #coach-documents-summary').isVisible(),'Staff owns the document summary');
+    assert.equal(await page.locator('#admin-club-overview #coach-documents-summary').count(),0);
+    await page.locator('#club-coaches-panel [data-page-route="coach-documents"]').click();
+    assert.equal(await page.evaluate(()=>currentView),'coach-documents');
+    assert(await page.locator('#coach-document-matrix').isVisible());
+    assert.equal(await page.locator(width<=900?'[data-mobile-target="club-coaches"]':'[data-nav="club-coaches"]').getAttribute('aria-current'),'page');
+    await page.locator('#view-coach-documents [data-page-route="club-coaches"]').click();
+    assert.equal(await page.evaluate(()=>__clubTab),'coaches');
+    assert(await page.locator('#coach-documents-summary-status').isVisible());
    }
    if(['parent','player'].includes(role))for(const forbidden of ['training-settings','feature-settings','season-control','club-compliance']){await page.evaluate(route=>navigate(route,false),forbidden);assert.notEqual(await page.evaluate(()=>currentView),forbidden);}
    results.push({role,width,theme,routes,bounds});
