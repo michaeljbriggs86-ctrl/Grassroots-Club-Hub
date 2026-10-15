@@ -20,7 +20,20 @@ try{
  const people=[['coach',20],['assistant_coach',21],['parent',20],['pending_parent',20],['player',20],['club_admin',21],['parent',21],['coach',22],['coach',21]];
  for(let n=1;n<=people.length;n++){const [role,team]=people[n-1];await query('insert into auth.users(id,email,email_confirmed_at) values($1,$2,now())',[id(n),`fictional${n}@example.invalid`]);await query('insert into public.profiles(user_id,club_id,role,team_id) values($1,$2,$3,$4)',[id(n),id(team===22?11:10),role,id(team)]);}
  await sql(`insert into public.coach_team_assignments values('${id(2)}','${id(20)}','${id(10)}'),('${id(9)}','${id(20)}','${id(10)}');insert into public.parent_player_links values('${id(3)}','${id(20)}','${id(10)}'),('${id(4)}','${id(20)}','${id(10)}'),('${id(7)}','${id(21)}','${id(10)}');`);
- await sql(fs.readFileSync(path.resolve(__dirname,'../../../supabase/migrations/20261014105830_kickoff_updates.sql'),'utf8'));
+ await sql(fs.readFileSync(path.resolve(__dirname,'../../../supabase/migrations/20261015215438_kickoff_updates.sql'),'utf8'));
+ // Hosted authenticator sessions load safeupdate, unlike this isolated runtime.
+ // Verify the required WHERE guard, while retaining the exact original bodies
+ // and grants apart from the bounded singleton update predicates.
+ const singletonCatalog=()=>query("select p.proname,pg_get_functiondef(p.oid) definition,p.proacl::text acl from pg_proc p join pg_namespace n on n.oid=p.pronamespace where n.nspname='public' and p.proname in ('configure_kickoff_delivery','install_kickoff_signing') order by p.proname");
+ const originalSingletonFunctions=await singletonCatalog();
+ const singletonRepair=fs.readFileSync(path.resolve(__dirname,'../../../supabase/migrations/20261015220143_kickoff_updates_singleton_guard.sql'),'utf8');
+ await sql(singletonRepair);
+ for(const repaired of await singletonCatalog()){
+  const original=originalSingletonFunctions.find(f=>f.proname===repaired.proname);
+  assert.match(repaired.definition,/update private\.kickoff_delivery_config set [^;]+ where singleton;/i,`${repaired.proname} is safeupdate compatible`);
+  assert.equal(repaired.definition.replace(/ where singleton;/i,';'),original.definition,`${repaired.proname} changes only the singleton guard`);
+  assert.equal(repaired.acl,original.acl,`${repaired.proname} retains service-only grants`);
+ }
  const date=(await query("select (current_date+3)::text as d"))[0].d;
  const fixture={date,opponent:'Example & United',venue:'H',competition:'League',time:'',groundName:'Example Fields',address:'Public ground'};
  const state={selkent:{fixtures:[fixture],fixtureOverrides:{}}};const key=`${date}|example and united|H|league`;
@@ -83,7 +96,7 @@ try{
  create function vault.create_secret(value text,secret_name text,description text) returns uuid language plpgsql as $$begin insert into vault.secrets values(secret_name);insert into vault.decrypted_secrets values(secret_name,value);return gen_random_uuid();end$$;
  create function net.http_post(url text,body jsonb default '{}',params jsonb default '{}',headers jsonb default '{}',timeout_milliseconds integer default 1000) returns bigint language sql as $$select 42::bigint$$;
  create function cron.schedule(job_name text,schedule text,command text) returns bigint language plpgsql as $$begin insert into cron.test_jobs values(job_name,schedule,command);return 1;end$$;`);
- const scheduleSql=fs.readFileSync(path.resolve(__dirname,'../../../supabase/migrations/20261014111626_kickoff_dispatch_schedule.sql'),'utf8');
+ const scheduleSql=fs.readFileSync(path.resolve(__dirname,'../../../supabase/migrations/20261015220250_kickoff_dispatch_schedule.sql'),'utf8');
  await assert.rejects(sql(scheduleSql),/Provision kickoff_dispatch_token/,'schedule refuses an absent token');
  await sql(`insert into vault.secrets values('kickoff_dispatch_token');insert into vault.decrypted_secrets values('kickoff_dispatch_token','${'a'.repeat(64)}');select public.configure_kickoff_delivery('',false,false);`);
  assert.equal((await query('select public.kickoff_dispatch_configuration($1) result',['b'.repeat(64)]))[0].result,null,'wrong dispatcher token returns no keys');
@@ -101,5 +114,5 @@ try{
  await sql('select public.configure_kickoff_delivery(\''+'A'.repeat(87)+'\',true,true)');assert.equal((await claim()).length,0,'channel activation does not send queued historical updates');
  await sql('select public.configure_kickoff_delivery(\''+'A'.repeat(87)+'\',true,false)');assert.equal(Number((await query('select private.dispatch_kickoff_updates() as id'))[0].id),42,'push-only channel configuration still dispatches');
  if(process.env.KICKOFF_CATALOG_OUT){const catalog=await query("select n.nspname schema,p.proname name,pg_get_function_identity_arguments(p.oid) args,encode(sha256(convert_to(pg_get_functiondef(p.oid),'UTF8')),'hex') sha256 from pg_proc p join pg_namespace n on n.oid=p.pronamespace where n.nspname in ('public','private') and p.proname like '%kickoff%' order by n.nspname,p.proname");fs.writeFileSync(process.env.KICKOFF_CATALOG_OUT,JSON.stringify(catalog,null,2)+'\n');}
- console.log('PASS kick-off Postgres: committed-only events, team audience, multiteam coaches, version/reset/idempotence, private RLS, receipt ownership, stale writes, device ownership, outbox leases/retries/revocation, Vault bootstrap and withdrawn-time protection.');
+ console.log('PASS kick-off Postgres: safeupdate singleton guards with preserved bodies/grants, committed-only events, team audience, multiteam coaches, version/reset/idempotence, private RLS, receipt ownership, stale writes, device ownership, outbox leases/retries/revocation, Vault bootstrap and withdrawn-time protection.');
 }finally{await db.close();}})().catch(e=>{console.error({message:e.message,code:e.code,position:e.position,where:e.where,stack:e.stack});process.exitCode=1;});

@@ -1,6 +1,6 @@
 # Kick-off update delivery
 
-Priority 3 continuation, 15 October 2026. Candidate until actual deployment/catalog readback; independent device/inbox acceptance is separate.
+Priority 3 release, 15 October 2026. Database functions, deployed Edge source and public app assets have been checked directly; independent device/inbox acceptance is separate.
 
 Reviewed UI: https://www.figma.com/design/NY8QhcuOWiEcD0pKDTsbP8?node-id=285-6351 . A committed change to an upcoming valid UK-local kick-off, public venue or confirmation status creates private versioned adult receipts. Opening/read/delivery is separate from the explicit checkbox acknowledgement. No player audience, other club rollout or historical send backfill.
 
@@ -15,3 +15,5 @@ Deploy kickoff-dispatch with verify_jwt=false because its custom Bearer token is
 No live recipient, account, child or acknowledgement is created as a test. Verify actual function source, grants/RLS, the native binding and fixed-origin HTTP guards, a zero-outbox authenticated dispatcher run and scheduled invocation before any live claim. Use only user-authorised real future fixture changes for operational sends. Keep actual inbox/device receipt and Claude acceptance explicitly open until checked. Push opt-in remains a deliberate action on each supported browser/PWA; native WebViews without Push API show unavailable. Logout unsubscribes the current device; private data is never service-worker cached.
 
 References: https://supabase.com/docs/guides/functions/schedule-functions ; https://supabase.com/docs/guides/database/vault ; https://developers.cloudflare.com/email-service/api/send-emails/workers-api/ ; https://github.com/web-push-libs/web-push
+
+Hosted activation on 15 October 2026: kickoff_updates history 20261015215438, the bounded singleton repair 20261015220143, and kickoff_dispatch_schedule 20261015220250. The authenticator loads safeupdate, so both configuration UPDATEs require WHERE singleton. The repair preserves original authorization, key and activation semantics and grants. Both channels were enabled at 22:03:29 UTC; an empty-queue bootstrap returned HTTP 200 with all counters zero. The one-minute schedule uses Vault without literal secrets. Edge diagnostics log only fixed phase/operation labels and HTTP status, never RPC payloads or credentials. Final scheduled HTTP readback and source parity evidence are in the dated release handoff.

@@ -5,6 +5,7 @@ on:
       - 'app/src/main/assets/**'
       - 'cloudflare/web-app/**'
       - 'supabase/migrations/*kickoff_updates.sql'
+      - 'supabase/migrations/*kickoff_updates_singleton_guard.sql'
       - 'supabase/functions/kickoff-dispatch/**'
       - 'tests/kickoff*.mjs'
       - 'web/db-drafts/test/run-kickoff-updates.cjs'
