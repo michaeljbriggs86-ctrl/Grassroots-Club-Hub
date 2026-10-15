@@ -1,3 +1,4 @@
+import { registrationMail } from './registration-mail.js';
 import { registrationDocument } from './registration-document.js';
 import { pilotBadge } from './pilot-badges.js';
 import { badgeReview } from './badge-review.js';
@@ -14,6 +15,7 @@ const FEEDS = {
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
+    if (url.pathname === '/__registration_mail') return registrationMail(request,env);
     if (url.pathname === '/__registration_document') return registrationDocument(request,env);
     if (url.pathname.startsWith('/_private_documents/')) return new Response('Not found',{status:404,headers:{'Cache-Control':'no-store'}});
     if (url.pathname.startsWith('/__pilot_badges/')) return pilotBadge(request, env);

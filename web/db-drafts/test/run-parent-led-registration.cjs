@@ -1,0 +1,67 @@
+const assert=require('node:assert/strict');const {registrationFixture}=require('./registration-fixture.cjs');
+(async()=>{const {db,q,as,owner,api,delivery,fail,eq,count,uid,club,foreign,team,team2,admin,parent,other,coach,outsider,unverified,revoked,pack,documents,hash}=await registrationFixture();
+ await as(null,'anon');await fail(()=>api('list'),/permission denied/);
+ for(const user of [coach,other,revoked,unverified]){await as(user);await fail(()=>api('teams'),/Admin|available|Confirm/);}
+ await as(admin);eq((await api('teams')).teams.length,1);await fail(()=>api('invite',null,null,{email:'p@example.invalid',team_id:team2,request_key:uid(400)}),/pack/);
+ const requestKey=uid(401),created=await api('invite',null,null,{email:'parent@example.invalid',team_id:team,request_key:requestKey}),id=created.id;
+ eq((await api('invite',null,null,{email:'parent@example.invalid',team_id:team,request_key:requestKey})).id,id);
+ await as(other);await fail(()=>api('get',id),/unavailable/);await as(outsider);await fail(()=>api('get',id),/unavailable/);
+ await as(admin);await fail(()=>delivery('lease',id),/permission denied/);
+ await as(null,'service_role');const lease=await delivery('lease',id);eq(typeof lease.ticket,'string');await as(null,'anon');const job=await delivery('redeem',null,{ticket:lease.ticket});
+ eq(Object.keys(job).includes('token'),true);await fail(()=>delivery('redeem',null,{ticket:lease.ticket}),/unavailable/);await fail(()=>delivery('ack',job.id,{ack:'a'.repeat(64),status:'sent'}),/unavailable/);await delivery('ack',job.id,{ack:job.ack,status:'sent',receipt:'invented-receipt'});eq(true,true);
+ await as(other);await fail(()=>api('claim',null,null,{token:job.token}),/unavailable/);await as(unverified);await fail(()=>api('claim',null,null,{token:job.token}),/Confirm/);
+ await as(parent);eq((await api('claim',null,null,{token:job.token})).id,id);await fail(()=>api('claim',null,null,{token:job.token}),/unavailable/);
+ eq((await api('list')).applications.length,1);let a=await api('get',id);eq(a.status,'draft');eq(a.read_documents,[]);
+ eq((await q('select public.can_read_team($1) allowed',[team])).rows[0].allowed,false);
+ eq((await q('select public.get_my_context() ctx')).rows[0].ctx.team_state,null);
+ eq((await q('select public.list_announcements_for_me() x')).rows[0].x,[]);eq((await q('select public.list_notifications_for_me() x')).rows[0].x,[]);
+ await fail(()=>q('select * from private.registration_applications'),/permission denied/);
+ await fail(()=>api('save',id,a.revision,{answers:{first_name:'Invented',private_override:true}}),/Unknown/);
+ let answers={first_name:'Invented',surname:'Child',dob:'2017-01-01',gender:'boy',address:'Invented address',postcode:'ZZ1 1ZZ',school_year:'Year 4',medical:'no',parent_first:'Invented',parent_surname:'Parent',mobile:'07700 900123',relationship:'Parent',parent_dob:'1980-01-01',signature:'Invented Parent',pack_version:'invented-v1',membership:true,fees:true,weather:true,conduct:true,photos:false};
+ await fail(()=>api('submit',id,a.revision,{answers}),/Read the full/);
+ for(const kind of ['terms','conduct'])eq((await api('document',id,null,{kind})).document.sha256,documents[kind].sha256);
+ for(const bad of [{...answers,medical:'yes'},{...answers,photos:null},{...answers,fees:false},{...answers,dob:'2017-02-31'},{...answers,mobile:'bad'},{...answers,pack_version:'old'}])await fail(()=>api('submit',id,a.revision,{answers:bad}),/medical|photography|declaration|date|mobile|pack/);
+ let saved=await api('save',id,a.revision,{answers});await fail(()=>api('save',id,a.revision,{answers}),/changed/);a=await api('get',id);eq(a.answers.photos,false);eq(a.read_documents.sort(),['conduct','terms']);
+ await api('submit',id,a.revision,{answers});a=await api('get',id);eq(a.status,'submitted');eq(a.submissions.length,1);await fail(()=>api('save',id,a.revision,{answers}),/open registration/);
+ await as(coach);await fail(()=>api('get',id),/unavailable/);await as(admin);a=await api('get',id);
+ await fail(()=>api('review',id,a.revision,{decision:'approve',verified:false}),/Verify/);
+ await api('review',id,a.revision,{decision:'corrections',note:'Check the medical response'});await as(parent);a=await api('get',id);eq(a.submissions.length,1);eq(a.status,'corrections');
+ answers={...answers,medical:'yes',medical_details:'Invented condition'};await api('submit',id,a.revision,{answers});a=await api('get',id);eq(a.submissions.length,2);eq(a.submissions[0].answers.medical,'no');
+ await as(admin);a=await api('get',id);
+ await fail(()=>api('review',id,a.revision,{decision:'approve',verified:true,shirt_number:0,player_role:'outfield'}),/shirt/);
+ eq((await api('get',id)).status,'submitted','failed roster creation rolls application status back');
+ await owner();eq((await q('select count(*)::int n from public.parent_access_requests')).rows[0].n,0);
+ await as(admin);await api('review',id,a.revision,{decision:'approve',verified:true,shirt_number:1,player_role:'outfield'});a=await api('get',id);eq(a.status,'approved');
+ await fail(()=>api('review',id,a.revision-1,{decision:'approve',verified:true,shirt_number:1,player_role:'outfield'}),/changed/);
+ await as(parent);eq((await q('select public.can_read_team($1) allowed',[team])).rows[0].allowed,true);eq((await api('get',id)).submissions.length,2);
+ await owner();eq((await q('select count(*)::int n from public.parent_player_links')).rows[0].n,1);eq((await q('select role from public.profiles where user_id=$1',[parent])).rows[0].role,'parent');
+ await fail(()=>q('update private.registration_submissions set answers=\'{}\''),/immutable/);await fail(()=>q('update private.registration_packs set version=\'tampered\''),/immutable/);
+ // A new unrelated parent cannot read a submitted medical answer or its documents.
+ await as(other);await fail(()=>api('document',id,null,{kind:'conduct'}),/unavailable/);
+ await owner();await q('update public.profiles set role=\'revoked\' where user_id=$1',[parent]);await as(parent);await fail(()=>api('get',id),/available/);
+ await owner();eq((await q("select has_function_privilege('anon','public.registration_api(text,uuid,bigint,jsonb)','execute') a,has_function_privilege('authenticated','private.registration_api(text,uuid,bigint,jsonb)','execute') b")).rows[0],{a:false,b:false});
+
+ // Existing imported player reconciliation must not append a duplicate squad record.
+ await as(admin);const second=await api('invite',null,null,{email:'other@example.invalid',team_id:team,request_key:uid(410)});
+ await as(null,'service_role');const lease2=await delivery('lease',second.id);await as(null,'anon');const job2=await delivery('redeem',null,{ticket:lease2.ticket});
+ await fail(()=>delivery('lease',second.id),/Service delivery/);
+ await as(other);await api('claim',null,null,{token:job2.token});let b=await api('get',second.id);
+ await owner();const fakeReq=uid(411);await q("insert into public.parent_access_requests(id,user_id,club_id,team_id,child_name,status) values($1,$2,$3,$4,'Invented Child','pending')",[fakeReq,other,club,team]);
+ await as(admin);await fail(()=>q('select public.approve_parent_request($1,$2)',[fakeReq,'Invented Child']),/full registration/);
+ await as(other);for(const kind of ['terms','conduct'])await api('document',second.id,null,{kind});
+ await owner();await q("update auth.users set email='changed@example.invalid' where id=$1",[other]);await as(other);await fail(()=>api('get',second.id),/original invited/);
+ await owner();await q("update auth.users set email='other@example.invalid' where id=$1",[other]);await q('update private.registration_packs set enabled=false where id=$1',[pack]);await as(other);await fail(()=>api('submit',second.id,b.revision,{answers}),/pack/);
+ await owner();await q('update private.registration_packs set enabled=true where id=$1',[pack]);await as(other);await api('submit',second.id,b.revision,{answers});b=await api('get',second.id);
+ await as(outsider);await fail(()=>api('review',second.id,b.revision,{decision:'approve',verified:true,existing_player:'Invented Child'}),/unavailable/);
+ await owner();await q('update public.profiles set acting_as_parent=true where user_id=$1',[admin]);await q("insert into public.parent_player_links(club_id,team_id,parent_user_id,player_name) values($1,$2,$3,'Invented Child')",[club,team,admin]);await as(admin);await fail(()=>api('teams'),/Admin/);
+ await owner();await q('update public.profiles set acting_as_parent=false where user_id=$1',[admin]);await as(admin);await api('review',second.id,b.revision,{decision:'approve',verified:true,existing_player:'Invented Child'});
+ await owner();eq((await q("select jsonb_array_length(state->'squad') n from public.team_state where team_id=$1",[team])).rows[0].n,1,'linking an existing player does not duplicate the roster');
+ // Expiry, cancellation and resend rotate unclaimed links and do not create child access.
+ await as(admin);const third=await api('invite',null,null,{email:'unverified@example.invalid',team_id:team,request_key:uid(420)});let c=await api('get',third.id);
+ await as(null,'service_role');const lt=await delivery('lease',third.id);await owner();await q("update private.registration_delivery_jobs set leased_at=now()-interval '3 minutes' where application_id=$1",[third.id]);await as(null,'anon');await fail(()=>delivery('redeem',null,{ticket:lt.ticket}),/unavailable/);
+ await owner();await q("update private.registration_delivery_jobs set created_at=now()-interval '2 minutes',updated_at=now()-interval '6 minutes' where application_id=$1",[third.id]);await as(admin);eq((await api('list')).applications.find(x=>x.id===third.id).delivery,'uncertain');
+ await api('resend',third.id,c.revision);c=await api('get',third.id);await fail(()=>api('resend',third.id,c.revision),/minute/);await api('cancel',third.id,c.revision);eq((await api('get',third.id)).status,'cancelled');
+ await as(null,'service_role');eq((await delivery('lease',third.id)).skipped,true);
+ await owner();eq((await q('select token_hash from private.registration_applications where id=$1',[id])).rows[0].token_hash,null,'consumed claim token is removed');
+ await db.close();console.log('PASS parent-led registration:',count(),'isolated PostgreSQL checks; invented records only');
+})().catch(e=>{console.error(e);process.exitCode=1;});
