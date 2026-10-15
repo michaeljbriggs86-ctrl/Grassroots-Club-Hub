@@ -14,6 +14,9 @@ from urllib.request import Request, urlopen
 ROOT = Path(__file__).resolve().parents[1]
 SITE = "https://shootershillafc.app"
 AUTH = "https://obntycksmkcnkprrcutg.supabase.co"
+# Exact hosting addition observed on the existing main page, 15 October 2026.
+# Registration must remain byte-exact and prohibit this third-party script.
+MAIN_BEACON = b'''<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v4bc70e2c01a94c73b74392e4234840661791215815920" integrity="sha512-L0ha0OXavK/8okipN9F8BtP84dg9DUhPERbBXzwI6dgTA55d2+yweo3pn5CSFYs45/r8md2+xvUPtTdvTNRfjA==" data-cf-beacon='{"version":"2024.11.0","token":"10a09a2b669849c9b6d21b5eade55991","r":1,"spa":2}' crossorigin="anonymous"></script>\n'''
 
 
 def fetch(url: str, *, method: str = "GET", payload: bytes | None = None):
@@ -42,9 +45,19 @@ def main():
                          else "app/src/main/assets/" + name)
         status, url, headers, body = fetch(SITE + "/" + name)
         digest = hashlib.sha256(body).hexdigest()
-        match = status == 200 and body == source.read_bytes()
+        expected = source.read_bytes()
+        known_main_beacon = name == "index.html" and body == expected.replace(b"</body>", MAIN_BEACON + b"</body>", 1)
+        match = status == 200 and (body == expected or known_main_beacon)
         evidence["assets"].append({"path": name, "status": status, "url": url,
-                                   "sha256": digest, "source_match": match})
+                                   "sha256": digest, "source_match": match, "known_main_beacon": known_main_beacon})
+        if name == "register.html":
+            policy = {k.lower(): v for k, v in headers.items()}
+            csp = policy.get("content-security-policy", "")
+            cache = policy.get("cache-control", "")
+            protected = all(item in csp for item in ("default-src 'none'", "script-src 'self';", "frame-ancestors 'none'", "https://obntycksmkcnkprrcutg.supabase.co")) and all(item in cache for item in ("no-store", "no-transform"))
+            evidence["registration_policy"] = {"csp": csp, "cache_control": cache, "passed": protected}
+            if not protected:
+                problems.append("Registration policy is missing")
         if not match:
             problems.append(name + ": deployed bytes differ")
             if name.endswith(".html"):
@@ -75,7 +88,7 @@ def main():
     (out / "readback.json").write_text(json.dumps(evidence, indent=2) + "\n")
     if problems:
         raise SystemExit("; ".join(problems))
-    print("PASS exact public assets and unauthenticated guards; no mail, accounts, applications or access writes")
+    print("PASS registration policy, source assets (only the observed main-page hosting beacon allowed), and unauthenticated guards; no mail, accounts, applications or access writes")
 
 
 if __name__ == "__main__":
