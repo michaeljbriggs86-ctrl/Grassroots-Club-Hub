@@ -39,7 +39,7 @@ def main():
     problems = []
     out = ROOT / "registration-live-review"
     out.mkdir(exist_ok=True)
-    for name in ("register.html", "registration.js", "registration.css", "cloud.js",
+    for name in ("register.html", "registration.js", "registration.css", "cloud.js", "kickoff-updates.js", "notifications.css", "app.js",
                  "player-onboarding.js", "service-worker.js", "index.html", "shooters-hill-logo.png"):
         source = ROOT / ("cloudflare/web-app/service-worker.js" if name == "service-worker.js"
                          else "app/src/main/assets/" + name)
@@ -73,12 +73,15 @@ def main():
         ("mail-invalid-ticket", SITE + "/__registration_mail", "POST", b'{"ticket":"invalid"}',
          400, "Invalid delivery ticket"),
         ("edge-no-auth", AUTH + "/functions/v1/registration-invite", "POST", b"{}", 401, None),
+        ("kickoff-mail-get", SITE + "/__kickoff_mail", "GET", None, 405, "Method not allowed"),
+        ("kickoff-mail-invalid-lease", SITE + "/__kickoff_mail", "POST", b'{"id":"invalid","claim_token":"invalid"}', 400, "Invalid delivery lease"),
+        ("kickoff-edge-no-auth", AUTH + "/functions/v1/kickoff-dispatch", "POST", b"{}", 401, "Unauthorised"),
     )
     for name, target, method, payload, expected, message in checks:
         status, url, headers, body = fetch(target, method=method, payload=payload)
         result = json.loads(body)
         passed = status == expected and (message is None or result.get("error") == message)
-        if name.startswith("mail-"):
+        if name.startswith(("mail-", "kickoff-mail-")):
             passed = passed and "no-store" in headers.get("Cache-Control", headers.get("cache-control", ""))
         evidence["guards"].append({"name": name, "status": status, "response": result, "passed": passed})
         if not passed:

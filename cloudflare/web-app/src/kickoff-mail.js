@@ -11,10 +11,16 @@ export async function kickoffMail(request,env){
  if(!env.REGISTRATION_EMAIL?.send)return reply({error:'Club email is unavailable',status:'retrying'},503);
  let row;try{
   const response=await fetch(env.REGISTRATION_SUPABASE_URL+'/rest/v1/rpc/redeem_kickoff_email',{method:'POST',headers:{apikey:env.REGISTRATION_SUPABASE_PUBLISHABLE_KEY,'Content-Type':'application/json'},body:JSON.stringify({p_id:body.id,p_claim_token:body.claim_token}),signal:AbortSignal.timeout(10000)});
-  if(!response.ok)return reply({error:'Delivery unavailable'},403);
+  if(!response.ok){
+   // PostgREST returns 401 for anon or 403 for an authenticated caller when
+   // this RPC explicitly rejects a lease. Other failures are not revocations.
+   const error=await response.json().catch(()=>null);
+   if([401,403].includes(response.status)&&error?.code==='42501'&&error?.message==='Delivery unavailable')return reply({error:'Delivery unavailable'},403);
+   return reply({error:'Delivery unavailable',status:'retrying'},503);
+  }
   row=await response.json();
  }catch{return reply({error:'Delivery unavailable',status:'retrying'},503);}
- if(!uuid.test(row?.update_id||'')||typeof row.email!=='string'||!row.email||/[\r\n]/.test(row.email))return reply({error:'Delivery unavailable',status:'failed'},503);
+ if(!uuid.test(row?.update_id||'')||typeof row.email!=='string'||!row.email||/[\r\n]/.test(row.email))return reply({error:'Delivery unavailable',status:'retrying'},503);
  const message=emailMessage(row,'https://shootershillafc.app');
  try{
   const result=await env.REGISTRATION_EMAIL.send({from:{email:'Hello@pitchkind.com',name:'Shooters Hill AFC'},to:row.email,replyTo:'secretary@shootershillfc.com',subject:message.subject,text:message.text,html:message.html});

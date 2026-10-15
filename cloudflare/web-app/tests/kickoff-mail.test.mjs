@@ -22,9 +22,21 @@ test('email recipient, body, link and sender come only from the redeemed server 
  assert.equal(sent[0].to,row.email);assert.equal(sent[0].from.email,'Hello@pitchkind.com');assert.match(sent[0].html,/&lt;script&gt;/);assert.match(sent[0].text,/https:\/\/shootershillafc.app\/\?kickoff_update=/);assert(!sent[0].text.includes('caller content'));assert(!JSON.stringify(sent[0]).includes('attacker'));
  assert.match(response.headers.get('Cache-Control'),/no-store/);
 }));
-test('an expired, replayed or revoked server lease cannot send',async()=>mock(async(env,calls,sent)=>{
- assert.equal((await kickoffMail(request(),env)).status,403);assert.equal(sent.length,0);
-},undefined,()=>Response.json({error:'unavailable'},{status:403})));
+test('an explicit expired, replayed or revoked lease denial cannot send or retry',async()=>{
+ for(const status of [401,403])await mock(async(env,calls,sent)=>{
+  const response=await kickoffMail(request(),env);assert.equal(response.status,403);assert.deepEqual(await response.json(),{error:'Delivery unavailable'});assert.equal(sent.length,0);
+ },undefined,()=>Response.json({code:'42501',message:'Delivery unavailable'},{status}));
+});
+test('HTTP redemption outages and configuration errors retry without sending',async()=>{
+ for(const status of [400,401,403,404,408,429,500,502,503,504])await mock(async(env,calls,sent)=>{
+  const response=await kickoffMail(request(),env);assert.equal(response.status,503,`upstream ${status}`);assert.equal((await response.json()).status,'retrying');assert.equal(sent.length,0);
+ },undefined,()=>Response.json({code:status===403?'42501':'PGRST000',message:status===403?'permission denied for function redeem_kickoff_email':'Temporary configuration or service error'},{status}));
+});
+test('malformed redemption responses retry without sending',async()=>{
+ for(const redeem of [()=>new Response('invalid upstream body',{status:503}),()=>new Response('invalid denial body',{status:403}),()=>new Response('invalid success body',{status:200}),()=>Response.json({}),()=>Response.json({...row,email:'invalid\r\naddress'})])await mock(async(env,calls,sent)=>{
+  const response=await kickoffMail(request(),env);assert.equal(response.status,503);assert.equal((await response.json()).status,'retrying');assert.equal(sent.length,0);
+ },undefined,redeem);
+});
 test('missing native provider receipt never claims sent',async()=>mock(async env=>{
  const response=await kickoffMail(request(),env);assert.equal(response.status,503);assert.equal((await response.json()).status,'retrying');
 },async()=>({})));
