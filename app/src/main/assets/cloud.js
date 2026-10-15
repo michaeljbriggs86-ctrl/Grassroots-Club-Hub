@@ -880,7 +880,18 @@
     if(testModeActive())return 0;if(!activeTeam||!canEdit())throw new Error('Coach access required');
     return Number(await rpc('send_availability_reminder',{p_team_id:activeTeam.id,p_fixture_key:String(fixtureKey)})||0);
   }
-  async function listNotifications(){if(testModeActive())return [];const data=await rpc('list_notifications_for_me',{});return Array.isArray(data)?data:(Array.isArray(data?.data)?data.data:[]);}
+  async function listNotifications(){
+    if(testModeActive())return [];
+    const data=await rpc('list_notifications_for_me',{});
+    const ordinary=(Array.isArray(data)?data:(Array.isArray(data?.data)?data.data:[])).filter(n=>n.type!=='kickoff_update');
+    let updates=[];
+    try{updates=await rpc('list_kickoff_updates_for_me',{});}catch(e){if(!/PGRST202|Could not find the function|does not exist/.test(String(e.message||e)))throw e;}
+    return [...ordinary,...(Array.isArray(updates)?updates:[])];
+  }
+  async function acknowledgeKickoffUpdate(id){return rpc('acknowledge_kickoff_update',{p_update_id:id,p_confirm_seen:true});}
+  async function getKickoffPushSettings(endpoint=''){return rpc('get_kickoff_push_settings',{p_endpoint:endpoint});}
+  async function registerKickoffPush(sub){return rpc('register_kickoff_push',{p_endpoint:sub.endpoint,p_p256dh:sub.keys?.p256dh||'',p_auth:sub.keys?.auth||''});}
+  async function unregisterKickoffPush(endpoint){return rpc('unregister_kickoff_push',{p_endpoint:endpoint});}
   async function markNotificationRead(id){if(testModeActive())return true;return await rpc('mark_notification_read',{p_notification_id:id});}
   async function notifyFixtureChange(fixtureKey,body){if(testModeActive())return 0;if(!activeTeam||!canEdit())return 0;return Number(await rpc('notify_fixture_change',{p_team_id:activeTeam.id,p_fixture_key:String(fixtureKey),p_body:String(body||'')})||0);}
   async function notifySelectedSquad(fixtureKey,playerNames=[]){if(testModeActive())return 0;if(!activeTeam||!canEdit())throw new Error('Coach access required');return Number(await rpc('notify_selected_squad',{p_team_id:activeTeam.id,p_fixture_key:String(fixtureKey),p_player_names:playerNames})||0);}
@@ -1154,6 +1165,7 @@
 
     // Revoke the Supabase refresh session when possible. Local logout must still
     // complete if the device is offline or the server request fails.
+    await window.ClubHubKickoffUpdates?.disableForLogout?.();
     const accessToken=session?.access_token||'';
     if(accessToken){
       try{
@@ -1312,7 +1324,7 @@
   window.ClubHubCloud={
     getRegistrationContactConduct,submitRegistrationContactConduct,readRegistrationConductDocument,listContactDirectory,saveMemberContactDetails,importMemberContactDetails,loadAdminPlayerOnboarding,onboardAdminPlayer,
     configured,bootstrap,loadInitialState,queueStateSave,confirmStateSave,pullLatest,startPolling,
-    role,requestCoachAccess,listPendingCoachRequests,reviewCoachRequest,listMyCoachTeams,switchMyCoachTeam,setMyCapacity,requestChildLink,realRole,isStaffAccount,actingAsParent,assignCoachTeam,unassignCoachTeam,canEdit,canAdmin,assignedTeam,currentTeam,coachTeam,hasDualCoachAccess,visibleTeamList,getClubConfiguration,listLoginClubs,listLoginTeams,listCurrentClubLoginTeams,createInvite,requestParentAccess,listPendingParentRequests,listTeamMembers,listClubCoaches,listCoachQualifications,getCoachQualifications,saveCoachQualifications,listClubAccessAccounts,removeClubCoach,listPublishedClubResults,listParentPlayerLinks,saveParentPlayerLinks,listPlayerAccountLinks,listMatchAvailability,saveMatchAvailability,saveCoachMatchAvailability,listSelkentTeamDirectory,syncSelkentTeamDirectory,getCoachMatchNote,saveCoachMatchNote,listAnnouncements,createAnnouncement,markAnnouncementRead,deleteAnnouncement,listMatchAttendance,saveMatchAttendance,getAvailabilitySettings,setAvailabilityDeadline,sendAvailabilityReminder,listNotifications,markNotificationRead,notifyFixtureChange,notifySelectedSquad,notifyMatchReport,notifyMatchReopened,listPlayerAppearanceStats,recordAuditEvent,listAuditHistory,listSeasonArchives,getSeasonArchive,archiveCurrentSeason,rolloverClubSeason,resetParentPin,setAccessPin,approveParentRequest,removeTeamMember,syncTeamDirectory,switchAdminTeam,switchParentTeam,getClubOverview,signOut,switchToParentSignIn,handleAuthCallback,listMessageContacts,listClubMessages,sendClubMessage,markClubMessagesRead,getClubComplianceStatus,setDisputeReviewers,setClubSafeguardingContacts,getConcernRouting,raiseClubConcern,listGeneralDisputes,listDisputeMessages,upsertU11SafeguardingInfo,exportU11SafeguardingPack,listSafeguardingExportAudit,requestClubCancellation,cancelClubCancellation,
+    role,requestCoachAccess,listPendingCoachRequests,reviewCoachRequest,listMyCoachTeams,switchMyCoachTeam,setMyCapacity,requestChildLink,realRole,isStaffAccount,actingAsParent,assignCoachTeam,unassignCoachTeam,canEdit,canAdmin,assignedTeam,currentTeam,coachTeam,hasDualCoachAccess,visibleTeamList,getClubConfiguration,listLoginClubs,listLoginTeams,listCurrentClubLoginTeams,createInvite,requestParentAccess,listPendingParentRequests,listTeamMembers,listClubCoaches,listCoachQualifications,getCoachQualifications,saveCoachQualifications,listClubAccessAccounts,removeClubCoach,listPublishedClubResults,listParentPlayerLinks,saveParentPlayerLinks,listPlayerAccountLinks,listMatchAvailability,saveMatchAvailability,saveCoachMatchAvailability,listSelkentTeamDirectory,syncSelkentTeamDirectory,getCoachMatchNote,saveCoachMatchNote,listAnnouncements,createAnnouncement,markAnnouncementRead,deleteAnnouncement,listMatchAttendance,saveMatchAttendance,getAvailabilitySettings,setAvailabilityDeadline,sendAvailabilityReminder,listNotifications,acknowledgeKickoffUpdate,getKickoffPushSettings,registerKickoffPush,unregisterKickoffPush,markNotificationRead,notifyFixtureChange,notifySelectedSquad,notifyMatchReport,notifyMatchReopened,listPlayerAppearanceStats,recordAuditEvent,listAuditHistory,listSeasonArchives,getSeasonArchive,archiveCurrentSeason,rolloverClubSeason,resetParentPin,setAccessPin,approveParentRequest,removeTeamMember,syncTeamDirectory,switchAdminTeam,switchParentTeam,getClubOverview,signOut,switchToParentSignIn,handleAuthCallback,listMessageContacts,listClubMessages,sendClubMessage,markClubMessagesRead,getClubComplianceStatus,setDisputeReviewers,setClubSafeguardingContacts,getConcernRouting,raiseClubConcern,listGeneralDisputes,listDisputeMessages,upsertU11SafeguardingInfo,exportU11SafeguardingPack,listSafeguardingExportAudit,requestClubCancellation,cancelClubCancellation,
     updateCloudPanel,
     get context(){return context;},get configuration(){return clubConfiguration;},get session(){return session;},get revision(){return activeRevision;},get testMode(){return testModeActive();}
   };

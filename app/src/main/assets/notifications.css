@@ -35,3 +35,16 @@
 .notification-modal .modal-actions button{width:100%!important;min-height:52px;font-size:14px}
 .notification-toolbar button[hidden],.notification-item-actions button[hidden]{display:none!important}
 @media(min-width:760px){.communications-notifications-panel{max-width:720px;margin-inline:auto}}
+.kickoff-confirmation,.kickoff-push-panel,.kickoff-totals{display:grid;gap:12px;min-width:0}
+.kickoff-push-panel{padding:16px;border:1px solid var(--gch-control-line,var(--gch-line));border-radius:20px;background:var(--gch-control-surface,var(--white));color:var(--ink)}
+.kickoff-push-panel[hidden]{display:none!important}
+.kickoff-push-panel p,.kickoff-totals p{margin:0;font-size:14px;line-height:1.4;overflow-wrap:anywhere}
+.kickoff-helper{color:var(--gch-control-muted,var(--muted));font-size:14px;line-height:1.4}
+.notification-list .kickoff-checkbox{display:flex!important;flex-direction:row!important;grid-template-columns:none!important;align-items:center;gap:12px;min-height:48px;padding:12px;border-radius:12px;background:var(--gch-control-choice,var(--gch-soft-green));color:var(--ink);font-size:14px;font-weight:700;line-height:1.4;cursor:pointer}
+.kickoff-checkbox input{flex:0 0 24px;width:24px;height:24px;margin:0;accent-color:var(--gch-green-800)}
+.kickoff-checkbox:focus-within{outline:2px solid var(--gch-green-700);outline-offset:2px}
+.kickoff-confirmation button,.kickoff-push-panel button{width:100%;height:auto;min-height:52px;padding:12px 16px;font-size:14px;line-height:1.4;white-space:normal}
+.kickoff-confirmation button:disabled{opacity:.5;cursor:default}
+.kickoff-totals{padding-top:16px;border-top:1px solid var(--gch-control-line,var(--gch-line))}
+.kickoff-error{color:var(--ink);padding:12px;border:1px solid var(--gch-error);border-radius:12px;font-size:14px;line-height:1.4}
+.kickoff-seen{font-weight:700}
