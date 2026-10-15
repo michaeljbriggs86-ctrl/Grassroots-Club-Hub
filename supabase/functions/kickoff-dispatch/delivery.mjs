@@ -27,8 +27,9 @@ export async function dispatchBatch({rpc,sendPush,sendEmail,origin}){
      await sendPush(row.subscription,JSON.stringify({update_id:row.update_id}),{TTL:3600,timeout:10000});
     }else{
      if(!row.email||/[\r\n]/.test(row.email))throw {responseCode:550};
-     const result=await sendEmail({to:row.email,...emailMessage(row,origin),messageId:`<kickoff-${row.id}@${new URL(origin).hostname}>`});
-     if(!result?.accepted?.length)throw {responseCode:450};
+     const result=await sendEmail(row);
+     if(result?.status==='cancelled'){outcome='cancelled';await rpc('finish_kickoff_delivery',{p_id:row.id,p_claim_token:row.claim_token,p_outcome:outcome});counts.cancelled++;continue;}
+     if(result?.status!=='sent')throw {responseCode:result?.status==='failed'?550:450};
     }
     outcome='sent';
    }catch(error){outcome=failureOutcome(error,row.channel);}

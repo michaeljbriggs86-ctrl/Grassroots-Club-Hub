@@ -42,7 +42,7 @@
    panel.hidden=!adult();if(!adult())continue;
    const blocked=supported()&&Notification.permission==='denied';
    const copy=!supported()?'Push is not available on this device.':blocked?'Blocked in your browser settings':push.loading?'Checking push settings…':push.on?'On for this device':push.available?'Get kick-off updates on this device':'Push is not available on this device yet';
-   const html=`<strong>Push notifications</strong><p>${esc(copy)}</p>${supported()&&!blocked&&push.available?`<button type="button" class="secondary-button" data-kickoff-push-toggle ${push.busy||push.loading?'disabled aria-busy="true"':''}>${push.busy?'Updating…':push.on?'Turn off push':'Turn on push'}</button>`:''}<p class="kickoff-helper">Email updates are sent separately. Confirm seen inside the app.</p>${push.error?`<p class="kickoff-error" role="alert">${esc(push.error)}</p>`:''}`;
+   const html=`<strong>Push notifications</strong><p>${esc(copy)}</p>${supported()&&!blocked&&push.available?`<button type="button" class="secondary-button" data-kickoff-push-toggle ${push.busy||push.loading?'disabled aria-busy="true"':''}>${push.busy?'Updating…':push.on?'Turn off push':'Turn on push'}</button>`:''}<p class="kickoff-helper">Email and push delivery are separate from confirming seen.</p>${push.error?`<p class="kickoff-error" role="alert">${esc(push.error)}</p>`:''}`;
    if(panel.innerHTML!==html)panel.innerHTML=html;
   }
   if(adult()&&supported()&&!push.loading&&!push.busy&&Date.now()-pushStamp>60000){pushStamp=Date.now();void refreshPush();}

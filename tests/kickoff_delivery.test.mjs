@@ -16,14 +16,14 @@ test('dispatcher rechecks lease and audience, sends generic push, and records se
  const rows=['push','email','email','push'].map((channel,i)=>({id:String(i),channel,claim_token:'lease'+i,update_id:'fixture-event',email:'fictional@example.invalid',body:'Provisional',subscription:{endpoint:'https://fcm.googleapis.com/fictional',keys:{}}}));
  const finishes=[],sent=[];
  const rpc=async(name,args)=>name==='claim_kickoff_deliveries'?rows:name==='validate_kickoff_delivery'?args.p_id!=='2':finishes.push(args);
- const result=await dispatchBatch({rpc,origin:'https://shootershillafc.app',sendPush:async(sub,payload)=>{sent.push(JSON.parse(payload));if(sent.length>1)throw {statusCode:410};},sendEmail:async message=>{sent.push(message);return {accepted:[message.to]};}});
+ const result=await dispatchBatch({rpc,origin:'https://shootershillafc.app',sendPush:async(sub,payload)=>{sent.push(JSON.parse(payload));if(sent.length>1)throw {statusCode:410};},sendEmail:async message=>{sent.push(message);return {status:'sent'};}});
  assert.deepEqual(finishes.map(x=>x.p_outcome),['sent','sent','cancelled','expired']);assert.deepEqual(sent[0],{update_id:'fixture-event'});assert(!JSON.stringify(sent[0]).includes('Provisional'));assert.equal(result.sent,2);assert.equal(result.cancelled,1);
 });
 test('transient email and push errors retry; permanent rejection and expired devices are distinct',()=>{
  assert.equal(failureOutcome({statusCode:429},'push'),'retrying');assert.equal(failureOutcome({responseCode:450},'email'),'retrying');assert.equal(failureOutcome({responseCode:550},'email'),'failed');assert.equal(failureOutcome({statusCode:410},'push'),'expired');assert.equal(failureOutcome({statusCode:400},'push'),'failed');
 });
-test('empty SMTP acceptance never becomes Sent',async()=>{
- const finishes=[];await dispatchBatch({origin:'https://shootershillafc.app',rpc:async(name,a)=>name==='claim_kickoff_deliveries'?[{id:'1',claim_token:'lease',channel:'email',update_id:'event',email:'fictional@example.invalid'}]:name==='validate_kickoff_delivery'?true:finishes.push(a),sendEmail:async()=>({accepted:[]}),sendPush:async()=>{throw Error('unexpected');}});assert.equal(finishes[0].p_outcome,'retrying');
+test('missing native email receipt never becomes Sent',async()=>{
+ const finishes=[];await dispatchBatch({origin:'https://shootershillafc.app',rpc:async(name,a)=>name==='claim_kickoff_deliveries'?[{id:'1',claim_token:'lease',channel:'email',update_id:'event',email:'fictional@example.invalid'}]:name==='validate_kickoff_delivery'?true:finishes.push(a),sendEmail:async()=>({}),sendPush:async()=>{throw Error('unexpected');}});assert.equal(finishes[0].p_outcome,'retrying');
 });
 test('pinned Web Push library constructs an encrypted, authenticated request without sending',()=>{
  const webpush=require(process.env.KICKOFF_NODE_MODULES?process.env.KICKOFF_NODE_MODULES+'/web-push':'web-push');
