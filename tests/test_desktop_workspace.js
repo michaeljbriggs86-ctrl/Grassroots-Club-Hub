@@ -14,4 +14,5 @@ assert.match(desktop, /#view-home\.active\s*\{[^}]*grid-template-columns:\s*repe
 assert.match(desktop, /@media\s*\(min-width:\s*901px\)/, 'desktop navigation breakpoint');
 assert.match(desktop, /\.bottom-nav\s*\{[^}]*display:\s*none\s*!important/s, 'desktop hides phone dock');
 assert.match(css, /@media\s*\(max-width:\s*900px\)\s*\{[\s\S]*?#top-nav-tabs\s*\{display:\s*none!important/, 'mobile retains bottom navigation');
+assert.match(desktop, /#view-club\s+\.admin-home\s*\{[^}]*grid-template-columns:\s*repeat\(12,\s*minmax\(0,\s*1fr\)\)/s, 'Admin Home has wide-screen operational grid');
 console.log('PASS desktop workspace responsive CSS contract');
