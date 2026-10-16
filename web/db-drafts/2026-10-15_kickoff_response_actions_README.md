@@ -1,6 +1,8 @@
-# Kick-off response actions — candidate, not applied
+# Kick-off response actions — applied database change
 
-Reviewed Figma scope: [board 370:6986](https://www.figma.com/design/NY8QhcuOWiEcD0pKDTsbP8?node-id=370-6986), including the 23:33 explicit-action/read refinement on 15 October 2026. Applying this candidate requires Mike's written approval naming **kickoff_response_actions**. It creates no invitations, releases, delivery jobs or real responses.
+Applied to the live database on 16 October 2026 as **20261016170624_kickoff_response_actions**, following Mike's continuation of the explicitly named release proposal. The migration mirror preserves the exact tested SQL bytes (SHA256 `b0f4eba6351d06d0f0429351a2f4e918382ebc1463fe5f2dd56b291fcdf23100`), including its original candidate header. It creates no invitations, releases, delivery jobs or real responses. Website release and served verification are recorded separately in the dated immutable handoff.
+
+Reviewed Figma scope: [board 370:6986](https://www.figma.com/design/NY8QhcuOWiEcD0pKDTsbP8?node-id=370-6986), including the explicit-action/read refinement on 15 October and Confirm-only refinement on 16 October 2026.
 
 `2026-10-15_kickoff_response_actions.sql` adds a separate coach acknowledgement timestamp and private own-child evidence pointing to an existing availability row and its timestamp. Attendance remains in `public.match_availability`; its status is not duplicated. The predecessor definitions are fingerprinted against the read-only live catalog before replacement, and existing function grants are preserved.
 

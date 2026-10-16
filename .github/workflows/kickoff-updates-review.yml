@@ -6,6 +6,7 @@ on:
       - 'cloudflare/web-app/**'
       - 'supabase/migrations/*kickoff_updates.sql'
       - 'supabase/migrations/*kickoff_updates_singleton_guard.sql'
+      - 'supabase/migrations/*kickoff_response_actions.sql'
       - 'supabase/functions/kickoff-dispatch/**'
       - 'tests/kickoff*.mjs'
       - 'web/db-drafts/test/run-kickoff-updates.cjs'

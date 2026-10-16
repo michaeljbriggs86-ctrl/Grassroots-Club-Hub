@@ -30,6 +30,7 @@ try{
  await sql(`insert into public.coach_team_assignments values('${id(2)}','${id(20)}','${id(10)}');
  insert into public.parent_player_links(id,parent_user_id,team_id,club_id,player_name) values('${id(31)}','${id(3)}','${id(20)}','${id(10)}','Invented Child One'),('${id(32)}','${id(3)}','${id(20)}','${id(10)}','Invented Child Two'),('${id(33)}','${id(4)}','${id(20)}','${id(10)}','Other Invented Child'),('${id(34)}','${id(9)}','${id(20)}','${id(10)}','Dual Adult Child');`);
  const candidate=fs.readFileSync(path.resolve(__dirname,'../../db-drafts/2026-10-15_kickoff_response_actions.sql'),'utf8');
+ assert.equal(fs.readFileSync(path.resolve(__dirname,'../../../supabase/migrations/20261016170624_kickoff_response_actions.sql'),'utf8'),candidate,'applied migration mirror must preserve the tested candidate bytes');
  const grantsBefore=await query("select proname,proacl::text acl from pg_proc where oid in('public.stamp_match_availability_response()'::regprocedure,'public.list_kickoff_updates_for_me()'::regprocedure,'public.acknowledge_kickoff_update(uuid,boolean)'::regprocedure) order by proname");
  await sql(candidate);
  assert.deepEqual(await query("select proname,proacl::text acl from pg_proc where oid in('public.stamp_match_availability_response()'::regprocedure,'public.list_kickoff_updates_for_me()'::regprocedure,'public.acknowledge_kickoff_update(uuid,boolean)'::regprocedure) order by proname"),grantsBefore,'replacement functions retain existing grants');

@@ -2967,7 +2967,7 @@ async function refreshMatchAvailability(quiet=true){
     }
     const count=document.getElementById('match-availability-count');if(count)count.textContent=retained?'Some replies could not load. Retry.':'Availability unavailable';
     if(warning){warning.innerHTML='Some replies could not load. <button type="button" class="text-button compact" data-availability-retry>Retry</button>';warning.classList.remove('hidden');}
-    renderTacticsBoard();renderMatchdayDashboard();renderParentHomeMatchInfo();if(!quiet)toast('Some replies could not load. Retry.');return;
+    renderTacticsBoard();renderMatchdayDashboard();renderParentHomeMatchInfo();focusParentHomeReply();if(!quiet)toast('Some replies could not load. Retry.');return;
   }
   const count=document.getElementById('match-availability-count');if(count)count.textContent=`${__availabilityRows.length} update${__availabilityRows.length===1?'':'s'}`;
   if(['parent','player'].includes(currentRole)){
@@ -2989,6 +2989,51 @@ async function refreshMatchAvailability(quiet=true){
   }
   renderMatchdayDashboard();
   renderParentHomeMatchInfo();
+  focusParentHomeReply();
+}
+// Home Respond is navigation to the existing own-child availability controls.
+let __parentHomeReplyRequest=null;
+function parentHomeReplyScope(){
+  const cloud=window.ClubHubCloud;
+  if(!CLOUD_MODE||currentRole!=='parent'||cloud?.role?.()!=='parent')return '';
+  return [cloud.session?.user?.id||'',cloud.context?.profile?.club_id||'',cloud.currentTeam?.()?.id||'',cloud.actingAsParent?.()?'parent-capacity':'parent-account'].join('|');
+}
+function currentParentHomeReply(request=__parentHomeReplyRequest){
+  const cloud=window.ClubHubCloud,fixture=nextPublishedFixture();
+  return !!request&&request===__parentHomeReplyRequest&&request.cloud===cloud&&request.scope===parentHomeReplyScope()&&parentMatchdayReady(fixture)&&request.fixture===fixtureResponseKey(fixture)&&document.getElementById('next-fixture-dialog')?.open;
+}
+function focusParentHomeReply(){
+  const request=__parentHomeReplyRequest;
+  if(!request)return;
+  if(!currentParentHomeReply(request)){__parentHomeReplyRequest=null;return;}
+  const cloud=window.ClubHubCloud,teamId=String(cloud.currentTeam?.()?.id||''),uid=String(cloud.session?.user?.id||'');
+  if(__availabilityFixture!==request.fixture||__availabilityTeamId!==teamId||__availabilityUserId!==uid||__availabilityLoadStatus==='loading')return;
+  if(['error','partial'].includes(__availabilityLoadStatus)){
+    if(request.focus){const warning=document.getElementById('match-availability-warning'),retry=warning?.querySelector('[data-availability-retry]');warning?.scrollIntoView({block:'center',behavior:'auto'});retry?.focus({preventScroll:true});request.focus=false;}
+    return;
+  }
+  if(__availabilityLoadStatus!=='ready')return;
+  const own=__parentPlayerLinks.some(link=>String(link.parent_user_id)===uid&&(!link.team_id||String(link.team_id)===teamId)&&link.player_name===request.name);
+  const select=document.getElementById('availability-player'),controls=document.getElementById('parent-availability-controls');
+  if(!own||!select||!controls||controls.classList.contains('hidden')||![...select.options].some(option=>option.value===request.name)){__parentHomeReplyRequest=null;return;}
+  select.value=request.name;select.dispatchEvent(new Event('change'));
+  if(request.focus){
+    const target=controls.querySelector('[data-availability-status].selected:not(:disabled)')||controls.querySelector('[data-availability-status]:not(:disabled)');
+    controls.scrollIntoView({block:'center',behavior:'auto'});target?.focus({preventScroll:true});
+  }
+  __parentHomeReplyRequest=null;
+}
+async function openParentHomeMatchReply(name){
+  const cloud=window.ClubHubCloud,scope=parentHomeReplyScope(),fixture=nextPublishedFixture(),uid=String(cloud?.session?.user?.id||''),teamId=String(cloud?.currentTeam?.()?.id||'');
+  if(!scope||!uid||!teamId||!fixture||!parentMatchdayReady(fixture)||__parentFamilyStatus!=='ready'||__parentFamilyKey!==uid+':'+teamId||!__parentFamilyLinks.some(link=>String(link.parent_user_id)===uid&&(!link.team_id||String(link.team_id)===teamId)&&link.player_name===name))return;
+  const request={cloud,scope,fixture:fixtureResponseKey(fixture),name,focus:true};__parentHomeReplyRequest=request;
+  const dialog=document.getElementById('next-fixture-dialog');if(!dialog){__parentHomeReplyRequest=null;return;}
+  if(!dialog.open)void openNextFixtureDetails();
+  if(!currentParentHomeReply(request)){__parentHomeReplyRequest=null;return;}
+  // Do not offer a stale row while the current reply and approved links refresh.
+  document.querySelectorAll('#parent-availability-controls [data-availability-status]').forEach(button=>button.disabled=true);
+  await refreshMatchAvailability(false);
+  if(request===__parentHomeReplyRequest)focusParentHomeReply();
 }
 async function saveParentAvailability(status){
   if(!['parent','player'].includes(currentRole)||!__availabilityFixture)return;const player=document.getElementById('availability-player')?.value||'';if(!player)return toast('No player is linked to this account');
@@ -6536,12 +6581,13 @@ document.getElementById('training-skipped-list')?.addEventListener('click',e=>{
 });
 document.getElementById('parent-home-match-info')?.addEventListener('click',e=>{
   if(e.target.closest('[data-parent-home-calendar]')){addFixtureToCalendar();return;}
-  const button=e.target.closest('[data-parent-home-reply]');if(!button||currentRole!=='parent')return;
-  const name=button.dataset.parentHomeReply||'',uid=String(window.ClubHubCloud?.session?.user?.id||''),teamId=String(window.ClubHubCloud?.currentTeam?.()?.id||'');
-  if(__parentFamilyStatus!=='ready'||__parentFamilyKey!==uid+':'+teamId||!__parentFamilyLinks.some(link=>link.player_name===name))return;
-  document.getElementById('next-match-card')?.click();
-  const select=document.getElementById('availability-player');if(select&&[...select.options].some(option=>option.value===name)){select.value=name;select.dispatchEvent(new Event('change'));}
+  const button=e.target.closest('[data-parent-home-reply]');if(button)void openParentHomeMatchReply(button.dataset.parentHomeReply||'');
 });
+document.getElementById('match-availability-warning')?.addEventListener('click',e=>{
+  if(e.target.closest('[data-availability-retry]')&&currentParentHomeReply())__parentHomeReplyRequest.focus=true;
+});
+document.getElementById('next-fixture-dialog')?.addEventListener('close',()=>{__parentHomeReplyRequest=null;});
+window.addEventListener('clubhub-contacts-clear',()=>{__parentHomeReplyRequest=null;});
 document.getElementById('parent-add-child-form')?.addEventListener('submit',submitParentAddChild);
 document.getElementById('remove-player')?.addEventListener('click',removePlayerFromSquad);
 for(const [id,detail] of [['match-form',false],['match-detail-form',true]]){
