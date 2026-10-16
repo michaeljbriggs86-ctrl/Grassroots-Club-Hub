@@ -5027,6 +5027,7 @@ function renderAdminHomeTeams(){
   setStableHtml(grid,[...grouped].map(([key,items])=>`<section class="admin-home-team-group"><h4>${esc(key)}</h4>${items.join('')}</section>`).join('')||(snap.rows.length?'<p class="muted">No teams match. Try another name or age group.</p>':'<p class="muted">No club teams available yet.</p>'));
 }
 function renderAdminHome(snap){
+  window.ClubHubKickoffUpdates?.setAdminWeekend?.(snap.dates);
   adminHomeText('admin-home-weekend-dates',`${formatDate(snap.dates[0])} – ${formatDate(snap.dates[1])}`);
   adminHomeText('admin-home-fixture-count',snap.feedWarning?'—':snap.fixtures.length);
   adminHomeText('admin-home-ready-count',snap.feedWarning?'—':snap.digest.events.length);

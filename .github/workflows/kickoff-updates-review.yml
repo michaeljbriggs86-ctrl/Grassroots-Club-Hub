@@ -15,6 +15,7 @@ on:
       - 'web/db-drafts/test/kickoff-response-actions-extra.cjs'
       - 'verification/browser/verify_kickoff_updates.cjs'
       - 'verification/browser/check_kickoff_response_actions.cjs'
+      - 'verification/browser/check_admin_weekend_seen.cjs'
       - 'verification/browser/check_kickoff_dispatcher.cjs'
       - 'supabase/migrations/*kickoff_dispatch_schedule.sql'
       - '.github/workflows/kickoff-updates-review.yml'
