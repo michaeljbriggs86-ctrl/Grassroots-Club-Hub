@@ -2508,3 +2508,13 @@ html body #club-detail-dialog :is(h3,summary,a,button,input):focus-visible{outli
     grid-column: 1 / -1;
   }
 }
+
+/* Top navigation owns desktop navigation; no duplicate fixed phone dock. */
+@media (min-width: 901px) {
+  html body:not(.auth-open) .bottom-nav {
+    display: none !important;
+  }
+  html body:not(.auth-open) .app-shell > .content {
+    padding-bottom: 48px;
+  }
+}
