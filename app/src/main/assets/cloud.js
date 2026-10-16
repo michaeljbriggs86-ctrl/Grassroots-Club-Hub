@@ -1245,7 +1245,7 @@
       clearAccountLocalData();
       let parentSignIn=false;
       try{parentSignIn=sessionStorage.getItem(PARENT_SIGNIN_AFTER_LOGOUT_KEY)==='1';sessionStorage.removeItem(PARENT_SIGNIN_AFTER_LOGOUT_KEY);}catch{}
-      const coachInvitation=new URLSearchParams(window.location.search).get('signup')==='coach';
+      const coachInvitation=/(?:[?&])signup=coach(?:&|$)/.test(String(window.location?.search||''));
       setGateHtml(coachInvitation?'coachsignup':parentSignIn?'parentsignin':'signin');return null;
     }
     try{sessionStorage.removeItem(PARENT_SIGNIN_AFTER_LOGOUT_KEY);}catch{}
