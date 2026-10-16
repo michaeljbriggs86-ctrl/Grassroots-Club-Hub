@@ -15,9 +15,10 @@ const node=id=>{if(!nodes.has(id))nodes.set(id,new Node(id));return nodes.get(id
 const w={navigator:{clipboard:{writeText:async url=>clipboard.push(url)}},confirm:()=>true,addEventListener:()=>{},ClubHubCoachQualifications:{catalogue:[]}};
 vm.runInContext(source,vm.createContext({window:w,document:{getElementById:node,addEventListener:(name,fn)=>events[name]=fn}}));
 let allowed=true;
+const cloudApi={listPendingCoachRequests:async()=>[],listClubAccessAccounts:async()=>[],listClubCoaches:async()=>[],visibleTeamList:()=>[]};
 w.ClubHubCoachOnboarding.configure({
  allowed:()=>allowed,currentView:()=> 'coach-onboarding',contextKey:()=> 'admin|club',
- cloud:()=>({listPendingCoachRequests:async()=>[],listClubAccessAccounts:async()=>[],listClubCoaches:async()=>[],visibleTeamList:()=>[]}),
+ cloud:()=>cloudApi,
  openInviteDraft:href=>drafts.push(href),toast(){},confirm:async()=>true
 });
 const invite=async kind=>events.click({target:{closest:selector=>selector==='[data-coach-invite]'?{dataset:{coachInvite:kind}}:null}});
