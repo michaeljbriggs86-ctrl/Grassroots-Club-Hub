@@ -2541,3 +2541,25 @@ html body #club-detail-dialog :is(h3,summary,a,button,input):focus-visible{outli
     grid-column: 1 / -1;
   }
 }
+
+/* Figma: Admin onboarding hub, 16 October 2026 (392:7151–392:7184).
+   The hub only links to the existing permission-guarded registration pages. */
+.admin-onboarding-hub .section-title-row{margin-block:18px 24px}
+.admin-onboarding-hub .section-title-row .muted{margin:10px 0 0;font-size:1rem;line-height:1.5}
+.admin-onboarding-options{display:grid;grid-template-columns:minmax(0,1fr);gap:16px}
+html body .admin-onboarding-options .admin-onboarding-choice{
+  display:flex;align-items:center;justify-content:space-between;gap:20px;
+  min-width:0;min-height:148px;margin:0;padding:24px;
+  border:1px solid var(--gch-depth-line);border-radius:20px;
+  color:var(--gch-control-copy);background:var(--gch-depth-panel);
+  box-shadow:var(--gch-shadow-card);text-decoration:none;
+}
+.admin-onboarding-choice strong{display:block;font-size:clamp(1.125rem,2vw,1.375rem);line-height:1.3}
+.admin-onboarding-choice small{display:block;margin-top:10px;font-size:.9375rem;line-height:1.5;color:var(--gch-control-muted)}
+.admin-onboarding-choice>span:last-child{flex:none;font-size:1.75rem}
+.admin-onboarding-choice:focus-visible{outline:3px solid var(--gch-control-choice-copy);outline-offset:3px}
+@media(min-width:900px){.admin-onboarding-options{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:900px){
+  .mobile-primary-nav.has-onboarding-tab{grid-template-columns:repeat(5,minmax(0,1fr))}
+  .mobile-primary-nav.has-onboarding-tab .mobile-primary-item{font-size:clamp(.65rem,2.5vw,.75rem)}
+}

@@ -1,0 +1,20 @@
+// Onboarding hub is a navigation-only Admin view; existing workflows retain authority.
+const assert=require('node:assert/strict'),fs=require('node:fs');
+const html=fs.readFileSync('app/src/main/assets/index.html','utf8');
+const js=fs.readFileSync('app/src/main/assets/app.js','utf8');
+const css=fs.readFileSync('app/src/main/assets/app-design-system.css','utf8');
+const hub=html.slice(html.indexOf('id="view-onboarding"'),html.indexOf('id="view-coach-onboarding"'));
+assert.match(html, /data-nav="onboarding" data-admin-global-nav/, 'Admin-only top tab');
+assert.match(hub, /data-view="onboarding"/);
+assert.match(hub, /data-page-route="player-onboarding"/, 'Existing parent/player route');
+assert.match(hub, /data-page-route="coach-onboarding"/, 'Existing coach route');
+assert.match(html, /data-mobile-tab="onboarding" hidden/, 'Mobile admin tab starts hidden');
+assert.match(js, /onboarding:\{title:'Onboarding',parent:'onboarding'.*access:'admin'\}/);
+assert.match(js, /'coach-onboarding':\{title:'Coach onboarding',parent:'onboarding'.*access:'admin'\}/);
+assert.match(js, /'player-onboarding':\{title:'Parent onboarding',parent:'onboarding'.*access:'admin'\}/);
+assert.match(js, /if\(page.access==='admin'\)return CLOUD_MODE&&isClubOverviewMode\(\)/, 'Admin role guard retained');
+assert.match(js, /button.hidden=!club;\s*button.dataset.mobileTarget='onboarding'/, 'Mobile tab only for club Admin');
+assert.match(css, /\.mobile-primary-nav\.has-onboarding-tab\{grid-template-columns:repeat\(5,minmax\(0,1fr\)\)\}/);
+assert.match(html, /id="view-player-onboarding"[\s\S]*?href="\?view=onboarding" data-page-route="onboarding"/);
+assert.match(html, /id="view-coach-onboarding"[\s\S]*?href="\?view=onboarding" data-page-route="onboarding"/);
+console.log('PASS Admin Onboarding hub routes and role guards');

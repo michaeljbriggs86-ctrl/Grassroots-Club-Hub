@@ -2523,11 +2523,19 @@ function syncMobileNavigation(selectedView=currentView){
   const nav=document.getElementById('mobile-primary-nav');
   if(!nav)return;
   const club=isClubOverviewMode();
+  nav.classList.toggle('has-onboarding-tab',club);
   const parent=CLOUD_MODE&&currentRole==='parent',showTable=!club&&!parent&&isPublishedLeagueTeam();
   nav.classList.toggle('has-table-tab',showTable);
   const selected=club&&selectedView==='club'?(__clubTab==='coaches'?'club-coaches':__clubTab==='overview'?'club':'club-matches'):club&&selectedView==='club-fixtures'||club&&selectedView==='club-results'?'club-matches':selectedView;
   const primary=club?[['Home','club'],['Matches','club-matches'],['Staff','club-coaches']]:parent?[['Home','home'],['Schedule','matches'],['Inbox','inbox'],['Table','league']]:[['Home','home'],['Matches','matches'],['Squad','squad'],['Table','league']];
   nav.querySelectorAll('[data-mobile-tab]').forEach(button=>{
+    if(button.dataset.mobileTab==='onboarding'){
+      button.hidden=!club;
+      button.dataset.mobileTarget='onboarding';
+      if(club&&selectedView==='onboarding')button.setAttribute('aria-current','page');
+      else button.removeAttribute('aria-current');
+      return;
+    }
     if(button.dataset.mobileTab==='3'&&!showTable){button.hidden=true;button.removeAttribute('aria-current');return;}
     if(button.dataset.mobileTab!=='more'){
       if(button.dataset.mobileTab==='3')button.hidden=false;
@@ -2566,8 +2574,9 @@ const LINKED_PAGES={
   'my-account':{title:"My account",parent:'more',panel:'access-panel',access:'account'},
   'team-stats':{title:'Player & team stats',parent:'home',panel:'home-player-stats',access:'team-data'},
   contacts:{title:'Contact details',parent:'inbox',panel:'member-contacts-panel',access:'contacts'},
-  'coach-onboarding':{title:'Coach onboarding',parent:'club',panel:'coach-onboarding-panel',access:'admin'},
-  'player-onboarding':{title:'Parent onboarding',parent:'club',panel:'player-onboarding-panel',access:'admin'},
+  onboarding:{title:'Onboarding',parent:'onboarding',panel:'onboarding-options',access:'admin'},
+  'coach-onboarding':{title:'Coach onboarding',parent:'onboarding',panel:'coach-onboarding-panel',access:'admin'},
+  'player-onboarding':{title:'Parent onboarding',parent:'onboarding',panel:'player-onboarding-panel',access:'admin'},
   'club-teams':{title:'Club teams',parent:'club',panel:'admin-home-teams',access:'admin'},
   'coach-documents':{title:'Coach documents',parent:'club-coaches',panel:'coach-document-matrix',access:'admin'},
   'app-access':{title:'App access',parent:'club-coaches',panel:'app-access-panel',access:'admin'},
