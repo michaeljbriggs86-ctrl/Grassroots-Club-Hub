@@ -1245,7 +1245,8 @@
       clearAccountLocalData();
       let parentSignIn=false;
       try{parentSignIn=sessionStorage.getItem(PARENT_SIGNIN_AFTER_LOGOUT_KEY)==='1';sessionStorage.removeItem(PARENT_SIGNIN_AFTER_LOGOUT_KEY);}catch{}
-      setGateHtml(parentSignIn?'parentsignin':'signin');return null;
+      const coachInvitation=new URLSearchParams(window.location.search).get('signup')==='coach';
+      setGateHtml(coachInvitation?'coachsignup':parentSignIn?'parentsignin':'signin');return null;
     }
     try{sessionStorage.removeItem(PARENT_SIGNIN_AFTER_LOGOUT_KEY);}catch{}
     const pendingAdultInvite=localStorage.getItem(INVITE_KEY)||'';
