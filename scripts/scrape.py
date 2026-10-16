@@ -539,8 +539,8 @@ def parse_published_results(html: str) -> list[dict[str, Any]]:
 
     Real 2026-09-27 shape: #results-{division} .panel.panel-static, with a
     dd/mm/yy (Week n) heading and .panel-body > .row containing two
-    .resultTeam cells around one .resultScore cell. Empty and '-' scores are
-    unplayed matches and must not be published as results.
+    .resultTeam cells around one .resultScore cell. Unplayed matches and
+    verified non-numeric outcomes must not be published as goal scores.
     """
     soup = BeautifulSoup(html, "html.parser")
     results_panel = soup.select_one('div[id^="results-"]')
@@ -590,6 +590,12 @@ def parse_published_results(html: str) -> list[dict[str, Any]]:
             score_match = re.fullmatch(r"(\d{1,2})\s*-\s*(\d{1,2})", score_text)
             home = _normalise_text(teams[0].get_text(" ", strip=True))
             away = _normalise_text(teams[1].get_text(" ", strip=True))
+            # Verified resultsTable/4250 on 2026-10-16 uses W - L.
+            # As with cup outcomes, these are not numeric goal scores.
+            if home and away and re.fullmatch(
+                r"(?:W\s*-\s*L|L\s*-\s*W)", score_text
+            ):
+                continue
             if not score_match or not home or not away:
                 raise UnverifiedPublishedResultsMarkupError(
                     f"Results row has unsupported score or team: {score_text!r}"

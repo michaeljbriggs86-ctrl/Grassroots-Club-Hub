@@ -1,7 +1,12 @@
+import hashlib
+import json
 import sys
+import tempfile
 import unittest
 from pathlib import Path
 from unittest.mock import patch
+
+from bs4 import BeautifulSoup
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPTS = ROOT / "scripts"
@@ -404,6 +409,148 @@ class GeneralizedSelkentFeedTests(unittest.TestCase):
             'away': 'Eversley Rangers', 'homeGoals': 9, 'awayGoals': 1,
             'provider_division_id': 4242, 'division_name': 'Under12X A Navy',
         }])
+
+
+class LeagueOutcomeRegressionTests(unittest.TestCase):
+    # Current official public HTML, not a reconstruction of the failed run.
+    # Source/date/response hashes are recorded beside the unchanged fixture.
+    fixture_path = ROOT / "tests/fixtures/selkent_resultsTable_4250_outcome_2026_10_16.html"
+    expected_results = [
+        {"date": "2026-10-04", "home": "Eagles & Stars FC", "away": "Old Roan FC Gold", "homeGoals": 1, "awayGoals": 0},
+        {"date": "2026-10-04", "home": "London Legends Gold", "away": "Metrogas FC Red", "homeGoals": 4, "awayGoals": 5},
+        {"date": "2026-10-04", "home": "Regans FC Black", "away": "Lewisham Project Gold", "homeGoals": 3, "awayGoals": 5},
+        {"date": "2026-09-27", "home": "Dulwich Village Black", "away": "Dynamo Youth Silver", "homeGoals": 1, "awayGoals": 3},
+        {"date": "2026-09-27", "home": "Metrogas FC Red", "away": "Regans FC Black", "homeGoals": 4, "awayGoals": 3},
+        {"date": "2026-09-27", "home": "Old Roan FC Gold", "away": "London Legends Gold", "homeGoals": 3, "awayGoals": 3},
+        {"date": "2026-09-27", "home": "SE Dons Football Club", "away": "Cray Valley (PM) FC Black", "homeGoals": 3, "awayGoals": 3},
+    ]
+
+    def source(self):
+        return self.fixture_path.read_text()
+
+    def outcome_row(self):
+        soup = BeautifulSoup(self.source(), "html.parser")
+        score = next(cell for cell in soup.select("#results-4250 .resultScore")
+                     if cell.get_text(" ", strip=True) == "W - L")
+        return soup, score, score.parent
+
+    def collected_results(self):
+        return [{**row, "provider_division_id": 4250,
+                 "division_name": "Under 12A Silver"} for row in self.expected_results]
+
+    def fixture_html(self, age):
+        # Fictional future fixture in the already verified provider shape.
+        return f'''<div id="fixtureContainer"><h2 class="subHead">18/10/26 - Week 5</h2>
+          <div class="panel-title">{age} Example Division</div>
+          <div class="row fixtureRow" data-team-ids="10;11;">
+          <div class="col-xs-5">Example Home</div><div class="col-xs-1">v</div>
+          <div class="col-xs-5">Example Away</div></div></div>'''
+
+    def payload(self, results_html=None):
+        ages = {1: "U7", 2: "U8", 3: "U9", 4: "U10", 5: "U11", 6: "U12"}
+        results_parent = '''<ul id="agegroupTabs"><a class="tabAgegroup"
+          data-agegroup-id="6" data-format-type="9">U12</a></ul>'''
+        public_ages = parse_public_results_agegroups(results_parent)
+        payloads = {f"fixturespage/{age_id}": self.fixture_html(age)
+                    for age_id, age in ages.items()}
+        payloads.update({"results/9/6": '''<a class="tabDivision" data-division-id="4250"
+          aria-controls="Under 12A Silver">Under 12A Silver</a>''',
+                         "resultsTable/4250": self.source() if results_html is None else results_html})
+        with patch.object(scrape, "discover_fixture_agegroups", return_value=(ages, "public")), \
+             patch.object(scrape, "discover_public_results_agegroups", return_value=public_ages), \
+             patch.object(scrape, "collect_cup_results", return_value={}), \
+             patch.object(scrape, "fetch_json", side_effect=lambda target: payloads[target]) as fetch, \
+             patch.object(scrape, "_sleep_between_requests", return_value=None):
+            result = scrape.build_payload()
+        return result, [call.args[0] for call in fetch.call_args_list]
+
+    def test_official_league_walkover_does_not_invent_or_hide_numeric_scores(self):
+        raw = self.fixture_path.read_bytes()
+        provenance = json.loads(self.fixture_path.with_suffix(".provenance.json").read_text())
+        self.assertEqual(len(raw), provenance["html_bytes"])
+        self.assertEqual(hashlib.sha256(raw).hexdigest(), provenance["html_sha256"])
+        results = parse_published_results(self.source())
+        self.assertEqual(results, self.expected_results)
+        self.assertFalse(any(row["home"] == "Lewisham Project Gold" and
+                             row["away"] == "Eagles & Stars FC" for row in results))
+        self.assertTrue(all(type(row["homeGoals"]) is int and type(row["awayGoals"]) is int
+                            for row in results))
+
+    def test_known_league_outcome_directions_and_spacing_are_nonnumeric(self):
+        for outcome in ["W - L", "L - W", "W-L", "L-W", "W  -\n L", "L\u00a0-\tW"]:
+            with self.subTest(outcome=outcome):
+                self.assertEqual(parse_published_results(self.source().replace("W - L", outcome)),
+                                 self.expected_results)
+
+    def test_unknown_outcomes_do_not_hide_behind_a_recognised_walkover(self):
+        for outcome in ["W - W", "L - L", "W - 0", "0 - L", "P - P", "w - l",
+                        "W — L", "W - L awarded", "Awarded", "Won on penalties"]:
+            with self.subTest(outcome=outcome), self.assertRaises(UnverifiedPublishedResultsMarkupError):
+                parse_published_results(self.source().replace("W - L", outcome))
+        # A valid walkover does not hide an unrelated unknown neighbouring score.
+        with self.assertRaises(UnverifiedPublishedResultsMarkupError):
+            parse_published_results(self.source().replace("1 - 0", "Awarded", 1))
+
+    def test_walkovers_with_missing_teams_or_malformed_cells_still_fail_closed(self):
+        for team_index in [0, 1]:
+            soup, _score, row = self.outcome_row()
+            row.select(".resultTeam")[team_index].clear()
+            with self.subTest(missing_team=team_index), self.assertRaises(UnverifiedPublishedResultsMarkupError):
+                parse_published_results(str(soup))
+        for change in ["missing-score", "extra-score", "missing-team-cell", "invalid-date"]:
+            soup, score, row = self.outcome_row()
+            if change == "missing-score":
+                score.extract()
+            elif change == "extra-score":
+                row.append(BeautifulSoup('<div class="resultScore">W - L</div>', "html.parser"))
+            elif change == "missing-team-cell":
+                row.select(".resultTeam")[0].extract()
+            else:
+                row.find_parent(class_="panel-static").select_one(".panel-heading").string = "32/09/26 (Week 2)"
+            with self.subTest(change=change), self.assertRaises(UnverifiedPublishedResultsMarkupError):
+                parse_published_results(str(soup))
+
+    def test_walkover_collection_keeps_official_standings_and_all_valid_fixtures(self):
+        payload, targets = self.payload()
+        by_age = {entry["age_group"]: entry for entry in payload["age_groups"]}
+        self.assertEqual(len(by_age), 6)
+        for age, entry in by_age.items():
+            self.assertEqual(entry["fixtures"], [{"date": "2026-10-18",
+                "division_name": f"{age} Example Division", "home": "Example Home",
+                "away": "Example Away", "provider_team_ids": ["10", "11"]}])
+            self.assertEqual(entry["fixture_parse_status"], "verified_fixture_rows_v1")
+        self.assertEqual(by_age["U12"]["published_results"], self.collected_results())
+        table = by_age["U12"]["standings"][0]
+        self.assertEqual(table["division_name"], "Under 12A Silver")
+        self.assertEqual(len(table["rows"]), 10)
+        self.assertEqual(table["rows"][0], {"row_order": 1, "provider_team_id": 208,
+            "provider_division_id": 4250, "team_name": "Lewisham Project Gold", "played": 2,
+            "won": 2, "drawn": 0, "lost": 0, "gf": 5, "ga": 3, "points": 4})
+        self.assertFalse(table["source_order_authoritative_for_ties"])
+        # Only the advertised public U12 results endpoint was fetched; youth fixtures remain available.
+        self.assertEqual([target for target in targets if target.startswith("results")],
+                         ["results/9/6", "resultsTable/4250"])
+        for age in ["U7", "U8", "U9", "U10", "U11"]:
+            self.assertIsNone(by_age[age]["standings"])
+            self.assertIsNone(by_age[age]["published_results"])
+            self.assertEqual(by_age[age]["published_results_status"], "not_publicly_published")
+
+    def test_unknown_league_outcome_aborts_refresh_and_preserves_published_bytes(self):
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory) / "results.json"
+            previous = {"last_updated": "2026-10-16T02:05:58.429342+00:00", "known_good": True}
+            original = json.dumps(previous).encode()
+            output.write_bytes(original)
+            real_build = scrape.build_payload
+            # Exercise main's actual write boundary with a real unknown-outcome parse failure.
+            def fail_build(_previous):
+                with patch.object(scrape, "build_payload", real_build):
+                    return self.payload(self.source().replace("W - L", "W - W"))[0]
+            with patch.object(scrape, "OUTPUT_PATH", output), \
+                 patch.object(scrape, "build_payload", side_effect=fail_build):
+                with self.assertRaises(UnverifiedPublishedResultsMarkupError):
+                    scrape.main()
+            self.assertEqual(output.read_bytes(), original)
 
 
 if __name__ == "__main__":
