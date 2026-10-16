@@ -91,6 +91,7 @@
       <button type="button" class="top-nav-tab nav-item hidden" data-nav="club-matches" data-admin-global-nav>Matches</button>
       <button type="button" class="top-nav-tab nav-item hidden" data-nav="club-results" data-results-global-nav>Results</button>
       <button type="button" class="top-nav-tab nav-item hidden" data-nav="club-coaches" data-admin-global-nav>Staff</button>
+      <button type="button" class="top-nav-tab nav-item hidden" data-nav="onboarding" data-admin-global-nav>Onboarding</button>
       <button type="button" class="top-nav-tab nav-item hidden" data-nav="inbox"><span id="communications-nav-label">Inbox</span><span class="notification-badge hidden" id="global-inbox-badge">0</span></button>
       <button type="button" class="top-nav-tab nav-item" data-nav="more">More</button>
     </nav>
@@ -755,8 +756,20 @@
           </div>
         </details>
       </section>
-      <section id="view-coach-onboarding" class="view linked-page" data-view="coach-onboarding" aria-labelledby="coach-onboarding-title">
+      <section id="view-onboarding" class="view linked-page admin-onboarding-hub" data-view="onboarding" aria-labelledby="onboarding-title">
         <a class="page-back secondary-button" href="?view=club" data-page-route="club">← Back to Club Home</a>
+        <div class="section-title-row"><div><p class="kicker">Club administration</p><h2 id="onboarding-title" tabindex="-1">Onboarding</h2><p class="muted">Choose who you would like to onboard.</p></div></div>
+        <div id="onboarding-options" class="admin-onboarding-options">
+          <a class="page-link admin-onboarding-choice" href="?view=player-onboarding" data-page-route="player-onboarding">
+            <span><strong>Parents &amp; players</strong><small>Invite a parent, register a player and review access.</small></span><span aria-hidden="true">›</span>
+          </a>
+          <a class="page-link admin-onboarding-choice" href="?view=coach-onboarding" data-page-route="coach-onboarding">
+            <span><strong>Coaches</strong><small>Invite coaches and manage their onboarding details.</small></span><span aria-hidden="true">›</span>
+          </a>
+        </div>
+      </section>
+      <section id="view-coach-onboarding" class="view linked-page" data-view="coach-onboarding" aria-labelledby="coach-onboarding-title">
+        <a class="page-back secondary-button" href="?view=onboarding" data-page-route="onboarding">← Back to Onboarding</a>
         <div class="section-title-row"><div><p class="kicker">Club administration</p><h2 id="coach-onboarding-title" tabindex="-1">Coach onboarding</h2></div></div>
         <section id="coach-onboarding-panel">
           <p id="coach-onboarding-status" class="helper" role="status" aria-live="polite" aria-atomic="true"></p>
@@ -765,7 +778,7 @@
       </section>
 
       <section id="view-player-onboarding" class="view linked-page" data-view="player-onboarding" aria-labelledby="player-onboarding-title">
-        <a class="page-back secondary-button" href="?view=club" data-page-route="club">← Back to Club Home</a>
+        <a class="page-back secondary-button" href="?view=onboarding" data-page-route="onboarding">← Back to Onboarding</a>
         <div class="section-title-row"><div><p class="kicker">Club administration</p><h2 id="player-onboarding-title" tabindex="-1">Parent onboarding</h2></div></div>
         <section id="player-onboarding-panel">
           <label class="onboarding-team-choice">Team<select id="player-onboarding-team" name="onboarding_team" autocomplete="off"><option value="">Choose a team</option></select></label>
@@ -897,6 +910,7 @@
       <symbol id="mobile-icon-table" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M3 15h18M9 10v10"/></symbol>
       <symbol id="mobile-icon-team" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 20v-2a6 6 0 0 1 12 0v2Zm14-14a3 3 0 0 1 0 6m1 4a5 5 0 0 1 3 4"/></symbol>
       <symbol id="mobile-icon-inbox" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m4 7 8 6 8-6"/></symbol>
+      <symbol id="mobile-icon-onboarding" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 20v-2a6 6 0 0 1 12 0v2M19 8v8m-4-4h8"/></symbol>
       <symbol id="mobile-icon-menu" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></symbol>
       <symbol id="mobile-icon-close" viewBox="0 0 24 24"><path d="M5 5l14 14M19 5 5 19"/></symbol>
     </svg>
@@ -905,6 +919,7 @@
       <button type="button" class="mobile-primary-item" data-mobile-tab="1"><svg aria-hidden="true"><use href="#mobile-icon-calendar"/></svg><span>Matches</span></button>
       <button type="button" class="mobile-primary-item" data-mobile-tab="3" hidden><svg aria-hidden="true"><use href="#mobile-icon-table"/></svg><span>Table</span></button>
       <button type="button" class="mobile-primary-item" data-mobile-tab="2"><svg aria-hidden="true"><use href="#mobile-icon-team"/></svg><span>Squad</span></button>
+      <button type="button" class="mobile-primary-item" data-mobile-tab="onboarding" hidden><svg aria-hidden="true"><use href="#mobile-icon-onboarding"/></svg><span>Onboarding</span></button>
       <button type="button" class="mobile-primary-item" data-mobile-tab="more"><svg aria-hidden="true"><use href="#mobile-icon-menu"/></svg><span>More</span></button>
     </nav>
 
