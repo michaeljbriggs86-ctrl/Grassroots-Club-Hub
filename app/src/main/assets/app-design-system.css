@@ -2518,3 +2518,26 @@ html body #club-detail-dialog :is(h3,summary,a,button,input):focus-visible{outli
     padding-bottom: 48px;
   }
 }
+
+/* Admin desktop command centre: use the wider workspace for operational panels.
+   Existing links, access controls and data stay unchanged. */
+@media (min-width: 1400px) {
+  html body:not(.auth-open) #view-club .admin-home {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    align-items: start;
+    gap: 24px;
+  }
+  html body:not(.auth-open) #view-club .admin-home > :is(.admin-home-weekend, #kickoff-admin-panel) {
+    grid-column: span 6;
+  }
+  html body:not(.auth-open) #view-club .admin-home > :is(.admin-home-people, .admin-home-communications) {
+    grid-column: span 6;
+  }
+  html body:not(.auth-open) #view-club .admin-home > .admin-home-directory-link {
+    grid-column: span 4;
+    align-self: stretch;
+  }
+  html body:not(.auth-open) #view-club .admin-home > .admin-home-footer {
+    grid-column: 1 / -1;
+  }
+}
