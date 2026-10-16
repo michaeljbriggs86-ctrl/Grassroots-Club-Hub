@@ -2452,3 +2452,59 @@ html body #club-detail-dialog .modal-actions{position:static;grid-template-colum
 html body #club-detail-dialog .modal-actions .primary-button{width:100%;min-height:52px}
 html body #club-detail-dialog :is(h3,summary,a,button,input):focus-visible{outline:3px solid var(--gch-control-choice-copy);outline-offset:3px}
 @media(max-width:600px){html body #club-detail-dialog .club-kit-grid,html body #club-detail-dialog .form-grid.two{grid-template-columns:minmax(0,1fr)}}
+
+
+/* Desktop workspace: use available monitor width while preserving phone/tablet layouts.
+   Keep readable text widths inside cards; tabular and operational regions may grow. */
+@media (min-width: 1200px) {
+  html body:not(.auth-open) .app-shell {
+    width: 100%;
+    max-width: none;
+    margin-inline: 0;
+  }
+  html body:not(.auth-open) .app-shell > .content {
+    width: 100%;
+    max-width: 1800px;
+    margin-inline: auto;
+    padding-inline: clamp(28px, 3.25vw, 64px);
+  }
+  html body:not(.auth-open) .app-shell > .hero {
+    width: 100%;
+    max-width: none;
+  }
+  html body:not(.auth-open) .app-shell > .top-nav-tabs {
+    padding-inline: max(32px, calc((100vw - 1800px) / 2 + 64px));
+  }
+  html body:not(.auth-open) .content .view.active {
+    min-width: 0;
+  }
+  html body:not(.auth-open) .content :is(.dashboard-grid, .running-count-grid) {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)) !important;
+  }
+  html body:not(.auth-open) .content #view-home.active {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: 18px 24px;
+    align-content: start;
+  }
+  html body:not(.auth-open) #view-home > * {
+    grid-column: 1 / -1;
+    min-width: 0;
+  }
+  html body:not(.auth-open) #view-home > :is(#home-next-match, #home-club-notices, #parent-home-family) {
+    grid-column: span 6;
+    align-self: stretch;
+  }
+  html body:not(.auth-open) #view-home > :is(#home-next-match, #home-club-notices, #parent-home-family):only-of-type {
+    grid-column: 1 / -1;
+  }
+  html body:not(.auth-open) #view-home .panel,
+  html body:not(.auth-open) #view-home .next-match-card {
+    min-width: 0;
+  }
+}
+@media (min-width: 1200px) and (max-width: 1399px) {
+  html body:not(.auth-open) #view-home > :is(#home-next-match, #home-club-notices, #parent-home-family) {
+    grid-column: 1 / -1;
+  }
+}
