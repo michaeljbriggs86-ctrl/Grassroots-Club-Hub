@@ -67,3 +67,20 @@
 .kickoff-admin-coaches>p>span:last-child{color:var(--gch-control-muted,var(--muted))}
 .kickoff-admin-parents{padding-top:12px;border-top:1px solid var(--gch-control-line,var(--gch-line));font-size:14px;line-height:1.5}
 @media(max-width:359px){.kickoff-availability-actions{grid-template-columns:minmax(0,1fr)}.kickoff-admin-panel .panel-heading>button{width:100%}}
+/* A quiet disclosure within Admin's existing weekend feature card. */
+.kickoff-weekend-seen{min-width:0;margin:4px 0 10px;color:inherit;font-size:13px}
+.kickoff-weekend-seen[hidden]{display:none!important}
+.kickoff-weekend-details>summary{display:flex;align-items:center;gap:6px;width:fit-content;max-width:100%;min-height:44px;padding:10px 4px;box-sizing:border-box;cursor:pointer;list-style:none;color:inherit;font-size:13px;line-height:1.5}
+.kickoff-weekend-details>summary::-webkit-details-marker{display:none}
+.kickoff-weekend-details>summary::after{content:'›';font-size:19px;line-height:1;transition:transform .15s}
+.kickoff-weekend-details[open]>summary::after{transform:rotate(90deg)}
+.kickoff-weekend-details>summary:focus-visible{outline:2px solid currentColor;outline-offset:2px;border-radius:6px}
+.kickoff-weekend-groups{display:grid;gap:16px;padding:4px 0 12px;overflow-wrap:anywhere}
+.kickoff-weekend-groups section{min-width:0}
+.kickoff-weekend-groups h4{margin:0 0 8px;color:inherit;font-size:13px}
+.kickoff-weekend-groups ul{display:grid;gap:12px;margin:0;padding:0;list-style:none}
+.kickoff-weekend-groups li{min-width:0}
+.kickoff-weekend-context{margin:4px 0 0;font-size:12px;line-height:1.5;opacity:.8;overflow-wrap:anywhere}
+.kickoff-weekend-seen .kickoff-helper{margin:4px 0 8px;color:inherit;font-size:12px;line-height:1.5}
+.kickoff-weekend-seen .kickoff-helper:last-child{margin-bottom:0}
+.kickoff-weekend-seen [data-kickoff-admin-refresh]{min-height:44px}

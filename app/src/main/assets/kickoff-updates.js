@@ -5,7 +5,8 @@
  const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  const busy=new Set(),errors=new Map(),cards=new Map(),blocked=new Map();
  let scope='',push={loading:false,busy:false,available:false,on:false,key:'',error:''},pushVersion=0,pushStamp=0;
- let admin={scope:'',rows:[],loading:false,error:'',stamp:0,version:0};
+ let admin={scope:'',rows:[],loading:false,error:'',stamp:0,version:0,weekend:''};
+ let adminWeekend={scope:'',dates:[],open:false};
  const identity=()=>[cloud()?.session?.user?.id||'',cloud()?.context?.profile?.club_id||'',cloud()?.role?.()||'',cloud()?.actingAsParent?.()?'parent':'staff',cloud()?.currentTeam?.()?.id||''].join('|');
  const adult=()=>!!cloud()?.session?.user?.id&&['club_admin','admin','coach','assistant_coach','parent'].includes(cloud()?.context?.profile?.role||cloud()?.role?.());
  const parentCapacity=()=>cloud()?.role?.()==='parent'||!!cloud()?.actingAsParent?.();
@@ -13,7 +14,8 @@
  const stamp=value=>{const date=new Date(value);return value&&!Number.isNaN(date.getTime())?date.toLocaleString('en-GB',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}):'';};
  const notificationStamp=()=>typeof __notificationStamp==='undefined'?0:__notificationStamp;
  const notificationUnavailable=()=>typeof __notificationLoading!=='undefined'&&__notificationLoading||typeof __notificationError!=='undefined'&&!!__notificationError;
- function resetAdmin(){const version=admin.version+1;admin={scope:'',rows:[],loading:false,error:'',stamp:0,version};const panel=document.getElementById('kickoff-admin-panel');if(panel){panel.hidden=true;const list=panel.querySelector('[data-kickoff-admin-list]');if(list)list.innerHTML='';const status=panel.querySelector('[data-kickoff-admin-status]');if(status)status.textContent='';}}
+ function clearAdminWeekend(){adminWeekend={scope:'',dates:[],open:false};const container=document.getElementById('kickoff-weekend-seen');if(container){container.hidden=true;container.innerHTML='';}}
+ function resetAdmin(){const version=admin.version+1;admin={scope:'',rows:[],loading:false,error:'',stamp:0,version,weekend:''};clearAdminWeekend();const panel=document.getElementById('kickoff-admin-panel');if(panel){panel.hidden=true;const list=panel.querySelector('[data-kickoff-admin-list]');if(list)list.innerHTML='';const status=panel.querySelector('[data-kickoff-admin-status]');if(status)status.textContent='';}}
  function reset(){scope=identity();busy.clear();errors.clear();cards.clear();blocked.clear();resetAdmin();++pushVersion;pushStamp=0;push={loading:false,busy:false,available:false,on:false,key:'',error:''};}
  function sync(){if(scope!==identity())reset();}
  function redraw(){if(typeof renderNotificationCenter==='function')renderNotificationCenter();}
@@ -75,9 +77,63 @@
   finally{if(key===identity()){busy.delete(token);redraw();}}
  }
  function adminAllowed(){return !!cloud()?.session?.user?.id&&cloud()?.canAdmin?.()===true&&!parentCapacity()&&(typeof isClubOverviewMode!=='function'||isClubOverviewMode());}
+ function currentAdminWeekendDates(){
+  const dates=typeof adminShareWeekendDates==='function'?adminShareWeekendDates():[];
+  return Array.isArray(dates)&&dates.length===2&&dates.every(date=>typeof date==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(date))?[...dates]:[];
+ }
+ function invalidateAdminResponses(){++admin.version;admin.rows=[];admin.stamp=0;admin.loading=false;admin.error='';admin.weekend='';}
+ function syncAdminWeekend(){
+  const dates=currentAdminWeekendDates(),stale=!!admin.stamp&&admin.weekend!==dates.join('|');
+  if(!adminWeekend.scope){if(stale)invalidateAdminResponses();return stale;}
+  if(adminWeekend.scope!==identity()||!adminAllowed()){clearAdminWeekend();return false;}
+  if(!stale&&dates.join('|')===adminWeekend.dates.join('|'))return false;
+  clearAdminWeekend();invalidateAdminResponses();
+  if(dates.length)adminWeekend={scope:identity(),dates,open:false};
+  return true;
+ }
+ function scheduleAdminRefresh(){const key=identity();void Promise.resolve().then(()=>{if(key===identity()&&adminAllowed()&&!admin.loading&&!admin.stamp)void refreshAdmin(false);});}
+ function setAdminWeekend(dates){
+  sync();const expected=currentAdminWeekendDates(),key=identity();
+  if(!adminAllowed()||!expected.length||!Array.isArray(dates)||dates.length!==2||!dates.every((date,index)=>date===expected[index])){clearAdminWeekend();return;}
+  if(admin.scope!==key){resetAdmin();admin.scope=key;}
+  const changed=adminWeekend.scope!==key||adminWeekend.dates.join('|')!==expected.join('|'),rolled=!!adminWeekend.scope&&changed,stale=!!admin.stamp&&admin.weekend!==expected.join('|');
+  if(changed){clearAdminWeekend();adminWeekend={scope:key,dates:expected,open:false};}if(rolled||stale)invalidateAdminResponses();
+  renderAdmin();if(rolled||stale)scheduleAdminRefresh();
+ }
+ function validAdminRows(rows){
+  return Array.isArray(rows)&&rows.every(row=>row&&typeof row.update_id==='string'&&!!row.update_id.trim()&&typeof row.team_id==='string'&&!!row.team_id.trim()&&Number.isSafeInteger(row.revision)&&row.revision>0&&row.details&&typeof row.details.date==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(row.details.date)&&Array.isArray(row.coaches)&&row.coaches.every(coach=>coach&&typeof coach.user_id==='string'&&!!coach.user_id.trim()&&typeof coach.revision_current==='boolean'&&(coach.acknowledged_at==null||typeof coach.acknowledged_at==='string'&&!!stamp(coach.acknowledged_at))));
+ }
+ function renderAdminWeekend(){
+  const container=document.getElementById('kickoff-weekend-seen');if(!container)return;
+  if(!adminAllowed()||adminWeekend.scope!==identity()||!adminWeekend.dates.length){container.hidden=true;container.innerHTML='';return;}
+  const details=container.querySelector('details');if(details)adminWeekend.open=details.open;
+  container.hidden=false;container.setAttribute('aria-busy',String(admin.loading||!admin.stamp&&!admin.error));
+  let html='';
+  if(admin.loading||!admin.stamp&&!admin.error)html='<p class="kickoff-helper" data-kickoff-weekend-status tabindex="-1" role="status">Checking coach acknowledgements…</p>';
+  else if(admin.error)html='<p class="kickoff-helper" data-kickoff-weekend-status tabindex="-1" role="status">Coach acknowledgements unavailable. Refresh to try again.</p><button type="button" class="secondary-button" data-kickoff-admin-refresh>Retry</button>';
+  else if(admin.rows.length>=100)html='<p class="kickoff-helper" data-kickoff-weekend-status tabindex="-1" role="status">Too many updates to show a complete weekend count. Review the kick-off responses below.</p>';
+  else{
+   const rows=admin.rows.filter(row=>adminWeekend.dates.includes(row.details.date)),coaches=new Map();
+   for(const row of rows)for(const coach of row.coaches){
+    let person=coaches.get(coach.user_id);if(!person){person={id:coach.user_id,name:coach.name||'Coach',pending:new Map(),teams:new Set()};coaches.set(coach.user_id,person);}
+    person.teams.add(row.team_name||'Team');
+    if(coach.revision_current!==true||!coach.acknowledged_at)person.pending.set(row.update_id,row);
+   }
+   const people=[...coaches.values()].sort((a,b)=>String(a.name).localeCompare(String(b.name),'en-GB')||a.id.localeCompare(b.id)),outstanding=people.filter(person=>person.pending.size),seen=people.filter(person=>!person.pending.size);
+   if(!rows.length)html='<p class="kickoff-helper" data-kickoff-weekend-status tabindex="-1" role="status">No upcoming kick-off updates released for this weekend.</p>';
+   else if(!people.length)html='<p class="kickoff-helper" data-kickoff-weekend-status tabindex="-1" role="status">No coaches were notified about these upcoming weekend updates.</p>';
+   else{
+    const context=row=>{const d=row.details;return [row.team_name||'Team',d.opponent||'Upcoming fixture',d.date,d.time?'Kick-off '+d.time:'','Update '+row.revision,d.status==='provisional'?'Provisional':d.status==='confirmed'?'Confirmed':''].filter(Boolean).map(esc).join(' · ');};
+    const names=list=>list.map(person=>`<li data-kickoff-weekend-coach="${esc(person.id)}"><strong>${esc(person.name)}</strong>${person.pending.size?`<ul>${[...person.pending.values()].map(row=>`<li class="kickoff-weekend-context" data-kickoff-weekend-update="${esc(row.update_id)}">${context(row)}</li>`).join('')}</ul>`:`<span class="kickoff-weekend-context"> · ${[...person.teams].sort().map(esc).join(', ')}</span>`}</li>`).join('');
+    html=`<details class="kickoff-weekend-details"${adminWeekend.open?' open':''}><summary data-kickoff-weekend-summary><span>Coaches ·</span><strong data-kickoff-weekend-count>${seen.length}/${people.length} seen</strong></summary><div class="kickoff-weekend-groups"><p class="kickoff-helper">Upcoming released updates this weekend. A coach is seen after acknowledging every current update addressed to them. Opening or reading an update does not acknowledge it.</p><section data-kickoff-weekend-group="outstanding"><h4>Outstanding (${outstanding.length})</h4>${outstanding.length?`<ul>${names(outstanding)}</ul>`:'<p>All notified coaches have acknowledged the current details.</p>'}</section><section data-kickoff-weekend-group="seen"><h4>Seen (${seen.length})</h4>${seen.length?`<ul>${names(seen)}</ul>`:'<p>No coach has acknowledged all their current updates yet.</p>'}</section></div></details>`;
+   }
+  }
+  if(container.innerHTML!==html){const focused=container.contains(document.activeElement);container.innerHTML=html;if(focused)(container.querySelector('[data-kickoff-weekend-summary]')||container.querySelector('[data-kickoff-admin-refresh]')||container.querySelector('[data-kickoff-weekend-status]'))?.focus({preventScroll:true});}
+ }
  function renderAdmin(){
-  sync();const panel=document.getElementById('kickoff-admin-panel');if(!panel)return;
+  sync();const panel=document.getElementById('kickoff-admin-panel');
   if(!adminAllowed()){resetAdmin();return;}
+  const rolled=syncAdminWeekend();renderAdminWeekend();if(rolled)scheduleAdminRefresh();if(!panel)return;
   panel.hidden=false;
   const status=panel.querySelector('[data-kickoff-admin-status]'),list=panel.querySelector('[data-kickoff-admin-list]'),button=panel.querySelector('[data-kickoff-admin-refresh]');
   const message=admin.loading?'Loading latest responses…':admin.error||(!admin.stamp?'Loading latest responses…':'Responses are for these exact fixture details. Opening an email does not acknowledge them.');
@@ -93,11 +149,11 @@
   sync();const panel=document.getElementById('kickoff-admin-panel');if(!panel||!adminAllowed()){resetAdmin();return;}
   // Never fetch for a hidden screen or for a capacity that cannot inspect club responses.
   if(!panel.parentElement?.getClientRects?.().length)return;
-  const key=identity();if(admin.scope!==key){resetAdmin();admin.scope=key;}
+  const key=identity();if(admin.scope!==key){resetAdmin();admin.scope=key;}syncAdminWeekend();
   if(admin.loading||quiet&&Date.now()-admin.stamp<30000){renderAdmin();return;}
-  const version=++admin.version;admin.loading=true;admin.error='';admin.rows=[];renderAdmin();
-  try{const result=await cloud().listKickoffUpdatesForAdmin(null);if(key!==identity()||version!==admin.version||!adminAllowed())return;admin.rows=Array.isArray(result)?result:[];admin.stamp=Date.now();}
-  catch(_){if(key!==identity()||version!==admin.version)return;admin.rows=[];admin.stamp=0;admin.error='Could not load latest responses. Try again.';}
+  const version=++admin.version,weekend=currentAdminWeekendDates().join('|');admin.loading=true;admin.error='';admin.rows=[];renderAdmin();
+  try{const result=await cloud().listKickoffUpdatesForAdmin(null);if(key!==identity()||version!==admin.version||!adminAllowed())return;if(weekend!==currentAdminWeekendDates().join('|')){if(!syncAdminWeekend())invalidateAdminResponses();scheduleAdminRefresh();return;}if(!validAdminRows(result))throw Error('Invalid responses');admin.rows=result;admin.stamp=Date.now();admin.weekend=weekend;}
+  catch(_){if(key!==identity()||version!==admin.version)return;if(weekend!==currentAdminWeekendDates().join('|')){if(!syncAdminWeekend())invalidateAdminResponses();scheduleAdminRefresh();return;}admin.rows=[];admin.stamp=0;admin.error='Could not load latest responses. Try again.';}
   finally{if(key===identity()&&version===admin.version){admin.loading=false;renderAdmin();}}
  }
  async function registration(){const r=await navigator.serviceWorker.getRegistration();if(!r?.active)throw Error('Push is not available on this device yet');return r;}
@@ -151,6 +207,7 @@
   if(event.target.closest?.('[data-kickoff-refresh]')){void refreshLatest();return;}
   if(event.target.closest?.('[data-kickoff-push-toggle]'))void togglePush();
  });
+ document.addEventListener('toggle',event=>{const details=document.getElementById('kickoff-weekend-seen')?.querySelector('details');if(event.target===details&&adminWeekend.scope===identity())adminWeekend.open=details.open;},true);
  for(const name of ['clubhub-contacts-clear','clubhub-signed-out'])window.addEventListener(name,reset);
- window.ClubHubKickoffUpdates={renderAcknowledgement,renderPush,refreshPush,disableForLogout,reset,renderAdmin,refreshAdmin,resetAdmin};
+ window.ClubHubKickoffUpdates={renderAcknowledgement,renderPush,refreshPush,disableForLogout,reset,renderAdmin,refreshAdmin,resetAdmin,setAdminWeekend};
 })();
