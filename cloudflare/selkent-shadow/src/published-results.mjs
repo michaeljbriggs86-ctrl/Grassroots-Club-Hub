@@ -68,11 +68,13 @@ export async function parsePublishedResults(html, divisionId) {
         }
         const score = row.scores[0];
         if (score !== '' && score !== '-' && score !== 'Abandoned') {
+          // Verified league outcomes carry no numeric goals, as in the public parser.
+          const outcome = /^(?:W\s*-\s*L|L\s*-\s*W)$/.test(score);
           const match = score.match(/^(\d{1,2})\s*-\s*(\d{1,2})$/);
-          if (!match || !row.teams[0] || !row.teams[1] || !panel.date) {
+          if ((!match && !outcome) || !row.teams[0] || !row.teams[1] || !panel.date) {
             throw new Error('Unsupported private result score or team');
           }
-          results.push({ date: panel.date, home: row.teams[0], away: row.teams[1],
+          if (match) results.push({ date: panel.date, home: row.teams[0], away: row.teams[1],
             homeGoals: Number(match[1]), awayGoals: Number(match[2]) });
         }
         activeRow = undefined;

@@ -1,0 +1,14 @@
+{
+  "source_url": "https://www.selkent.org.uk/public/resultsTable/4250",
+  "captured_at_utc": "2026-10-16T18:06:49.507763+00:00",
+  "http_status": 200,
+  "response_content_type": "application/json",
+  "response_success": true,
+  "raw_response_bytes": 11422,
+  "raw_response_sha256": "10e41021f21a7d424097530f57890c3f4467fc2bb9b8c46347b822f279a99931",
+  "html_bytes": 8868,
+  "html_sha256": "9ebec0f28658536060d0adbd2fa5468480585eafcaa6d8b70ed9b35067ea2ed8",
+  "fixture_format": "Unchanged UTF-8 HTML value extracted from the official JSON response; original CRLF preserved.",
+  "scope": "Public Under 12A Silver standings and Results panel, including a W - L outcome on 27 September 2026.",
+  "limits": "Current official readback matching the failed marker. The failed Actions log did not identify its division or retain the raw provider response; this is not claimed as that historical response."
+}
