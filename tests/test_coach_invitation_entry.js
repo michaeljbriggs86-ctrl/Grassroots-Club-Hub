@@ -2,7 +2,7 @@ const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('nod
 const source=fs.readFileSync('app/src/main/assets/coach-onboarding.js','utf8');
 const cloud=fs.readFileSync('app/src/main/assets/cloud.js','utf8');
 const app=fs.readFileSync('app/src/main/assets/app.js','utf8');
-assert.match(cloud,/get\('signup'\)==='coach'/,'registration URL selects existing coach account form');
+assert.match(cloud,/signup=coach/,'registration URL selects existing coach account form');
 assert.match(cloud,/setGateHtml\(coachInvitation\?'coachsignup':parentSignIn\?'parentsignin':'signin'\)/);
 assert.match(app,/openInviteDraft:href=>\{if\(typeof href==='string'&&href\.startsWith\('mailto:'\)\)window\.location\.assign\(href\)/);
 const events={},nodes=new Map(),drafts=[],clipboard=[];
