@@ -9,7 +9,7 @@ const events={},nodes=new Map(),drafts=[],clipboard=[];
 class Node{
  constructor(id){this.id=id;this.value='';this.validity=true;this.textContent='';this.html='';this.classList={toggle(){}};this.dataset={};}
  get innerHTML(){return this.html;}set innerHTML(v){this.html=v;}
- replaceChildren(){this.html='';}setAttribute(){}focus(){this.focused=true;}checkValidity(){return this.validity;}
+ replaceChildren(){this.html='';}setAttribute(){}addEventListener(){}focus(){this.focused=true;}checkValidity(){return this.validity;}
 }
 const node=id=>{if(!nodes.has(id))nodes.set(id,new Node(id));return nodes.get(id);};
 const w={navigator:{clipboard:{writeText:async url=>clipboard.push(url)}},confirm:()=>true,addEventListener:()=>{},ClubHubCoachQualifications:{catalogue:[]}};
