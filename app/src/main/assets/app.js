@@ -6785,6 +6785,7 @@ window.ClubHubCoachOnboarding?.configure({
   allowed:()=>CLOUD_MODE&&isAdmin()&&isClubOverviewMode()&&window.ClubHubCloud?.role?.()==='admin'&&!window.ClubHubCloud?.actingAsParent?.(),
   contextKey:()=>[window.ClubHubCloud?.session?.user?.id||'',window.ClubHubCloud?.context?.profile?.club_id||'',currentRole,adminUiMode,window.ClubHubCloud?.role?.()||''].join('|'),
   toast,confirm:appConfirm,
+  openInviteDraft:href=>{if(typeof href==='string'&&href.startsWith('mailto:'))window.location.assign(href);},
   onSaved:()=>{if(isAdmin()&&isClubOverviewMode()){refreshAdminClubOverview(false);refreshClubCoaches(false);refreshCoachRequests();}}
 });
 window.ClubHubPlayerOnboarding?.configure({
