@@ -85,23 +85,13 @@ vm.runInNewContext(source.slice(start,end),context);
   assert(visible.every(([,name,hidden])=>name==='hidden'&&hidden===false),'the More selector stays visible for a Coach with one action');
   await context.switchAccountContext(choices[0],button);
   assert.equal(switches.filter(x=>x==='parent-signin').length,2);
-  const cloudStart=cloud.indexOf('async function switchAdminTeam(teamId,seedFactory){');
-  const cloudEnd=cloud.indexOf('async function switchParentTeam(teamId){',cloudStart);
-  assert(cloudStart>=0&&cloudEnd>cloudStart);
-  const old={id:'old',age_group:9},next={id:'next',age_group:12};
-  const saved=new Map([['active','old']]);
-  const contactEvents=[];
-  const cloudContext={visibleTeams:[old,next],activeTeam:old,activeRevision:7,lastRemoteUpdatedAt:'yesterday',
-    Event,window:{dispatchEvent:event=>contactEvents.push(event.type)},
-    ACTIVE_TEAM_KEY:'active',TEAM_STATE_CACHE_PREFIX:'state:',pendingState:null,
-    canAdmin:()=>true,canEdit:()=>false,cachedTeamState:()=>null,
-    fetchTeamState:async()=>{throw new Error('offline');},updateCloudPanel:()=>{},
-    localStorage:{setItem:(k,v)=>saved.set(k,v),removeItem:k=>saved.delete(k)},oldShapeTeam:x=>x};
-  vm.runInNewContext(cloud.slice(cloudStart,cloudEnd),cloudContext);
-  await assert.rejects(cloudContext.switchAdminTeam('next'),/offline/);
-  assert.equal(cloudContext.activeTeam,old);
-  assert.equal(cloudContext.activeRevision,7);
-  assert.equal(saved.get('active'),'old');
-  assert.deepEqual(contactEvents,['clubhub-contacts-clear'],'old contact details clear before an admin team request, even when the switch fails');
+  const {harness}=require('./helpers/cloud_client_harness');
+  const h=harness(r=>{if(r.path.endsWith('get_team_state_for_me'))throw Error('offline');});
+  const previousTeam=h.test.getTeam(),previousRevision=h.api.revision;
+  h.localStorage.setItem('grassroots_hub_admin_active_team_v1','one');
+  await assert.rejects(h.api.switchAdminTeam('two'),/offline/);
+  assert.equal(h.test.getTeam(),previousTeam);assert.equal(h.api.revision,previousRevision);
+  assert.equal(h.store.get('grassroots_hub_admin_active_team_v1'),'one');
+  assert.deepEqual(h.events.filter(e=>e.type==='clubhub-contacts-clear').map(e=>e.type),['clubhub-contacts-clear'],'old contact details clear before an admin team request, even when the switch fails');
   console.log('PASS account contexts and authorized transitions');
 })().catch(e=>{console.error(e);process.exitCode=1;});

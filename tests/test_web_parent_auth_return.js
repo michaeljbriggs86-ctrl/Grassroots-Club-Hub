@@ -20,25 +20,18 @@ async function main(){
   assert.equal(constants(newDomain).INITIAL_AUTH_CALLBACK,newDomain.href);
   assert.equal(constants({protocol:'file:',origin:'null',pathname:'/index.html',search:'',hash:'',href:'file:///android_asset/index.html'}).AUTH_REDIRECT,'grassrootsclubhub://auth-callback');
 
-  const start=source.indexOf('async function handleAuthCallback(');
-  const end=source.indexOf('async function rpc(',start);
-  const saved=[],requested=[],screens=[],history=[];
-  const context={location,history:{replaceState:(...args)=>history.push(args)},URL,URLSearchParams,Date,
-    session:null,context:null,PENDING_PARENT_REQUEST_KEY:'parent',VERIFY_EMAIL_KEY:'email',
-    localStorage:{removeItem:key=>saved.push('removed:'+key)},
-    saveSession(value){saved.push(value);context.session=value;},
-    async hydrateSessionUser(){context.session.user={user_metadata:{parent_signup:true,requested_team_id:'team-a',requested_child_name:'Alex'}};},
-    async requestParentAccess(team,child){requested.push({team,child});},
-    async getContext(){return {profile:{role:'pending_parent'}};},
-    setGateHtml:(...args)=>screens.push(args)};
-  vm.runInNewContext(source.slice(start,end),context);
-  assert.equal(await context.handleAuthCallback(location.href,{duringBootstrap:true}),'parentrequest');
-  assert.deepEqual(requested,[{team:'team-a',child:'Alex'}]);
-  assert.equal(saved[0].access_token,'abc');
-  assert.deepEqual(history[0],[null,'','/']);
-  assert.equal(screens.at(-1)[0],'approval');
-  assert.equal(await context.handleAuthCallback('https://test.pitchkind.com/#error=access_denied',{duringBootstrap:true}),'error');
-  assert.equal(screens.at(-1)[0],'signin');
+  const {harness,response}=require('./helpers/cloud_client_harness');
+  const h=harness(r=>{
+    if(r.path==='/auth/v1/user')return response(200,{id:'parent',user_metadata:{parent_signup:true,requested_team_id:'team-a',requested_child_name:'Alex'}});
+    if(r.path.endsWith('request_parent_access'))return response(200,{});
+    if(r.path.endsWith('get_my_context'))return response(200,{profile:{user_id:'parent',role:'pending_parent'}});
+  });
+  assert.equal(await h.api.handleAuthCallback(location.href,{duringBootstrap:true}),'parentrequest');
+  assert.deepEqual(h.requests.find(r=>r.path.endsWith('request_parent_access')).body,{p_team_id:'team-a',p_child_name:'Alex'});
+  assert.equal(h.api.session.access_token,'abc');assert.equal(h.events.find(e=>e.type==='history').url,'/');
+  assert.equal(h.node('activation-gate').dataset.authMode,'approval');
+  assert.equal(await h.api.handleAuthCallback('https://test.pitchkind.com/#error=access_denied',{duringBootstrap:true}),'error');
+  assert.equal(h.node('activation-gate').dataset.authMode,'signin');
   console.log('PASS browser verification return restores a parent request and clears callback tokens; Android keeps its scheme');
 }
 main().catch(error=>{console.error(error);process.exitCode=1;});

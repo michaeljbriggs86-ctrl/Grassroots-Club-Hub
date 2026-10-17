@@ -37,7 +37,7 @@ function harness({data=state(),revision=8,handler=null,expired=false}={}){
   const sandbox={window,localStorage,location:{protocol:'https:',origin:'https://fictional.test',search:'',hash:'',href:'https://fictional.test/'},URLSearchParams,URL,AbortController,fetch,document:{getElementById:()=>null},Event:class{constructor(type){this.type=type;}},CustomEvent:class{constructor(type,options){this.type=type;this.detail=options?.detail;}},setTimeout:(fn,delay)=>{const id=++timerId;timers.set(id,{fn,delay});return id;},clearTimeout:id=>timers.delete(id),setInterval:()=>0,clearInterval:()=>{},console};
   const expose=`
   window.__testCloud={
-    initialize(s){saveSession(s);activeTeam={id:'team-a',club_id:'club-a',age_group:12};context={profile:{role:'coach',club_id:'club-a'},team:activeTeam,real_role:'coach'};visibleTeams=[activeTeam];activeRevision=1;hooks={onRemoteState:state=>window.__updates.push(state)};},
+    initialize(s){saveSession(s);activeTeam={id:'team-a',club_id:'club-a',age_group:12};context={profile:{role:'coach',club_id:'club-a'},team:activeTeam,real_role:'coach'};visibleTeams=[activeTeam];activeRevision=1;accountReady=true;hooks={onRemoteState:state=>window.__updates.push(state)};},
     getContext:()=>context,getTeam:()=>activeTeam,
     changeSession:s=>saveSession(s),setUnsynced:v=>{unsyncedState=v;},setRevision:v=>{activeRevision=v;},
     seedStorage:(k,v)=>localStorage.setItem(k,v),clearPrivateData:clearAccountLocalData,
@@ -202,7 +202,7 @@ test('intent is detached before awaits so caller mutation cannot broaden deletio
 test('account, team, capacity, cloud, state/dialog guard changes stop before CAS',async()=>{
   for(const change of [h=>h.setGuard(false),h=>h.test.getTeam().id='other-team',h=>h.test.getContext().acting_as_parent=true,h=>h.test.getContext().profile.role='parent',h=>h.window.ClubHubCloud={},h=>h.test.changeSession({...h.validSession,user:{id:'other-account'}})]){
     const waiting=deferred(),h=fresh({handler:r=>r.path.endsWith('get_team_state_for_me')?waiting.promise:undefined});const pending=commit(h);await tick();change(h);waiting.resolve(response(200,{state:copy(h.backend.state),revision:8}));
-    await assert.rejects(pending,code('MATCH_ACTION_CONTEXT_CHANGED'));assert.equal(h.writes().length,0);assert.equal(h.debug().activeRevision,1);
+    await assert.rejects(pending,code('MATCH_ACTION_CONTEXT_CHANGED'));assert.equal(h.writes().length,0);assert.equal(h.debug().activeRevision,h.api.session?.user?.id==='other-account'?-1:1);
   }
 });
 test('match and tournament actions share one exclusive lease',async()=>{

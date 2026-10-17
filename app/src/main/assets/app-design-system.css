@@ -1854,6 +1854,11 @@ html body.auth-open #activation-gate .auth-redesign .auth-main{
   border-radius:20px;box-shadow:var(--gch-shadow-card)!important;text-align:left;
 }
 html body.auth-open #activation-gate .auth-redesign .auth-heading-copy{display:grid;gap:4px}
+/* Keep the reviewed auth controls contained when text is enlarged. */
+html body.auth-open #activation-gate .auth-redesign :is(.auth-main,.auth-heading-copy,.auth-fields,.auth-field-group,#cloud-signin-form){grid-template-columns:minmax(0,1fr);min-width:0;max-width:100%}
+html body.auth-open #activation-gate .auth-redesign .auth-password-wrap{min-width:0;max-width:100%}
+html body.auth-open #activation-gate .auth-redesign :is(h1,p,button,label){overflow-wrap:anywhere}
+html body.auth-open #activation-gate .auth-redesign button{white-space:normal}
 html body.auth-open #activation-gate .auth-redesign .auth-main h1{margin:0;font-size:1.875rem!important;line-height:1.15!important;font-weight:700;color:var(--gch-control-copy)!important}
 html body.auth-open #activation-gate .auth-redesign .auth-lead{margin:0!important;font-size:.875rem!important;line-height:1.45!important;color:var(--gch-control-copy)!important}
 html body.auth-open #activation-gate .auth-redesign #cloud-signin-form{display:grid;gap:12px}
@@ -1862,11 +1867,11 @@ html body.auth-open #activation-gate .auth-redesign .auth-field-group{gap:8px}
 html body.auth-open #activation-gate .auth-redesign .auth-field-label{color:var(--gch-control-copy)!important;font-size:.875rem;line-height:1.43;font-weight:600}
 html body.auth-open #activation-gate .auth-redesign .auth-field{min-height:52px!important;border-color:var(--gch-control-line)!important;border-radius:12px!important;background:var(--gch-control-surface)!important;box-shadow:none!important}
 html body.auth-open #activation-gate .auth-redesign .auth-field-icon{display:none}
-html body.auth-open #activation-gate .auth-redesign .auth-field :is(input,select){height:50px!important;min-height:50px;padding:0 16px!important;font-size:1rem!important;line-height:1.5!important;font-weight:400!important;color:var(--gch-control-copy)!important;background:transparent!important}
+html body.auth-open #activation-gate .auth-redesign .auth-field :is(input,select){height:max(50px,calc(1.5em + 16px))!important;min-height:50px;padding:0 16px!important;font-size:1rem!important;line-height:1.5!important;font-weight:400!important;color:var(--gch-control-copy)!important;background:transparent!important}
 html body.auth-open #activation-gate .auth-redesign input::placeholder{color:var(--gch-control-muted)!important;opacity:1}
-html body.auth-open #activation-gate .auth-redesign .auth-password-wrap .auth-field{padding-right:60px}
+html body.auth-open #activation-gate .auth-redesign .auth-password-wrap .auth-field{padding-right:calc(4em + 8px)}
 html body.auth-open #activation-gate .auth-redesign .auth-password-wrap input{padding-right:0!important}
-html body.auth-open #activation-gate .auth-redesign .auth-eye{bottom:4px;right:8px;width:44px;height:44px!important;min-height:44px;color:var(--gch-control-choice-copy)!important;font-size:.875rem;background:transparent!important}
+html body.auth-open #activation-gate .auth-redesign .auth-eye{bottom:4px;right:8px;width:3.75em;min-width:44px;height:auto!important;min-height:44px;padding:6px!important;line-height:1.45;color:var(--gch-control-choice-copy)!important;font-size:.875rem;background:transparent!important}
 html body.auth-open #activation-gate .auth-redesign :is(.auth-forgot,.auth-back,.auth-link-strong){color:var(--gch-control-choice-copy)!important;font-size:.875rem!important;font-weight:600;min-height:44px;line-height:1.45}
 html body.auth-open #activation-gate .auth-redesign .auth-forgot{padding:8px 0!important;justify-self:end}
 html body.auth-open #activation-gate .auth-redesign :is(.auth-primary,.auth-secondary){min-height:52px!important;line-height:1.25;padding:12px 16px!important;border-radius:12px!important;font-weight:600!important;font-size:1rem!important}

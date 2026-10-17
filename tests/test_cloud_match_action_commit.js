@@ -34,10 +34,10 @@ function harness({data=state(),revision=8,handler=null,expired=false}={}){
     if(request.path.startsWith('/rest/v1/coach_match_notes')){backend.note=request.body.note;return response(200,[copy(request.body)]);}
     throw new Error('Unexpected test request: '+request.path);
   };
-  const sandbox={window,localStorage,location:{protocol:'https:',origin:'https://fictional.test',search:'',hash:'',href:'https://fictional.test/'},URLSearchParams,URL,AbortController,fetch,document:{getElementById:()=>null},CustomEvent:class{constructor(type,options){this.type=type;this.detail=options?.detail;}},setTimeout:(fn,delay)=>{const id=++timerId;timers.set(id,{fn,delay});return id;},clearTimeout:id=>timers.delete(id),setInterval:()=>0,clearInterval:()=>{},console};
+  const sandbox={window,localStorage,location:{protocol:'https:',origin:'https://fictional.test',search:'',hash:'',href:'https://fictional.test/'},URLSearchParams,URL,AbortController,Event:class{constructor(type){this.type=type;}},fetch,document:{getElementById:()=>null},CustomEvent:class{constructor(type,options){this.type=type;this.detail=options?.detail;}},setTimeout:(fn,delay)=>{const id=++timerId;timers.set(id,{fn,delay});return id;},clearTimeout:id=>timers.delete(id),setInterval:()=>0,clearInterval:()=>{},console};
   const expose=`
   window.__testCloud={
-    initialize(s){saveSession(s);activeTeam={id:'team-a',club_id:'club-a',age_group:12};context={profile:{role:'coach',club_id:'club-a'},team:activeTeam,real_role:'coach'};visibleTeams=[activeTeam];activeRevision=1;hooks={onRemoteState:state=>window.__updates.push(state)};},
+    initialize(s){saveSession(s);activeTeam={id:'team-a',club_id:'club-a',age_group:12};context={profile:{role:'coach',club_id:'club-a'},team:activeTeam,real_role:'coach'};visibleTeams=[activeTeam];activeRevision=1;accountReady=true;hooks={onRemoteState:state=>window.__updates.push(state)};},
     getContext:()=>context,getTeam:()=>activeTeam,
     changeSession:s=>saveSession(s),setUnsynced:v=>{unsyncedState=v;},setRevision:v=>{activeRevision=v;},
     debug:()=>({pendingState,unsyncedState,saving,confirmingState,activeRevision,lease:!!matchActionLease,quarantine:!!matchActionQuarantine}),
@@ -115,7 +115,7 @@ test('all captured scope changes after a read prevent the destructive RPC',async
   for(const change of [h=>h.setGuard(false),h=>{h.test.getContext().profile.role='parent';},h=>{h.test.getContext().profile.club_id='other-club';},h=>{h.test.getContext().acting_as_parent=true;},h=>{h.test.getTeam().id='other-team';},h=>{h.test.changeSession({...h.validSession,user:{id:'other-account'}});},h=>{h.window.ClubHubCloud={};},h=>{h.test.getContext().team=null;}]){
     const waiting=deferred();let h;h=harness({handler:r=>r.path.endsWith('get_team_state_for_me')?waiting.promise:undefined});
     const pending=commit(h);await tick();change(h);waiting.resolve(response(200,{state:state(),revision:8}));
-    await assert.rejects(pending,code('MATCH_ACTION_CONTEXT_CHANGED'));assert.equal(h.writes().length,0);assert.equal(h.debug().activeRevision,1);
+    await assert.rejects(pending,code('MATCH_ACTION_CONTEXT_CHANGED'));assert.equal(h.writes().length,0);assert.equal(h.debug().activeRevision,h.api.session?.user?.id==='other-account'?-1:1);
   }
 });
 test('different account stored while RPC is pending blocks follow-on work',async()=>{
