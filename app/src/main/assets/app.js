@@ -334,6 +334,8 @@ function confirmHeroContextLeave(){
   if(currentView==='player-onboarding'&&window.ClubHubPlayerOnboarding?.confirmLeave()===false)return false;
   if(currentView==='add'&&!confirmDiscardMatchEdits())return false;
   if(document.getElementById('match-detail-dialog')?.open&&!confirmDiscardMatchEdits(true))return false;
+  if(document.getElementById('tournament-dialog')?.open&&!confirmDiscardTournamentEdits())return false;
+  if(typeof tournamentActionIsPending==='function'&&tournamentActionIsPending())return false;
   return true;
 }
 function setHeroContextBusy(busy){
@@ -2750,6 +2752,9 @@ function navigate(view,scroll=true,historyMode='push'){
   if(document.getElementById('registration-conduct-dialog')?.open&&window.ClubHubRegistrationConduct?.close()===false)return false;
   const editor=document.getElementById('match-detail-dialog');
   if(editor?.open&&view!==currentView){if(!confirmDiscardMatchEdits(true))return false;editor.close();}
+  const tournamentEditor=document.getElementById('tournament-dialog');
+  if(tournamentEditor?.open&&view!==currentView){if(!confirmDiscardTournamentEdits())return false;tournamentEditor.close();}
+  if(typeof tournamentActionIsPending==='function'&&tournamentActionIsPending()&&view!==currentView)return false;
   if(historyMode==='replace')restoreMatchPageChoices();
   const summary=document.getElementById('club-match-summary-dialog');if(summary?.open)summary.close();
   if(!NAVIGATION_VIEWS.has(view))view='home';
@@ -3693,18 +3698,305 @@ function tournamentStats(t){const games=tournamentGames(t.id).filter(isPlayedMat
 function tournamentFormatLabel(v){return v==='round_robin'?'Round robin':v==='knockout'?'Knockout':v==='festival'?'Festival / mini tournament':'Group + knockout';}
 function renderTournamentEvents(){
   ensureTournamentState();const list=document.getElementById('tournament-event-list'),count=document.getElementById('tournament-event-count');if(!list)return;
-  if(CLOUD_MODE&&currentRole==='parent'){list.innerHTML='';if(count)count.textContent='0';return;}
+  if(CLOUD_MODE&&currentRole==='parent'){list.innerHTML='';if(count)count.textContent='0';document.getElementById('tournament-action-notice')?.classList.add('hidden');return;}
+  if(typeof renderTournamentActionNotice==='function')renderTournamentActionNotice();
   const rows=[...state.tournaments].sort((a,b)=>(b.date||'').localeCompare(a.date||''));if(count)count.textContent=String(rows.length);
   list.innerHTML=rows.map(t=>{const st=tournamentStats(t),games=tournamentGames(t.id);const squad=t.playerNames||[];return `<article class="panel tournament-event-card"><div class="tournament-event-head"><div><p class="kicker">${t.date?formatDate(t.date):'Date TBC'} · ${esc(tournamentFormatLabel(t.format))}</p><h3>${esc(t.name)}</h3><p class="muted">${esc(t.location||'Location TBC')} · ${squad.length} player${squad.length===1?'':'s'} in squad</p></div><div class="tournament-event-actions">${isCoach()?`<button type="button" class="text-button compact" data-edit-tournament="${esc(t.id)}">Edit</button><button type="button" class="secondary-button compact" data-add-tournament-game="${esc(t.id)}">+ Game</button>`:''}</div></div><div class="tournament-summary-grid"><span><b>${games.length}</b> games</span><span><b>${st.wins}</b> W</span><span><b>${st.draws}</b> D</span><span><b>${st.losses}</b> L</span><span><b>${st.gf}</b> GF</span><span><b>${st.ga}</b> GA</span></div><div class="tournament-game-list">${(games.length?matchResultsTableHTML(games):'<div class="empty-state compact-empty">No games added yet.</div>')}</div>${isCoach()?`<button type="button" class="inline-action delete tournament-delete" data-delete-tournament="${esc(t.id)}">Delete tournament</button>`:''}</article>`;}).join('')||'<div class="empty-state"><strong>No tournament events yet.</strong><span>Create one event and keep all of its games together.</span></div>';
 }
 function renderTournamentSquadChoices(selected=[]){const box=document.getElementById('tournament-squad-list');if(!box)return;const chosen=new Set(selected||[]);box.innerHTML=activePlayers().map(p=>`<label class="parent-link-player"><input type="checkbox" value="${esc(p.name)}" ${chosen.has(p.name)?'checked':''}/><span>${miniJerseyHTML(p.number,p.role,'compact')}<strong>${esc(p.name)}</strong></span></label>`).join('')||'<div class="empty-state compact-empty">Add players to the squad first.</div>';}
+// Confirmed tournament editor operations.
+let __tournamentAction=null,__tournamentActionBusy=false,__tournamentEditor=null,__tournamentDialogEpoch=0,__tournamentMutationVersion=0;
+function tournamentActionIsPending(){return __tournamentActionBusy;}
+function tournamentActionMutationEpoch(){return __tournamentMutationVersion;}
+function tournamentActionScope(){
+  if(!isCoach()||window.ClubHubCloud?.actingAsParent?.())return '';
+  const scope=matchActionScope();if(!scope)return '';
+  return scope==='local'?[scope,state.meta?.clubName||'',state.meta?.teamName||'',currentRole,currentRole==='admin'?adminUiMode:''].join('|'):scope;
+}
+function tournamentActionStorageKey(scope){return 'grassrootsHub_tournament_action_v1:'+encodeURIComponent(scope);}
+function tournamentCopy(value){return value==null?null:JSON.parse(JSON.stringify(value));}
+function tournamentEditable(value){
+  if(!value)return null;
+  return {id:String(value.id||''),name:String(value.name||'').trim(),date:String(value.date||''),location:String(value.location||'').trim(),format:String(value.format||'group_knockout'),playerNames:Array.isArray(value.playerNames)?value.playerNames.map(String):[]};
+}
+function tournamentStable(value){
+  if(Array.isArray(value))return '['+value.map(tournamentStable).join(',')+']';
+  if(value&&typeof value==='object')return '{'+Object.keys(value).sort().map(key=>JSON.stringify(key)+':'+tournamentStable(value[key])).join(',')+'}';
+  return JSON.stringify(value);
+}
+function tournamentSameIds(a=[],b=[]){return a.length===b.length&&[...a].sort().every((id,index)=>id===[...b].sort()[index]);}
+function tournamentValidIds(ids){return Array.isArray(ids)&&ids.every(id=>typeof id==='string'&&id.length>0&&id.length<=200)&&new Set(ids).size===ids.length;}
+function currentTournamentAction(){
+  const scope=tournamentActionScope();if(!scope)return null;
+  if(__tournamentAction?.scope===scope)return __tournamentAction;
+  try{
+    const saved=JSON.parse(localStorage.getItem(tournamentActionStorageKey(scope))||'null');
+    if(saved?.version!==1||saved.scope!==scope||!['save','delete'].includes(saved.action)||typeof saved.tournamentId!=='string'||!saved.tournamentId||saved.tournamentId.length>200||!tournamentValidIds(saved.gameIds)||typeof saved.stateConfirmed!=='boolean')return null;
+    if(!tournamentValidIds(saved.attendanceCleared)||!tournamentValidIds(saved.noteCleared)||[...saved.attendanceCleared,...saved.noteCleared].some(id=>!saved.gameIds.includes(id)))return null;
+    if(saved.action==='save'&&(!saved.candidate||saved.candidate.id!==saved.tournamentId||(saved.baseline&&saved.baseline.id!==saved.tournamentId)))return null;
+    __tournamentAction={...saved,candidate:saved.action==='save'?tournamentEditable(saved.candidate):null,expectedTournament:saved.action==='save'?tournamentEditable(saved.baseline):null,expectedGames:null,cloud:window.ClubHubCloud,reviewRequired:true,loadedFromStorage:true,message:'',controls:[]};
+    return __tournamentAction;
+  }catch{return null;}
+}
+function persistTournamentAction(op){
+  // Delete recovery contains IDs and confirmed flags only. Save adds only its
+  // editor candidate/baseline; linked game snapshots remain in memory.
+  const saved={version:1,scope:op.scope,action:op.action,tournamentId:op.tournamentId,gameIds:[...op.gameIds],stateConfirmed:op.stateConfirmed,attendanceCleared:[...op.attendanceCleared],noteCleared:[...op.noteCleared],attempted:!!op.attempted};
+  if(op.action==='save'){saved.candidate=tournamentEditable(op.candidate);saved.baseline=tournamentEditable(op.expectedTournament);}
+  try{localStorage.setItem(tournamentActionStorageKey(op.scope),JSON.stringify(saved));op.storageFailed=false;return true;}
+  catch{op.storageFailed=true;return false;}
+}
+function sameTournamentAction(op){
+  const dialog=document.getElementById('tournament-dialog');
+  return __tournamentAction===op&&op.scope===tournamentActionScope()&&op.cloud===window.ClubHubCloud&&op.stateRef===state&&op.dialogEpoch===__tournamentDialogEpoch&&!!dialog?.open;
+}
+function tournamentEditorCandidate(){
+  return tournamentEditable({id:document.getElementById('tournament-id')?.value||__tournamentEditor?.tournamentId||'',name:document.getElementById('tournament-name')?.value||'',date:document.getElementById('tournament-date')?.value||'',location:document.getElementById('tournament-location')?.value||'',format:document.getElementById('tournament-format')?.value||'group_knockout',playerNames:[...document.querySelectorAll('#tournament-squad-list input:checked')].map(input=>input.value)});
+}
+function fillTournamentEditor(candidate,title){
+  const form=document.getElementById('tournament-form');form?.reset();
+  document.getElementById('tournament-id').value=candidate.id;
+  document.getElementById('tournament-dialog-title').textContent=title;
+  for(const key of ['name','date','location','format'])document.getElementById('tournament-'+key).value=candidate[key];
+  renderTournamentSquadChoices(candidate.playerNames);
+}
+function tournamentSaveOperation(editor){
+  return {version:1,scope:editor.scope,action:'save',tournamentId:editor.tournamentId,candidate:tournamentCopy(editor.candidate),expectedTournament:tournamentCopy(editor.expectedTournament),expectedGames:tournamentCopy(editor.expectedGames),gameIds:[...editor.gameIds],stateConfirmed:false,attendanceCleared:[],noteCleared:[],attempted:false,reviewRequired:false,message:'',cloud:editor.cloud,stateRef:state,dialogEpoch:__tournamentDialogEpoch,controls:[]};
+}
+function tournamentEditorChanged(){
+  const editor=__tournamentEditor;
+  if(!editor||__tournamentActionBusy||editor.scope!==tournamentActionScope()||editor.cloud!==window.ClubHubCloud||editor.dialogEpoch!==__tournamentDialogEpoch)return;
+  editor.candidate=tournamentEditorCandidate();editor.dirty=true;
+  let op=currentTournamentAction();if(op&&op.action!=='save')return;
+  if(!op){op=tournamentSaveOperation(editor);__tournamentAction=op;}
+  op.candidate=tournamentCopy(editor.candidate);persistTournamentAction(op);renderTournamentActionNotice();
+}
+function confirmDiscardTournamentEdits(discard=false){
+  if(__tournamentActionBusy){toast('Wait for the tournament change to finish.');return false;}
+  const op=currentTournamentAction();
+  if(!discard){
+    if(__tournamentEditor?.dirty&&!op)tournamentEditorChanged();
+    return true;
+  }
+  if((__tournamentEditor?.dirty||op?.action==='save')&&!confirm('Discard your unsaved tournament changes?'))return false;
+  if(op?.action==='save')clearTournamentAction(op);
+  __tournamentEditor=null;++__tournamentDialogEpoch;return true;
+}
+function renderTournamentActionNotice(){
+  const box=document.getElementById('tournament-action-notice');if(!box)return;
+  if(!isCoach()||window.ClubHubCloud?.actingAsParent?.()){box.classList.add('hidden');box.replaceChildren();return;}
+  const op=currentTournamentAction();box.classList.toggle('hidden',!op);
+  if(!op){box.replaceChildren();return;}
+  setStableHtml(box,'<div><strong>Tournament change needs attention</strong><p>One draft or action still needs confirmation or cleanup.</p></div><button type="button" class="primary-button" data-tournament-action="resume">Resume</button>');
+}
+function renderTournamentActionOutcome(op,focus=false){
+  if(!sameTournamentAction(op))return;
+  const dialog=document.getElementById('tournament-dialog'),box=document.getElementById('tournament-action-outcome');if(!box)return;
+  const pending=__tournamentActionBusy,review=op.reviewRequired,save=op.action==='save',edit=save&&!pending&&!review;
+  const summaryBox=document.getElementById('tournament-action-summary');
+  if(summaryBox){summaryBox.textContent=save?'':`${op.expectedTournament?.name||'Tournament'} · ${op.gameIds.length} captured linked game${op.gameIds.length===1?'':'s'}`;summaryBox.classList.toggle('hidden',save);}
+  dialog.classList.add('tournament-action-mode');dialog.classList.toggle('tournament-edit-mode',edit);box.classList.remove('hidden');
+  const title=pending?(op.stage==='review'?'Loading latest tournament…':'Confirming tournament…'):review?'Change not confirmed':save?(op.awaitingExplicitSave?'Review tournament details':'Change not confirmed'):op.stateConfirmed?'Cleanup incomplete':'Change not confirmed';
+  const summary=pending?(op.stage==='review'?'Loading the latest club record. No further change or cleanup will run until you decide again.':save?'Waiting for the club to confirm this tournament. Your draft is retained.':op.stateConfirmed?'The club confirmed the tournament and linked-game deletion. Waiting for the remaining cleanup.':'Waiting for the club to confirm deletion. Attendance and private notes have not been cleared.'):
+    review?(op.message||'Review the latest club record before deciding again.'):save?(op.awaitingExplicitSave?'Review the retained details, then explicitly Save.':op.message||'The club has not confirmed this save. Your editor and retry are still here.'):op.stateConfirmed?'The tournament and captured linked games are removed. Some attendance or private notes still need clearing.':op.message||'The club has not confirmed deletion. Attendance and private notes have not been cleared.';
+  const confirmed=matchActionUsesCloud()?'Confirmed by club':'Confirmed on this device';
+  const parts=save?[['Tournament',op.stateConfirmed?confirmed:pending?'Awaiting confirmation':'Not confirmed']]:[['Tournament and linked games',op.stateConfirmed?confirmed:pending?'Awaiting confirmation':'Not confirmed'],['Attendance',!op.stateConfirmed?'Not started':`${op.attendanceCleared.length} of ${op.gameIds.length} games cleared`],['Private notes',!op.stateConfirmed?'Not started':`${op.noteCleared.length} of ${op.gameIds.length} games cleared`]];
+  const storage=op.storageFailed?'<p>This browser could not retain this retry after reload. Keep this page open and try again.</p>':'';
+  box.innerHTML=`<div class="tournament-action-status"><h3>${title}</h3><p>${esc(summary)}</p>${review&&!pending?'<p>Reviewing latest club data replaces unsynced changes on this device.</p>':''}${storage}<dl>${parts.map(([label,value])=>`<div><dt>${label}</dt><dd>${esc(value)}</dd></div>`).join('')}</dl></div>${pending?'<button type="button" class="primary-button" disabled>Confirming…</button><p class="helper">Please wait before leaving this tournament.</p>':`<button type="button" class="primary-button" data-tournament-action="${review?'review':save&&op.awaitingExplicitSave?'save':'retry'}">${review?'Review latest tournament':save?(op.awaitingExplicitSave?'Save tournament':'Retry save'):op.stateConfirmed?'Retry cleanup':'Retry delete'}</button><button type="button" class="secondary-button" data-tournament-action="back">Back to Matches</button><p class="helper">${save?'Your tournament draft is retained until confirmed or deliberately discarded.':op.stateConfirmed?'Retry only clears parts still needing attention.':'The Matches reminder keeps this action available.'}</p>`}`;
+  if(focus){
+    box.focus({preventScroll:true});
+    if(edit&&!op.awaitingExplicitSave)box.scrollIntoView?.({block:'nearest',inline:'nearest'});
+    else dialog.scrollTo?.({top:0});
+  }
+}
+function openTournamentActionOutcome(op){
+  if(__tournamentActionBusy||op.scope!==tournamentActionScope())return false;
+  const dialog=document.getElementById('tournament-dialog');if(!dialog)return false;
+  ++__tournamentDialogEpoch;op.dialogEpoch=__tournamentDialogEpoch;op.cloud=window.ClubHubCloud;op.stateRef=state;
+  op.controls?.forEach(({el,disabled})=>el.disabled=disabled);op.controls=[];
+  if(op.action==='save'){
+    fillTournamentEditor(op.candidate,op.expectedTournament?'Edit tournament':'Create tournament');
+    __tournamentEditor={scope:op.scope,tournamentId:op.tournamentId,candidate:tournamentCopy(op.candidate),expectedTournament:tournamentCopy(op.expectedTournament),expectedGames:tournamentCopy(op.expectedGames),gameIds:[...op.gameIds],cloud:op.cloud,dialogEpoch:op.dialogEpoch,dirty:true};
+  }else{
+    __tournamentEditor=null;document.getElementById('tournament-id').value=op.tournamentId;document.getElementById('tournament-dialog-title').textContent='Delete tournament';
+  }
+  const summary=document.getElementById('tournament-action-summary');
+  if(summary){summary.textContent=op.action==='delete'?`${op.expectedTournament?.name||'Tournament'} · ${op.gameIds.length} captured linked game${op.gameIds.length===1?'':'s'}`:'';summary.classList.toggle('hidden',op.action!=='delete');}
+  if(!dialog.open)dialog.showModal();renderTournamentActionOutcome(op,true);return true;
+}
 function openTournamentDialog(id=''){
-  if(!requireCoach())return;ensureTournamentState();const t=id?tournamentById(id):null;const dlg=document.getElementById('tournament-dialog');if(!dlg)return;document.getElementById('tournament-form').reset();document.getElementById('tournament-id').value=t?.id||'';document.getElementById('tournament-dialog-title').textContent=t?'Edit tournament':'Create tournament';document.getElementById('tournament-name').value=t?.name||'';document.getElementById('tournament-date').value=t?.date||new Date().toISOString().slice(0,10);document.getElementById('tournament-location').value=t?.location||'';document.getElementById('tournament-format').value=t?.format||'group_knockout';renderTournamentSquadChoices(t?.playerNames||[]);dlg.showModal();
+  if(!requireCoach()||__tournamentActionBusy||__matchReportSaveBusy||matchActionIsPending())return;
+  if(currentMatchAction()){resumeMatchAction();return;}
+  if(currentTournamentAction()){resumeTournamentAction();return;}
+  ensureTournamentState();const event=id?tournamentById(id):null;if(id&&!event)return;
+  const dialog=document.getElementById('tournament-dialog'),scope=tournamentActionScope();if(!dialog||!scope)return;
+  ++__tournamentDialogEpoch;
+  const candidate=tournamentEditable(event||{id:uid('t'),name:'',date:new Date().toISOString().slice(0,10),location:'',format:'group_knockout',playerNames:[]});
+  const games=event?tournamentCopy(tournamentGames(event.id)):[];
+  __tournamentEditor={scope,tournamentId:candidate.id,candidate:tournamentCopy(candidate),expectedTournament:tournamentEditable(event),expectedGames:games,gameIds:games.map(game=>String(game.id)),cloud:window.ClubHubCloud,dialogEpoch:__tournamentDialogEpoch,dirty:false};
+  fillTournamentEditor(candidate,event?'Edit tournament':'Create tournament');dialog.classList.remove('tournament-action-mode','tournament-edit-mode');document.getElementById('tournament-action-outcome')?.classList.add('hidden');document.getElementById('tournament-action-summary')?.classList.add('hidden');if(!dialog.open)dialog.showModal();
 }
-function saveTournament(e){
-  e.preventDefault();if(!requireCoach())return;ensureTournamentState();const id=document.getElementById('tournament-id').value||uid('t');const before=tournamentById(id)?JSON.parse(JSON.stringify(tournamentById(id))):null;const playerNames=[...document.querySelectorAll('#tournament-squad-list input:checked')].map(x=>x.value);const t={id,name:document.getElementById('tournament-name').value.trim(),date:document.getElementById('tournament-date').value,location:document.getElementById('tournament-location').value.trim(),format:document.getElementById('tournament-format').value,playerNames};if(!t.name||!t.date)return toast('Add the tournament name and date');const idx=state.tournaments.findIndex(x=>x.id===id);if(idx>=0)state.tournaments[idx]=t;else state.tournaments.push(t);saveState();auditEvent(before?'tournament_edited':'tournament_created','tournament',id,`${before?'Updated':'Created'} tournament ${t.name}`,before,t);document.getElementById('tournament-dialog')?.close();toast('Tournament saved');
+async function saveTournament(event){
+  event?.preventDefault?.();if(!requireCoach()||__tournamentActionBusy||__matchReportSaveBusy||matchActionIsPending())return;
+  if(currentMatchAction()){resumeMatchAction();return;}
+  const editor=__tournamentEditor;if(!editor||editor.scope!==tournamentActionScope()||editor.cloud!==window.ClubHubCloud||editor.dialogEpoch!==__tournamentDialogEpoch)return;
+  const candidate=tournamentEditorCandidate();if(!candidate.name||!candidate.date){toast('Add the tournament name and date');return;}
+  let op=currentTournamentAction();if(op&&op.action!=='save'){resumeTournamentAction();return;}
+  if(!op){op=tournamentSaveOperation(editor);__tournamentAction=op;}
+  if(op.reviewRequired){openTournamentActionOutcome(op);return;}
+  op.candidate=tournamentCopy(candidate);op.stateRef=state;op.attempted=true;op.awaitingExplicitSave=false;editor.candidate=tournamentCopy(candidate);editor.dirty=true;
+  if(!persistTournamentAction(op)){op.message='The club has not been asked to save. This browser could not retain your draft; keep this page open and retry.';openTournamentActionOutcome(op);return;}
+  if(!openTournamentActionOutcome(op))return;await runTournamentAction(op);
 }
-function deleteTournament(id){if(!requireCoach())return;const t=tournamentById(id);if(!t)return;const games=tournamentGames(id);if(!confirm(`Delete “${t.name}” and ${games.length} linked game${games.length===1?'':'s'}? This also removes their goals, assists and awards.`))return;const gameIds=new Set(games.map(g=>g.id));state.tournaments=state.tournaments.filter(x=>x.id!==id);state.matches=state.matches.filter(m=>!gameIds.has(m.id));state.goals=state.goals.filter(x=>!gameIds.has(x.matchId));state.assists=(state.assists||[]).filter(x=>!gameIds.has(x.matchId));state.bookings=(state.bookings||[]).filter(x=>!gameIds.has(x.matchId));state.awards=state.awards.filter(x=>!gameIds.has(x.matchId));saveState();auditEvent('tournament_deleted','tournament',id,`Deleted tournament ${t.name}`,t,null);toast('Tournament deleted');}
+function tournamentDeleteWarning(event,games,{cleanup=false}={}){
+  const name=event?.name?`“${event.name}”`:'this tournament',count=games.length;
+  return `${cleanup?'Confirm deletion and finish cleanup for':'Delete'} ${name} and ${count} linked game${count===1?'':'s'}?\n\nThis removes their scores, goals, assists, bookings, awards, attendance and private coaching notes.\n\nFixture preparations, parent availability and matchday/tactics plans are kept.`;
+}
+async function deleteTournament(id){
+  if(!requireCoach()||__tournamentActionBusy||__matchReportSaveBusy||matchActionIsPending())return;
+  if(currentMatchAction()){resumeMatchAction();return;}
+  if(currentTournamentAction()){resumeTournamentAction();return;}
+  const event=tournamentById(id);if(!event)return;const games=tournamentCopy(tournamentGames(id));
+  if(games.some(isProviderOwnedMatch)){toast('A published Selkent fixture is linked to this tournament. Review its fixture correction or match status instead.');return;}
+  if(!confirmDiscardMatchEdits(true)||!confirmDiscardMatchEdits()||!confirm(tournamentDeleteWarning(event,games)))return;
+  const scope=tournamentActionScope();if(!scope)return;
+  const op={version:1,scope,action:'delete',tournamentId:id,expectedTournament:tournamentEditable(event),expectedGames:games,gameIds:games.map(game=>String(game.id)),stateConfirmed:false,attendanceCleared:[],noteCleared:[],attempted:true,reviewRequired:false,message:'',cloud:window.ClubHubCloud,controls:[]};
+  __tournamentAction=op;if(!openTournamentActionOutcome(op))return;
+  if(!persistTournamentAction(op)){op.message='The club has not been asked to delete. This browser could not retain the cleanup retry; keep this page open and retry.';renderTournamentActionOutcome(op,true);return;}
+  await runTournamentAction(op);
+}
+function resumeTournamentAction(){
+  if(!requireCoach()||__tournamentActionBusy||__matchReportSaveBusy||matchActionIsPending()||!confirmDiscardMatchEdits(true)||!confirmDiscardMatchEdits())return;
+  if(currentMatchAction()){resumeMatchAction();return;}
+  const op=currentTournamentAction();if(op)openTournamentActionOutcome(op);
+}
+async function retryTournamentAction(){
+  const op=currentTournamentAction();if(!op||__tournamentActionBusy||!sameTournamentAction(op))return;
+  if(op.reviewRequired){await reviewTournamentAction();return;}
+  if(op.action==='save'){await saveTournament();return;}
+  if(!persistTournamentAction(op)){renderTournamentActionOutcome(op,true);return;}
+  await runTournamentAction(op);
+}
+function tournamentActionDesired(op,data){
+  const events=(data.tournaments||[]).filter(row=>String(row.id)===op.tournamentId),games=data.matches||[];
+  if(op.action==='save'){
+    const linked=games.filter(game=>String(game.tournamentId||'')===op.tournamentId).map(game=>String(game.id));
+    return events.length===1&&tournamentStable(tournamentEditable(events[0]))===tournamentStable(tournamentEditable(op.candidate))&&tournamentValidIds(linked)&&tournamentSameIds(linked,op.gameIds)&&op.gameIds.every(id=>games.filter(game=>String(game.id)===id).length===1);
+  }
+  const ids=new Set(op.gameIds);
+  return !events.length&&!games.some(game=>String(game.tournamentId||'')===op.tournamentId||ids.has(String(game.id)))&&['goals','assists','bookings','awards'].every(key=>!(data[key]||[]).some(row=>ids.has(String(row.matchId))));
+}
+function localTournamentActionState(op){
+  const next=tournamentCopy(state);
+  if((next.tournaments||[]).filter(row=>String(row.id)===op.tournamentId).length>1||!tournamentValidIds(op.gameIds)||op.gameIds.some(id=>(next.matches||[]).filter(game=>String(game.id)===id).length>1))throw Object.assign(new Error('Review duplicate tournament or game identifiers.'),{code:'TOURNAMENT_ACTION_CONFLICT'});
+  if(tournamentActionDesired(op,next))return next;
+  const event=(next.tournaments||[]).find(row=>String(row.id)===op.tournamentId)||null,games=(next.matches||[]).filter(game=>String(game.tournamentId||'')===op.tournamentId);
+  if(tournamentStable(tournamentEditable(event))!==tournamentStable(tournamentEditable(op.expectedTournament))||!Array.isArray(op.expectedGames)||tournamentStable([...games].sort((a,b)=>String(a.id).localeCompare(String(b.id))))!==tournamentStable([...op.expectedGames].sort((a,b)=>String(a.id).localeCompare(String(b.id))))||(op.action==='delete'&&games.some(isProviderOwnedMatch)))throw Object.assign(new Error('Review the latest tournament.'),{code:'TOURNAMENT_ACTION_CONFLICT'});
+  next.tournaments=next.tournaments||[];
+  if(op.action==='save'){
+    const index=next.tournaments.findIndex(row=>String(row.id)===op.tournamentId);if(index<0)next.tournaments.push(tournamentCopy(op.candidate));else next.tournaments[index]={...next.tournaments[index],...tournamentCopy(op.candidate)};
+    for(const game of next.matches||[])if(op.gameIds.includes(String(game.id)))game.tournamentId=op.tournamentId;
+  }else{
+    const ids=new Set(op.gameIds);next.tournaments=next.tournaments.filter(row=>String(row.id)!==op.tournamentId);next.matches=(next.matches||[]).filter(game=>!ids.has(String(game.id)));
+    for(const key of ['goals','assists','bookings','awards'])next[key]=(next[key]||[]).filter(row=>!ids.has(String(row.matchId)));
+  }
+  return next;
+}
+function setTournamentActionBusy(op,busy){
+  __tournamentActionBusy=busy;
+  if(busy){++__tournamentMutationVersion;op.controls=[...document.querySelectorAll('#tournament-form input,#tournament-form textarea,#tournament-form select,#tournament-form button')].map(el=>({el,disabled:el.disabled}));op.controls.forEach(({el})=>el.disabled=true);}
+  else{op.controls?.forEach(({el,disabled})=>el.disabled=disabled);op.controls=[];}
+}
+function acceptTournamentActionState(op,data){
+  state=repairStateIdentity(normalizeState(data));op.stateRef=state;persistLocalState();renderAll();
+}
+function tournamentNeedsReview(error){return /(?:MATCH|TOURNAMENT)_ACTION_(?:CONFLICT|SYNC_BUSY)/.test(String(error?.code||''));}
+async function runTournamentAction(op){
+  if(__tournamentActionBusy||__matchReportSaveBusy||matchActionIsPending()||!sameTournamentAction(op))return;
+  if(currentMatchAction()){resumeMatchAction();return;}
+  const guard=()=>sameTournamentAction(op),cloud=op.cloud;let complete=false;
+  op.message='';op.stage='state';setTournamentActionBusy(op,true);renderTournamentActionOutcome(op);
+  try{
+    const result=matchActionUsesCloud()?await cloud.commitTournamentAction({action:op.action,tournamentId:op.tournamentId,tournament:op.action==='save'?tournamentCopy(op.candidate):null,expectedTournament:op.stateConfirmed?null:tournamentCopy(op.expectedTournament),expectedGames:op.stateConfirmed?null:tournamentCopy(op.expectedGames),gameIds:[...op.gameIds]},guard):{state:localTournamentActionState(op)};
+    if(!guard())return;
+    if(!result?.state||!tournamentActionDesired(op,result.state))throw Object.assign(new Error('Review the latest tournament.'),{code:'TOURNAMENT_ACTION_CONFLICT'});
+    acceptTournamentActionState(op,result.state);op.stateConfirmed=true;persistTournamentAction(op);renderTournamentActionOutcome(op);
+    if(op.action==='save')complete=true;
+    else{
+      if(!matchActionUsesCloud()){op.attendanceCleared=[...op.gameIds];op.noteCleared=[...op.gameIds];}
+      for(const [stage,key,method] of [['attendance','attendanceCleared','clearMatchActionAttendance'],['note','noteCleared','clearMatchActionNote']]){
+        for(const id of op.gameIds){
+          if(!guard())return;if(op[key].includes(id))continue;op.stage=stage;renderTournamentActionOutcome(op);
+          try{await cloud[method](id,guard);if(!guard())return;op[key].push(id);persistTournamentAction(op);}
+          catch(error){if(!guard())return;if(tournamentNeedsReview(error))throw error;}
+        }
+      }
+      if(!guard())return;complete=op.gameIds.every(id=>op.attendanceCleared.includes(id)&&op.noteCleared.includes(id));persistTournamentAction(op);
+    }
+  }catch(error){
+    if(!guard())return;op.reviewRequired=tournamentNeedsReview(error);
+    op.message=op.reviewRequired?(String(error.code).endsWith('SYNC_BUSY')?'Existing edits need syncing; save them before retrying, or review the latest club data.':'This tournament or its linked games changed elsewhere. Review the latest club record before deciding again.'):'The club could not confirm this attempt. Check your connection and retry.';
+  }finally{
+    if(guard()){setTournamentActionBusy(op,false);if(!complete)renderTournamentActionOutcome(op,true);}
+    else if(__tournamentAction===op)__tournamentActionBusy=false;
+  }
+  if(!guard())return;renderTournamentActionNotice();if(!complete)return;
+  auditEvent(op.action==='delete'?'tournament_deleted':op.expectedTournament?'tournament_edited':'tournament_created','tournament',op.tournamentId,op.action==='delete'?'Deleted tournament':op.expectedTournament?'Updated tournament':'Created tournament',op.expectedTournament||null,op.action==='save'?op.candidate:null);
+  clearTournamentAction(op);__tournamentEditor=null;++__tournamentDialogEpoch;document.getElementById('tournament-dialog').close();navigate('matches',false);
+  toast((op.action==='save'?'Tournament saved':'Tournament deleted')+(matchActionUsesCloud()?'':' on this device'));
+}
+function clearTournamentAction(op){
+  try{localStorage.removeItem(tournamentActionStorageKey(op.scope));}catch{}
+  if(__tournamentAction===op)__tournamentAction=null;renderTournamentActionNotice();
+}
+async function reviewTournamentAction(){
+  const op=currentTournamentAction();if(!op||__tournamentActionBusy||__matchReportSaveBusy||matchActionIsPending()||!sameTournamentAction(op))return;
+  if(currentMatchAction()){resumeMatchAction();return;}
+  if(!confirm('Reviewing latest club data replaces unsynced changes on this device. Continue?'))return;
+  const guard=()=>sameTournamentAction(op);let fresh=null;
+  op.stage='review';setTournamentActionBusy(op,true);renderTournamentActionOutcome(op);
+  try{
+    const result=matchActionUsesCloud()?await op.cloud.reviewMatchActionState(guard,{discardQueuedChanges:true}):{state:tournamentCopy(state)};
+    if(!guard())return;if(!result?.state)throw new Error('No current club record');fresh=result.state;acceptTournamentActionState(op,fresh);op.message='';
+  }catch{if(guard()){op.reviewRequired=true;op.message='Could not load the latest club data. Your draft and retry are still here.';}}
+  finally{if(guard())setTournamentActionBusy(op,false);else if(__tournamentAction===op)__tournamentActionBusy=false;}
+  if(!guard())return;if(!fresh){renderTournamentActionOutcome(op,true);return;}
+  const latest=tournamentEditable((state.tournaments||[]).find(row=>String(row.id)===op.tournamentId)),games=tournamentCopy((state.matches||[]).filter(game=>String(game.tournamentId||'')===op.tournamentId));
+  if(op.action==='save'){
+    if(op.expectedTournament&&!latest){clearTournamentAction(op);__tournamentEditor=null;++__tournamentDialogEpoch;document.getElementById('tournament-dialog').close();toast('Tournament was deleted elsewhere.');return;}
+    const desired=tournamentActionDesired(op,fresh),unchanged=tournamentStable(latest)===tournamentStable(tournamentEditable(op.expectedTournament))&&tournamentSameIds(games.map(game=>String(game.id)),op.gameIds);
+    if(!op.expectedTournament&&latest&&!desired){clearTournamentAction(op);__tournamentEditor=null;++__tournamentDialogEpoch;document.getElementById('tournament-dialog').close();toast('This tournament identifier is already in use. Create a tournament again.');return;}
+    if(!unchanged&&!desired)op.candidate=tournamentCopy(latest);
+    op.expectedTournament=tournamentCopy(latest);op.expectedGames=games;op.gameIds=games.map(game=>String(game.id));op.reviewRequired=false;op.stateConfirmed=false;op.loadedFromStorage=false;op.awaitingExplicitSave=true;persistTournamentAction(op);openTournamentActionOutcome(op);return;
+  }
+  if(tournamentActionDesired(op,fresh)){
+    if(!confirm(tournamentDeleteWarning(op.expectedTournament,op.gameIds,{cleanup:true}))){op.reviewRequired=true;op.message='The tournament and captured games are already removed. Review and confirm before clearing remaining attendance and private notes.';persistTournamentAction(op);renderTournamentActionOutcome(op,true);return;}
+    if(!guard())return;op.stateConfirmed=true;op.reviewRequired=false;op.loadedFromStorage=false;persistTournamentAction(op);await runTournamentAction(op);return;
+  }
+  if(!latest||games.some(isProviderOwnedMatch)){
+    op.reviewRequired=true;op.message=games.some(isProviderOwnedMatch)?'A published Selkent fixture is linked to this tournament. Its fixture correction or match status must be reviewed.':'The tournament record is missing while captured games or report data remain. No cleanup has run; review the current club record.';renderTournamentActionOutcome(op,true);return;
+  }
+  if(!confirm(tournamentDeleteWarning(latest,games))){op.reviewRequired=true;op.message='Kept the latest club record. Confirm its exact linked-game count before deleting.';renderTournamentActionOutcome(op,true);return;}
+  if(!guard())return;op.expectedTournament=latest;op.expectedGames=games;op.gameIds=games.map(game=>String(game.id));op.stateConfirmed=false;op.attendanceCleared=[];op.noteCleared=[];op.reviewRequired=false;op.loadedFromStorage=false;
+  if(!persistTournamentAction(op)){renderTournamentActionOutcome(op,true);return;}await runTournamentAction(op);
+}
+function handleTournamentActionClick(event){
+  const action=event.target.closest('[data-tournament-action]')?.dataset.tournamentAction;if(!action)return;
+  if(action==='resume'){resumeTournamentAction();return;}
+  const op=currentTournamentAction();if(!op||__tournamentActionBusy||!sameTournamentAction(op))return;
+  if(action==='retry')void retryTournamentAction();else if(action==='review')void reviewTournamentAction();else if(action==='save')void saveTournament();
+  else if(action==='back'){document.getElementById('tournament-dialog').close();__tournamentEditor=null;++__tournamentDialogEpoch;navigate('matches',false);}
+}
+function tournamentContextCleared(){
+  const op=__tournamentAction;if(op&&__tournamentActionBusy)setTournamentActionBusy(op,false);
+  ++__tournamentDialogEpoch;++__tournamentMutationVersion;__tournamentAction=null;__tournamentActionBusy=false;__tournamentEditor=null;
+  const dialog=document.getElementById('tournament-dialog');if(dialog?.open)dialog.close();dialog?.classList.remove('tournament-action-mode','tournament-edit-mode');
+  const notice=document.getElementById('tournament-action-notice');if(notice){notice.classList.add('hidden');notice.replaceChildren();}
+  const outcome=document.getElementById('tournament-action-outcome');if(outcome){outcome.replaceChildren();outcome.classList.add('hidden');}
+  const summary=document.getElementById('tournament-action-summary');if(summary){summary.textContent='';summary.classList.add('hidden');}
+  const title=document.getElementById('tournament-dialog-title');if(title)title.textContent='Create tournament';
+  document.getElementById('tournament-form')?.reset();document.getElementById('tournament-squad-list')?.replaceChildren();
+}
 function populateTournamentSelect(selected=''){ensureTournamentState();const sel=document.getElementById('match-tournament');if(!sel)return;sel.innerHTML='<option value="">Choose tournament</option>'+state.tournaments.slice().sort((a,b)=>(b.date||'').localeCompare(a.date||'')).map(t=>`<option value="${esc(t.id)}">${esc(t.name)} · ${t.date?formatDate(t.date):'TBC'}</option>`).join('');if(selected&&[...sel.options].some(o=>o.value===selected))sel.value=selected;}
 function updateTournamentMatchUI(selected=''){const comp=document.getElementById('match-competition')?.value||'';const wrap=document.getElementById('match-tournament-wrap');const isT=/tournament/i.test(comp);wrap?.classList.toggle('hidden',!isT);if(isT)populateTournamentSelect(selected||document.getElementById('match-tournament')?.value||'');}
 function addTournamentGame(id){const t=tournamentById(id);if(!t||!requireCoach())return;resetMatchForm();const comp=document.getElementById('match-competition');if(comp){comp.value='Tournament';if(!comp.value){comp.add(new Option('Tournament','Tournament',true,true));}}document.getElementById('match-date').value=t.date||new Date().toISOString().slice(0,10);document.getElementById('match-stage').value=t.format==='knockout'?'Quarter Final':'Group';updateTournamentMatchUI(id);document.getElementById('match-tournament').value=id;document.getElementById('form-title').textContent=`${t.name} · Add game`;document.getElementById('form-kicker').textContent='Tournament game';navigate('add');}
@@ -4203,8 +4495,8 @@ async function saveMatchDetails(e){
 
 // Confirmed destructive match actions: retain only a scoped retry intent, never a report payload.
 let __matchAction=null,__matchActionBusy=false,__matchActionMutationVersion=0;
-function matchActionIsPending(){return __matchActionBusy;}
-function matchActionMutationEpoch(){return __matchActionMutationVersion;}
+function matchActionIsPending(){return __matchActionBusy||(typeof tournamentActionIsPending==='function'&&tournamentActionIsPending());}
+function matchActionMutationEpoch(){return __matchActionMutationVersion+(typeof tournamentActionMutationEpoch==='function'?tournamentActionMutationEpoch():0);}
 function matchActionUsesCloud(){return CLOUD_MODE&&!window.ClubHubCloud?.testMode;}
 function matchActionScope(){
   if(!isCoach())return '';
@@ -4293,6 +4585,7 @@ function clearMatchAction(op){
 }
 async function startMatchAction(action,id){
   if(!requireCoach()||__matchReportSaveBusy||__matchActionBusy)return;
+  if(typeof currentTournamentAction==='function'&&currentTournamentAction()){resumeTournamentAction();return;}
   const outstanding=currentMatchAction();
   if(outstanding){resumeMatchAction();return;}
   const m=state.matches.find(x=>x.id===id);if(!m)return;
@@ -6715,6 +7008,12 @@ document.getElementById('match-competition')?.addEventListener('change',()=>{upd
 document.getElementById('match-opponent-age')?.addEventListener('change',()=>{const opponent=document.getElementById('match-opponent');if(opponent)opponent.value='';return refreshSelkentOpponentDirectory(false);});
 document.getElementById('create-tournament')?.addEventListener('click',()=>openTournamentDialog());
 document.getElementById('tournament-form')?.addEventListener('submit',saveTournament);
+document.getElementById('tournament-form')?.addEventListener('input',tournamentEditorChanged);
+document.getElementById('tournament-form')?.addEventListener('change',tournamentEditorChanged);
+document.getElementById('tournament-action-outcome')?.addEventListener('click',handleTournamentActionClick);
+document.getElementById('tournament-action-notice')?.addEventListener('click',handleTournamentActionClick);
+document.getElementById('tournament-dialog')?.addEventListener('cancel',event=>{if(!confirmDiscardTournamentEdits())event.preventDefault();});
+window.addEventListener('clubhub-contacts-clear',tournamentContextCleared);
 document.getElementById('open-season-archive')?.addEventListener('click',openSeasonArchive);
 document.getElementById('refresh-audit-history')?.addEventListener('click',()=>refreshAuditHistory(false));
 document.getElementById('archive-current-season')?.addEventListener('click',archiveCurrentSeason);
@@ -6768,7 +7067,7 @@ for(const [id,detail] of [['match-form',false],['match-detail-form',true]]){
 }
 document.getElementById('match-detail-dialog')?.addEventListener('cancel',event=>{if(!confirmDiscardMatchEdits(true))event.preventDefault();});
 window.addEventListener('beforeunload',event=>{
-  if((currentView==='add'&&__matchFormDirty)||(document.getElementById('match-detail-dialog')?.open&&__matchDetailDirty)){
+  if((currentView==='add'&&__matchFormDirty)||(document.getElementById('match-detail-dialog')?.open&&__matchDetailDirty)||__tournamentActionBusy||(document.getElementById('tournament-dialog')?.open&&__tournamentEditor?.dirty)){
     event.preventDefault();event.returnValue='';
   }
 });
@@ -6847,7 +7146,15 @@ const copyBtn=document.getElementById('copy-assignment-code');if(copyBtn)copyBtn
 const playerInviteBtn=document.getElementById('generate-team-player-invite');if(playerInviteBtn)playerInviteBtn.addEventListener('click',createTeamPlayerInvite);
 const copyPlayerInviteBtn=document.getElementById('copy-team-player-invite');if(copyPlayerInviteBtn)copyPlayerInviteBtn.addEventListener('click',copyTeamPlayerInvite);
 const refreshMembersBtn=document.getElementById('refresh-team-members');if(refreshMembersBtn)refreshMembersBtn.addEventListener('click',()=>refreshTeamMembers(false));
-document.querySelectorAll('[data-close-dialog]').forEach(btn=>btn.addEventListener('click',()=>{const dialog=btn.closest('dialog');if(dialog?.id==='match-detail-dialog'&&!confirmDiscardMatchEdits(true))return;dialog?.close();}));
+document.querySelectorAll('[data-close-dialog]').forEach(btn=>btn.addEventListener('click',()=>{
+  const dialog=btn.closest('dialog');
+  if(dialog?.id==='match-detail-dialog'&&!confirmDiscardMatchEdits(true))return;
+  if(dialog?.id==='tournament-dialog'){
+    const discard=btn.id==='cancel-tournament'||(dialog.classList.contains('tournament-action-mode')&&currentTournamentAction()?.action==='save');
+    if(!confirmDiscardTournamentEdits(discard))return;
+  }
+  dialog?.close();
+}));
 
 
 document.getElementById('squad-list-tab')?.addEventListener('click',()=>setSquadPage(0));
@@ -6892,7 +7199,7 @@ document.getElementById('club-results-next')?.addEventListener('click',()=>{__cl
 
 
 // Horizontal navigation remains visible; dialogs no longer manipulate a footer bar.
-window.closeTopDialog=function(){const dlg=[...document.querySelectorAll('dialog[open]')].pop();if(dlg){if(dlg.id==='match-detail-dialog'&&!confirmDiscardMatchEdits(true))return true;try{document.activeElement?.blur?.();}catch{}dlg.close();return true;}return false;};
+window.closeTopDialog=function(){const dlg=[...document.querySelectorAll('dialog[open]')].pop();if(dlg){if(dlg.id==='match-detail-dialog'&&!confirmDiscardMatchEdits(true))return true;if(dlg.id==='tournament-dialog'&&!confirmDiscardTournamentEdits())return true;try{document.activeElement?.blur?.();}catch{}dlg.close();return true;}return false;};
 document.querySelectorAll('dialog').forEach(d=>{d.addEventListener('cancel',e=>{if(e.defaultPrevented)return;e.preventDefault();window.closeTopDialog();});d.addEventListener('close',()=>{try{document.activeElement?.blur?.();}catch{}});});
 
 if('serviceWorker' in navigator && location.protocol.startsWith('http')){ window.addEventListener('load',()=>navigator.serviceWorker.register('./service-worker.js').catch(()=>{})); }

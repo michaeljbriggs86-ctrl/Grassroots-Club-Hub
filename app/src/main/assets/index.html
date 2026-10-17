@@ -197,6 +197,7 @@
         </div>
 
         <section id="match-action-notice" class="match-action-notice hidden" role="status" aria-live="polite"></section>
+        <section id="tournament-action-notice" class="tournament-action-notice hidden" role="status" aria-live="polite"></section>
         <nav class="screen-section-nav matches-section-nav" aria-label="Jump to match section">
           <button type="button" data-scroll-to="matches-next-fixture">Next match</button>
           <button type="button" data-scroll-to="selkent-fixtures-panel">Fixtures</button>
@@ -1162,12 +1163,16 @@
     <form method="dialog" id="tournament-form">
       <div class="modal-heading"><div><p class="kicker">Tournament event</p><h3 id="tournament-dialog-title">Create tournament</h3></div><button type="button" class="icon-button small" data-close-dialog aria-label="Close">×</button></div>
       <input type="hidden" id="tournament-id" />
+      <p id="tournament-action-summary" class="hidden"></p>
+      <div id="tournament-editor-fields">
       <label>Tournament name<input id="tournament-name" type="text" required maxlength="100" placeholder="e.g. Autumn Trophy" /></label>
       <div class="form-grid two"><label>Date<input id="tournament-date" type="date" required /></label><label>Location<input id="tournament-location" type="text" maxlength="160" placeholder="Venue / ground" /></label></div>
       <label>Format<select id="tournament-format"><option value="group_knockout">Group + knockout</option><option value="round_robin">Round robin</option><option value="knockout">Knockout</option><option value="festival">Festival / mini tournament</option></select></label>
       <div class="panel-heading"><div><h3>Tournament squad</h3><span class="helper">Select the players registered for this event.</span></div></div>
       <div id="tournament-squad-list" class="parent-link-player-list"></div>
-      <div class="modal-actions"><button type="button" class="secondary-button" data-close-dialog>Cancel</button><button type="submit" class="primary-button">Save tournament</button></div>
+      </div>
+      <div id="tournament-editor-actions" class="modal-actions"><button id="cancel-tournament" type="button" class="secondary-button" data-close-dialog>Cancel</button><button id="save-tournament" type="submit" class="primary-button">Save tournament</button></div>
+      <section id="tournament-action-outcome" class="hidden" role="status" aria-live="polite" aria-atomic="true" tabindex="-1"></section>
     </form>
   </dialog>
 

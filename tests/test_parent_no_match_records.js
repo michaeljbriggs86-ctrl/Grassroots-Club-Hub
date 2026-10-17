@@ -13,6 +13,8 @@ const body = extract('function applyMatchFilter(){', 'function ensureTournamentS
 const groups = {}, tables = {};
 const tournamentList = {innerHTML: 'PRIVATE TOURNAMENT CONTENT'};
 const tournamentCount = {textContent: '99'};
+let recoveryHidden = false;
+const recoveryNotice = {classList: {add: name => {if(name === 'hidden') recoveryHidden = true;}}};
 const state = {tournaments: [{id: 'private-tournament', name: 'PRIVATE TOURNAMENT'}]};
 Object.defineProperty(state, 'matches', {configurable: true, get() {
   throw new Error('Parent read private match records');
@@ -20,7 +22,8 @@ Object.defineProperty(state, 'matches', {configurable: true, get() {
 const ctx = {
   CLOUD_MODE: true, currentRole: 'parent', state,
   document: {getElementById: id => id === 'tournament-event-list' ? tournamentList
-    : id === 'tournament-event-count' ? tournamentCount : {value: ''}},
+    : id === 'tournament-event-count' ? tournamentCount
+    : id === 'tournament-action-notice' ? recoveryNotice : {value: ''}},
   isPublishedLeagueTeam: () => true,
   isLeagueMatch: m => m.competition === 'League', isDivisionMatch: () => false,
   isFriendlyMatch: m => m.competition === 'Friendly', isCupMatch: m => m.competition === 'Cup',
@@ -35,6 +38,7 @@ for (const kind of ['league', 'friendly', 'other']) assert.deepEqual(groups[`${k
 for (const kind of ['cup', 'vase', 'shield']) assert.deepEqual(tables[kind], []);
 assert.equal(tournamentList.innerHTML, '');
 assert.equal(tournamentCount.textContent, '0');
+assert.equal(recoveryHidden, true, 'parent cannot see a staff tournament recovery notice');
 // Test the real tournament renderer independently, so the filter cannot mask a leak there.
 tournamentList.innerHTML = 'PRIVATE TOURNAMENT CONTENT';
 ctx.renderTournamentEvents();

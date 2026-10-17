@@ -73,6 +73,18 @@
       localStorage.removeItem(TEAM_DIRECTORY_CACHE_KEY);
       Object.keys(localStorage).forEach(k=>{
         if(k.startsWith(TEAM_STATE_CACHE_PREFIX))localStorage.removeItem(k);
+        if(k.startsWith('grassrootsHub_tournament_action_v1:')){
+          try{
+            const intent=JSON.parse(localStorage.getItem(k)||'null'),validIds=ids=>Array.isArray(ids)&&ids.every(id=>typeof id==='string'&&id.length>0&&id.length<=200)&&new Set(ids).size===ids.length;
+            const keys=['version','scope','action','tournamentId','gameIds','stateConfirmed','attendanceCleared','noteCleared','attempted'];
+            const minimal=intent?.version===1&&intent.action==='delete'&&typeof intent.scope==='string'&&!!intent.scope&&
+              k==='grassrootsHub_tournament_action_v1:'+encodeURIComponent(intent.scope)&&typeof intent.tournamentId==='string'&&intent.tournamentId.length>0&&intent.tournamentId.length<=200&&
+              typeof intent.stateConfirmed==='boolean'&&(intent.attempted===undefined||typeof intent.attempted==='boolean')&&Object.keys(intent).every(key=>keys.includes(key))&&
+              validIds(intent.gameIds)&&validIds(intent.attendanceCleared)&&validIds(intent.noteCleared)&&[...intent.attendanceCleared,...intent.noteCleared].every(id=>intent.gameIds.includes(id));
+            if(!minimal)localStorage.removeItem(k);
+          }
+          catch{localStorage.removeItem(k);}
+        }
       });
     }catch{}
   }
@@ -715,6 +727,136 @@
       assertMatchActionClean(lease);
       const confirmed=await readMatchActionState(lease.scope,lease);
       if(confirmed.revision!==Number(saved.revision)||!matchActionDesired(confirmed.state,action,matchId))throw matchActionError('MATCH_ACTION_CONFLICT');
+      acceptMatchActionState(lease,confirmed);return {...confirmed,alreadyApplied:false};
+    }catch(error){
+      if(String(error.message||'').includes('STALE_STATE'))throw matchActionError('MATCH_ACTION_CONFLICT');
+      throw error;
+    }finally{finishMatchAction(lease);}
+  }
+  function tournamentActionStable(value){
+    return JSON.stringify(value,(_,row)=>row&&typeof row==='object'&&!Array.isArray(row)?Object.fromEntries(Object.keys(row).sort().map(key=>[key,row[key]])):row);
+  }
+  function tournamentActionEvent(row){
+    if(!row||typeof row!=='object'||Array.isArray(row))return null;
+    return {id:String(row.id||''),name:String(row.name||'').trim(),date:String(row.date||''),location:String(row.location||'').trim(),format:String(row.format||'group_knockout'),playerNames:(Array.isArray(row.playerNames)?row.playerNames:[]).map(String)};
+  }
+  function tournamentActionEventKey(row){
+    return tournamentActionStable(tournamentActionEvent(row));
+  }
+  function tournamentActionIds(ids){
+    if(!Array.isArray(ids)||ids.some(id=>typeof id!=='string'||!id||id.length>200)||new Set(ids).size!==ids.length)throw matchActionError('MATCH_ACTION_CONFLICT');
+    return [...ids].sort();
+  }
+  function tournamentActionGame(row,tournamentId){
+    if(!row||typeof row!=='object'||Array.isArray(row)||typeof row.id!=='string'||!row.id)throw matchActionError('MATCH_ACTION_CONFLICT');
+    const status=String(row.status||'').toLowerCase();
+    return {...row,tournamentId,status:['scheduled','postponed','abandoned','played'].includes(status)?status:'played'};
+  }
+  function tournamentActionTarget(state,tournamentId){
+    if(!Array.isArray(state.matches)||(state.tournaments!=null&&!Array.isArray(state.tournaments)))throw matchActionError('MATCH_ACTION_CONFLICT');
+    const events=state.tournaments||[],raw=events.filter(row=>String(row?.id||'')===tournamentId);
+    if(raw.length>1)throw matchActionError('MATCH_ACTION_CONFLICT');
+    // Project the existing legacy display rule without materializing other groups.
+    const groups=new Map();
+    for(const match of state.matches){
+      if(!match||match.tournamentId||!/tournament/i.test(String(match.competition||match.type||'')))continue;
+      const key=`${match.date||''}|${String(match.competition||'Tournament').toLowerCase()}`;
+      if(!groups.has(key))groups.set(key,[]);groups.get(key).push(match);
+    }
+    const inferred=[];
+    for(const [key,games]of groups){
+      const first=games[0],existing=events.filter(row=>row?.date===(first.date||'')&&String(row.name||'').toLowerCase()===String(first.competition||'Tournament').toLowerCase());
+      const id=existing[0]?.id||`tlegacy_${key.replace(/[^a-z0-9]+/gi,'_')}`;
+      if(String(id)!==tournamentId){
+        if(existing.length>1&&existing.some(row=>String(row?.id||'')===tournamentId))throw matchActionError('MATCH_ACTION_CONFLICT');
+        continue;
+      }
+      if(existing.length>1||(raw.length&&raw[0]!==existing[0]))throw matchActionError('MATCH_ACTION_CONFLICT');
+      inferred.push({games,event:existing[0]||{id,name:first.competition||'Tournament',date:first.date||'',location:'',format:'group_knockout',playerNames:[]}});
+    }
+    if(inferred.length>1)throw matchActionError('MATCH_ACTION_CONFLICT');
+    const inferredGames=inferred[0]?.games||[],inferredIds=tournamentActionIds(inferredGames.map(row=>row.id));
+    const games=state.matches.filter(row=>row&&(String(row.tournamentId||'')===tournamentId||inferredGames.includes(row)));
+    const ids=tournamentActionIds(games.map(row=>row.id));
+    if(ids.some(id=>state.matches.filter(row=>String(row?.id||'')===id).length!==1))throw matchActionError('MATCH_ACTION_CONFLICT');
+    return {raw:raw[0]||null,event:raw[0]||inferred[0]?.event||null,games:games.map(row=>tournamentActionGame(row,tournamentId)),ids,inferredIds};
+  }
+  function tournamentActionGamesKey(games,tournamentId){
+    if(!Array.isArray(games))throw matchActionError('MATCH_ACTION_CONFLICT');
+    return tournamentActionStable(games.map(row=>{
+      if(row?.tournamentId&&String(row.tournamentId)!==tournamentId)throw matchActionError('MATCH_ACTION_CONFLICT');
+      return tournamentActionGame(row,tournamentId);
+    }).sort((a,b)=>a.id.localeCompare(b.id)));
+  }
+  function tournamentActionDesired(state,target,action,tournamentId,tournament,gameIds){
+    if(action==='save')return !!target.raw&&tournamentActionEventKey(target.raw)===tournamentActionEventKey(tournament)&&
+      tournamentActionStable(target.ids)===tournamentActionStable(gameIds)&&gameIds.every(id=>state.matches.some(row=>row.id===id&&row.tournamentId===tournamentId));
+    const ids=new Set(gameIds);
+    if(target.event||target.games.length||state.matches.some(row=>ids.has(String(row?.id))))return false;
+    for(const key of ['goals','assists','bookings','awards']){
+      if(state[key]!=null&&!Array.isArray(state[key]))throw matchActionError('MATCH_ACTION_CONFLICT');
+      if((state[key]||[]).some(row=>ids.has(String(row?.matchId))))return false;
+    }
+    return true;
+  }
+  async function commitTournamentAction(payload={},guard){
+    // Detach the entire intent before the first await, including its baseline.
+    const intent=JSON.parse(JSON.stringify(payload)),{action,tournamentId,expectedTournament,expectedGames}=intent;
+    if(!['save','delete'].includes(action)||typeof tournamentId!=='string'||!tournamentId||tournamentId.length>200)throw matchActionError('MATCH_ACTION_CONFLICT');
+    const expectedIds=Array.isArray(expectedGames)?tournamentActionIds(expectedGames.map(row=>row?.id)):null;
+    const gameIds=tournamentActionIds(intent.gameIds??expectedIds);
+    if(expectedIds&&tournamentActionStable(expectedIds)!==tournamentActionStable(gameIds))throw matchActionError('MATCH_ACTION_CONFLICT');
+    if(expectedTournament!=null&&tournamentActionEvent(expectedTournament)?.id!==tournamentId)throw matchActionError('MATCH_ACTION_CONFLICT');
+    const tournament=action==='save'?tournamentActionEvent(intent.tournament):null;
+    if(action==='save'){
+      const stamp=Date.parse(String(tournament?.date)+'T00:00:00Z');
+      if(!tournament||tournament.id!==tournamentId||!tournament.name||tournament.name.length>100||tournament.location.length>160||!Array.isArray(intent.tournament?.playerNames)||
+        !/^\d{4}-\d{2}-\d{2}$/.test(tournament.date)||!Number.isFinite(stamp)||new Date(stamp).toISOString().slice(0,10)!==tournament.date||
+        !['group_knockout','round_robin','knockout','festival'].includes(tournament.format)||new Set(tournament.playerNames).size!==tournament.playerNames.length)throw new Error('Check the tournament name, date, format and squad.');
+    }
+    const lease=await beginMatchAction(guard);
+    // A retry may be verifying an earlier lost response. Never replay a queued
+    // full-state draft merely because it interrupted this initial read.
+    lease.mayHaveApplied=true;
+    try{
+      const fresh=await readMatchActionState(lease.scope,lease),target=tournamentActionTarget(fresh.state,tournamentId);
+      if(tournamentActionDesired(fresh.state,target,action,tournamentId,tournament,gameIds)){
+        lease.mayHaveApplied=true;acceptMatchActionState(lease,fresh);return {...fresh,alreadyApplied:true};
+      }
+      assertMatchActionClean(lease);
+      if(expectedTournament===undefined||!Array.isArray(expectedGames)||tournamentActionEventKey(target.event)!==tournamentActionEventKey(expectedTournament)||
+        tournamentActionGamesKey(target.games,tournamentId)!==tournamentActionGamesKey(expectedGames,tournamentId))throw matchActionError('MATCH_ACTION_CONFLICT');
+      if(action==='delete'&&(!target.event||target.games.some(row=>/selkent|(?:github|cloudflare)-static|static-fixture/i.test(String(row.source||'')))))throw matchActionError('MATCH_ACTION_CONFLICT');
+      if(action==='save'){
+        if(target.games.some(row=>target.inferredIds.includes(row.id)&&/selkent|(?:github|cloudflare)-static|static-fixture/i.test(String(row.source||''))))throw matchActionError('MATCH_ACTION_CONFLICT');
+        const activeNames=new Set((Array.isArray(fresh.state.squad)?fresh.state.squad:[]).filter(row=>row&&row.status!=='inactive'&&String(row.name||'').trim()).map(row=>String(row.name).trim()));
+        if(tournament.playerNames.some(name=>!activeNames.has(name)))throw new Error('The tournament squad changed. Review the latest active players before saving.');
+      }
+      const candidate=JSON.parse(JSON.stringify(fresh.state)),ids=new Set(gameIds);
+      if(action==='save'){
+        candidate.tournaments=Array.isArray(candidate.tournaments)?candidate.tournaments:[];
+        const index=candidate.tournaments.findIndex(row=>String(row?.id||'')===tournamentId);
+        if(index<0)candidate.tournaments.push({...target.event,...tournament});
+        else candidate.tournaments[index]={...candidate.tournaments[index],...tournament};
+        const inferred=new Set(target.inferredIds);
+        candidate.matches=candidate.matches.map(row=>inferred.has(row?.id)?{...row,tournamentId}:row);
+      }else{
+        if(Array.isArray(candidate.tournaments))candidate.tournaments=candidate.tournaments.filter(row=>String(row?.id||'')!==tournamentId);
+        candidate.matches=candidate.matches.filter(row=>!ids.has(String(row?.id)));
+        for(const key of ['goals','assists','bookings','awards']){
+          if(candidate[key]!=null&&!Array.isArray(candidate[key]))throw matchActionError('MATCH_ACTION_CONFLICT');
+          if(Array.isArray(candidate[key]))candidate[key]=candidate[key].filter(row=>!ids.has(String(row?.matchId)));
+        }
+      }
+      // A rename/create must not implicitly adopt an unconfirmed legacy group.
+      const candidateTarget=tournamentActionTarget(candidate,tournamentId);
+      if(!tournamentActionDesired(candidate,candidateTarget,action,tournamentId,tournament,gameIds))throw matchActionError('MATCH_ACTION_CONFLICT');
+      assertMatchActionClean(lease);lease.mayHaveApplied=true;
+      const {data}=await matchActionRequest(lease.scope,'/rest/v1/rpc/save_team_state',{method:'POST',body:{p_team_id:lease.scope.teamId,p_state:candidate,p_expected_revision:fresh.revision}},lease);
+      const saved=Array.isArray(data)?data[0]:data;
+      if(!saved||!Number.isSafeInteger(saved.revision)||saved.revision<=fresh.revision)throw new Error('The cloud did not confirm this tournament change.');
+      const confirmed=await readMatchActionState(lease.scope,lease),confirmedTarget=tournamentActionTarget(confirmed.state,tournamentId);
+      if(confirmed.revision!==saved.revision||!tournamentActionDesired(confirmed.state,confirmedTarget,action,tournamentId,tournament,gameIds))throw matchActionError('MATCH_ACTION_CONFLICT');
       acceptMatchActionState(lease,confirmed);return {...confirmed,alreadyApplied:false};
     }catch(error){
       if(String(error.message||'').includes('STALE_STATE'))throw matchActionError('MATCH_ACTION_CONFLICT');
@@ -1495,7 +1637,7 @@
   }
   window.ClubHubCloud={
     getRegistrationContactConduct,submitRegistrationContactConduct,readRegistrationConductDocument,listContactDirectory,saveMemberContactDetails,importMemberContactDetails,loadAdminPlayerOnboarding,onboardAdminPlayer,
-    configured,bootstrap,loadInitialState,queueStateSave,confirmStateSave,pullLatest,startPolling,commitMatchAction,reviewMatchActionState,clearMatchActionAttendance,clearMatchActionNote,
+    configured,bootstrap,loadInitialState,queueStateSave,confirmStateSave,pullLatest,startPolling,commitMatchAction,commitTournamentAction,reviewMatchActionState,clearMatchActionAttendance,clearMatchActionNote,
     role,requestCoachAccess,listPendingCoachRequests,reviewCoachRequest,listMyCoachTeams,switchMyCoachTeam,setMyCapacity,requestChildLink,realRole,isStaffAccount,actingAsParent,assignCoachTeam,unassignCoachTeam,canEdit,canAdmin,assignedTeam,currentTeam,coachTeam,hasDualCoachAccess,visibleTeamList,getClubConfiguration,listLoginClubs,listLoginTeams,listCurrentClubLoginTeams,createInvite,requestParentAccess,listPendingParentRequests,listTeamMembers,listClubCoaches,listCoachQualifications,getCoachQualifications,saveCoachQualifications,listClubAccessAccounts,removeClubCoach,listPublishedClubResults,listParentPlayerLinks,saveParentPlayerLinks,listPlayerAccountLinks,listMatchAvailability,saveMatchAvailability,saveCoachMatchAvailability,listSelkentTeamDirectory,syncSelkentTeamDirectory,getCoachMatchNote,saveCoachMatchNote,listAnnouncements,createAnnouncement,markAnnouncementRead,deleteAnnouncement,listMatchAttendance,saveMatchAttendance,getAvailabilitySettings,setAvailabilityDeadline,sendAvailabilityReminder,listNotifications,acknowledgeKickoffUpdate,acknowledgeKickoffAsCoach,respondKickoffParentAvailability,listKickoffUpdatesForAdmin,getKickoffPushSettings,registerKickoffPush,unregisterKickoffPush,markNotificationRead,notifyFixtureChange,notifySelectedSquad,notifyMatchReport,notifyMatchReopened,listPlayerAppearanceStats,recordAuditEvent,listAuditHistory,listSeasonArchives,getSeasonArchive,archiveCurrentSeason,rolloverClubSeason,resetParentPin,setAccessPin,approveParentRequest,removeTeamMember,syncTeamDirectory,switchAdminTeam,switchParentTeam,getClubOverview,signOut,switchToParentSignIn,handleAuthCallback,listMessageContacts,listClubMessages,sendClubMessage,markClubMessagesRead,getClubComplianceStatus,setDisputeReviewers,setClubSafeguardingContacts,getConcernRouting,raiseClubConcern,listGeneralDisputes,listDisputeMessages,upsertU11SafeguardingInfo,exportU11SafeguardingPack,listSafeguardingExportAudit,requestClubCancellation,cancelClubCancellation,
     updateCloudPanel,
     get context(){return context;},get configuration(){return clubConfiguration;},get session(){return session;},get revision(){return activeRevision;},get testMode(){return testModeActive();}
