@@ -2278,6 +2278,34 @@ html body #match-action-notice>div{min-width:0;overflow-wrap:anywhere}
 html body #match-action-notice p{margin:4px 0 0;font-size:14px;line-height:1.5}
 html body #match-action-notice button{min-height:52px;flex-shrink:0;border-radius:12px}
 @media(max-width:480px){html body #match-action-notice{align-items:stretch;flex-direction:column}html body #match-action-notice button{width:100%}}
+/* Figma 413:7307: tournament confirmation, retained draft and cleanup recovery. */
+html body #tournament-dialog{max-height:calc(100dvh - 16px);max-width:calc(100vw - 16px);overflow-y:auto}
+html body #tournament-form,html body #tournament-editor-fields{display:flex;flex-direction:column;gap:16px;min-width:0}
+html body #tournament-dialog :is(h3,p,label,dt,dd,strong,button){overflow-wrap:anywhere}
+html body #tournament-dialog :is(input,select){min-width:0;max-width:100%}
+html body #tournament-dialog :is(#tournament-editor-actions button,.modal-heading button){min-height:52px;white-space:normal}
+html body #tournament-dialog .modal-heading button{min-width:52px;flex-shrink:0}
+html body #tournament-dialog.tournament-action-mode #tournament-editor-actions,
+html body #tournament-dialog.tournament-action-mode:not(.tournament-edit-mode) #tournament-editor-fields{display:none!important}
+html body #tournament-action-summary{margin:0;font-size:14px;line-height:1.5}
+html body #tournament-action-outcome{min-width:0}
+html body #tournament-action-outcome .tournament-action-status,
+html body #tournament-action-notice{padding:16px;border:1px solid var(--gch-control-line);border-radius:12px;background:var(--gch-depth-panel);color:var(--gch-control-copy)}
+html body #tournament-action-outcome h3{margin:0 0 12px;font-size:20px;line-height:1.25}
+html body #tournament-action-outcome :is(p,dt,dd){font-size:14px;line-height:1.5}
+html body #tournament-action-outcome p{margin:0 0 12px}
+html body #tournament-action-outcome dl{margin:0}
+html body #tournament-action-outcome dl>div{padding:8px 0}
+html body #tournament-action-outcome dt{font-weight:600}
+html body #tournament-action-outcome dd{margin:2px 0 0;font-weight:600}
+html body #tournament-action-outcome button{display:block;width:100%;min-height:52px;margin-top:16px;padding:12px 16px;border-radius:12px;white-space:normal;line-height:1.4}
+html body #tournament-action-outcome .helper{margin:12px 0 0;color:var(--gch-control-muted)}
+html body #tournament-action-outcome button:disabled{opacity:.7;cursor:wait}
+html body #tournament-action-notice{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:12px 0;min-width:0}
+html body #tournament-action-notice :is(div,p){min-width:0;margin:0;font-size:14px;line-height:1.5;overflow-wrap:anywhere}
+html body #tournament-action-notice button{min-height:52px;flex-shrink:0;border-radius:12px;white-space:normal}
+html body #tournament-dialog .hidden,html body #tournament-action-notice.hidden{display:none!important}
+@media(max-width:360px){html body #tournament-dialog .modal-heading{display:grid;grid-template-columns:minmax(0,1fr) auto}html body #tournament-dialog .modal-heading>button{grid-row:1;grid-column:2}html body #tournament-dialog .modal-heading>div{grid-row:2;grid-column:1/-1;min-width:0}html body #tournament-editor-actions{grid-template-columns:minmax(0,1fr)}html body #tournament-action-notice{align-items:stretch;flex-direction:column}html body #tournament-editor-actions button,html body #tournament-action-notice button{width:100%}}
 html body :is(#view-add,#match-detail-dialog) .hidden{display:none!important}
 @media(max-width:360px){html body #match-detail-dialog .attendance-player-row{flex-wrap:wrap}html body #match-detail-dialog .attendance-switch{margin-left:auto}html body #match-detail-dialog .match-report-progress{grid-template-columns:repeat(2,minmax(0,1fr))}}
 html body #registration-conduct-dialog{width:min(720px,100vw);max-width:100vw;max-height:100dvh;padding:20px;overflow-y:auto;border-radius:20px;background:var(--gch-depth-canvas);color:var(--gch-control-copy)}
