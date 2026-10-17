@@ -830,7 +830,7 @@
       if(action==='save'){
         if(target.games.some(row=>target.inferredIds.includes(row.id)&&/selkent|(?:github|cloudflare)-static|static-fixture/i.test(String(row.source||''))))throw matchActionError('MATCH_ACTION_CONFLICT');
         const activeNames=new Set((Array.isArray(fresh.state.squad)?fresh.state.squad:[]).filter(row=>row&&row.status!=='inactive'&&String(row.name||'').trim()).map(row=>String(row.name).trim()));
-        if(tournament.playerNames.some(name=>!activeNames.has(name)))throw new Error('The tournament squad changed. Review the latest active players before saving.');
+        if(tournament.playerNames.some(name=>!activeNames.has(name)))throw Object.assign(new Error('The tournament squad changed. Review the latest active players before saving.'),{code:'MATCH_ACTION_CONFLICT'});
       }
       const candidate=JSON.parse(JSON.stringify(fresh.state)),ids=new Set(gameIds);
       if(action==='save'){

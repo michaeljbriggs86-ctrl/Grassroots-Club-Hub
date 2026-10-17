@@ -130,7 +130,10 @@ test('save validates fields and the current active squad, including U11 without 
   for(const change of [t=>t.name='',t=>t.date='2026-02-30',t=>t.format='unknown',t=>t.location='x'.repeat(161),t=>t.playerNames=['Fictional player','Fictional player'],t=>t.playerNames=['Not in this team'],t=>t.playerNames={}]){
     const h=fresh(),args=payload();change(args.tournament);await assert.rejects(commit(h,args));assert.equal(h.writes().length,0);
   }
-  const inactive=fresh();inactive.backend.state.squad[0].status='inactive';await assert.rejects(commit(inactive),/squad changed/);assert.equal(inactive.writes().length,0);
+  for(const mode of ['inactive','removed']){
+    const changed=fresh();if(mode==='inactive')changed.backend.state.squad[0].status='inactive';else changed.backend.state.squad=[];
+    await assert.rejects(commit(changed),error=>error.code==='MATCH_ACTION_CONFLICT'&&/squad changed/.test(error.message));assert.equal(changed.writes().length,0,'known fresh-roster conflict must offer Review without a CAS');
+  }
   for(const status of [undefined,'pending']){const h=fresh();h.backend.state.squad[0].status=status;await commit(h);assert.equal(h.writes().length,1,'normalizeState treats non-inactive legacy status as active');}
   const h=fresh();h.test.getTeam().age_group=9;delete h.backend.state.squad[0].number;await commit(h);assert.equal(h.writes().length,1,'active staff-visible U11 player does not need a device number');
 });

@@ -3964,7 +3964,7 @@ async function reviewTournamentAction(){
   const latest=tournamentEditable((state.tournaments||[]).find(row=>String(row.id)===op.tournamentId)),games=tournamentCopy((state.matches||[]).filter(game=>String(game.tournamentId||'')===op.tournamentId));
   if(op.action==='save'){
     if(op.expectedTournament&&!latest){clearTournamentAction(op);__tournamentEditor=null;++__tournamentDialogEpoch;document.getElementById('tournament-dialog').close();toast('Tournament was deleted elsewhere.');return;}
-    const desired=tournamentActionDesired(op,fresh),unchanged=tournamentStable(latest)===tournamentStable(tournamentEditable(op.expectedTournament))&&tournamentSameIds(games.map(game=>String(game.id)),op.gameIds);
+    const desired=tournamentActionDesired(op,fresh),unchanged=tournamentStable(latest)===tournamentStable(tournamentEditable(op.expectedTournament));
     if(!op.expectedTournament&&latest&&!desired){clearTournamentAction(op);__tournamentEditor=null;++__tournamentDialogEpoch;document.getElementById('tournament-dialog').close();toast('This tournament identifier is already in use. Create a tournament again.');return;}
     if(!unchanged&&!desired)op.candidate=tournamentCopy(latest);
     op.expectedTournament=tournamentCopy(latest);op.expectedGames=games;op.gameIds=games.map(game=>String(game.id));op.reviewRequired=false;op.stateConfirmed=false;op.loadedFromStorage=false;op.awaitingExplicitSave=true;persistTournamentAction(op);openTournamentActionOutcome(op);return;
