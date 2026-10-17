@@ -1,9 +1,9 @@
 {
   "schema_version": 2,
   "provider": "Selkent",
-  "last_updated": "2026-10-17T09:53:19.850592+00:00",
+  "last_updated": "2026-10-17T14:36:53.582663+00:00",
   "cup_results_last_updated": "2026-10-12T13:49:27.311080+00:00",
-  "cup_results_last_attempted": "2026-10-17T09:53:19.850592+00:00",
+  "cup_results_last_attempted": "2026-10-17T14:36:53.582663+00:00",
   "cup_results_status": "stale_retained",
   "fixture_agegroup_discovery_source": "selkent_divisions_all",
   "coverage": {
@@ -3445,16 +3445,6 @@
         {
           "date": "2026-10-25",
           "division_name": "Under 12A Silver",
-          "home": "Cray Valley (PM) FC Black",
-          "away": "Regans FC Black",
-          "provider_team_ids": [
-            "321",
-            "456"
-          ]
-        },
-        {
-          "date": "2026-10-25",
-          "division_name": "Under 12A Silver",
           "home": "Dynamo Youth Silver",
           "away": "Lewisham Project Gold",
           "provider_team_ids": [
@@ -3470,6 +3460,16 @@
           "provider_team_ids": [
             "794",
             "812"
+          ]
+        },
+        {
+          "date": "2026-10-25",
+          "division_name": "Under 12A Silver",
+          "home": "Regans FC Black",
+          "away": "Cray Valley (PM) FC Black",
+          "provider_team_ids": [
+            "456",
+            "321"
           ]
         },
         {
@@ -15176,16 +15176,6 @@
         {
           "date": "2026-10-25",
           "division_name": "Under 16B Navy",
-          "home": "Cray Valley (PM) FC Black",
-          "away": "Teviot Rangers BLUE",
-          "provider_team_ids": [
-            "303",
-            "740"
-          ]
-        },
-        {
-          "date": "2026-10-25",
-          "division_name": "Under 16B Navy",
           "home": "Foots Cray Lions",
           "away": "Falconwood FC White",
           "provider_team_ids": [
@@ -15211,6 +15201,16 @@
           "provider_team_ids": [
             "315",
             "557"
+          ]
+        },
+        {
+          "date": "2026-10-25",
+          "division_name": "Under 16B Navy",
+          "home": "Teviot Rangers BLUE",
+          "away": "Cray Valley (PM) FC Black",
+          "provider_team_ids": [
+            "740",
+            "303"
           ]
         },
         {
