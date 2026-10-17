@@ -3973,6 +3973,10 @@ async function reviewTournamentAction(){
     if(!confirm(tournamentDeleteWarning(op.expectedTournament,op.gameIds,{cleanup:true}))){op.reviewRequired=true;op.message='The tournament and captured games are already removed. Review and confirm before clearing remaining attendance and private notes.';persistTournamentAction(op);renderTournamentActionOutcome(op,true);return;}
     if(!guard())return;op.stateConfirmed=true;op.reviewRequired=false;op.loadedFromStorage=false;persistTournamentAction(op);await runTournamentAction(op);return;
   }
+  const latestGameIds=new Set(games.map(game=>String(game.id)));
+  if(op.stateConfirmed||op.gameIds.some(id=>!latestGameIds.has(id))){
+    op.reviewRequired=true;op.message='The tournament or captured games were restored, reused or reassigned after this deletion began. Your original cleanup retry is retained; review the current club record before continuing.';persistTournamentAction(op);renderTournamentActionOutcome(op,true);return;
+  }
   if(!latest||games.some(isProviderOwnedMatch)){
     op.reviewRequired=true;op.message=games.some(isProviderOwnedMatch)?'A published Selkent fixture is linked to this tournament. Its fixture correction or match status must be reviewed.':'The tournament record is missing while captured games or report data remain. No cleanup has run; review the current club record.';renderTournamentActionOutcome(op,true);return;
   }
