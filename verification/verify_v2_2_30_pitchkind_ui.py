@@ -616,10 +616,16 @@ check(
     and "delete p.number" in cloud
     and "copy.awards=[]" not in cloud,
 )
+scoped_team_read_match=re.search(r"async function fetchTeamState\(.*?(?=  async function getClubOverview)",cloud,re.S)
+scoped_team_read=scoped_team_read_match.group(0) if scoped_team_read_match else ''
+scoped_projection="row.state=sanitizeMiniSoccerParentStateClient(row.state,age,scope.role)"
 check(
     'remote team state applies parent privacy defense before handoff',
-    "row.state=sanitizeMiniSoccerParentStateClient(row.state,age,context?.profile?.role||'')" in cloud
-    and "if(age>=7&&age<=11)localStorage.removeItem(TEAM_STATE_CACHE_PREFIX+teamId)" in cloud,
+    scoped_projection in scoped_team_read
+    and scoped_team_read.index(scoped_projection)<scoped_team_read.rfind('return row||null;')
+    and "['admin','coach','assistant_coach'].includes(role())&&!actingAsParent()&&age>=12" in cloud
+    and "if(!mayCacheTeamState(teamId)){localStorage.removeItem(TEAM_STATE_CACHE_PREFIX+teamId);return;}" in cloud
+    and behavior_tests('test_cloud_account_isolation.js','test_private_account_eviction.js'),
 )
 check(
     'live U7-U11 backend privacy contract is recorded',

@@ -36,6 +36,8 @@
   let confirmingState = false;
   let pollTimer = null;
   let hooks = {};
+  let accountGeneration=0,teamReadGeneration=0,authAttempt=0,readyBootstrap=null,accountReady=false,pendingBootstrapContext=null,suspendedDraft=null,activeSaveDraft=null,verifiedAccountUser='',authAttemptOwner='';
+  const accountRequests=new Set();
   const TEST_TEAM={id:'debug-u9-green',club_id:'debug-club',name:'Green',age_group:9,division:'U9 Development',season:'2026/27',selkent_label:'Under 9s Green',league_name:'Demo Juniors FC Green',active:true};
   const TEST_CLUB_CONFIG={club:{id:'debug-club',name:'Demo Juniors FC'},settings:{slug:'demo-juniors',display_name:'Demo Juniors FC',short_name:'Demo Juniors',primary_color:'#1d7a65',secondary_color:'#ffffff',accent_color:'#165c4d',logo_asset:'',current_season:'2026/27',default_provider_key:'manual',results_publish_from_age:12,player_account_age_groups:[15],is_demo:true},rules:[{age_group:9,format:'5v5',players_on_pitch:5,max_registered:10,matchday_max:10,rolling_substitutions:true,results_published:false,player_accounts_allowed:false}],providers:[{provider_key:'manual',provider_type:'manual',enabled:true,is_primary:true,config:{}}],teams:[TEST_TEAM]};
 
@@ -54,7 +56,9 @@
     window.dispatchEvent(new CustomEvent('clubhub-cloud-status',{detail:{text,type}}));
   }
   function saveSession(s){
-    session=s||null;
+    const previous=session?.user?.id||loadSession()?.user?.id||verifiedAccountUser||context?.profile?.user_id||'',next=s?.user?.id||'';
+    if(next&&previous!==next){clearAccountLocalData();context=null;clubConfiguration=null;visibleTeams=[];activeTeam=null;activeRevision=-1;lastRemoteUpdatedAt='';}
+    session=s||null;if(next){verifiedAccountUser=next;authAttemptOwner=next;}
     if(session) localStorage.setItem(SESSION_KEY,JSON.stringify(session));
     else localStorage.removeItem(SESSION_KEY);
   }
@@ -63,19 +67,45 @@
   }
   function cachedTeams(){try{const x=JSON.parse(localStorage.getItem(TEAM_DIRECTORY_CACHE_KEY)||'null');return Array.isArray(x?.rows)?x.rows:[];}catch{return [];}}
   function cacheTeams(rows){try{localStorage.setItem(TEAM_DIRECTORY_CACHE_KEY,JSON.stringify({savedAt:Date.now(),rows:Array.isArray(rows)?rows:[]}));}catch{}}
-  function cachedTeamState(teamId){try{const x=JSON.parse(localStorage.getItem(TEAM_STATE_CACHE_PREFIX+teamId)||'null');return x&&x.state?x:null;}catch{return null;}}
-  function cacheTeamState(teamId,row){if(!teamId||!row?.state)return;try{localStorage.setItem(TEAM_STATE_CACHE_PREFIX+teamId,JSON.stringify({state:row.state,revision:Number(row.revision??0),updated_at:row.updated_at||'',savedAt:Date.now()}));}catch{}}
-  function clearAccountLocalData(){
+  function teamCacheOwner(){return [session?.user?.id||'',context?.profile?.club_id||'',role(),actingAsParent()?'parent':'staff'].join('|');}
+  function mayCacheTeamState(teamId){const age=Number((visibleTeams.find(t=>t.id===teamId)||activeTeam)?.age_group||0);return !!session?.user?.id&&['admin','coach','assistant_coach'].includes(role())&&!actingAsParent()&&age>=12;}
+  function cachedTeamState(teamId){try{const x=JSON.parse(localStorage.getItem(TEAM_STATE_CACHE_PREFIX+teamId)||'null');if(mayCacheTeamState(teamId)&&x?.owner===teamCacheOwner()&&x.state)return x;localStorage.removeItem(TEAM_STATE_CACHE_PREFIX+teamId);}catch{}return null;}
+  function cacheTeamState(teamId,row){if(!teamId||!row?.state)return;try{if(!mayCacheTeamState(teamId)){localStorage.removeItem(TEAM_STATE_CACHE_PREFIX+teamId);return;}localStorage.setItem(TEAM_STATE_CACHE_PREFIX+teamId,JSON.stringify({owner:teamCacheOwner(),state:row.state,revision:Number(row.revision??0),updated_at:row.updated_at||'',savedAt:Date.now()}));}catch{}}
+  function accountContextChanged(){const error=new Error('The account or team changed. Sign in again or reopen the correct team.');error.code='AUTH_CONTEXT_CHANGED';return error;}
+  function lockGate(){try{document.querySelectorAll?.('dialog[open]').forEach(d=>d.close());}catch{}document.getElementById('activation-gate')?.classList.remove('hidden');document.body?.classList.add('auth-open');document.querySelector?.('.app-shell')?.classList.add('account-locked');}
+  function stopAccountBackgroundWork(){clearTimeout(saveTimer);saveTimer=null;clearInterval(pollTimer);pollTimer=null;for(const key of ['__clubInboxTimer','__clubNoticeTimer','__adminBackgroundTimer','__fixtureScanTimer']){try{if(window[key]){clearInterval(window[key]);window[key]=null;}}catch{}}}
+  function draftOwner(scope){return [scope.uid,scope.club,scope.team?.id||'',scope.role,scope.parent?'parent':'staff'].join('|');}
+  function invalidateAccountWork({discardDrafts=false}={}){
+    if(!discardDrafts&&(pendingState||activeSaveDraft?.state)&&session?.user?.id&&activeTeam){const scope=captureTeamStateScope();suspendedDraft={owner:draftOwner(scope),state:JSON.parse(JSON.stringify(pendingState||activeSaveDraft.state)),revision:activeRevision,resume:!!pendingState&&!saving&&!confirmingState&&!currentMatchActionBarrier()};}
+    ++accountGeneration;++teamReadGeneration;readyBootstrap=null;pendingBootstrapContext=null;accountReady=false;sessionRefresh=null;stopAccountBackgroundWork();for(const cancel of [...accountRequests])cancel();saving=false;confirmingState=false;activeSaveDraft=null;pendingState=null;
+    if(discardDrafts){suspendedDraft=null;unsyncedState=false;}
+  }
+  async function awaitAccountWork(work,scope){let cancel;const cancelled=new Promise((_,reject)=>{cancel=()=>reject(accountContextChanged());accountRequests.add(cancel);});try{const value=await Promise.race([work,cancelled]);if(scope.generation!==accountGeneration||scope.attempt!==authAttempt)throw accountContextChanged();return value;}finally{accountRequests.delete(cancel);}}
+  async function awaitAuthWork(work,attempt){try{const value=await awaitAccountWork(work,{generation:accountGeneration,attempt});assertAuthAttempt(attempt);return value;}catch(error){assertAuthAttempt(attempt);throw error;}}
+  function beginAuthAttempt(){++authAttempt;authAttemptOwner=String(loadSession()?.user?.id||'');invalidateAccountWork();lockGate();return authAttempt;}
+  function assertAuthAttempt(attempt){if(attempt!==authAttempt||String(loadSession()?.user?.id||'')!==authAttemptOwner)throw accountContextChanged();}
+  function captureAccountRequest(){return {generation:accountGeneration,attempt:authAttempt,uid:session?.user?.id||loadSession()?.user?.id||''};}
+  function assertAccountRequest(scope,{unloaded=false}={}){if(scope.generation!==accountGeneration||scope.attempt!==authAttempt||String(loadSession()?.user?.id||'')!==scope.uid||(!unloaded&&String(session?.user?.id||'')!==scope.uid))throw accountContextChanged();}
+  function captureTeamStateScope(){return {...captureAccountRequest(),context,team:activeTeam,teamGeneration:teamReadGeneration,club:String(context?.profile?.club_id||''),role:role(),parent:actingAsParent(),mutation:window.matchActionMutationEpoch?.()||0};}
+  function assertTeamStateScope(scope,{passive=false}={}){assertAccountRequest(scope);if(scope.context!==context||scope.team!==activeTeam||scope.teamGeneration!==teamReadGeneration||scope.club!==String(context?.profile?.club_id||'')||scope.role!==role()||scope.parent!==actingAsParent()||(passive&&(scope.mutation!==(window.matchActionMutationEpoch?.()||0)||currentMatchActionBarrier()||saving||pendingState||confirmingState||unsyncedState)))throw accountContextChanged();}
+  function acceptTeamStateRead(row,scope,{reason='',passive=false}={}){assertTeamStateScope(scope,{passive});activeRevision=row?Number(row.revision||0):-1;lastRemoteUpdatedAt=row?.updated_at||'';if(row?.state)cacheTeamState(activeTeam?.id,row);if(reason&&row?.state&&hooks.onRemoteState)hooks.onRemoteState(row.state,{reason});return row;}
+  function clearAccountLocalData({preserveUser=''}={}){
+    invalidateAccountWork({discardDrafts:true});verifiedAccountUser='';
+    context=null;clubConfiguration=null;visibleTeams=[];activeTeam=null;activeRevision=-1;lastRemoteUpdatedAt='';
     window.dispatchEvent(new Event('clubhub-contacts-clear'));
+    window.dispatchEvent(new Event('clubhub-account-cleared'));
     try{
       localStorage.removeItem(APP_STATE_STORAGE_KEY);
+      localStorage.removeItem('grassrootsHub_account_v1');
+      localStorage.removeItem('grassrootsHub_role_v1');
       localStorage.removeItem(ACTIVE_TEAM_KEY);
       localStorage.removeItem(TEAM_DIRECTORY_CACHE_KEY);
       Object.keys(localStorage).forEach(k=>{
-        if(k.startsWith(TEAM_STATE_CACHE_PREFIX))localStorage.removeItem(k);
+        if(k.startsWith(TEAM_STATE_CACHE_PREFIX)){let owner='';try{owner=JSON.parse(localStorage.getItem(k)||'null')?.owner?.split('|')[0]||'';}catch{}if(!preserveUser||owner!==preserveUser)localStorage.removeItem(k);}
         if(k.startsWith('grassrootsHub_tournament_action_v1:')){
           try{
             const intent=JSON.parse(localStorage.getItem(k)||'null'),validIds=ids=>Array.isArray(ids)&&ids.every(id=>typeof id==='string'&&id.length>0&&id.length<=200)&&new Set(ids).size===ids.length;
+            if(preserveUser&&intent?.scope?.split('|')[0]===preserveUser&&intent.version===1&&k==='grassrootsHub_tournament_action_v1:'+encodeURIComponent(intent.scope)&&['save','delete'].includes(intent.action)&&typeof intent.tournamentId==='string'&&intent.tournamentId.length>0&&intent.tournamentId.length<=200&&validIds(intent.gameIds)&&validIds(intent.attendanceCleared)&&validIds(intent.noteCleared)&&typeof intent.stateConfirmed==='boolean'&&[...intent.attendanceCleared,...intent.noteCleared].every(id=>intent.gameIds.includes(id))&&(intent.action==='delete'||(intent.candidate?.id===intent.tournamentId&&(!intent.baseline||intent.baseline.id===intent.tournamentId))))return;
             const keys=['version','scope','action','tournamentId','gameIds','stateConfirmed','attendanceCleared','noteCleared','attempted'];
             const minimal=intent?.version===1&&intent.action==='delete'&&typeof intent.scope==='string'&&!!intent.scope&&
               k==='grassrootsHub_tournament_action_v1:'+encodeURIComponent(intent.scope)&&typeof intent.tournamentId==='string'&&intent.tournamentId.length>0&&intent.tournamentId.length<=200&&
@@ -94,33 +124,40 @@
     return h;
   }
   async function request(path,{method='GET',body=null,token=true,headers={},signal}={}){
-    if(token && !await ensureFreshSession())throw new Error('Your session has expired. Sign in again before saving; your edits remain on this page.');
-    const send=async()=>{
-      const usedToken=token?session?.access_token:null;
-      const res=await fetch(base()+path,{method,headers:{...authHeaders(usedToken),...headers},body:body==null?undefined:JSON.stringify(body),...(signal?{signal}:{})});
-      const text=await res.text();
-      let data=null;try{data=text?JSON.parse(text):null;}catch{data=text;}
-      return {res,text,data,usedToken};
-    };
-    let {res,text,data,usedToken}=await send();
-    if(token && res.status===401 && /(?:jwt|token).{0,30}expir|expir.{0,30}(?:jwt|token)/i.test(String(data?.message||data?.msg||data?.error_description||text||''))){
-      // A rejected authorization never applied the write; refresh and retry it once.
-      const latest=loadSession();
-      if(latest?.access_token && latest.access_token!==usedToken)session=latest;
-      else if(!await refreshSession())throw new Error('Your session has expired. Sign in again before saving; your edits remain on this page.');
-      ({res,text,data}=await send());
-    }
-    if(!res.ok){
-      const msg=(data&&typeof data==='object'&&(data.msg||data.message||data.error_description||data.hint||data.details||data.error))||text||('HTTP '+res.status);
-      const err=new Error(msg);err.status=res.status;err.data=data;throw err;
-    }
-    return {data,headers:res.headers,status:res.status};
+    const scope=token?captureAccountRequest():null,controller=token&&typeof AbortController==='function'?new AbortController():null;
+    let cancel;
+    const cancelled=token?new Promise((_,reject)=>{cancel=()=>{controller?.abort();reject(accountContextChanged());};accountRequests.add(cancel);}):null;
+    const check=()=>{if(scope)assertAccountRequest(scope);};
+    try{
+      const work=(async()=>{
+        if(scope)assertAccountRequest(scope,{unloaded:true});
+        if(token&&!await ensureFreshSession())throw new Error('Your session has expired. Sign in again before saving; your edits remain on this page.');
+        check();
+        const send=async()=>{
+          check();const usedToken=token?session?.access_token:null;
+          const res=await fetch(base()+path,{method,headers:{...authHeaders(usedToken),...headers},body:body==null?undefined:JSON.stringify(body),...((signal||controller?.signal)?{signal:signal||controller.signal}:{})});check();
+          const text=await res.text();check();let data=null;try{data=text?JSON.parse(text):null;}catch{data=text;}
+          return {res,text,data,usedToken};
+        };
+        let {res,text,data,usedToken}=await send();check();
+        if(token&&res.status===401&&/(?:jwt|token).{0,30}expir|expir.{0,30}(?:jwt|token)/i.test(String(data?.message||data?.msg||data?.error_description||text||''))){
+          const latest=loadSession();check();
+          if(latest?.access_token&&latest.access_token!==usedToken)session=latest;
+          else if(!await refreshSession())throw new Error('Your session has expired. Sign in again before saving; your edits remain on this page.');
+          check();({res,text,data}=await send());
+        }
+        check();
+        if(!res.ok){const msg=(data&&typeof data==='object'&&(data.msg||data.message||data.error_description||data.hint||data.details||data.error))||text||('HTTP '+res.status);const err=new Error(msg);err.status=res.status;err.data=data;throw err;}
+        return {data,headers:res.headers,status:res.status};
+      })();
+      return await (cancelled?Promise.race([work,cancelled]):work);
+    }finally{if(cancel)accountRequests.delete(cancel);}
   }
   async function refreshSession(){
     if(sessionRefresh)return sessionRefresh;
     if(!session?.refresh_token)return false;
     const refreshToken=session.refresh_token,refreshUser=session?.user?.id;
-    sessionRefresh=(async()=>{
+    const running=(async()=>{
       try{
         const res=await fetch(base()+'/auth/v1/token?grant_type=refresh_token',{method:'POST',headers:authHeaders(),body:JSON.stringify({refresh_token:refreshToken})});
         const data=await res.json();
@@ -132,7 +169,8 @@
         saveSession(data);return true;
       }catch{return false;}
     })();
-    try{return await sessionRefresh;}finally{sessionRefresh=null;}
+    sessionRefresh=running;
+    try{return await running;}finally{if(sessionRefresh===running)sessionRefresh=null;}
   }
   async function ensureFreshSession(){
     if(sessionRefresh)return await sessionRefresh;
@@ -143,14 +181,15 @@
     return true;
   }
   async function signIn(email,password){
+    const attempt=beginAuthAttempt();
     const normalizedEmail=String(email||'').trim().toLowerCase();
     let res;
     try{
-      res=await fetch(base()+'/auth/v1/token?grant_type=password',{method:'POST',headers:authHeaders(),body:JSON.stringify({email:normalizedEmail,password:String(password||'')})});
+      res=await awaitAuthWork(fetch(base()+'/auth/v1/token?grant_type=password',{method:'POST',headers:authHeaders(),body:JSON.stringify({email:normalizedEmail,password:String(password||'')})}),attempt);
     }catch(e){
-      throw new Error('Could not reach the sign-in service. Check your internet connection and try again.');
+      assertAuthAttempt(attempt);throw new Error('Could not reach the sign-in service. Check your internet connection and try again.');
     }
-    const text=await res.text();
+    assertAuthAttempt(attempt);const text=await awaitAuthWork(res.text(),attempt);
     let data={};try{data=text?JSON.parse(text):{};}catch{data={message:text};}
     if(!res.ok){
       const raw=data?.error_description||data?.msg||data?.message||data?.error||'Sign in failed';
@@ -163,9 +202,10 @@
     return data;
   }
   async function signUp(email,password,fullName,inviteCode,metadata={}){
+    const attempt=beginAuthAttempt();
     const url=base()+'/auth/v1/signup?redirect_to='+encodeURIComponent(AUTH_REDIRECT);
-    const res=await fetch(url,{method:'POST',headers:authHeaders(),body:JSON.stringify({email,password,data:{full_name:fullName||'',...(metadata||{})}})});
-    const data=await res.json();
+    const res=await awaitAuthWork(fetch(url,{method:'POST',headers:authHeaders(),body:JSON.stringify({email,password,data:{full_name:fullName||'',...(metadata||{})}})}),attempt);
+    assertAuthAttempt(attempt);const data=await awaitAuthWork(res.json(),attempt);assertAuthAttempt(attempt);
     if(!res.ok)throw new Error(data?.msg||data?.message||data?.error_description||'Account creation failed');
     if(inviteCode)localStorage.setItem(INVITE_KEY,inviteCode.trim());
     localStorage.setItem(VERIFY_EMAIL_KEY,email.trim());
@@ -186,31 +226,33 @@
     return data;
   }
   async function joinWithInvite(name,inviteCode){
-    const res=await fetch(base()+'/functions/v1/join-team',{method:'POST',headers:{'apikey':cfg.anonKey,'Content-Type':'application/json'},body:JSON.stringify({name:String(name||'').trim(),invite_code:String(inviteCode||'').trim()})});
-    const data=await res.json().catch(()=>({}));
-    if(!res.ok||!data?.session?.access_token)throw new Error(data?.error||data?.message||'Could not join the team');
+    const attempt=beginAuthAttempt();
+    const res=await awaitAuthWork(fetch(base()+'/functions/v1/join-team',{method:'POST',headers:{'apikey':cfg.anonKey,'Content-Type':'application/json'},body:JSON.stringify({name:String(name||'').trim(),invite_code:String(inviteCode||'').trim()})}),attempt);
+    const data=await awaitAuthWork(res.json(),attempt).catch(()=>({}));
+    assertAuthAttempt(attempt);if(!res.ok||!data?.session?.access_token)throw new Error(data?.error||data?.message||'Could not join the team');
     const next=data.session;
     if(!next.expires_at)next.expires_at=Math.floor(Date.now()/1000)+Number(next.expires_in||3600);
     saveSession(next);
     return data;
   }
 
-  async function playerAccessRequest(action,payload={},useSession=false){
+  async function playerAccessRequest(action,payload={},useSession=false,attempt=null){
+    if(useSession){const {data}=await request('/functions/v1/player-access',{method:'POST',body:{action,...payload}});if(data?.error)throw new Error(data.error);return data;}
     const headers={'apikey':cfg.anonKey,'Content-Type':'application/json'};
-    if(useSession&&session?.access_token)headers['Authorization']='Bearer '+session.access_token;
     let res;
     try{
-      res=await fetch(base()+'/functions/v1/player-access',{method:'POST',headers,body:JSON.stringify({action,...payload})});
-    }catch{
-      throw new Error('Could not reach Player Access. Check your internet connection and try again.');
+      res=await awaitAuthWork(fetch(base()+'/functions/v1/player-access',{method:'POST',headers,body:JSON.stringify({action,...payload})}),attempt);
+    }catch(error){
+      if(attempt!==null)assertAuthAttempt(attempt);throw new Error('Could not reach Player Access. Check your internet connection and try again.');
     }
-    const text=await res.text();let data={};try{data=text?JSON.parse(text):{};}catch{data={error:text};}
+    const text=await awaitAuthWork(res.text(),attempt);let data={};try{data=text?JSON.parse(text):{};}catch{data={error:text};}
     if(!res.ok||data?.error)throw new Error(data?.error||data?.message||'Player Access is unavailable.');
     return data;
   }
   async function playerCodeLogin(name,code){
-    const data=await playerAccessRequest('login',{name:String(name||'').trim(),code:String(code||'').trim().toUpperCase()},false);
-    if(!data?.session?.access_token)throw new Error('Player Access did not return a sign-in session.');
+    const attempt=beginAuthAttempt();
+    const data=await playerAccessRequest('login',{name:String(name||'').trim(),code:String(code||'').trim().toUpperCase()},false,attempt);
+    assertAuthAttempt(attempt);if(!data?.session?.access_token)throw new Error('Player Access did not return a sign-in session.');
     const next={...data.session};if(!next.expires_at)next.expires_at=Math.floor(Date.now()/1000)+Number(next.expires_in||3600);saveSession(next);return data;
   }
   async function issuePlayerAccessCode(teamId,playerName){
@@ -219,15 +261,14 @@
   }
 
   async function loginWithPin(club,team,name,pin){
-    const res=await fetch(base()+'/functions/v1/pin-login',{method:'POST',headers:{'apikey':cfg.anonKey,'Content-Type':'application/json'},body:JSON.stringify({club:String(club||'').trim(),team:String(team||'').trim(),name:String(name||'').trim(),pin:String(pin||'').trim()})});
-    const data=await res.json().catch(()=>({}));
-    if(!res.ok||!data?.session?.access_token)throw new Error(data?.error||data?.message||'Could not sign in with PIN');
+    const attempt=beginAuthAttempt();
+    const res=await awaitAuthWork(fetch(base()+'/functions/v1/pin-login',{method:'POST',headers:{'apikey':cfg.anonKey,'Content-Type':'application/json'},body:JSON.stringify({club:String(club||'').trim(),team:String(team||'').trim(),name:String(name||'').trim(),pin:String(pin||'').trim()})}),attempt);
+    const data=await awaitAuthWork(res.json(),attempt).catch(()=>({}));
+    assertAuthAttempt(attempt);if(!res.ok||!data?.session?.access_token)throw new Error(data?.error||data?.message||'Could not sign in with PIN');
     const next=data.session;if(!next.expires_at)next.expires_at=Math.floor(Date.now()/1000)+Number(next.expires_in||3600);saveSession(next);return data;
   }
   async function pinAdmin(action,payload={}){
-    if(!session?.access_token)throw new Error('Sign in required');
-    const res=await fetch(base()+'/functions/v1/pin-admin',{method:'POST',headers:{...authHeaders(session.access_token)},body:JSON.stringify({action,...payload})});
-    const data=await res.json().catch(()=>({}));if(!res.ok)throw new Error(data?.error||data?.message||'PIN action failed');return data;
+    const {data}=await request('/functions/v1/pin-admin',{method:'POST',body:{action,...payload}});return data;
   }
   function accessPinPassword(pin){return `GCH-PIN!${String(pin||'').trim()}#APP`;}
   async function setAccessPin(pin){
@@ -259,52 +300,35 @@
     try{
       const {data}=await request('/auth/v1/user');
       if(session&&data){session.user=data;saveSession(session);}
-    }catch{}
+    }catch(error){if(error?.code==='AUTH_CONTEXT_CHANGED')throw error;}
   }
   async function handleAuthCallback(uri,{duringBootstrap=false}={}){
     if(!uri)return null;
+    const attempt=beginAuthAttempt();setGateHtml('signin');const checking=document.getElementById('cloud-auth-submit');if(checking){checking.disabled=true;checking.textContent='Signing in…';}
     try{
-      const u=new URL(uri);
-      const hash=new URLSearchParams((u.hash||'').replace(/^#/,''));
-      const query=u.searchParams;
-      const get=(k)=>hash.get(k)||query.get(k)||'';
-      const error=get('error_description')||get('error');
-      const errorCode=get('error_code');
-      if(error){
-        if(u.origin===location.origin&&u.hash)history.replaceState(null,'',location.pathname+location.search);
-        setGateHtml('signin',decodeURIComponent(error.replace(/\+/g,' '))+(errorCode?' ('+errorCode+')':''));return 'error';
-      }
-      const accessToken=get('access_token');
-      const refreshToken=get('refresh_token');
-      const type=get('type');
-      if(!accessToken||!refreshToken){
-        if(type==='recovery')setGateHtml('signin','The password reset link opened, but Supabase did not return a recovery session. Request a fresh reset email and try again.');
-        return null;
-      }
+      const u=new URL(uri),hash=new URLSearchParams((u.hash||'').replace(/^#/,'')),query=u.searchParams;
+      const get=k=>hash.get(k)||query.get(k)||'';
+      const clean=new URL(location.href);for(const key of ['auth_callback','access_token','refresh_token','expires_in','expires_at','token_type','type','error','error_code','error_description'])clean.searchParams.delete(key);if(/(?:access_token|refresh_token|error|type)=/.test(clean.hash))clean.hash='';history.replaceState(null,'',clean.pathname+clean.search+clean.hash);
+      const error=get('error_description')||get('error'),errorCode=get('error_code');
+      if(error){setGateHtml('signin',error.replace(/\+/g,' ')+(errorCode?' ('+errorCode+')':''));return 'error';}
+      const accessToken=get('access_token'),refreshToken=get('refresh_token'),type=get('type');
+      if(!accessToken||!refreshToken)throw new Error('The email link did not return a verified session. Request a fresh email and try again.');
+      const controller=typeof AbortController==='function'?new AbortController():null;let timer;
+      const verification=request('/auth/v1/user',{token:false,headers:authHeaders(accessToken),signal:controller?.signal});
+      const verified=await awaitAuthWork(Promise.race([verification,new Promise((_,reject)=>{timer=setTimeout(()=>{controller?.abort();reject(new Error('The email link could not be verified. Try again.'));},15000);})]).finally(()=>clearTimeout(timer)),attempt);
+      assertAuthAttempt(attempt);const user=verified.data;
+      if(!user?.id)throw new Error('The email link did not return a verified account.');
+      const previous=session?.user?.id||loadSession()?.user?.id||verifiedAccountUser||context?.profile?.user_id||'';
+      if(!previous||previous!==user.id){clearAccountLocalData();context=null;clubConfiguration=null;visibleTeams=[];activeTeam=null;activeRevision=-1;lastRemoteUpdatedAt='';}
       const expiresIn=Number(get('expires_in')||3600);
-      saveSession({access_token:accessToken,refresh_token:refreshToken,token_type:get('token_type')||'bearer',expires_in:expiresIn,expires_at:Math.floor(Date.now()/1000)+expiresIn});
-      if(u.origin===location.origin&&u.hash)history.replaceState(null,'',location.pathname+location.search);
-      await hydrateSessionUser();
+      saveSession({access_token:accessToken,refresh_token:refreshToken,token_type:get('token_type')||'bearer',expires_in:expiresIn,expires_at:Math.floor(Date.now()/1000)+expiresIn,user});
       localStorage.removeItem(VERIFY_EMAIL_KEY);
-      if(type==='recovery'){
-        setGateHtml('newpassword','Password reset verified. Choose your new password below.');
-        return 'recovery';
-      }
-      const parentMeta=session?.user?.user_metadata||{},metaTeam=String(parentMeta.requested_team_id||''),metaChild=String(parentMeta.requested_child_name||'').trim();
-      if(parentMeta.parent_signup&&metaTeam&&metaChild){
-        try{await requestParentAccess(metaTeam,metaChild);localStorage.removeItem(PENDING_PARENT_REQUEST_KEY);context=await getContext();setGateHtml('approval','Your email is confirmed. Your parent access request is waiting for coach approval.');return 'parentrequest';}
-        catch(e){setGateHtml('signin','Your account was created, but the parent access request could not be submitted. '+(e.message||''));return 'error';}
-      }
-      if(parentMeta.coach_signup&&metaTeam){
-        try{const sent=await resumeCoachSignupRequestFromMetadata();if(!sent)throw new Error('The request was not recorded. Sign in again to retry.');setGateHtml('coachapproval','Your email is confirmed. Your request is waiting for the Club Admin.');return 'coachrequest';}
-        catch(e){setGateHtml('signin','Your account was created, but the coach access request could not be submitted. '+(e.message||''));return 'error';}
-      }
-      if(!duringBootstrap) location.reload();
-      return type||'auth';
-    }catch(e){
-      if(!duringBootstrap)setGateHtml('signin','The email link could not be opened in the app. '+(e.message||''));
-      return 'error';
-    }
+      if(type==='recovery'){setGateHtml('newpassword','Password reset verified. Choose your new password below.');return 'recovery';}
+      const parentMeta=user.user_metadata||{},metaTeam=String(parentMeta.requested_team_id||''),metaChild=String(parentMeta.requested_child_name||'').trim();
+      if(parentMeta.parent_signup&&metaTeam&&metaChild){await requestParentAccess(metaTeam,metaChild);assertAuthAttempt(attempt);localStorage.removeItem(PENDING_PARENT_REQUEST_KEY);context=await getContext();assertAuthAttempt(attempt);setGateHtml('approval','Your email is confirmed. Your parent access request is waiting for coach approval.');return 'parentrequest';}
+      if(parentMeta.coach_signup&&metaTeam){const sent=await resumeCoachSignupRequestFromMetadata();assertAuthAttempt(attempt);if(!sent)throw new Error('The request was not recorded. Sign in again to retry.');setGateHtml('coachapproval','Your email is confirmed. Your request is waiting for the Club Admin.');return 'coachrequest';}
+      if(!duringBootstrap)location.reload();return type||'auth';
+    }catch(e){if(attempt!==authAttempt||e?.code==='AUTH_CONTEXT_CHANGED')return 'error';setGateHtml('signin','The email link could not be opened in the app. '+(e.message||''));return 'error';}
   }
   async function rpc(name,args={}){
     const {data}=await request('/rest/v1/rpc/'+encodeURIComponent(name),{method:'POST',body:args});return data;
@@ -389,9 +413,9 @@
     return Array.isArray(data)?data:[];
   }
   async function listTeams(){
-    if(testModeActive())return [TEST_TEAM];
+    if(testModeActive())return [TEST_TEAM];const scope=captureAccountRequest();
     const {data}=await request('/rest/v1/teams?select=id,club_id,name,age_group,division,season,selkent_label,league_name,active&active=eq.true&order=age_group.asc,name.asc');
-    const rows=Array.isArray(data)?data:[];if(rows.length)cacheTeams(rows);return rows;
+    assertAccountRequest(scope);const rows=Array.isArray(data)?data:[];if(rows.length)cacheTeams(rows);return rows;
   }
   function oldShapeTeam(t){
     if(!t)return null;
@@ -417,14 +441,15 @@
     return oldShapeTeam(visibleTeams.find(t=>t.id===id)||null);
   }
   function hasDualCoachAccess(){return role()==='admin'&&!!coachTeam();}
-  function canEdit(){
+  function canEditPermission(){
     if(testModeActive())return true;
     const r=role();
     if(r==='coach'||r==='assistant_coach')return !!activeTeam&&context?.team?.id===activeTeam.id;
     if(r==='admin')return !!activeTeam&&!!context?.profile?.coach_team_id&&context.profile.coach_team_id===activeTeam.id;
     return false;
   }
-  function canAdmin(){return !testModeActive()&&role()==='admin';}
+  function canEdit(){return accountReady&&canEditPermission();}
+  function canAdmin(){return accountReady&&!testModeActive()&&role()==='admin';}
   function teamMatchesState(team,state){
     const stateName=String(state?.division?.teamName||state?.meta?.teamName||'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
     const teamName=String(team?.league_name||team?.name||'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
@@ -443,7 +468,7 @@
    localStorage.setItem(ACTIVE_TEAM_KEY,found.id);return found;
  }
   function sanitizeMiniSoccerParentStateClient(input,age,profileRole=context?.profile?.role||''){
-    const restricted=Number(age)>=7&&Number(age)<=11&&['parent','player'].includes(String(profileRole||''));
+    const restricted=(!Number.isFinite(Number(age))||Number(age)<=11)&&['parent','player'].includes(String(profileRole||''));
     if(!restricted||!input||typeof input!=='object')return input;
     const copy=JSON.parse(JSON.stringify(input));
     copy.matches=(Array.isArray(copy.matches)?copy.matches:[]).map(match=>{
@@ -472,16 +497,13 @@
     copy.meta={...(copy.meta||{}),miniSoccerResultRestriction:true,miniSoccerResultRestrictionAges:'U7-U11'};
     return copy;
   }
-  async function fetchTeamState(teamId){
-    const data=await rpc('get_team_state_for_me',{p_team_id:teamId});
+  async function fetchTeamState(teamId,scope=captureTeamStateScope()){
+    assertTeamStateScope(scope);
+    const data=await rpc('get_team_state_for_me',{p_team_id:teamId});assertTeamStateScope(scope);
     const row=Array.isArray(data)?data[0]:data;
-    if(row){
-      activeRevision=Number(row.revision||0);lastRemoteUpdatedAt=row.updated_at||'';
-      const age=Number((visibleTeams.find(t=>t.id===teamId)||activeTeam)?.age_group||0);
-      if(row.state)row.state=sanitizeMiniSoccerParentStateClient(row.state,age,context?.profile?.role||'');
-      // Never persist the U7-U11 staff identity mapping in a device cache.
-      if(age>=7&&age<=11)localStorage.removeItem(TEAM_STATE_CACHE_PREFIX+teamId);else cacheTeamState(teamId,row);
-    }else{activeRevision=-1;lastRemoteUpdatedAt='';}
+    if(row&&(row.team_id!=null&&String(row.team_id)!==String(teamId)))throw new Error('Team information is not available. Please try again.');
+    if(row?.state&&(!row.state||typeof row.state!=='object'||Array.isArray(row.state)))throw new Error('Team information is not available. Please try again.');
+    if(row?.state){const age=Number((visibleTeams.find(t=>t.id===teamId)||scope.team)?.age_group||0);row.state=sanitizeMiniSoccerParentStateClient(row.state,age,scope.role);}
     return row||null;
   }
   async function getClubOverview(){
@@ -523,37 +545,38 @@
     if(!result?.ok)throw new Error('The cloud did not confirm this parent onboarding.');
     // Refresh only the already-active team; onboarding never switches a team/context.
     if(activeTeam?.id===team.id){
-      try{const saved=await fetchTeamState(team.id);if(identity===adminOnboardingIdentity()&&saved?.state&&!pendingState&&!saving&&hooks.onRemoteState)hooks.onRemoteState(saved.state,{reason:'player-onboarded'});}
+      try{const scope=captureTeamStateScope(),saved=await fetchTeamState(team.id,scope);assertTeamStateScope(scope,{passive:true});if(identity===adminOnboardingIdentity())acceptTeamStateRead(saved,scope,{passive:true,reason:'player-onboarded'});}
       catch(_){emitStatus('Player saved. Refresh this team to see the new squad.','warn');}
     }
     return result;
   }
-  async function saveTeamStateNow(nextState,{force=false,preserveOnConflict=false}={}){
-    if(!configured()||!session||!activeTeam||!canEdit())return null;
+  async function saveTeamStateNow(nextState,{force=false,preserveOnConflict=false,bootstrapScope=null}={}){
+    if(!configured()||!session||!activeTeam||(!canEdit()&&!(bootstrapScope&&canEditPermission())))return null;
+    if(bootstrapScope)assertTeamStateScope(bootstrapScope);
     if(holdMatchActionDraft(nextState))throw matchActionError('MATCH_ACTION_SYNC_BUSY');
     if(saving){pendingState=nextState;return null;}
+    const scope=captureTeamStateScope(),teamId=activeTeam.id,revision=activeRevision;
+    const current=()=>{try{assertTeamStateScope(scope);return true;}catch{return false;}};
+    const attemptedDraft={state:JSON.parse(JSON.stringify(nextState)),scope};activeSaveDraft=attemptedDraft;
     saving=true;emitStatus('Saving…','working');
     try{
-      const data=await rpc('save_team_state',{p_team_id:activeTeam.id,p_state:nextState,p_expected_revision:force?-2:activeRevision});
+      const data=await rpc('save_team_state',{p_team_id:teamId,p_state:nextState,p_expected_revision:force?-2:revision});assertTeamStateScope(scope);
       const row=Array.isArray(data)?data[0]:data;
       if(!row&&preserveOnConflict)throw new Error('The cloud did not confirm these changes.');
-      if(row){activeRevision=Number(row.revision);lastRemoteUpdatedAt=row.updated_at||lastRemoteUpdatedAt;}
-      // Read back the server-normalized state. For U7-U11 this removes name-keyed performance data.
-      const saved=await fetchTeamState(activeTeam.id);
-      unsyncedState=false;
+      const saved=await fetchTeamState(teamId,scope);assertTeamStateScope(scope);acceptTeamStateRead(saved,scope);
+      unsyncedState=false;if(suspendedDraft?.owner===draftOwner(scope))suspendedDraft=null;
       if(saved?.state&&!pendingState&&!confirmingState&&hooks.onRemoteState)hooks.onRemoteState(saved.state,{reason:'save-normalized'});
       emitStatus('Cloud synced','ok');return row;
     }catch(err){
+      if(!current())throw accountContextChanged();
       if(String(err.message||'').includes('STALE_STATE')){
         emitStatus('Newer cloud changes found — local edits need retrying','warn');
-        const row=await fetchTeamState(activeTeam.id);
+        const row=await fetchTeamState(teamId,scope);assertTeamStateScope(scope);acceptTeamStateRead(row,scope);
         if(!preserveOnConflict&&!pendingState&&!confirmingState&&row?.state&&hooks.onRemoteState)hooks.onRemoteState(row.state,{reason:'conflict'});
       }else emitStatus('Sync failed: '+(err.message||err),'error');
-      if(preserveOnConflict)unsyncedState=true;
-      throw err;
+      if(preserveOnConflict)unsyncedState=true;throw err;
     }finally{
-      saving=false;
-      if(pendingState){const p=pendingState;pendingState=null;queueStateSave(p);}
+      if(current()){if(activeSaveDraft===attemptedDraft)activeSaveDraft=null;saving=false;if(pendingState){const p=pendingState;pendingState=null;queueStateSave(p);}}
     }
   }
   function queueStateSave(nextState){
@@ -563,7 +586,8 @@
     unsyncedState=true;
     emitStatus('Changes queued…','working');
     clearTimeout(saveTimer);
-    saveTimer=setTimeout(()=>{const p=pendingState;pendingState=null;if(p)saveTeamStateNow(p,{preserveOnConflict:true}).catch(()=>{});},700);
+    const scope=captureTeamStateScope();
+    saveTimer=setTimeout(()=>{try{assertTeamStateScope(scope);}catch{return;}const p=pendingState;pendingState=null;if(p)saveTeamStateNow(p,{preserveOnConflict:true}).catch(()=>{});},700);
   }
   async function confirmStateSave(nextState){
     if(holdMatchActionDraft(nextState))throw matchActionError('MATCH_ACTION_SYNC_BUSY');
@@ -573,13 +597,13 @@
       throw new Error('This team is not available for editing. Your match is still on this device; reopen your team before saving.');
     }
     if(!session)throw new Error('Your session has expired. Sign in again before saving; your edits remain on this page.');
-    const teamId=activeTeam.id;
+    const scope=captureTeamStateScope(),teamId=activeTeam.id;
     const snapshot=JSON.parse(JSON.stringify(nextState));
     confirmingState=true;
     try{
       clearTimeout(saveTimer);pendingState=null;
       // An earlier queued save may still be reading back its normalized state.
-      while(saving)await new Promise(resolve=>setTimeout(resolve,40));
+      while(saving){await new Promise(resolve=>setTimeout(resolve,40));assertTeamStateScope(scope);}
       if(!activeTeam||activeTeam.id!==teamId||!canEdit()){
         throw new Error('The active team changed while saving. Your match is still on this device; reopen the correct team and save again.');
       }
@@ -589,21 +613,16 @@
         throw new Error('The cloud did not confirm these changes. Your match is still on this device; tap Save again.');
       }
       return saved;
-    }catch(err){unsyncedState=true;throw err;}
-    finally{confirmingState=false;}
+    }catch(err){try{assertTeamStateScope(scope);unsyncedState=true;}catch{}throw err;}
+    finally{try{assertTeamStateScope(scope);confirmingState=false;}catch{}}
   }
   async function pullLatest({quiet=false}={}){
-    if(!configured()||!session||!activeTeam)return null;
-    if(currentMatchActionBarrier())return null;
-    if(saving||pendingState||confirmingState||unsyncedState)return null;
+    if(!configured()||!session||!activeTeam||!accountReady)return null;
+    if(currentMatchActionBarrier()||saving||pendingState||confirmingState||unsyncedState)return null;
+    const scope=captureTeamStateScope(),teamId=activeTeam.id,before=activeRevision;
     if(!quiet)emitStatus('Checking cloud…','working');
-    try{
-      const before=activeRevision;
-      const row=await fetchTeamState(activeTeam.id);
-      if(row?.state&&Number(row.revision)!==before&&hooks.onRemoteState){hooks.onRemoteState(row.state,{reason:'pull'});}
-      if(!quiet)emitStatus('Cloud synced','ok');
-      return row;
-    }catch(err){if(!quiet)emitStatus('Sync failed: '+(err.message||err),'error');return null;}
+    try{const row=await fetchTeamState(teamId,scope);assertTeamStateScope(scope,{passive:true});acceptTeamStateRead(row,scope,{passive:true,reason:row?.state&&Number(row.revision)!==before?'pull':''});if(!quiet)emitStatus('Cloud synced','ok');return row;}
+    catch(err){if(err?.code!=='AUTH_CONTEXT_CHANGED'&&!quiet)emitStatus('Sync failed: '+(err.message||err),'error');return null;}
   }
   // Destructive match actions use a detached candidate and a captured identity.
   // A full-state background draft must never replay over a confirmed removal.
@@ -895,57 +914,31 @@
       return {cleared:true};
     }finally{finishMatchAction(lease);}
   }
-  async function switchAdminTeam(teamId,seedFactory){
-    if(!canAdmin())throw new Error('Club Admin access required');
+  async function switchAdminTeam(teamId,seedFactory,bootContext=null){
+    if(!canAdmin()&&!(bootContext&&bootContext===pendingBootstrapContext&&role()==='admin'))throw new Error('Club Admin access required');
     const team=visibleTeams.find(t=>t.id===teamId);if(!team)throw new Error('Team not found');
-    if(pendingState&&canEdit()){const p=pendingState;pendingState=null;await saveTeamStateNow(p).catch(()=>{});}
-    const previousTeam=activeTeam,previousRevision=activeRevision,previousUpdatedAt=lastRemoteUpdatedAt;
-    activeTeam=team;localStorage.setItem(ACTIVE_TEAM_KEY,team.id);
+    if(saving||confirmingState||currentMatchActionBarrier()||(unsyncedState&&!pendingState))throw matchActionError('MATCH_ACTION_SYNC_BUSY');
+    if(pendingState&&canEdit()){const scope=captureTeamStateScope(),draft=pendingState;pendingState=null;try{const saved=await saveTeamStateNow(draft,{preserveOnConflict:true});assertTeamStateScope(scope);if(!saved)throw matchActionError('MATCH_ACTION_SYNC_BUSY');}catch(error){try{assertTeamStateScope(scope);if(!pendingState)pendingState=draft;unsyncedState=true;}catch{}throw error;}}
+    ++teamReadGeneration;readyBootstrap=null;const scope=captureTeamStateScope();
     window.dispatchEvent(new Event('clubhub-contacts-clear'));
-    try{
-    const sensitiveMini=Number(team.age_group||0)>=7&&Number(team.age_group||0)<=11;
-    if(sensitiveMini)localStorage.removeItem(TEAM_STATE_CACHE_PREFIX+team.id);
-    const cached=sensitiveMini?null:cachedTeamState(team.id);
-    if(cached?.state){
-      activeRevision=Number(cached.revision??0);lastRemoteUpdatedAt=cached.updated_at||'';
-      hooks.onRemoteState&&hooks.onRemoteState(cached.state,{reason:'switch-cache'});
-      updateCloudPanel();
-      fetchTeamState(team.id).then(row=>{if(row?.state&&Number(row.revision)!==Number(cached.revision))hooks.onRemoteState&&hooks.onRemoteState(row.state,{reason:'switch-refresh'});}).catch(()=>{});
-      return oldShapeTeam(team);
-    }
-    const row=await fetchTeamState(team.id);
-    if(row?.state){hooks.onRemoteState&&hooks.onRemoteState(row.state,{reason:'switch'});}
-    else if(seedFactory){
-      const seed=seedFactory(oldShapeTeam(team));
-      activeRevision=-1;
-      if(canEdit())await saveTeamStateNow(seed);
-      hooks.onRemoteState&&hooks.onRemoteState(seed,{reason:canEdit()?'switch-seed':'switch-preview'});
-    }
-    updateCloudPanel();return oldShapeTeam(team);
-    }catch(err){
-      activeTeam=previousTeam;activeRevision=previousRevision;lastRemoteUpdatedAt=previousUpdatedAt;
-      if(previousTeam)localStorage.setItem(ACTIVE_TEAM_KEY,previousTeam.id);
-      else localStorage.removeItem(ACTIVE_TEAM_KEY);
-      updateCloudPanel();throw err;
-    }
+    const cached=cachedTeamState(team.id);
+    let row=cached||await fetchTeamState(team.id,scope);assertTeamStateScope(scope);
+    if(!row?.state&&seedFactory)row={state:seedFactory(oldShapeTeam(team)),revision:0,updated_at:''};
+    if(!row?.state)throw new Error('Team information is not available');
+    activeTeam=team;localStorage.setItem(ACTIVE_TEAM_KEY,team.id);
+    const selected=captureTeamStateScope();acceptTeamStateRead(row,selected,{reason:cached?'switch-cache':'switch'});updateCloudPanel();
+    if(cached)fetchTeamState(team.id,selected).then(fresh=>{assertTeamStateScope(selected,{passive:true});acceptTeamStateRead(fresh,selected,{passive:true,reason:fresh?.state&&Number(fresh.revision)!==Number(cached.revision)?'switch-refresh':''});}).catch(()=>{});
+    return oldShapeTeam(team);
   }
   async function switchParentTeam(teamId){
-   if(role()!=='parent')throw new Error('Parent access required');
-   const team=visibleTeams.find(t=>String(t.id)===String(teamId));
-   if(!team)throw new Error('This team is not linked to your parent account');
-   const previousRevision=activeRevision,previousUpdatedAt=lastRemoteUpdatedAt;
-   let row;
-   try{row=await fetchTeamState(team.id);}
-   catch(err){activeRevision=previousRevision;lastRemoteUpdatedAt=previousUpdatedAt;throw err;}
-   if(!row?.state){activeRevision=previousRevision;lastRemoteUpdatedAt=previousUpdatedAt;throw new Error('Team information is not available');}
-   activeTeam=team;
-   window.dispatchEvent(new Event('clubhub-contacts-clear'));
-   localStorage.setItem(ACTIVE_TEAM_KEY,team.id);
-   context={...(context||{}),team};
-   hooks.onRemoteState&&hooks.onRemoteState(row.state,{reason:'parent-team-switch'});
-   updateCloudPanel();
-   return oldShapeTeam(team);
- }
+    if(role()!=='parent')throw new Error('Parent access required');
+    const team=visibleTeams.find(t=>String(t.id)===String(teamId));if(!team)throw new Error('This team is not linked to your parent account');
+    ++teamReadGeneration;readyBootstrap=null;const scope=captureTeamStateScope();
+    const row=await fetchTeamState(team.id,scope);assertTeamStateScope(scope);
+    if(!row?.state)throw new Error('Team information is not available');
+    activeTeam=team;context={...(context||{}),team};window.dispatchEvent(new Event('clubhub-contacts-clear'));localStorage.setItem(ACTIVE_TEAM_KEY,team.id);
+    acceptTeamStateRead(row,captureTeamStateScope(),{reason:'parent-team-switch'});updateCloudPanel();return oldShapeTeam(team);
+  }
 
  async function listCurrentClubLoginTeams(){
    if(role()!=='parent'&&!isStaffAccount())return [];
@@ -992,8 +985,9 @@
     try{const data=await rpc('list_my_coach_teams',{});return Array.isArray(data)?data:[];}catch(err){if(strict)throw err;return [];}
   }
   async function switchMyCoachTeam(teamId){
+    if(saving||confirmingState||pendingState||unsyncedState||currentMatchActionBarrier())throw matchActionError('MATCH_ACTION_SYNC_BUSY');
     await rpc('switch_my_active_team',{p_team_id:String(teamId||'')});
-    clearAccountLocalData();// nothing from the previous team stays in this browser
+    lockGate();clearAccountLocalData();// nothing from the previous team stays in this browser
     return true;
   }
   // One login, two capacities (draft 015): coaching staff and Club Admins who are also parents.
@@ -1003,8 +997,9 @@
   function actingAsParent(){return !!(context?.acting_as_parent&&isStaffAccount());}
   async function setMyCapacity(asParent){
     if(!isStaffAccount())throw new Error('Only coaching staff and Club Admins have two capacities');
+    if(saving||confirmingState||pendingState||unsyncedState||currentMatchActionBarrier())throw matchActionError('MATCH_ACTION_SYNC_BUSY');
     await rpc('set_my_capacity',{p_parent:!!asParent});
-    clearAccountLocalData();
+    lockGate();clearAccountLocalData();
     return true;
   }
   async function requestChildLink(teamId,childName){
@@ -1350,8 +1345,8 @@
           const token=session?.access_token||'';if(token){try{await fetch(base()+'/auth/v1/logout',{method:'POST',headers:authHeaders(token)});}catch{}}
           clearInviteAccess();clearAccountLocalData();
           throw new Error('This account does not have approved Parent access. Use an approved parent account.');
-        }hideGate();window.dispatchEvent(new CustomEvent('clubhub-authenticated',{detail:{source:parentOnly?'parent-signin':'signin'}}));}
-        catch(e){const msg=e.message||String(e);if(/confirm|verified/i.test(msg)){localStorage.setItem(VERIFY_EMAIL_KEY,email);setGateHtml('verify','Your email still needs confirming.',email);}else authError(msg);if(btn){btn.disabled=false;btn.innerHTML=(parentOnly?'Sign In as Parent':'Log In')+' <span>→</span>';}}
+        }window.dispatchEvent(new CustomEvent('clubhub-authenticated',{detail:{source:parentOnly?'parent-signin':'signin'}}));}
+        catch(e){if(e?.code==='AUTH_CONTEXT_CHANGED')return;const msg=e.message||String(e);if(/confirm|verified/i.test(msg)){localStorage.setItem(VERIFY_EMAIL_KEY,email);setGateHtml('verify','Your email still needs confirming.',email);}else authError(msg);if(btn){btn.disabled=false;btn.innerHTML=(parentOnly?'Sign In as Parent':'Log In')+' <span>→</span>';}}
       });return;
     }
 
@@ -1383,14 +1378,14 @@
           const data=await signUp(email,password,name,'',{coach_signup:true,requested_team_id:teamId,requested_role:t});
           if(data?.access_token){await hydrateSessionUser();context=await getContext();await requestCoachAccess(teamId,t);context=await getContext();setGateHtml('coachapproval',t==='club_admin'?'Your request has been sent to the club owner for approval.':'Your request has been sent to the Club Admin for approval.');return;}
           setGateHtml('verify','Account created. Confirm your email, then sign in and your request goes for approval.',email);
-        }catch(e){authError(e.message||String(e));btn.disabled=false;btn.innerHTML=label;}
+        }catch(e){if(e?.code==='AUTH_CONTEXT_CHANGED')return;authError(e.message||String(e));btn.disabled=false;btn.innerHTML=label;}
       });return;
     }
 
     if(mode==='coachapproval'||context?.profile?.role==='pending_coach'){
       const body=`<p class="auth-notice ${message?'':'hidden'}" id="cloud-auth-notice">${escapeHtml(message)}</p><p class="activation-error hidden" id="cloud-auth-error" role="alert"></p><button class="auth-primary" id="cloud-check-coach-approval">Check Approval <span>→</span></button><button class="auth-link-strong" id="cloud-reset-device">Back to Main Login</button>`;
       gate.innerHTML=authSimple('Waiting for Approval','Your account is set up. Team data appears once your Club Admin approves your access.',body,'STAFF ACCESS');
-      document.getElementById('cloud-check-coach-approval')?.addEventListener('click',async()=>{try{context=await getContext();if(['coach','assistant_coach','club_admin'].includes(context?.profile?.role))location.reload();else showNotice('Still waiting for the Club Admin to approve access.');}catch(e){authError(e.message||String(e));}});document.getElementById('cloud-reset-device')?.addEventListener('click',()=>{clearInviteAccess();setGateHtml('signin');});return;
+      document.getElementById('cloud-check-coach-approval')?.addEventListener('click',async()=>{try{context=await getContext();if(['coach','assistant_coach','club_admin'].includes(context?.profile?.role))location.reload();else showNotice('Still waiting for the Club Admin to approve access.');}catch(e){if(e?.code==='AUTH_CONTEXT_CHANGED')return;authError(e.message||String(e));}});document.getElementById('cloud-reset-device')?.addEventListener('click',()=>{clearInviteAccess();setGateHtml('signin');});return;
     }
 
     if(mode==='playerlogin'){
@@ -1400,7 +1395,7 @@
         <button class="auth-primary" id="cloud-player-submit">Enter App <span>→</span></button><button class="auth-link-strong auth-back-link" id="cloud-player-back">Back to Main Login</button>`;
       gate.innerHTML=authMainScreen({screen:'player',heroNote:'Same<br/>Team<br/>Brighter<br/>Tomorrow',title:'Player Access',copy:'No email required.',body,footer:'A BRIGHTER TOMORROW TOGETHER',back:true});
       const back=()=>setGateHtml('signin');document.getElementById('auth-screen-back')?.addEventListener('click',back);document.getElementById('cloud-player-back')?.addEventListener('click',back);
-      document.getElementById('cloud-player-submit')?.addEventListener('click',async()=>{const name=document.getElementById('cloud-player-name')?.value?.trim()||'',code=document.getElementById('cloud-player-code')?.value?.trim()||'';if(name.length<2||code.length<6)return authError('Enter the player name and reusable player code.');const btn=document.getElementById('cloud-player-submit');if(btn){btn.disabled=true;btn.innerHTML='Checking…';}try{localStorage.removeItem(TEST_MODE_KEY);setInviteAccessLocked(false);await playerCodeLogin(name,code);context=await getContext();if(context?.profile?.role!=='player'||Number(context?.team?.age_group||0)!==15){clearInviteAccess();throw new Error('This Player Access code is not assigned to an eligible U15 player account.');}clubConfiguration=await getClubConfiguration().catch(()=>null);hideGate();window.dispatchEvent(new CustomEvent('clubhub-authenticated',{detail:{source:'player-code'}}));}catch(e){authError(e.message||String(e));if(btn){btn.disabled=false;btn.innerHTML='Enter App <span>→</span>';}}});return;
+      document.getElementById('cloud-player-submit')?.addEventListener('click',async()=>{const name=document.getElementById('cloud-player-name')?.value?.trim()||'',code=document.getElementById('cloud-player-code')?.value?.trim()||'';if(name.length<2||code.length<6)return authError('Enter the player name and reusable player code.');const btn=document.getElementById('cloud-player-submit');if(btn){btn.disabled=true;btn.innerHTML='Checking…';}try{localStorage.removeItem(TEST_MODE_KEY);setInviteAccessLocked(false);await playerCodeLogin(name,code);context=await getContext();if(context?.profile?.role!=='player'||Number(context?.team?.age_group||0)!==15){clearInviteAccess();throw new Error('This Player Access code is not assigned to an eligible U15 player account.');}clubConfiguration=await getClubConfiguration().catch(()=>null);window.dispatchEvent(new CustomEvent('clubhub-authenticated',{detail:{source:'player-code'}}));}catch(e){if(e?.code==='AUTH_CONTEXT_CHANGED')return;authError(e.message||String(e));if(btn){btn.disabled=false;btn.innerHTML='Enter App <span>→</span>';}}});return;
     }
 
     if(mode==='clubsignup'){
@@ -1416,27 +1411,27 @@
       const body=`<p class="auth-caption auth-caption-top">Use a one-time staff invitation from your club to create an email and password account. Then sign in through the main login.</p><div class="auth-fields">${authField({icon:'user',id:'cloud-setup-name',placeholder:'Your name',autocomplete:'name'})}${authField({icon:'mail',id:'cloud-setup-email',type:'email',placeholder:'Email address',autocomplete:'username',value:prefillEmail})}${authField({icon:'lock',id:'cloud-setup-password',type:'password',placeholder:'Create password',autocomplete:'new-password'})}${authField({icon:'code',id:'cloud-setup-invite',placeholder:'Staff invite code',autocomplete:'one-time-code',extra:'autocapitalize="characters" spellcheck="false"'})}</div><p class="auth-notice ${message?'':'hidden'}" id="cloud-auth-notice">${escapeHtml(message)}</p><p class="activation-error hidden" id="cloud-auth-error" role="alert"></p><button class="auth-primary" id="cloud-setup-submit">Create Account <span>→</span></button><button class="auth-link-strong" id="cloud-setup-back">Back to Main Login</button>`;
       gate.innerHTML=authMainScreen({screen:'adult',heroNote:'Welcome<br/>To<br/>The Club',title:'Set Up Your Account',copy:'Staff members use email and password after setup.',body,back:true});
       const back=()=>setGateHtml('signin');document.getElementById('auth-screen-back')?.addEventListener('click',back);document.getElementById('cloud-setup-back')?.addEventListener('click',back);
-      document.getElementById('cloud-setup-submit')?.addEventListener('click',async()=>{const name=document.getElementById('cloud-setup-name')?.value?.trim()||'',email=document.getElementById('cloud-setup-email')?.value?.trim()||'',password=document.getElementById('cloud-setup-password')?.value||'',code=document.getElementById('cloud-setup-invite')?.value?.trim()||'';if(name.length<2)return authError('Enter your name.');if(!/^\S+@\S+\.\S+$/.test(email))return authError('Enter a valid email address.');if(password.length<8)return authError('Use at least 8 characters for the password.');if(!code)return authError('Enter the invitation from your club.');const btn=document.getElementById('cloud-setup-submit');if(btn){btn.disabled=true;btn.innerHTML='Creating…';}try{localStorage.setItem(INVITE_KEY,code);const data=await signUp(email,password,name,code);if(data?.access_token){await claimInvite(code);localStorage.removeItem(INVITE_KEY);location.reload();return;}setGateHtml('verify','Account created. Confirm your email to finish applying the club invitation.',email);}catch(e){authError(e.message||String(e));if(btn){btn.disabled=false;btn.innerHTML='Create Account <span>→</span>';}}});return;
+      document.getElementById('cloud-setup-submit')?.addEventListener('click',async()=>{const name=document.getElementById('cloud-setup-name')?.value?.trim()||'',email=document.getElementById('cloud-setup-email')?.value?.trim()||'',password=document.getElementById('cloud-setup-password')?.value||'',code=document.getElementById('cloud-setup-invite')?.value?.trim()||'';if(name.length<2)return authError('Enter your name.');if(!/^\S+@\S+\.\S+$/.test(email))return authError('Enter a valid email address.');if(password.length<8)return authError('Use at least 8 characters for the password.');if(!code)return authError('Enter the invitation from your club.');const btn=document.getElementById('cloud-setup-submit');if(btn){btn.disabled=true;btn.innerHTML='Creating…';}try{localStorage.setItem(INVITE_KEY,code);const data=await signUp(email,password,name,code);if(data?.access_token){await claimInvite(code);localStorage.removeItem(INVITE_KEY);location.reload();return;}setGateHtml('verify','Account created. Confirm your email to finish applying the club invitation.',email);}catch(e){if(e?.code==='AUTH_CONTEXT_CHANGED')return;authError(e.message||String(e));if(btn){btn.disabled=false;btn.innerHTML='Create Account <span>→</span>';}}});return;
     }
 
     if(mode==='pinlogin'){
       const body=`<p class="auth-caption auth-caption-top">Legacy access only. New adult accounts use email and password; new players use Player Access.</p><label>Club<select id="cloud-pin-club"><option value="">Loading clubs…</option></select></label><label>Team<select id="cloud-pin-team"><option value="">Choose a club first</option></select></label>${authField({icon:'user',id:'cloud-pin-name',placeholder:'Name'})}${authField({icon:'lock',id:'cloud-pin-login',type:'password',placeholder:'6-digit PIN',inputmode:'numeric',maxlength:'6'})}<p class="auth-notice ${message?'':'hidden'}" id="cloud-auth-notice">${escapeHtml(message)}</p><p class="activation-error hidden" id="cloud-auth-error" role="alert"></p><button class="auth-primary" id="cloud-pin-login-submit">Continue <span>→</span></button><button class="auth-link-strong" id="cloud-pin-back">Back to Main Login</button><button class="auth-legacy-link" id="cloud-use-old-invite">Use an old invite code</button>`;
       gate.innerHTML=authSimple('Existing PIN Access','For accounts created before the new login system.',body,'LEGACY ACCESS');populatePinClubChoices();
       document.getElementById('cloud-pin-back')?.addEventListener('click',()=>setGateHtml('signin'));document.getElementById('cloud-use-old-invite')?.addEventListener('click',()=>setGateHtml('join'));
-      document.getElementById('cloud-pin-login-submit')?.addEventListener('click',async()=>{const club=document.getElementById('cloud-pin-club')?.value?.trim()||'',team=document.getElementById('cloud-pin-team')?.value?.trim()||'',name=document.getElementById('cloud-pin-name')?.value?.trim()||'',pin=document.getElementById('cloud-pin-login')?.value||'';if(club.length<2||team.length<2||name.length<2||!/^\d{6}$/.test(pin))return authError('Choose your club and team, then enter your name and 6-digit PIN.');try{localStorage.removeItem(TEST_MODE_KEY);setInviteAccessLocked(false);await loginWithPin(club,team,name,pin);context=await getContext();clubConfiguration=await getClubConfiguration().catch(()=>null);hideGate();window.dispatchEvent(new CustomEvent('clubhub-authenticated',{detail:{source:'pin'}}));}catch(e){authError(e.message||String(e));}});return;
+      document.getElementById('cloud-pin-login-submit')?.addEventListener('click',async()=>{const club=document.getElementById('cloud-pin-club')?.value?.trim()||'',team=document.getElementById('cloud-pin-team')?.value?.trim()||'',name=document.getElementById('cloud-pin-name')?.value?.trim()||'',pin=document.getElementById('cloud-pin-login')?.value||'';if(club.length<2||team.length<2||name.length<2||!/^\d{6}$/.test(pin))return authError('Choose your club and team, then enter your name and 6-digit PIN.');try{localStorage.removeItem(TEST_MODE_KEY);setInviteAccessLocked(false);await loginWithPin(club,team,name,pin);context=await getContext();clubConfiguration=await getClubConfiguration().catch(()=>null);window.dispatchEvent(new CustomEvent('clubhub-authenticated',{detail:{source:'pin'}}));}catch(e){if(e?.code==='AUTH_CONTEXT_CHANGED')return;authError(e.message||String(e));}});return;
     }
 
     if(mode==='join'){
       const body=`<p class="auth-caption auth-caption-top">Legacy one-time access. New coaches and parents should use the account setup route from the main login.</p>${authField({icon:'user',id:'cloud-join-name',placeholder:'Your name'})}${authField({icon:'code',id:'cloud-join-code',placeholder:'Invite code',autocomplete:'one-time-code',extra:'autocapitalize="characters" spellcheck="false"'})}<p class="auth-notice ${message?'':'hidden'}" id="cloud-auth-notice">${escapeHtml(message)}</p><p class="activation-error hidden" id="cloud-auth-error" role="alert"></p><button class="auth-primary" id="cloud-join-submit">Continue <span>→</span></button><button class="auth-link-strong" id="cloud-admin-signin">Back to Main Login</button>`;
       gate.innerHTML=authSimple('Existing Invite Access','Use only if your club gave you an older one-time invite.',body,'LEGACY ACCESS');document.getElementById('cloud-admin-signin')?.addEventListener('click',()=>setGateHtml('signin'));
-      document.getElementById('cloud-join-submit')?.addEventListener('click',async()=>{const name=document.getElementById('cloud-join-name')?.value?.trim()||'',code=document.getElementById('cloud-join-code')?.value?.trim()||'';if(name.length<2)return authError('Enter your name.');if(!code)return authError('Enter your invite code.');try{localStorage.removeItem(TEST_MODE_KEY);setInviteAccessLocked(false);await joinWithInvite(name,code);context=await getContext();if(context?.profile?.role==='pending_parent'){setGateHtml('approval','Your request is waiting for coach approval.');return;}hideGate();window.dispatchEvent(new CustomEvent('clubhub-authenticated',{detail:{source:'invite'}}));}catch(e){authError(e.message||String(e));}});return;
+      document.getElementById('cloud-join-submit')?.addEventListener('click',async()=>{const name=document.getElementById('cloud-join-name')?.value?.trim()||'',code=document.getElementById('cloud-join-code')?.value?.trim()||'';if(name.length<2)return authError('Enter your name.');if(!code)return authError('Enter your invite code.');try{localStorage.removeItem(TEST_MODE_KEY);setInviteAccessLocked(false);await joinWithInvite(name,code);context=await getContext();if(context?.profile?.role==='pending_parent'){setGateHtml('approval','Your request is waiting for coach approval.');return;}window.dispatchEvent(new CustomEvent('clubhub-authenticated',{detail:{source:'invite'}}));}catch(e){if(e?.code==='AUTH_CONTEXT_CHANGED')return;authError(e.message||String(e));}});return;
     }
 
     if(mode==='approval'||context?.profile?.role==='pending_parent'){
       const body=`<p class="auth-notice ${message?'':'hidden'}" id="cloud-auth-notice">${escapeHtml(message)}</p><p class="activation-error hidden" id="cloud-auth-error" role="alert"></p><button class="auth-link-strong" id="cloud-continue-registration">Continue registration</button><button class="auth-primary" id="cloud-check-approval">Check Approval <span>→</span></button><button class="auth-link-strong" id="cloud-reset-device">Back to Main Login</button>`;
       gate.innerHTML=authSimple('Waiting for Approval','Your parent account is set up. Complete your registration or wait for the club to review access.',body,'PARENT ACCESS');
       document.getElementById('cloud-continue-registration')?.addEventListener('click',()=>location.href='register.html');
-      document.getElementById('cloud-check-approval')?.addEventListener('click',async()=>{try{context=await getContext();if(context?.profile?.role==='parent')location.reload();else showNotice('Still waiting for the club to approve access.');}catch(e){authError(e.message||String(e));}});document.getElementById('cloud-reset-device')?.addEventListener('click',()=>{clearInviteAccess();setGateHtml('signin');});return;
+      document.getElementById('cloud-check-approval')?.addEventListener('click',async()=>{try{context=await getContext();if(context?.profile?.role==='parent')location.reload();else showNotice('Still waiting for the club to approve access.');}catch(e){if(e?.code==='AUTH_CONTEXT_CHANGED')return;authError(e.message||String(e));}});document.getElementById('cloud-reset-device')?.addEventListener('click',()=>{clearInviteAccess();setGateHtml('signin');});return;
     }
 
     if(mode==='revoked'||context?.profile?.role==='revoked'){
@@ -1444,16 +1439,16 @@
     }
 
     if(mode==='verify'){
-      const email=prefillEmail||localStorage.getItem(VERIFY_EMAIL_KEY)||'';const body=`${authField({icon:'mail',id:'cloud-verify-email',type:'email',placeholder:'Email address',value:email})}<p class="auth-notice ${message?'':'hidden'}" id="cloud-auth-notice">${escapeHtml(message)}</p><p class="activation-error hidden" id="cloud-auth-error" role="alert"></p><button class="auth-primary" id="cloud-verify-continue">I’ve Verified My Email <span>→</span></button><button class="auth-link-strong" id="cloud-resend-btn">Resend confirmation email</button><button class="auth-link-strong" id="cloud-back-signin">Back to Login</button>`;const instructions=location.protocol==='file:'?'Tap the confirmation link, then return to Shooters Hill AFC. If the browser does not reopen the app automatically, come back here and continue.':'Open the confirmation link in your email. It will return you to Shooters Hill AFC in your browser; sign in if prompted.';gate.innerHTML=authSimple('Check Your Inbox',instructions,body,'VERIFY EMAIL');document.getElementById('cloud-verify-continue')?.addEventListener('click',()=>{const addr=document.getElementById('cloud-verify-email')?.value?.trim()||email;setGateHtml('signin',localStorage.getItem(INVITE_KEY)?'Sign in to finish applying your club invitation.':'Sign in to finish sending your parent access request.',addr);});document.getElementById('cloud-resend-btn')?.addEventListener('click',async()=>{const addr=document.getElementById('cloud-verify-email')?.value?.trim();if(!addr)return authError('Enter your email address.');try{await resendSignup(addr);showNotice('Confirmation email sent. After confirming, return to Shooters Hill AFC and continue.');}catch(e){authError(e.message||String(e));}});document.getElementById('cloud-back-signin')?.addEventListener('click',()=>setGateHtml('signin','',email));return;
+      const email=prefillEmail||localStorage.getItem(VERIFY_EMAIL_KEY)||'';const body=`${authField({icon:'mail',id:'cloud-verify-email',type:'email',placeholder:'Email address',value:email})}<p class="auth-notice ${message?'':'hidden'}" id="cloud-auth-notice">${escapeHtml(message)}</p><p class="activation-error hidden" id="cloud-auth-error" role="alert"></p><button class="auth-primary" id="cloud-verify-continue">I’ve Verified My Email <span>→</span></button><button class="auth-link-strong" id="cloud-resend-btn">Resend confirmation email</button><button class="auth-link-strong" id="cloud-back-signin">Back to Login</button>`;const instructions=location.protocol==='file:'?'Tap the confirmation link, then return to Shooters Hill AFC. If the browser does not reopen the app automatically, come back here and continue.':'Open the confirmation link in your email. It will return you to Shooters Hill AFC in your browser; sign in if prompted.';gate.innerHTML=authSimple('Check Your Inbox',instructions,body,'VERIFY EMAIL');document.getElementById('cloud-verify-continue')?.addEventListener('click',()=>{const addr=document.getElementById('cloud-verify-email')?.value?.trim()||email;setGateHtml('signin',localStorage.getItem(INVITE_KEY)?'Sign in to finish applying your club invitation.':'Sign in to finish sending your parent access request.',addr);});document.getElementById('cloud-resend-btn')?.addEventListener('click',async()=>{const addr=document.getElementById('cloud-verify-email')?.value?.trim();if(!addr)return authError('Enter your email address.');try{await resendSignup(addr);showNotice('Confirmation email sent. After confirming, return to Shooters Hill AFC and continue.');}catch(e){if(e?.code==='AUTH_CONTEXT_CHANGED')return;authError(e.message||String(e));}});document.getElementById('cloud-back-signin')?.addEventListener('click',()=>setGateHtml('signin','',email));return;
     }
 
     if(mode==='forgot'){
-      const body=`${authField({icon:'mail',id:'cloud-recover-email',type:'email',placeholder:'Email address',value:prefillEmail})}<p class="auth-notice ${message?'':'hidden'}" id="cloud-auth-notice">${escapeHtml(message)}</p><p class="activation-error hidden" id="cloud-auth-error" role="alert"></p><button class="auth-primary" id="cloud-recover-submit">Send Reset Email <span>→</span></button><button class="auth-link-strong" id="cloud-back-signin">Back to Login</button>`;gate.innerHTML=authSimple('Reset Password','We’ll send a secure password reset link to your email address.',body,'ACCOUNT RECOVERY');document.getElementById('cloud-recover-submit')?.addEventListener('click',async()=>{const email=document.getElementById('cloud-recover-email')?.value?.trim()||'';if(!email)return authError('Enter your email address.');try{await sendPasswordReset(email);showNotice('Password reset email sent. Open the link on this device.');}catch(e){authError(e.message||String(e));}});document.getElementById('cloud-back-signin')?.addEventListener('click',()=>setGateHtml('signin'));return;
+      const body=`${authField({icon:'mail',id:'cloud-recover-email',type:'email',placeholder:'Email address',value:prefillEmail})}<p class="auth-notice ${message?'':'hidden'}" id="cloud-auth-notice">${escapeHtml(message)}</p><p class="activation-error hidden" id="cloud-auth-error" role="alert"></p><button class="auth-primary" id="cloud-recover-submit">Send Reset Email <span>→</span></button><button class="auth-link-strong" id="cloud-back-signin">Back to Login</button>`;gate.innerHTML=authSimple('Reset Password','We’ll send a secure password reset link to your email address.',body,'ACCOUNT RECOVERY');document.getElementById('cloud-recover-submit')?.addEventListener('click',async()=>{const email=document.getElementById('cloud-recover-email')?.value?.trim()||'';if(!email)return authError('Enter your email address.');try{await sendPasswordReset(email);showNotice('Password reset email sent. Open the link on this device.');}catch(e){if(e?.code==='AUTH_CONTEXT_CHANGED')return;authError(e.message||String(e));}});document.getElementById('cloud-back-signin')?.addEventListener('click',()=>setGateHtml('signin'));return;
     }
 
     if(mode==='newpassword'||mode==='pinsetup'||mode==='preapproval-pin'||mode==='resume'){
       if(mode==='newpassword'){
-        const body=`${authField({icon:'lock',id:'cloud-new-password',type:'password',placeholder:'New password',autocomplete:'new-password'})}${authField({icon:'lock',id:'cloud-new-password2',type:'password',placeholder:'Repeat new password',autocomplete:'new-password'})}<p class="auth-notice ${message?'':'hidden'}" id="cloud-auth-notice">${escapeHtml(message)}</p><p class="activation-error hidden" id="cloud-auth-error" role="alert"></p><button class="auth-primary" id="cloud-password-save">Save Password <span>→</span></button>`;gate.innerHTML=authSimple('Choose New Password','Use at least 8 characters.',body,'ACCOUNT RECOVERY');document.getElementById('cloud-password-save')?.addEventListener('click',async()=>{const a=document.getElementById('cloud-new-password')?.value||'',b=document.getElementById('cloud-new-password2')?.value||'';if(a.length<8)return authError('Use at least 8 characters.');if(a!==b)return authError('The passwords do not match.');try{await updatePassword(a);location.reload();}catch(e){authError(e.message||String(e));}});return;
+        const body=`${authField({icon:'lock',id:'cloud-new-password',type:'password',placeholder:'New password',autocomplete:'new-password'})}${authField({icon:'lock',id:'cloud-new-password2',type:'password',placeholder:'Repeat new password',autocomplete:'new-password'})}<p class="auth-notice ${message?'':'hidden'}" id="cloud-auth-notice">${escapeHtml(message)}</p><p class="activation-error hidden" id="cloud-auth-error" role="alert"></p><button class="auth-primary" id="cloud-password-save">Save Password <span>→</span></button>`;gate.innerHTML=authSimple('Choose New Password','Use at least 8 characters.',body,'ACCOUNT RECOVERY');document.getElementById('cloud-password-save')?.addEventListener('click',async()=>{const a=document.getElementById('cloud-new-password')?.value||'',b=document.getElementById('cloud-new-password2')?.value||'';if(a.length<8)return authError('Use at least 8 characters.');if(a!==b)return authError('The passwords do not match.');try{await updatePassword(a);location.reload();}catch(e){if(e?.code==='AUTH_CONTEXT_CHANGED')return;authError(e.message||String(e));}});return;
       }
       gate.innerHTML=authSimple('Legacy Access','This account uses the previous PIN/access method.',`<p class="auth-notice">${escapeHtml(message||'Continue using the existing access method or return to the main login.')}</p><button class="auth-primary" id="cloud-legacy-continue">Continue <span>→</span></button><button class="auth-link-strong" id="cloud-legacy-main">Main Login</button>`,'LEGACY ACCESS');document.getElementById('cloud-legacy-continue')?.addEventListener('click',()=>setGateHtml('pinlogin'));document.getElementById('cloud-legacy-main')?.addEventListener('click',()=>setGateHtml('signin'));return;
     }
@@ -1466,50 +1461,21 @@
   function hideGate(){document.getElementById('activation-gate')?.classList.add('hidden');document.body.classList.remove('auth-open');document.querySelector('.app-shell')?.classList.remove('account-locked');}
   async function signOut(event,nextMode='signin'){
     try{event?.preventDefault?.();event?.stopPropagation?.();}catch{}
-    const btn=event?.currentTarget instanceof HTMLElement?event.currentTarget:null;
-    if(btn){btn.setAttribute('disabled','disabled');btn.textContent='Signing out…';}
-
-    // Stop any account-specific work before clearing the active session.
-    clearTimeout(saveTimer);saveTimer=null;pendingState=null;saving=false;
-    clearInterval(pollTimer);pollTimer=null;
-    try{if(window.__clubInboxTimer){clearInterval(window.__clubInboxTimer);window.__clubInboxTimer=null;}}catch{}
-    try{if(window.__adminBackgroundTimer){clearInterval(window.__adminBackgroundTimer);window.__adminBackgroundTimer=null;}}catch{}
-    try{if(window.__fixtureScanTimer){clearInterval(window.__fixtureScanTimer);window.__fixtureScanTimer=null;}}catch{}
-
-    // Revoke the Supabase refresh session when possible. Local logout must still
-    // complete if the device is offline or the server request fails.
-    await window.ClubHubKickoffUpdates?.disableForLogout?.();
-    const accessToken=session?.access_token||'';
-    if(accessToken){
-      try{
-        await fetch(base()+'/auth/v1/logout',{method:'POST',headers:authHeaders(accessToken)});
-      }catch{}
-    }
-
-    localStorage.removeItem(TEST_MODE_KEY);
-    clearInviteAccess();
-    localStorage.removeItem(VERIFY_EMAIL_KEY);
-    clearAccountLocalData();
-    context=null;visibleTeams=[];activeTeam=null;activeRevision=-1;lastRemoteUpdatedAt='';
-    try{
-      if(nextMode==='parentsignin')sessionStorage.setItem(PARENT_SIGNIN_AFTER_LOGOUT_KEY,'1');
-      else sessionStorage.removeItem(PARENT_SIGNIN_AFTER_LOGOUT_KEY);
-    }catch{}
-
-    // Lock the existing app immediately so no team data remains visible while
-    // the clean reload is being prepared.
+    const oldSession=session||loadSession(),accessToken=oldSession?.access_token||'',attempt=++authAttempt;
+    lockGate();clearInviteAccess();clearAccountLocalData();localStorage.removeItem(TEST_MODE_KEY);localStorage.removeItem(VERIFY_EMAIL_KEY);
+    context=null;clubConfiguration=null;visibleTeams=[];activeTeam=null;activeRevision=-1;lastRemoteUpdatedAt='';
+    try{if(nextMode==='parentsignin')sessionStorage.setItem(PARENT_SIGNIN_AFTER_LOGOUT_KEY,'1');else sessionStorage.removeItem(PARENT_SIGNIN_AFTER_LOGOUT_KEY);}catch{}
     try{document.querySelectorAll('dialog[open]').forEach(d=>d.close());}catch{}
-    setGateHtml(nextMode==='parentsignin'?'parentsignin':'signin');
-    window.dispatchEvent(new CustomEvent('clubhub-signed-out'));
-
-    // Reload without any auth callback/query fragments so bootstrap cannot
-    // restore the session we just cleared.
-    setTimeout(()=>{
-      try{
-        const clean=location.href.split('#')[0].split('?')[0];
-        location.replace(clean);
-      }catch{location.reload();}
-    },120);
+    setGateHtml(nextMode==='parentsignin'?'parentsignin':'signin');window.dispatchEvent(new CustomEvent('clubhub-signed-out'));
+    const current=()=>attempt===authAttempt&&!loadSession()?.access_token;
+    const controllers=new Set();
+    const cleanupRequest=(path,body)=>{const controller=typeof AbortController==='function'?new AbortController():null;if(controller)controllers.add(controller);return fetch(base()+path,{method:'POST',headers:authHeaders(accessToken),...(body?{body:JSON.stringify(body)}:{}),keepalive:true,...(controller?{signal:controller.signal}:{})}).finally(()=>controllers.delete(controller));};
+    const reload=()=>{for(const controller of controllers)controller.abort();if(!current())return;try{location.replace(location.href.split('#')[0].split('?')[0]);}catch{location.reload();}};
+    const deadline=setTimeout(reload,1500);
+    const cleanup=[];
+    try{cleanup.push(Promise.resolve(window.ClubHubKickoffUpdates?.disableForLogout?.({isCurrent:current,unregister:endpoint=>accessToken?cleanupRequest('/rest/v1/rpc/unregister_kickoff_push',{p_endpoint:endpoint}):Promise.resolve()})));}catch{}
+    if(accessToken)cleanup.push(cleanupRequest('/auth/v1/logout'));
+    Promise.allSettled(cleanup).then(()=>{clearTimeout(deadline);if(current())setTimeout(reload,120);});
   }
   function switchToParentSignIn(){return signOut(null,'parentsignin');}
 
@@ -1538,7 +1504,7 @@
   async function bootstrap(options={}){
     hooks=options||{};
     if(!configured()){document.body.classList.add('cloud-not-configured');return {configured:false};}
-    document.body.classList.add('cloud-enabled');
+    document.body.classList.add('cloud-enabled');accountReady=false;readyBootstrap=null;pendingBootstrapContext=null;lockGate();if(!document.getElementById('activation-gate')?.dataset?.authMode){setGateHtml('signin');const checking=document.getElementById('cloud-auth-submit');if(checking){checking.disabled=true;checking.textContent='Signing in…';}}
     if(!testModeActive()){document.body.classList.remove('debug-test-mode');document.getElementById('test-mode-banner')?.remove();}
     if(testModeActive()){
       clubConfiguration=await getClubConfiguration().catch(()=>TEST_CLUB_CONFIG);const teams=Array.isArray(clubConfiguration?.teams)&&clubConfiguration.teams.length?clubConfiguration.teams:[TEST_TEAM];
@@ -1550,7 +1516,8 @@
       return {configured:true,role:'coach',profile:context.profile,club:context.club,configuration:clubConfiguration,team:oldShapeTeam(picked),teams:visibleTeamList(),email:''};
     }
     if(INITIAL_AUTH_CALLBACK&&!initialAuthCallbackHandled){initialAuthCallbackHandled=true;const callbackType=await handleAuthCallback(INITIAL_AUTH_CALLBACK,{duringBootstrap:true});if(['recovery','parentrequest','error'].includes(callbackType))return null;}
-    const valid=await ensureFreshSession();
+    const bootScope=captureAccountRequest();
+    const valid=await awaitAccountWork(ensureFreshSession(),bootScope);if(valid)assertAccountRequest(bootScope);else if(bootScope.generation!==accountGeneration||bootScope.attempt!==authAttempt)throw accountContextChanged();
     if(!valid){
       clearAccountLocalData();
       let parentSignIn=false;
@@ -1561,64 +1528,79 @@
     try{sessionStorage.removeItem(PARENT_SIGNIN_AFTER_LOGOUT_KEY);}catch{}
     const pendingAdultInvite=localStorage.getItem(INVITE_KEY)||'';
     if(pendingAdultInvite){
-      try{await claimInvite(pendingAdultInvite);localStorage.removeItem(INVITE_KEY);}catch(e){setGateHtml('adultsetup','Your email account is signed in, but the invitation could not be applied. Check the invite code and try again.');return null;}
+      try{await claimInvite(pendingAdultInvite);localStorage.removeItem(INVITE_KEY);}catch(e){if(e?.code==='AUTH_CONTEXT_CHANGED')throw e;setGateHtml('adultsetup','Your email account is signed in, but the invitation could not be applied. Check the invite code and try again.');return null;}
     }
     const teamCache=cachedTeams();
     let teamFetch=null;
     try{
       teamFetch=listTeams().catch(()=>null);
-      context=await getContext();
-    }catch(e){saveSession(null);clearAccountLocalData();setGateHtml('signin','Your saved access expired. Sign in again.');return null;}
+      const nextContext=await getContext();assertAccountRequest(bootScope);context=nextContext;if(context?.profile?.user_id===session?.user?.id)verifiedAccountUser=session.user.id;
+    }catch(e){if(e?.code==='AUTH_CONTEXT_CHANGED')throw e;saveSession(null);clearAccountLocalData();setGateHtml('signin','Your saved access expired. Sign in again.');return null;}
     if(!context?.profile){saveSession(null);clearAccountLocalData();setGateHtml('signin','No club access profile is attached to this account.');return null;}
     if(context.profile.role==='pending'){
-      try{await resumeCoachSignupRequestFromMetadata();}catch(e){setGateHtml('signin','Your account is verified, but the coach access request could not be submitted. '+(e.message||''),session?.user?.email||'');return null;}
+      try{await resumeCoachSignupRequestFromMetadata();}catch(e){if(e?.code==='AUTH_CONTEXT_CHANGED')throw e;setGateHtml('signin','Your account is verified, but the coach access request could not be submitted. '+(e.message||''),session?.user?.email||'');return null;}
     }
     if(context.profile.role==='pending_coach'){setGateHtml('coachapproval','Your account is ready. Waiting for the Club Admin to approve access.');return null;}
     if(context.profile.role==='pending'){
       try{await resumeParentSignupRequestFromMetadata();}
-      catch(e){setGateHtml('signin','Your account is verified, but the parent access request could not be submitted. '+(e.message||''),session?.user?.email||'');return null;}
+      catch(e){if(e?.code==='AUTH_CONTEXT_CHANGED')throw e;setGateHtml('signin','Your account is verified, but the parent access request could not be submitted. '+(e.message||''),session?.user?.email||'');return null;}
     }
-    try{clubConfiguration=await getClubConfiguration();}catch{clubConfiguration=null;}
+    try{const configuration=await getClubConfiguration();assertAccountRequest(bootScope);clubConfiguration=configuration;}catch(error){if(error?.code==='AUTH_CONTEXT_CHANGED')throw error;clubConfiguration=null;}
     if(context.profile.role==='pending_parent'){
       setGateHtml('approval','Your parent account is ready. Waiting for coach approval.');return null;
     }
     if(context.profile.role==='player'&&context.profile.access_method!=='player_code'&&!context.profile.pin_set_at){setGateHtml('pinsetup','This is a legacy player account. Create a 6-digit PIN to continue.');return null;}
     if(context.profile.role==='revoked'){clearAccountLocalData();setGateHtml('revoked');return null;}
     if(context.profile.role==='pending'){setGateHtml('signup','This account is not attached to a club yet. Choose your account type and team to request access.');return null;}
+    if(!['club_admin','coach','assistant_coach','parent','player'].includes(context.profile.role)||context.profile.user_id!==session?.user?.id){clearAccountLocalData();setGateHtml('signin','No club access profile is attached to this account.');return null;}
+    if(context.profile.role==='player'&&Number(context.team?.age_group)!==15){clearAccountLocalData();setGateHtml('signin','This Player Access code is not assigned to an eligible U15 player account.');return null;}
     if(context.profile.role==='parent'){
-      const linked=await teamFetch;
+      const linked=await teamFetch;assertAccountRequest(bootScope);
       if(!Array.isArray(linked)){setGateHtml('signin','Could not verify linked teams. Please try again.');return null;}
       visibleTeams=linked;
-    }else if(teamCache.length){visibleTeams=teamCache;teamFetch?.then(rows=>{if(Array.isArray(rows)&&rows.length){visibleTeams=rows;}}).catch(()=>{});}else visibleTeams=(await teamFetch)||[];
+    }else if(teamCache.length){visibleTeams=teamCache;teamFetch?.then(rows=>{assertAccountRequest(bootScope);if(Array.isArray(rows)&&rows.length){visibleTeams=rows;}}).catch(()=>{});}else{const rows=await teamFetch;assertAccountRequest(bootScope);visibleTeams=rows||[];}
     activeTeam=chooseActiveTeam(options.localState||null);
     if(!activeTeam){setGateHtml('join','No team is available to this account.');return null;}
     if(inviteAccessActive() && inviteAccessLocked()){setGateHtml('resume');return null;}
-    hideGate();updateCloudPanel();
-    return {configured:true,role:role(),profile:context.profile,club:context.club,configuration:clubConfiguration,team:oldShapeTeam(activeTeam),teams:visibleTeamList(),email:session?.user?.email||''};
+    updateCloudPanel();
+    const result={configured:true,role:role(),profile:context.profile,club:context.club,configuration:clubConfiguration,team:oldShapeTeam(activeTeam),teams:visibleTeamList(),email:session?.user?.email||''};pendingBootstrapContext=result;return result;
   }
 
+  function bootstrapResult(value,scope,refresh=null){readyBootstrap={value,scope,refresh};return value;}
+  function completeBootstrap(loaded,render){
+    const ready=readyBootstrap;if(!ready||ready.value!==loaded)throw accountContextChanged();assertTeamStateScope(ready.scope);
+    accountReady=true;
+    try{if(render)render();assertTeamStateScope(ready.scope);readyBootstrap=null;pendingBootstrapContext=null;hideGate();updateCloudPanel();if(ready.refresh)ready.refresh();return true;}
+    catch(error){accountReady=false;lockGate();throw error;}
+  }
+  function failBootstrap(error,loaded){if(error?.code==='AUTH_CONTEXT_CHANGED')return;if(loaded&&readyBootstrap?.value!==loaded)return;readyBootstrap=null;lockGate();setGateHtml('signin',error?.message||'Team information is not available. Please try again.');}
   async function loadInitialState(localState,seedFactory){
-    if(testModeActive()){const seed=seedFactory?seedFactory(oldShapeTeam(activeTeam)):localState;return {state:seed,fromCloud:false,testMode:true};}
-    if(!configured()||!activeTeam)return {state:localState,fromCloud:false};
-    const activeAge=Number(activeTeam?.age_group||0);
-    const sensitiveMini=activeAge>=7&&activeAge<=11;
-    if(sensitiveMini)localStorage.removeItem(TEAM_STATE_CACHE_PREFIX+activeTeam.id);
-    const cached=sensitiveMini?null:cachedTeamState(activeTeam.id);
-    if(cached?.state){
-      activeRevision=Number(cached.revision??0);lastRemoteUpdatedAt=cached.updated_at||'';
-      const cachedRevision=activeRevision;
-      fetchTeamState(activeTeam.id).then(row=>{if(row?.state&&Number(row.revision)!==cachedRevision&&hooks.onRemoteState)hooks.onRemoteState(row.state,{reason:'background-refresh'});}).catch(()=>{});
-      return {state:cached.state,fromCloud:true,cached:true,revision:activeRevision};
+    if(testModeActive()){const seed=seedFactory?seedFactory(oldShapeTeam(activeTeam)):localState;return bootstrapResult({state:seed,fromCloud:false,testMode:true},captureTeamStateScope());}
+    if(!configured())return {state:localState,fromCloud:false};
+    if(!activeTeam)throw new Error('Team information is not available. Please try again.');
+    const scope=captureTeamStateScope(),teamId=activeTeam.id,cached=cachedTeamState(teamId);
+    if(cached?.state&&!(suspendedDraft&&suspendedDraft.owner===draftOwner(scope))){
+      acceptTeamStateRead(cached,scope);
+      const refresh=()=>fetchTeamState(teamId,scope).then(row=>{assertTeamStateScope(scope,{passive:true});acceptTeamStateRead(row,scope,{passive:true,reason:row?.state&&Number(row.revision)!==Number(cached.revision)?'background-refresh':''});}).catch(()=>{});
+      return bootstrapResult({state:cached.state,fromCloud:true,cached:true,revision:activeRevision},scope,refresh);
     }
-    const row=await fetchTeamState(activeTeam.id);
-    if(row?.state)return {state:row.state,fromCloud:true,revision:activeRevision};
-    if(canEdit()){
-      const seed=seedFactory?seedFactory(oldShapeTeam(activeTeam)):localState;
-      activeRevision=-1;
-      await saveTeamStateNow(seed);
-      return {state:seed,fromCloud:false,created:true,revision:activeRevision};
+    const row=await fetchTeamState(teamId,scope);assertTeamStateScope(scope);
+    if(row?.state){
+      acceptTeamStateRead(row,scope);
+      const draft=suspendedDraft;
+      if(draft&&draft.owner===draftOwner(scope)){
+        activeRevision=draft.revision;unsyncedState=true;
+        const resume=draft.resume?()=>{assertTeamStateScope(scope);if(suspendedDraft!==draft)return;suspendedDraft=null;queueStateSave(draft.state);}:null;
+        return bootstrapResult({state:JSON.parse(JSON.stringify(draft.state)),fromCloud:false,unsynced:true,revision:activeRevision},scope,resume);
+      }
+      return bootstrapResult({state:row.state,fromCloud:true,revision:activeRevision},scope);
     }
-    return {state:localState,fromCloud:false};
+    if(canEditPermission()){
+      const seed=seedFactory?seedFactory(oldShapeTeam(activeTeam)):null;if(!seed)throw new Error('Team information is not available. Please try again.');
+      activeRevision=-1;await saveTeamStateNow(seed,{bootstrapScope:scope});assertTeamStateScope(scope);
+      return bootstrapResult({state:seed,fromCloud:false,created:true,revision:activeRevision},scope);
+    }
+    throw new Error('Team information is not available. Please try again.');
   }
   function startPolling(){
     if(!configured()||!activeTeam)return;
@@ -1630,14 +1612,22 @@
   async function getRegistrationContactConduct({teamId,playerName,season}){return rpc('get_registration_contact_conduct',{p_team_id:teamId,p_player_name:playerName,p_season:season});}
   async function submitRegistrationContactConduct({teamId,playerName,season,mobile,documentVersion,agree}){return rpc('submit_registration_contact_conduct',{p_team_id:teamId,p_player_name:playerName,p_season:season,p_mobile:mobile,p_document_version:documentVersion,p_agree:agree===true});}
   async function readRegistrationConductDocument({teamId,playerName,season}){
-    if(!await ensureFreshSession())throw Error('Sign in first');
+    const scope=captureAccountRequest();if(!await ensureFreshSession())throw Error('Sign in first');assertAccountRequest(scope);
     const url=new URL('/__registration_document',location.href);url.searchParams.set('team',teamId);url.searchParams.set('player',playerName);url.searchParams.set('season',season);
     const response=await fetch(url,{headers:{Authorization:'Bearer '+session.access_token},cache:'no-store'});
-    if(!response.ok)throw Error('Code of conduct unavailable');return response.blob();
+    assertAccountRequest(scope);if(!response.ok)throw Error('Code of conduct unavailable');const blob=await response.blob();assertAccountRequest(scope);return blob;
   }
+  window.addEventListener?.('storage',event=>{
+    if(event.key!==SESSION_KEY)return;
+    const next=loadSession();
+    const oldUser=session?.user?.id||verifiedAccountUser||context?.profile?.user_id||'',nextUser=next?.user?.id||'';
+    if(oldUser&&oldUser===nextUser){session=next;return;}
+    const attempt=++authAttempt;lockGate();clearAccountLocalData({preserveUser:nextUser});session=next;verifiedAccountUser=nextUser;authAttemptOwner=nextUser;context=null;clubConfiguration=null;visibleTeams=[];activeTeam=null;activeRevision=-1;lastRemoteUpdatedAt='';
+    setGateHtml('signin');setTimeout(()=>{if(attempt!==authAttempt||String(loadSession()?.user?.id||'')!==nextUser)return;try{location.replace(location.href.split('#')[0].split('?')[0]);}catch{location.reload();}},120);
+  });
   window.ClubHubCloud={
     getRegistrationContactConduct,submitRegistrationContactConduct,readRegistrationConductDocument,listContactDirectory,saveMemberContactDetails,importMemberContactDetails,loadAdminPlayerOnboarding,onboardAdminPlayer,
-    configured,bootstrap,loadInitialState,queueStateSave,confirmStateSave,pullLatest,startPolling,commitMatchAction,commitTournamentAction,reviewMatchActionState,clearMatchActionAttendance,clearMatchActionNote,
+    configured,bootstrap,loadInitialState,completeBootstrap,failBootstrap,queueStateSave,confirmStateSave,pullLatest,startPolling,commitMatchAction,commitTournamentAction,reviewMatchActionState,clearMatchActionAttendance,clearMatchActionNote,
     role,requestCoachAccess,listPendingCoachRequests,reviewCoachRequest,listMyCoachTeams,switchMyCoachTeam,setMyCapacity,requestChildLink,realRole,isStaffAccount,actingAsParent,assignCoachTeam,unassignCoachTeam,canEdit,canAdmin,assignedTeam,currentTeam,coachTeam,hasDualCoachAccess,visibleTeamList,getClubConfiguration,listLoginClubs,listLoginTeams,listCurrentClubLoginTeams,createInvite,requestParentAccess,listPendingParentRequests,listTeamMembers,listClubCoaches,listCoachQualifications,getCoachQualifications,saveCoachQualifications,listClubAccessAccounts,removeClubCoach,listPublishedClubResults,listParentPlayerLinks,saveParentPlayerLinks,listPlayerAccountLinks,listMatchAvailability,saveMatchAvailability,saveCoachMatchAvailability,listSelkentTeamDirectory,syncSelkentTeamDirectory,getCoachMatchNote,saveCoachMatchNote,listAnnouncements,createAnnouncement,markAnnouncementRead,deleteAnnouncement,listMatchAttendance,saveMatchAttendance,getAvailabilitySettings,setAvailabilityDeadline,sendAvailabilityReminder,listNotifications,acknowledgeKickoffUpdate,acknowledgeKickoffAsCoach,respondKickoffParentAvailability,listKickoffUpdatesForAdmin,getKickoffPushSettings,registerKickoffPush,unregisterKickoffPush,markNotificationRead,notifyFixtureChange,notifySelectedSquad,notifyMatchReport,notifyMatchReopened,listPlayerAppearanceStats,recordAuditEvent,listAuditHistory,listSeasonArchives,getSeasonArchive,archiveCurrentSeason,rolloverClubSeason,resetParentPin,setAccessPin,approveParentRequest,removeTeamMember,syncTeamDirectory,switchAdminTeam,switchParentTeam,getClubOverview,signOut,switchToParentSignIn,handleAuthCallback,listMessageContacts,listClubMessages,sendClubMessage,markClubMessagesRead,getClubComplianceStatus,setDisputeReviewers,setClubSafeguardingContacts,getConcernRouting,raiseClubConcern,listGeneralDisputes,listDisputeMessages,upsertU11SafeguardingInfo,exportU11SafeguardingPack,listSafeguardingExportAudit,requestClubCancellation,cancelClubCancellation,
     updateCloudPanel,
     get context(){return context;},get configuration(){return clubConfiguration;},get session(){return session;},get revision(){return activeRevision;},get testMode(){return testModeActive();}

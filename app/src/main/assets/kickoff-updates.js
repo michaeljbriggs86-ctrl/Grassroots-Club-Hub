@@ -194,11 +194,15 @@
   }catch(_){if(created)await created.unsubscribe().catch(()=>{});if(key===identity())push.error=Notification.permission==='denied'?'Blocked in your browser settings':'Could not update push settings. Try again.';}
   finally{if(key===identity()){push.busy=false;renderPush();}}
  }
- async function disableForLogout(){
-  ++pushVersion;
+ async function disableForLogout({unregister=endpoint=>cloud().unregisterKickoffPush(endpoint),isCurrent=()=>true}={}){
+  const version=++pushVersion;
   if(!supported())return;
-  try{const r=await navigator.serviceWorker.getRegistration(),sub=await r?.pushManager?.getSubscription();if(sub){try{await cloud().unregisterKickoffPush(sub.endpoint);}finally{await sub.unsubscribe();}}}catch(_){/* Logout still completes offline. Generic lock-screen content never includes private data. */}
-  reset();
+  try{
+   const r=await navigator.serviceWorker.getRegistration();if(!isCurrent()||version!==pushVersion)return;
+   const sub=await r?.pushManager?.getSubscription();if(!sub||!isCurrent()||version!==pushVersion)return;
+   await Promise.allSettled([Promise.resolve().then(()=>unregister(sub.endpoint)),Promise.resolve().then(()=>{if(isCurrent()&&version===pushVersion)return sub.unsubscribe();})]);
+  }catch(_){/* Local sign-out never waits for remote cleanup. */}
+  if(isCurrent()&&version===pushVersion)reset();
  }
  document.addEventListener('click',event=>{
   const coach=event.target.closest?.('[data-kickoff-coach-confirm]');if(coach){void confirmCoach(coach.dataset.kickoffCoachConfirm);return;}

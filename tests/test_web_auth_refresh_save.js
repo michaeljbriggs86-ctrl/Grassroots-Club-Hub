@@ -7,15 +7,17 @@ const start=source.indexOf('  function authHeaders(');
 const end=source.indexOf('  async function signIn(',start);
 assert.ok(start>=0&&end>start);
 const auth=source.slice(start,end);
+const scopeHelpers=source.slice(source.indexOf('  function accountContextChanged('),source.indexOf('  function clearAccountLocalData('));
 
 function harness(initial,fetch){
   let stored={...initial};
   return new Function('fetch','getStored','setStored',`
     const cfg={anonKey:'public-key'};
     const base=()=> 'https://example.supabase.co';
-    let session=getStored(),sessionRefresh=null;
+    let session=getStored(),sessionRefresh=null,accountGeneration=0,authAttempt=0;const accountRequests=new Set();
     const loadSession=()=>getStored();
     const saveSession=x=>{session=x;setStored(x);};
+    ${scopeHelpers}
     ${auth}
     return {request,ensureFreshSession,getSession:()=>session};
   `)(fetch,()=>stored,x=>{stored=x;});

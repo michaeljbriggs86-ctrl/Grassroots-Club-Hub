@@ -7,18 +7,18 @@ const start=source.indexOf('  async function saveTeamStateNow('),end=source.inde
 assert.ok(start>=0&&end>start,'cloud save functions are present');
 const saveFunctions=source.slice(start,end);
 
-function cloudHarness(rpc,{editable=true,team=true,session=true,timers=null}={}){
-  const updates=[],statuses=[];
-  const api=new Function('rpc','fetchTeamState','emitStatus','setTimeout','clearTimeout','updates','statuses',`
-    let saveTimer=null,saving=false,pendingState=null,unsyncedState=false,confirmingState=false;
-    let session={user:{id:'coach'}},activeTeam={id:'u9'},activeRevision=1,lastRemoteUpdatedAt='';
-    const configured=()=>true,canEdit=()=>${editable},hooks={onRemoteState:(row)=>updates.push(row)};
-    if(!${team})activeTeam=null;
-    if(!${session})session=null;
-    ${saveFunctions}
-    return {queueStateSave,confirmStateSave,pullLatest};
-  `)(rpc,async()=>({state:{matches:[]},revision:2}),(...args)=>statuses.push(args),(timers?fn=>{timers.push(fn);return fn;}:setTimeout),(timers?()=>{}:clearTimeout),updates,statuses);
-  return {api,updates,statuses};
+function cloudHarness(rpc,{editable=true,team=true,session:hasSession=true,timers=null}={}){
+  const {harness,session,response}=require('./helpers/cloud_client_harness');
+  const statuses=[];
+  const h=harness(async r=>{
+    if(r.path.endsWith('save_team_state'))return response(200,await rpc('save_team_state',r.body));
+    if(r.path.endsWith('get_team_state_for_me'))return response(200,{state:{matches:[]},revision:2});
+  });
+  if(!editable)h.test.initialize(session('a'),'parent');
+  if(!team)h.test.setTeam(null);if(!hasSession)h.test.clearSession();
+  h.window.addEventListener('clubhub-cloud-status',event=>statuses.push([event.detail.text,event.detail.type]));
+  const api={...h.api,queueStateSave(value){h.api.queueStateSave(value);if(timers){const task=[...h.timers.values()].find(t=>t.delay===700);if(task)timers.push(task.fn);}}};
+  return {api,updates:h.updates,statuses};
 }
 
 (async()=>{
