@@ -20,7 +20,8 @@ const window = { ClubHubNative: { isDebugBuild: () => true }, __PITCHKIND_PILOT_
 const hero = { src: '', alt: '', onerror: null, getAttribute(name) { return this[name] || null; } };
 const document = { querySelectorAll: () => [hero] };
 const overlay = vm.createContext({ state, norm, window });
-vm.runInContext(extract('app/src/main/assets/static-feed-overlay.js', '  function attachDirectoryBadges(', '  function loadDirectory('), overlay);
+const guardHelpers=extract('app/src/main/assets/static-feed-overlay.js', '  function feedMutationIdentity(', '  function norm(');
+vm.runInContext(guardHelpers+extract('app/src/main/assets/static-feed-overlay.js', '  function attachDirectoryBadges(', '  function loadDirectory('), overlay);
 const app = vm.createContext({ state, window, document, providerType: () => 'selkent', primaryProvider: () => ({ config: { club_url: state.selkent.clubUrl } }),
   clubSettings: () => ({ display_name: 'Shooters Hill AFC' }), isOwnTeamName: () => false,
   selkentNorm: norm, pilotBadgeOverrideAllowed: () => false, FAILED_BADGE_URLS: new Set() });
@@ -199,7 +200,7 @@ assert.equal(app.verifiedTeamBadgeUrl(secondTeam), '');
     isSelkentProvider: () => true, original: {},
     loadDirectory: async force => { calls.push(force); return { last_updated: '2026-09-26T10:00:00Z' }; },
     buildClubTeams: () => [{ teamName: crayTeam }], persistWithoutRender: () => {}, CLOUD_MODE: false });
-  vm.runInContext(extract('app/src/main/assets/static-feed-overlay.js', '  window.syncProviderClubTeams=async function(silent=true){', '  window.syncSelkentDivision='), refresh);
+  vm.runInContext(guardHelpers+extract('app/src/main/assets/static-feed-overlay.js', '  window.syncProviderClubTeams=async function(silent=true){', '  window.syncSelkentDivision='), refresh);
   await refresh.window.syncProviderClubTeams(false);
   await refresh.window.syncProviderClubTeams(true);
   assert.deepEqual(calls, [true, false]);

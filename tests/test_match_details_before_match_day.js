@@ -9,7 +9,7 @@ class Clock extends Date{constructor(...args){super(...(args.length?args:[now]))
 const node=()=>{const set=new Set();return {value:'',textContent:'',innerHTML:'',dataset:{},classList:{toggle(k,on){on?set.add(k):set.delete(k);},contains:k=>set.has(k),add:k=>set.add(k),remove:k=>set.delete(k)},showModal(){}};};
 const nodes={};const get=id=>nodes[id]||(nodes[id]=node());
 const sections=['goals','assists','awards','bookings'].map(f=>Object.assign(node(),{dataset:{detailFeature:f}}));
-const ctx={Date:Clock,state:{matches:[{id:'future',date:'2026-10-24',competition:'Friendly',status:'scheduled'},{id:'played',date:'2026-10-03',competition:'League',gf:5,ga:0}]},
+const ctx={Date:Clock,__matchReportSaveBusy:false,state:{matches:[{id:'future',date:'2026-10-24',competition:'Friendly',status:'scheduled'},{id:'played',date:'2026-10-03',competition:'League',gf:5,ga:0}]},
   document:{getElementById:get,querySelectorAll:sel=>sel==='[data-detail-feature]'?sections:[]},
   resetMatchReportMode(){},formatDate:s=>s,esc:s=>s,matchScoreText:()=>'',matchStatus:m=>m.status||'played',statusLabel:()=>'Scheduled',
   renderMatchOverview(){},detailPlayerInputs(){},detailBookingInputs(){},renderAwardFields(){},featureEnabled:()=>true,isCoach:()=>true,

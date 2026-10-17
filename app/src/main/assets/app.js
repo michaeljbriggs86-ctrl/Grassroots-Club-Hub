@@ -1202,11 +1202,22 @@ function updateCurrentClubTeamDivision(division=''){
   const current=state.selkent.clubTeams.find(t=>String(t.ageGroup)===String(state.meta.ageGroup)&&selkentTeamMatch(t.leagueName,state.division.teamName));
   if(current)current.division=division;
 }
+// Keep pre-action feed continuations from mutating a newer team or match state.
+function backgroundFeedMutationScope(){
+  const capture=()=>{
+    const cloud=window.ClubHubCloud,ctx=cloud?.context;
+    return {cloud,state,user:cloud?.session?.user?.id||'',club:ctx?.profile?.club_id||ctx?.club?.id||'',team:cloud?.currentTeam?.()?.id||'',role:typeof currentRole==='undefined'?'':currentRole,capacity:typeof adminUiMode==='undefined'?'':adminUiMode,cloudRole:cloud?.role?.()||ctx?.profile?.role||'',parent:cloud?.actingAsParent?.()===true,epoch:window.matchActionMutationEpoch?.()||0};
+  };
+  const scope=capture();
+  return ()=>{const now=capture();return window.matchActionIsPending?.()!==true&&Object.keys(scope).every(key=>scope[key]===now[key]);};
+}
 async function syncSelkentDivision(silent=false){
+  const mayApply=backgroundFeedMutationScope();if(!mayApply())return null;
   state.selkent=state.selkent||cloneStarter().selkent;
   const sk=state.selkent;
   if(!silent)toast('Checking Selkent division…');
   const page=await fetchSelkentSelected(sk.divisionsUrl||STARTER_DATA.selkent.divisionsUrl,[state.meta.ageGroup].filter(Boolean));
+  if(!mayApply())return null;
   const info=parseSelkentDivisionDirectory(page.html);
   if(!info.division)throw new Error(`No ${state.meta.ageGroup||''} division found for ${state.division.teamName||state.meta.teamName}`.trim());
   const cleanTeams=sanitizeDivisionTeamList(info.teams);
@@ -1220,7 +1231,9 @@ async function syncSelkentDivision(silent=false){
   return info;
 }
 async function syncSelkentLeagueTable(silent=false){
+  const mayApply=backgroundFeedMutationScope();if(!mayApply())return false;
   await refreshPublishedLeagueAges(true);
+  if(!mayApply())return false;
   if(!leagueTableEnabled()){
     if(!silent)toast('Selkent does not publish a league table for this age group.');
     return false;
@@ -1230,7 +1243,9 @@ async function syncSelkentLeagueTable(silent=false){
   if(!silent)toast('Syncing league table…');
   try{
     await syncSelkentDivision(true);
+    if(!mayApply())return false;
     const resultPage=await fetchSelkentSelected(sk.resultsUrl||STARTER_DATA.selkent.resultsUrl,[state.meta.ageGroup,state.division.name].filter(Boolean));
+    if(!mayApply())return false;
     const resultData=parseSelkentHtml(resultPage.html,resultPage.url);
     if(!resultData.table.length)throw new Error('No league table recognised on the selected Selkent division');
     state.selkent.table=resultData.table||[];
@@ -1246,6 +1261,7 @@ async function syncSelkentLeagueTable(silent=false){
     if(!silent)toast('League table synced');
     return true;
   }catch(err){
+    if(!mayApply())return false;
     state.selkent.status='League data will retry automatically';persistLocalState();renderSelkentSettings();if(!silent)toast('League table sync failed');return false;
   }finally{if(btn)btn.disabled=false;}
 }
@@ -1255,6 +1271,7 @@ function stableSyncedMatchId(r){
   let h=2166136261;for(let i=0;i<raw.length;i++){h^=raw.charCodeAt(i);h=Math.imul(h,16777619);}return 'sk'+(h>>>0).toString(36);
 }
 function syncOwnLeagueMatchesFromSelkent(results=[],source='selkent'){
+  if(window.matchActionIsPending?.()===true)return;
   const self=normalizeTeamKey(state.division.teamName||state.meta.teamName||'');
   if(!self)return;
   results.forEach(r=>{
@@ -1302,23 +1319,27 @@ function parseSelkentClubGroundOptions(html=''){
   return out;
 }
 async function fetchClubDirectoryDetails(teamName){
+  const mayApply=backgroundFeedMutationScope();if(!mayApply())return null;
   const key=selkentNorm(teamName);if(!key)return null;
   state.selkent=state.selkent||{};state.selkent.directoryDetails=state.selkent.directoryDetails||{};
   const cached=state.selkent.directoryDetails[key]||{};
   if(cached.clubName&&Array.isArray(cached.groundOptions)&&cached.groundOptions.length)return cached;
   try{
     const r=await fetch(`${SELKENT_DIRECTORY_API}?team=${encodeURIComponent(teamName)}`,{cache:'no-store'});
+    if(!mayApply())return null;
     if(!r.ok)throw new Error(`HTTP ${r.status}`);
     const d=await r.json(),homeGround=d.home_ground&&d.home_ground.name&&d.home_ground.address?[{name:String(d.home_ground.name).trim(),address:String(d.home_ground.address).trim()}]:[],otherGrounds=Array.isArray(d.other_grounds)?d.other_grounds.map(g=>({name:String(g?.name||'').trim(),address:String(g?.address||'').trim()})).filter(g=>g.name&&g.address):[],apiGrounds=[...homeGround,...otherGrounds];
+    if(!mayApply())return null;
     const sourceUrl=d.source_url||cached.sourceUrl||'',idMatch=String(sourceUrl).match(/\/public\/clubs\/(\d+)/i),clubId=d.club_id||cached.clubId||(idMatch?Number(idMatch[1]):null);
     const detail={...cached,clubId,clubName:d.club_name||cached.clubName||teamName,colours:shirtColoursOnly(d.club_colours||cached.colours||'TBC'),groundName:d.home_ground?.name||cached.groundName||'TBC',address:d.home_ground?.address||cached.address||'TBC',sourceUrl,groundOptions:apiGrounds,logoUrl:d.logo_url||cached.logoUrl||'',logoVerified:d.logo_verified===true||cached.logoVerified===true};
     const selkentPage=detail.clubId?`https://www.selkent.org.uk/public/clubs/${detail.clubId}`:(/^https:\/\/(?:www\.)?selkent\.org\.uk\/public\/clubs\//i.test(detail.sourceUrl)?detail.sourceUrl:'');
-    if(!detail.groundOptions.length&&selkentPage){try{const page=await nativeHttp(selkentPage);if(page.status>=200&&page.status<400){const parsed=parseSelkentClubGroundOptions(page.body);if(parsed.length)detail.groundOptions=parsed;}}catch(_){}}
+    if(!detail.groundOptions.length&&selkentPage){try{const page=await nativeHttp(selkentPage);if(!mayApply())return null;if(page.status>=200&&page.status<400){const parsed=parseSelkentClubGroundOptions(page.body);if(parsed.length)detail.groundOptions=parsed;}}catch(_){}}
+    if(!mayApply())return null;
     if(!detail.groundOptions.length&&knownKit(detail.groundName)&&knownKit(detail.address))detail.groundOptions=[{name:detail.groundName,address:detail.address}];
     state.selkent.directoryDetails[key]=detail;
     if(detail.colours&&detail.colours!=='TBC')state.selkent.kitColours[key]=detail.colours;
     return detail;
-  }catch(_){return Object.keys(cached).length?cached:null;}
+  }catch(_){return mayApply()&&Object.keys(cached).length?cached:null;}
 }
 
 function parseSelkentHtml(html,url=''){
@@ -1449,6 +1470,7 @@ function renderSelkentFixtures(){
   if(meta)meta.textContent='';
 }
 async function syncSelkent(silent=false){
+  const mayApply=backgroundFeedMutationScope();if(!mayApply())return false;
   const sk=state.selkent||cloneStarter().selkent;
   if(providerType()!=='selkent'){state.selkent.enabled=false;state.selkent.status='Manual provider';renderSelkentSettings();if(!silent)toast('This club uses manual fixtures and results');return;}
   const dot=document.getElementById('selkent-sync-dot'),status=document.getElementById('selkent-sync-status');
@@ -1456,18 +1478,23 @@ async function syncSelkent(silent=false){
   if(!silent)toast('Syncing with Selkent…');
   try{
     await syncProviderClubTeams(true);
+    if(!mayApply())return false;
     // Selkent Results determines whether this age group has a published league table.
     // The Divisions page is still authoritative for the team's actual division and opponents.
     await refreshPublishedLeagueAges(true);
+    if(!mayApply())return false;
     // The Divisions tab is authoritative for age/division membership. Resolve it
     // before visiting fixtures or results so a team can never inherit a division
     // from the previously selected team.
     await syncSelkentDivision(true);
+    if(!mayApply())return false;
     const fixturePage=await fetchSelkentSelected(sk.fixturesUrl||STARTER_DATA.selkent.fixturesUrl,[state.meta.ageGroup,state.division.name].filter(Boolean));
+    if(!mayApply())return false;
     const fixtureData=parseSelkentHtml(fixturePage.html,fixturePage.url);
     let resultData={table:[],fixtures:[],results:[],teams:[]};
     if(leagueTableEnabled()){
       const resultPage=await fetchSelkentSelected(sk.resultsUrl||STARTER_DATA.selkent.resultsUrl,[state.meta.ageGroup,state.division.name].filter(Boolean));
+      if(!mayApply())return false;
       resultData=parseSelkentHtml(resultPage.html,resultPage.url);
     }
     const previousNext=nextPublishedFixture();
@@ -1475,6 +1502,7 @@ async function syncSelkent(silent=false){
     state.selkent.fixtures=fixtureData.fixtures||[];
     state.selkent.lastFixtureScan=new Date().toISOString();
     await ensureFixtureKitColours(nextPublishedFixture());
+    if(!mayApply())return false;
     updateFixtureTracking(previousNext,nextPublishedFixture());
     if(leagueTableEnabled()){
       state.selkent.table=resultData.table||[];
@@ -1490,6 +1518,7 @@ async function syncSelkent(silent=false){
     if(CLOUD_MODE&&isAdmin())refreshAdminClubOverview(true);
     if(!silent)toast(bits.length?'Selkent sync complete':'Selkent page loaded; check setup');
   }catch(err){
+    if(!mayApply())return false;
     state.selkent=state.selkent||cloneStarter().selkent;state.selkent.status='League data will retry automatically';persistLocalState();renderSelkentSettings();if(!silent)toast('Selkent sync failed');
   }
 }
@@ -1719,38 +1748,45 @@ function setFixtureAcknowledgement(status){
   saveState();auditEvent(status==='issue'?'fixture_issue':'fixture_confirmed','fixture',fixtureStableKey(f),status==='issue'?`Fixture issue: ${note.trim()}`:`Confirmed fixture vs ${f.opponent}`,null,{status,note:note.trim()});renderNextMatch();renderMatchdayDashboard();toast(status==='confirmed'?'Fixture confirmed':'Issue reported to Club Admin');
 }
 async function ensureFixtureKitColours(fixture){
+  const mayApply=backgroundFeedMutationScope();if(!mayApply())return false;
   if(!fixture)return false;
   state.selkent=state.selkent||{};state.selkent.kitColours=state.selkent.kitColours||{};state.selkent.directoryDetails=state.selkent.directoryDetails||{};
   let changed=false;
   const ownKey=selkentNorm(clubSettings().display_name||state.meta?.clubName||'club');
   if(!state.selkent.kitColours[ownKey]){
-    try{const r=await nativeHttp(state.selkent.clubUrl||STARTER_DATA.selkent.clubUrl);const c=parseClubColours(r.body);if(c){state.selkent.kitColours[ownKey]=c;changed=true;}}catch(_){ }
+    try{const r=await nativeHttp(state.selkent.clubUrl||STARTER_DATA.selkent.clubUrl);if(!mayApply())return false;const c=parseClubColours(r.body);if(c){state.selkent.kitColours[ownKey]=c;changed=true;}}catch(_){ }
   }
+  if(!mayApply())return false;
   const oppKey=selkentNorm(fixture.opponent);
   const before=JSON.stringify(state.selkent.directoryDetails[oppKey]||null);
   const detail=await fetchClubDirectoryDetails(fixture.opponent);
+  if(!mayApply())return false;
   if(detail){
     fixture.clubName=detail.clubName||fixture.clubName||fixture.opponent;
     fixture.kitColours=detail.colours||fixture.kitColours||'TBC';
     const grounds=Array.isArray(detail.groundOptions)?detail.groundOptions:[];if(grounds.length===1){fixture.groundName=fixture.groundName||grounds[0].name||'';fixture.address=fixture.address||grounds[0].address||'';}
     if(before!==JSON.stringify(detail))changed=true;
   }else if(oppKey&&!state.selkent.kitColours[oppKey]&&fixture.opponentClubUrl){
-    try{const r=await nativeHttp(fixture.opponentClubUrl);const c=parseClubColours(r.body);if(c){state.selkent.kitColours[oppKey]=c;fixture.kitColours=c;changed=true;}}catch(_){ }
+    try{const r=await nativeHttp(fixture.opponentClubUrl);if(!mayApply())return false;const c=parseClubColours(r.body);if(c){state.selkent.kitColours[oppKey]=c;fixture.kitColours=c;changed=true;}}catch(_){ }
   }
+  if(!mayApply())return false;
   if(changed)persistLocalState();
   return changed;
 }
 async function scanUpcomingFixtures(silent=true){
+  const mayApply=backgroundFeedMutationScope();if(!mayApply())return false;
   if(state.selkent?.enabled===false||!state.division?.name)return false;
   if(window.ClubHubStaticSelkent?.applyStaticFixtures){
     try{
       await window.ClubHubStaticSelkent.applyStaticFixtures(silent,true);
+      if(!mayApply())return false;
       renderNextMatch();renderMatchPageNextFixture();refreshMatchAvailability(true);renderSelkentFixtures();renderLeagueQuickView();renderMatchdayDashboard();
       return true;
-    }catch(_){/* use the isolated live migration fallback below only if the static feed cannot be read */}
+    }catch(_){if(!mayApply())return false;/* use the isolated live migration fallback below only if the static feed cannot be read */}
   }
   try{
     const page=await fetchSelkentSelected(state.selkent.fixturesUrl||STARTER_DATA.selkent.fixturesUrl,[state.meta.ageGroup,state.division.name].filter(Boolean));
+    if(!mayApply())return false;
     const parsed=parseSelkentHtml(page.html,page.url);
     const before=JSON.stringify(state.selkent.fixtures||[]);
     const previousNext=nextPublishedFixture();
@@ -1758,6 +1794,7 @@ async function scanUpcomingFixtures(silent=true){
     state.selkent.lastFixtureScan=new Date().toISOString();
     const next=nextPublishedFixture();
     const colourChanged=await ensureFixtureKitColours(next);
+    if(!mayApply())return false;
     updateFixtureTracking(previousNext,nextPublishedFixture());
     const changed=before!==JSON.stringify(state.selkent.fixtures||[])||colourChanged;
     persistLocalState();
@@ -1765,7 +1802,7 @@ async function scanUpcomingFixtures(silent=true){
     renderNextMatch();refreshMatchAvailability(true);renderSelkentFixtures();renderLeagueQuickView();
     if(!silent&&changed)toast('Upcoming fixtures refreshed');
     return true;
-  }catch(err){if(!silent)toast('Fixture check failed');return false;}
+  }catch(err){if(mayApply()&&!silent)toast('Fixture check failed');return false;}
 }
 function fixtureOverride(f={}){
   state.selkent=state.selkent||{};state.selkent.fixtureOverrides=state.selkent.fixtureOverrides||{};
@@ -3597,7 +3634,7 @@ function renderMatchGroup(listId,countId,rows,emptyText){
   if(count) count.textContent=rows.length;
   if(list) setStableHtml(list,rows.length?matchResultsTableHTML(rows):`<div class="empty-state"><strong>${emptyText}</strong></div>`);
 }
-function renderMatches(){ applyMatchFilter(); }
+function renderMatches(){ applyMatchFilter();renderMatchActionNotice(); }
 /** "U9 Selkent Cup Two - Round 1" becomes {name:"Selkent Cup Two", round:"Round 1"}. Plain names pass through. */
 function cupNameAndRound(m){const raw=String(m?.competition||m?.type||'').trim();const [head,...rest]=raw.split(/\s+[-–]\s+/);const name=head.replace(/^U\s*\d{1,2}X?\s+/i,'').trim()||raw||'Cup';return {name,round:(rest.join(' - ')||String(m?.stage||'')).trim()};}
 function competitionGameRow(m){
@@ -3833,8 +3870,8 @@ function applyMatchReportStep(){
 }
 function resetMatchReportMode(){
   __matchDetailEpoch++;__matchReportHub=false;__matchNoteLoaded=false;__matchAttendanceLoaded=false;
-  ['match-report-hub','match-report-outcome','match-report-return','match-report-step-label'].forEach(id=>document.getElementById(id)?.classList.add('hidden'));
-  document.getElementById('match-detail-dialog')?.classList.remove('report-hub-mode','report-outcome-mode');
+  ['match-report-hub','match-report-outcome','match-action-outcome','match-report-return','match-report-step-label'].forEach(id=>document.getElementById(id)?.classList.add('hidden'));
+  document.getElementById('match-detail-dialog')?.classList.remove('report-hub-mode','report-outcome-mode','match-action-mode');
   __matchDetailDirty=false;
   __matchReportMode=false;__matchReportStep=0;__matchReportSteps=[];
   document.getElementById('match-detail-dialog')?.classList.remove('report-wizard-mode');
@@ -4084,6 +4121,7 @@ function configureMatchDetailActions(m){
   if(report){report.classList.toggle('hidden',!canReport);report.dataset.matchPlayed=canReport?m.id:'';}
 }
 function openMatchDetails(matchId){
+  if(__matchReportSaveBusy)return;
   resetMatchReportMode();
   const m=state.matches.find(x=>x.id===matchId);if(!m)return;
   document.getElementById('match-detail-id').value=m.id;
@@ -4163,64 +4201,204 @@ async function saveMatchDetails(e){
   // Match report changes no longer notify anyone (Mike, 2026-10-10). Only upcoming fixture changes notify.
 }
 
-async function undoMatchPlayed(){
-  if(!requireCoach())return;
-  const id=document.getElementById('match-detail-id')?.value||'';
-  const m=state.matches.find(x=>x.id===id);
-  if(!m||!isPlayedMatch(m)){toast('This match is not marked as played');return;}
-  const warning=`Undo match played against ${m.opponent}?
-
-This returns the match to Scheduled and removes the recorded score, attendance, goals, assists, bookings, awards and private post-match coaching note.
-
-The Selkent fixture, matchday squad and availability are kept.`;
-  if(!confirm(warning))return;
-
-  const beforeMatch=JSON.parse(JSON.stringify(m));
-  const beforeDetails={
-    goals:state.goals.filter(x=>x.matchId===id),
-    assists:(state.assists||[]).filter(x=>x.matchId===id),
-    bookings:(state.bookings||[]).filter(x=>x.matchId===id),
-    awards:state.awards.filter(x=>x.matchId===id),
-    attendance:JSON.parse(JSON.stringify(__matchAttendanceRows||[]))
-  };
-
-  let noteWarning=false;
-  if(CLOUD_MODE&&isCoach()){
-    try{
-      await window.ClubHubCloud.saveMatchAttendance(id,[]);
-      __matchAttendanceRows=[];
-      await refreshAppearanceStats(false);
-    }catch(err){
-      alert('Could not clear match attendance, so the result has not been undone. Check your connection and try again.');
-      return;
-    }
-    try{
-      await window.ClubHubCloud.saveCoachMatchNote(id,'');
-    }catch(err){
-      noteWarning=true;
-    }
-  }
-
-  m.status='scheduled';
-  m.gf=0;
-  m.ga=0;
-  state.goals=state.goals.filter(x=>x.matchId!==id);
-  state.assists=(state.assists||[]).filter(x=>x.matchId!==id);
-  state.bookings=(state.bookings||[]).filter(x=>x.matchId!==id);
-  state.awards=state.awards.filter(x=>x.matchId!==id);
-
-  const afterMatch=JSON.parse(JSON.stringify(m));
-  const afterDetails={goals:[],assists:[],bookings:[],awards:[],attendance:[]};
-
-  saveState();
-  auditEvent('match_played_undone','match',id,`Returned match vs ${m.opponent} to Scheduled`,beforeMatch,afterMatch);
-  auditEvent('match_report_cleared','match_details',id,`Cleared mistaken match report vs ${m.opponent}`,beforeDetails,afterDetails);
-
-  document.getElementById('match-detail-dialog')?.close();
+// Confirmed destructive match actions: retain only a scoped retry intent, never a report payload.
+let __matchAction=null,__matchActionBusy=false,__matchActionMutationVersion=0;
+function matchActionIsPending(){return __matchActionBusy;}
+function matchActionMutationEpoch(){return __matchActionMutationVersion;}
+function matchActionUsesCloud(){return CLOUD_MODE&&!window.ClubHubCloud?.testMode;}
+function matchActionScope(){
+  if(!isCoach())return '';
+  if(!matchActionUsesCloud())return 'local';
+  const cloud=window.ClubHubCloud,user=cloud?.session?.user?.id,team=cloud?.currentTeam?.()?.id;
+  if(!user||!team||cloud?.canEdit?.()===false)return '';
+  return [user,cloud.context?.profile?.club_id||cloud.context?.club?.id||'',team,currentRole,currentRole==='admin'?adminUiMode:''].join('|');
+}
+function matchActionStorageKey(scope){return 'grassrootsHub_match_action_v1:'+encodeURIComponent(scope);}
+function currentMatchAction(){
+  const scope=matchActionScope();if(!scope)return null;
+  if(__matchAction?.scope===scope)return __matchAction;
+  try{
+    const saved=JSON.parse(localStorage.getItem(matchActionStorageKey(scope))||'null');
+    if(saved?.version!==1||saved.scope!==scope||!['undo','delete'].includes(saved.action)||typeof saved.matchId!=='string'||!saved.matchId||saved.matchId.length>200)return null;
+    if(['stateConfirmed','attendanceCleared','noteCleared'].some(k=>typeof saved[k]!=='boolean'))return null;
+    __matchAction={...saved,cloud:window.ClubHubCloud,reviewRequired:!saved.stateConfirmed,message:'',controls:[]};
+    return __matchAction;
+  }catch{return null;}
+}
+function persistMatchAction(op){
+  // Deliberate whitelist: no expected match, score, names, note, attendance or credentials.
+  const saved={version:1,scope:op.scope,action:op.action,matchId:op.matchId,stateConfirmed:op.stateConfirmed,attendanceCleared:op.attendanceCleared,noteCleared:op.noteCleared};
+  try{localStorage.setItem(matchActionStorageKey(op.scope),JSON.stringify(saved));return true;}catch{return false;}
+}
+function sameMatchAction(op){
+  return __matchAction===op&&op.scope===matchActionScope()&&op.cloud===window.ClubHubCloud&&sameMatchDetail(op.matchId,op.dialogEpoch,op.detailKey);
+}
+function matchActionDesired(op,data){
+  const m=(data.matches||[]).find(x=>x.id===op.matchId);
+  const cleared=['goals','assists','bookings','awards'].every(k=>!(data[k]||[]).some(x=>x.matchId===op.matchId));
+  return cleared&&(op.action==='delete'?!m:!!m&&m.status==='scheduled'&&Number(m.gf||0)===0&&Number(m.ga||0)===0);
+}
+function localMatchActionState(op){
+  const next=JSON.parse(JSON.stringify(state)),m=next.matches.find(x=>x.id===op.matchId);
+  if(op.action==='delete')next.matches=next.matches.filter(x=>x.id!==op.matchId);
+  else if(m){m.status='scheduled';m.gf=0;m.ga=0;}
+  for(const k of ['goals','assists','bookings','awards'])next[k]=(next[k]||[]).filter(x=>x.matchId!==op.matchId);
+  return next;
+}
+function matchActionWarning(action,m){
+  const against=m?.opponent?` against ${m.opponent}`:'';
+  return action==='undo'?`Undo match played${against}?\n\nThis returns the match to Scheduled and removes the recorded score, attendance, goals, assists, bookings, awards and private post-match coaching note.\n\nThe Selkent fixture, matchday squad and availability are kept.`:`Delete ${m?.opponent?'the match'+against:'this match'}? This removes its score, attendance, goals, assists, bookings, awards and private match note.`;
+}
+function renderMatchActionNotice(){
+  const box=document.getElementById('match-action-notice');if(!box)return;
+  const op=currentMatchAction();box.classList.toggle('hidden',!op);
+  if(!op){box.replaceChildren();return;}
+  setStableHtml(box,'<div><strong>Match change needs attention</strong><p>One action still needs confirmation or cleanup.</p></div><button type="button" class="primary-button" data-match-action="resume">Resume</button>');
+}
+function renderMatchActionOutcome(op,focus=false){
+  if(!sameMatchAction(op))return;
+  const dialog=document.getElementById('match-detail-dialog'),box=document.getElementById('match-action-outcome'),pending=__matchActionBusy,review=op.reviewRequired;
+  dialog.classList.add('match-action-mode');box.classList.remove('hidden');
+  const title=pending?'Confirming change…':op.stateConfirmed&&!review?'Cleanup incomplete':'Change not confirmed';
+  const summary=pending?(op.stage==='review'?'Loading the latest club record. No further cleanup will run until you decide again.':op.stateConfirmed?'The club confirmed the match change. Waiting for the remaining report cleanup.':'Waiting for the club to confirm this change. Attendance and the private note have not been cleared.'):
+    review?(op.message||'This match changed elsewhere. Review the latest club record before deciding again.'):
+    op.stateConfirmed?`${op.action==='undo'?'Match returned to Scheduled.':'Match removed.'} Some report data still needs clearing.`:'The club has not confirmed this change. Attendance and the private note have not been cleared. Your retry is still available.';
+  const parts=[['Match change',op.stateConfirmed?(matchActionUsesCloud()?'Confirmed by club':'Confirmed on this device'):pending?'Awaiting confirmation':'Not confirmed'],['Attendance',op.attendanceCleared?'Cleared':!op.stateConfirmed?'Not started':pending&&op.stage==='attendance'?'Clearing…':'Not cleared · Try again'],['Private note',op.noteCleared?'Cleared':!op.stateConfirmed?'Not started':pending&&op.stage==='note'?'Clearing…':'Not cleared · Try again']];
+  box.innerHTML=`<div class="match-action-status"><h3>${title}</h3><p>${esc(summary)}</p>${review&&!pending?'<p>Reviewing latest club data replaces unsynced changes on this device.</p>':''}${op.message&&!review&&!pending?`<p>${esc(op.message)}</p>`:''}<dl>${parts.map(([label,value])=>`<div><dt>${label}</dt><dd>${value}</dd></div>`).join('')}</dl></div>${pending?'<button type="button" class="primary-button" disabled>Confirming…</button><p class="helper">Please wait before leaving this match.</p>':`<button type="button" class="primary-button" data-match-action="${review?'review':'retry'}">${review?'Review latest match':op.stateConfirmed?'Retry cleanup':'Retry change'}</button><button type="button" class="secondary-button" data-match-action="back">Back to Matches</button><p class="helper">${op.stateConfirmed?'Retry only clears parts still needing attention.':'The Matches reminder keeps this action available.'}</p>`}`;
+  if(focus){box.focus({preventScroll:true});dialog.scrollTo({top:0});}
+}
+function openMatchActionOutcome(op){
+  if(__matchActionBusy||op.scope!==matchActionScope())return false;
   resetMatchReportMode();
-
-
-  toast(noteWarning?'Match restored; coaching note could not be cleared':'Match returned to Scheduled');
+  const dialog=document.getElementById('match-detail-dialog'),m=state.matches.find(x=>x.id===op.matchId);
+  document.getElementById('match-detail-id').value=op.matchId;
+  document.getElementById('match-detail-title').textContent=op.action==='undo'?'Undo match played':'Remove manual match';
+  document.getElementById('match-detail-summary').textContent=m?`${formatDate(m.date)} · ${m.opponent}`:'Match change';
+  if(!dialog.open)dialog.showModal();
+  op.dialogEpoch=__matchDetailEpoch;op.detailKey=matchDetailContext();op.cloud=window.ClubHubCloud;
+  renderMatchActionOutcome(op,true);return true;
+}
+function setMatchActionBusy(op,busy){
+  __matchActionBusy=busy;__matchReportSaveBusy=busy;__matchDetailDirty=busy;
+  if(busy){
+    ++__matchActionMutationVersion;
+    op.controls=[...document.querySelectorAll('#match-detail-form input,#match-detail-form textarea,#match-detail-form select,#match-detail-form button')].map(el=>({el,disabled:el.disabled}));
+    op.controls.forEach(({el})=>el.disabled=true);
+  }else{op.controls?.forEach(({el,disabled})=>el.disabled=disabled);op.controls=[];}
+}
+function clearMatchAction(op){
+  try{localStorage.removeItem(matchActionStorageKey(op.scope));}catch{}
+  if(__matchAction===op)__matchAction=null;
+  renderMatchActionNotice();
+}
+async function startMatchAction(action,id){
+  if(!requireCoach()||__matchReportSaveBusy||__matchActionBusy)return;
+  const outstanding=currentMatchAction();
+  if(outstanding){resumeMatchAction();return;}
+  const m=state.matches.find(x=>x.id===id);if(!m)return;
+  if(action==='undo'&&!isPlayedMatch(m)){toast('This match is not marked as played');return;}
+  if(action==='delete'&&isProviderOwnedMatch(m)){toast('Published Selkent fixtures cannot be removed. Use fixture correction or match status instead.');return;}
+  if(!confirmDiscardMatchEdits(true)||!confirmDiscardMatchEdits()||!confirm(matchActionWarning(action,m)))return;
+  const scope=matchActionScope();if(!scope)return;
+  const op={version:1,scope,action,matchId:id,stateConfirmed:false,attendanceCleared:false,noteCleared:false,expectedMatch:JSON.parse(JSON.stringify(m)),reviewRequired:false,message:'',cloud:window.ClubHubCloud,controls:[]};
+  // Without a durable intent, a removed row could lose its cleanup retry after reload.
+  if(!persistMatchAction(op)){toast('Could not retain the retry on this device. Check browser storage and try again.');return;}
+  __matchAction=op;if(!openMatchActionOutcome(op))return;
+  await runMatchAction(op);
+}
+function resumeMatchAction(){
+  if(!requireCoach()||__matchReportSaveBusy||__matchActionBusy||!confirmDiscardMatchEdits(true)||!confirmDiscardMatchEdits())return;
+  const op=currentMatchAction();if(op)openMatchActionOutcome(op);
+}
+async function retryMatchAction(){
+  const op=currentMatchAction();if(!op||!sameMatchAction(op)||__matchActionBusy)return;
+  if(op.reviewRequired){await reviewMatchAction();return;}
+  await runMatchAction(op);
+}
+async function runMatchAction(op){
+  if(__matchActionBusy||!sameMatchAction(op))return;
+  const guard=()=>sameMatchAction(op),cloud=op.cloud;
+  op.message='';op.stage='state';setMatchActionBusy(op,true);renderMatchActionOutcome(op);
+  let complete=false;
+  try{
+    const result=matchActionUsesCloud()?await cloud.commitMatchAction({action:op.action,matchId:op.matchId,expectedMatch:op.stateConfirmed?null:op.expectedMatch},guard):{state:localMatchActionState(op)};
+    if(!guard())return;
+    if(!result?.state||!matchActionDesired(op,result.state))throw Object.assign(new Error('Review the latest club record before trying again.'),{code:'MATCH_ACTION_CONFLICT'});
+    state=repairStateIdentity(normalizeState(result.state));op.stateConfirmed=true;persistMatchAction(op);persistLocalState();renderAll();
+    if(!matchActionUsesCloud()){op.attendanceCleared=true;op.noteCleared=true;}
+    if(!op.attendanceCleared){
+      op.stage='attendance';renderMatchActionOutcome(op);
+      try{await cloud.clearMatchActionAttendance(op.matchId,guard);if(!guard())return;op.attendanceCleared=true;__matchAttendanceRows=[];persistMatchAction(op);}
+      catch(err){if(!guard())return;if(err.code==='MATCH_ACTION_SYNC_BUSY'||err.code==='MATCH_ACTION_CONFLICT')throw err;}
+    }
+    if(!guard())return;
+    if(!op.noteCleared){
+      op.stage='note';renderMatchActionOutcome(op);
+      try{await cloud.clearMatchActionNote(op.matchId,guard);if(!guard())return;op.noteCleared=true;persistMatchAction(op);}
+      catch(err){if(!guard())return;if(err.code==='MATCH_ACTION_SYNC_BUSY'||err.code==='MATCH_ACTION_CONFLICT')throw err;}
+    }
+    if(!guard())return;
+    complete=op.stateConfirmed&&op.attendanceCleared&&op.noteCleared;
+    persistMatchAction(op);
+  }catch(err){
+    if(!guard())return;
+    op.reviewRequired=['MATCH_ACTION_CONFLICT','MATCH_ACTION_SYNC_BUSY'].includes(err.code);
+    op.message=op.reviewRequired?(err.code==='MATCH_ACTION_SYNC_BUSY'?'Existing edits need syncing; save them before retrying, or review the latest club data.':'This match changed elsewhere. Review the latest club record before deciding again.'):'The club could not confirm this attempt. Check your connection and retry.';
+  }finally{
+    if(guard()){setMatchActionBusy(op,false);if(!complete)renderMatchActionOutcome(op,true);}
+    else if(__matchAction===op){__matchActionBusy=false;__matchReportSaveBusy=false;__matchDetailDirty=false;}
+  }
+  if(!guard())return;
+  renderMatchActionNotice();
+  if(op.attendanceCleared)Promise.resolve(refreshAppearanceStats(false)).catch(()=>{});
+  if(!complete)return;
+  const m=state.matches.find(x=>x.id===op.matchId)||null;
+  auditEvent(op.action==='undo'?'match_played_undone':'match_deleted','match',op.matchId,op.action==='undo'?'Returned match to Scheduled':'Removed match',op.expectedMatch||null,m);
+  if(op.action==='undo')auditEvent('match_report_cleared','match_details',op.matchId,'Cleared mistaken match report',null,{goals:[],assists:[],bookings:[],awards:[],attendance:[]});
+  clearMatchAction(op);document.getElementById('match-detail-dialog').close();resetMatchReportMode();__matchFormDirty=false;resetMatchForm();navigate('matches',false);
+  toast((op.action==='undo'?'Match returned to Scheduled':'Match removed')+(matchActionUsesCloud()?'':' on this device'));
+}
+async function reviewMatchAction(){
+  const op=currentMatchAction();if(!op||__matchActionBusy||!sameMatchAction(op))return;
+  if(!confirm('Reviewing latest club data replaces unsynced changes on this device. Continue?'))return;
+  const guard=()=>sameMatchAction(op);let loaded=false;
+  op.stage='review';setMatchActionBusy(op,true);renderMatchActionOutcome(op);
+  try{
+    const result=await op.cloud.reviewMatchActionState(guard,{discardQueuedChanges:true});if(!guard())return;
+    if(!result?.state)throw new Error('No current club record');
+    state=repairStateIdentity(normalizeState(result.state));persistLocalState();renderAll();op.message='';op.reviewRequired=false;loaded=true;
+  }catch{if(guard()){op.reviewRequired=true;op.message='Could not load the latest club data. Your current edits and retry are still here.';}}
+  finally{if(guard())setMatchActionBusy(op,false);else if(__matchAction===op){__matchActionBusy=false;__matchReportSaveBusy=false;__matchDetailDirty=false;}}
+  if(!guard())return;
+  if(loaded){
+    if(matchActionDesired(op,state)){
+      // An unconfirmed reload has no retained match payload. A lost response may
+      // still have applied the core, but cleanup requires the action confirmation.
+      if(!op.stateConfirmed&&!confirm(matchActionWarning(op.action,state.matches.find(x=>x.id===op.matchId)))){
+        op.reviewRequired=true;
+        op.message=`The latest club record is already ${op.action==='undo'?'Scheduled':'removed'}. Review and confirm before clearing the remaining attendance and private note.`;
+        persistMatchAction(op);renderMatchActionOutcome(op,true);renderMatchActionNotice();return;
+      }
+      op.stateConfirmed=true;persistMatchAction(op);renderMatchActionOutcome(op,true);return;
+    }
+    const m=state.matches.find(x=>x.id===op.matchId);
+    if(!m||(op.action==='undo'&&!isPlayedMatch(m))||(op.action==='delete'&&isProviderOwnedMatch(m))||!confirm(matchActionWarning(op.action,m))){
+      clearMatchAction(op);document.getElementById('match-detail-dialog').close();toast('Kept the latest club record.');return;
+    }
+    op.expectedMatch=JSON.parse(JSON.stringify(m));op.stateConfirmed=false;op.attendanceCleared=false;op.noteCleared=false;persistMatchAction(op);await runMatchAction(op);return;
+  }
+  renderMatchActionOutcome(op,true);
+}
+function handleMatchActionClick(event){
+  const action=event.target.closest('[data-match-action]')?.dataset.matchAction;if(!action)return;
+  if(action==='resume'){resumeMatchAction();return;}
+  const op=currentMatchAction();if(!op||!sameMatchAction(op)||__matchActionBusy)return;
+  if(action==='retry')void retryMatchAction();
+  else if(action==='review')void reviewMatchAction();
+  else if(action==='back'){document.getElementById('match-detail-dialog').close();navigate('matches',false);}
+}
+async function undoMatchPlayed(){
+  await startMatchAction('undo',document.getElementById('match-detail-id')?.value||'');
 }
 
 function jerseyHTML(player){
@@ -6279,23 +6457,7 @@ async function submitMatch(e){
 }
 function isProviderOwnedMatch(m={}){return /selkent|github-static|static-fixture/i.test(String(m.source||''));}
 async function deleteMatch(id){
-  if(!requireCoach())return;
-  const m=state.matches.find(x=>x.id===id);if(!m)return;
-  if(isProviderOwnedMatch(m)){toast('Published Selkent fixtures cannot be removed. Use fixture correction or match status instead.');return;}
-  if(!confirm(`Delete the match against ${m.opponent}? This removes its score, attendance, goals, assists, bookings, awards and private match note.`))return;
-  let noteWarning=false;
-  if(CLOUD_MODE&&isCoach()){
-    try{await window.ClubHubCloud.saveMatchAttendance(id,[]);await refreshAppearanceStats(false);}catch(err){alert('Could not clear match attendance, so the match has not been deleted. Check your connection and try again.');return;}
-    try{await window.ClubHubCloud.saveCoachMatchNote(id,'');}catch(err){noteWarning=true;}
-  }
-  state.matches=state.matches.filter(x=>x.id!==id);
-  state.goals=state.goals.filter(g=>g.matchId!==id);
-  state.assists=(state.assists||[]).filter(a=>a.matchId!==id);
-  state.bookings=(state.bookings||[]).filter(b=>b.matchId!==id);
-  state.awards=state.awards.filter(a=>a.matchId!==id);
-  saveState();auditEvent('match_deleted','match',id,`Deleted match vs ${m.opponent}`,m,null);
-  document.getElementById('match-detail-dialog')?.close();resetMatchForm();renderAll();navigate('matches',false);
-  toast(noteWarning?'Match deleted; private note could not be cleared':'Match deleted');
+  await startMatchAction('delete',id);
 }
 
 function playerSeasonSummary(name){
@@ -6613,6 +6775,15 @@ window.addEventListener('beforeunload',event=>{
 document.getElementById('club-match-summary-dialog')?.addEventListener('close',event=>{if(!event.target.open)document.getElementById('club-match-summary-body').replaceChildren();});
 document.getElementById('match-detail-form').addEventListener('submit',saveMatchDetails);
 document.getElementById('undo-match-played')?.addEventListener('click',undoMatchPlayed);
+document.getElementById('match-action-outcome')?.addEventListener('click',handleMatchActionClick);
+document.getElementById('match-action-notice')?.addEventListener('click',handleMatchActionClick);
+window.addEventListener('clubhub-contacts-clear',()=>{
+  const op=__matchAction;if(op&&__matchActionBusy)setMatchActionBusy(op,false);
+  ++__matchActionMutationVersion;__matchAction=null;
+  const dialog=document.getElementById('match-detail-dialog');if(dialog?.classList.contains('match-action-mode'))dialog.close();
+  const notice=document.getElementById('match-action-notice');if(notice){notice.classList.add('hidden');notice.replaceChildren();}
+  document.getElementById('match-action-outcome')?.replaceChildren();
+});
 document.getElementById('match-report-back')?.addEventListener('click',()=>changeMatchReportStep(-1));
 document.getElementById('match-report-next')?.addEventListener('click',()=>changeMatchReportStep(1));
 document.getElementById('match-entry-manual')?.addEventListener('click',()=>{document.getElementById('match-entry-chooser').close();resetMatchForm();navigate('add');});
@@ -6721,8 +6892,8 @@ document.getElementById('club-results-next')?.addEventListener('click',()=>{__cl
 
 
 // Horizontal navigation remains visible; dialogs no longer manipulate a footer bar.
-window.closeTopDialog=function(){const dlg=[...document.querySelectorAll('dialog[open]')].pop();if(dlg){try{document.activeElement?.blur?.();}catch{}dlg.close();return true;}return false;};
-document.querySelectorAll('dialog').forEach(d=>{d.addEventListener('cancel',e=>{e.preventDefault();window.closeTopDialog();});d.addEventListener('close',()=>{try{document.activeElement?.blur?.();}catch{}});});
+window.closeTopDialog=function(){const dlg=[...document.querySelectorAll('dialog[open]')].pop();if(dlg){if(dlg.id==='match-detail-dialog'&&!confirmDiscardMatchEdits(true))return true;try{document.activeElement?.blur?.();}catch{}dlg.close();return true;}return false;};
+document.querySelectorAll('dialog').forEach(d=>{d.addEventListener('cancel',e=>{if(e.defaultPrevented)return;e.preventDefault();window.closeTopDialog();});d.addEventListener('close',()=>{try{document.activeElement?.blur?.();}catch{}});});
 
 if('serviceWorker' in navigator && location.protocol.startsWith('http')){ window.addEventListener('load',()=>navigator.serviceWorker.register('./service-worker.js').catch(()=>{})); }
 

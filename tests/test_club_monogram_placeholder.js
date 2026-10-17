@@ -59,7 +59,7 @@ Object.assign(missingBadges.clubs.find(c=>Number(c.club_id)===499),{
 // starting without cached details.
 const overlaySrc=fs.readFileSync(path.join(__dirname,'../app/src/main/assets/static-feed-overlay.js'),'utf8');
 context.norm=norm;state.selkent.directoryDetails={};
-vm.runInContext(overlaySrc.slice(overlaySrc.indexOf('  function attachDirectoryBadges('),overlaySrc.indexOf('  function loadDirectory(')),context);
+vm.runInContext(overlaySrc.slice(overlaySrc.indexOf('  function feedMutationIdentity('),overlaySrc.indexOf('  function norm('))+overlaySrc.slice(overlaySrc.indexOf('  function attachDirectoryBadges('),overlaySrc.indexOf('  function loadDirectory(')),context);
 context.isOwnTeamName=()=>false;
 context.pilotBadgeOverrideAllowed=()=>false;
 vm.runInContext(src.slice(src.indexOf('function verifiedTeamBadgeUrl('),src.indexOf('function reviewedBadgeRotation(')),context);
