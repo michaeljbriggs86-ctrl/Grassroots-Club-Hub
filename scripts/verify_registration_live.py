@@ -7,6 +7,7 @@ import difflib
 import json
 import os
 import subprocess
+import sys
 from pathlib import Path
 from urllib.error import HTTPError
 from urllib.request import Request, urlopen
@@ -14,9 +15,23 @@ from urllib.request import Request, urlopen
 ROOT = Path(__file__).resolve().parents[1]
 SITE = "https://shootershillafc.app"
 AUTH = "https://obntycksmkcnkprrcutg.supabase.co"
-# Exact hosting addition observed on the existing main page, 15 October 2026.
+# Exact hosting additions observed on the main page, 15 and 17 October 2026.
 # Registration must remain byte-exact and prohibit this third-party script.
 MAIN_BEACON = b'''<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v4bc70e2c01a94c73b74392e4234840661791215815920" integrity="sha512-L0ha0OXavK/8okipN9F8BtP84dg9DUhPERbBXzwI6dgTA55d2+yweo3pn5CSFYs45/r8md2+xvUPtTdvTNRfjA==" data-cf-beacon='{"version":"2024.11.0","token":"10a09a2b669849c9b6d21b5eade55991","r":1,"spa":2}' crossorigin="anonymous"></script>\n'''
+
+
+MAIN_BEACONS = (
+    MAIN_BEACON,
+    b'''<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092" integrity="sha512-UKNk8GbxkABxKcXYuLkO16EleLGUkcvJWtpSNmExE0Too3ZaFAxTscNWEc1OdAv5/BikHawapSCaiD2XCmp+Bw==" data-cf-beacon='{"version":"2024.11.0","token":"10a09a2b669849c9b6d21b5eade55991","r":1,"spa":2}' crossorigin="anonymous"></script>\n''',
+)
+
+
+def matches_expected_asset(name: str, expected: bytes, body: bytes) -> tuple[bool, bool]:
+    known_main_beacon = name == "index.html" and any(
+        body == expected.replace(b"</body>", beacon + b"</body>", 1)
+        for beacon in MAIN_BEACONS
+    )
+    return body == expected or known_main_beacon, known_main_beacon
 
 
 def fetch(url: str, *, method: str = "GET", payload: bytes | None = None):
@@ -34,6 +49,10 @@ def fetch(url: str, *, method: str = "GET", payload: bytes | None = None):
 
 
 def main():
+    # Compare the deployable artifact, including the existing same-origin feed
+    # rewrite. Reusing the trusted builder avoids a second transformation here.
+    subprocess.run([sys.executable, str(ROOT / "cloudflare/web-app/build.py")], cwd=ROOT, check=True)
+    built = ROOT / "cloudflare/web-app/dist"
     evidence = {"source_commit": subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip(),
                 "event_commit": os.environ.get("GITHUB_SHA", "local"), "assets": [], "guards": []}
     problems = []
@@ -42,15 +61,16 @@ def main():
     for name in ("register.html", "registration.js", "registration.css", "cloud.js", "kickoff-updates.js", "notifications.css", "app.js",
                  "player-onboarding.js", "service-worker.js", "index.html", "shooters-hill-logo.png",
                  "app-design-system.css", "static-feed-overlay.js"):
-        source = ROOT / ("cloudflare/web-app/service-worker.js" if name == "service-worker.js"
-                         else "app/src/main/assets/" + name)
+        source = built / name
         status, url, headers, body = fetch(SITE + "/" + name)
         digest = hashlib.sha256(body).hexdigest()
         expected = source.read_bytes()
-        known_main_beacon = name == "index.html" and body == expected.replace(b"</body>", MAIN_BEACON + b"</body>", 1)
-        match = status == 200 and (body == expected or known_main_beacon)
+        exact, known_main_beacon = matches_expected_asset(name, expected, body)
+        match = status == 200 and exact
         evidence["assets"].append({"path": name, "status": status, "url": url,
-                                   "sha256": digest, "source_match": match, "known_main_beacon": known_main_beacon})
+                                   "sha256": digest, "source_match": match, "known_main_beacon": known_main_beacon,
+                                   "expected_sha256": hashlib.sha256(expected).hexdigest(),
+                                   "expected_artifact": str(source.relative_to(ROOT))})
         if name == "register.html":
             policy = {k.lower(): v for k, v in headers.items()}
             csp = policy.get("content-security-policy", "")
