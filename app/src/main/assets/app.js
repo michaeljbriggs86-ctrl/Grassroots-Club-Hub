@@ -4246,7 +4246,8 @@ function localMatchActionState(op){
   return next;
 }
 function matchActionWarning(action,m){
-  return action==='undo'?`Undo match played against ${m.opponent}?\n\nThis returns the match to Scheduled and removes the recorded score, attendance, goals, assists, bookings, awards and private post-match coaching note.\n\nThe Selkent fixture, matchday squad and availability are kept.`:`Delete the match against ${m.opponent}? This removes its score, attendance, goals, assists, bookings, awards and private match note.`;
+  const against=m?.opponent?` against ${m.opponent}`:'';
+  return action==='undo'?`Undo match played${against}?\n\nThis returns the match to Scheduled and removes the recorded score, attendance, goals, assists, bookings, awards and private post-match coaching note.\n\nThe Selkent fixture, matchday squad and availability are kept.`:`Delete ${m?.opponent?'the match'+against:'this match'}? This removes its score, attendance, goals, assists, bookings, awards and private match note.`;
 }
 function renderMatchActionNotice(){
   const box=document.getElementById('match-action-notice');if(!box)return;
@@ -4370,7 +4371,16 @@ async function reviewMatchAction(){
   finally{if(guard())setMatchActionBusy(op,false);else if(__matchAction===op){__matchActionBusy=false;__matchReportSaveBusy=false;__matchDetailDirty=false;}}
   if(!guard())return;
   if(loaded){
-    if(matchActionDesired(op,state)){op.stateConfirmed=true;persistMatchAction(op);renderMatchActionOutcome(op,true);return;}
+    if(matchActionDesired(op,state)){
+      // An unconfirmed reload has no retained match payload. A lost response may
+      // still have applied the core, but cleanup requires the action confirmation.
+      if(!op.stateConfirmed&&!confirm(matchActionWarning(op.action,state.matches.find(x=>x.id===op.matchId)))){
+        op.reviewRequired=true;
+        op.message=`The latest club record is already ${op.action==='undo'?'Scheduled':'removed'}. Review and confirm before clearing the remaining attendance and private note.`;
+        persistMatchAction(op);renderMatchActionOutcome(op,true);renderMatchActionNotice();return;
+      }
+      op.stateConfirmed=true;persistMatchAction(op);renderMatchActionOutcome(op,true);return;
+    }
     const m=state.matches.find(x=>x.id===op.matchId);
     if(!m||(op.action==='undo'&&!isPlayedMatch(m))||(op.action==='delete'&&isProviderOwnedMatch(m))||!confirm(matchActionWarning(op.action,m))){
       clearMatchAction(op);document.getElementById('match-detail-dialog').close();toast('Kept the latest club record.');return;

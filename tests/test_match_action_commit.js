@@ -74,6 +74,32 @@ function harness({cloud=true,storage=new Map(),server=null,attendance=['fictiona
  const partial=harness();partial.test.fail='note';await partial.begin('delete');partial.click('back');assert.match(partial.node('match-action-notice').innerHTML,/Resume/);
  const restored=harness({storage:partial.storage,server:partial.test.server,attendance:partial.test.attendance,note:partial.test.note});restored.context.resumeMatchAction();assert.match(restored.node('match-action-outcome').innerHTML,/Cleanup incomplete/);await restored.context.retryMatchAction();assert.equal(restored.calls.attendance,0);assert.equal(restored.calls.note,1);assert.equal(restored.calls.closed,1);checks++;
  const unconfirmed=harness();unconfirmed.test.fail='core';await unconfirmed.begin('undo');const reloaded=harness({storage:unconfirmed.storage,server:unconfirmed.test.server});reloaded.context.resumeMatchAction();assert.match(reloaded.node('match-action-outcome').innerHTML,/Review latest match/);assert.equal(reloaded.calls.core.length,0);checks++;
+ for(const action of ['undo','delete']){
+  const lost=harness();lost.test.lost=true;await lost.begin(action);
+  assert.equal(JSON.parse([...lost.storage.values()][0]).stateConfirmed,false,'lost response retains an unconfirmed intent');
+  const reloaded=harness({storage:lost.storage,server:lost.test.server,attendance:lost.test.attendance,note:lost.test.note});
+  reloaded.context.resumeMatchAction();reloaded.test.answers=[true,false];await reloaded.context.reviewMatchAction();
+  assert.equal(reloaded.calls.confirm.length,2,'fresh already-desired state still requires destructive reconfirmation after reload');
+  assert.match(reloaded.calls.confirm[0],/Reviewing latest club data replaces unsynced changes/);
+  assert.match(reloaded.calls.confirm[1],action==='undo'?/Undo match played against Example United/:/Delete this match\?/);
+  assert.equal(reloaded.context.matchActionDesired({action,matchId:'fictional-match'},reloaded.context.state),true,'review shows the actual applied core without claiming rollback');
+  assert.equal(reloaded.calls.attendance+reloaded.calls.note+reloaded.calls.closed+reloaded.calls.audit.length,0,'cancel cannot clean up or complete');
+  assert.equal(reloaded.storage.size,1,'cancel retains the cleanup route');
+  assert.equal(JSON.parse([...reloaded.storage.values()][0]).stateConfirmed,false);
+  assert.match(reloaded.node('match-action-outcome').innerHTML,/Review latest match/);
+  assert.doesNotMatch(reloaded.node('match-action-outcome').innerHTML,/>Retry change</);
+  reloaded.test.answers=[true,true];await reloaded.context.retryMatchAction();
+  assert.equal(reloaded.calls.review,2,'cancelled reconfirmation still routes through review');
+  assert.equal(reloaded.calls.confirm.length,4,'accept explicitly reconfirms the action again');
+  assert.equal(JSON.parse([...reloaded.storage.values()][0]).stateConfirmed,true);
+  assert.equal(reloaded.calls.attendance+reloaded.calls.note,0,'accepted review exposes cleanup retry before cleanup starts');
+  assert.match(reloaded.node('match-action-outcome').innerHTML,/Retry cleanup/);
+  await reloaded.context.retryMatchAction();
+  assert.equal(reloaded.calls.core.length,1,'cleanup retry revalidates the already-desired record');
+  assert.equal(reloaded.calls.core[0].expectedMatch,null,'already-applied cleanup needs no persisted match payload');
+  assert.equal(reloaded.calls.attendance,1);assert.equal(reloaded.calls.note,1);assert.equal(reloaded.calls.closed,1);assert.equal(reloaded.storage.size,0);
+  assert.match(reloaded.calls.toasts.at(-1),action==='undo'?/returned to Scheduled/:/removed/);checks++;
+ }
  const local=harness({cloud:false});await local.begin('undo');assert.equal(local.calls.core.length+local.calls.attendance+local.calls.note,0);assert.match(local.calls.toasts[0],/on this device$/);assert.doesNotMatch(local.calls.toasts[0],/club|cloud/i);checks++;
  const denied=harness();denied.context.state.matches[0].source='selkent';await denied.begin('delete');assert.equal(denied.calls.core.length,0);assert.equal(denied.storage.size,0);checks++;
  const cancelled=harness();cancelled.test.answers=[false];await cancelled.begin('undo');assert.equal(cancelled.calls.core.length,0);assert.equal(cancelled.storage.size,0);checks++;
