@@ -3,7 +3,7 @@ const src=fs.readFileSync('app/src/main/assets/app.js','utf8'),html=fs.readFileS
 let coach=true,closed=0;
 const nodes={};
 function node(id){return nodes[id]??={dataset:{},textContent:'',value:'',classList:{hidden:false,toggle(name,value){if(name==='hidden')this.hidden=value;},add(name){if(name==='hidden')this.hidden=true;},remove(name){if(name==='hidden')this.hidden=false;}},showModal(){},close(){closed++;}};}
-const context=vm.createContext({document:{getElementById:node,querySelectorAll:()=>[]},state:{matches:[]},
+const context=vm.createContext({document:{getElementById:node,querySelectorAll:()=>[]},state:{matches:[]},__matchReportSaveBusy:false,
  isCoach:()=>coach,isPlayedMatch:m=>(m.status||'played')==='played',isLeagueMatch:m=>m.competition==='League',isDivisionMatch:m=>m.competition==='Division',
  isProviderOwnedMatch:m=>m.source==='selkent',matchStatus:m=>m.status||'played',matchDayReached:m=>m.date<='2026-10-10',
  resetMatchReportMode(){},formatDate:s=>s,esc:s=>s,matchScoreText:()=>'',statusLabel:()=>'',renderMatchOverview(){},detailPlayerInputs(){},detailBookingInputs(){},renderAwardFields(){},

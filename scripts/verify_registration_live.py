@@ -40,7 +40,8 @@ def main():
     out = ROOT / "registration-live-review"
     out.mkdir(exist_ok=True)
     for name in ("register.html", "registration.js", "registration.css", "cloud.js", "kickoff-updates.js", "notifications.css", "app.js",
-                 "player-onboarding.js", "service-worker.js", "index.html", "shooters-hill-logo.png"):
+                 "player-onboarding.js", "service-worker.js", "index.html", "shooters-hill-logo.png",
+                 "app-design-system.css", "static-feed-overlay.js"):
         source = ROOT / ("cloudflare/web-app/service-worker.js" if name == "service-worker.js"
                          else "app/src/main/assets/" + name)
         status, url, headers, body = fetch(SITE + "/" + name)

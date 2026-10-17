@@ -81,11 +81,11 @@
     if(accessToken)h['Authorization']='Bearer '+accessToken;
     return h;
   }
-  async function request(path,{method='GET',body=null,token=true,headers={}}={}){
+  async function request(path,{method='GET',body=null,token=true,headers={},signal}={}){
     if(token && !await ensureFreshSession())throw new Error('Your session has expired. Sign in again before saving; your edits remain on this page.');
     const send=async()=>{
       const usedToken=token?session?.access_token:null;
-      const res=await fetch(base()+path,{method,headers:{...authHeaders(usedToken),...headers},body:body==null?undefined:JSON.stringify(body)});
+      const res=await fetch(base()+path,{method,headers:{...authHeaders(usedToken),...headers},body:body==null?undefined:JSON.stringify(body),...(signal?{signal}:{})});
       const text=await res.text();
       let data=null;try{data=text?JSON.parse(text):null;}catch{data=text;}
       return {res,text,data,usedToken};
@@ -107,10 +107,14 @@
   async function refreshSession(){
     if(sessionRefresh)return sessionRefresh;
     if(!session?.refresh_token)return false;
+    const refreshToken=session.refresh_token,refreshUser=session?.user?.id;
     sessionRefresh=(async()=>{
       try{
-        const res=await fetch(base()+'/auth/v1/token?grant_type=refresh_token',{method:'POST',headers:authHeaders(),body:JSON.stringify({refresh_token:session.refresh_token})});
+        const res=await fetch(base()+'/auth/v1/token?grant_type=refresh_token',{method:'POST',headers:authHeaders(),body:JSON.stringify({refresh_token:refreshToken})});
         const data=await res.json();
+        // A response for an older login must not replace or clear a newer one.
+        const latest=loadSession();
+        if(latest?.refresh_token!==refreshToken||latest?.user?.id!==refreshUser){session=latest;return !!latest?.access_token;}
         if(!res.ok||!data.access_token){if(res.status===400||res.status===401)saveSession(null);return false;}
         data.expires_at=Math.floor(Date.now()/1000)+(data.expires_in||3600);
         saveSession(data);return true;
@@ -514,6 +518,7 @@
   }
   async function saveTeamStateNow(nextState,{force=false,preserveOnConflict=false}={}){
     if(!configured()||!session||!activeTeam||!canEdit())return null;
+    if(holdMatchActionDraft(nextState))throw matchActionError('MATCH_ACTION_SYNC_BUSY');
     if(saving){pendingState=nextState;return null;}
     saving=true;emitStatus('Saving…','working');
     try{
@@ -541,6 +546,7 @@
   }
   function queueStateSave(nextState){
     if(!configured()||!canEdit()||!activeTeam)return;
+    if(holdMatchActionDraft(nextState))return;
     pendingState=JSON.parse(JSON.stringify(nextState));
     unsyncedState=true;
     emitStatus('Changes queued…','working');
@@ -548,6 +554,7 @@
     saveTimer=setTimeout(()=>{const p=pendingState;pendingState=null;if(p)saveTeamStateNow(p,{preserveOnConflict:true}).catch(()=>{});},700);
   }
   async function confirmStateSave(nextState){
+    if(holdMatchActionDraft(nextState))throw matchActionError('MATCH_ACTION_SYNC_BUSY');
     // A local match report must stay protected from background pulls until a write is confirmed.
     unsyncedState=true;
     if(!configured()||!activeTeam||!canEdit()){
@@ -575,6 +582,7 @@
   }
   async function pullLatest({quiet=false}={}){
     if(!configured()||!session||!activeTeam)return null;
+    if(currentMatchActionBarrier())return null;
     if(saving||pendingState||confirmingState||unsyncedState)return null;
     if(!quiet)emitStatus('Checking cloud…','working');
     try{
@@ -584,6 +592,166 @@
       if(!quiet)emitStatus('Cloud synced','ok');
       return row;
     }catch(err){if(!quiet)emitStatus('Sync failed: '+(err.message||err),'error');return null;}
+  }
+  // Destructive match actions use a detached candidate and a captured identity.
+  // A full-state background draft must never replay over a confirmed removal.
+  let matchActionLease=null,matchActionQuarantine=null;
+  function matchActionError(code){
+    const messages={MATCH_ACTION_CONFLICT:'The match changed in the cloud. Review the latest match before confirming again.',MATCH_ACTION_SYNC_BUSY:'Finish syncing existing team changes, or review the latest club data before continuing.',MATCH_ACTION_CONTEXT_CHANGED:'The account or team changed. Reopen the match in the correct team.'};
+    const error=new Error(messages[code]||'The cloud did not confirm this match action.');error.code=code;return error;
+  }
+  function matchActionScopeMatches(scope){
+    return !!scope&&session?.user?.id===scope.uid&&loadSession()?.user?.id===scope.uid&&context===scope.context&&activeTeam===scope.team&&activeTeam.id===scope.teamId&&
+      String(context?.profile?.club_id||'')===scope.club&&role()===scope.role&&actingAsParent()===scope.parent&&
+      window.ClubHubCloud===scope.cloud&&canEdit()&&!actingAsParent();
+  }
+  function assertMatchActionScope(scope){
+    if(!matchActionScopeMatches(scope)||scope.guard()!==true)throw matchActionError('MATCH_ACTION_CONTEXT_CHANGED');
+  }
+  function captureMatchActionScope(guard){
+    if(typeof guard!=='function'||!configured()||!session?.user?.id||!activeTeam||!canEdit()||actingAsParent())throw matchActionError('MATCH_ACTION_CONTEXT_CHANGED');
+    const scope={uid:session.user.id,club:String(context?.profile?.club_id||''),context,team:activeTeam,teamId:activeTeam.id,role:role(),parent:actingAsParent(),cloud:window.ClubHubCloud,guard};
+    assertMatchActionScope(scope);return scope;
+  }
+  function currentMatchActionBarrier(){
+    return [matchActionLease,matchActionQuarantine].find(record=>record&&matchActionScopeMatches(record.scope))||null;
+  }
+  function holdMatchActionDraft(nextState){
+    const barrier=currentMatchActionBarrier();if(!barrier)return false;
+    pendingState=JSON.parse(JSON.stringify(nextState));unsyncedState=true;barrier.interfered=true;
+    clearTimeout(saveTimer);saveTimer=null;return true;
+  }
+  async function beginMatchAction(guard,{discardQueuedChanges=false}={}){
+    const scope=captureMatchActionScope(guard);
+    if(matchActionLease)throw matchActionError('MATCH_ACTION_SYNC_BUSY');
+    if(!discardQueuedChanges&&currentMatchActionBarrier())throw matchActionError('MATCH_ACTION_SYNC_BUSY');
+    // Let an ordinary in-flight/debounced save finish, without discarding its draft.
+    for(let attempts=0;saving||confirmingState||(!discardQueuedChanges&&pendingState);attempts++){
+      if(attempts>=75)throw matchActionError('MATCH_ACTION_SYNC_BUSY');
+      await new Promise(resolve=>setTimeout(resolve,40));assertMatchActionScope(scope);
+    }
+    if(!discardQueuedChanges&&unsyncedState)throw matchActionError('MATCH_ACTION_SYNC_BUSY');
+    assertMatchActionScope(scope);
+    const lease={scope,interfered:false,mayHaveApplied:!!(discardQueuedChanges&&currentMatchActionBarrier()),discardQueuedChanges};
+    matchActionLease=lease;
+    if(discardQueuedChanges){clearTimeout(saveTimer);saveTimer=null;}
+    return lease;
+  }
+  function finishMatchAction(lease){
+    if(matchActionLease!==lease)return;
+    matchActionLease=null;
+    if(!matchActionScopeMatches(lease.scope))return;
+    if(lease.interfered&&lease.mayHaveApplied){matchActionQuarantine=lease;return;}
+    if(lease.interfered&&pendingState){const draft=pendingState;pendingState=null;queueStateSave(draft);}
+  }
+  function assertMatchActionClean(lease){
+    assertMatchActionScope(lease.scope);
+    if(lease.interfered)throw matchActionError('MATCH_ACTION_SYNC_BUSY');
+  }
+  async function matchActionRequest(scope,path,options={},lease=null){
+    const check=()=>{assertMatchActionScope(scope);if(lease)assertMatchActionClean(lease);};
+    check();
+    const controller=typeof AbortController==='function'?new AbortController():null;
+    let timedOut=false,timer;
+    const timeout=()=>new Error('The club did not confirm this request in time. Check your connection and retry.');
+    const deadline=new Promise((_,reject)=>{timer=setTimeout(()=>{timedOut=true;controller?.abort();reject(timeout());},15000);});
+    try{
+      return await Promise.race([deadline,(async()=>{
+        const fresh=await ensureFreshSession();check();
+        // A timed-out refresh must never start a late destructive request.
+        if(timedOut)throw timeout();
+        if(!fresh)throw new Error('Your session has expired. Sign in again before retrying.');
+        // token:false avoids the ordinary request's cross-session 401 replay.
+        const token=session.access_token;
+        const result=await request(path,{...options,token:false,signal:controller?.signal,headers:{...authHeaders(token),...(options.headers||{})}});
+        check();return result;
+      })()]);
+    }catch(error){check();throw error;}
+    finally{clearTimeout(timer);}
+  }
+  async function readMatchActionState(scope,lease){
+    const {data}=await matchActionRequest(scope,'/rest/v1/rpc/get_team_state_for_me',{method:'POST',body:{p_team_id:scope.teamId}},lease);
+    const row=Array.isArray(data)?data[0]:data,revision=row?.revision;
+    if(!row?.state||typeof row.state!=='object'||Array.isArray(row.state)||!Array.isArray(row.state.matches)||!Number.isSafeInteger(revision)||revision<0)throw new Error('The cloud did not confirm the latest team state.');
+    const state=sanitizeMiniSoccerParentStateClient(JSON.parse(JSON.stringify(row.state)),Number(scope.team.age_group||0),scope.context?.profile?.role||'');
+    return {state,revision,updatedAt:row.updated_at||''};
+  }
+  function matchActionCore(match){
+    const core={};
+    for(const key of ['status','date','opponent','competition','venue','source','gf','ga'])core[key]=key==='gf'||key==='ga'?Number(match?.[key]||0):String(match?.[key]||(key==='status'?'played':''));
+    return JSON.stringify(core);
+  }
+  function matchActionDesired(state,action,matchId){
+    const match=state.matches.find(row=>String(row.id)===matchId);
+    const linked=['goals','assists','bookings','awards'].some(key=>(Array.isArray(state[key])?state[key]:[]).some(row=>String(row.matchId)===matchId));
+    return !linked&&(action==='delete'?!match:!!match&&match.status==='scheduled'&&Number(match.gf||0)===0&&Number(match.ga||0)===0);
+  }
+  function acceptMatchActionState(lease,row){
+    assertMatchActionClean(lease);activeRevision=row.revision;lastRemoteUpdatedAt=row.updatedAt;
+    try{localStorage.removeItem(TEAM_STATE_CACHE_PREFIX+lease.scope.teamId);}catch{}
+    // These helpers never persist identity/performance data in device caches.
+  }
+  async function commitMatchAction({action,matchId,expectedMatch}={},guard){
+    if(!['undo','delete'].includes(action)||!String(matchId||''))throw matchActionError('MATCH_ACTION_CONFLICT');
+    matchId=String(matchId);const lease=await beginMatchAction(guard);
+    try{
+      const fresh=await readMatchActionState(lease.scope,lease);
+      if(matchActionDesired(fresh.state,action,matchId)){
+        lease.mayHaveApplied=true;acceptMatchActionState(lease,fresh);return {...fresh,alreadyApplied:true};
+      }
+      assertMatchActionClean(lease);
+      const match=fresh.state.matches.find(row=>String(row.id)===matchId);
+      if(!expectedMatch||!match||matchActionCore(match)!==matchActionCore(expectedMatch)||(action==='delete'&&/selkent|github-static|static-fixture/i.test(String(match.source||''))))throw matchActionError('MATCH_ACTION_CONFLICT');
+      const candidate=JSON.parse(JSON.stringify(fresh.state));
+      if(action==='delete')candidate.matches=candidate.matches.filter(row=>String(row.id)!==matchId);
+      else Object.assign(candidate.matches.find(row=>String(row.id)===matchId),{status:'scheduled',gf:0,ga:0});
+      for(const key of ['goals','assists','bookings','awards'])candidate[key]=(Array.isArray(candidate[key])?candidate[key]:[]).filter(row=>String(row.matchId)!==matchId);
+      assertMatchActionClean(lease);
+      // Once sent, even a lost response may have applied the compare-and-swap.
+      lease.mayHaveApplied=true;
+      const {data}=await matchActionRequest(lease.scope,'/rest/v1/rpc/save_team_state',{method:'POST',body:{p_team_id:lease.scope.teamId,p_state:candidate,p_expected_revision:fresh.revision}},lease);
+      const saved=Array.isArray(data)?data[0]:data;
+      if(!saved||!Number.isSafeInteger(saved.revision)||saved.revision<=fresh.revision)throw new Error('The cloud did not confirm this match action.');
+      assertMatchActionClean(lease);
+      const confirmed=await readMatchActionState(lease.scope,lease);
+      if(confirmed.revision!==Number(saved.revision)||!matchActionDesired(confirmed.state,action,matchId))throw matchActionError('MATCH_ACTION_CONFLICT');
+      acceptMatchActionState(lease,confirmed);return {...confirmed,alreadyApplied:false};
+    }catch(error){
+      if(String(error.message||'').includes('STALE_STATE'))throw matchActionError('MATCH_ACTION_CONFLICT');
+      throw error;
+    }finally{finishMatchAction(lease);}
+  }
+  async function reviewMatchActionState(guard,{discardQueuedChanges=false}={}){
+    const lease=await beginMatchAction(guard,{discardQueuedChanges:discardQueuedChanges===true});
+    try{
+      const fresh=await readMatchActionState(lease.scope,lease);assertMatchActionClean(lease);
+      if(discardQueuedChanges===true){
+        // The caller obtained explicit consent; keep the draft until this read succeeds.
+        pendingState=null;unsyncedState=false;clearTimeout(saveTimer);saveTimer=null;
+        matchActionQuarantine=null;lease.interfered=false;
+      }
+      acceptMatchActionState(lease,fresh);return fresh;
+    }finally{finishMatchAction(lease);}
+  }
+  async function clearMatchActionAttendance(matchId,guard){
+    if(!String(matchId||''))throw matchActionError('MATCH_ACTION_CONFLICT');
+    const lease=await beginMatchAction(guard);lease.mayHaveApplied=true;
+    try{
+      const {data}=await matchActionRequest(lease.scope,'/rest/v1/rpc/save_match_attendance',{method:'POST',body:{p_team_id:lease.scope.teamId,p_match_id:String(matchId),p_rows:[]}},lease);
+      assertMatchActionClean(lease);
+      if(data!==0)throw new Error('The cloud did not confirm the cleared match attendance.');
+      return {cleared:true};
+    }finally{finishMatchAction(lease);}
+  }
+  async function clearMatchActionNote(matchId,guard){
+    if(!String(matchId||''))throw matchActionError('MATCH_ACTION_CONFLICT');
+    const lease=await beginMatchAction(guard);lease.mayHaveApplied=true;
+    try{
+      const {data}=await matchActionRequest(lease.scope,'/rest/v1/coach_match_notes?on_conflict=team_id,match_id',{method:'POST',body:{team_id:lease.scope.teamId,match_id:String(matchId),note:'',updated_by:lease.scope.uid,updated_at:new Date().toISOString()},headers:{Prefer:'resolution=merge-duplicates,return=representation'}},lease);
+      assertMatchActionClean(lease);const row=Array.isArray(data)?data[0]:data;
+      if(!row||row.team_id!==lease.scope.teamId||String(row.match_id)!==String(matchId)||row.note!=='')throw new Error('The cloud did not confirm the cleared match note.');
+      return {cleared:true};
+    }finally{finishMatchAction(lease);}
   }
   async function switchAdminTeam(teamId,seedFactory){
     if(!canAdmin())throw new Error('Club Admin access required');
@@ -1327,7 +1495,7 @@
   }
   window.ClubHubCloud={
     getRegistrationContactConduct,submitRegistrationContactConduct,readRegistrationConductDocument,listContactDirectory,saveMemberContactDetails,importMemberContactDetails,loadAdminPlayerOnboarding,onboardAdminPlayer,
-    configured,bootstrap,loadInitialState,queueStateSave,confirmStateSave,pullLatest,startPolling,
+    configured,bootstrap,loadInitialState,queueStateSave,confirmStateSave,pullLatest,startPolling,commitMatchAction,reviewMatchActionState,clearMatchActionAttendance,clearMatchActionNote,
     role,requestCoachAccess,listPendingCoachRequests,reviewCoachRequest,listMyCoachTeams,switchMyCoachTeam,setMyCapacity,requestChildLink,realRole,isStaffAccount,actingAsParent,assignCoachTeam,unassignCoachTeam,canEdit,canAdmin,assignedTeam,currentTeam,coachTeam,hasDualCoachAccess,visibleTeamList,getClubConfiguration,listLoginClubs,listLoginTeams,listCurrentClubLoginTeams,createInvite,requestParentAccess,listPendingParentRequests,listTeamMembers,listClubCoaches,listCoachQualifications,getCoachQualifications,saveCoachQualifications,listClubAccessAccounts,removeClubCoach,listPublishedClubResults,listParentPlayerLinks,saveParentPlayerLinks,listPlayerAccountLinks,listMatchAvailability,saveMatchAvailability,saveCoachMatchAvailability,listSelkentTeamDirectory,syncSelkentTeamDirectory,getCoachMatchNote,saveCoachMatchNote,listAnnouncements,createAnnouncement,markAnnouncementRead,deleteAnnouncement,listMatchAttendance,saveMatchAttendance,getAvailabilitySettings,setAvailabilityDeadline,sendAvailabilityReminder,listNotifications,acknowledgeKickoffUpdate,acknowledgeKickoffAsCoach,respondKickoffParentAvailability,listKickoffUpdatesForAdmin,getKickoffPushSettings,registerKickoffPush,unregisterKickoffPush,markNotificationRead,notifyFixtureChange,notifySelectedSquad,notifyMatchReport,notifyMatchReopened,listPlayerAppearanceStats,recordAuditEvent,listAuditHistory,listSeasonArchives,getSeasonArchive,archiveCurrentSeason,rolloverClubSeason,resetParentPin,setAccessPin,approveParentRequest,removeTeamMember,syncTeamDirectory,switchAdminTeam,switchParentTeam,getClubOverview,signOut,switchToParentSignIn,handleAuthCallback,listMessageContacts,listClubMessages,sendClubMessage,markClubMessagesRead,getClubComplianceStatus,setDisputeReviewers,setClubSafeguardingContacts,getConcernRouting,raiseClubConcern,listGeneralDisputes,listDisputeMessages,upsertU11SafeguardingInfo,exportU11SafeguardingPack,listSafeguardingExportAudit,requestClubCancellation,cancelClubCancellation,
     updateCloudPanel,
     get context(){return context;},get configuration(){return clubConfiguration;},get session(){return session;},get revision(){return activeRevision;},get testMode(){return testModeActive();}

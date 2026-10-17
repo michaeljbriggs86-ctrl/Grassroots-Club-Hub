@@ -196,6 +196,7 @@
           <button type="button" class="primary-button compact" data-action="quick-add" data-requires-edit>+ Add match</button>
         </div>
 
+        <section id="match-action-notice" class="match-action-notice hidden" role="status" aria-live="polite"></section>
         <nav class="screen-section-nav matches-section-nav" aria-label="Jump to match section">
           <button type="button" data-scroll-to="matches-next-fixture">Next match</button>
           <button type="button" data-scroll-to="selkent-fixtures-panel">Fixtures</button>
@@ -1027,6 +1028,7 @@
       <p class="helper hidden" id="match-report-step-label" aria-live="polite"></p>
       <section id="match-report-hub" class="hidden" aria-label="Edit match report"></section>
       <section id="match-report-outcome" class="hidden" role="status" aria-live="polite" tabindex="-1"></section>
+      <section id="match-action-outcome" class="hidden" role="status" aria-live="polite" aria-atomic="true" tabindex="-1"></section>
       <section class="detail-feature-section match-report-score-section hidden" id="match-report-score-section">
         <div class="panel-heading"><div><h3>Final score</h3><span class="helper">Enter the final score</span></div></div>
         <div class="match-report-score-grid">

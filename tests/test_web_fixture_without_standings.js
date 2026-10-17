@@ -41,6 +41,7 @@ const context = vm.createContext({
   applyStaticDivision: async () => {}, liveResultFallback: async () => ({ results: [] }),
   liveFixtureFallback: async () => {fixtureFallbacks++;throw Error('Unexpected live fixture fallback');}
 });
+vm.runInContext(extract('  function feedMutationIdentity(', '  function norm('), context);
 vm.runInContext(extract('  function findResultsAge(', '  async function staticPublishedAges('), context);
 vm.runInContext(extract('  function sameTeam(', '  async function liveFixtureFallback('), context);
 vm.runInContext(extract('  window.syncSelkent=async function(silent=false){', '  /* Defence in depth:'), context);

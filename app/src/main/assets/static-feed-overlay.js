@@ -31,6 +31,31 @@
 
   const memoryCache={directory:null,results:null};
 
+  // A match Undo/Remove commits a detached state snapshot. An older background
+  // response must not mutate or queue the still-visible snapshot over that save.
+  // Reads may fill their source caches; applying them requires the same scope.
+  function feedMutationIdentity(){
+    const cloud=window.ClubHubCloud,profile=cloud?.context?.profile;
+    return {cloud,state:typeof state==='undefined'?null:state,
+      user:cloud?.session?.user?.id||profile?.user_id||'',
+      club:profile?.club_id||cloud?.context?.club?.id||'',
+      team:cloud?.currentTeam?.()?.id||'',role:cloud?.role?.()||profile?.role||'',
+      viewRole:typeof currentRole==='undefined'?'':currentRole,capacity:typeof adminUiMode==='undefined'?'':adminUiMode,
+      parent:!!cloud?.actingAsParent?.()};
+  }
+  function feedMutationScope(){
+    return {...feedMutationIdentity(),epoch:Number(window.matchActionMutationEpoch?.()||0),pending:window.matchActionIsPending?.()===true};
+  }
+  function canApplyFeedMutation(scope){
+    if(!scope||scope.pending||window.matchActionIsPending?.()===true||scope.epoch!==Number(window.matchActionMutationEpoch?.()||0))return false;
+    const current=feedMutationIdentity();
+    return ['cloud','state','user','club','team','role','viewRole','capacity','parent'].every(key=>scope[key]===current[key]);
+  }
+  async function guardedFeedRead(scope,promise){
+    try{const value=await promise;return canApplyFeedMutation(scope)?value:null;}
+    catch(error){if(!canApplyFeedMutation(scope))return null;throw error;}
+  }
+
   function norm(value=''){
     return String(value||'').toLowerCase().replace(/&amp;/g,'and').replace(/&/g,'and').replace(/[^a-z0-9]+/g,' ').trim().replace(/\s+/g,' ');
   }
@@ -85,7 +110,8 @@
     }
   }
 
-  function attachDirectoryBadges(directory){
+  function attachDirectoryBadges(directory,scope=feedMutationScope()){
+    if(!canApplyFeedMutation(scope))return directory;
     state.selkent=state.selkent||{};
     const details=state.selkent.directoryDetails=state.selkent.directoryDetails||{};
     const clubs=new Map(directory.clubs.map(club=>[Number(club.club_id),club]));
@@ -143,17 +169,20 @@
     return directory;
   }
   function loadDirectory(force=false){
+    const scope=feedMutationScope();
     return fetchStaticFeed(STATIC_DIRECTORY_URL,DIRECTORY_CACHE_KEY,validateDirectory,force)
-      .then(attachDirectoryBadges);
+      .then(directory=>attachDirectoryBadges(directory,scope));
   }
   function loadResults(force=false,requireFresh=false){return fetchStaticFeed(STATIC_RESULTS_URL,RESULTS_CACHE_KEY,validateResults,force,requireFresh);}
 
-  function persistWithoutRender(){
+  function persistWithoutRender(scope=feedMutationScope()){
+    if(!canApplyFeedMutation(scope))return;
     try{if(typeof window.persistLocalState==='function')window.persistLocalState();else if(typeof state!=='undefined'&&state)localStorage.setItem('grassrootsHub_team_state_v1',JSON.stringify(state));}catch(_){ }
   }
 
-  function saveAndRender(){
-    if(typeof window.saveState==='function')window.saveState();else{persistWithoutRender();if(typeof window.renderAll==='function')window.renderAll();}
+  function saveAndRender(scope=feedMutationScope()){
+    if(!canApplyFeedMutation(scope))return;
+    if(typeof window.saveState==='function')window.saveState();else{persistWithoutRender(scope);if(typeof window.renderAll==='function')window.renderAll();}
   }
 
   function providerClubIdFromState(){
@@ -241,7 +270,9 @@
 
   async function applyStaticDivision(silent=true,force=false){
     if(!isSelkentProvider())return null;
-    const directory=await loadDirectory(force);
+    const scope=feedMutationScope();if(!canApplyFeedMutation(scope))return null;
+    const directory=await guardedFeedRead(scope,loadDirectory(force));
+    if(!directory||!canApplyFeedMutation(scope))return null;
     const league=findDirectoryLeague(directory);
     if(!league)throw new Error(`No ${ageCode()||'current-age'} static Selkent division found for ${state?.division?.teamName||state?.meta?.teamName||'this team'}`);
     state.selkent=state.selkent||{};
@@ -254,7 +285,7 @@
     state.selkent.directoryGeneratedAt=directory.last_updated||'';
     state.selkent.lastDivisionSync=directory.last_updated||new Date().toISOString();
     if(typeof window.updateCurrentClubTeamDivision==='function')window.updateCurrentClubTeamDivision(state.division.name);
-    persistWithoutRender();
+    persistWithoutRender(scope);
     if(!silent&&typeof window.toast==='function')window.toast(`${state.division.name} loaded from Selkent feed`);
     return league;
   }
@@ -295,10 +326,13 @@
   }
 
   async function applyStaticPublishedResults(force=false){
-    const results=await loadResults(force),ageEntry=findResultsAge(results);
+    const scope=feedMutationScope();if(!canApplyFeedMutation(scope))return[];
+    const results=await guardedFeedRead(scope,loadResults(force));
+    if(!results||!canApplyFeedMutation(scope))return[];
+    const ageEntry=findResultsAge(results);
     if(!ageEntry)throw new Error(`No ${ageCode()} entry in static Selkent results feed`);
     if(ageEntry.published_results_status==='not_publicly_published'){
-      state.selkent.results=[];state.selkent.resultSource=RESULT_SOURCE;persistWithoutRender();return[];
+      state.selkent.results=[];state.selkent.resultSource=RESULT_SOURCE;persistWithoutRender(scope);return[];
     }
     const table=findStandingTable(ageEntry);
     if(!table)throw new Error(`No static results division found for ${state?.division?.name||'current division'}`);
@@ -307,23 +341,25 @@
     state.selkent.resultSource=RESULT_SOURCE;
     state.selkent.resultsGeneratedAt=results.last_updated||'';
     if(typeof window.syncOwnLeagueMatchesFromSelkent==='function')window.syncOwnLeagueMatchesFromSelkent(rows,'selkent-static');
-    persistWithoutRender();
+    persistWithoutRender(scope);
     return rows;
   }
 
   async function applyStaticStandings(silent=true,force=false){
+    const scope=feedMutationScope();if(!canApplyFeedMutation(scope))return[];
     state.selkent=state.selkent||{};
     if(typeof window.leagueTableEnabled==='function'&&!window.leagueTableEnabled()){
       state.selkent.table=[];
       state.selkent.tableSource=TABLE_SOURCE;
-      persistWithoutRender();
+      persistWithoutRender(scope);
       return[];
     }
-    const results=await loadResults(force);
+    const results=await guardedFeedRead(scope,loadResults(force));
+    if(!results||!canApplyFeedMutation(scope))return[];
     const ageEntry=findResultsAge(results);
     if(!ageEntry)throw new Error(`No ${ageCode()} entry in static Selkent results feed`);
     if(ageEntry.standings===null||ageEntry.published_results_status==='not_publicly_published'){
-      state.selkent.table=[];state.selkent.tableSource=TABLE_SOURCE;persistWithoutRender();return[];
+      state.selkent.table=[];state.selkent.tableSource=TABLE_SOURCE;persistWithoutRender(scope);return[];
     }
     const table=findStandingTable(ageEntry);
     if(!table)throw new Error(`No static standings found for ${state?.division?.name||'current division'}`);
@@ -336,7 +372,7 @@
     state.selkent.tableSourceOrderAuthoritativeForTies=false;
     state.selkent.resultsGeneratedAt=results.last_updated||'';
     state.selkent.lastTableSync=results.last_updated||new Date().toISOString();
-    persistWithoutRender();
+    persistWithoutRender(scope);
     if(!silent&&typeof window.toast==='function')window.toast('League standings loaded from static Selkent feed');
     return rows;
   }
@@ -383,8 +419,11 @@
   }
 
   async function applyStaticFixtures(silent=true,force=false){
+    const scope=feedMutationScope();if(!canApplyFeedMutation(scope))return[];
     state.selkent=state.selkent||{};
-    const results=await loadResults(force),ageEntry=findResultsAge(results);
+    const results=await guardedFeedRead(scope,loadResults(force));
+    if(!results||!canApplyFeedMutation(scope))return[];
+    const ageEntry=findResultsAge(results);
     if(!ageEntry)throw new Error(`No ${ageCode()} entry in static Selkent results feed`);
     const previous=(typeof window.nextPublishedFixture==='function')?window.nextPublishedFixture():null;
     const rows=adaptStaticFixtures(ageEntry);
@@ -394,36 +433,43 @@
     state.selkent.lastFixtureScan=new Date().toISOString();
     const next=(typeof window.nextPublishedFixture==='function')?window.nextPublishedFixture():(rows[0]||null);
     try{if(next&&typeof window.ensureFixtureKitColours==='function')await window.ensureFixtureKitColours(next);}catch(_){ }
+    if(!canApplyFeedMutation(scope))return[];
     try{if(typeof window.updateFixtureTracking==='function')window.updateFixtureTracking(previous,next);}catch(_){ }
-    persistWithoutRender();
+    persistWithoutRender(scope);
     if(!silent&&typeof window.toast==='function')window.toast(`${rows.length} team fixture${rows.length===1?'':'s'} loaded from Selkent feed`);
     return rows;
   }
 
   async function liveFixtureFallback(){
+    const scope=feedMutationScope();if(!canApplyFeedMutation(scope))return null;
     const sk=state.selkent||{};
     const choices=[state?.meta?.ageGroup,state?.division?.name].filter(Boolean);
-    const page=await window.fetchSelkentSelected(sk.fixturesUrl||STARTER_DATA?.selkent?.fixturesUrl,choices);
+    const page=await guardedFeedRead(scope,window.fetchSelkentSelected(sk.fixturesUrl||STARTER_DATA?.selkent?.fixturesUrl,choices));
+    if(!page||!canApplyFeedMutation(scope))return null;
     const parsed=original.parseSelkentHtml?original.parseSelkentHtml(page.html,page.url):window.parseSelkentHtml(page.html,page.url);
     return parsed||{fixtures:[],teams:[]};
   }
 
   window.syncProviderClubTeams=async function(silent=true){
+    const scope=feedMutationScope();if(!canApplyFeedMutation(scope))return[];
     if(!isSelkentProvider()&&original.syncProviderClubTeams)return original.syncProviderClubTeams(silent);
     try{
-      const directory=await loadDirectory(!silent),teams=buildClubTeams(directory);
+      const directory=await guardedFeedRead(scope,loadDirectory(!silent));
+      if(!directory||!canApplyFeedMutation(scope))return[];
+      const teams=buildClubTeams(directory);
       if(!teams.length)throw new Error('No current-club teams found in static Selkent directory');
       state.selkent=state.selkent||{};
       state.selkent.clubTeams=teams;
       state.selkent.directorySource=DIRECTORY_SOURCE;
       state.selkent.directoryGeneratedAt=directory.last_updated||'';
       state.selkent.lastClubSync=directory.last_updated||new Date().toISOString();
-      persistWithoutRender();
+      persistWithoutRender(scope);
       if((typeof CLOUD_MODE!=='undefined'&&CLOUD_MODE)&&typeof window.isAdmin==='function'&&window.isAdmin())window.ClubHubCloud?.syncTeamDirectory?.(teams).catch(()=>{});
       if(typeof window.renderClubTeamOptions==='function')window.renderClubTeamOptions();
       if(!silent&&typeof window.toast==='function')window.toast(`${teams.length} club teams loaded from Selkent feed`);
       return teams;
     }catch(err){
+      if(!canApplyFeedMutation(scope))return[];
       if(typeof window.renderClubTeamOptions==='function')window.renderClubTeamOptions();
       if(!silent&&typeof window.toast==='function')window.toast('Using last saved club team list');
       if(Array.isArray(state?.selkent?.clubTeams)&&state.selkent.clubTeams.length)return state.selkent.clubTeams;
@@ -436,76 +482,96 @@
   };
 
   window.refreshPublishedLeagueAges=async function(silent=true){
+    const scope=feedMutationScope();if(!canApplyFeedMutation(scope))return[];
     state.selkent=state.selkent||{};
     if(!isSelkentProvider()&&original.refreshPublishedLeagueAges)return original.refreshPublishedLeagueAges(silent);
     try{
-      const ages=await staticPublishedAges(false);
+      const ages=await guardedFeedRead(scope,staticPublishedAges(false));
+      if(!ages||!canApplyFeedMutation(scope))return[];
       if(!ages.length)throw new Error('Static feed contains no published standings ages');
       state.selkent.publishedLeagueAges=ages;
       state.selkent.competitionMode=ages.map(x=>String(x).toUpperCase()).includes(ageCode())?'league':'no-league';
       state.selkent.lastCompetitionCheck=new Date().toISOString();
       try{localStorage.setItem('grassrootsHub_published_league_ages_v1',JSON.stringify(ages));}catch(_){ }
-      persistWithoutRender();
+      persistWithoutRender(scope);
       return ages;
     }catch(err){
+      if(!canApplyFeedMutation(scope))return[];
       if(Array.isArray(state.selkent.publishedLeagueAges)&&state.selkent.publishedLeagueAges.length)return state.selkent.publishedLeagueAges;
       throw err;
     }
   };
 
   window.syncSelkentLeagueTable=async function(silent=false){
+    const scope=feedMutationScope();if(!canApplyFeedMutation(scope))return false;
     const btn=document.getElementById('sync-league-table');if(btn)btn.disabled=true;
     try{
       await loadResults(true);
+      if(!canApplyFeedMutation(scope))return false;
       await window.refreshPublishedLeagueAges(true);
+      if(!canApplyFeedMutation(scope))return false;
       if(typeof window.leagueTableEnabled==='function'&&!window.leagueTableEnabled()){
-        state.selkent.table=[];state.selkent.results=[];persistWithoutRender();
+        state.selkent.table=[];state.selkent.results=[];persistWithoutRender(scope);
         if(!silent&&typeof window.toast==='function')window.toast('Selkent does not publish a league table for this age group.');
         return false;
       }
       await applyStaticDivision(true,false);
+      if(!canApplyFeedMutation(scope))return false;
       await applyStaticStandings(true,false);
+      if(!canApplyFeedMutation(scope))return false;
       await applyStaticPublishedResults(false);
+      if(!canApplyFeedMutation(scope))return false;
       state.selkent.lastSync=new Date().toISOString();
       state.selkent.status='Standings loaded from validated static Selkent feed';
-      saveAndRender();
+      saveAndRender(scope);
       if(!silent&&typeof window.toast==='function')window.toast('League standings synced');
       return true;
     }catch(err){
+      if(!canApplyFeedMutation(scope))return false;
       state.selkent=state.selkent||{};
       state.selkent.status=`Static standings unavailable: ${err.message||err}`;
-      persistWithoutRender();if(typeof window.renderSelkentSettings==='function')window.renderSelkentSettings();
+      persistWithoutRender(scope);if(typeof window.renderSelkentSettings==='function')window.renderSelkentSettings();
       if(!silent&&typeof window.toast==='function')window.toast('League table sync failed');
       return false;
-    }finally{if(btn)btn.disabled=false;}
+    }finally{if(btn&&canApplyFeedMutation(scope))btn.disabled=false;}
   };
 
   window.syncSelkent=async function(silent=false){
+    const scope=feedMutationScope();if(!canApplyFeedMutation(scope))return false;
     const dot=document.getElementById('selkent-sync-dot'),status=document.getElementById('selkent-sync-status');
     if(dot)dot.className='sync-dot busy';if(status)status.textContent='Syncing Selkent feeds…';
     if(!silent&&typeof window.toast==='function')window.toast('Syncing with Selkent…');
     try{
       await loadResults(true);
+      if(!canApplyFeedMutation(scope))return false;
       await window.syncProviderClubTeams(true);
+      if(!canApplyFeedMutation(scope))return false;
       await applyStaticDivision(true,false);
+      if(!canApplyFeedMutation(scope))return false;
       await window.refreshPublishedLeagueAges(true);
+      if(!canApplyFeedMutation(scope))return false;
       try{
         await applyStaticFixtures(true,false);
       }catch(_){
+        if(!canApplyFeedMutation(scope))return false;
         /* Migration-only safety fallback. A validated static fixture feed is authoritative. */
-        try{const fixtureData=await liveFixtureFallback();state.selkent.fixtures=fixtureData.fixtures||[];state.selkent.fixtureSource='selkent-live-fallback';state.selkent.lastFixtureScan=new Date().toISOString();}catch(__){/* keep last-known-good fixtures */}
+        try{const fixtureData=await liveFixtureFallback();if(!fixtureData||!canApplyFeedMutation(scope))return false;state.selkent.fixtures=fixtureData.fixtures||[];state.selkent.fixtureSource='selkent-live-fallback';state.selkent.lastFixtureScan=new Date().toISOString();}catch(__){/* keep last-known-good fixtures */}
       }
+      if(!canApplyFeedMutation(scope))return false;
 
       if(typeof window.leagueTableEnabled!=='function'||window.leagueTableEnabled()){
         try{await applyStaticStandings(true,false);}catch(err){
+          if(!canApplyFeedMutation(scope))return false;
           state.selkent.table=[];
           state.selkent.tableStatus=`Standings unavailable: ${err.message||err}`;
         }
       }else{state.selkent.table=[];state.selkent.tableSource=TABLE_SOURCE;state.selkent.tableStatus='';}
+      if(!canApplyFeedMutation(scope))return false;
 
       if(typeof window.leagueTableEnabled!=='function'||window.leagueTableEnabled()){
         try{await applyStaticPublishedResults(false);}catch(_){/* keep last-known-good published results */}
       }else state.selkent.results=[];
+      if(!canApplyFeedMutation(scope))return false;
 
       state.selkent.lastSync=new Date().toISOString();
       const bits=[];
@@ -513,13 +579,14 @@
       if(state.selkent.table?.length)bits.push(`${state.selkent.table.length} standings teams`);
       if(state.selkent.results?.length)bits.push(`${state.selkent.results.length} results`);
       state.selkent.status=bits.length?`Synced: ${bits.join(' · ')}`:'Static Selkent directory connected; no live fixtures/results currently published.';
-      saveAndRender();
+      saveAndRender(scope);
       if(!silent&&typeof window.toast==='function')window.toast('Selkent sync complete');
       return true;
     }catch(err){
+      if(!canApplyFeedMutation(scope))return false;
       state.selkent=state.selkent||{};
       state.selkent.status=`Sync failed: ${err.message||err}`;
-      persistWithoutRender();if(typeof window.renderSelkentSettings==='function')window.renderSelkentSettings();
+      persistWithoutRender(scope);if(typeof window.renderSelkentSettings==='function')window.renderSelkentSettings();
       if(!silent&&typeof window.toast==='function')window.toast('Selkent sync failed');
       return false;
     }
@@ -537,6 +604,7 @@
 
   if(original.applySelkentTeamDiscovery){
     window.applySelkentTeamDiscovery=function(teams){
+      if(!canApplyFeedMutation(feedMutationScope()))return;
       if(state?.selkent?.directorySource===DIRECTORY_SOURCE)return;
       return original.applySelkentTeamDiscovery(teams);
     };
@@ -564,16 +632,23 @@
 
   async function primeStaticFeeds(){
     if(!isSelkentProvider())return;
+    const scope=feedMutationScope();if(!canApplyFeedMutation(scope))return;
     try{
       await window.syncProviderClubTeams(true);
+      if(!canApplyFeedMutation(scope))return;
       await applyStaticDivision(true,false);
+      if(!canApplyFeedMutation(scope))return;
       await window.refreshPublishedLeagueAges(true);
+      if(!canApplyFeedMutation(scope))return;
       await applyStaticFixtures(true,false);
+      if(!canApplyFeedMutation(scope))return;
       if(typeof window.leagueTableEnabled!=='function'||window.leagueTableEnabled()){
-        try{await applyStaticStandings(true,false);}catch(err){state.selkent.table=[];state.selkent.tableStatus=`Standings unavailable: ${err.message||err}`;}
+        try{await applyStaticStandings(true,false);}catch(err){if(!canApplyFeedMutation(scope))return;state.selkent.table=[];state.selkent.tableStatus=`Standings unavailable: ${err.message||err}`;}
+        if(!canApplyFeedMutation(scope))return;
         try{await applyStaticPublishedResults(false);}catch(_){/* retain last-known-good published results */}
       }else{state.selkent.table=[];state.selkent.tableSource=TABLE_SOURCE;state.selkent.tableStatus='';}
-      persistWithoutRender();if(typeof window.renderAll==='function')window.renderAll();
+      if(!canApplyFeedMutation(scope))return;
+      persistWithoutRender(scope);if(typeof window.renderAll==='function')window.renderAll();
     }catch(_){/* retain last-known-good app state; normal sync can retry */}
   }
 

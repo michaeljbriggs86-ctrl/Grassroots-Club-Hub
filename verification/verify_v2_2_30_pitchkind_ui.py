@@ -266,30 +266,20 @@ check(
     and "addEventListener('click',undoMatchPlayed)" in app,
 )
 check(
-    'undo returns existing match to scheduled',
-    'async function undoMatchPlayed()' in app
-    and "m.status='scheduled'" in app
-    and 'm.gf=0' in app
-    and 'm.ga=0' in app,
+    'undo returns the existing match to scheduled only after confirmation',
+    behavior_tests('test_match_action_commit.js', 'test_cloud_match_action_commit.js'),
 )
 check(
-    'undo clears recorded match report data',
-    "state.goals=state.goals.filter(x=>x.matchId!==id)" in app
-    and "state.assists=(state.assists||[]).filter(x=>x.matchId!==id)" in app
-    and "state.bookings=(state.bookings||[]).filter(x=>x.matchId!==id)" in app
-    and "state.awards=state.awards.filter(x=>x.matchId!==id)" in app,
+    'undo and removal clear only the selected report with a retained retry',
+    behavior_tests('test_match_action_commit.js', 'test_cloud_match_action_commit.js'),
 )
 check(
-    'undo clears attendance before local reversal',
-    "await window.ClubHubCloud.saveMatchAttendance(id,[])" in app
-    and "Could not clear match attendance, so the result has not been undone" in app
-    and "await refreshAppearanceStats(false)" in app,
+    'attendance cleanup follows confirmed match state and can be retried separately',
+    behavior_tests('test_match_action_commit.js', 'test_cloud_match_action_commit.js'),
 )
 check(
-    'undo clears coach note and audits reversal',
-    "await window.ClubHubCloud.saveCoachMatchNote(id,'')" in app
-    and "'match_played_undone'" in app
-    and "'match_report_cleared'" in app,
+    'private note cleanup and completion remain truthful across failed saves',
+    behavior_tests('test_match_action_commit.js', 'test_cloud_match_action_commit.js'),
 )
 check(
     'undo does not send retired match-report notifications',
