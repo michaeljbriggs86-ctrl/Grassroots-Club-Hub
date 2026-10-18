@@ -1,9 +1,9 @@
 {
   "schema_version": 2,
   "provider": "Selkent",
-  "last_updated": "2026-10-18T12:37:21.388811+00:00",
+  "last_updated": "2026-10-18T15:04:32.180038+00:00",
   "cup_results_last_updated": "2026-10-12T13:49:27.311080+00:00",
-  "cup_results_last_attempted": "2026-10-18T12:37:21.388811+00:00",
+  "cup_results_last_attempted": "2026-10-18T15:04:32.180038+00:00",
   "cup_results_status": "stale_retained",
   "fixture_agegroup_discovery_source": "selkent_divisions_all",
   "coverage": {
@@ -3872,12 +3872,25 @@
       "standings": [
         {
           "division_name": "Under 12A Navy",
-          "updated_at_text": "18/10/26 10:35:32",
+          "updated_at_text": "18/10/26 14:10:07",
           "source_order_authoritative_for_ties": false,
           "source_disclaimer": "Note: Table does not yet take account of rules for determining winner if teams on equal points",
           "rows": [
             {
               "row_order": 1,
+              "provider_team_id": 610,
+              "provider_division_id": 4249,
+              "team_name": "Cray Wanderers Panthers",
+              "played": 3,
+              "won": 2,
+              "drawn": 1,
+              "lost": 0,
+              "gf": 6,
+              "ga": 2,
+              "points": 5
+            },
+            {
+              "row_order": 2,
               "provider_team_id": 667,
               "provider_division_id": 4249,
               "team_name": "Ebbsfleet United Red",
@@ -3890,29 +3903,16 @@
               "points": 4
             },
             {
-              "row_order": 2,
+              "row_order": 3,
               "provider_team_id": 811,
               "provider_division_id": 4249,
               "team_name": "Ballon Dor FC",
-              "played": 3,
+              "played": 4,
               "won": 1,
               "drawn": 1,
-              "lost": 1,
+              "lost": 2,
               "gf": 4,
-              "ga": 6,
-              "points": 3
-            },
-            {
-              "row_order": 3,
-              "provider_team_id": 610,
-              "provider_division_id": 4249,
-              "team_name": "Cray Wanderers Panthers",
-              "played": 2,
-              "won": 1,
-              "drawn": 1,
-              "lost": 0,
-              "gf": 4,
-              "ga": 2,
+              "ga": 8,
               "points": 3
             },
             {
@@ -4024,7 +4024,7 @@
         },
         {
           "division_name": "Under 12A Silver",
-          "updated_at_text": "18/10/26 13:33:50",
+          "updated_at_text": "18/10/26 13:43:38",
           "source_order_authoritative_for_ties": false,
           "source_disclaimer": "Note: Table does not yet take account of rules for determining winner if teams on equal points",
           "rows": [
@@ -4069,6 +4069,19 @@
             },
             {
               "row_order": 4,
+              "provider_team_id": 812,
+              "provider_division_id": 4250,
+              "team_name": "Old Roan FC Gold",
+              "played": 3,
+              "won": 1,
+              "drawn": 1,
+              "lost": 1,
+              "gf": 8,
+              "ga": 5,
+              "points": 3
+            },
+            {
+              "row_order": 5,
               "provider_team_id": 537,
               "provider_division_id": 4250,
               "team_name": "Dynamo Youth Silver",
@@ -4081,7 +4094,7 @@
               "points": 2
             },
             {
-              "row_order": 5,
+              "row_order": 6,
               "provider_team_id": 321,
               "provider_division_id": 4250,
               "team_name": "Cray Valley (PM) FC Black",
@@ -4094,7 +4107,7 @@
               "points": 1
             },
             {
-              "row_order": 6,
+              "row_order": 7,
               "provider_team_id": 1023,
               "provider_division_id": 4250,
               "team_name": "London Legends Gold",
@@ -4107,29 +4120,16 @@
               "points": 1
             },
             {
-              "row_order": 7,
-              "provider_team_id": 812,
-              "provider_division_id": 4250,
-              "team_name": "Old Roan FC Gold",
-              "played": 2,
-              "won": 0,
-              "drawn": 1,
-              "lost": 1,
-              "gf": 3,
-              "ga": 4,
-              "points": 1
-            },
-            {
               "row_order": 8,
               "provider_team_id": 527,
               "provider_division_id": 4250,
               "team_name": "SE Dons Football Club",
-              "played": 1,
+              "played": 2,
               "won": 0,
               "drawn": 1,
-              "lost": 0,
-              "gf": 3,
-              "ga": 3,
+              "lost": 1,
+              "gf": 4,
+              "ga": 8,
               "points": 1
             },
             {
@@ -4315,7 +4315,7 @@
         },
         {
           "division_name": "Under 12B Orange",
-          "updated_at_text": "18/10/26 13:21:40",
+          "updated_at_text": "18/10/26 14:31:58",
           "source_order_authoritative_for_ties": false,
           "source_disclaimer": "Note: Table does not yet take account of rules for determining winner if teams on equal points",
           "rows": [
@@ -4334,6 +4334,19 @@
             },
             {
               "row_order": 2,
+              "provider_team_id": 481,
+              "provider_division_id": 4252,
+              "team_name": "Erith & Belvedere Selkent",
+              "played": 2,
+              "won": 2,
+              "drawn": 0,
+              "lost": 0,
+              "gf": 6,
+              "ga": 2,
+              "points": 4
+            },
+            {
+              "row_order": 3,
               "provider_team_id": 750,
               "provider_division_id": 4252,
               "team_name": "Teviot Rangers Gold",
@@ -4346,7 +4359,7 @@
               "points": 4
             },
             {
-              "row_order": 3,
+              "row_order": 4,
               "provider_team_id": 556,
               "provider_division_id": 4252,
               "team_name": "Vikings FC Red",
@@ -4359,7 +4372,7 @@
               "points": 4
             },
             {
-              "row_order": 4,
+              "row_order": 5,
               "provider_team_id": 252,
               "provider_division_id": 4252,
               "team_name": "AFC Lewisham Blue",
@@ -4372,7 +4385,7 @@
               "points": 2
             },
             {
-              "row_order": 5,
+              "row_order": 6,
               "provider_team_id": 609,
               "provider_division_id": 4252,
               "team_name": "Cray Wanderers Wolves",
@@ -4382,19 +4395,6 @@
               "lost": 1,
               "gf": 4,
               "ga": 2,
-              "points": 2
-            },
-            {
-              "row_order": 6,
-              "provider_team_id": 481,
-              "provider_division_id": 4252,
-              "team_name": "Erith & Belvedere Selkent",
-              "played": 1,
-              "won": 1,
-              "drawn": 0,
-              "lost": 0,
-              "gf": 3,
-              "ga": 0,
               "points": 2
             },
             {
@@ -4415,12 +4415,12 @@
               "provider_team_id": 792,
               "provider_division_id": 4252,
               "team_name": "Metrogas FC White",
-              "played": 2,
+              "played": 3,
               "won": 1,
               "drawn": 0,
-              "lost": 1,
-              "gf": 1,
-              "ga": 1,
+              "lost": 2,
+              "gf": 3,
+              "ga": 4,
               "points": 2
             },
             {
@@ -4467,12 +4467,38 @@
         },
         {
           "division_name": "Under 12B Silver",
-          "updated_at_text": "18/10/26 11:38:23",
+          "updated_at_text": "18/10/26 15:24:28",
           "source_order_authoritative_for_ties": false,
           "source_disclaimer": "Note: Table does not yet take account of rules for determining winner if teams on equal points",
           "rows": [
             {
               "row_order": 1,
+              "provider_team_id": 521,
+              "provider_division_id": 4253,
+              "team_name": "Dulwich Hamlet JFC Pink",
+              "played": 3,
+              "won": 2,
+              "drawn": 1,
+              "lost": 0,
+              "gf": 14,
+              "ga": 2,
+              "points": 5
+            },
+            {
+              "row_order": 2,
+              "provider_team_id": 239,
+              "provider_division_id": 4253,
+              "team_name": "Dulwich Village White",
+              "played": 3,
+              "won": 2,
+              "drawn": 0,
+              "lost": 1,
+              "gf": 7,
+              "ga": 5,
+              "points": 4
+            },
+            {
+              "row_order": 3,
               "provider_team_id": 292,
               "provider_division_id": 4253,
               "team_name": "Fisher Youth",
@@ -4485,46 +4511,33 @@
               "points": 4
             },
             {
-              "row_order": 2,
+              "row_order": 4,
               "provider_team_id": 49,
               "provider_division_id": 4253,
               "team_name": "Russellers Whites",
-              "played": 2,
+              "played": 3,
               "won": 2,
               "drawn": 0,
-              "lost": 0,
-              "gf": 7,
-              "ga": 2,
+              "lost": 1,
+              "gf": 8,
+              "ga": 9,
               "points": 4
             },
             {
-              "row_order": 3,
-              "provider_team_id": 521,
-              "provider_division_id": 4253,
-              "team_name": "Dulwich Hamlet JFC Pink",
-              "played": 2,
-              "won": 1,
-              "drawn": 1,
-              "lost": 0,
-              "gf": 7,
-              "ga": 1,
-              "points": 3
-            },
-            {
-              "row_order": 4,
+              "row_order": 5,
               "provider_team_id": 238,
               "provider_division_id": 4253,
               "team_name": "Dulwich Village Orange",
-              "played": 2,
+              "played": 3,
               "won": 1,
               "drawn": 1,
-              "lost": 0,
-              "gf": 5,
-              "ga": 1,
+              "lost": 1,
+              "gf": 6,
+              "ga": 3,
               "points": 3
             },
             {
-              "row_order": 5,
+              "row_order": 6,
               "provider_team_id": 725,
               "provider_division_id": 4253,
               "team_name": "Sporting Club Vista",
@@ -4537,7 +4550,7 @@
               "points": 3
             },
             {
-              "row_order": 6,
+              "row_order": 7,
               "provider_team_id": 458,
               "provider_division_id": 4253,
               "team_name": "Athenlay FC",
@@ -4547,19 +4560,6 @@
               "lost": 1,
               "gf": 2,
               "ga": 5,
-              "points": 2
-            },
-            {
-              "row_order": 7,
-              "provider_team_id": 239,
-              "provider_division_id": 4253,
-              "team_name": "Dulwich Village White",
-              "played": 2,
-              "won": 1,
-              "drawn": 0,
-              "lost": 1,
-              "gf": 5,
-              "ga": 4,
               "points": 2
             },
             {
@@ -4784,7 +4784,7 @@
         },
         {
           "division_name": "Under 12C Orange",
-          "updated_at_text": "18/10/26 13:20:26",
+          "updated_at_text": "18/10/26 14:26:52",
           "source_order_authoritative_for_ties": false,
           "source_disclaimer": "Note: Table does not yet take account of rules for determining winner if teams on equal points",
           "rows": [
@@ -4949,7 +4949,7 @@
         },
         {
           "division_name": "Under 12C Silver",
-          "updated_at_text": "18/10/26 12:41:57",
+          "updated_at_text": "18/10/26 13:58:24",
           "source_order_authoritative_for_ties": false,
           "source_disclaimer": "Note: Table does not yet take account of rules for determining winner if teams on equal points",
           "rows": [
@@ -4981,19 +4981,32 @@
             },
             {
               "row_order": 3,
-              "provider_team_id": 946,
+              "provider_team_id": 173,
               "provider_division_id": 4256,
-              "team_name": "Deptford United Flamingoes",
-              "played": 2,
+              "team_name": "KSI Coaching FC Navy",
+              "played": 4,
               "won": 2,
-              "drawn": 0,
+              "drawn": 2,
               "lost": 0,
-              "gf": 11,
-              "ga": 2,
-              "points": 4
+              "gf": 16,
+              "ga": 8,
+              "points": 6
             },
             {
               "row_order": 4,
+              "provider_team_id": 946,
+              "provider_division_id": 4256,
+              "team_name": "Deptford United Flamingoes",
+              "played": 3,
+              "won": 2,
+              "drawn": 0,
+              "lost": 1,
+              "gf": 12,
+              "ga": 4,
+              "points": 4
+            },
+            {
+              "row_order": 5,
               "provider_team_id": 494,
               "provider_division_id": 4256,
               "team_name": "Mayow Park Rangers FC",
@@ -5003,19 +5016,6 @@
               "lost": 1,
               "gf": 7,
               "ga": 4,
-              "points": 4
-            },
-            {
-              "row_order": 5,
-              "provider_team_id": 173,
-              "provider_division_id": 4256,
-              "team_name": "KSI Coaching FC Navy",
-              "played": 3,
-              "won": 1,
-              "drawn": 2,
-              "lost": 0,
-              "gf": 14,
-              "ga": 7,
               "points": 4
             },
             {
@@ -5046,6 +5046,19 @@
             },
             {
               "row_order": 8,
+              "provider_team_id": 1061,
+              "provider_division_id": 4256,
+              "team_name": "Junior Reds Sabres",
+              "played": 4,
+              "won": 1,
+              "drawn": 1,
+              "lost": 2,
+              "gf": 12,
+              "ga": 10,
+              "points": 3
+            },
+            {
+              "row_order": 9,
               "provider_team_id": 637,
               "provider_division_id": 4256,
               "team_name": "Hillyfielders Falcons",
@@ -5055,19 +5068,6 @@
               "lost": 2,
               "gf": 7,
               "ga": 12,
-              "points": 2
-            },
-            {
-              "row_order": 9,
-              "provider_team_id": 1061,
-              "provider_division_id": 4256,
-              "team_name": "Junior Reds Sabres",
-              "played": 3,
-              "won": 1,
-              "drawn": 0,
-              "lost": 2,
-              "gf": 10,
-              "ga": 8,
               "points": 2
             },
             {
@@ -5098,6 +5098,19 @@
             },
             {
               "row_order": 12,
+              "provider_team_id": 733,
+              "provider_division_id": 4256,
+              "team_name": "Greenwich Peninsula Jaguars",
+              "played": 3,
+              "won": 0,
+              "drawn": 1,
+              "lost": 2,
+              "gf": 3,
+              "ga": 12,
+              "points": 1
+            },
+            {
+              "row_order": 13,
               "provider_team_id": 945,
               "provider_division_id": 4256,
               "team_name": "Deptford United Falcons",
@@ -5108,26 +5121,13 @@
               "gf": 2,
               "ga": 8,
               "points": 0
-            },
-            {
-              "row_order": 13,
-              "provider_team_id": 733,
-              "provider_division_id": 4256,
-              "team_name": "Greenwich Peninsula Jaguars",
-              "played": 2,
-              "won": 0,
-              "drawn": 0,
-              "lost": 2,
-              "gf": 1,
-              "ga": 10,
-              "points": 0
             }
           ],
           "provider_division_id": 4256
         },
         {
           "division_name": "Under 12D Navy",
-          "updated_at_text": "18/10/26 11:20:09",
+          "updated_at_text": "18/10/26 15:13:29",
           "source_order_authoritative_for_ties": false,
           "source_disclaimer": "Note: Table does not yet take account of rules for determining winner if teams on equal points",
           "rows": [
@@ -5136,16 +5136,29 @@
               "provider_team_id": 613,
               "provider_division_id": 4257,
               "team_name": "Cray Wanderers Ambers",
-              "played": 3,
-              "won": 3,
+              "played": 4,
+              "won": 4,
               "drawn": 0,
               "lost": 0,
-              "gf": 22,
+              "gf": 26,
               "ga": 2,
-              "points": 6
+              "points": 8
             },
             {
               "row_order": 2,
+              "provider_team_id": 5,
+              "provider_division_id": 4257,
+              "team_name": "ST Sports FC City",
+              "played": 4,
+              "won": 3,
+              "drawn": 1,
+              "lost": 0,
+              "gf": 11,
+              "ga": 1,
+              "points": 7
+            },
+            {
+              "row_order": 3,
               "provider_team_id": 184,
               "provider_division_id": 4257,
               "team_name": "South Darenth Whites",
@@ -5156,19 +5169,6 @@
               "gf": 21,
               "ga": 3,
               "points": 6
-            },
-            {
-              "row_order": 3,
-              "provider_team_id": 5,
-              "provider_division_id": 4257,
-              "team_name": "ST Sports FC City",
-              "played": 3,
-              "won": 2,
-              "drawn": 1,
-              "lost": 0,
-              "gf": 8,
-              "ga": 1,
-              "points": 5
             },
             {
               "row_order": 4,
@@ -5214,12 +5214,12 @@
               "provider_team_id": 897,
               "provider_division_id": 4257,
               "team_name": "Welling United Green",
-              "played": 3,
+              "played": 4,
               "won": 1,
               "drawn": 1,
-              "lost": 1,
+              "lost": 2,
               "gf": 4,
-              "ga": 9,
+              "ga": 13,
               "points": 3
             },
             {
@@ -5253,12 +5253,12 @@
               "provider_team_id": 587,
               "provider_division_id": 4257,
               "team_name": "AFC Green Court Dukes",
-              "played": 3,
+              "played": 4,
               "won": 0,
               "drawn": 1,
-              "lost": 2,
+              "lost": 3,
               "gf": 1,
-              "ga": 12,
+              "ga": 15,
               "points": 1
             },
             {
@@ -5305,12 +5305,25 @@
         },
         {
           "division_name": "Under 12D Orange",
-          "updated_at_text": "18/10/26 12:55:59",
+          "updated_at_text": "18/10/26 15:32:41",
           "source_order_authoritative_for_ties": false,
           "source_disclaimer": "Note: Table does not yet take account of rules for determining winner if teams on equal points",
           "rows": [
             {
               "row_order": 1,
+              "provider_team_id": 798,
+              "provider_division_id": 4258,
+              "team_name": "Metrogas FC Blue",
+              "played": 4,
+              "won": 3,
+              "drawn": 0,
+              "lost": 1,
+              "gf": 22,
+              "ga": 9,
+              "points": 6
+            },
+            {
+              "row_order": 2,
               "provider_team_id": 2107,
               "provider_division_id": 4258,
               "team_name": "South Darenth Blues",
@@ -5323,7 +5336,7 @@
               "points": 6
             },
             {
-              "row_order": 2,
+              "row_order": 3,
               "provider_team_id": 331,
               "provider_division_id": 4258,
               "team_name": "Dartford Royals white",
@@ -5336,20 +5349,20 @@
               "points": 4
             },
             {
-              "row_order": 3,
+              "row_order": 4,
               "provider_team_id": 367,
               "provider_division_id": 4258,
               "team_name": "Junior Reds Spartans",
-              "played": 3,
+              "played": 4,
               "won": 2,
               "drawn": 0,
-              "lost": 1,
+              "lost": 2,
               "gf": 14,
-              "ga": 14,
+              "ga": 20,
               "points": 4
             },
             {
-              "row_order": 4,
+              "row_order": 5,
               "provider_team_id": 375,
               "provider_division_id": 4258,
               "team_name": "Long Lane Lions",
@@ -5362,33 +5375,33 @@
               "points": 4
             },
             {
-              "row_order": 5,
-              "provider_team_id": 798,
-              "provider_division_id": 4258,
-              "team_name": "Metrogas FC Blue",
-              "played": 3,
-              "won": 2,
-              "drawn": 0,
-              "lost": 1,
-              "gf": 16,
-              "ga": 9,
-              "points": 4
-            },
-            {
               "row_order": 6,
               "provider_team_id": 542,
               "provider_division_id": 4258,
               "team_name": "SE Dons Football Club Dragons",
-              "played": 2,
+              "played": 3,
               "won": 2,
               "drawn": 0,
-              "lost": 0,
-              "gf": 4,
-              "ga": 2,
+              "lost": 1,
+              "gf": 5,
+              "ga": 4,
               "points": 4
             },
             {
               "row_order": 7,
+              "provider_team_id": 511,
+              "provider_division_id": 4258,
+              "team_name": "Thamesmead Tigers FC",
+              "played": 3,
+              "won": 2,
+              "drawn": 0,
+              "lost": 1,
+              "gf": 10,
+              "ga": 8,
+              "points": 4
+            },
+            {
+              "row_order": 8,
               "provider_team_id": 342,
               "provider_division_id": 4258,
               "team_name": "Erith Town Yellow",
@@ -5401,7 +5414,7 @@
               "points": 2
             },
             {
-              "row_order": 8,
+              "row_order": 9,
               "provider_team_id": 2084,
               "provider_division_id": 4258,
               "team_name": "Eversley Rangers White",
@@ -5411,19 +5424,6 @@
               "lost": 3,
               "gf": 9,
               "ga": 22,
-              "points": 2
-            },
-            {
-              "row_order": 9,
-              "provider_team_id": 511,
-              "provider_division_id": 4258,
-              "team_name": "Thamesmead Tigers FC",
-              "played": 2,
-              "won": 1,
-              "drawn": 0,
-              "lost": 1,
-              "gf": 8,
-              "ga": 7,
               "points": 2
             },
             {
@@ -5457,12 +5457,25 @@
         },
         {
           "division_name": "Under 12D Silver",
-          "updated_at_text": "18/10/26 12:31:58",
+          "updated_at_text": "18/10/26 14:55:48",
           "source_order_authoritative_for_ties": false,
           "source_disclaimer": "Note: Table does not yet take account of rules for determining winner if teams on equal points",
           "rows": [
             {
               "row_order": 1,
+              "provider_team_id": 207,
+              "provider_division_id": 4259,
+              "team_name": "Lewisham Project Whites",
+              "played": 4,
+              "won": 3,
+              "drawn": 1,
+              "lost": 0,
+              "gf": 18,
+              "ga": 3,
+              "points": 7
+            },
+            {
+              "row_order": 2,
               "provider_team_id": 180,
               "provider_division_id": 4259,
               "team_name": "Total FC",
@@ -5475,7 +5488,7 @@
               "points": 6
             },
             {
-              "row_order": 2,
+              "row_order": 3,
               "provider_team_id": 721,
               "provider_division_id": 4259,
               "team_name": "EWD Eagles Youth",
@@ -5488,7 +5501,7 @@
               "points": 5
             },
             {
-              "row_order": 3,
+              "row_order": 4,
               "provider_team_id": 992,
               "provider_division_id": 4259,
               "team_name": "Kekoa",
@@ -5501,29 +5514,16 @@
               "points": 5
             },
             {
-              "row_order": 4,
-              "provider_team_id": 207,
-              "provider_division_id": 4259,
-              "team_name": "Lewisham Project Whites",
-              "played": 3,
-              "won": 2,
-              "drawn": 1,
-              "lost": 0,
-              "gf": 12,
-              "ga": 1,
-              "points": 5
-            },
-            {
               "row_order": 5,
               "provider_team_id": 460,
               "provider_division_id": 4259,
               "team_name": "Athenlay RYE",
-              "played": 3,
+              "played": 4,
               "won": 1,
               "drawn": 2,
-              "lost": 0,
-              "gf": 15,
-              "ga": 12,
+              "lost": 1,
+              "gf": 18,
+              "ga": 17,
               "points": 4
             },
             {
@@ -5567,6 +5567,19 @@
             },
             {
               "row_order": 9,
+              "provider_team_id": 1065,
+              "provider_division_id": 4259,
+              "team_name": "Gipsy Hill FC Whites",
+              "played": 4,
+              "won": 1,
+              "drawn": 0,
+              "lost": 3,
+              "gf": 10,
+              "ga": 17,
+              "points": 2
+            },
+            {
+              "row_order": 10,
               "provider_team_id": 245,
               "provider_division_id": 4259,
               "team_name": "Junior Reds Valiants",
@@ -5579,20 +5592,20 @@
               "points": 2
             },
             {
-              "row_order": 10,
+              "row_order": 11,
               "provider_team_id": 785,
               "provider_division_id": 4259,
               "team_name": "Residents FC",
-              "played": 2,
+              "played": 3,
               "won": 1,
               "drawn": 0,
-              "lost": 1,
-              "gf": 3,
-              "ga": 1,
+              "lost": 2,
+              "gf": 5,
+              "ga": 7,
               "points": 2
             },
             {
-              "row_order": 11,
+              "row_order": 12,
               "provider_team_id": 931,
               "provider_division_id": 4259,
               "team_name": "Beacons Red",
@@ -5603,25 +5616,21 @@
               "gf": 2,
               "ga": 2,
               "points": 1
-            },
-            {
-              "row_order": 12,
-              "provider_team_id": 1065,
-              "provider_division_id": 4259,
-              "team_name": "Gipsy Hill FC Whites",
-              "played": 3,
-              "won": 0,
-              "drawn": 0,
-              "lost": 3,
-              "gf": 5,
-              "ga": 14,
-              "points": 0
             }
           ],
           "provider_division_id": 4259
         }
       ],
       "published_results": [
+        {
+          "date": "2026-10-18",
+          "home": "Cray Wanderers Panthers",
+          "away": "Ballon Dor FC",
+          "homeGoals": 2,
+          "awayGoals": 0,
+          "provider_division_id": 4249,
+          "division_name": "Under 12A Navy"
+        },
         {
           "date": "2026-10-18",
           "home": "Dartford FC Black",
@@ -5735,6 +5744,15 @@
           "home": "Eagles & Stars FC",
           "away": "Dulwich Village Black",
           "homeGoals": 3,
+          "awayGoals": 1,
+          "provider_division_id": 4250,
+          "division_name": "Under 12A Silver"
+        },
+        {
+          "date": "2026-10-18",
+          "home": "Old Roan FC Gold",
+          "away": "SE Dons Football Club",
+          "homeGoals": 5,
           "awayGoals": 1,
           "provider_division_id": 4250,
           "division_name": "Under 12A Silver"
@@ -5974,6 +5992,15 @@
           "division_name": "Under 12B Orange"
         },
         {
+          "date": "2026-10-18",
+          "home": "Metrogas FC White",
+          "away": "Erith & Belvedere Selkent",
+          "homeGoals": 2,
+          "awayGoals": 3,
+          "provider_division_id": 4252,
+          "division_name": "Under 12B Orange"
+        },
+        {
           "date": "2026-10-04",
           "home": "AFC Lewisham Blue",
           "away": "On Target F.C. Red",
@@ -6062,6 +6089,24 @@
           "awayGoals": 0,
           "provider_division_id": 4252,
           "division_name": "Under 12B Orange"
+        },
+        {
+          "date": "2026-10-18",
+          "home": "Dulwich Village Orange",
+          "away": "Dulwich Village White",
+          "homeGoals": 1,
+          "awayGoals": 2,
+          "provider_division_id": 4253,
+          "division_name": "Under 12B Silver"
+        },
+        {
+          "date": "2026-10-18",
+          "home": "Russellers Whites",
+          "away": "Dulwich Hamlet JFC Pink",
+          "homeGoals": 1,
+          "awayGoals": 7,
+          "provider_division_id": 4253,
+          "division_name": "Under 12B Silver"
         },
         {
           "date": "2026-10-18",
@@ -6505,6 +6550,24 @@
           "division_name": "Under 12C Silver"
         },
         {
+          "date": "2026-10-18",
+          "home": "Junior Reds Sabres",
+          "away": "Greenwich Peninsula Jaguars",
+          "homeGoals": 2,
+          "awayGoals": 2,
+          "provider_division_id": 4256,
+          "division_name": "Under 12C Silver"
+        },
+        {
+          "date": "2026-10-18",
+          "home": "KSI Coaching FC Navy",
+          "away": "Deptford United Flamingoes",
+          "homeGoals": 2,
+          "awayGoals": 1,
+          "provider_division_id": 4256,
+          "division_name": "Under 12C Silver"
+        },
+        {
           "date": "2026-10-11",
           "home": "AFC Lewisham Yellow",
           "away": "Dulwich Hamlet JFC Navy",
@@ -6659,6 +6722,15 @@
         },
         {
           "date": "2026-10-18",
+          "home": "AFC Green Court Dukes",
+          "away": "ST Sports FC City",
+          "homeGoals": 0,
+          "awayGoals": 3,
+          "provider_division_id": 4257,
+          "division_name": "Under 12D Navy"
+        },
+        {
+          "date": "2026-10-18",
           "home": "Guru Nanak Youth",
           "away": "South Darenth Whites",
           "homeGoals": 0,
@@ -6672,6 +6744,15 @@
           "away": "Slade Green Knights Whites",
           "homeGoals": 1,
           "awayGoals": 5,
+          "provider_division_id": 4257,
+          "division_name": "Under 12D Navy"
+        },
+        {
+          "date": "2026-10-18",
+          "home": "Welling United Green",
+          "away": "Cray Wanderers Ambers",
+          "homeGoals": 0,
+          "awayGoals": 4,
           "provider_division_id": 4257,
           "division_name": "Under 12D Navy"
         },
@@ -6824,6 +6905,24 @@
           "home": "Dartford Royals white",
           "away": "Erith Town Yellow",
           "homeGoals": 3,
+          "awayGoals": 2,
+          "provider_division_id": 4258,
+          "division_name": "Under 12D Orange"
+        },
+        {
+          "date": "2026-10-18",
+          "home": "Metrogas FC Blue",
+          "away": "Junior Reds Spartans",
+          "homeGoals": 6,
+          "awayGoals": 0,
+          "provider_division_id": 4258,
+          "division_name": "Under 12D Orange"
+        },
+        {
+          "date": "2026-10-18",
+          "home": "SE Dons Football Club Dragons",
+          "away": "Thamesmead Tigers FC",
+          "homeGoals": 1,
           "awayGoals": 2,
           "provider_division_id": 4258,
           "division_name": "Under 12D Orange"
@@ -6992,10 +7091,28 @@
         },
         {
           "date": "2026-10-18",
+          "home": "Gipsy Hill FC Whites",
+          "away": "Athenlay RYE",
+          "homeGoals": 5,
+          "awayGoals": 3,
+          "provider_division_id": 4259,
+          "division_name": "Under 12D Silver"
+        },
+        {
+          "date": "2026-10-18",
           "home": "Junior Reds Valiants",
           "away": "Beacons Black",
           "homeGoals": 2,
           "awayGoals": 0,
+          "provider_division_id": 4259,
+          "division_name": "Under 12D Silver"
+        },
+        {
+          "date": "2026-10-18",
+          "home": "Lewisham Project Whites",
+          "away": "Residents FC",
+          "homeGoals": 6,
+          "awayGoals": 2,
           "provider_division_id": 4259,
           "division_name": "Under 12D Silver"
         },
@@ -8273,12 +8390,25 @@
       "standings": [
         {
           "division_name": "Under 14 A Navy",
-          "updated_at_text": "18/10/26 12:12:42",
+          "updated_at_text": "18/10/26 13:58:26",
           "source_order_authoritative_for_ties": false,
           "source_disclaimer": "Note: Table does not yet take account of rules for determining winner if teams on equal points",
           "rows": [
             {
               "row_order": 1,
+              "provider_team_id": 801,
+              "provider_division_id": 4271,
+              "team_name": "Metrogas FC YELLOW",
+              "played": 4,
+              "won": 3,
+              "drawn": 1,
+              "lost": 0,
+              "gf": 30,
+              "ga": 8,
+              "points": 7
+            },
+            {
+              "row_order": 2,
               "provider_team_id": 43,
               "provider_division_id": 4271,
               "team_name": "Bexley Ballers Football Club",
@@ -8288,19 +8418,6 @@
               "lost": 0,
               "gf": 13,
               "ga": 4,
-              "points": 5
-            },
-            {
-              "row_order": 2,
-              "provider_team_id": 801,
-              "provider_division_id": 4271,
-              "team_name": "Metrogas FC YELLOW",
-              "played": 3,
-              "won": 2,
-              "drawn": 1,
-              "lost": 0,
-              "gf": 24,
-              "ga": 7,
               "points": 5
             },
             {
@@ -8334,13 +8451,13 @@
               "provider_team_id": 718,
               "provider_division_id": 4271,
               "team_name": "Swanscombe Tigers Yellow",
-              "played": 1,
-              "won": 1,
+              "played": 2,
+              "won": 2,
               "drawn": 0,
               "lost": 0,
-              "gf": 4,
+              "gf": 9,
               "ga": 0,
-              "points": 2
+              "points": 4
             },
             {
               "row_order": 6,
@@ -8373,12 +8490,12 @@
               "provider_team_id": 323,
               "provider_division_id": 4271,
               "team_name": "Northumberland Heath",
-              "played": 1,
+              "played": 2,
               "won": 0,
               "drawn": 0,
-              "lost": 1,
-              "gf": 3,
-              "ga": 7,
+              "lost": 2,
+              "gf": 4,
+              "ga": 13,
               "points": 0
             },
             {
@@ -8386,12 +8503,12 @@
               "provider_team_id": 531,
               "provider_division_id": 4271,
               "team_name": "SE Dons Football Club Lions",
-              "played": 2,
+              "played": 3,
               "won": 0,
               "drawn": 0,
-              "lost": 2,
+              "lost": 3,
               "gf": 0,
-              "ga": 5,
+              "ga": 10,
               "points": 0
             }
           ],
@@ -8525,7 +8642,7 @@
         },
         {
           "division_name": "Under 14 B Navy",
-          "updated_at_text": "18/10/26 12:52:11",
+          "updated_at_text": "18/10/26 15:10:23",
           "source_order_authoritative_for_ties": false,
           "source_disclaimer": "Note: Table does not yet take account of rules for determining winner if teams on equal points",
           "rows": [
@@ -8534,16 +8651,29 @@
               "provider_team_id": 916,
               "provider_division_id": 4273,
               "team_name": "Baldon Sports Tigers",
-              "played": 2,
+              "played": 3,
               "won": 2,
               "drawn": 0,
-              "lost": 0,
-              "gf": 10,
-              "ga": 4,
+              "lost": 1,
+              "gf": 11,
+              "ga": 8,
               "points": 4
             },
             {
               "row_order": 2,
+              "provider_team_id": 129,
+              "provider_division_id": 4273,
+              "team_name": "Crayford Arrows Black",
+              "played": 4,
+              "won": 1,
+              "drawn": 1,
+              "lost": 2,
+              "gf": 10,
+              "ga": 15,
+              "points": 3
+            },
+            {
+              "row_order": 3,
               "provider_team_id": 802,
               "provider_division_id": 4273,
               "team_name": "Metrogas FC Black",
@@ -8556,20 +8686,20 @@
               "points": 3
             },
             {
-              "row_order": 3,
-              "provider_team_id": 129,
+              "row_order": 4,
+              "provider_team_id": 18,
               "provider_division_id": 4273,
-              "team_name": "Crayford Arrows Black",
-              "played": 3,
+              "team_name": "IEXEL F.C Gold",
+              "played": 1,
               "won": 1,
               "drawn": 0,
-              "lost": 2,
-              "gf": 8,
-              "ga": 13,
+              "lost": 0,
+              "gf": 4,
+              "ga": 1,
               "points": 2
             },
             {
-              "row_order": 4,
+              "row_order": 5,
               "provider_team_id": 769,
               "provider_division_id": 4273,
               "team_name": "Phoenix Sports Cobras",
@@ -8582,7 +8712,7 @@
               "points": 2
             },
             {
-              "row_order": 5,
+              "row_order": 6,
               "provider_team_id": 435,
               "provider_division_id": 4273,
               "team_name": "Sutton Athletic Stripes",
@@ -8595,7 +8725,7 @@
               "points": 2
             },
             {
-              "row_order": 6,
+              "row_order": 7,
               "provider_team_id": 681,
               "provider_division_id": 4273,
               "team_name": "Eversley Rangers White",
@@ -8608,30 +8738,17 @@
               "points": 2
             },
             {
-              "row_order": 7,
+              "row_order": 8,
               "provider_team_id": 720,
               "provider_division_id": 4273,
               "team_name": "Swanscombe Tigers Stripes",
-              "played": 1,
+              "played": 2,
               "won": 0,
-              "drawn": 1,
+              "drawn": 2,
               "lost": 0,
-              "gf": 1,
-              "ga": 1,
-              "points": 1
-            },
-            {
-              "row_order": 8,
-              "provider_team_id": 18,
-              "provider_division_id": 4273,
-              "team_name": "IEXEL F.C Gold",
-              "played": 0,
-              "won": 0,
-              "drawn": 0,
-              "lost": 0,
-              "gf": 0,
-              "ga": 0,
-              "points": 0
+              "gf": 3,
+              "ga": 3,
+              "points": 2
             },
             {
               "row_order": 9,
@@ -8651,7 +8768,7 @@
         },
         {
           "division_name": "Under 14 B silver",
-          "updated_at_text": "18/10/26 13:09:11",
+          "updated_at_text": "18/10/26 14:57:58",
           "source_order_authoritative_for_ties": false,
           "source_disclaimer": "Note: Table does not yet take account of rules for determining winner if teams on equal points",
           "rows": [
@@ -8696,6 +8813,19 @@
             },
             {
               "row_order": 4,
+              "provider_team_id": 262,
+              "provider_division_id": 4274,
+              "team_name": "AFC Lewisham White",
+              "played": 3,
+              "won": 1,
+              "drawn": 0,
+              "lost": 2,
+              "gf": 8,
+              "ga": 11,
+              "points": 2
+            },
+            {
+              "row_order": 5,
               "provider_team_id": 270,
               "provider_division_id": 4274,
               "team_name": "Dulwich Village Red",
@@ -8708,7 +8838,7 @@
               "points": 2
             },
             {
-              "row_order": 5,
+              "row_order": 6,
               "provider_team_id": 353,
               "provider_division_id": 4274,
               "team_name": "Erith Town Black",
@@ -8721,7 +8851,7 @@
               "points": 2
             },
             {
-              "row_order": 6,
+              "row_order": 7,
               "provider_team_id": 1027,
               "provider_division_id": 4274,
               "team_name": "London Legends Gold",
@@ -8734,7 +8864,7 @@
               "points": 2
             },
             {
-              "row_order": 7,
+              "row_order": 8,
               "provider_team_id": 465,
               "provider_division_id": 4274,
               "team_name": "Athenlay RYE",
@@ -8747,30 +8877,17 @@
               "points": 1
             },
             {
-              "row_order": 8,
+              "row_order": 9,
               "provider_team_id": 384,
               "provider_division_id": 4274,
               "team_name": "Long Lane Lions",
-              "played": 3,
+              "played": 4,
               "won": 0,
               "drawn": 1,
-              "lost": 2,
-              "gf": 6,
-              "ga": 13,
+              "lost": 3,
+              "gf": 8,
+              "ga": 16,
               "points": 1
-            },
-            {
-              "row_order": 9,
-              "provider_team_id": 262,
-              "provider_division_id": 4274,
-              "team_name": "AFC Lewisham White",
-              "played": 2,
-              "won": 0,
-              "drawn": 0,
-              "lost": 2,
-              "gf": 5,
-              "ga": 9,
-              "points": 0
             }
           ],
           "provider_division_id": 4274
@@ -8916,7 +9033,7 @@
         },
         {
           "division_name": "Under 14C Orange",
-          "updated_at_text": "18/10/26 13:33:40",
+          "updated_at_text": "18/10/26 13:58:49",
           "source_order_authoritative_for_ties": false,
           "source_disclaimer": "Note: Table does not yet take account of rules for determining winner if teams on equal points",
           "rows": [
@@ -9000,6 +9117,19 @@
             },
             {
               "row_order": 7,
+              "provider_team_id": 505,
+              "provider_division_id": 4276,
+              "team_name": "Kent United FC Reds",
+              "played": 1,
+              "won": 1,
+              "drawn": 0,
+              "lost": 0,
+              "gf": 5,
+              "ga": 1,
+              "points": 2
+            },
+            {
+              "row_order": 8,
               "provider_team_id": 955,
               "provider_division_id": 4276,
               "team_name": "Welling United white",
@@ -9012,7 +9142,7 @@
               "points": 2
             },
             {
-              "row_order": 8,
+              "row_order": 9,
               "provider_team_id": 529,
               "provider_division_id": 4276,
               "team_name": "SE Dons Football Club Jaguars",
@@ -9025,7 +9155,7 @@
               "points": 1
             },
             {
-              "row_order": 9,
+              "row_order": 10,
               "provider_team_id": 2129,
               "provider_division_id": 4276,
               "team_name": "Vikings FC Red",
@@ -9038,29 +9168,16 @@
               "points": 1
             },
             {
-              "row_order": 10,
+              "row_order": 11,
               "provider_team_id": 915,
               "provider_division_id": 4276,
               "team_name": "Baldon Sports Lions",
-              "played": 2,
+              "played": 3,
               "won": 0,
               "drawn": 0,
-              "lost": 2,
-              "gf": 1,
-              "ga": 10,
-              "points": 0
-            },
-            {
-              "row_order": 11,
-              "provider_team_id": 505,
-              "provider_division_id": 4276,
-              "team_name": "Kent United FC Reds",
-              "played": 0,
-              "won": 0,
-              "drawn": 0,
-              "lost": 0,
-              "gf": 0,
-              "ga": 0,
+              "lost": 3,
+              "gf": 2,
+              "ga": 15,
               "points": 0
             }
           ],
@@ -9068,12 +9185,25 @@
         },
         {
           "division_name": "Under 14C Silver",
-          "updated_at_text": "18/10/26 11:40:14",
+          "updated_at_text": "18/10/26 15:05:41",
           "source_order_authoritative_for_ties": false,
           "source_disclaimer": "Note: Table does not yet take account of rules for determining winner if teams on equal points",
           "rows": [
             {
               "row_order": 1,
+              "provider_team_id": 510,
+              "provider_division_id": 4277,
+              "team_name": "Thamesmead Tigers FC",
+              "played": 3,
+              "won": 2,
+              "drawn": 1,
+              "lost": 0,
+              "gf": 9,
+              "ga": 3,
+              "points": 5
+            },
+            {
+              "row_order": 2,
               "provider_team_id": 497,
               "provider_division_id": 4277,
               "team_name": "Mayow Park Rangers FC White",
@@ -9086,7 +9216,7 @@
               "points": 4
             },
             {
-              "row_order": 2,
+              "row_order": 3,
               "provider_team_id": 743,
               "provider_division_id": 4277,
               "team_name": "Teviot Rangers WHITE",
@@ -9096,19 +9226,6 @@
               "lost": 0,
               "gf": 4,
               "ga": 2,
-              "points": 3
-            },
-            {
-              "row_order": 3,
-              "provider_team_id": 510,
-              "provider_division_id": 4277,
-              "team_name": "Thamesmead Tigers FC",
-              "played": 2,
-              "won": 1,
-              "drawn": 1,
-              "lost": 0,
-              "gf": 5,
-              "ga": 3,
               "points": 3
             },
             {
@@ -9155,12 +9272,12 @@
               "provider_team_id": 642,
               "provider_division_id": 4277,
               "team_name": "Hillyfielders Falcons",
-              "played": 1,
+              "played": 2,
               "won": 1,
               "drawn": 0,
-              "lost": 0,
+              "lost": 1,
               "gf": 2,
-              "ga": 1,
+              "ga": 5,
               "points": 2
             },
             {
@@ -9207,7 +9324,7 @@
         },
         {
           "division_name": "Under 14D Navy",
-          "updated_at_text": "18/10/26 12:40:19",
+          "updated_at_text": "18/10/26 15:30:58",
           "source_order_authoritative_for_ties": false,
           "source_disclaimer": "Note: Table does not yet take account of rules for determining winner if teams on equal points",
           "rows": [
@@ -9268,16 +9385,42 @@
               "provider_team_id": 979,
               "provider_division_id": 4278,
               "team_name": "Shooters Hill AFC Cannons",
-              "played": 3,
+              "played": 4,
               "won": 1,
               "drawn": 1,
-              "lost": 1,
-              "gf": 7,
-              "ga": 9,
+              "lost": 2,
+              "gf": 8,
+              "ga": 18,
               "points": 3
             },
             {
               "row_order": 6,
+              "provider_team_id": 594,
+              "provider_division_id": 4278,
+              "team_name": "AFC Green Court Knights",
+              "played": 3,
+              "won": 1,
+              "drawn": 0,
+              "lost": 2,
+              "gf": 3,
+              "ga": 4,
+              "points": 2
+            },
+            {
+              "row_order": 7,
+              "provider_team_id": 29,
+              "provider_division_id": 4278,
+              "team_name": "Junior Reds Sabres",
+              "played": 2,
+              "won": 1,
+              "drawn": 0,
+              "lost": 1,
+              "gf": 12,
+              "ga": 5,
+              "points": 2
+            },
+            {
+              "row_order": 8,
               "provider_team_id": 103,
               "provider_division_id": 4278,
               "team_name": "Slade Green Knights Whites",
@@ -9290,33 +9433,20 @@
               "points": 2
             },
             {
-              "row_order": 7,
-              "provider_team_id": 594,
-              "provider_division_id": 4278,
-              "team_name": "AFC Green Court Knights",
-              "played": 2,
-              "won": 0,
-              "drawn": 0,
-              "lost": 2,
-              "gf": 1,
-              "ga": 4,
-              "points": 0
-            },
-            {
-              "row_order": 8,
+              "row_order": 9,
               "provider_team_id": 545,
               "provider_division_id": 4278,
               "team_name": "Dartford Royals Blue",
-              "played": 3,
+              "played": 4,
               "won": 0,
               "drawn": 0,
-              "lost": 3,
+              "lost": 4,
               "gf": 3,
-              "ga": 16,
+              "ga": 18,
               "points": 0
             },
             {
-              "row_order": 9,
+              "row_order": 10,
               "provider_team_id": 479,
               "provider_division_id": 4278,
               "team_name": "Hayden Youth Hurricanes",
@@ -9326,19 +9456,6 @@
               "lost": 3,
               "gf": 2,
               "ga": 11,
-              "points": 0
-            },
-            {
-              "row_order": 10,
-              "provider_team_id": 29,
-              "provider_division_id": 4278,
-              "team_name": "Junior Reds Sabres",
-              "played": 1,
-              "won": 0,
-              "drawn": 0,
-              "lost": 1,
-              "gf": 3,
-              "ga": 4,
               "points": 0
             }
           ],
@@ -9486,6 +9603,24 @@
           "home": "Foots Cray Lions",
           "away": "Bexley Ballers Football Club",
           "homeGoals": 1,
+          "awayGoals": 5,
+          "provider_division_id": 4271,
+          "division_name": "Under 14 A Navy"
+        },
+        {
+          "date": "2026-10-18",
+          "home": "Northumberland Heath",
+          "away": "Metrogas FC YELLOW",
+          "homeGoals": 1,
+          "awayGoals": 6,
+          "provider_division_id": 4271,
+          "division_name": "Under 14 A Navy"
+        },
+        {
+          "date": "2026-10-18",
+          "home": "SE Dons Football Club Lions",
+          "away": "Swanscombe Tigers Yellow",
+          "homeGoals": 0,
           "awayGoals": 5,
           "provider_division_id": 4271,
           "division_name": "Under 14 A Navy"
@@ -9681,6 +9816,24 @@
         },
         {
           "date": "2026-10-18",
+          "home": "Crayford Arrows Black",
+          "away": "Swanscombe Tigers Stripes",
+          "homeGoals": 2,
+          "awayGoals": 2,
+          "provider_division_id": 4273,
+          "division_name": "Under 14 B Navy"
+        },
+        {
+          "date": "2026-10-18",
+          "home": "IEXEL F.C Gold",
+          "away": "Baldon Sports Tigers",
+          "homeGoals": 4,
+          "awayGoals": 1,
+          "provider_division_id": 4273,
+          "division_name": "Under 14 B Navy"
+        },
+        {
+          "date": "2026-10-18",
           "home": "Phoenix Sports Cobras",
           "away": "Metrogas FC Black",
           "homeGoals": 2,
@@ -9750,6 +9903,15 @@
           "awayGoals": 4,
           "provider_division_id": 4273,
           "division_name": "Under 14 B Navy"
+        },
+        {
+          "date": "2026-10-18",
+          "home": "Long Lane Lions",
+          "away": "AFC Lewisham White",
+          "homeGoals": 2,
+          "awayGoals": 3,
+          "provider_division_id": 4274,
+          "division_name": "Under 14 B silver"
         },
         {
           "date": "2026-10-18",
@@ -9969,6 +10131,15 @@
         },
         {
           "date": "2026-10-18",
+          "home": "Kent United FC Reds",
+          "away": "Baldon Sports Lions",
+          "homeGoals": 5,
+          "awayGoals": 1,
+          "provider_division_id": 4276,
+          "division_name": "Under 14C Orange"
+        },
+        {
+          "date": "2026-10-18",
           "home": "Teviot Rangers Silver",
           "away": "Vikings FC Red",
           "homeGoals": 4,
@@ -10077,6 +10248,15 @@
         },
         {
           "date": "2026-10-18",
+          "home": "Thamesmead Tigers FC",
+          "away": "Hillyfielders Falcons",
+          "homeGoals": 4,
+          "awayGoals": 0,
+          "provider_division_id": 4277,
+          "division_name": "Under 14C Silver"
+        },
+        {
+          "date": "2026-10-18",
           "home": "The Bosco FC Dons",
           "away": "Mayow Park Rangers FC White",
           "homeGoals": 1,
@@ -10158,10 +10338,28 @@
         },
         {
           "date": "2026-10-18",
+          "home": "AFC Green Court Knights",
+          "away": "Dartford Royals Blue",
+          "homeGoals": 2,
+          "awayGoals": 0,
+          "provider_division_id": 4278,
+          "division_name": "Under 14D Navy"
+        },
+        {
+          "date": "2026-10-18",
           "home": "Hayden Youth Hurricanes",
           "away": "Slade Green Knights Whites",
           "homeGoals": 0,
           "awayGoals": 5,
+          "provider_division_id": 4278,
+          "division_name": "Under 14D Navy"
+        },
+        {
+          "date": "2026-10-18",
+          "home": "Shooters Hill AFC Cannons",
+          "away": "Junior Reds Sabres",
+          "homeGoals": 1,
+          "awayGoals": 9,
           "provider_division_id": 4278,
           "division_name": "Under 14D Navy"
         },
@@ -11274,7 +11472,7 @@
       "standings": [
         {
           "division_name": "Under 13A",
-          "updated_at_text": "18/10/26 13:30:24",
+          "updated_at_text": "18/10/26 14:09:35",
           "source_order_authoritative_for_ties": false,
           "source_disclaimer": "Note: Table does not yet take account of rules for determining winner if teams on equal points",
           "rows": [
@@ -11319,6 +11517,19 @@
             },
             {
               "row_order": 4,
+              "provider_team_id": 2239,
+              "provider_division_id": 4260,
+              "team_name": "Sporting Club Vista",
+              "played": 2,
+              "won": 2,
+              "drawn": 0,
+              "lost": 0,
+              "gf": 8,
+              "ga": 2,
+              "points": 4
+            },
+            {
+              "row_order": 5,
               "provider_team_id": 813,
               "provider_division_id": 4260,
               "team_name": "Ballon Dor FC",
@@ -11331,29 +11542,16 @@
               "points": 4
             },
             {
-              "row_order": 5,
+              "row_order": 6,
               "provider_team_id": 440,
               "provider_division_id": 4260,
               "team_name": "Next Level FC Black",
-              "played": 1,
+              "played": 2,
               "won": 1,
               "drawn": 0,
-              "lost": 0,
-              "gf": 2,
-              "ga": 1,
-              "points": 2
-            },
-            {
-              "row_order": 6,
-              "provider_team_id": 2239,
-              "provider_division_id": 4260,
-              "team_name": "Sporting Club Vista",
-              "played": 1,
-              "won": 1,
-              "drawn": 0,
-              "lost": 0,
-              "gf": 4,
-              "ga": 1,
+              "lost": 1,
+              "gf": 3,
+              "ga": 5,
               "points": 2
             },
             {
@@ -11413,12 +11611,25 @@
         },
         {
           "division_name": "Under 13B",
-          "updated_at_text": "18/10/26 12:14:43",
+          "updated_at_text": "18/10/26 13:44:37",
           "source_order_authoritative_for_ties": false,
           "source_disclaimer": "Note: Table does not yet take account of rules for determining winner if teams on equal points",
           "rows": [
             {
               "row_order": 1,
+              "provider_team_id": 351,
+              "provider_division_id": 4261,
+              "team_name": "Riverview FC",
+              "played": 3,
+              "won": 3,
+              "drawn": 0,
+              "lost": 0,
+              "gf": 11,
+              "ga": 3,
+              "points": 6
+            },
+            {
+              "row_order": 2,
               "provider_team_id": 920,
               "provider_division_id": 4261,
               "team_name": "Baldon Sports Pumas",
@@ -11431,7 +11642,7 @@
               "points": 5
             },
             {
-              "row_order": 2,
+              "row_order": 3,
               "provider_team_id": 522,
               "provider_division_id": 4261,
               "team_name": "Dulwich Hamlet JFC Navy",
@@ -11441,19 +11652,6 @@
               "lost": 2,
               "gf": 6,
               "ga": 6,
-              "points": 4
-            },
-            {
-              "row_order": 3,
-              "provider_team_id": 351,
-              "provider_division_id": 4261,
-              "team_name": "Riverview FC",
-              "played": 2,
-              "won": 2,
-              "drawn": 0,
-              "lost": 0,
-              "gf": 6,
-              "ga": 2,
               "points": 4
             },
             {
@@ -11487,12 +11685,12 @@
               "provider_team_id": 858,
               "provider_division_id": 4261,
               "team_name": "Blackheath Rhinos Black",
-              "played": 3,
+              "played": 4,
               "won": 1,
               "drawn": 1,
-              "lost": 1,
-              "gf": 6,
-              "ga": 6,
+              "lost": 2,
+              "gf": 7,
+              "ga": 11,
               "points": 3
             },
             {
@@ -11552,12 +11750,25 @@
         },
         {
           "division_name": "Under 13C Navy",
-          "updated_at_text": "18/10/26 12:28:59",
+          "updated_at_text": "18/10/26 15:42:51",
           "source_order_authoritative_for_ties": false,
           "source_disclaimer": "Note: Table does not yet take account of rules for determining winner if teams on equal points",
           "rows": [
             {
               "row_order": 1,
+              "provider_team_id": 476,
+              "provider_division_id": 4262,
+              "team_name": "Hayden Youth Panthers",
+              "played": 4,
+              "won": 3,
+              "drawn": 1,
+              "lost": 0,
+              "gf": 7,
+              "ga": 1,
+              "points": 7
+            },
+            {
+              "row_order": 2,
               "provider_team_id": 128,
               "provider_division_id": 4262,
               "team_name": "Crayford Arrows White",
@@ -11567,19 +11778,6 @@
               "lost": 0,
               "gf": 11,
               "ga": 2,
-              "points": 5
-            },
-            {
-              "row_order": 2,
-              "provider_team_id": 476,
-              "provider_division_id": 4262,
-              "team_name": "Hayden Youth Panthers",
-              "played": 3,
-              "won": 2,
-              "drawn": 1,
-              "lost": 0,
-              "gf": 6,
-              "ga": 1,
               "points": 5
             },
             {
@@ -11597,19 +11795,32 @@
             },
             {
               "row_order": 4,
-              "provider_team_id": 700,
+              "provider_team_id": 126,
               "provider_division_id": 4262,
-              "team_name": "Erith Town Red",
-              "played": 2,
-              "won": 1,
-              "drawn": 1,
-              "lost": 0,
-              "gf": 4,
+              "team_name": "Crayford Arrows Black",
+              "played": 3,
+              "won": 2,
+              "drawn": 0,
+              "lost": 1,
+              "gf": 6,
               "ga": 3,
-              "points": 3
+              "points": 4
             },
             {
               "row_order": 5,
+              "provider_team_id": 700,
+              "provider_division_id": 4262,
+              "team_name": "Erith Town Red",
+              "played": 3,
+              "won": 1,
+              "drawn": 1,
+              "lost": 1,
+              "gf": 4,
+              "ga": 5,
+              "points": 3
+            },
+            {
+              "row_order": 6,
               "provider_team_id": 442,
               "provider_division_id": 4262,
               "team_name": "S.E. Lions FC Blues",
@@ -11622,28 +11833,15 @@
               "points": 3
             },
             {
-              "row_order": 6,
+              "row_order": 7,
               "provider_team_id": 84,
               "provider_division_id": 4262,
               "team_name": "Blackheath Village Blue",
-              "played": 2,
+              "played": 3,
               "won": 1,
               "drawn": 0,
-              "lost": 1,
+              "lost": 2,
               "gf": 2,
-              "ga": 2,
-              "points": 2
-            },
-            {
-              "row_order": 7,
-              "provider_team_id": 126,
-              "provider_division_id": 4262,
-              "team_name": "Crayford Arrows Black",
-              "played": 2,
-              "won": 1,
-              "drawn": 0,
-              "lost": 1,
-              "gf": 4,
               "ga": 3,
               "points": 2
             },
@@ -11691,7 +11889,7 @@
         },
         {
           "division_name": "Under 13C Silver",
-          "updated_at_text": "18/10/26 12:22:58",
+          "updated_at_text": "18/10/26 15:20:31",
           "source_order_authoritative_for_ties": false,
           "source_disclaimer": "Note: Table does not yet take account of rules for determining winner if teams on equal points",
           "rows": [
@@ -11710,6 +11908,19 @@
             },
             {
               "row_order": 2,
+              "provider_team_id": 45,
+              "provider_division_id": 4263,
+              "team_name": "L.I.C. FC",
+              "played": 2,
+              "won": 2,
+              "drawn": 0,
+              "lost": 0,
+              "gf": 16,
+              "ga": 3,
+              "points": 4
+            },
+            {
+              "row_order": 3,
               "provider_team_id": 74,
               "provider_division_id": 4263,
               "team_name": "Ballers SE Yellow",
@@ -11722,7 +11933,7 @@
               "points": 3
             },
             {
-              "row_order": 3,
+              "row_order": 4,
               "provider_team_id": 217,
               "provider_division_id": 4263,
               "team_name": "Lewisham Borough VIPERS",
@@ -11735,7 +11946,7 @@
               "points": 3
             },
             {
-              "row_order": 4,
+              "row_order": 5,
               "provider_team_id": 382,
               "provider_division_id": 4263,
               "team_name": "Long Lane Tigers",
@@ -11746,19 +11957,6 @@
               "gf": 11,
               "ga": 3,
               "points": 3
-            },
-            {
-              "row_order": 5,
-              "provider_team_id": 45,
-              "provider_division_id": 4263,
-              "team_name": "L.I.C. FC",
-              "played": 1,
-              "won": 1,
-              "drawn": 0,
-              "lost": 0,
-              "gf": 6,
-              "ga": 2,
-              "points": 2
             },
             {
               "row_order": 6,
@@ -11791,12 +11989,12 @@
               "provider_team_id": 835,
               "provider_division_id": 4263,
               "team_name": "Blue Stars Elite FC",
-              "played": 3,
+              "played": 4,
               "won": 0,
               "drawn": 0,
-              "lost": 3,
-              "gf": 0,
-              "ga": 22,
+              "lost": 4,
+              "gf": 1,
+              "ga": 32,
               "points": 0
             },
             {
@@ -11817,7 +12015,7 @@
         },
         {
           "division_name": "Under 13D Navy",
-          "updated_at_text": "18/10/26 11:31:32",
+          "updated_at_text": "18/10/26 14:26:51",
           "source_order_authoritative_for_ties": false,
           "source_disclaimer": "Note: Table does not yet take account of rules for determining winner if teams on equal points",
           "rows": [
@@ -11826,13 +12024,13 @@
               "provider_team_id": 943,
               "provider_division_id": 4264,
               "team_name": "Welling United Green",
-              "played": 3,
-              "won": 3,
+              "played": 4,
+              "won": 4,
               "drawn": 0,
               "lost": 0,
-              "gf": 17,
-              "ga": 4,
-              "points": 6
+              "gf": 22,
+              "ga": 5,
+              "points": 8
             },
             {
               "row_order": 2,
@@ -11852,13 +12050,13 @@
               "provider_team_id": 503,
               "provider_division_id": 4264,
               "team_name": "Guru Nanak Youth",
-              "played": 3,
+              "played": 4,
               "won": 1,
-              "drawn": 0,
+              "drawn": 1,
               "lost": 2,
-              "gf": 3,
-              "ga": 11,
-              "points": 2
+              "gf": 4,
+              "ga": 12,
+              "points": 3
             },
             {
               "row_order": 4,
@@ -11901,6 +12099,19 @@
             },
             {
               "row_order": 7,
+              "provider_team_id": 333,
+              "provider_division_id": 4264,
+              "team_name": "Dartford Royals white",
+              "played": 3,
+              "won": 0,
+              "drawn": 1,
+              "lost": 2,
+              "gf": 3,
+              "ga": 10,
+              "points": 1
+            },
+            {
+              "row_order": 8,
               "provider_team_id": 788,
               "provider_division_id": 4264,
               "team_name": "Swanley Rangers White",
@@ -11913,29 +12124,16 @@
               "points": 1
             },
             {
-              "row_order": 8,
-              "provider_team_id": 333,
-              "provider_division_id": 4264,
-              "team_name": "Dartford Royals white",
-              "played": 2,
-              "won": 0,
-              "drawn": 0,
-              "lost": 2,
-              "gf": 2,
-              "ga": 9,
-              "points": 0
-            },
-            {
               "row_order": 9,
               "provider_team_id": 334,
               "provider_division_id": 4264,
               "team_name": "Dartford Royals yellow",
-              "played": 0,
+              "played": 1,
               "won": 0,
               "drawn": 0,
-              "lost": 0,
-              "gf": 0,
-              "ga": 0,
+              "lost": 1,
+              "gf": 1,
+              "ga": 5,
               "points": 0
             },
             {
@@ -11956,7 +12154,7 @@
         },
         {
           "division_name": "Under 13D Orange",
-          "updated_at_text": "18/10/26 12:47:04",
+          "updated_at_text": "18/10/26 14:24:23",
           "source_order_authoritative_for_ties": false,
           "source_disclaimer": "Note: Table does not yet take account of rules for determining winner if teams on equal points",
           "rows": [
@@ -12001,6 +12199,19 @@
             },
             {
               "row_order": 4,
+              "provider_team_id": 105,
+              "provider_division_id": 4265,
+              "team_name": "Abbeymead FC",
+              "played": 3,
+              "won": 1,
+              "drawn": 1,
+              "lost": 1,
+              "gf": 11,
+              "ga": 4,
+              "points": 3
+            },
+            {
+              "row_order": 5,
               "provider_team_id": 30,
               "provider_division_id": 4265,
               "team_name": "Junior Reds Titans",
@@ -12011,19 +12222,6 @@
               "gf": 3,
               "ga": 5,
               "points": 3
-            },
-            {
-              "row_order": 5,
-              "provider_team_id": 105,
-              "provider_division_id": 4265,
-              "team_name": "Abbeymead FC",
-              "played": 2,
-              "won": 1,
-              "drawn": 0,
-              "lost": 1,
-              "gf": 10,
-              "ga": 3,
-              "points": 2
             },
             {
               "row_order": 6,
@@ -12069,13 +12267,13 @@
               "provider_team_id": 680,
               "provider_division_id": 4265,
               "team_name": "Eversley Rangers",
-              "played": 2,
+              "played": 3,
               "won": 0,
-              "drawn": 1,
+              "drawn": 2,
               "lost": 1,
-              "gf": 2,
-              "ga": 4,
-              "points": 1
+              "gf": 3,
+              "ga": 5,
+              "points": 2
             },
             {
               "row_order": 10,
@@ -12095,7 +12293,7 @@
         },
         {
           "division_name": "Under 13D Silver",
-          "updated_at_text": "18/10/26 11:17:43",
+          "updated_at_text": "18/10/26 15:28:48",
           "source_order_authoritative_for_ties": false,
           "source_disclaimer": "Note: Table does not yet take account of rules for determining winner if teams on equal points",
           "rows": [
@@ -12104,13 +12302,13 @@
               "provider_team_id": 2089,
               "provider_division_id": 4266,
               "team_name": "Beacons White",
-              "played": 3,
+              "played": 4,
               "won": 2,
-              "drawn": 1,
+              "drawn": 2,
               "lost": 0,
-              "gf": 9,
-              "ga": 5,
-              "points": 5
+              "gf": 11,
+              "ga": 7,
+              "points": 6
             },
             {
               "row_order": 2,
@@ -12140,6 +12338,32 @@
             },
             {
               "row_order": 4,
+              "provider_team_id": 174,
+              "provider_division_id": 4266,
+              "team_name": "KSI Coaching FC Navy",
+              "played": 2,
+              "won": 2,
+              "drawn": 0,
+              "lost": 0,
+              "gf": 6,
+              "ga": 1,
+              "points": 4
+            },
+            {
+              "row_order": 5,
+              "provider_team_id": 860,
+              "provider_division_id": 4266,
+              "team_name": "Blackheath Rhinos Grey",
+              "played": 3,
+              "won": 1,
+              "drawn": 1,
+              "lost": 1,
+              "gf": 9,
+              "ga": 9,
+              "points": 3
+            },
+            {
+              "row_order": 6,
               "provider_team_id": 2130,
               "provider_division_id": 4266,
               "team_name": "Vikings FC Red",
@@ -12152,7 +12376,7 @@
               "points": 3
             },
             {
-              "row_order": 5,
+              "row_order": 7,
               "provider_team_id": 735,
               "provider_division_id": 4266,
               "team_name": "Greenwich Peninsula Pumas",
@@ -12165,20 +12389,7 @@
               "points": 2
             },
             {
-              "row_order": 6,
-              "provider_team_id": 174,
-              "provider_division_id": 4266,
-              "team_name": "KSI Coaching FC Navy",
-              "played": 1,
-              "won": 1,
-              "drawn": 0,
-              "lost": 0,
-              "gf": 5,
-              "ga": 1,
-              "points": 2
-            },
-            {
-              "row_order": 7,
+              "row_order": 8,
               "provider_team_id": 2066,
               "provider_division_id": 4266,
               "team_name": "Woolwich Wanderers FC",
@@ -12191,55 +12402,42 @@
               "points": 2
             },
             {
-              "row_order": 8,
-              "provider_team_id": 860,
-              "provider_division_id": 4266,
-              "team_name": "Blackheath Rhinos Grey",
-              "played": 2,
-              "won": 0,
-              "drawn": 1,
-              "lost": 1,
-              "gf": 4,
-              "ga": 8,
-              "points": 1
-            },
-            {
               "row_order": 9,
               "provider_team_id": 649,
               "provider_division_id": 4266,
               "team_name": "Hillyfielders Falcons",
-              "played": 2,
+              "played": 3,
               "won": 0,
               "drawn": 1,
-              "lost": 1,
-              "gf": 1,
-              "ga": 5,
+              "lost": 2,
+              "gf": 2,
+              "ga": 10,
               "points": 1
             },
             {
               "row_order": 10,
-              "provider_team_id": 783,
-              "provider_division_id": 4266,
-              "team_name": "Braves Sporting Club",
-              "played": 2,
-              "won": 0,
-              "drawn": 0,
-              "lost": 2,
-              "gf": 1,
-              "ga": 9,
-              "points": 0
-            },
-            {
-              "row_order": 11,
               "provider_team_id": 443,
               "provider_division_id": 4266,
               "team_name": "S.E. Lions FC Gold",
-              "played": 2,
+              "played": 3,
+              "won": 0,
+              "drawn": 1,
+              "lost": 2,
+              "gf": 4,
+              "ga": 7,
+              "points": 1
+            },
+            {
+              "row_order": 11,
+              "provider_team_id": 783,
+              "provider_division_id": 4266,
+              "team_name": "Braves Sporting Club",
+              "played": 3,
               "won": 0,
               "drawn": 0,
-              "lost": 2,
-              "gf": 2,
-              "ga": 5,
+              "lost": 3,
+              "gf": 1,
+              "ga": 10,
               "points": 0
             }
           ],
@@ -12271,6 +12469,15 @@
           "away": "Parkwood Rangers Lions",
           "homeGoals": 6,
           "awayGoals": 0,
+          "provider_division_id": 4260,
+          "division_name": "Under 13A"
+        },
+        {
+          "date": "2026-10-18",
+          "home": "Sporting Club Vista",
+          "away": "Next Level FC Black",
+          "homeGoals": 4,
+          "awayGoals": 1,
           "provider_division_id": 4260,
           "division_name": "Under 13A"
         },
@@ -12383,6 +12590,15 @@
           "division_name": "Under 13B"
         },
         {
+          "date": "2026-10-18",
+          "home": "Riverview FC",
+          "away": "Blackheath Rhinos Black",
+          "homeGoals": 5,
+          "awayGoals": 1,
+          "provider_division_id": 4261,
+          "division_name": "Under 13B"
+        },
+        {
           "date": "2026-10-11",
           "home": "Baldon Sports Pumas",
           "away": "Dulwich Hamlet JFC Navy",
@@ -12489,6 +12705,24 @@
           "awayGoals": 2,
           "provider_division_id": 4261,
           "division_name": "Under 13B"
+        },
+        {
+          "date": "2026-10-18",
+          "home": "Blackheath Village Blue",
+          "away": "Hayden Youth Panthers",
+          "homeGoals": 0,
+          "awayGoals": 1,
+          "provider_division_id": 4262,
+          "division_name": "Under 13C Navy"
+        },
+        {
+          "date": "2026-10-18",
+          "home": "Crayford Arrows Black",
+          "away": "Erith Town Red",
+          "homeGoals": 2,
+          "awayGoals": 0,
+          "provider_division_id": 4262,
+          "division_name": "Under 13C Navy"
         },
         {
           "date": "2026-10-18",
@@ -12618,6 +12852,15 @@
         },
         {
           "date": "2026-10-18",
+          "home": "Blue Stars Elite FC",
+          "away": "L.I.C. FC",
+          "homeGoals": 1,
+          "awayGoals": 10,
+          "provider_division_id": 4263,
+          "division_name": "Under 13C Silver"
+        },
+        {
+          "date": "2026-10-18",
           "home": "Cray Valley (PM) FC Black",
           "away": "Palace Knights",
           "homeGoals": 3,
@@ -12707,6 +12950,24 @@
           "division_name": "Under 13D Navy"
         },
         {
+          "date": "2026-10-18",
+          "home": "Dartford Royals white",
+          "away": "Guru Nanak Youth",
+          "homeGoals": 1,
+          "awayGoals": 1,
+          "provider_division_id": 4264,
+          "division_name": "Under 13D Navy"
+        },
+        {
+          "date": "2026-10-18",
+          "home": "Welling United Green",
+          "away": "Dartford Royals yellow",
+          "homeGoals": 5,
+          "awayGoals": 1,
+          "provider_division_id": 4264,
+          "division_name": "Under 13D Navy"
+        },
+        {
           "date": "2026-10-11",
           "home": "Guru Nanak Youth",
           "away": "Welling United Green",
@@ -12786,6 +13047,15 @@
           "awayGoals": 5,
           "provider_division_id": 4264,
           "division_name": "Under 13D Navy"
+        },
+        {
+          "date": "2026-10-18",
+          "home": "Eversley Rangers",
+          "away": "Abbeymead FC",
+          "homeGoals": 1,
+          "awayGoals": 1,
+          "provider_division_id": 4265,
+          "division_name": "Under 13D Orange"
         },
         {
           "date": "2026-10-18",
@@ -12912,6 +13182,33 @@
           "awayGoals": 2,
           "provider_division_id": 4265,
           "division_name": "Under 13D Orange"
+        },
+        {
+          "date": "2026-10-18",
+          "home": "Blackheath Rhinos Grey",
+          "away": "Hillyfielders Falcons",
+          "homeGoals": 5,
+          "awayGoals": 1,
+          "provider_division_id": 4266,
+          "division_name": "Under 13D Silver"
+        },
+        {
+          "date": "2026-10-18",
+          "home": "Braves Sporting Club",
+          "away": "KSI Coaching FC Navy",
+          "homeGoals": 0,
+          "awayGoals": 1,
+          "provider_division_id": 4266,
+          "division_name": "Under 13D Silver"
+        },
+        {
+          "date": "2026-10-18",
+          "home": "S.E. Lions FC Gold",
+          "away": "Beacons White",
+          "homeGoals": 2,
+          "awayGoals": 2,
+          "provider_division_id": 4266,
+          "division_name": "Under 13D Silver"
         },
         {
           "date": "2026-10-18",
@@ -13809,12 +14106,25 @@
       "standings": [
         {
           "division_name": "Under 15A",
-          "updated_at_text": "18/10/26 12:59:22",
+          "updated_at_text": "18/10/26 15:42:16",
           "source_order_authoritative_for_ties": false,
           "source_disclaimer": "Note: Table does not yet take account of rules for determining winner if teams on equal points",
           "rows": [
             {
               "row_order": 1,
+              "provider_team_id": 271,
+              "provider_division_id": 4280,
+              "team_name": "Dulwich Village Orange",
+              "played": 4,
+              "won": 2,
+              "drawn": 1,
+              "lost": 1,
+              "gf": 10,
+              "ga": 9,
+              "points": 5
+            },
+            {
+              "row_order": 2,
               "provider_team_id": 1004,
               "provider_division_id": 4280,
               "team_name": "Fleetdown United",
@@ -13827,7 +14137,20 @@
               "points": 5
             },
             {
-              "row_order": 2,
+              "row_order": 3,
+              "provider_team_id": 618,
+              "provider_division_id": 4280,
+              "team_name": "SE Dons Football Club Tigers",
+              "played": 4,
+              "won": 2,
+              "drawn": 1,
+              "lost": 1,
+              "gf": 6,
+              "ga": 3,
+              "points": 5
+            },
+            {
+              "row_order": 4,
               "provider_team_id": 272,
               "provider_division_id": 4280,
               "team_name": "Dulwich Village White",
@@ -13840,55 +14163,29 @@
               "points": 4
             },
             {
-              "row_order": 3,
-              "provider_team_id": 618,
-              "provider_division_id": 4280,
-              "team_name": "SE Dons Football Club Tigers",
-              "played": 3,
-              "won": 2,
-              "drawn": 0,
-              "lost": 1,
-              "gf": 4,
-              "ga": 1,
-              "points": 4
-            },
-            {
-              "row_order": 4,
-              "provider_team_id": 271,
-              "provider_division_id": 4280,
-              "team_name": "Dulwich Village Orange",
-              "played": 3,
-              "won": 1,
-              "drawn": 1,
-              "lost": 1,
-              "gf": 6,
-              "ga": 6,
-              "points": 3
-            },
-            {
               "row_order": 5,
               "provider_team_id": 661,
               "provider_division_id": 4280,
               "team_name": "Ebbsfleet United White",
-              "played": 3,
+              "played": 4,
               "won": 1,
-              "drawn": 1,
+              "drawn": 2,
               "lost": 1,
-              "gf": 4,
-              "ga": 5,
-              "points": 3
+              "gf": 6,
+              "ga": 7,
+              "points": 4
             },
             {
               "row_order": 6,
               "provider_team_id": 641,
               "provider_division_id": 4280,
               "team_name": "Hillyfielders Falcons",
-              "played": 2,
+              "played": 3,
               "won": 1,
               "drawn": 0,
-              "lost": 1,
-              "gf": 4,
-              "ga": 3,
+              "lost": 2,
+              "gf": 7,
+              "ga": 7,
               "points": 2
             },
             {
@@ -14239,7 +14536,7 @@
         },
         {
           "division_name": "Under 15C Silver",
-          "updated_at_text": "18/10/26 13:12:45",
+          "updated_at_text": "18/10/26 15:24:31",
           "source_order_authoritative_for_ties": false,
           "source_disclaimer": "Note: Table does not yet take account of rules for determining winner if teams on equal points",
           "rows": [
@@ -14271,6 +14568,19 @@
             },
             {
               "row_order": 3,
+              "provider_team_id": 714,
+              "provider_division_id": 4283,
+              "team_name": "Blue Stars Elite FC Stars",
+              "played": 2,
+              "won": 2,
+              "drawn": 0,
+              "lost": 0,
+              "gf": 9,
+              "ga": 3,
+              "points": 4
+            },
+            {
+              "row_order": 4,
               "provider_team_id": 966,
               "provider_division_id": 4283,
               "team_name": "Welling United orange",
@@ -14283,7 +14593,7 @@
               "points": 4
             },
             {
-              "row_order": 4,
+              "row_order": 5,
               "provider_team_id": 275,
               "provider_division_id": 4283,
               "team_name": "Dulwich Village Blue",
@@ -14296,56 +14606,43 @@
               "points": 3
             },
             {
-              "row_order": 5,
+              "row_order": 6,
               "provider_team_id": 179,
               "provider_division_id": 4283,
               "team_name": "Total FC",
-              "played": 3,
+              "played": 4,
               "won": 1,
               "drawn": 1,
-              "lost": 1,
+              "lost": 2,
               "gf": 7,
-              "ga": 5,
+              "ga": 7,
               "points": 3
             },
             {
-              "row_order": 6,
-              "provider_team_id": 714,
-              "provider_division_id": 4283,
-              "team_name": "Blue Stars Elite FC Stars",
-              "played": 1,
-              "won": 1,
-              "drawn": 0,
-              "lost": 0,
-              "gf": 4,
-              "ga": 3,
-              "points": 2
-            },
-            {
               "row_order": 7,
-              "provider_team_id": 525,
+              "provider_team_id": 912,
               "provider_division_id": 4283,
-              "team_name": "Dulwich Hamlet JFC",
-              "played": 2,
+              "team_name": "Baldon Sports Pumas",
+              "played": 4,
               "won": 1,
               "drawn": 0,
-              "lost": 1,
-              "gf": 2,
-              "ga": 3,
+              "lost": 3,
+              "gf": 6,
+              "ga": 8,
               "points": 2
             },
             {
               "row_order": 8,
-              "provider_team_id": 912,
+              "provider_team_id": 525,
               "provider_division_id": 4283,
-              "team_name": "Baldon Sports Pumas",
+              "team_name": "Dulwich Hamlet JFC",
               "played": 3,
-              "won": 0,
+              "won": 1,
               "drawn": 0,
-              "lost": 3,
-              "gf": 4,
+              "lost": 2,
+              "gf": 2,
               "ga": 8,
-              "points": 0
+              "points": 2
             },
             {
               "row_order": 9,
@@ -14365,7 +14662,7 @@
         },
         {
           "division_name": "Under 15D Navy",
-          "updated_at_text": "18/10/26 12:38:00",
+          "updated_at_text": "18/10/26 15:34:15",
           "source_order_authoritative_for_ties": false,
           "source_disclaimer": "Note: Table does not yet take account of rules for determining winner if teams on equal points",
           "rows": [
@@ -14384,6 +14681,19 @@
             },
             {
               "row_order": 2,
+              "provider_team_id": 597,
+              "provider_division_id": 4284,
+              "team_name": "AFC Green Court Knights",
+              "played": 4,
+              "won": 3,
+              "drawn": 0,
+              "lost": 1,
+              "gf": 5,
+              "ga": 6,
+              "points": 6
+            },
+            {
+              "row_order": 3,
               "provider_team_id": 549,
               "provider_division_id": 4284,
               "team_name": "Dartford Royals white",
@@ -14396,20 +14706,33 @@
               "points": 6
             },
             {
-              "row_order": 3,
+              "row_order": 4,
               "provider_team_id": 598,
               "provider_division_id": 4284,
               "team_name": "AFC Green Court Dukes",
-              "played": 3,
+              "played": 4,
               "won": 2,
               "drawn": 1,
-              "lost": 0,
-              "gf": 14,
-              "ga": 3,
+              "lost": 1,
+              "gf": 15,
+              "ga": 5,
               "points": 5
             },
             {
-              "row_order": 4,
+              "row_order": 5,
+              "provider_team_id": 433,
+              "provider_division_id": 4284,
+              "team_name": "Sutton Athletic Greens",
+              "played": 4,
+              "won": 2,
+              "drawn": 1,
+              "lost": 1,
+              "gf": 15,
+              "ga": 10,
+              "points": 5
+            },
+            {
+              "row_order": 6,
               "provider_team_id": 963,
               "provider_division_id": 4284,
               "team_name": "Welling United White",
@@ -14420,32 +14743,6 @@
               "gf": 12,
               "ga": 6,
               "points": 5
-            },
-            {
-              "row_order": 5,
-              "provider_team_id": 597,
-              "provider_division_id": 4284,
-              "team_name": "AFC Green Court Knights",
-              "played": 3,
-              "won": 2,
-              "drawn": 0,
-              "lost": 1,
-              "gf": 3,
-              "ga": 5,
-              "points": 4
-            },
-            {
-              "row_order": 6,
-              "provider_team_id": 433,
-              "provider_division_id": 4284,
-              "team_name": "Sutton Athletic Greens",
-              "played": 3,
-              "won": 1,
-              "drawn": 1,
-              "lost": 1,
-              "gf": 9,
-              "ga": 10,
-              "points": 3
             },
             {
               "row_order": 7,
@@ -14491,12 +14788,12 @@
               "provider_team_id": 131,
               "provider_division_id": 4284,
               "team_name": "Crayford Arrows Cannons",
-              "played": 2,
+              "played": 3,
               "won": 0,
               "drawn": 0,
-              "lost": 2,
+              "lost": 3,
               "gf": 2,
-              "ga": 7,
+              "ga": 13,
               "points": 0
             },
             {
@@ -14530,7 +14827,7 @@
         },
         {
           "division_name": "Under 15D Silver",
-          "updated_at_text": "18/10/26 12:00:35",
+          "updated_at_text": "18/10/26 15:23:06",
           "source_order_authoritative_for_ties": false,
           "source_disclaimer": "Note: Table does not yet take account of rules for determining winner if teams on equal points",
           "rows": [
@@ -14549,6 +14846,19 @@
             },
             {
               "row_order": 2,
+              "provider_team_id": 736,
+              "provider_division_id": 4285,
+              "team_name": "Greenwich Peninsula Jaguars",
+              "played": 3,
+              "won": 2,
+              "drawn": 1,
+              "lost": 0,
+              "gf": 10,
+              "ga": 6,
+              "points": 5
+            },
+            {
+              "row_order": 3,
               "provider_team_id": 938,
               "provider_division_id": 4285,
               "team_name": "Beacons Black",
@@ -14561,7 +14871,7 @@
               "points": 4
             },
             {
-              "row_order": 3,
+              "row_order": 4,
               "provider_team_id": 706,
               "provider_division_id": 4285,
               "team_name": "The Bosco FC Dons",
@@ -14574,20 +14884,20 @@
               "points": 4
             },
             {
-              "row_order": 4,
-              "provider_team_id": 736,
+              "row_order": 5,
+              "provider_team_id": 1072,
               "provider_division_id": 4285,
-              "team_name": "Greenwich Peninsula Jaguars",
-              "played": 2,
+              "team_name": "Dulwich Village Red",
+              "played": 4,
               "won": 1,
               "drawn": 1,
-              "lost": 0,
+              "lost": 2,
               "gf": 7,
-              "ga": 4,
+              "ga": 9,
               "points": 3
             },
             {
-              "row_order": 5,
+              "row_order": 6,
               "provider_team_id": 737,
               "provider_division_id": 4285,
               "team_name": "Greenwich Peninsula Lions",
@@ -14600,20 +14910,20 @@
               "points": 3
             },
             {
-              "row_order": 6,
+              "row_order": 7,
               "provider_team_id": 980,
               "provider_division_id": 4285,
               "team_name": "Shooters Hill AFC Romans",
-              "played": 3,
+              "played": 4,
               "won": 1,
               "drawn": 0,
-              "lost": 2,
-              "gf": 7,
-              "ga": 11,
+              "lost": 3,
+              "gf": 9,
+              "ga": 14,
               "points": 2
             },
             {
-              "row_order": 7,
+              "row_order": 8,
               "provider_team_id": 911,
               "provider_division_id": 4285,
               "team_name": "Baldon Sports Lions",
@@ -14623,19 +14933,6 @@
               "lost": 2,
               "gf": 6,
               "ga": 15,
-              "points": 1
-            },
-            {
-              "row_order": 8,
-              "provider_team_id": 1072,
-              "provider_division_id": 4285,
-              "team_name": "Dulwich Village Red",
-              "played": 3,
-              "won": 0,
-              "drawn": 1,
-              "lost": 2,
-              "gf": 4,
-              "ga": 9,
               "points": 1
             },
             {
@@ -14656,12 +14953,12 @@
               "provider_team_id": 58,
               "provider_division_id": 4285,
               "team_name": "Lewisham Youth",
-              "played": 2,
+              "played": 3,
               "won": 0,
               "drawn": 0,
-              "lost": 2,
+              "lost": 3,
               "gf": 3,
-              "ga": 9,
+              "ga": 12,
               "points": 0
             }
           ],
@@ -14669,6 +14966,24 @@
         }
       ],
       "published_results": [
+        {
+          "date": "2026-10-18",
+          "home": "Ebbsfleet United White",
+          "away": "SE Dons Football Club Tigers",
+          "homeGoals": 2,
+          "awayGoals": 2,
+          "provider_division_id": 4280,
+          "division_name": "Under 15A"
+        },
+        {
+          "date": "2026-10-18",
+          "home": "Hillyfielders Falcons",
+          "away": "Dulwich Village Orange",
+          "homeGoals": 3,
+          "awayGoals": 4,
+          "provider_division_id": 4280,
+          "division_name": "Under 15A"
+        },
         {
           "date": "2026-10-11",
           "home": "Dulwich Village Orange",
@@ -15067,6 +15382,24 @@
         },
         {
           "date": "2026-10-18",
+          "home": "Baldon Sports Pumas",
+          "away": "Total FC",
+          "homeGoals": 2,
+          "awayGoals": 0,
+          "provider_division_id": 4283,
+          "division_name": "Under 15C Silver"
+        },
+        {
+          "date": "2026-10-18",
+          "home": "Blue Stars Elite FC Stars",
+          "away": "Dulwich Hamlet JFC",
+          "homeGoals": 5,
+          "awayGoals": 0,
+          "provider_division_id": 4283,
+          "division_name": "Under 15C Silver"
+        },
+        {
+          "date": "2026-10-18",
           "home": "EWD Eagles Youth",
           "away": "Dulwich Village Blue",
           "homeGoals": 5,
@@ -15175,6 +15508,15 @@
         },
         {
           "date": "2026-10-18",
+          "home": "AFC Green Court Knights",
+          "away": "AFC Green Court Dukes",
+          "homeGoals": 2,
+          "awayGoals": 1,
+          "provider_division_id": 4284,
+          "division_name": "Under 15D Navy"
+        },
+        {
+          "date": "2026-10-18",
           "home": "Guru Nanak Youth",
           "away": "Beacons Blue",
           "homeGoals": 1,
@@ -15188,6 +15530,15 @@
           "away": "Welling United White",
           "homeGoals": 0,
           "awayGoals": 5,
+          "provider_division_id": 4284,
+          "division_name": "Under 15D Navy"
+        },
+        {
+          "date": "2026-10-18",
+          "home": "Sutton Athletic Greens",
+          "away": "Crayford Arrows Cannons",
+          "homeGoals": 6,
+          "awayGoals": 0,
           "provider_division_id": 4284,
           "division_name": "Under 15D Navy"
         },
@@ -15314,6 +15665,24 @@
           "away": "Junior Reds Valiants",
           "homeGoals": 2,
           "awayGoals": 4,
+          "provider_division_id": 4285,
+          "division_name": "Under 15D Silver"
+        },
+        {
+          "date": "2026-10-18",
+          "home": "Dulwich Village Red",
+          "away": "Lewisham Youth",
+          "homeGoals": 3,
+          "awayGoals": 0,
+          "provider_division_id": 4285,
+          "division_name": "Under 15D Silver"
+        },
+        {
+          "date": "2026-10-18",
+          "home": "Greenwich Peninsula Jaguars",
+          "away": "Shooters Hill AFC Romans",
+          "homeGoals": 3,
+          "awayGoals": 2,
           "provider_division_id": 4285,
           "division_name": "Under 15D Silver"
         },
@@ -16172,7 +16541,7 @@
         },
         {
           "division_name": "Under 16B Navy",
-          "updated_at_text": "18/10/26 10:57:30",
+          "updated_at_text": "18/10/26 14:23:22",
           "source_order_authoritative_for_ties": false,
           "source_disclaimer": "Note: Table does not yet take account of rules for determining winner if teams on equal points",
           "rows": [
@@ -16207,12 +16576,12 @@
               "provider_team_id": 489,
               "provider_division_id": 4287,
               "team_name": "Dartford FC Black",
-              "played": 3,
+              "played": 4,
               "won": 2,
               "drawn": 0,
-              "lost": 1,
-              "gf": 8,
-              "ga": 7,
+              "lost": 2,
+              "gf": 10,
+              "ga": 10,
               "points": 4
             },
             {
@@ -16256,6 +16625,19 @@
             },
             {
               "row_order": 7,
+              "provider_team_id": 210,
+              "provider_division_id": 4287,
+              "team_name": "Foots Cray Lions",
+              "played": 4,
+              "won": 1,
+              "drawn": 1,
+              "lost": 2,
+              "gf": 7,
+              "ga": 13,
+              "points": 3
+            },
+            {
+              "row_order": 8,
               "provider_team_id": 2049,
               "provider_division_id": 4287,
               "team_name": "Barnehurst FC",
@@ -16268,7 +16650,7 @@
               "points": 2
             },
             {
-              "row_order": 8,
+              "row_order": 9,
               "provider_team_id": 408,
               "provider_division_id": 4287,
               "team_name": "Junior Reds Knights",
@@ -16281,7 +16663,7 @@
               "points": 2
             },
             {
-              "row_order": 9,
+              "row_order": 10,
               "provider_team_id": 740,
               "provider_division_id": 4287,
               "team_name": "Teviot Rangers BLUE",
@@ -16292,19 +16674,6 @@
               "gf": 13,
               "ga": 10,
               "points": 2
-            },
-            {
-              "row_order": 10,
-              "provider_team_id": 210,
-              "provider_division_id": 4287,
-              "team_name": "Foots Cray Lions",
-              "played": 3,
-              "won": 0,
-              "drawn": 1,
-              "lost": 2,
-              "gf": 4,
-              "ga": 11,
-              "points": 1
             },
             {
               "row_order": 11,
@@ -16324,34 +16693,34 @@
         },
         {
           "division_name": "Under 16B Silver",
-          "updated_at_text": "18/10/26 11:04:07",
+          "updated_at_text": "18/10/26 16:03:54",
           "source_order_authoritative_for_ties": false,
           "source_disclaimer": "Note: Table does not yet take account of rules for determining winner if teams on equal points",
           "rows": [
             {
               "row_order": 1,
-              "provider_team_id": 87,
-              "provider_division_id": 4288,
-              "team_name": "Blackheath Village",
-              "played": 3,
-              "won": 3,
-              "drawn": 0,
-              "lost": 0,
-              "gf": 10,
-              "ga": 3,
-              "points": 6
-            },
-            {
-              "row_order": 2,
               "provider_team_id": 562,
               "provider_division_id": 4288,
               "team_name": "Newpark Football Club",
-              "played": 3,
-              "won": 3,
+              "played": 4,
+              "won": 4,
               "drawn": 0,
               "lost": 0,
-              "gf": 16,
+              "gf": 19,
               "ga": 2,
+              "points": 8
+            },
+            {
+              "row_order": 2,
+              "provider_team_id": 87,
+              "provider_division_id": 4288,
+              "team_name": "Blackheath Village",
+              "played": 4,
+              "won": 3,
+              "drawn": 0,
+              "lost": 1,
+              "gf": 10,
+              "ga": 6,
               "points": 6
             },
             {
@@ -16395,19 +16764,32 @@
             },
             {
               "row_order": 6,
-              "provider_team_id": 37,
+              "provider_team_id": 547,
               "provider_division_id": 4288,
-              "team_name": "Lewisham Tigers",
-              "played": 3,
-              "won": 1,
+              "team_name": "Villacourt Rovers Yellow",
+              "played": 4,
+              "won": 2,
               "drawn": 0,
               "lost": 2,
-              "gf": 5,
-              "ga": 6,
-              "points": 2
+              "gf": 8,
+              "ga": 10,
+              "points": 4
             },
             {
               "row_order": 7,
+              "provider_team_id": 37,
+              "provider_division_id": 4288,
+              "team_name": "Lewisham Tigers",
+              "played": 4,
+              "won": 1,
+              "drawn": 0,
+              "lost": 3,
+              "gf": 6,
+              "ga": 8,
+              "points": 2
+            },
+            {
+              "row_order": 8,
               "provider_team_id": 553,
               "provider_division_id": 4288,
               "team_name": "S.E. Eagles FC",
@@ -16417,19 +16799,6 @@
               "lost": 2,
               "gf": 5,
               "ga": 6,
-              "points": 2
-            },
-            {
-              "row_order": 8,
-              "provider_team_id": 547,
-              "provider_division_id": 4288,
-              "team_name": "Villacourt Rovers Yellow",
-              "played": 3,
-              "won": 1,
-              "drawn": 0,
-              "lost": 2,
-              "gf": 6,
-              "ga": 9,
               "points": 2
             },
             {
@@ -16463,7 +16832,7 @@
         },
         {
           "division_name": "Under 16C Navy",
-          "updated_at_text": "18/10/26 13:29:43",
+          "updated_at_text": "18/10/26 14:32:21",
           "source_order_authoritative_for_ties": false,
           "source_disclaimer": "Note: Table does not yet take account of rules for determining winner if teams on equal points",
           "rows": [
@@ -16534,6 +16903,19 @@
             },
             {
               "row_order": 6,
+              "provider_team_id": 260,
+              "provider_division_id": 4289,
+              "team_name": "AFC Lewisham White",
+              "played": 4,
+              "won": 1,
+              "drawn": 1,
+              "lost": 2,
+              "gf": 10,
+              "ga": 10,
+              "points": 3
+            },
+            {
+              "row_order": 7,
               "provider_team_id": 1062,
               "provider_division_id": 4289,
               "team_name": "Junior Reds Athletic",
@@ -16546,7 +16928,7 @@
               "points": 3
             },
             {
-              "row_order": 7,
+              "row_order": 8,
               "provider_team_id": 866,
               "provider_division_id": 4289,
               "team_name": "Blackheath Rhinos Black",
@@ -16559,7 +16941,7 @@
               "points": 2
             },
             {
-              "row_order": 8,
+              "row_order": 9,
               "provider_team_id": 564,
               "provider_division_id": 4289,
               "team_name": "Mayow Park Rangers FC Blue",
@@ -16572,29 +16954,16 @@
               "points": 2
             },
             {
-              "row_order": 9,
-              "provider_team_id": 260,
-              "provider_division_id": 4289,
-              "team_name": "AFC Lewisham White",
-              "played": 3,
-              "won": 0,
-              "drawn": 1,
-              "lost": 2,
-              "gf": 4,
-              "ga": 7,
-              "points": 1
-            },
-            {
               "row_order": 10,
               "provider_team_id": 629,
               "provider_division_id": 4289,
               "team_name": "Hayden Youth Panthers",
-              "played": 3,
+              "played": 4,
               "won": 0,
               "drawn": 1,
-              "lost": 2,
-              "gf": 3,
-              "ga": 8,
+              "lost": 3,
+              "gf": 6,
+              "ga": 14,
               "points": 1
             }
           ],
@@ -16856,6 +17225,15 @@
         },
         {
           "date": "2026-10-18",
+          "home": "Dartford FC Black",
+          "away": "Foots Cray Lions",
+          "homeGoals": 2,
+          "awayGoals": 3,
+          "provider_division_id": 4287,
+          "division_name": "Under 16B Navy"
+        },
+        {
+          "date": "2026-10-18",
           "home": "Teviot Rangers BLUE",
           "away": "Samuel Montagu Green",
           "homeGoals": 3,
@@ -17000,10 +17378,28 @@
         },
         {
           "date": "2026-10-18",
+          "home": "Lewisham Tigers",
+          "away": "Villacourt Rovers Yellow",
+          "homeGoals": 1,
+          "awayGoals": 2,
+          "provider_division_id": 4288,
+          "division_name": "Under 16B Silver"
+        },
+        {
+          "date": "2026-10-18",
           "home": "London Legends Gold",
           "away": "The Bosco FC Dons",
           "homeGoals": 3,
           "awayGoals": 7,
+          "provider_division_id": 4288,
+          "division_name": "Under 16B Silver"
+        },
+        {
+          "date": "2026-10-18",
+          "home": "Newpark Football Club",
+          "away": "Blackheath Village",
+          "homeGoals": 3,
+          "awayGoals": 0,
           "provider_division_id": 4288,
           "division_name": "Under 16B Silver"
         },
@@ -17132,6 +17528,15 @@
           "awayGoals": 3,
           "provider_division_id": 4288,
           "division_name": "Under 16B Silver"
+        },
+        {
+          "date": "2026-10-18",
+          "home": "AFC Lewisham White",
+          "away": "Hayden Youth Panthers",
+          "homeGoals": 6,
+          "awayGoals": 3,
+          "provider_division_id": 4289,
+          "division_name": "Under 16C Navy"
         },
         {
           "date": "2026-10-18",
@@ -17679,7 +18084,7 @@
       "standings": [
         {
           "division_name": "Under 17 Division One",
-          "updated_at_text": "11/10/26 13:56:31",
+          "updated_at_text": "18/10/26 15:32:42",
           "source_order_authoritative_for_ties": false,
           "source_disclaimer": "Note: Table does not yet take account of rules for determining winner if teams on equal points",
           "rows": [
@@ -17688,29 +18093,42 @@
               "provider_team_id": 279,
               "provider_division_id": 4291,
               "team_name": "Dulwich Village White",
-              "played": 3,
-              "won": 2,
+              "played": 4,
+              "won": 3,
               "drawn": 0,
               "lost": 1,
-              "gf": 7,
+              "gf": 10,
               "ga": 5,
-              "points": 4
+              "points": 6
             },
             {
               "row_order": 2,
               "provider_team_id": 644,
               "provider_division_id": 4291,
               "team_name": "Hillyfielders Hawks",
-              "played": 2,
-              "won": 2,
+              "played": 3,
+              "won": 3,
               "drawn": 0,
               "lost": 0,
-              "gf": 9,
+              "gf": 12,
               "ga": 3,
-              "points": 4
+              "points": 6
             },
             {
               "row_order": 3,
+              "provider_team_id": 371,
+              "provider_division_id": 4291,
+              "team_name": "AFC Unity Black",
+              "played": 4,
+              "won": 2,
+              "drawn": 1,
+              "lost": 1,
+              "gf": 10,
+              "ga": 9,
+              "points": 5
+            },
+            {
+              "row_order": 4,
               "provider_team_id": 2056,
               "provider_division_id": 4291,
               "team_name": "The Charcoal FC",
@@ -17723,29 +18141,16 @@
               "points": 4
             },
             {
-              "row_order": 4,
-              "provider_team_id": 371,
-              "provider_division_id": 4291,
-              "team_name": "AFC Unity Black",
-              "played": 3,
-              "won": 1,
-              "drawn": 1,
-              "lost": 1,
-              "gf": 7,
-              "ga": 7,
-              "points": 3
-            },
-            {
               "row_order": 5,
               "provider_team_id": 2054,
               "provider_division_id": 4291,
               "team_name": "Bridon Ropes",
-              "played": 3,
+              "played": 4,
               "won": 1,
               "drawn": 0,
-              "lost": 2,
+              "lost": 3,
               "gf": 4,
-              "ga": 6,
+              "ga": 9,
               "points": 2
             },
             {
@@ -17753,12 +18158,12 @@
               "provider_team_id": 1086,
               "provider_division_id": 4291,
               "team_name": "Foots Cray Lions Yellow",
-              "played": 2,
+              "played": 3,
               "won": 1,
               "drawn": 0,
-              "lost": 1,
-              "gf": 5,
-              "ga": 4,
+              "lost": 2,
+              "gf": 7,
+              "ga": 7,
               "points": 2
             },
             {
@@ -17766,12 +18171,12 @@
               "provider_team_id": 470,
               "provider_division_id": 4291,
               "team_name": "Athenlay Park",
-              "played": 3,
+              "played": 4,
               "won": 0,
               "drawn": 2,
-              "lost": 1,
+              "lost": 2,
               "gf": 2,
-              "ga": 7,
+              "ga": 10,
               "points": 2
             },
             {
@@ -17792,12 +18197,25 @@
         },
         {
           "division_name": "Under 17 Division Two",
-          "updated_at_text": "18/10/26 11:54:52",
+          "updated_at_text": "18/10/26 15:50:18",
           "source_order_authoritative_for_ties": false,
           "source_disclaimer": "Note: Table does not yet take account of rules for determining winner if teams on equal points",
           "rows": [
             {
               "row_order": 1,
+              "provider_team_id": 1063,
+              "provider_division_id": 4292,
+              "team_name": "Welling United white",
+              "played": 4,
+              "won": 3,
+              "drawn": 1,
+              "lost": 0,
+              "gf": 14,
+              "ga": 2,
+              "points": 7
+            },
+            {
+              "row_order": 2,
               "provider_team_id": 132,
               "provider_division_id": 4292,
               "team_name": "Crayford Arrows",
@@ -17810,30 +18228,17 @@
               "points": 6
             },
             {
-              "row_order": 2,
-              "provider_team_id": 1063,
-              "provider_division_id": 4292,
-              "team_name": "Welling United white",
-              "played": 3,
-              "won": 2,
-              "drawn": 1,
-              "lost": 0,
-              "gf": 9,
-              "ga": 1,
-              "points": 5
-            },
-            {
               "row_order": 3,
               "provider_team_id": 561,
               "provider_division_id": 4292,
               "team_name": "Newpark Football Club",
-              "played": 2,
-              "won": 2,
+              "played": 3,
+              "won": 3,
               "drawn": 0,
               "lost": 0,
-              "gf": 6,
+              "gf": 10,
               "ga": 2,
-              "points": 4
+              "points": 6
             },
             {
               "row_order": 4,
@@ -17892,12 +18297,12 @@
               "provider_team_id": 565,
               "provider_division_id": 4292,
               "team_name": "Mayow Park Rangers FC",
-              "played": 3,
+              "played": 4,
               "won": 1,
               "drawn": 0,
-              "lost": 2,
-              "gf": 5,
-              "ga": 13,
+              "lost": 3,
+              "gf": 6,
+              "ga": 18,
               "points": 2
             },
             {
@@ -17905,12 +18310,12 @@
               "provider_team_id": 552,
               "provider_division_id": 4292,
               "team_name": "Dartford Royals",
-              "played": 3,
+              "played": 4,
               "won": 0,
               "drawn": 1,
-              "lost": 2,
+              "lost": 3,
               "gf": 4,
-              "ga": 6,
+              "ga": 10,
               "points": 1
             },
             {
@@ -17931,7 +18336,7 @@
         },
         {
           "division_name": "Under 17 Division Three",
-          "updated_at_text": "18/10/26 11:33:30",
+          "updated_at_text": "18/10/26 15:59:41",
           "source_order_authoritative_for_ties": false,
           "source_disclaimer": "Note: Table does not yet take account of rules for determining winner if teams on equal points",
           "rows": [
@@ -17940,25 +18345,25 @@
               "provider_team_id": 630,
               "provider_division_id": 4293,
               "team_name": "Hayden Youth Hawks",
-              "played": 3,
-              "won": 3,
+              "played": 4,
+              "won": 4,
               "drawn": 0,
               "lost": 0,
-              "gf": 17,
-              "ga": 1,
-              "points": 6
+              "gf": 19,
+              "ga": 2,
+              "points": 8
             },
             {
               "row_order": 2,
               "provider_team_id": 369,
               "provider_division_id": 4293,
               "team_name": "Junior Reds Titans",
-              "played": 3,
+              "played": 4,
               "won": 3,
               "drawn": 0,
-              "lost": 0,
-              "gf": 19,
-              "ga": 2,
+              "lost": 1,
+              "gf": 20,
+              "ga": 4,
               "points": 6
             },
             {
@@ -18071,6 +18476,33 @@
       ],
       "published_results": [
         {
+          "date": "2026-10-18",
+          "home": "Athenlay Park",
+          "away": "Dulwich Village White",
+          "homeGoals": 0,
+          "awayGoals": 3,
+          "provider_division_id": 4291,
+          "division_name": "Under 17 Division One"
+        },
+        {
+          "date": "2026-10-18",
+          "home": "Bridon Ropes",
+          "away": "Hillyfielders Hawks",
+          "homeGoals": 0,
+          "awayGoals": 3,
+          "provider_division_id": 4291,
+          "division_name": "Under 17 Division One"
+        },
+        {
+          "date": "2026-10-18",
+          "home": "Foots Cray Lions Yellow",
+          "away": "AFC Unity Black",
+          "homeGoals": 2,
+          "awayGoals": 3,
+          "provider_division_id": 4291,
+          "division_name": "Under 17 Division One"
+        },
+        {
           "date": "2026-10-11",
           "home": "AFC Unity Black",
           "away": "Bridon Ropes",
@@ -18175,6 +18607,24 @@
           "away": "Istead United Colts",
           "homeGoals": 2,
           "awayGoals": 2,
+          "provider_division_id": 4292,
+          "division_name": "Under 17 Division Two"
+        },
+        {
+          "date": "2026-10-18",
+          "home": "Newpark Football Club",
+          "away": "Dartford Royals",
+          "homeGoals": 4,
+          "awayGoals": 0,
+          "provider_division_id": 4292,
+          "division_name": "Under 17 Division Two"
+        },
+        {
+          "date": "2026-10-18",
+          "home": "Welling United white",
+          "away": "Mayow Park Rangers FC",
+          "homeGoals": 5,
+          "awayGoals": 1,
           "provider_division_id": 4292,
           "division_name": "Under 17 Division Two"
         },
@@ -18303,6 +18753,15 @@
           "awayGoals": 2,
           "provider_division_id": 4292,
           "division_name": "Under 17 Division Two"
+        },
+        {
+          "date": "2026-10-18",
+          "home": "Hayden Youth Hawks",
+          "away": "Junior Reds Titans",
+          "homeGoals": 2,
+          "awayGoals": 1,
+          "provider_division_id": 4293,
+          "division_name": "Under 17 Division Three"
         },
         {
           "date": "2026-10-18",
@@ -18626,7 +19085,7 @@
       "standings": [
         {
           "division_name": "Senior Division One",
-          "updated_at_text": "18/10/26 13:14:15",
+          "updated_at_text": "18/10/26 15:54:42",
           "source_order_authoritative_for_ties": false,
           "source_disclaimer": "Note: Table does not yet take account of rules for determining winner if teams on equal points",
           "rows": [
@@ -18697,6 +19156,19 @@
             },
             {
               "row_order": 6,
+              "provider_team_id": 2120,
+              "provider_division_id": 4295,
+              "team_name": "Crayford Arrows",
+              "played": 4,
+              "won": 1,
+              "drawn": 1,
+              "lost": 2,
+              "gf": 10,
+              "ga": 13,
+              "points": 3
+            },
+            {
+              "row_order": 7,
               "provider_team_id": 1043,
               "provider_division_id": 4295,
               "team_name": "Dulwich Village White",
@@ -18707,19 +19179,6 @@
               "gf": 4,
               "ga": 14,
               "points": 2
-            },
-            {
-              "row_order": 7,
-              "provider_team_id": 2120,
-              "provider_division_id": 4295,
-              "team_name": "Crayford Arrows",
-              "played": 3,
-              "won": 0,
-              "drawn": 1,
-              "lost": 2,
-              "gf": 3,
-              "ga": 9,
-              "points": 1
             },
             {
               "row_order": 8,
@@ -18739,12 +19198,12 @@
               "provider_team_id": 693,
               "provider_division_id": 4295,
               "team_name": "Sutton Athletic",
-              "played": 1,
+              "played": 2,
               "won": 0,
               "drawn": 0,
-              "lost": 1,
-              "gf": 0,
-              "ga": 5,
+              "lost": 2,
+              "gf": 4,
+              "ga": 12,
               "points": 0
             }
           ],
@@ -18752,7 +19211,7 @@
         },
         {
           "division_name": "Senior Division Two",
-          "updated_at_text": "16/10/26 07:11:15",
+          "updated_at_text": "18/10/26 15:50:25",
           "source_order_authoritative_for_ties": false,
           "source_disclaimer": "Note: Table does not yet take account of rules for determining winner if teams on equal points",
           "rows": [
@@ -18761,13 +19220,13 @@
               "provider_team_id": 1032,
               "provider_division_id": 4296,
               "team_name": "Fleetdown United",
-              "played": 3,
-              "won": 3,
+              "played": 4,
+              "won": 4,
               "drawn": 0,
               "lost": 0,
-              "gf": 4,
+              "gf": 6,
               "ga": 1,
-              "points": 6
+              "points": 8
             },
             {
               "row_order": 2,
@@ -18784,6 +19243,19 @@
             },
             {
               "row_order": 3,
+              "provider_team_id": 102,
+              "provider_division_id": 4296,
+              "team_name": "Slade Green Knights",
+              "played": 4,
+              "won": 2,
+              "drawn": 1,
+              "lost": 1,
+              "gf": 17,
+              "ga": 6,
+              "points": 5
+            },
+            {
+              "row_order": 4,
               "provider_team_id": 320,
               "provider_division_id": 4296,
               "team_name": "Cray Valley (PM) FC",
@@ -18796,7 +19268,7 @@
               "points": 4
             },
             {
-              "row_order": 4,
+              "row_order": 5,
               "provider_team_id": 2055,
               "provider_division_id": 4296,
               "team_name": "Bridon Ropes",
@@ -18806,19 +19278,6 @@
               "lost": 1,
               "gf": 14,
               "ga": 10,
-              "points": 3
-            },
-            {
-              "row_order": 5,
-              "provider_team_id": 102,
-              "provider_division_id": 4296,
-              "team_name": "Slade Green Knights",
-              "played": 3,
-              "won": 1,
-              "drawn": 1,
-              "lost": 1,
-              "gf": 12,
-              "ga": 5,
               "points": 3
             },
             {
@@ -18852,12 +19311,12 @@
               "provider_team_id": 213,
               "provider_division_id": 4296,
               "team_name": "Kingsdale Red",
-              "played": 3,
+              "played": 4,
               "won": 1,
               "drawn": 0,
-              "lost": 2,
-              "gf": 9,
-              "ga": 10,
+              "lost": 3,
+              "gf": 10,
+              "ga": 15,
               "points": 2
             },
             {
@@ -18865,12 +19324,12 @@
               "provider_team_id": 2135,
               "provider_division_id": 4296,
               "team_name": "EWD Eagles Youth",
-              "played": 3,
+              "played": 4,
               "won": 0,
               "drawn": 0,
-              "lost": 3,
+              "lost": 4,
               "gf": 7,
-              "ga": 21,
+              "ga": 23,
               "points": 0
             },
             {
@@ -18891,6 +19350,15 @@
         }
       ],
       "published_results": [
+        {
+          "date": "2026-10-18",
+          "home": "Crayford Arrows",
+          "away": "Sutton Athletic",
+          "homeGoals": 7,
+          "awayGoals": 4,
+          "provider_division_id": 4295,
+          "division_name": "Senior Division One"
+        },
         {
           "date": "2026-10-18",
           "home": "Docklands",
@@ -19016,6 +19484,24 @@
           "awayGoals": 1,
           "provider_division_id": 4295,
           "division_name": "Senior Division One"
+        },
+        {
+          "date": "2026-10-18",
+          "home": "EWD Eagles Youth",
+          "away": "Fleetdown United",
+          "homeGoals": 0,
+          "awayGoals": 2,
+          "provider_division_id": 4296,
+          "division_name": "Senior Division Two"
+        },
+        {
+          "date": "2026-10-18",
+          "home": "Slade Green Knights",
+          "away": "Kingsdale Red",
+          "homeGoals": 5,
+          "awayGoals": 1,
+          "provider_division_id": 4296,
+          "division_name": "Senior Division Two"
         },
         {
           "date": "2026-10-11",
@@ -20739,7 +21225,7 @@
       "standings": [
         {
           "division_name": "Under12X A Navy",
-          "updated_at_text": "18/10/26 10:29:57",
+          "updated_at_text": "18/10/26 14:23:33",
           "source_order_authoritative_for_ties": false,
           "source_disclaimer": "Note: Table does not yet take account of rules for determining winner if teams on equal points",
           "rows": [
@@ -20797,6 +21283,19 @@
             },
             {
               "row_order": 5,
+              "provider_team_id": 808,
+              "provider_division_id": 4242,
+              "team_name": "Ballon Dor FC",
+              "played": 3,
+              "won": 1,
+              "drawn": 0,
+              "lost": 2,
+              "gf": 5,
+              "ga": 15,
+              "points": 2
+            },
+            {
+              "row_order": 6,
               "provider_team_id": 361,
               "provider_division_id": 4242,
               "team_name": "Dartford FC White",
@@ -20809,7 +21308,7 @@
               "points": 2
             },
             {
-              "row_order": 6,
+              "row_order": 7,
               "provider_team_id": 657,
               "provider_division_id": 4242,
               "team_name": "Sutton Dynamo FC",
@@ -20822,29 +21321,16 @@
               "points": 2
             },
             {
-              "row_order": 7,
-              "provider_team_id": 808,
-              "provider_division_id": 4242,
-              "team_name": "Ballon Dor FC",
-              "played": 2,
-              "won": 0,
-              "drawn": 0,
-              "lost": 2,
-              "gf": 2,
-              "ga": 13,
-              "points": 0
-            },
-            {
               "row_order": 8,
               "provider_team_id": 664,
               "provider_division_id": 4242,
               "team_name": "Ebbsfleet United Red",
-              "played": 1,
+              "played": 2,
               "won": 0,
               "drawn": 0,
-              "lost": 1,
-              "gf": 2,
-              "ga": 6,
+              "lost": 2,
+              "gf": 4,
+              "ga": 9,
               "points": 0
             },
             {
@@ -21104,7 +21590,7 @@
         },
         {
           "division_name": "Under 12X B Silver",
-          "updated_at_text": "18/10/26 13:14:01",
+          "updated_at_text": "18/10/26 15:57:39",
           "source_order_authoritative_for_ties": false,
           "source_disclaimer": "Note: Table does not yet take account of rules for determining winner if teams on equal points",
           "rows": [
@@ -21123,6 +21609,19 @@
             },
             {
               "row_order": 2,
+              "provider_team_id": 172,
+              "provider_division_id": 4245,
+              "team_name": "KSI Coaching FC",
+              "played": 4,
+              "won": 3,
+              "drawn": 0,
+              "lost": 1,
+              "gf": 18,
+              "ga": 6,
+              "points": 6
+            },
+            {
+              "row_order": 3,
               "provider_team_id": 519,
               "provider_division_id": 4245,
               "team_name": "Dulwich Hamlet JFC Pink",
@@ -21132,19 +21631,6 @@
               "lost": 0,
               "gf": 7,
               "ga": 4,
-              "points": 4
-            },
-            {
-              "row_order": 3,
-              "provider_team_id": 172,
-              "provider_division_id": 4245,
-              "team_name": "KSI Coaching FC",
-              "played": 3,
-              "won": 2,
-              "drawn": 0,
-              "lost": 1,
-              "gf": 7,
-              "ga": 5,
               "points": 4
             },
             {
@@ -21191,12 +21677,12 @@
               "provider_team_id": 2123,
               "provider_division_id": 4245,
               "team_name": "AFC Lewisham White",
-              "played": 3,
+              "played": 4,
               "won": 1,
               "drawn": 0,
-              "lost": 2,
-              "gf": 8,
-              "ga": 12,
+              "lost": 3,
+              "gf": 9,
+              "ga": 23,
               "points": 2
             },
             {
@@ -21230,12 +21716,25 @@
         },
         {
           "division_name": "Under 12X C Navy",
-          "updated_at_text": "18/10/26 12:05:17",
+          "updated_at_text": "18/10/26 13:48:02",
           "source_order_authoritative_for_ties": false,
           "source_disclaimer": "Note: Table does not yet take account of rules for determining winner if teams on equal points",
           "rows": [
             {
               "row_order": 1,
+              "provider_team_id": 432,
+              "provider_division_id": 4246,
+              "team_name": "Hayden Youth Panthers",
+              "played": 4,
+              "won": 4,
+              "drawn": 0,
+              "lost": 0,
+              "gf": 29,
+              "ga": 1,
+              "points": 8
+            },
+            {
+              "row_order": 2,
               "provider_team_id": 121,
               "provider_division_id": 4246,
               "team_name": "Crayford Arrows Gold",
@@ -21248,7 +21747,7 @@
               "points": 7
             },
             {
-              "row_order": 2,
+              "row_order": 3,
               "provider_team_id": 51,
               "provider_division_id": 4246,
               "team_name": "Russellers Reds",
@@ -21261,29 +21760,16 @@
               "points": 7
             },
             {
-              "row_order": 3,
-              "provider_team_id": 432,
-              "provider_division_id": 4246,
-              "team_name": "Hayden Youth Panthers",
-              "played": 3,
-              "won": 3,
-              "drawn": 0,
-              "lost": 0,
-              "gf": 22,
-              "ga": 1,
-              "points": 6
-            },
-            {
               "row_order": 4,
               "provider_team_id": 312,
               "provider_division_id": 4246,
               "team_name": "Samuel Montagu Blue",
-              "played": 3,
+              "played": 4,
               "won": 2,
               "drawn": 0,
-              "lost": 1,
+              "lost": 2,
               "gf": 6,
-              "ga": 4,
+              "ga": 11,
               "points": 4
             },
             {
@@ -21573,6 +22059,15 @@
         }
       ],
       "published_results": [
+        {
+          "date": "2026-10-18",
+          "home": "Ballon Dor FC",
+          "away": "Ebbsfleet United Red",
+          "homeGoals": 3,
+          "awayGoals": 2,
+          "provider_division_id": 4242,
+          "division_name": "Under12X A Navy"
+        },
         {
           "date": "2026-10-18",
           "home": "Welling United Red",
@@ -21908,6 +22403,15 @@
         },
         {
           "date": "2026-10-18",
+          "home": "AFC Lewisham White",
+          "away": "KSI Coaching FC",
+          "homeGoals": 1,
+          "awayGoals": 11,
+          "provider_division_id": 4245,
+          "division_name": "Under 12X B Silver"
+        },
+        {
+          "date": "2026-10-18",
           "home": "Dulwich Hamlet JFC Pink",
           "away": "London Legends Gold",
           "homeGoals": 4,
@@ -22038,6 +22542,15 @@
           "away": "Foots Cray Lions Black",
           "homeGoals": 3,
           "awayGoals": 3,
+          "provider_division_id": 4246,
+          "division_name": "Under 12X C Navy"
+        },
+        {
+          "date": "2026-10-18",
+          "home": "Hayden Youth Panthers",
+          "away": "Samuel Montagu Blue",
+          "homeGoals": 7,
+          "awayGoals": 0,
           "provider_division_id": 4246,
           "division_name": "Under 12X C Navy"
         },
@@ -22887,7 +23400,7 @@
         },
         {
           "division_name": "Under 14X B",
-          "updated_at_text": "18/10/26 13:27:27",
+          "updated_at_text": "18/10/26 14:07:20",
           "source_order_authoritative_for_ties": false,
           "source_disclaimer": "Note: Table does not yet take account of rules for determining winner if teams on equal points",
           "rows": [
@@ -22987,16 +23500,29 @@
               "provider_team_id": 462,
               "provider_division_id": 4268,
               "team_name": "Athenlay FC",
-              "played": 2,
+              "played": 3,
               "won": 1,
               "drawn": 0,
-              "lost": 1,
+              "lost": 2,
               "gf": 1,
-              "ga": 4,
+              "ga": 8,
               "points": 2
             },
             {
               "row_order": 9,
+              "provider_team_id": 274,
+              "provider_division_id": 4268,
+              "team_name": "Dulwich Village Blue",
+              "played": 4,
+              "won": 1,
+              "drawn": 0,
+              "lost": 3,
+              "gf": 9,
+              "ga": 14,
+              "points": 2
+            },
+            {
+              "row_order": 10,
               "provider_team_id": 1026,
               "provider_division_id": 4268,
               "team_name": "London Legends white",
@@ -23007,19 +23533,6 @@
               "gf": 12,
               "ga": 11,
               "points": 2
-            },
-            {
-              "row_order": 10,
-              "provider_team_id": 274,
-              "provider_division_id": 4268,
-              "team_name": "Dulwich Village Blue",
-              "played": 3,
-              "won": 0,
-              "drawn": 0,
-              "lost": 3,
-              "gf": 5,
-              "ga": 14,
-              "points": 0
             },
             {
               "row_order": 11,
@@ -23039,7 +23552,7 @@
         },
         {
           "division_name": "Under 14X C Navy",
-          "updated_at_text": "18/10/26 11:54:48",
+          "updated_at_text": "18/10/26 15:29:53",
           "source_order_authoritative_for_ties": false,
           "source_disclaimer": "Note: Table does not yet take account of rules for determining winner if teams on equal points",
           "rows": [
@@ -23058,6 +23571,19 @@
             },
             {
               "row_order": 2,
+              "provider_team_id": 343,
+              "provider_division_id": 4269,
+              "team_name": "Erith Town Red",
+              "played": 3,
+              "won": 2,
+              "drawn": 1,
+              "lost": 0,
+              "gf": 13,
+              "ga": 8,
+              "points": 5
+            },
+            {
+              "row_order": 3,
               "provider_team_id": 544,
               "provider_division_id": 4269,
               "team_name": "Dartford Royals Blue",
@@ -23070,7 +23596,20 @@
               "points": 4
             },
             {
-              "row_order": 3,
+              "row_order": 4,
+              "provider_team_id": 59,
+              "provider_division_id": 4269,
+              "team_name": "New Ash Green JFC Pumas",
+              "played": 4,
+              "won": 2,
+              "drawn": 0,
+              "lost": 2,
+              "gf": 14,
+              "ga": 15,
+              "points": 4
+            },
+            {
+              "row_order": 5,
               "provider_team_id": 1059,
               "provider_division_id": 4269,
               "team_name": "Crayford Arrows Girls Red",
@@ -23083,20 +23622,7 @@
               "points": 3
             },
             {
-              "row_order": 4,
-              "provider_team_id": 343,
-              "provider_division_id": 4269,
-              "team_name": "Erith Town Red",
-              "played": 2,
-              "won": 1,
-              "drawn": 1,
-              "lost": 0,
-              "gf": 7,
-              "ga": 3,
-              "points": 3
-            },
-            {
-              "row_order": 5,
+              "row_order": 6,
               "provider_team_id": 749,
               "provider_division_id": 4269,
               "team_name": "Teviot Rangers BLUE",
@@ -23109,30 +23635,17 @@
               "points": 3
             },
             {
-              "row_order": 6,
+              "row_order": 7,
               "provider_team_id": 901,
               "provider_division_id": 4269,
               "team_name": "Welling United Blue X",
-              "played": 2,
-              "won": 1,
-              "drawn": 1,
-              "lost": 0,
-              "gf": 2,
-              "ga": 1,
-              "points": 3
-            },
-            {
-              "row_order": 7,
-              "provider_team_id": 59,
-              "provider_division_id": 4269,
-              "team_name": "New Ash Green JFC Pumas",
               "played": 3,
               "won": 1,
-              "drawn": 0,
-              "lost": 2,
-              "gf": 6,
-              "ga": 12,
-              "points": 2
+              "drawn": 1,
+              "lost": 1,
+              "gf": 7,
+              "ga": 7,
+              "points": 3
             },
             {
               "row_order": 8,
@@ -23152,12 +23665,12 @@
               "provider_team_id": 398,
               "provider_division_id": 4269,
               "team_name": "Castle Hill United FC",
-              "played": 1,
+              "played": 2,
               "won": 0,
               "drawn": 0,
-              "lost": 1,
-              "gf": 0,
-              "ga": 7,
+              "lost": 2,
+              "gf": 3,
+              "ga": 15,
               "points": 0
             }
           ],
@@ -23165,7 +23678,7 @@
         },
         {
           "division_name": "Under 14X C Silver",
-          "updated_at_text": "18/10/26 12:30:07",
+          "updated_at_text": "18/10/26 14:05:18",
           "source_order_authoritative_for_ties": false,
           "source_disclaimer": "Note: Table does not yet take account of rules for determining winner if teams on equal points",
           "rows": [
@@ -23210,6 +23723,19 @@
             },
             {
               "row_order": 4,
+              "provider_team_id": 917,
+              "provider_division_id": 4270,
+              "team_name": "Baldon Sports Panthers",
+              "played": 4,
+              "won": 2,
+              "drawn": 0,
+              "lost": 2,
+              "gf": 10,
+              "ga": 20,
+              "points": 4
+            },
+            {
+              "row_order": 5,
               "provider_team_id": 10,
               "provider_division_id": 4270,
               "team_name": "Bermondsey Utd FC",
@@ -23222,7 +23748,7 @@
               "points": 4
             },
             {
-              "row_order": 5,
+              "row_order": 6,
               "provider_team_id": 2137,
               "provider_division_id": 4270,
               "team_name": "SE Dons Football Club Panthers",
@@ -23233,19 +23759,6 @@
               "gf": 12,
               "ga": 12,
               "points": 4
-            },
-            {
-              "row_order": 6,
-              "provider_team_id": 917,
-              "provider_division_id": 4270,
-              "team_name": "Baldon Sports Panthers",
-              "played": 3,
-              "won": 1,
-              "drawn": 0,
-              "lost": 2,
-              "gf": 6,
-              "ga": 18,
-              "points": 2
             },
             {
               "row_order": 7,
@@ -23265,12 +23778,12 @@
               "provider_team_id": 903,
               "provider_division_id": 4270,
               "team_name": "Welling United Purple",
-              "played": 3,
+              "played": 4,
               "won": 0,
               "drawn": 0,
-              "lost": 3,
-              "gf": 4,
-              "ga": 16,
+              "lost": 4,
+              "gf": 6,
+              "ga": 20,
               "points": 0
             },
             {
@@ -23423,6 +23936,15 @@
           "away": "Hillyfielders Eagles",
           "homeGoals": 13,
           "awayGoals": 2,
+          "provider_division_id": 4268,
+          "division_name": "Under 14X B"
+        },
+        {
+          "date": "2026-10-18",
+          "home": "Athenlay FC",
+          "away": "Dulwich Village Blue",
+          "homeGoals": 0,
+          "awayGoals": 4,
           "provider_division_id": 4268,
           "division_name": "Under 14X B"
         },
@@ -23589,6 +24111,24 @@
           "division_name": "Under 14X C Navy"
         },
         {
+          "date": "2026-10-18",
+          "home": "New Ash Green JFC Pumas",
+          "away": "Castle Hill United FC",
+          "homeGoals": 8,
+          "awayGoals": 3,
+          "provider_division_id": 4269,
+          "division_name": "Under 14X C Navy"
+        },
+        {
+          "date": "2026-10-18",
+          "home": "Welling United Blue X",
+          "away": "Erith Town Red",
+          "homeGoals": 5,
+          "awayGoals": 6,
+          "provider_division_id": 4269,
+          "division_name": "Under 14X C Navy"
+        },
+        {
           "date": "2026-10-11",
           "home": "AFC Green Court Knights",
           "away": "Welling United Blue X",
@@ -23686,6 +24226,15 @@
           "awayGoals": 2,
           "provider_division_id": 4269,
           "division_name": "Under 14X C Navy"
+        },
+        {
+          "date": "2026-10-18",
+          "home": "Baldon Sports Panthers",
+          "away": "Welling United Purple",
+          "homeGoals": 4,
+          "awayGoals": 2,
+          "provider_division_id": 4270,
+          "division_name": "Under 14X C Silver"
         },
         {
           "date": "2026-10-18",
