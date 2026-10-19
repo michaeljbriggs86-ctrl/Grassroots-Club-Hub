@@ -1,10 +1,10 @@
 {
   "schema_version": 2,
   "provider": "Selkent",
-  "last_updated": "2026-10-19T17:55:41.747184+00:00",
-  "cup_results_last_updated": "2026-10-12T13:49:27.311080+00:00",
-  "cup_results_last_attempted": "2026-10-19T17:55:41.747184+00:00",
-  "cup_results_status": "stale_retained",
+  "last_updated": "2026-10-19T21:51:27.040409+00:00",
+  "cup_results_last_updated": "2026-10-19T21:51:27.040409+00:00",
+  "cup_results_last_attempted": "2026-10-19T21:51:27.040409+00:00",
+  "cup_results_status": "verified_current",
   "fixture_agegroup_discovery_source": "selkent_divisions_all",
   "coverage": {
     "fixtures": {
@@ -6956,6 +6956,17 @@
           "round": "Prelim Round",
           "provider_cup_id": "cupCombined7-0",
           "provider_match_ref": "C"
+        },
+        {
+          "date": "2026-10-18",
+          "home": "Fisher Youth Sharks",
+          "away": "Welling United Red",
+          "homeGoals": 3,
+          "awayGoals": 0,
+          "competition": "Selkent Cup One",
+          "round": "Prelim Round",
+          "provider_cup_id": "cupCombined7-0",
+          "provider_match_ref": "D"
         },
         {
           "date": "2026-10-11",
