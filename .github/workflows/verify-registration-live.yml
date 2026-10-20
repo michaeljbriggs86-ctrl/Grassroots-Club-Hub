@@ -34,12 +34,14 @@ jobs:
           python-version: '3.12'
       - name: Check exact build and hosting expectations
         run: python -m unittest discover -s tests -p 'test_verify_registration_live.py' -v
+  # Served bytes can match a new revision only after its publisher succeeds.
+  # Push/PR events still exercise verifier-tests without racing production.
   readback:
     needs: verifier-tests
     if: >-
       github.repository == 'michaeljbriggs86-ctrl/Grassroots-Club-Hub' &&
-      github.event_name != 'pull_request' &&
-      (github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success')
+      (github.event_name == 'workflow_dispatch' ||
+       (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success'))
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:

@@ -1,5 +1,8 @@
 """Keep live byte checks strict across the actual browser build and hosting additions."""
 import importlib.util
+import ast
+import re
+from types import SimpleNamespace
 from pathlib import Path
 import subprocess
 import sys
@@ -25,6 +28,29 @@ class LiveReadbackExpectations(unittest.TestCase):
             self.assertIn(guard, built)
         self.assertEqual(live.matches_expected_asset("static-feed-overlay.js", built, built), (True, False))
         self.assertEqual(live.matches_expected_asset("static-feed-overlay.js", built, authored), (False, False))
+
+    def test_live_comparison_waits_for_publication_or_explicit_manual_request(self):
+        workflow = (ROOT / ".github/workflows/verify-registration-live.yml").read_text()
+        block = re.search(r"(?ms)^  readback:\n.*?^    if: >-\n((?:      [^\n]*\n)+)", workflow)
+        self.assertIsNotNone(block)
+        expression = " ".join(line.strip() for line in block.group(1).splitlines())
+        expression = expression.replace("&&", " and ").replace("||", " or ")
+        allowed = (ast.Expression, ast.BoolOp, ast.And, ast.Or, ast.Compare, ast.Eq,
+                   ast.NotEq, ast.Name, ast.Attribute, ast.Load, ast.Constant)
+        tree = ast.parse(expression, mode="eval")
+        self.assertTrue(all(isinstance(node, allowed) for node in ast.walk(tree)))
+        for event, conclusion, expected in (
+            ("push", "success", False), ("pull_request", "success", False),
+            ("workflow_dispatch", "", True), ("workflow_run", "success", True),
+            ("workflow_run", "failure", False), ("workflow_run", "cancelled", False),
+            ("workflow_run", "skipped", False),
+        ):
+            for repository in ("michaeljbriggs86-ctrl/Grassroots-Club-Hub", "example/fork"):
+                github = SimpleNamespace(repository=repository, event_name=event,
+                                         event=SimpleNamespace(workflow_run=SimpleNamespace(conclusion=conclusion)))
+                with self.subTest(event=event, conclusion=conclusion, repository=repository):
+                    actual = eval(compile(tree, "readback-gate", "eval"), {"__builtins__": {}}, {"github": github})
+                    self.assertEqual(actual, expected and repository == "michaeljbriggs86-ctrl/Grassroots-Club-Hub")
 
     def test_observed_beacons_are_allowed_only_on_unchanged_main_page(self):
         page = b"<!doctype html><body>Reviewed app</body>"
