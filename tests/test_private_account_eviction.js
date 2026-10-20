@@ -21,6 +21,7 @@ const cases=[
   const node=id=>{if(!nodes.has(id))nodes.set(id,{value:['season-history-select','reviewer-thread-id'].includes(id)?'fictional-id':'',innerHTML:'',textContent:'',classList:{add(){},toggle(){}},showModal(){opened++;}});return nodes.get(id);};
   const cloud={context:{profile:{user_id:'a',club_id:'club'}},session:{user:{id:'a'}},currentTeam:()=>({id:'one'}),[method]:()=>pending};
   const ctx={CLOUD_MODE:true,currentRole:'admin',window:{ClubHubCloud:cloud},document:{getElementById:node,activeElement:null},Date,Set,
+   __seasonHistoryLoad:0,__auditHistoryLoad:0,__complianceLoad:0,
    __appearanceStamp:0,__appearanceStats:[],__seasonArchives:[],__auditRows:[],__complianceStatus:name==='refreshDisputeReviewerPanel'?{is_current_user_reviewer:true}:null,
    isAdmin:()=>ctx.currentRole==='admin',isClubOverviewMode:()=>true,isAdminTeamPreviewMode:()=>false,isAdminCoachMode:()=>false,requireCoach:()=>true,
    renderSeasonPlayerStats:()=>renders++,renderSeasonHistory:()=>renders++,renderAuditHistory:()=>renders++,activePlayers:()=>[{name:'Fictional Child A',number:1}],
