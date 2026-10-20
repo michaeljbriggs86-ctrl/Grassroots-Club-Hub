@@ -27,9 +27,9 @@
   async function enter(){
     const key=syncAccess();if(!key||!active())return;
     const select=el('player-onboarding-team');const teams=options.cloud().visibleTeamList();
-    select.innerHTML='<option value="">Choose a team</option>'+teams.map(t=>`<option value="${esc(t.id)}">${esc(teamLabel(t))}</option>`).join('');
+    select.innerHTML=`<option value="">${teams.length?'Choose a team':'No teams available'}</option>`+teams.map(t=>`<option value="${esc(t.id)}">${esc(teamLabel(t))}</option>`).join('');
     if(!teams.some(t=>t.id===teamId))teamId='';select.value=teamId;
-    if(!teamId){el('player-onboarding-content').innerHTML='<div class="empty-state"><strong>Start with a team</strong><p>Choose the squad you want to add a player to.</p></div>';status('');return;}
+    if(!teamId){clearPrivate();select.disabled=!teams.length;el('player-onboarding-content').innerHTML=teams.length?'<div class="empty-state"><strong>Start with a team</strong><p>Choose the squad you want to add a player to.</p></div>':'<div class="empty-state"><strong>No teams available</strong><p>No teams are available for parent onboarding in this view. Check Club teams, then reopen this page.</p></div>';status('');return;}
     await load();
   }
   async function load(){

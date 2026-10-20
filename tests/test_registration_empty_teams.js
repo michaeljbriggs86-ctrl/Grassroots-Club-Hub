@@ -1,0 +1,23 @@
+'use strict';
+const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
+let source=fs.readFileSync('app/src/main/assets/registration.js','utf8');
+const marker=' start();\n})();';assert.equal(source.split(marker).length,2);
+source=source.replace(marker," window.__emptyTeamTest={begin:id=>{user={id};session=loadSession();},renderList,newInvite};\n})();");
+const nodes=new Map(),events={},calls=[],storage=new Map();
+const node=id=>{if(!nodes.has(id))nodes.set(id,{innerHTML:'',textContent:'',hidden:false,classList:{toggle(){}},focus(){},addEventListener:(kind,fn)=>events[id+':'+kind]=fn});return nodes.get(id);};
+let admin=true,teams=[],failure=null;
+const window={CLUB_HUB_CLOUD:{url:'https://fictional.invalid',anonKey:'fictional-only'},addEventListener:(kind,fn)=>events['window:'+kind]=fn};
+const fetch=async(url,options)=>{const body=JSON.parse(options.body);calls.push(body.p_action);if(failure&&body.p_action==='teams')return{ok:false,status:503,json:async()=>({message:'Fictional team service unavailable'})};return{ok:true,status:200,json:async()=>body.p_action==='list'?{admin,applications:[]}:{teams}};};
+const setAccount=id=>storage.set('grassroots_hub_cloud_session_v1',JSON.stringify({user:{id},access_token:'fictional',expires_at:Math.floor(Date.now()/1000)+3600}));setAccount('admin-a');
+vm.runInNewContext(source,{window,document:{getElementById:node,documentElement:{dataset:{}},querySelectorAll:()=>[]},localStorage:{getItem:k=>storage.get(k)||null,setItem:(k,v)=>storage.set(k,v),removeItem:k=>storage.delete(k)},location:{hash:'',pathname:'/register.html',search:''},history:{replaceState(){}},URLSearchParams,crypto:{randomUUID:()=> 'fictional'},fetch,Date,Set});
+const api=window.__emptyTeamTest,body=()=>node('registration-content').innerHTML;
+(async()=>{
+ api.begin('admin-a');await api.renderList();assert.match(body(),/No registrations yet/);assert.match(body(),/Applications will appear here for club review/);assert.doesNotMatch(body(),/Open the original registration invitation/);
+ await api.newInvite();assert.match(body(),/No teams available|Retry available teams|Back to registrations/);assert.doesNotMatch(body(),/<form|name="email"|Send registration email/,'an empty eligible list exposes no invitation form');
+ teams=[{id:'team-a',label:'U9 Example <script>',season:'2026/27'}];await api.newInvite();assert.match(body(),/name="team_id"|name="email"|Send registration email/);assert.match(body(),/Example &lt;script&gt;/);assert.doesNotMatch(body(),/Retry available teams/);
+ const loaded=body();teams=null;await assert.rejects(api.newInvite,/Available teams could not be loaded/);assert.equal(body(),loaded,'malformed response is an error and does not render an empty state');
+ failure=true;await assert.rejects(api.newInvite,/Fictional team service unavailable/);assert.equal(body(),loaded,'service failure retains current view');failure=null;
+ admin=false;setAccount('parent-a');api.begin('parent-a');await api.renderList();assert.match(body(),/Open the original registration invitation/);assert.doesNotMatch(body(),/Invite a new player|No registrations yet/,'parents keep their own invitation guidance');
+ assert(calls.every(c=>c==='list'||c==='teams'),'only read actions were exercised');
+ console.log('PASS registration empty teams: Admin/Parent guidance, empty versus malformed/failure, eligibility recovery, escaped labels and no invitation writes');
+})().catch(e=>{console.error(e);process.exitCode=1;});
