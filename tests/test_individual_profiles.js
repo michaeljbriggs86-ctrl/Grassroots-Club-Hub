@@ -58,6 +58,23 @@ const deferred=()=>{let resolve;return{promise:new Promise(r=>resolve=r),resolve
  await open(member('coach-a'));assert.doesNotMatch(body(),/Coaching qualifications/,'coach cannot read colleagues qualifications');
  await open(member('me','self'));assert.match(body(),/Coaching qualifications|2028-01-01/);assert.equal(qualificationReads.at(-1),'me');
  ctx.currentRole='admin';ctx.admin=true;ui.syncAccess();await open(member('parent-a','access'));assert.match(body(),/data-contact-user="parent-a"/);
+ const savedAccess=cloud.listClubAccessAccounts,savedLinks=cloud.listParentPlayerLinks;
+ cloud.listClubAccessAccounts=async()=>[c('parent-b','parent','b')];let linkCalls=[];
+ cloud.listParentPlayerLinks=async(id,teamId)=>{linkCalls.push([id,teamId]);return [
+  {parent_user_id:id,team_id:'b',player_name:'Other child'},
+  {parent_user_id:id,team_id:'a',player_name:'Wrong team child'},
+  {parent_user_id:'someone-else',team_id:'b',player_name:'Wrong parent child'}];};
+ await open({...member('parent-b','access'),teamId:'b'});
+ assert.deepEqual(linkCalls.at(-1),['parent-b','b']);assert.match(body(),/Other child/);
+ assert.doesNotMatch(body(),/Wrong team child|Wrong parent child|data-player-profile/,'club overview keeps verified names readable without an unresolvable action');
+ assert.equal(team,'a','opening a profile never switches the workspace');
+ await open(member('parent-b','access'));assert.deepEqual(linkCalls.at(-1),['parent-b','b'],'access row supplies subject team when target omits it');
+ const count=linkCalls.length;await open({...member('parent-b','access'),teamId:'unauthorised'});
+ assert.equal(linkCalls.length,count);assert.equal(body(),'','target must match a freshly authorised subject/team row');
+ cloud.listParentPlayerLinks=async()=>{throw Error('denied or offline')};await open(member('parent-b','access'));
+ assert.equal(body(),'');assert.match(node('person-profile-status').textContent,/unavailable/,'failed link read is never an empty-links claim');
+ cloud.listParentPlayerLinks=async()=>[];await ui.refresh();assert.match(body(),/No linked players available/,'successful empty read remains distinct');
+ cloud.listClubAccessAccounts=savedAccess;cloud.listParentPlayerLinks=savedLinks;
  await open(member('coach-a','club'));assert.match(body(),/Coaching qualifications|Manage access|data-remove-club-coach/);assert.equal(qualificationReads.at(-1),'coach-a');
  await open(member('req','request'));assert.match(body(),/Typed child|pending@example.invalid|review-request/);assert.doesNotMatch(body(),/<script>|mailto:/);
  ctx.currentRole='player';ctx.admin=false;ctx.state.meta.ageGroup='U15';ui.syncAccess();await open({kind:'player',name:'Own child'});assert.match(body(),/Goals/);assert.doesNotMatch(body(),/Edit player details|No-shows/);await open({kind:'player',name:'Other child'});assert.equal(body(),'');

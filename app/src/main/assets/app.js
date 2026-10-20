@@ -6213,6 +6213,7 @@ function personTeamSummary(rows){
 }
 async function resolveMemberProfile(target){
   const cloud=window.ClubHubCloud,uid=cloud?.session?.user?.id,teamId=cloud?.currentTeam?.()?.id||null;
+  const profileContext=personProfileContextKey();
   const admin=currentRole==='admin'&&isClubOverviewMode(),staff=['admin','coach','assistant_coach'].includes(currentRole);
   if(!CLOUD_MODE||!uid||!target.id)return null;
   if(!admin&&target.source!=='self'&&!teamId)return null;
@@ -6247,14 +6248,24 @@ async function resolveMemberProfile(target){
   if(!person)return null;
   if(currentRole==='parent'&&person.user_id!==uid&&(person.role==='parent'||person.kind==='parent'))return null;
   const own=person.user_id===uid,role=person.role||'parent',parent=role==='parent',coaching=['club_admin','coach','assistant_coach'].includes(role);
+  if(admin&&parent&&target.teamId)rows=rows.filter(r=>r.team_id===target.teamId);
   let html=`<section class="panel"><h3>${esc(accessRoleLabel(role))}</h3>${personTeamSummary(rows.filter(r=>r.user_id===person.user_id))?`<ul class="person-profile-teams">${personTeamSummary(rows.filter(r=>r.user_id===person.user_id))}</ul>`:'<p class="helper">'+(admin?'Club account':'Your team')+'</p>'}${staff&&person.access_method?`<p class="helper">Sign-in method: ${esc(person.access_method)}</p>`:''}</section>`;
   if(contact)html+=`<section class="panel"><h3>Contact details</h3>${memberContactDetails(contact,contactManage||own)}</section>`;
   else if(['club_admin','coach','assistant_coach','parent'].includes(role))html+='<section class="panel"><h3>Contact details</h3><p class="helper">Contact details are unavailable. The club can populate these from its spreadsheet once the contact directory is enabled.</p></section>';
   let links=[];
   if(parent&&(staff||own)){
-    try{links=await cloud.listParentPlayerLinks(person.user_id);}catch(_){}
-    const names=[...new Set([...(contact?.player_names||[]),...links.filter(l=>l.parent_user_id===person.user_id&&(!teamId||l.team_id===teamId)).map(l=>l.player_name)].filter(n=>typeof n==='string'))];
-    html+=`<section class="panel"><h3>Linked players for this team</h3>${names.length?`<ul class="person-profile-teams">${names.map(n=>`<li>${playerForName(n)?`<button type="button" class="person-name-button" data-player-profile="${esc(n)}">${esc(n)}</button>`:esc(n)}</li>`).join('')}</ul>`:'<p class="helper">No linked players available for this team.</p>'}</section>`;
+    // Use the subject's authorised team, never the Admin viewer's remembered
+    // workspace. A contact/name button is not evidence of a player link.
+    const linkTeamId=admin?(target.teamId||person.team_id||contact?.team_id||null):teamId;
+    const scoped=linkTeamId&&(!admin||[...rows,contact].some(r=>r?.user_id===person.user_id&&r.team_id===linkTeamId));
+    if(profileContext!==personProfileContextKey())return null;
+    if(!scoped)throw Error('Profile unavailable');
+    links=await cloud.listParentPlayerLinks(person.user_id,linkTeamId);
+    if(profileContext!==personProfileContextKey())return null;
+    const names=[...new Set(links.filter(l=>l.parent_user_id===person.user_id&&l.team_id===linkTeamId).map(l=>l.player_name).filter(n=>typeof n==='string'))];
+    // The player resolver requires a loaded team workspace. In club overview,
+    // show the verified names as text rather than opening an unavailable page.
+    html+=`<section class="panel"><h3>Linked players for this team</h3>${names.length?`<ul class="person-profile-teams">${names.map(n=>`<li>${!isClubOverviewMode()&&linkTeamId===teamId&&playerForName(n)?`<button type="button" class="person-name-button" data-player-profile="${esc(n)}">${esc(n)}</button>`:esc(n)}</li>`).join('')}</ul>`:'<p class="helper">No linked players available for this team.</p>'}</section>`;
   }
   if(role==='player'&&own){const linked=await cloud.listPlayerAccountLinks(uid);const names=linked.filter(l=>l.user_id===uid&&(!teamId||l.team_id===teamId)).map(l=>l.player_name);html+=`<section class="panel"><h3>Player details</h3>${names.map(name=>`<button type="button" class="person-name-button" data-player-profile="${esc(name)}">${esc(name)}</button>`).join('')||'<p class="helper">No player link is available for this team.</p>'}</section>`;}
   // Qualifications are private to Club Admin and the staff member; parents see contact details only.

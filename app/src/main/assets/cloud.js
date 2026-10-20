@@ -1088,10 +1088,14 @@
   async function requestClubCancellation(){if(role()!=='admin')throw new Error('Club Admin access required');return await rpc('request_club_cancellation',{});}
   async function cancelClubCancellation(){if(role()!=='admin')throw new Error('Club Admin access required');return await rpc('cancel_club_cancellation',{});}
 
-  async function listParentPlayerLinks(parentUserId=null){
+  async function listParentPlayerLinks(parentUserId=null,teamId=null){
     if(testModeActive())return [];
-    if(!activeTeam||!['admin','coach','assistant_coach','parent'].includes(role()))return [];
-    const data=await rpc('list_parent_player_links',{p_parent_user_id:parentUserId||null,p_team_id:activeTeam.id});
+    const target=teamId||activeTeam?.id,r=role();
+    if(!target||!['admin','coach','assistant_coach','parent'].includes(r))return [];
+    // Only Club Admin may explicitly inspect another team. The existing RPC
+    // still verifies club, role and parent/child access on the server.
+    if(r!=='admin'&&target!==activeTeam?.id)throw new Error('Use your current team to view player links');
+    const data=await rpc('list_parent_player_links',{p_parent_user_id:parentUserId||null,p_team_id:target});
     return Array.isArray(data)?data:[];
   }
   async function saveParentPlayerLinks(parentUserId,players=[]){

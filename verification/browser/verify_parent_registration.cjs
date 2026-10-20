@@ -19,8 +19,15 @@ const server=http.createServer(async(req,res)=>{
  }catch{res.writeHead(500);res.end();}
 });
 const click=(page,name)=>page.getByRole('button',{name,exact:true}).click();
-async function auth(page,id,theme){await page.evaluate(({id,theme})=>{localStorage.clear();localStorage.setItem('grassroots_hub_cloud_session_v1',JSON.stringify({access_token:id,refresh_token:'fictional-refresh',expires_at:Math.floor(Date.now()/1000)+3600,user:{id}}));localStorage.setItem('grassrootsHub_theme_v1',theme);},{id,theme});}
+async function auth(page,id,theme){await page.evaluate(({id,theme})=>{localStorage.clear();localStorage.setItem('grassroots_hub_cloud_session_v1',JSON.stringify({access_token:id,refresh_token:'fictional-refresh',expires_at:Math.floor(Date.now()/1000)+3600,user:{id}}));localStorage.setItem('grassrootsHub_theme_v1',theme);},{id,theme});
+ // A hash-only invitation navigation retains the existing document. Changing
+ // storage alone does not change its rendered theme; use the actual control.
+ if(await page.locator('html').getAttribute('data-theme')!==theme)await page.getByRole('button',{name:'Change colour theme',exact:true}).click();
+ assert.equal(await page.locator('html').getAttribute('data-theme'),theme);
+}
 async function checkLayout(page,width,name){
+ const expectedTheme=name.split('-')[0];
+ assert.equal(await page.locator('html').getAttribute('data-theme'),expectedTheme,'layout uses the requested actual theme');
  for(const zoom of [100,200]){await page.evaluate(v=>document.documentElement.style.fontSize=v+'%',zoom);await page.evaluate(()=>document.fonts.ready);
   const issues=await page.evaluate(()=>[...document.querySelectorAll('#registration-main input,#registration-main select,#registration-main textarea,#registration-main button,#registration-main h1,#registration-main p')].filter(n=>n.getClientRects().length).flatMap(n=>{const r=n.getBoundingClientRect();return r.left<0||r.right>innerWidth+1?[{tag:n.tagName,text:n.textContent.slice(0,60),left:r.left,right:r.right}]:[]}));assert.deepEqual(issues,[],name+' fits '+width+' at '+zoom+'%');
   if(zoom===100||width===320)await page.screenshot({path:path.join(out,`${name}-${width}-${zoom}.png`),fullPage:true});
