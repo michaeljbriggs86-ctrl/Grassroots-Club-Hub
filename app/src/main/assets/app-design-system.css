@@ -2629,3 +2629,8 @@ html body .admin-onboarding-options .admin-onboarding-choice{
 
 /* History read gates do not change controls elsewhere in the app. */
 #view-season-history #open-season-archive:disabled{opacity:.5;cursor:not-allowed}
+
+/* Assignment readiness is visible only on its existing Admin form. */
+#admin-assign-team #assign-coach-button:disabled{opacity:.5;cursor:not-allowed}
+
+#club-coaches-status,#assignment-account-status{font-size:.875rem;line-height:1.5}

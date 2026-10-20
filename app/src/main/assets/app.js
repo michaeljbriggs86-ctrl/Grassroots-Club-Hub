@@ -5776,61 +5776,99 @@ async function removeTeamMember(userId){
   if(!confirm("Remove this person\'s access? Their football data is not deleted."))return;
   try{await window.ClubHubCloud.removeTeamMember(userId);auditEvent('access_removed','access',userId,'Removed team app access');toast('Access removed');await refreshTeamMembers(false);if(window.ClubHubPersonProfiles?.isActive())await window.ClubHubPersonProfiles.refresh();}catch(err){alert(err.message||err);}
 }
-let __clubCoachStamp=0;
-let __staffDirectoryLoad=0,__accessDirectoryLoad=0;
-async function refreshClubCoaches(quiet=false){
-  const list=document.getElementById('club-coaches-list');if(!list||!CLOUD_MODE||!isAdmin())return;
-  const key=staffRequestContext(),cloud=window.ClubHubCloud;if(!key)return;
-  if(quiet&&Date.now()-__clubCoachStamp<12000)return;__clubCoachStamp=Date.now();
-  const version=++__staffDirectoryLoad,current=()=>key===staffRequestContext()&&cloud===window.ClubHubCloud&&version===__staffDirectoryLoad;
-  if(!quiet)list.innerHTML='<div class="empty-state compact-empty">Loading coaching staff…</div>';
-  try{
-    const rows=await cloud.listClubCoaches();if(!current())return;__adminCoachRows=rows;
-    list.innerHTML=rows.map(r=>{const role=r.role==='club_admin'?adminTitleLabel(r.club_title)+' · Coach':accessRoleLabel(r.role),team=[r.age_group?'U'+r.age_group:'',r.team_name].filter(Boolean).join(' ')||'Team not assigned';return personNameButton(r.full_name||role,r.user_id,'club',r.team_id||'',role+' · '+team);}).join('')||'<div class="empty-state compact-empty">No coaching staff accounts currently have access.</div>';
-    await refreshAdminAccessManagement(true);
-    if(current())populateAssignCoachControls();
-  }catch(err){if(current())list.innerHTML='<div class="empty-state compact-empty">Coaching staff are temporarily unavailable.</div>';}
-}
 let __adminAccessRows=[];
 let __adminAccessState='idle';
+let __clubCoachStamp=0;
+let __staffDirectoryLoad=0,__accessDirectoryLoad=0;
+let __staffDirectoryIdentity='',__staffDirectoryCloud=null,__staffDirectoryRead='idle',__staffDirectoryRows=[];
+let __assignmentBusy=false,__assignmentOperation=0;
+function validateDirectoryRows(rows){if(!Array.isArray(rows)||rows.some(r=>!r||typeof r.user_id!=='string'||!r.user_id||typeof r.role!=='string'))throw new Error('Account list unavailable');return rows;}
+function clearAdminDirectoryContext(){
+  ++__staffDirectoryLoad;++__accessDirectoryLoad;++__assignmentOperation;__assignmentBusy=false;
+  __staffDirectoryIdentity='';__staffDirectoryCloud=null;__staffDirectoryRead='idle';__staffDirectoryRows=[];__adminAccessState='idle';__adminCoachRows=[];__adminAccessRows=[];__clubCoachStamp=0;
+  for(const id of ['club-coaches-list','admin-access-list','assign-coach-person','assign-coach-team']){const node=document.getElementById(id);if(node){node.innerHTML='';delete node.__pitchkindMarkup;if('value'in node)node.value='';}}
+  for(const [id,text]of [['club-coaches-status','Open Staff to load coaching staff.'],['assignment-account-status','Open Staff to load assignment accounts.'],['admin-access-stats','Access data not loaded.']]){const node=document.getElementById(id);if(node)node.textContent=text;}
+  const button=document.getElementById('assign-coach-button');if(button)button.disabled=true;document.getElementById('retry-assignment-accounts')?.classList.add('hidden');document.getElementById('club-coaches-list')?.setAttribute('aria-busy','false');
+}
+function syncAdminDirectoryContext(){
+  syncStaffRequestContext();
+  const key=staffRequestContext(),cloud=window.ClubHubCloud;
+  if(key!==__staffDirectoryIdentity||cloud!==__staffDirectoryCloud){clearAdminDirectoryContext();__staffDirectoryIdentity=key;__staffDirectoryCloud=cloud;renderStaffDirectory();populateAssignCoachControls();}
+  return key;
+}
+function renderStaffDirectory(){
+  const list=document.getElementById('club-coaches-list'),status=document.getElementById('club-coaches-status');if(!list)return;
+  list.setAttribute('aria-busy',String(__staffDirectoryRead==='loading'));
+  if(status)status.textContent=__staffDirectoryRead==='loading'?'Loading coaching staff…'+(__staffDirectoryRows.length?' Previously loaded rows are unrefreshed.':''):__staffDirectoryRead==='error'?'Coaching staff are unavailable. Refresh staff to retry.'+(__staffDirectoryRows.length?' Previously loaded rows are unrefreshed.':''):__staffDirectoryRead==='loaded'?'Staff list loaded.':'Open Staff to load coaching staff.';
+  const focused=list.contains(document.activeElement)?document.activeElement.closest('[data-person-profile]'):null;
+  const subject=focused?.dataset.personProfile,team=focused?.dataset.profileTeam;
+  const markup=__staffDirectoryRows.map(r=>{const role=r.role==='club_admin'?adminTitleLabel(r.club_title)+' · Coach':accessRoleLabel(r.role),team=[r.age_group?'U'+r.age_group:'',r.team_name].filter(Boolean).join(' ')||'Team not assigned';return personNameButton(r.full_name||role,r.user_id,'club',r.team_id||'',role+' · '+team);}).join('')||(__staffDirectoryRead==='loaded'?'<div class="empty-state compact-empty">No coaching staff accounts currently have access.</div>':'');
+  setStableHtml(list,markup);
+  if(focused&&!focused.isConnected){const replacement=[...list.querySelectorAll('[data-person-profile]')].find(n=>n.dataset.personProfile===subject&&n.dataset.profileTeam===team);(replacement||document.getElementById('refresh-club-coaches'))?.focus();}
+}
+async function refreshClubCoaches(quiet=false){
+  const list=document.getElementById('club-coaches-list');if(!list||!CLOUD_MODE||!isAdmin())return;
+  const key=syncAdminDirectoryContext(),cloud=window.ClubHubCloud;if(!key)return;
+  if(quiet&&Date.now()-__clubCoachStamp<12000)return;__clubCoachStamp=Date.now();
+  const version=++__staffDirectoryLoad,current=()=>key===staffRequestContext()&&cloud===window.ClubHubCloud&&version===__staffDirectoryLoad;
+  __staffDirectoryRead='loading';renderStaffDirectory();
+  // Independent reads: either section can recover when the other is unavailable.
+  const people=refreshAdminAccessManagement(true);
+  try{const rows=await cloud.listClubCoaches();if(!current())return;__staffDirectoryRows=validateDirectoryRows(rows);__adminCoachRows=__staffDirectoryRows;__staffDirectoryRead='loaded';renderStaffDirectory();}
+  catch(err){if(current()){if([401,403].includes(err?.status)){__staffDirectoryRows=[];__adminCoachRows=[];}__staffDirectoryRead='error';renderStaffDirectory();}}
+  finally{await people;}
+}
 function accessRoleLabel(role){return role==='club_admin'?'Club Admin':role==='assistant_coach'?'Assistant Coach':role==='coach'?'Coach':role==='player'?'Player':role==='pending_parent'?'Parent · pending':'Parent';}
 function renderAdminAccessManagement(){
   const list=document.getElementById('admin-access-list'),stats=document.getElementById('admin-access-stats'),filter=document.getElementById('admin-access-filter');if(!list)return;
+  if(__adminAccessState==='idle'||__adminAccessState==='loading'){if(stats)stats.textContent='Loading club access…';setStableHtml(list,'<div class="empty-state compact-empty" role="status">Loading club access…</div>');return;}
   if(__adminAccessState==='error'){
     if(stats)stats.textContent='Access data unavailable';
-    list.innerHTML='<div class="empty-state compact-empty" role="status">Club access is temporarily unavailable. Use Refresh access to try again.</div>';
+    setStableHtml(list,'<div class="empty-state compact-empty" role="status">Club access is temporarily unavailable. Use Refresh access to try again.</div>');
     return;
   }
   const mode=filter?.value||'all',rows=__adminAccessRows.filter(r=>mode==='all'||(mode==='staff'?['coach','assistant_coach'].includes(r.role):mode==='parent'?r.role==='parent':r.role===mode));
   const counts={admins:__adminAccessRows.filter(r=>r.role==='club_admin').length,staff:__adminAccessRows.filter(r=>['coach','assistant_coach'].includes(r.role)||(r.role==='club_admin'&&r.coach_team_id)).length,parents:__adminAccessRows.filter(r=>r.role==='parent').length,players:__adminAccessRows.filter(r=>r.role==='player').length,pending:__adminAccessRows.filter(r=>r.role==='pending_parent').length};
   if(stats)stats.innerHTML=`<span class="admin-access-stat">${plural(counts.admins,'Admin')}</span><span class="admin-access-stat">${counts.staff} coaching staff</span><span class="admin-access-stat">${plural(counts.parents,'parent')}</span><span class="admin-access-stat">${plural(counts.players,'player')}</span>${counts.pending?`<span class="admin-access-stat">${counts.pending} pending</span>`:''}`;
-  list.innerHTML=rows.map(r=>{const dual=r.role==='club_admin'&&r.coach_team_id,adminBase=r.role==='club_admin'?adminTitleLabel(r.club_title):'',role=dual?adminBase+' · Coach':(r.role==='club_admin'?adminBase:accessRoleLabel(r.role)),team=(r.age_group&&r.team_name)?`U${r.age_group} ${r.team_name}`:(r.role==='club_admin'?'Club-wide':'Team not assigned');return personNameButton(r.full_name||role,r.user_id,'access',r.team_id||'',role+' · '+team);}).join('')||'<div class="empty-state compact-empty">No accounts match this filter.</div>';
+  setStableHtml(list,rows.map(r=>{const dual=r.role==='club_admin'&&r.coach_team_id,adminBase=r.role==='club_admin'?adminTitleLabel(r.club_title):'',role=dual?adminBase+' · Coach':(r.role==='club_admin'?adminBase:accessRoleLabel(r.role)),team=(r.age_group&&r.team_name)?`U${r.age_group} ${r.team_name}`:(r.role==='club_admin'?'Club-wide':'Team not assigned');return personNameButton(r.full_name||role,r.user_id,'access',r.team_id||'',role+' · '+team);}).join('')||'<div class="empty-state compact-empty">No accounts match this filter.</div>');
 }
 async function refreshAdminAccessManagement(quiet=false){
-  if(!CLOUD_MODE||!isAdmin())return;const list=document.getElementById('admin-access-list');if(!list)return;if(!quiet){__adminAccessState='loading';list.innerHTML='<div class="empty-state compact-empty">Loading club access…</div>';}
-  const key=staffRequestContext(),cloud=window.ClubHubCloud;if(!key)return;
+  if(!CLOUD_MODE||!isAdmin())return;const list=document.getElementById('admin-access-list');if(!list)return;
+  const key=syncAdminDirectoryContext(),cloud=window.ClubHubCloud;if(!key)return;
   const version=++__accessDirectoryLoad,current=()=>key===staffRequestContext()&&cloud===window.ClubHubCloud&&version===__accessDirectoryLoad;
-  try{const rows=await cloud.listClubAccessAccounts();if(!current())return;__adminAccessRows=rows;__adminAccessState='loaded';renderAdminAccessManagement();refreshCoachRequests();}catch(err){if(current()){__adminAccessRows=[];__adminAccessState='error';renderAdminAccessManagement();}}
+  __adminAccessState='loading';if(!quiet)renderAdminAccessManagement();populateAssignCoachControls();
+  try{const rows=await cloud.listClubAccessAccounts();if(!current())return;__adminAccessRows=validateDirectoryRows(rows);__adminAccessState='loaded';renderAdminAccessManagement();populateAssignCoachControls();refreshCoachRequests();}
+  catch(err){if(current()){if([401,403].includes(err?.status)){__adminAccessRows=[];for(const id of ['assign-coach-person','assign-coach-team']){const node=document.getElementById(id);if(node)node.value='';}}__adminAccessState='error';renderAdminAccessManagement();populateAssignCoachControls();}}
 }
-
+function assignmentPeople(){return __adminAccessRows.filter(r=>['coach','assistant_coach','club_admin'].includes(r.role));}
+function assignmentTeams(){return (window.ClubHubCloud?.visibleTeamList?.()||[]).slice().sort((x,y)=>Number(String(x.ageGroup).replace(/\D/g,''))-Number(String(y.ageGroup).replace(/\D/g,''))||String(x.teamName||'').localeCompare(String(y.teamName||'')));}
+function assignmentChoicesReady(){return !__assignmentBusy&&__adminAccessState==='loaded'&&!!__staffDirectoryIdentity&&__staffDirectoryIdentity===staffRequestContext()&&__staffDirectoryCloud===window.ClubHubCloud&&assignmentPeople().some(r=>String(r.user_id)===document.getElementById('assign-coach-person')?.value)&&assignmentTeams().some(t=>String(t.id)===document.getElementById('assign-coach-team')?.value);}
 function populateAssignCoachControls(){
   const person=document.getElementById('assign-coach-person'),team=document.getElementById('assign-coach-team');if(!person||!team)return;
   const keepP=person.value,keepT=team.value;
-  const people=__adminAccessRows.filter(r=>['coach','assistant_coach','club_admin'].includes(r.role));
-  person.innerHTML='<option value="">Choose a person</option>'+people.map(r=>`<option value="${esc(r.user_id)}">${esc(r.full_name||accessRoleLabel(r.role))}${r.role==='club_admin'?` · ${esc(adminTitleLabel(r.club_title))}`:r.role==='assistant_coach'?' · Assistant Coach':' · Coach'}</option>`).join('');
-  const teams=(window.ClubHubCloud?.visibleTeamList?.()||[]).slice().sort((x,y)=>Number(String(x.ageGroup).replace(/\D/g,''))-Number(String(y.ageGroup).replace(/\D/g,''))||String(x.teamName).localeCompare(String(y.teamName)));
-  team.innerHTML='<option value="">Choose a team</option>'+teams.map(t=>`<option value="${esc(t.id)}">${esc(matchTeamLabel([t.ageGroup,t.teamName].filter(Boolean).join(' ')))}</option>`).join('');
-  if([...person.options].some(o=>o.value===keepP))person.value=keepP;if([...team.options].some(o=>o.value===keepT))team.value=keepT;
+  const people=assignmentPeople(),teams=assignmentTeams(),missingP=!!keepP&&!people.some(r=>String(r.user_id)===keepP),missingT=!!keepT&&!teams.some(t=>String(t.id)===keepT);
+  setStableHtml(person,'<option value="">Choose a person</option>'+(missingP?`<option value="${esc(keepP)}" disabled>Selected account unavailable</option>`:'')+people.map(r=>`<option value="${esc(r.user_id)}">${esc(r.full_name||accessRoleLabel(r.role))}${r.role==='club_admin'?` · ${esc(adminTitleLabel(r.club_title))}`:r.role==='assistant_coach'?' · Assistant Coach':' · Coach'}</option>`).join(''));
+  setStableHtml(team,'<option value="">Choose a team</option>'+(missingT?`<option value="${esc(keepT)}" disabled>Selected team unavailable</option>`:'')+teams.map(t=>`<option value="${esc(t.id)}">${esc(matchTeamLabel([t.ageGroup,t.teamName].filter(Boolean).join(' ')))}</option>`).join(''));
+  person.value=keepP;team.value=keepT;
+  if((!people.length&&!keepP&&document.activeElement===person)||(!teams.length&&!keepT&&document.activeElement===team))document.getElementById('refresh-club-coaches')?.focus();
+  person.disabled=!people.length&&!keepP;team.disabled=!teams.length&&!keepT;
+  const status=document.getElementById('assignment-account-status'),retry=document.getElementById('retry-assignment-accounts'),button=document.getElementById('assign-coach-button');
+  if(status)status.textContent=__adminAccessState==='loading'?'Loading assignment accounts… Your choices are retained.':__adminAccessState==='error'?'Assignment accounts unavailable. Retry accounts.'+(people.length?' Previously loaded choices are unrefreshed.':''):__adminAccessState==='loaded'?(!people.length?'No eligible coaching accounts are available.':missingP?'Selected account is unavailable. Choose an available account.':missingT?'Selected team is unavailable. Choose an available team.':!teams.length?'No teams are available for assignment.':'Assignment accounts loaded.'):'Open Staff to load assignment accounts.';
+  if(retry){const show=__adminAccessState==='error'||(__adminAccessState==='loading'&&document.activeElement===retry);if(!show&&document.activeElement===retry)(__adminAccessState==='loaded'&&people.length?person:document.getElementById('refresh-club-coaches'))?.focus();retry.classList.toggle('hidden',!show);}
+  if(button)button.disabled=!assignmentChoicesReady();
 }
 async function assignCoachToTeam(){
-  if(!isAdmin()||!CLOUD_MODE)return;
-  const person=document.getElementById('assign-coach-person'),team=document.getElementById('assign-coach-team'),btn=document.getElementById('assign-coach-button');
+  if(!isAdmin()||!CLOUD_MODE||__assignmentBusy)return;
+  const person=document.getElementById('assign-coach-person'),team=document.getElementById('assign-coach-team');
   if(!person?.value||!team?.value)return toast('Choose a person and a team');
+  if(!assignmentChoicesReady())return toast('Refresh assignment accounts and choose an available person and team');
+  const userId=person.value,teamId=team.value,key=staffRequestContext(),cloud=window.ClubHubCloud,operation=++__assignmentOperation;
+  const current=()=>operation===__assignmentOperation&&key===staffRequestContext()&&cloud===window.ClubHubCloud;
   const name=person.selectedOptions[0]?.textContent.split(' · ')[0]||'Coach',teamName=team.selectedOptions[0]?.textContent||'team';
-  btn.disabled=true;
-  try{await window.ClubHubCloud.assignCoachTeam(person.value,team.value);auditEvent('coach_team_assigned','access',person.value,`Assigned ${name} to ${teamName}`);toast(`${name} assigned to ${teamName}`);team.value='';await refreshClubCoaches(false);await refreshAdminClubOverview(false);if(window.ClubHubPersonProfiles?.isActive())await window.ClubHubPersonProfiles.refresh();}
-  catch(err){alert(err.message||err);}
-  finally{btn.disabled=false;}
+  __assignmentBusy=true;populateAssignCoachControls();
+  try{await cloud.assignCoachTeam(userId,teamId);if(!current())return;auditEvent('coach_team_assigned','access',userId,`Assigned ${name} to ${teamName}`);toast(`${name} assigned to ${teamName}`);if(person.value===userId&&team.value===teamId)team.value='';await refreshClubCoaches(false);if(!current())return;await refreshAdminClubOverview(false);if(current()&&window.ClubHubPersonProfiles?.isActive())await window.ClubHubPersonProfiles.refresh();}
+  catch(err){if(current())alert(err.message||err);}
+  finally{if(operation===__assignmentOperation){__assignmentBusy=false;if(current())populateAssignCoachControls();}}
 }
 async function unassignCoachFromTeam(userId,teamId){
   if(!isAdmin()||!CLOUD_MODE)return;
@@ -7299,6 +7337,9 @@ for(const id of ['inbox-subject','inbox-message-body'])document.getElementById(i
 window.addEventListener('clubhub-contacts-clear',()=>{clearInboxContext();__inboxIdentity='';__inboxCloud=null;});
 document.getElementById('send-inbox-message')?.addEventListener('click',sendInboxMessage);
 document.getElementById('refresh-club-coaches')?.addEventListener('click',()=>refreshClubCoaches(false));
+window.addEventListener('clubhub-contacts-clear',clearAdminDirectoryContext);
+document.getElementById('retry-assignment-accounts')?.addEventListener('click',()=>refreshAdminAccessManagement(true));
+for(const id of ['assign-coach-person','assign-coach-team'])document.getElementById(id)?.addEventListener('change',populateAssignCoachControls);
 document.getElementById('refresh-coach-club-results')?.addEventListener('click',()=>refreshCoachClubResults(false));
 document.getElementById('assign-coach-button')?.addEventListener('click',assignCoachToTeam);
 document.getElementById('admin-mode-club')?.addEventListener('click',()=>setAdminUiMode('club'));
@@ -7468,7 +7509,7 @@ window.addEventListener('clubhub-account-cleared',()=>{
   __parentPlayerLinks=[];__availabilityRows=[];__availabilityFixture='';__availabilityTeamId='';__availabilityUserId='';__availabilityLoadStatus='idle';++__availabilityLoadVersion;
   __matchAttendanceRows=[];__matchNoteLoaded=false;__matchAttendanceLoaded=false;__matchdayNoteStamp='';
   clearInboxContext();__inboxIdentity='';__inboxCloud=null;
-  __adminOverviewRows=[];__adminCoachRows=[];__adminAccessRows=[];__clubResultsRows=[];__clubFixtureCards=[];
+  clearAdminDirectoryContext();__adminOverviewRows=[];__clubResultsRows=[];__clubFixtureCards=[];
   clearHistoryReadContext();clearComplianceContext();__complianceIdentity='';__complianceCloud=null;__appearanceStats=[];__appearanceStamp=0;__matchEntryChoices=[];__matchEntryChoiceContext='';__clubCoachStamp=0;++__staffDirectoryLoad;++__accessDirectoryLoad;++__adminHomeLoadVersion;
   __staffRequestRows=[];__staffRequestSelected=null;__staffRequestIdentity='';__staffRequestCloud=null;++__staffRequestVersion;__staffRequestBusy=false;
   for(const id of ['parent-home-family-list','parent-family-linked-list','parent-home-match-info','parent-home-training','team-members-list','parent-link-player-list','parent-request-player-list','coach-availability-summary','match-attendance-list','coach-note-readonly','matchday-dashboard-note-readonly','detail-before-match-note','inbox-thread','inbox-contacts','member-contacts-list','member-contacts-self','coach-requests-list','staff-request-review-panel','coach-document-table','coach-onboarding-content','player-onboarding-content','admin-access-list','club-results-list','tournament-squad-list','reviewer-retained-thread','reviewer-dispute-list','safeguarding-export-audit','season-archive-body','season-archive-title','season-history-summary','audit-history-list','detail-goals-inputs','detail-assists-inputs','detail-award-fields','detail-booking-inputs','match-detail-summary','match-report-outcome','parent-request-review-parent','parent-request-review-email','parent-request-review-child','parent-link-title','app-confirm-body','app-confirm-detail','club-coaches-list','access-summary','cloud-account-controls','club-match-summary-body','tactics-bench','matchday-squad-options','matchday-dashboard-squad','matchday-dashboard-formation','matchday-dashboard-alert','match-entry-choices','season-player-stats-body','top-scorers','award-leaders','concern-result','compliance-status','club-cancel-status']){const el=document.getElementById(id);if(el){el.replaceChildren();delete el.__pitchkindMarkup;}}

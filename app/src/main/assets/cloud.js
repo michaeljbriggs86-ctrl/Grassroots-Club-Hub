@@ -977,7 +977,7 @@
   async function listClubCoaches(){
     if(role()!=='admin')return [];
     const data=await rpc('list_club_coaches',{});
-    return Array.isArray(data)?data:[];
+    if(!Array.isArray(data))throw new Error('Coaching staff unavailable');return data;
   }
   // Several coaching teams for one person (draft 012): list the teams I am assigned to and switch the one I am working on.
   async function listMyCoachTeams(strict=false){
