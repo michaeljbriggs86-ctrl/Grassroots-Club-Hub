@@ -3360,17 +3360,17 @@ function renderUniversalClubConfiguration(){
   document.getElementById('rules-procedures-settings')?.classList.toggle('hidden',providerType()!=='selkent');
   const clubWide=isClubOverviewMode(),select=document.getElementById('club-rule-age'),field=document.getElementById('club-rule-age-field');
   field?.classList.toggle('hidden',!clubWide);
+  const ages=clubWide?[...new Set((window.ClubHubCloud?.visibleTeamList?.()||[]).map(t=>Number(String(t.ageGroup||'').replace(/\D/g,''))).filter(Boolean))].sort((a,b)=>a-b):[];
   const intro=document.getElementById('rules-procedures-intro');
-  if(intro)intro.textContent=clubWide?'Club-wide Selkent procedures are below. Choose an age group to see its playing format and limits.':"Team settings below are for your club. Selkent's official match card and fixture updates are completed on the league system.";
+  if(intro)intro.textContent=clubWide?(ages.length?'Club-wide Selkent procedures are below. Choose an age group to see its playing format and limits.':'Club-wide Selkent procedures are below. No age groups are currently available in this view.'):"Team settings below are for your club. Selkent's official match card and fixture updates are completed on the league system.";
   if(clubWide&&select){
     const previous=select.value;
-    const ages=[...new Set((window.ClubHubCloud?.visibleTeamList?.()||[]).map(t=>Number(String(t.ageGroup||'').replace(/\D/g,''))).filter(Boolean))].sort((a,b)=>a-b);
-    select.innerHTML='<option value="">Choose age group</option>'+ages.map(a=>`<option value="${a}">Under ${a}s</option>`).join('');
+    select.innerHTML=`<option value="">${ages.length?'Choose age group':'No age groups available'}</option>`+ages.map(a=>`<option value="${a}">Under ${a}s</option>`).join('');
     select.value=ages.includes(Number(previous))&&previous?previous:'';
   }
   const age=clubWide?Number(select?.value||0):ageGroupNumber();
   document.getElementById('selkent-mini-playing-time')?.classList.toggle('hidden',age<8||age>11);
-  if(clubWide&&!age){rulesEl.innerHTML='<p class="helper">Choose an age group above to see the relevant match format and limits.</p>';return;}
+  if(clubWide&&!age){rulesEl.innerHTML=ages.length?'<p class="helper">Choose an age group above to see the relevant match format and limits.</p>':'<p class="helper">Age-specific match formats and limits are unavailable in this view. General procedures remain below.</p>';return;}
   const r=competitionRuleForAge(age);if(!r){rulesEl.innerHTML='<p class="helper">No age-specific matchday rule is configured for this team yet.</p>';return;}
   const resultsText=age<=11?'Scores and tables are limited to coaching staff and club admins; parents and players do not see them':r.results_published?'Published results are available for this age group':'Scores are not publicly published for this age group';
   const minimum=selkentMinimumPlayers(r.format);

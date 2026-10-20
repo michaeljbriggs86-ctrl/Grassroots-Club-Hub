@@ -5,7 +5,7 @@ const vm=require('node:vm');
 
 const source=fs.readFileSync(path.join(__dirname,'../app/src/main/assets/app.js'),'utf8');
 const body=source.slice(source.indexOf('function renderUniversalClubConfiguration(){'),source.indexOf('function applyMiniResultVisibility(){'));
-let clubWide=true,coachAge=9;
+let clubWide=true,coachAge=9,teams=[{ageGroup:'U9'},{ageGroup:'U15'}];
 const hidden=new Map();
 const node=id=>({
   classList:{toggle:(name,value)=>{if(name==='hidden')hidden.set(id,value);}},
@@ -20,7 +20,7 @@ const rules={
 };
 const context={
   document:{getElementById:id=>nodes[id]},
-  window:{ClubHubCloud:{visibleTeamList:()=>[{ageGroup:'U9'},{ageGroup:'U15'}]}},
+  window:{ClubHubCloud:{visibleTeamList:()=>teams}},
   isClubOverviewMode:()=>clubWide,providerType:()=> 'selkent',ageGroupNumber:()=>coachAge,
   competitionRuleForAge:age=>rules[age]||null,selkentMinimumPlayers:()=>null,esc:s=>String(s)
 };
@@ -34,6 +34,18 @@ assert.equal(select.value,'15','chosen age survives a page refresh');
 assert.match(nodes['universal-config-rules'].innerHTML,/11v11/);
 assert.doesNotMatch(nodes['universal-config-rules'].innerHTML,/5v5/);
 assert.equal(hidden.get('selkent-mini-playing-time'),true);
+teams=[];context.renderUniversalClubConfiguration();
+assert.equal(select.value,'','an unavailable age is not silently substituted');
+assert.match(select.innerHTML,/No age groups available/);
+assert.doesNotMatch(select.innerHTML,/Choose age group/);
+assert.match(nodes['rules-procedures-intro'].textContent,/No age groups are currently available in this view/);
+assert.match(nodes['universal-config-rules'].innerHTML,/General procedures remain below/);
+assert.doesNotMatch(nodes['universal-config-rules'].innerHTML,/Choose|No teams|failed|error/i,'empty view makes no claim about the loader or whole club');
+teams=[{ageGroup:'U9'},{ageGroup:'U15'}];context.renderUniversalClubConfiguration();
+assert.match(select.innerHTML,/Choose age group/);
+assert.match(nodes['universal-config-rules'].innerHTML,/Choose an age group/);
+assert.doesNotMatch(nodes['rules-procedures-intro'].textContent,/No age groups/);
+teams=[];
 clubWide=false;context.renderUniversalClubConfiguration();
 assert.equal(hidden.get('club-rule-age-field'),true,'Coach uses the assigned team age');
 assert.match(nodes['universal-config-rules'].innerHTML,/5v5/);
