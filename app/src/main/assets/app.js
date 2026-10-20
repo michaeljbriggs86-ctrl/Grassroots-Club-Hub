@@ -5753,19 +5753,25 @@ async function refreshClubCoaches(quiet=false){
   }catch(err){if(current())list.innerHTML='<div class="empty-state compact-empty">Coaching staff are temporarily unavailable.</div>';}
 }
 let __adminAccessRows=[];
+let __adminAccessState='idle';
 function accessRoleLabel(role){return role==='club_admin'?'Club Admin':role==='assistant_coach'?'Assistant Coach':role==='coach'?'Coach':role==='player'?'Player':role==='pending_parent'?'Parent · pending':'Parent';}
 function renderAdminAccessManagement(){
   const list=document.getElementById('admin-access-list'),stats=document.getElementById('admin-access-stats'),filter=document.getElementById('admin-access-filter');if(!list)return;
+  if(__adminAccessState==='error'){
+    if(stats)stats.textContent='Access data unavailable';
+    list.innerHTML='<div class="empty-state compact-empty" role="status">Club access is temporarily unavailable. Use Refresh access to try again.</div>';
+    return;
+  }
   const mode=filter?.value||'all',rows=__adminAccessRows.filter(r=>mode==='all'||(mode==='staff'?['coach','assistant_coach'].includes(r.role):mode==='parent'?r.role==='parent':r.role===mode));
   const counts={admins:__adminAccessRows.filter(r=>r.role==='club_admin').length,staff:__adminAccessRows.filter(r=>['coach','assistant_coach'].includes(r.role)||(r.role==='club_admin'&&r.coach_team_id)).length,parents:__adminAccessRows.filter(r=>r.role==='parent').length,players:__adminAccessRows.filter(r=>r.role==='player').length,pending:__adminAccessRows.filter(r=>r.role==='pending_parent').length};
   if(stats)stats.innerHTML=`<span class="admin-access-stat">${plural(counts.admins,'Admin')}</span><span class="admin-access-stat">${counts.staff} coaching staff</span><span class="admin-access-stat">${plural(counts.parents,'parent')}</span><span class="admin-access-stat">${plural(counts.players,'player')}</span>${counts.pending?`<span class="admin-access-stat">${counts.pending} pending</span>`:''}`;
   list.innerHTML=rows.map(r=>{const dual=r.role==='club_admin'&&r.coach_team_id,adminBase=r.role==='club_admin'?adminTitleLabel(r.club_title):'',role=dual?adminBase+' · Coach':(r.role==='club_admin'?adminBase:accessRoleLabel(r.role)),team=(r.age_group&&r.team_name)?`U${r.age_group} ${r.team_name}`:(r.role==='club_admin'?'Club-wide':'Team not assigned');return personNameButton(r.full_name||role,r.user_id,'access',r.team_id||'',role+' · '+team);}).join('')||'<div class="empty-state compact-empty">No accounts match this filter.</div>';
 }
 async function refreshAdminAccessManagement(quiet=false){
-  if(!CLOUD_MODE||!isAdmin())return;const list=document.getElementById('admin-access-list');if(!list)return;if(!quiet)list.innerHTML='<div class="empty-state compact-empty">Loading club access…</div>';
+  if(!CLOUD_MODE||!isAdmin())return;const list=document.getElementById('admin-access-list');if(!list)return;if(!quiet){__adminAccessState='loading';list.innerHTML='<div class="empty-state compact-empty">Loading club access…</div>';}
   const key=staffRequestContext(),cloud=window.ClubHubCloud;if(!key)return;
   const version=++__accessDirectoryLoad,current=()=>key===staffRequestContext()&&cloud===window.ClubHubCloud&&version===__accessDirectoryLoad;
-  try{const rows=await cloud.listClubAccessAccounts();if(!current())return;__adminAccessRows=rows;renderAdminAccessManagement();refreshCoachRequests();}catch(err){if(current()){__adminAccessRows=[];list.innerHTML='<div class="empty-state compact-empty">Club access is temporarily unavailable.</div>';}}
+  try{const rows=await cloud.listClubAccessAccounts();if(!current())return;__adminAccessRows=rows;__adminAccessState='loaded';renderAdminAccessManagement();refreshCoachRequests();}catch(err){if(current()){__adminAccessRows=[];__adminAccessState='error';renderAdminAccessManagement();}}
 }
 
 function populateAssignCoachControls(){
