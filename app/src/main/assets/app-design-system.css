@@ -2620,3 +2620,6 @@ html body .admin-onboarding-options .admin-onboarding-choice{
   .mobile-primary-nav.has-onboarding-tab{grid-template-columns:repeat(5,minmax(0,1fr))}
   .mobile-primary-nav.has-onboarding-tab .mobile-primary-item{font-size:clamp(.65rem,2.5vw,.75rem)}
 }
+
+/* A1 inbox: make the guarded Send state visible without changing other roles/actions. */
+#view-inbox #send-inbox-message:disabled{opacity:.5;cursor:not-allowed}

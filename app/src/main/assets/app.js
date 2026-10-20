@@ -6324,6 +6324,44 @@ window.ClubHubPersonProfiles?.configure({
 document.getElementById('person-profile-body')?.addEventListener('submit',event=>{const form=event.target.closest('.contact-details-form');if(form){event.preventDefault();saveContactDetailsForm(form);}});
 
 let __inboxStamp=0,__inboxMessages=[],__inboxContacts=[],__inboxSelected='';
+let __inboxIdentity='',__inboxCloud=null,__inboxLoad=0,__inboxReadState='idle',__inboxDraftBinding=null,__inboxSending=false,__inboxContextVersion=0;
+function clearInboxContext(){
+  ++__inboxContextVersion;++__inboxLoad;__inboxStamp=0;__inboxMessages=[];__inboxContacts=[];__inboxSelected='';__inboxReadState='idle';__inboxDraftBinding=null;__inboxSending=false;
+  for(const id of ['inbox-message-body','inbox-subject']){const el=document.getElementById(id);if(el)el.value='';}
+  for(const id of ['inbox-thread','inbox-compose-hint','inbox-contact-select']){const el=document.getElementById(id);if(el)el.innerHTML='';}
+  const btn=document.getElementById('send-inbox-message');if(btn){btn.disabled=true;btn.textContent='Send';}
+  updateInboxBadges(0);
+}
+function syncInboxContext(){
+  const identity=personProfileContextKey(),cloud=window.ClubHubCloud;
+  if(identity!==__inboxIdentity||cloud!==__inboxCloud){clearInboxContext();__inboxIdentity=identity;__inboxCloud=cloud;}
+  return !!identity;
+}
+function inboxHasDraft(){return ['inbox-subject','inbox-message-body'].some(id=>!!document.getElementById(id)?.value);}
+function inboxRecipientIds(value){
+  if(value.startsWith('group:')){
+    const allowed=(isAdmin()&&isClubOverviewMode()&&['group:all','group:coaches','group:parents'].includes(value))||(['coach','assistant_coach'].includes(currentRole)&&value==='group:parents');
+    return allowed?[...new Set(inboxGroupRecipients(value))].sort():[];
+  }
+  return __inboxContacts.some(c=>c.user_id===value)?[value]:[];
+}
+function rememberInboxDraft(){
+  if(!inboxHasDraft()){__inboxDraftBinding=null;return;}
+  if(!__inboxDraftBinding)__inboxDraftBinding={selected:__inboxSelected,recipients:inboxRecipientIds(__inboxSelected).join('|')};
+}
+function inboxCanSend(){
+  const ids=inboxRecipientIds(__inboxSelected),binding=__inboxDraftBinding;
+  return !!__inboxIdentity&&__inboxReadState==='loaded'&&ids.length>0&&(!binding||(binding.selected===__inboxSelected&&binding.recipients===ids.join('|')));
+}
+function updateInboxComposer(){
+  const hint=document.getElementById('inbox-compose-hint'),btn=document.getElementById('send-inbox-message');
+  const valid=inboxCanSend();if(btn)btn.disabled=__inboxSending||!valid;
+  if(hint&&!valid)hint.textContent=__inboxReadState!=='loaded'?'Your draft is still here. Refresh contacts before sending.':inboxHasDraft()?'Your draft is still here. Choose an available recipient before sending.':'Choose an available recipient before sending.';
+}
+function selectInboxRecipient(value){
+  if(!syncInboxContext())return;
+  __inboxSelected=String(value||'');__inboxDraftBinding=null;rememberInboxDraft();renderInbox();
+}
 function inboxMyUserId(){return window.ClubHubCloud?.session?.user?.id||'';}
 function inboxOtherId(m){const me=inboxMyUserId();return m.sender_user_id===me?m.recipient_user_id:m.sender_user_id;}
 function inboxContactRoleLabel(c){
@@ -6344,7 +6382,7 @@ function inboxGroupRecipients(value){
 }
 function populateInboxContacts(){
   const sel=document.getElementById('inbox-contact-select');if(!sel)return;
-  const keep=__inboxSelected||sel.value,groups=[];
+  const keep=__inboxSelected||sel.value,groups=[];rememberInboxDraft();
   if(isAdmin()&&isClubOverviewMode()){
     if(__inboxContacts.length)groups.push('<option value="group:all">All club members</option>');
     if(__inboxContacts.some(c=>['coach','assistant_coach'].includes(c.role)))groups.push('<option value="group:coaches">All coaching staff</option>');
@@ -6354,18 +6392,23 @@ function populateInboxContacts(){
   }
   const individuals=__inboxContacts.map(c=>`<option value="${c.user_id}">${esc(inboxContactLabel(c))}</option>`);
   sel.innerHTML=[...groups,...individuals].join('')||'<option value="">No contacts available</option>';
-  const valid=__inboxContacts.some(c=>c.user_id===keep)||keep.startsWith('group:');
-  if(valid)__inboxSelected=keep;
+  const valid=inboxRecipientIds(keep).length>0;
+  if(valid||inboxHasDraft())__inboxSelected=keep;
   else{
-    const unreadContact=__inboxMessages.find(m=>!m.read_at&&m.recipient_user_id===inboxMyUserId());
+    const unreadContact=__inboxMessages.find(m=>!m.read_at&&m.recipient_user_id===inboxMyUserId()&&inboxRecipientIds(inboxOtherId(m)).length);
     __inboxSelected=unreadContact?inboxOtherId(unreadContact):(__inboxContacts[0]?.user_id||'');
   }
-  sel.value=__inboxSelected;
+  const binding=__inboxDraftBinding,changed=!!binding&&(binding.selected!==__inboxSelected||binding.recipients!==inboxRecipientIds(__inboxSelected).join('|'));
+  if((!valid||changed)&&inboxHasDraft()){
+    sel.innerHTML='<option value="">Recipient unavailable</option>'+sel.innerHTML;sel.value='';
+  }else sel.value=__inboxSelected;
+
 }
 function updateInboxBadges(count){
   ['club-inbox-badge','global-inbox-badge','mobile-inbox-badge'].forEach(id=>{const badge=document.getElementById(id);if(badge){badge.textContent=String(count);badge.classList.toggle('hidden',count===0);}});
 }
 function renderInbox(){
+  syncInboxContext();
   const box=document.getElementById('inbox-thread'),hint=document.getElementById('inbox-compose-hint');if(!box)return;
   populateInboxContacts();const me=inboxMyUserId();const unread=__inboxMessages.filter(m=>m.recipient_user_id===me&&!m.read_at).length;updateInboxBadges(unread);
   const selected=__inboxSelected;
@@ -6373,7 +6416,7 @@ function renderInbox(){
     const recipients=inboxGroupRecipients(selected),labels={'group:all':'all club members','group:coaches':'all coaching staff','group:parents':'all parents'};
     box.innerHTML=`<div class="empty-state compact-empty"><strong>Message ${labels[selected]||'group'}</strong>Each person receives a private copy.</div>`;
     if(hint)hint.textContent=`${recipients.length} recipient${recipients.length===1?'':'s'}`;
-    return;
+    updateInboxComposer();return;
   }
   const rows=__inboxMessages.filter(m=>inboxOtherId(m)===selected),contact=__inboxContacts.find(c=>c.user_id===selected);
   if(hint)hint.textContent=contact?`Conversation with ${inboxContactLabel(contact)}`:'Choose a conversation';
@@ -6382,41 +6425,52 @@ function renderInbox(){
   box.innerHTML=rows.map(m=>{const mine=m.sender_user_id===me,subj=String(m.subject||'').trim(),showSubject=!!subj&&subj!==lastSubject;if(subj)lastSubject=subj;return `<article class="inbox-message ${mine?'mine':'theirs'}">${mine?'':`<span class="inbox-avatar" aria-hidden="true">${esc(initials)}</span>`}<div class="inbox-bubble"><div class="inbox-message-meta"><strong>${mine?'You':esc(theirName)}</strong><span>${new Date(m.created_at).toLocaleString('en-GB',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})}</span></div>${showSubject?`<b class="inbox-message-subject">${esc(subj)}</b>`:''}<p>${esc(m.body).replace(/\n/g,'<br>')}</p>${mine?`<small>${m.read_at?'Read':'Sent'}</small>`:''}</div></article>`;}).join('')||'<div class="empty-state compact-empty">No messages in this conversation yet.</div>';
   box.scrollTop=box.scrollHeight;
   const ids=rows.filter(m=>m.recipient_user_id===me&&!m.read_at).map(m=>m.id);
-  if(ids.length)window.ClubHubCloud.markClubMessagesRead(ids).then(()=>{const stamp=new Date().toISOString();__inboxMessages.forEach(m=>{if(ids.includes(m.id))m.read_at=stamp;});updateInboxBadges(__inboxMessages.filter(m=>m.recipient_user_id===me&&!m.read_at).length);}).catch(()=>{});
+  const identity=__inboxIdentity,cloud=__inboxCloud,generation=__inboxLoad;
+  updateInboxComposer();
+  if(ids.length&&__inboxReadState==='loaded')cloud.markClubMessagesRead(ids).then(()=>{if(identity!==personProfileContextKey()||cloud!==window.ClubHubCloud||generation!==__inboxLoad)return;const stamp=new Date().toISOString();__inboxMessages.forEach(m=>{if(ids.includes(m.id))m.read_at=stamp;});updateInboxBadges(__inboxMessages.filter(m=>m.recipient_user_id===me&&!m.read_at).length);}).catch(()=>{});
 }
 async function refreshInbox(quiet=false){
   if(!CLOUD_MODE||!['admin','coach','assistant_coach','parent'].includes(currentRole))return;
   const box=document.getElementById('inbox-thread');if(!box)return;
-  if(quiet&&Date.now()-__inboxStamp<10000){renderInbox();return;}__inboxStamp=Date.now();
+  if(!syncInboxContext())return;
+  if(quiet&&__inboxReadState==='loaded'&&Date.now()-__inboxStamp<10000){renderInbox();return;}
+  rememberInboxDraft();const identity=__inboxIdentity,cloud=__inboxCloud,generation=++__inboxLoad;
+  const current=()=>generation===__inboxLoad&&identity===personProfileContextKey()&&cloud===window.ClubHubCloud;
+  __inboxReadState='loading';updateInboxComposer();
   if(!quiet)box.innerHTML='<div class="empty-state compact-empty">Loading messages…</div>';
   try{
-    const [contacts,messages]=await Promise.all([window.ClubHubCloud.listMessageContacts(),window.ClubHubCloud.listClubMessages()]);
+    const [contacts,messages]=await Promise.all([cloud.listMessageContacts(),cloud.listClubMessages()]);
+    if(!current())return;
     let visibleContacts=contacts||[];
     if(isAdminCoachMode()){
       const own=dualCoachTeam();
       visibleContacts=visibleContacts.filter(c=>c.role==='club_admin'||(c.role==='parent'&&own&&String(c.team_id||'')===String(own.id)));
     }
-    __inboxContacts=visibleContacts;__inboxMessages=messages||[];renderInbox();
+    __inboxContacts=visibleContacts;__inboxMessages=messages||[];__inboxReadState='loaded';__inboxStamp=Date.now();renderInbox();
     const help=document.getElementById('club-inbox-help');
     if(help)help.textContent=isAdmin()?'Message anyone in the club, individually or as private group copies.':['coach','assistant_coach'].includes(currentRole)?'Message Club Admin or parents on your team.':'Message Club Admin or your team coaching staff.';
-  }catch(err){box.innerHTML='<div class="empty-state compact-empty">Inbox is temporarily unavailable.<button type="button" class="secondary-button" data-inbox-retry>Retry</button></div>';}
+  }catch(err){if(!current())return;__inboxReadState='error';updateInboxComposer();box.innerHTML='<div class="empty-state compact-empty">Inbox is temporarily unavailable.<button type="button" class="secondary-button" data-inbox-retry>Retry</button></div>';}
 }
 function existingInboxSubject(recipient){const me=inboxMyUserId();const rows=__inboxMessages.filter(m=>((m.sender_user_id===me&&m.recipient_user_id===recipient)||(m.recipient_user_id===me&&m.sender_user_id===recipient))&&String(m.subject||'').trim());return rows.length?String(rows[rows.length-1].subject).trim():'';}
 function existingInboxThread(recipient){const me=inboxMyUserId();const rows=__inboxMessages.filter(m=>(m.sender_user_id===me&&m.recipient_user_id===recipient)||(m.recipient_user_id===me&&m.sender_user_id===recipient));return rows.length?rows[rows.length-1].thread_id:null;}
 async function sendInboxMessage(){
   if(!CLOUD_MODE||!['admin','coach','assistant_coach','parent'].includes(currentRole))return;
+  if(!syncInboxContext()||__inboxSending)return;rememberInboxDraft();if(!inboxCanSend()){updateInboxComposer();return;}
+  const identity=__inboxIdentity,cloud=__inboxCloud,contextVersion=__inboxContextVersion,current=()=>contextVersion===__inboxContextVersion&&identity===personProfileContextKey()&&cloud===window.ClubHubCloud;
   const body=document.getElementById('inbox-message-body')?.value?.trim()||'',subject=document.getElementById('inbox-subject')?.value?.trim()||'';if(!body)return toast('Write a message first');
-  const btn=document.getElementById('send-inbox-message');if(btn){btn.disabled=true;btn.textContent='Sending…';}
+  const draftBody=document.getElementById('inbox-message-body').value,draftSubject=document.getElementById('inbox-subject').value,selected=__inboxSelected;
+  __inboxSending=true;const btn=document.getElementById('send-inbox-message');if(btn){btn.disabled=true;btn.textContent='Sending…';}
   try{
-    const recipients=__inboxSelected.startsWith('group:')?inboxGroupRecipients(__inboxSelected):[__inboxSelected].filter(Boolean);
+    const recipients=inboxRecipientIds(selected);
     if(!recipients.length)throw new Error('Choose a recipient');
     // club_messages.subject is NOT NULL and send_club_message turns '' into NULL, so a blank subject reuses the conversation's last one, else "Message".
-    for(const id of recipients)await window.ClubHubCloud.sendClubMessage({recipientUserId:id,subject:subject||existingInboxSubject(id)||'Message',body,threadId:existingInboxThread(id)});
-    document.getElementById('inbox-message-body').value='';document.getElementById('inbox-subject').value='';
+    for(const id of recipients){if(!current())return;await cloud.sendClubMessage({recipientUserId:id,subject:subject||existingInboxSubject(id)||'Message',body,threadId:existingInboxThread(id)});}
+    if(!current())return;
+    if(selected===__inboxSelected&&document.getElementById('inbox-message-body').value===draftBody&&document.getElementById('inbox-subject').value===draftSubject){document.getElementById('inbox-message-body').value='';document.getElementById('inbox-subject').value='';__inboxDraftBinding=null;}
     toast(recipients.length>1?`Message sent to ${recipients.length} people`:'Message sent');await refreshInbox(false);
-  }catch(err){alert('Could not send message: '+(err.message||err));}finally{if(btn){btn.disabled=false;btn.textContent='Send';}}
+  }catch(err){if(current())alert('Could not send message: '+(err.message||err));}finally{if(current()){__inboxSending=false;if(btn)btn.textContent='Send';updateInboxComposer();}}
 }
-function openCoachInbox(userId){__inboxSelected=String(userId||'');__communicationsTab='inbox';navigate('inbox',false);setTimeout(()=>refreshInbox(false),0);}
+function openCoachInbox(userId){if(!syncInboxContext())return;__inboxSelected=String(userId||'');__inboxDraftBinding=null;rememberInboxDraft();__communicationsTab='inbox';navigate('inbox',false);setTimeout(()=>refreshInbox(false),0);}
 let __clubResultsStamp=0,__clubResultsRows=[],__clubResultsAge='all',__clubResultsCompetition='all',__clubResultsPage=0,__clubResultsWeekend='';const CLUB_RESULTS_PAGE_SIZE=6;
 function fullClubResultTeamName(team={}){
   const short=String(team.teamName||team.name||'').trim(),league=String(team.leagueName||'').trim(),club=String(clubSettings().display_name||'').trim();
@@ -7132,7 +7186,10 @@ document.getElementById('save-u11-safeguarding')?.addEventListener('click',saveU
 document.getElementById('export-u11-safeguarding')?.addEventListener('click',exportU11Safeguarding);
 document.getElementById('request-club-cancellation')?.addEventListener('click',requestClubCancellationUi);
 document.getElementById('cancel-club-cancellation')?.addEventListener('click',cancelClubCancellationUi);
-document.getElementById('inbox-contact-select')?.addEventListener('change',e=>{__inboxSelected=e.target.value;renderInbox();});
+document.getElementById('refresh-club-inbox')?.addEventListener('click',()=>refreshInbox(false));
+document.getElementById('inbox-contact-select')?.addEventListener('change',e=>selectInboxRecipient(e.target.value));
+for(const id of ['inbox-subject','inbox-message-body'])document.getElementById(id)?.addEventListener('input',()=>{if(syncInboxContext()){rememberInboxDraft();updateInboxComposer();}});
+window.addEventListener('clubhub-contacts-clear',()=>{clearInboxContext();__inboxIdentity='';__inboxCloud=null;});
 document.getElementById('send-inbox-message')?.addEventListener('click',sendInboxMessage);
 document.getElementById('refresh-club-coaches')?.addEventListener('click',()=>refreshClubCoaches(false));
 document.getElementById('refresh-coach-club-results')?.addEventListener('click',()=>refreshCoachClubResults(false));
@@ -7303,7 +7360,7 @@ window.addEventListener('clubhub-account-cleared',()=>{
   __teamParentLinks=[];__teamPlayerAccountLinks=[];__pendingParentRequests=[];__teamMembersContext='';__teamMembersStamp=0;++__teamMembersLoadVersion;
   __parentPlayerLinks=[];__availabilityRows=[];__availabilityFixture='';__availabilityTeamId='';__availabilityUserId='';__availabilityLoadStatus='idle';++__availabilityLoadVersion;
   __matchAttendanceRows=[];__matchNoteLoaded=false;__matchAttendanceLoaded=false;__matchdayNoteStamp='';
-  __inboxContacts=[];__inboxMessages=[];__inboxSelected='';__inboxStamp=0;
+  clearInboxContext();__inboxIdentity='';__inboxCloud=null;
   __adminOverviewRows=[];__adminCoachRows=[];__adminAccessRows=[];__clubResultsRows=[];__clubFixtureCards=[];
   __seasonArchives=[];__auditRows=[];__complianceStatus=null;__appearanceStats=[];__appearanceStamp=0;__matchEntryChoices=[];__matchEntryChoiceContext='';__clubCoachStamp=0;++__staffDirectoryLoad;++__accessDirectoryLoad;++__adminHomeLoadVersion;
   __staffRequestRows=[];__staffRequestSelected=null;__staffRequestIdentity='';__staffRequestCloud=null;++__staffRequestVersion;__staffRequestBusy=false;

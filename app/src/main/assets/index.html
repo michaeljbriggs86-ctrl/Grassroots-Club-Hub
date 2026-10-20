@@ -427,12 +427,12 @@
         <div id="communications-inbox-panel">
         <a class="page-link" href="?view=contacts" data-page-route="contacts" id="member-contacts-link" hidden><span><strong>Contact details</strong><small>Open your team contacts</small></span><span aria-hidden="true">›</span></a>
         <section class="panel inbox-card screen-lead-card"><div class="panel-heading"><div><p class="kicker">Conversations</p><h3>Messages</h3><p class="muted" id="club-inbox-help">Messages leave the active inbox 60 days after they are sent.</p></div></div>
-          <label class="inbox-conversation-label">Conversation<select id="inbox-contact-select"><option value="">Choose…</option></select></label>
-          <p class="helper inbox-hint-pill" id="inbox-compose-hint"></p>
+          <label class="inbox-conversation-label">Conversation<select id="inbox-contact-select" aria-describedby="inbox-compose-hint"><option value="">Choose…</option></select></label>
+          <p class="helper inbox-hint-pill" id="inbox-compose-hint" role="status"></p>
           <div class="inbox-thread" id="inbox-thread" aria-live="polite"></div>
           <div class="inbox-composer">
             <input id="inbox-subject" maxlength="120" placeholder="Subject (optional)" aria-label="Subject" />
-            <div class="inbox-compose-row"><textarea id="inbox-message-body" rows="2" maxlength="4000" placeholder="Write a message…" aria-label="Message"></textarea><button type="button" class="primary-button" id="send-inbox-message">Send</button></div>
+            <div class="inbox-compose-row"><textarea id="inbox-message-body" rows="2" maxlength="4000" placeholder="Write a message…" aria-label="Message"></textarea><button type="button" class="primary-button" id="send-inbox-message" aria-describedby="inbox-compose-hint" disabled>Send</button></div>
           </div>
         </section>
         <a class="page-link" href="?view=raise-concern" data-page-route="raise-concern" ><span><strong>Raise an issue</strong><small>Contact the club about a complaint or concern</small></span><span aria-hidden="true">›</span></a>

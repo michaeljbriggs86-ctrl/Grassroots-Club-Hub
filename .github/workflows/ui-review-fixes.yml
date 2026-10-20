@@ -92,6 +92,7 @@ jobs:
           node verification/browser/verify_tournament_action_commit.cjs "$RUNNER_TEMP/visual-review/node_modules/playwright" "$RUNNER_TEMP/visual-review-output/tournament-action-commit"
           node verification/browser/verify_account_context_isolation.cjs "$RUNNER_TEMP/visual-review/node_modules/playwright" "$RUNNER_TEMP/visual-review-output/account-context-isolation"
           node verification/browser/verify_admin_a1.cjs "$RUNNER_TEMP/visual-review/node_modules/playwright" "$RUNNER_TEMP/visual-review-output/admin-a1"
+          node verification/browser/verify_inbox_draft_safety.cjs "$RUNNER_TEMP/visual-review/node_modules/playwright" "$RUNNER_TEMP/visual-review-output/inbox-draft-safety"
           node verification/browser/verify_club_details.cjs "$RUNNER_TEMP/visual-review/node_modules/playwright" "$RUNNER_TEMP/visual-review-output/club-details"
       - name: Preserve visual review evidence
         if: always()
