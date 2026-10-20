@@ -96,6 +96,7 @@ jobs:
           node verification/browser/verify_inbox_draft_safety.cjs "$RUNNER_TEMP/visual-review/node_modules/playwright" "$RUNNER_TEMP/visual-review-output/inbox-draft-safety"
           node verification/browser/verify_admin_read_order.cjs "$RUNNER_TEMP/visual-review/node_modules/playwright" "$RUNNER_TEMP/visual-review-output/admin-read-order"
           node verification/browser/verify_qualification_read_recovery.cjs "$RUNNER_TEMP/visual-review/node_modules/playwright" "$RUNNER_TEMP/visual-review-output/qualification-read-recovery"
+          node verification/browser/verify_teams_notices_read_states.cjs "$RUNNER_TEMP/visual-review/node_modules/playwright" "$RUNNER_TEMP/visual-review-output/teams-notices-read-states"
           node verification/browser/verify_coach_invitation_draft.cjs "$RUNNER_TEMP/visual-review/node_modules/playwright" "$RUNNER_TEMP/visual-review-output/coach-invitation-draft"
           node verification/browser/verify_compliance_drafts.cjs "$RUNNER_TEMP/visual-review/node_modules/playwright" "$RUNNER_TEMP/visual-review-output/compliance-drafts"
           node verification/browser/verify_history_read_states.cjs "$RUNNER_TEMP/visual-review/node_modules/playwright" "$RUNNER_TEMP/visual-review-output/history-read-states"

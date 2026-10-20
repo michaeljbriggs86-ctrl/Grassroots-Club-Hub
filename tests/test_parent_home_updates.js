@@ -14,7 +14,9 @@ const ctx={CLOUD_MODE:true,currentRole:'parent',document:{getElementById:id=>nod
   isClubOverviewMode:()=>false,isAdmin:()=>false,renderNotificationCenter:()=>{},
   announcementAudienceLabel:()=> 'Team',esc:x=>String(x),window:{ClubHubCloud:{visibleTeamList:()=>[]}},Date};
 vm.createContext(ctx);
-vm.runInContext(app.slice(start,end),ctx);
+const contextStart=app.indexOf('let __appNotifications='),contextEnd=app.indexOf('function notificationRows(',contextStart);
+assert(contextStart>0&&contextEnd>contextStart);
+vm.runInContext(app.slice(contextStart,contextEnd)+app.slice(start,end),ctx);
 vm.runInContext(`__announcementRows=[
   {id:'one',title:'Training plan',body:'Bring boots',created_at:'2026-09-29T12:00:00Z',important:false,read_at:null},
   {id:'two',title:'Venue change',body:'New ground',created_at:'2026-09-30T12:00:00Z',important:true,read_at:null}

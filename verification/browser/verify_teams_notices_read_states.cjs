@@ -1,0 +1,64 @@
+// Built app/bootstrap/cloud and original permissions; synthetic HTTP responses only.
+const fs=require('node:fs'),assert=require('node:assert/strict');
+let harness=fs.readFileSync('verification/browser/verify_account_context_isolation.cjs','utf8');
+const boundary=" try{\n  for(const [initial,role] of [['coach-a','coach'],['admin-a','club_admin']]){";
+assert.equal(harness.split(boundary).length,2);harness=harness.slice(0,harness.indexOf(boundary));
+const dispatch='   const holdIndex=holds.findIndex(row=>row.match(call));';assert.equal(harness.split(dispatch).length,2);
+harness=harness.replace(dispatch,`   if(f.rpcOverride){const result=f.rpcOverride(call);if(result){body=result.body;status=result.status||200;}}
+   if(f.pausedReads?.has(call.name)){const gate=f.pausedReads.get(call.name);gate.markSeen();const override=await gate.promise;if(override){if('body'in override)body=override.body;if('status'in override)status=override.status;}}
+${dispatch}`);
+const scenarios=async function(){
+ function pause(f,name){let resolve,seen;const gate={promise:new Promise(r=>resolve=r),seen:new Promise(r=>seen=r),markSeen:()=>seen()};f.pausedReads??=new Map();f.pausedReads.set(name,gate);return{seen:gate.seen,release:override=>{if(f.pausedReads.get(name)===gate)f.pausedReads.delete(name);resolve(override);}};}
+ async function capture(p,selector,name,scale=100){
+  const region=p.locator(selector);if(scale===200)await region.evaluate(el=>{const sizes=[el,...el.querySelectorAll('*')].map(n=>({n,size:parseFloat(getComputedStyle(n).fontSize)}));for(const {n,size}of sizes){n.dataset.originalTestFont=n.style.fontSize;n.style.setProperty('font-size',size*2+'px','important');}});
+  const m=await region.evaluate(el=>({pageOverflow:document.documentElement.scrollWidth>innerWidth+1,localOverflow:el.scrollWidth>el.clientWidth+1,controls:[...el.querySelectorAll('button,input:not([type=checkbox]),select,textarea')].filter(n=>n.getClientRects().length).map(n=>({id:n.id,height:n.getBoundingClientRect().height,clipped:n.tagName==='BUTTON'&&n.scrollWidth>n.clientWidth+1}))}));
+  assert(!m.pageOverflow&&!m.localOverflow,name+' reflows');assert(m.controls.every(c=>c.height>=44&&!c.clipped),name+' controls remain usable: '+JSON.stringify(m.controls));measurements.push({name,scale,...m});await region.screenshot({path:path.join(out,name+'.png')});
+  if(scale===200)await region.evaluate(el=>{for(const n of [el,...el.querySelectorAll('*')]){n.style.fontSize=n.dataset.originalTestFont||'';delete n.dataset.originalTestFont;}});
+ }
+ try{
+  for(const theme of ['dark','light'])for(const [width,height]of [[320,844],[393,844],[844,393],[1440,1000]]){
+   console.log('Checking teams/notices',theme,width);
+   const f=await fixture({initial:'admin-a',role:'club_admin',theme,width});await f.ready();const p=f.page;await p.setViewportSize({width,height});
+   let overviewMode='loaded',staffMode='loaded',noticeMode='failed',noticeRows=[];
+   const coach={user_id:'fictional-coach-a',role:'coach',full_name:'Morgan Example',team_id:'fictional-u12-a',age_group:12,team_name:'Example Greens'};
+   f.rpcOverride=c=>c.name==='get_club_overview_for_me'?overviewMode==='failed'?{status:503,body:{message:'Fictional team outage'}}:overviewMode==='denied'?{status:403,body:{code:'42501',message:'Access denied'}}:overviewMode==='malformed'?{body:{data:null}}:{body:teams.map(t=>({team_id:t.id,state:projectedState(f.actors['admin-a'],t.id)}))}:c.name==='list_club_coaches'?staffMode==='failed'?{status:503,body:{message:'Fictional staff outage'}}:{body:[coach]}:c.name==='list_announcements_for_me'?noticeMode==='failed'?{status:503,body:{message:'Fictional notice outage'}}:noticeMode==='denied'?{status:403,body:{code:'42501',message:'Access denied'}}:noticeMode==='malformed'?{body:{data:null}}:{body:noticeRows}:null;
+   const first=pause(f,'get_club_overview_for_me');await f.go('?view=club-teams');await f.ready();await first.seen;
+   const teamStatus=p.locator('#admin-team-status'),grid=p.locator('#admin-team-grid'),teamRefresh=p.locator('#admin-team-refresh'),age=p.locator('#admin-home-age-select'),search=p.locator('#admin-home-team-search');
+   await teamStatus.getByText('Loading teams…',{exact:true}).waitFor();assert(await teamRefresh.isDisabled());assert.equal(await p.locator('#admin-home-teams').getAttribute('aria-busy'),'true');
+   first.release({status:503,body:{message:'Fictional first outage'}});await teamStatus.getByText('Teams are unavailable. Refresh teams to try again.',{exact:true}).waitFor();assert.equal(await grid.locator('[data-admin-open-team]').count(),0);
+   staffMode='failed';await teamRefresh.click();await teamStatus.getByText(/Staff-name search is incomplete/).waitFor();await search.fill('Morgan');assert.match(await grid.innerText(),/No matches in available team details/);assert.match(await teamStatus.innerText(),/Staff-name search is incomplete/);
+   await search.fill('Greens');assert.equal(await grid.locator('[data-admin-open-team]').count(),1);await search.fill('Morgan');staffMode='loaded';await teamRefresh.click();await teamStatus.getByText('Teams loaded.',{exact:true}).waitFor();assert.equal(await grid.locator('[data-admin-open-team]').count(),1);
+   await search.fill('');await age.selectOption('U12');assert.equal(await grid.locator('[data-admin-open-team]').count(),2);
+   const row=grid.locator('[data-admin-open-team="fictional-u12-a"]');await row.focus();await p.evaluate(()=>refreshAdminClubOverview(false));assert(await row.evaluate(n=>document.activeElement===n&&n.isConnected),'unchanged team row keeps focus');
+   overviewMode='failed';await teamRefresh.click();await teamStatus.getByText(/could not be refreshed.*Previously loaded teams/).waitFor();assert.equal(await age.inputValue(),'U12');assert.equal(await grid.locator('[data-admin-open-team]').count(),2);assert(await p.locator('#admin-home-share').isDisabled(),'failed Home snapshot cannot share stale fixtures');
+   overviewMode='malformed';await teamRefresh.click();await teamStatus.getByText(/could not be refreshed.*Previously loaded teams/).waitFor();assert.equal(await age.inputValue(),'U12');
+   await capture(p,'#view-club-teams',`${theme}-${width}-teams-stale`);await capture(p,'#view-club-teams',`${theme}-${width}-teams-stale-200`,200);
+   overviewMode='loaded';await teamRefresh.press('Enter');await teamStatus.getByText('Teams loaded.',{exact:true}).waitFor();assert.equal(await age.inputValue(),'U12');await age.selectOption('');assert.equal(await grid.locator('[data-admin-open-team]').count(),4);
+   overviewMode='denied';await teamRefresh.click();await teamStatus.getByText('Teams are unavailable. Refresh teams to try again.',{exact:true}).waitFor();assert.equal(await grid.locator('[data-admin-open-team]').count(),0,'denied overview clears retained rows');overviewMode='loaded';await teamRefresh.click();await teamStatus.getByText('Teams loaded.',{exact:true}).waitFor();
+   // Deep linking to notices must not load/select an Inbox conversation.
+   const pending=pause(f,'list_announcements_for_me');await f.go('?view=inbox&messages=notices');await f.ready();await pending.seen;
+   const status=p.locator('#admin-announcements-status'),list=p.locator('#admin-announcements-list'),refresh=p.locator('#admin-announcements-refresh');
+   await status.getByText('Loading club notices…',{exact:true}).waitFor();assert(await refresh.isDisabled());assert.equal(await list.getAttribute('aria-busy'),'true');assert.doesNotMatch(await list.innerText(),/No club announcements/);
+   pending.release();await status.getByText('Club notices are unavailable. Refresh notices to try again.',{exact:true}).waitFor();assert.doesNotMatch(await list.innerText(),/No club announcements/);
+   await p.locator('#announcement-title').fill('Fictional unsent draft');await p.locator('#announcement-audience').selectOption('team');await p.locator('#announcement-team').selectOption('fictional-u12-a');await p.locator('#announcement-body').fill('Unsent fictional paragraph\n\nSecond paragraph');await p.locator('#announcement-pinned').check();await p.locator('#announcement-important').check();
+   noticeMode='loaded';noticeRows=[{id:'fictional-notice-a',title:'Fictional <notice>',body:'Only synthetic content',audience:'whole_club',created_at:'2026-10-20T10:00:00Z',read_count:1,target_count:3}];
+   await p.locator('#announcement-body').focus();await p.evaluate(()=>refreshAnnouncements(false));assert(await p.locator('#announcement-body').evaluate(n=>document.activeElement===n));assert.equal(await p.locator('#announcement-team').inputValue(),'fictional-u12-a');assert(await p.locator('#announcement-pinned').isChecked());assert(await p.locator('#announcement-important').isChecked());
+   const remove=list.locator('[data-delete-announcement="fictional-notice-a"]');await remove.focus();await p.evaluate(()=>refreshAnnouncements(false));assert(await remove.evaluate(n=>n.isConnected&&document.activeElement===n),'unchanged notice action remains focused');
+   noticeRows=[{...noticeRows[0],read_count:2}];await p.evaluate(()=>refreshAnnouncements(false));assert(await remove.evaluate(n=>document.activeElement===n),'changed row restores focus to same notice action');
+   noticeMode='failed';await refresh.click();await status.getByText(/could not be refreshed.*Previously loaded notices/).waitFor();assert.match(await list.innerText(),/Fictional <notice>/);assert.equal(await p.locator('#announcement-title').inputValue(),'Fictional unsent draft');assert.equal(await p.locator('#announcement-body').inputValue(),'Unsent fictional paragraph\n\nSecond paragraph');
+   await capture(p,'#communications-notices-panel',`${theme}-${width}-notices-stale`);await capture(p,'#communications-notices-panel',`${theme}-${width}-notices-stale-200`,200);
+   noticeMode='malformed';await refresh.click();await status.getByText(/could not be refreshed/).waitFor();assert.match(await list.innerText(),/Fictional <notice>/);
+   noticeMode='denied';await refresh.click();await status.getByText('Club notices are unavailable. Refresh notices to try again.',{exact:true}).waitFor();assert.equal(await list.innerText(),'','denied notice read clears retained rows');noticeMode='loaded';await refresh.click();await status.getByText('Club notices loaded.',{exact:true}).waitFor();
+   noticeMode='loaded';noticeRows=[];await remove.focus();await p.evaluate(()=>refreshAnnouncements(false));await p.waitForFunction(()=>document.activeElement?.id==='admin-announcements-title');assert.match(await list.innerText(),/No club announcements yet/);
+   const old=f.hold('old-notices',c=>c.name==='list_announcements_for_me');await p.evaluate(()=>{window.__oldNoticeRead=refreshAnnouncements(false);});await old;await p.evaluate(()=>refreshAnnouncements(false));f.release('old-notices',{body:[{id:'old-notice',title:'Obsolete notice',body:'Old response',audience:'whole_club'}]});await p.evaluate(()=>window.__oldNoticeRead);assert.doesNotMatch(await list.innerText(),/Obsolete notice/);
+   const mutations=f.calls.filter(c=>/^(create_announcement|delete_announcement|mark_announcement_read|mark_club_messages_read|send_club_message)$/.test(c.name));assert.deepEqual(mutations,[],'no notice/message/receipt writes');assert.equal(f.calls.filter(c=>c.name==='list_message_contacts').length,0,'direct notices view never opens a conversation');
+   if(theme==='dark'&&width===320){
+    const logout=f.hold('logout-cleanup',c=>c.path==='/auth/v1/logout');await p.evaluate(()=>ClubHubCloud.signOut());await logout;
+    assert.equal(await p.locator('#admin-announcements-list').innerText(),'');assert.equal(await p.locator('#admin-team-grid').innerText(),'');assert.equal(await p.locator('#announcement-body').inputValue(),'','logout clears the private notice draft');f.release('logout-cleanup');
+   }
+   cases.push({theme,width,height,teams:true,notices:true,noNoticeMessageReceiptWrites:true});await f.close();
+  }
+  assert.deepEqual(errors,[]);assert.deepEqual(externalRequests,[]);assert.deepEqual(externalWrites,[]);fs.writeFileSync(path.join(out,'checks.json'),JSON.stringify({browser:browser.version(),cases,measurements,pageErrors:errors,externalRequests,externalWrites},null,2));console.log('PASS teams/notices read states: '+cases.length+' built-app cases, local pending/partial/error/recovery, retained age/drafts/focus, malformed/empty/obsolete notices; zero notice/message/receipt writes or external requests');
+ }finally{for(const c of contexts)await c.close().catch(()=>{});await browser.close();await new Promise(resolve=>server.close(resolve));}
+};
+new Function('require','process',harness+'await ('+scenarios.toString()+')();\n}\nmain().catch(error=>{console.error(error);server.close();process.exitCode=1;});')(require,process);

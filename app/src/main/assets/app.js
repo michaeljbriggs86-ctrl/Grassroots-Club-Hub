@@ -3157,6 +3157,12 @@ async function renderMatchdayDashboard(){
 async function saveMatchdayDashboardNote(){if(!requireCoach())return;const key=matchdayFixtureNoteKey();if(!key)return toast('No fixture available');try{await window.ClubHubCloud.saveCoachMatchNote(key,document.getElementById('matchday-dashboard-note-input')?.value||'');toast('Matchday note saved');}catch(err){alert(err.message||err);}}
 
 let __announcementRows=[],__announcementStamp=0,__announcementLoadVersion=0,__announcementScopeKey='';
+let __announcementLoading=false,__announcementLoaded=false,__announcementError='';
+function syncAnnouncementReadContext(){
+  const scope=syncNotificationContext();
+  if(__announcementScopeKey!==scope){__announcementScopeKey=scope;__announcementRows=[];__announcementStamp=0;++__announcementLoadVersion;__announcementLoading=false;__announcementLoaded=false;__announcementError='';}
+  return scope;
+}
 function announcementAudienceLabel(a={}){
   if(a.audience==='coaches')return 'Coaching staff';if(a.audience==='parents')return 'Parents';if(a.audience==='age_group')return `U${a.age_group||''}`;if(a.audience==='team'){const t=(window.ClubHubCloud?.visibleTeamList?.()||[]).find(x=>x.id===a.team_id);return t?`${t.ageGroup} ${t.teamName}`:'Team';}return 'Whole club';
 }
@@ -3167,21 +3173,37 @@ function populateAnnouncementTargets(){
   const audience=document.getElementById('announcement-audience')?.value||'whole_club';document.getElementById('announcement-age-wrap')?.classList.toggle('hidden',audience!=='age_group');document.getElementById('announcement-team-wrap')?.classList.toggle('hidden',audience!=='team');
 }
 function renderAnnouncements(){
+  syncAnnouncementReadContext();
   const panel=document.getElementById('home-club-notices'),list=document.getElementById('home-club-notices-list'),badge=document.getElementById('home-notices-unread');
   const active=__announcementRows.filter(a=>!a.expires_at||new Date(a.expires_at).getTime()>Date.now()),parent=CLOUD_MODE&&currentRole==='parent',visible=parent?[...active].sort((a,b)=>Number(!!b.pinned)-Number(!!a.pinned)||String(b.created_at||'').localeCompare(String(a.created_at||''))).slice(0,2):active.filter(a=>a.important).slice(0,4),unread=visible.filter(a=>!a.read_at).length;
   const heading=panel?.querySelector('h3');if(heading)heading.textContent=parent?'Team updates':'Club notices';
   if(panel)panel.classList.toggle('hidden',isClubOverviewMode()||(!parent&&!visible.length));if(badge){badge.textContent=`${unread} unread`;badge.classList.toggle('hidden',!unread);}
   if(list)list.innerHTML=visible.map(a=>`<article class="club-notice ${a.important?'important':''} ${a.pinned?'pinned':''} ${a.read_at?'read':'unread'}"><div class="club-notice-head"><div><strong>${esc(a.title)}</strong><span>${esc(announcementAudienceLabel(a))}${a.pinned?' · Pinned':''}${a.important?' · Important':''}</span></div>${!a.read_at?`<button type="button" class="text-button compact" data-read-announcement="${a.id}">Mark read</button>`:'<small>Read</small>'}</div><p>${esc(a.body).replace(/\n/g,'<br>')}</p><time>${new Date(a.created_at).toLocaleString('en-GB',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})}</time></article>`).join('')||(parent?'<p class="parent-family-message">No team updates yet. Fixture changes and coach notices will appear here.</p>':'');
-  const adminList=document.getElementById('admin-announcements-list');if(adminList&&isAdmin())adminList.innerHTML=__announcementRows.map(a=>{const expired=a.expires_at&&new Date(a.expires_at).getTime()<=Date.now();return `<article class="admin-announcement-row ${expired?'expired':''}"><div><strong>${esc(a.title)}</strong><span>${esc(announcementAudienceLabel(a))} · ${Number(a.read_count||0)}/${Number(a.target_count||0)} read${a.pinned?' · Pinned':''}${a.important?' · Important':''}${expired?' · Expired':''}</span><p>${esc(a.body)}</p></div><button type="button" class="inline-action delete" data-delete-announcement="${a.id}">Remove</button></article>`;}).join('')||'<div class="empty-state compact-empty">No club announcements yet.</div>';
+  const adminList=document.getElementById('admin-announcements-list');
+  const adminStatus=document.getElementById('admin-announcements-status'),refresh=document.getElementById('admin-announcements-refresh');
+  const canReview=isAdmin()&&isClubOverviewMode(),retained=__announcementLoaded;
+  if(adminStatus)adminStatus.textContent=canReview?(__announcementLoading?(retained?'Refreshing club notices… Previously loaded notices are shown.':'Loading club notices…'):__announcementError?(__announcementLoaded?'Club notices could not be refreshed. Previously loaded notices are shown. Refresh notices to try again.':'Club notices are unavailable. Refresh notices to try again.'):__announcementLoaded?'Club notices loaded.':''):'';
+  if(refresh)refresh.disabled=__announcementLoading||!canReview;
+  if(adminList){
+    adminList.setAttribute?.('aria-busy',String(canReview&&__announcementLoading));
+    const focused=document.activeElement,focusedId=adminList.contains?.(focused)?focused?.closest?.('[data-delete-announcement]')?.dataset.deleteAnnouncement:null;
+    const markup=canReview?__announcementRows.map(a=>{const expired=a.expires_at&&new Date(a.expires_at).getTime()<=Date.now();return `<article class="admin-announcement-row ${expired?'expired':''}"><div><strong>${esc(a.title)}</strong><span>${esc(announcementAudienceLabel(a))} · ${Number(a.read_count||0)}/${Number(a.target_count||0)} read${a.pinned?' · Pinned':''}${a.important?' · Important':''}${expired?' · Expired':''}</span><p>${esc(a.body)}</p></div><button type="button" class="inline-action delete" data-delete-announcement="${a.id}">Remove</button></article>`;}).join('')||(__announcementLoaded&&!__announcementError&&!__announcementLoading?'<div class="empty-state compact-empty">No club announcements yet.</div>':''):'';
+    setStableHtml(adminList,markup);
+    if(focusedId&&!focused?.isConnected){const replacement=[...(adminList.querySelectorAll?.('[data-delete-announcement]')||[])].find(button=>button.dataset.deleteAnnouncement===focusedId);(replacement||document.getElementById('admin-announcements-title'))?.focus();}
+  }
   renderNotificationCenter();
 }
 async function refreshAnnouncements(quiet=true){
-  if(!CLOUD_MODE||!['admin','coach','assistant_coach','parent'].includes(currentRole))return;
-  const teamId=String(window.ClubHubCloud?.currentTeam?.()?.id||''),uid=String(window.ClubHubCloud?.session?.user?.id||''),scope=uid+':'+teamId;
-  if(__announcementScopeKey!==scope){__announcementScopeKey=scope;__announcementRows=[];__announcementStamp=0;++__announcementLoadVersion;renderAnnouncements();}
-  if(quiet&&Date.now()-__announcementStamp<15000){renderAnnouncements();return;}__announcementStamp=Date.now();
-  const version=++__announcementLoadVersion;
-  try{const rows=await window.ClubHubCloud.listAnnouncements();if(version!==__announcementLoadVersion||teamId!==String(window.ClubHubCloud?.currentTeam?.()?.id||'')||uid!==String(window.ClubHubCloud?.session?.user?.id||''))return;__announcementRows=rows;renderAnnouncements();populateAnnouncementTargets();}catch(err){if(version!==__announcementLoadVersion)return;if(!quiet){const list=document.getElementById('home-club-notices-list');if(list)list.innerHTML='<div class="empty-state compact-empty">Club notices are temporarily unavailable.</div>';}}
+  const scope=syncAnnouncementReadContext();
+  if(!scope||!['admin','coach','assistant_coach','parent'].includes(currentRole)){renderAnnouncements();return;}
+  if(quiet&&(__announcementLoading||(__announcementLoaded&&!__announcementError&&Date.now()-__announcementStamp<15000))){renderAnnouncements();return;}
+  const cloud=window.ClubHubCloud,version=++__announcementLoadVersion;
+  const refresh=document.getElementById('admin-announcements-refresh'),restoreFocus=document.activeElement===refresh;
+  __announcementLoading=true;__announcementError='';renderAnnouncements();
+  const current=()=>version===__announcementLoadVersion&&cloud===window.ClubHubCloud&&scope===notificationContextKey();
+  try{const rows=await cloud.listAnnouncements();if(!current())return;if(!Array.isArray(rows)||rows.some(row=>!row||typeof row.id!=='string'||!row.id||typeof row.title!=='string'||typeof row.body!=='string'))throw Error('Invalid club notices');__announcementRows=rows;__announcementLoaded=true;__announcementStamp=Date.now();populateAnnouncementTargets();}
+  catch(error){if(current()){if([401,403].includes(Number(error?.status))||['42501','AUTH_CONTEXT_CHANGED'].includes(String(error?.code||error?.data?.code))){__announcementRows=[];__announcementLoaded=false;}__announcementError='Club notices unavailable';__announcementStamp=0;}}
+  finally{if(version===__announcementLoadVersion){__announcementLoading=false;renderAnnouncements();if(__announcementError&&!quiet){const list=document.getElementById('home-club-notices-list');if(list)list.innerHTML='<div class="empty-state compact-empty">Club notices are temporarily unavailable.</div>';}if(restoreFocus&&scope===notificationContextKey()&&currentView==='inbox'&&__communicationsTab==='notices'&&document.activeElement===document.body)refresh?.focus();}}
 }
 async function publishAnnouncement(){
   if(!isAdmin())return;
@@ -5497,6 +5519,7 @@ async function copyAdminWeekend(){
   catch(_){const raw=document.getElementById('admin-weekend-share-text');if(raw){raw.classList.remove('hidden');raw.focus();raw.select();}toast('Select and copy the text below, then paste into WhatsApp');}
 }
 let __adminHomeSnapshot=null,__adminHomeIdentity='',__adminHomeLoadVersion=0;
+let __adminTeamSnapshot=null,__adminTeamLoading=false,__adminTeamError='',__adminTeamAgeNotice='';
 function adminHomeText(id,text){const el=document.getElementById(id);if(el)el.textContent=String(text);}
 function buildAdminHomeSnapshot(rows,coaches,requests,messages,notices,feed,directory,now=new Date()){
   const dates=adminShareWeekendDates(now),all=buildAdminFixtureRows(rows,feed,true);
@@ -5511,20 +5534,30 @@ function buildAdminHomeSnapshot(rows,coaches,requests,messages,notices,feed,dire
     unread:messages===null?null:messages.filter(m=>m&&me&&m.recipient_user_id===me&&!m.read_at).length,
     notices:notices===null?null:notices.filter(n=>n&&(!n.expires_at||Date.parse(n.expires_at)>now.getTime())).length};
 }
-function clearAdminHome(resetSearch=false){
+function clearAdminHome(resetSearch=false,keepTeams=false){
   if(resetSearch)window.ClubHubKickoffUpdates?.resetAdmin?.();
   __adminHomeSnapshot=null;
   for(const id of ['admin-home-fixture-count','admin-home-ready-count','admin-home-pending-count'])adminHomeText(id,'—');
   adminHomeText('admin-team-count','');
-  for(const id of ['admin-home-weekend-list','admin-home-coverage-list','admin-team-grid']){const el=document.getElementById(id);if(el)setStableHtml(el,'');}
+  if(!keepTeams){__adminTeamSnapshot=null;__adminTeamLoading=false;__adminTeamError='';__adminTeamAgeNotice='';}
+  for(const id of ['admin-home-weekend-list','admin-home-coverage-list',...(!keepTeams?['admin-team-grid']:[])]){const el=document.getElementById(id);if(el)setStableHtml(el,'');}
   for(const id of ['admin-home-request-status','admin-home-coverage-status','admin-home-message-status','admin-home-notice-status'])adminHomeText(id,'Loading…');
   adminHomeText('admin-home-weekend-dates','');
-  const ages=document.getElementById('admin-home-age-select');if(ages){ages.innerHTML='<option value="">All age groups</option>';ages.value='';}
+  const ages=document.getElementById('admin-home-age-select');if(ages&&!keepTeams){ages.innerHTML='<option value="">All age groups</option>';ages.value='';}
   if(resetSearch){const search=document.getElementById('admin-home-team-search');if(search)search.value='';}
   const share=document.getElementById('admin-home-share');if(share)share.disabled=true;
+  renderAdminTeamReadState();
+}
+function renderAdminTeamReadState(){
+  const snap=__adminTeamSnapshot||__adminHomeSnapshot,valid=!!snap&&snap.identity===adminWeekendShareIdentity()&&isClubOverviewMode();
+  const partial=valid&&snap.uncovered===null?'Staff names are unavailable. Staff-name search is incomplete. Refresh teams to try again.':'';
+  adminHomeText('admin-team-status',[__adminTeamLoading?(valid?'Refreshing teams… Previously loaded teams are shown.':'Loading teams…'):__adminTeamError||(valid?'Teams loaded.':''),partial,__adminTeamAgeNotice].filter(Boolean).join(' '));
+  document.getElementById('admin-home-teams')?.setAttribute?.('aria-busy',String(__adminTeamLoading));
+  const button=document.getElementById('admin-team-refresh');if(button)button.disabled=__adminTeamLoading;
 }
 function renderAdminHomeTeams(){
-  const snap=__adminHomeSnapshot,grid=document.getElementById('admin-team-grid');if(!snap||!grid||snap.identity!==adminWeekendShareIdentity()||!isClubOverviewMode())return;
+  renderAdminTeamReadState();
+  const snap=__adminTeamSnapshot||__adminHomeSnapshot,grid=document.getElementById('admin-team-grid');if(!snap||!grid||snap.identity!==adminWeekendShareIdentity()||!isClubOverviewMode())return;
   const age=document.getElementById('admin-home-age-select')?.value||'';
   const query=String(document.getElementById('admin-home-team-search')?.value||'').trim().toLocaleLowerCase();
   const grouped=new Map();
@@ -5540,7 +5573,7 @@ function renderAdminHomeTeams(){
     const detail=[divAge&&teamAge&&divAge!==teamAge?'Division TBC':division,staffNames.length?staffNames.join(', '):snap.uncovered===null?'Staff information unavailable':'No staff assigned'].filter(Boolean).join(' · ');
     grouped.get(key).push(`<button type="button" class="admin-home-team" data-admin-open-team="${esc(r.team.id)}"><span><strong>${esc([r.team.ageGroup,r.team.teamName].filter(Boolean).join(' '))}</strong><small>${squad} in squad · ${esc(detail)}</small></span><span class="admin-home-team-size" aria-hidden="true">›</span></button>`);
   }
-  setStableHtml(grid,[...grouped].map(([key,items])=>`<section class="admin-home-team-group"><h4>${esc(key)}</h4>${items.join('')}</section>`).join('')||(snap.rows.length?'<p class="muted">No teams match. Try another name or age group.</p>':'<p class="muted">No club teams available yet.</p>'));
+  setStableHtml(grid,[...grouped].map(([key,items])=>`<section class="admin-home-team-group"><h4>${esc(key)}</h4>${items.join('')}</section>`).join('')||(snap.rows.length?(snap.uncovered===null?'<p class="muted">No matches in available team details. Staff-name search is incomplete.</p>':'<p class="muted">No teams match. Try another name or age group.</p>'):'<p class="muted">No club teams available yet.</p>'));
 }
 function renderAdminHome(snap){
   window.ClubHubKickoffUpdates?.setAdminWeekend?.(snap.dates);
@@ -5558,6 +5591,7 @@ function renderAdminHome(snap){
   const select=document.getElementById('admin-home-age-select');if(select){
     const previous=select.value,ages=[...new Set(snap.rows.map(r=>r.team.ageGroup||'Other'))].sort((a,b)=>(Number(String(a).replace(/\D/g,''))||999)-(Number(String(b).replace(/\D/g,''))||999));
     select.innerHTML='<option value="">All age groups</option>'+ages.map(age=>`<option value="${esc(age)}">${esc(age)}</option>`).join('');select.value=ages.includes(previous)?previous:'';
+    __adminTeamAgeNotice=previous&&!ages.includes(previous)?'The selected age group is no longer available. Showing all age groups.':'';
   }
   renderAdminHomeTeams();
 }
@@ -5573,11 +5607,12 @@ function openAdminHomeAction(action,teamId=''){
 }
 async function refreshAdminClubOverview(quiet=false){
   const panel=document.getElementById('admin-club-overview');if(!panel)return;
-  const show=CLOUD_MODE&&isAdmin()&&isClubOverviewMode();panel.classList.toggle('hidden',!show||__clubTab!=='overview');if(!show){window.ClubHubKickoffUpdates?.resetAdmin?.();return;}
+  const show=CLOUD_MODE&&isAdmin()&&isClubOverviewMode();panel.classList.toggle('hidden',!show||__clubTab!=='overview');if(!show){clearAdminHome(true);window.ClubHubKickoffUpdates?.resetAdmin?.();return;}
   const identity=adminWeekendShareIdentity();if(!identity)return;
   if(quiet&&identity===__adminHomeIdentity&&Date.now()-__adminOverviewStamp<15000)return;
   const changed=identity!==__adminHomeIdentity;__adminHomeIdentity=identity;__adminOverviewStamp=Date.now();
   if(changed)clearAdminHome(true);
+  __adminTeamLoading=true;__adminTeamError='';renderAdminTeamReadState();
   window.ClubHubKickoffUpdates?.renderAdmin?.();
   void window.ClubHubKickoffUpdates?.refreshAdmin?.(quiet);
   const version=++__adminHomeLoadVersion,cloud=window.ClubHubCloud;
@@ -5592,18 +5627,19 @@ async function refreshAdminClubOverview(quiet=false){
       safe(()=>window.ClubHubStaticSelkent?.loadDirectory?.(!quiet)||null)
     ]);
     if(!current())return;
-    const rows=results[0].status==='fulfilled'?results[0].value:null;
+    if(results[0].status==='rejected')throw results[0].reason;
+    const rows=results[0].value;
     if(!Array.isArray(rows)||rows.some(r=>!r?.team?.id))throw new Error('Club teams unavailable');
     const array=i=>results[i].status==='fulfilled'&&Array.isArray(results[i].value)?results[i].value:null;
     const rawFeed=results[5].status==='fulfilled'?results[5].value:null;
     const snap=buildAdminHomeSnapshot(rows,array(1),array(2),array(3),array(4),rawFeed,results[6].status==='fulfilled'?results[6].value:null);
     snap.identity=identity;snap.feedWarning=!rawFeed;
     if(rawFeed)__adminPublishedFeed=rawFeed;
-    __adminHomeSnapshot=snap;__adminOverviewRows=rows;if(array(1)!==null)__adminCoachRows=array(1);
+    __adminHomeSnapshot=snap;__adminTeamSnapshot=snap;__adminOverviewRows=rows;if(array(1)!==null)__adminCoachRows=array(1);
     renderAdminHome(snap);
     if(meta){meta.textContent=snap.feedWarning?'Latest league fixtures unavailable. Check saved details before sharing.':'Updated '+new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/London',hour:'2-digit',minute:'2-digit'}).format(new Date());meta.classList.remove('hidden');}
-  }catch(_){if(current()){clearAdminHome();adminHomeText('admin-overview-meta','Club home is unavailable. Tap Refresh to try again.');const grid=document.getElementById('admin-team-grid');if(grid)setStableHtml(grid,'<p class="muted">Teams unavailable · refresh to retry.</p>');for(const id of ['admin-home-request-status','admin-home-coverage-status','admin-home-message-status','admin-home-notice-status'])adminHomeText(id,'Unavailable · refresh to retry');}}
-  finally{if(version===__adminHomeLoadVersion&&button)button.disabled=false;}
+  }catch(error){if(current()){const denied=[401,403].includes(Number(error?.status))||['42501','AUTH_CONTEXT_CHANGED'].includes(String(error?.code||error?.data?.code));clearAdminHome(false,!denied);__adminTeamError=__adminTeamSnapshot?'Teams could not be refreshed. Previously loaded teams are shown. Refresh teams to try again.':'Teams are unavailable. Refresh teams to try again.';adminHomeText('admin-overview-meta','Club home is unavailable. Tap Refresh to try again.');const grid=document.getElementById('admin-team-grid');if(grid&&!__adminTeamSnapshot)setStableHtml(grid,'<p class="muted">Teams unavailable · refresh to retry.</p>');for(const id of ['admin-home-request-status','admin-home-coverage-status','admin-home-message-status','admin-home-notice-status'])adminHomeText(id,'Unavailable · refresh to retry');}}
+  finally{if(version===__adminHomeLoadVersion){if(!current())clearAdminHome(true);__adminTeamLoading=false;renderAdminTeamReadState();if(button)button.disabled=false;}}
 }
 
 let __teamMembersStamp=0;
@@ -7196,7 +7232,7 @@ document.getElementById('notification-dialog')?.addEventListener('keydown',event
   if(!first){event.preventDefault();dialog.focus();return;}
   if(!dialog.contains(active)||active===dialog||(!event.shiftKey&&active===last)||(event.shiftKey&&active===first)){event.preventDefault();(event.shiftKey?last:first).focus();}
 });
-window.addEventListener('clubhub-contacts-clear',()=>{__notificationScopeKey='';++__notificationLoadVersion;__appNotifications=[];__notificationStamp=0;__announcementRows=[];__announcementStamp=0;__announcementScopeKey='';++__announcementLoadVersion;__notificationLoading=false;__notificationReadBusy=new Set();__notificationBulkBusy=false;__notificationActionError='';__notificationError='';document.getElementById('notification-dialog')?.close();renderNotificationCenter();});
+window.addEventListener('clubhub-contacts-clear',()=>{__notificationScopeKey='';++__notificationLoadVersion;__appNotifications=[];__notificationStamp=0;__announcementRows=[];__announcementStamp=0;__announcementScopeKey='';++__announcementLoadVersion;__notificationLoading=false;__notificationReadBusy=new Set();__notificationBulkBusy=false;__notificationActionError='';__notificationError='';__announcementLoading=false;__announcementLoaded=false;__announcementError='';document.getElementById('notification-dialog')?.close();renderAnnouncements();});
 document.getElementById('mobile-notification-bell')?.addEventListener('click',()=>{closeMobileMore();openNotifications();});
 document.getElementById('communications-mark-all')?.addEventListener('click',markAllNotificationsRead);
 document.querySelectorAll('[data-communications-tab]').forEach(button=>button.addEventListener('click',()=>{setCommunicationsTab(button.dataset.communicationsTab);if(__communicationsTab==='inbox')refreshInbox(false);}));
@@ -7411,6 +7447,7 @@ document.getElementById('availability-player')?.addEventListener('change',()=>{i
 document.getElementById('coach-availability-summary')?.addEventListener('change',e=>{const select=e.target.closest('[data-coach-availability-player]');if(select)saveCoachAvailability(select);});
 document.getElementById('admin-access-filter')?.addEventListener('change',renderAdminAccessManagement);
 document.getElementById('announcement-audience')?.addEventListener('change',populateAnnouncementTargets);
+document.getElementById('admin-announcements-refresh')?.addEventListener('click',()=>{if(!__announcementLoading)refreshAnnouncements(false);});
 document.getElementById('announcement-send')?.addEventListener('click',publishAnnouncement);
 document.querySelectorAll('[data-club-tab]').forEach(b=>b.addEventListener('click',()=>setClubTab(b.dataset.clubTab)));
 document.getElementById('refresh-club-results')?.addEventListener('click',()=>refreshClubResults(false));

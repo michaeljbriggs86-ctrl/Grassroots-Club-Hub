@@ -509,7 +509,8 @@
   async function getClubOverview(){
     if(!canAdmin())return [];
     const data=await rpc('get_club_overview_for_me',{});
-    const rows=Array.isArray(data)?data:[];
+    if(!Array.isArray(data))throw new Error('Club teams could not be loaded. Try again.');
+    const rows=data;
     const byTeam=new Map(rows.map(row=>[row.team_id,row]));
     return visibleTeams.map(t=>{
       const row=byTeam.get(t.id)||{};
@@ -1169,7 +1170,7 @@
     const {data}=await request('/rest/v1/coach_match_notes?on_conflict=team_id,match_id',{method:'POST',body:payload,headers:{Prefer:'resolution=merge-duplicates,return=representation'}});
     return Array.isArray(data)?data[0]:data;
   }
-  async function listAnnouncements(){if(testModeActive())return [];const data=await rpc('list_announcements_for_me',{});return Array.isArray(data)?data:(Array.isArray(data?.data)?data.data:[]);}
+  async function listAnnouncements(){if(testModeActive())return [];const data=await rpc('list_announcements_for_me',{});if(Array.isArray(data))return data;if(Array.isArray(data?.data))return data.data;throw new Error('Club notices could not be loaded. Try again.');}
   async function createAnnouncement({title,body,audience='whole_club',ageGroup=null,teamId=null,pinned=false,important=false,expiresAt=null}={}){return await rpc('create_club_announcement',{p_title:String(title||'').trim(),p_body:String(body||'').trim(),p_audience:audience,p_age_group:ageGroup==null?null:Number(ageGroup),p_team_id:teamId||null,p_pinned:!!pinned,p_important:!!important,p_expires_at:expiresAt||null});}
   async function markAnnouncementRead(id){return await rpc('mark_announcement_read',{p_announcement_id:id});}
   async function deleteAnnouncement(id){return await rpc('delete_club_announcement',{p_announcement_id:id});}

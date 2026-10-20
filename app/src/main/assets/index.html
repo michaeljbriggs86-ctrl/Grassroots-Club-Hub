@@ -452,7 +452,9 @@
               <label class="checkbox-line"><input id="announcement-pinned" type="checkbox" /> Pin to top</label>
               <button type="button" class="primary-button" id="announcement-send">Publish notice</button>
             </div>
-            <div class="admin-announcements-list" id="admin-announcements-list"></div>
+            <div class="notification-toolbar"><h4 id="admin-announcements-title" tabindex="-1">Published notices</h4><button type="button" class="secondary-button" id="admin-announcements-refresh">Refresh notices</button></div>
+            <p id="admin-announcements-status" class="notification-status" role="status" aria-live="polite"></p>
+            <div class="admin-announcements-list" id="admin-announcements-list" aria-busy="false"></div>
           </section>
 
         </div>
@@ -797,10 +799,10 @@
         <div class="section-title-row"><div><p class="kicker">Club admin · People &amp; access</p><h2 id="club-teams-title" tabindex="-1">Club teams</h2></div></div>
         <p class="muted">Open a team to see its own workspace.</p>
         <section class="admin-home-directory" id="admin-home-teams">
-              <section class="panel admin-directory-filter"><h3>Find a team</h3><div class="admin-home-team-filters"><label>Search teams<input type="search" id="admin-home-team-search" placeholder="Team name or coaching staff" /></label><label>Age group<select id="admin-home-age-select"><option value="">All age groups</option></select></label></div></section>
+              <section class="panel admin-directory-filter"><h3>Find a team</h3><div class="admin-home-team-filters"><label>Search teams<input type="search" id="admin-home-team-search" placeholder="Team name or coaching staff" /></label><label>Age group<select id="admin-home-age-select"><option value="">All age groups</option></select></label></div><p id="admin-team-status" class="notification-status" role="status" aria-live="polite"></p></section>
               <div class="admin-team-grid admin-age-group-list" id="admin-team-grid"></div>
         </section>
-        <button type="button" class="secondary-button admin-directory-refresh" data-page-refresh="club-teams">Refresh teams</button>
+        <button type="button" class="secondary-button admin-directory-refresh" id="admin-team-refresh" data-page-refresh="club-teams">Refresh teams</button>
       </section>
       <section id="view-coach-documents" class="view linked-page" data-view="coach-documents" aria-labelledby="coach-documents-title">
         <a class="page-back secondary-button" href="?view=club-coaches" data-page-route="club-coaches">← Back to Staff</a>
