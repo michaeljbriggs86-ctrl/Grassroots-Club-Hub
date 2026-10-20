@@ -13,12 +13,14 @@ const scenarios=async function(){
  try{
   const parent={user_id:'fictional-parent-b',role:'parent',full_name:'Fictional Parent B',team_id:'fictional-u12-b',team_name:'Example Whites',age_group:12};
   const child='Fictional linked child';
+  const coach={user_id:'fictional-coach-a',role:'coach',full_name:'Fictional Coach A',team_id:'fictional-u12-a',team_name:'Example Greens',age_group:12};
   for(const theme of ['dark','light'])for(const [width,height]of [[320,740],[393,852],[844,390],[1440,1000]]){
    const f=await fixture({initial:'admin-a',role:'club_admin',width,theme});await f.ready();
-   await f.page.setViewportSize({width,height});let linkState='loaded',accessState='loaded';
+   await f.page.setViewportSize({width,height});let linkState='loaded',accessState='loaded',contactState='loaded',qualificationState='loaded';
    f.rpcOverride=call=>{
-    if(call.name==='list_club_access_accounts')return accessState==='error'?{status:503,body:{message:'Fictional access outage'}}:{body:[parent]};
-    if(call.name==='list_contact_directory')return{body:{self:{user_id:f.actors['admin-a'].user.id},contacts:[],can_manage:true}};
+    if(call.name==='list_club_access_accounts')return accessState==='error'?{status:503,body:{message:'Fictional access outage'}}:{body:[parent,coach]};
+    if(call.name==='list_contact_directory')return contactState==='failed'?{status:503,body:{message:'Fictional contact unavailable'}}:{body:{self:{user_id:f.actors['admin-a'].user.id},contacts:[{...parent,kind:'parent',email:'parent@example.invalid'},{...coach,kind:'staff',email:'coach@example.invalid'}],can_manage:true}};
+    if(call.name==='get_coach_qualifications')return qualificationState==='failed'?{status:503,body:{message:'Fictional qualifications unavailable'}}:{body:{records:[],revision:0}};
     if(call.name==='list_parent_player_links')return linkState==='failed'||linkState==='denied'?{status:linkState==='denied'?403:503,body:{message:'Fictional link unavailable'}}:{body:linkState==='empty'?[]:[
      {parent_user_id:parent.user_id,team_id:parent.team_id,player_name:child},
      {parent_user_id:parent.user_id,team_id:'fictional-u12-a',player_name:'Wrong team child'},
@@ -27,7 +29,7 @@ const scenarios=async function(){
    await f.go('?view=app-access');await f.ready();
    const select=f.page.locator('#admin-access-filter');await select.selectOption('parent');
    const opener=()=>f.page.getByRole('button',{name:/Fictional Parent B/});
-   await opener().click();await f.page.getByRole('heading',{name:'Fictional Parent B',exact:true}).waitFor();
+   await opener().click();await f.page.getByRole('heading',{name:'Fictional Parent B',exact:true,level:2}).waitFor();
    await f.page.getByText(child,{exact:true}).waitFor();
    assert.equal(f.calls.filter(c=>c.name==='list_parent_player_links').at(-1).args.p_team_id,parent.team_id);
    assert.equal(await f.page.evaluate(()=>ClubHubCloud.currentTeam().id),'fictional-u12-a');
@@ -38,14 +40,31 @@ const scenarios=async function(){
    await f.page.keyboard.press('Enter');await f.page.getByRole('heading',{name:'App access',exact:true}).waitFor();
    assert.equal(await select.inputValue(),'parent');
    for(const failure of ['failed','denied']){
-    linkState=failure;await opener().click();await f.page.getByText(/These details are unavailable/).waitFor();
-    assert.equal(await f.page.locator('#person-profile-body').innerText(),'');
+    linkState=failure;await opener().click();await f.page.getByText('Linked players could not be loaded. Retry person details to try again.',{exact:true}).waitFor();
+    assert.match(await f.page.locator('#person-profile-body').innerText(),/Parent/);
+    assert.doesNotMatch(await f.page.locator('#person-profile-body').innerText(),/No linked players available|Fictional linked child/);
     assert(await f.page.getByRole('button',{name:'Retry person details'}).isVisible());
     linkState='loaded';await f.page.getByRole('button',{name:'Retry person details'}).click();await f.page.getByText(child,{exact:true}).waitFor();
     await f.page.locator('#person-profile-back').click();await opener().waitFor();
    }
    linkState='empty';await opener().click();await f.page.getByText('No linked players available for this team.',{exact:true}).waitFor();
    await f.page.locator('#person-profile-back').click();await opener().waitFor();
+   // Contact and qualification failures retain only independent fresh sections.
+   await select.selectOption('staff');const coachOpener=f.page.getByRole('button',{name:/Fictional Coach A/});
+   contactState='failed';await coachOpener.click();await f.page.getByText('Contact details could not be loaded. Retry person details to try again.',{exact:true}).waitFor();
+   assert(await f.page.getByRole('heading',{name:'Coaching qualifications',exact:true}).isVisible());
+   assert.doesNotMatch(await f.page.locator('#person-profile-body').innerText(),/coach@example.invalid/);
+   const partialLayout=await f.page.locator('#view-person').evaluate(el=>({overflow:document.documentElement.scrollWidth>innerWidth+1,retryHeight:document.getElementById('person-profile-retry').getBoundingClientRect().height,text:el.innerText}));
+   assert(!partialLayout.overflow);assert(partialLayout.retryHeight>=44);measurements.push({width,height,theme,state:'contact-failure',...partialLayout});
+   await f.page.screenshot({path:path.join(out,`partial-${theme}-${width}.png`),fullPage:true});
+
+   contactState='loaded';qualificationState='failed';await f.page.getByRole('button',{name:'Retry person details'}).press('Enter');
+   await f.page.getByText('Qualification records could not be loaded. Retry person details or open the qualification record.',{exact:true}).waitFor();
+   assert.match(await f.page.locator('#person-profile-body').innerText(),/coach@example.invalid/);
+   qualificationState='loaded';await f.page.getByRole('button',{name:'Retry person details'}).press('Enter');
+   await f.page.getByRole('button',{name:'Manage qualifications',exact:true}).waitFor();
+   assert(!await f.page.locator('#person-profile-retry').isVisible());assert.equal(await f.page.evaluate(()=>document.activeElement.id),'person-profile-name');
+   await f.page.locator('#person-profile-back').click();await select.selectOption('parent');await opener().waitFor();
    // Actual read wrapper + rendered filter changes retain a genuine failure.
    accessState='error';await f.page.getByRole('button',{name:'Refresh access',exact:true}).click();
    await f.page.getByText(/Club access is temporarily unavailable/).waitFor();

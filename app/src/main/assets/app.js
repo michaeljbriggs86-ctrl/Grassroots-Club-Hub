@@ -6357,6 +6357,7 @@ async function resolveMemberProfile(target){
   if(!CLOUD_MODE||!uid||!target.id)return null;
   if(!admin&&target.source!=='self'&&!teamId)return null;
   let person=null,rows=[],contact=null,contactUnavailable=false,contactManage=false,request=null;
+  const unavailableSections=[];
   // Each source re-reads its authorised endpoint. A name button is never an access grant.
   if(target.source==='request'){
     if(!staff||!teamId)return null;
@@ -6390,7 +6391,10 @@ async function resolveMemberProfile(target){
   if(admin&&parent&&target.teamId)rows=rows.filter(r=>r.team_id===target.teamId);
   let html=`<section class="panel"><h3>${esc(accessRoleLabel(role))}</h3>${personTeamSummary(rows.filter(r=>r.user_id===person.user_id))?`<ul class="person-profile-teams">${personTeamSummary(rows.filter(r=>r.user_id===person.user_id))}</ul>`:'<p class="helper">'+(admin?'Club account':'Your team')+'</p>'}${staff&&person.access_method?`<p class="helper">Sign-in method: ${esc(person.access_method)}</p>`:''}</section>`;
   if(contact)html+=`<section class="panel"><h3>Contact details</h3>${memberContactDetails(contact,contactManage||own)}</section>`;
-  else if(['club_admin','coach','assistant_coach','parent'].includes(role))html+='<section class="panel"><h3>Contact details</h3><p class="helper">Contact details are unavailable. The club can populate these from its spreadsheet once the contact directory is enabled.</p></section>';
+  else if(['club_admin','coach','assistant_coach','parent'].includes(role)){
+    if(contactUnavailable)unavailableSections.push('Contact details');
+    html+=`<section class="panel"><h3>Contact details</h3><p class="helper">${contactUnavailable?'Contact details could not be loaded. Retry person details to try again.':'Contact details are unavailable.'}</p></section>`;
+  }
   let links=[];
   if(parent&&(staff||own)){
     // Use the subject's authorised team, never the Admin viewer's remembered
@@ -6399,12 +6403,19 @@ async function resolveMemberProfile(target){
     const scoped=linkTeamId&&(!admin||[...rows,contact].some(r=>r?.user_id===person.user_id&&r.team_id===linkTeamId));
     if(profileContext!==personProfileContextKey())return null;
     if(!scoped)throw Error('Profile unavailable');
-    links=await cloud.listParentPlayerLinks(person.user_id,linkTeamId);
-    if(profileContext!==personProfileContextKey())return null;
-    const names=[...new Set(links.filter(l=>l.parent_user_id===person.user_id&&l.team_id===linkTeamId).map(l=>l.player_name).filter(n=>typeof n==='string'))];
-    // The player resolver requires a loaded team workspace. In club overview,
-    // show the verified names as text rather than opening an unavailable page.
-    html+=`<section class="panel"><h3>Linked players for this team</h3>${names.length?`<ul class="person-profile-teams">${names.map(n=>`<li>${!isClubOverviewMode()&&linkTeamId===teamId&&playerForName(n)?`<button type="button" class="person-name-button" data-player-profile="${esc(n)}">${esc(n)}</button>`:esc(n)}</li>`).join('')}</ul>`:'<p class="helper">No linked players available for this team.</p>'}</section>`;
+    try{
+      links=await cloud.listParentPlayerLinks(person.user_id,linkTeamId);
+      if(profileContext!==personProfileContextKey())return null;
+      if(!Array.isArray(links))throw Error('Invalid player links');
+      const names=[...new Set(links.filter(l=>l?.parent_user_id===person.user_id&&l.team_id===linkTeamId).map(l=>l.player_name).filter(n=>typeof n==='string'&&n.trim()))];
+      // The player resolver requires a loaded team workspace. In club overview,
+      // show the verified names as text rather than opening an unavailable page.
+      html+=`<section class="panel"><h3>Linked players for this team</h3>${names.length?`<ul class="person-profile-teams">${names.map(n=>`<li>${!isClubOverviewMode()&&linkTeamId===teamId&&playerForName(n)?`<button type="button" class="person-name-button" data-player-profile="${esc(n)}">${esc(n)}</button>`:esc(n)}</li>`).join('')}</ul>`:'<p class="helper">No linked players available for this team.</p>'}</section>`;
+    }catch(_){
+      if(profileContext!==personProfileContextKey())return null;
+      unavailableSections.push('Linked players');
+      html+='<section class="panel"><h3>Linked players for this team</h3><p class="helper">Linked players could not be loaded. Retry person details to try again.</p></section>';
+    }
   }
   if(role==='player'&&own){const linked=await cloud.listPlayerAccountLinks(uid);const names=linked.filter(l=>l.user_id===uid&&(!teamId||l.team_id===teamId)).map(l=>l.player_name);html+=`<section class="panel"><h3>Player details</h3>${names.map(name=>`<button type="button" class="person-name-button" data-player-profile="${esc(name)}">${esc(name)}</button>`).join('')||'<p class="helper">No player link is available for this team.</p>'}</section>`;}
   // Qualifications are private to Club Admin and the staff member; parents see contact details only.
@@ -6415,7 +6426,7 @@ async function resolveMemberProfile(target){
       const data=await cloud.getCoachQualifications(person.user_id);
       if(!api||!Array.isArray(data.records))throw Error('Unavailable');data.records.forEach(r=>api.validate(r));
       html+=`<section class="panel"><h3>Coaching qualifications</h3>${api.catalogue.map(item=>{const r=data.records.find(r=>r.kind===item.kind),s=api.status(r);return `<article class="coach-qualification-row"><div><h4>${esc(item.label)}</h4><span class="qualification-state ${esc(s.tone)}">${esc(s.label)}</span>${r?`<p>${esc(item.courses[r.course])}</p><p>${esc(item.dateLabel||'Completed')}: ${esc(r.completed_on)}<br>${esc(item.expiryLabel||'Expiry')}: ${esc(r.expires_on||'Not recorded')}</p>`:''}</div></article>`;}).join('')}<button type="button" class="secondary-button" data-person-action="qualifications">${admin?'Manage qualifications':'View qualification record'}</button></section>`;
-    }catch(_){html+='<section class="panel"><h3>Coaching qualifications</h3><p class="helper">Qualification records are unavailable. Ask your Club Admin to check the dates.</p><button type="button" class="secondary-button" data-person-action="qualifications">Open qualification record</button></section>';}
+    }catch(_){unavailableSections.push('Qualification records');html+='<section class="panel"><h3>Coaching qualifications</h3><p class="helper">Qualification records could not be loaded. Retry person details or open the qualification record.</p><button type="button" class="secondary-button" data-person-action="qualifications">Open qualification record</button></section>';}
   }
   const actions=[];
   if(parent&&isCoach()&&!isAdminTeamPreviewMode()){
@@ -6428,7 +6439,7 @@ async function resolveMemberProfile(target){
     actions.push(`<button type="button" class="secondary-button delete" data-remove-club-coach="${esc(person.user_id)}">${role==='club_admin'?'Remove coaching role':'Remove coaching access'}</button>`);
   }else if(target.source==='team'&&!coaching&&isCoach()&&!isAdminTeamPreviewMode())actions.push(`<button type="button" class="secondary-button delete" data-remove-member="${esc(person.user_id)}">Remove team access</button>`);
   if(actions.length)html+=`<section class="panel"><h3>Manage access</h3><div class="person-profile-actions">${actions.join('')}</div></section>`;
-  return {name:person.full_name||accessRoleLabel(role),role,userId:person.user_id,html,qualifications,notice:contactUnavailable?'Some contact details could not load.':''};
+  return {name:person.full_name||accessRoleLabel(role),role,userId:person.user_id,html,qualifications,retryable:unavailableSections.length>0,notice:unavailableSections.length?`${unavailableSections.join(' and ')} could not be loaded. Other available details are shown below.`:''};
 }
 async function resolvePlayerProfile(target){
   const p=playerForName(target.name);if(!p||isClubOverviewMode()||state.squad.filter(row=>row.name&&selkentNorm(row.name)===selkentNorm(p.name)).length!==1)return null;
