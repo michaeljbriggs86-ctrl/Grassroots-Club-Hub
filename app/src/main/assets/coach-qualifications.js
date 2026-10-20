@@ -93,8 +93,12 @@
   }
   // Club-wide overview is admin-only and lives only in this module's current-session memory.
   let matrix=null,matrixVersion=0;
+  const matrixScrollObserver=typeof window.ResizeObserver==='function'?new window.ResizeObserver(updateMatrixScrollHint):null;
   function matrixCurrent(s=matrix){const c=context();return !!(s&&c?.editable&&c.cloud===s.cloud&&c.user===s.user&&c.club===s.club&&c.role===s.role);}
-  function clearMatrix(){matrixVersion++;matrix=null;for(const id of ['coach-document-table','coach-document-notice'])if(el(id))el(id).innerHTML='';if(el('coach-document-status'))el('coach-document-status').textContent='';if(el('coach-document-notice'))el('coach-document-notice').hidden=true;if(el('coach-documents-summary-status'))el('coach-documents-summary-status').textContent='Coach documents unavailable. Open the matrix to refresh.';}
+  function updateMatrixScrollHint(){const region=el('coach-document-table'),hint=el('coach-document-scroll-hint'),show=!!(matrixCurrent()&&matrix.loaded&&region?.querySelector?.('table')&&region.scrollWidth>region.clientWidth+1);if(hint)hint.hidden=!show;if(show)region?.setAttribute?.('aria-describedby','coach-document-scroll-hint');else region?.removeAttribute?.('aria-describedby');}
+  function resetMatrixScrollHint(){matrixScrollObserver?.disconnect();if(el('coach-document-scroll-hint'))el('coach-document-scroll-hint').hidden=true;el('coach-document-table')?.removeAttribute?.('aria-describedby');}
+  function watchMatrixScroll(){matrixScrollObserver?.disconnect();const region=el('coach-document-table'),table=region?.querySelector?.('table');if(region)matrixScrollObserver?.observe(region);if(table)matrixScrollObserver?.observe(table);updateMatrixScrollHint();}
+  function clearMatrix(){matrixVersion++;matrix=null;resetMatrixScrollHint();for(const id of ['coach-document-table','coach-document-notice'])if(el(id))el(id).innerHTML='';if(el('coach-document-status'))el('coach-document-status').textContent='';if(el('coach-document-notice'))el('coach-document-notice').hidden=true;if(el('coach-documents-summary-status'))el('coach-documents-summary-status').textContent='Coach documents unavailable. Open the matrix to refresh.';}
   function documentDate(value){return new Intl.DateTimeFormat('en-GB',{day:'numeric',month:'short',year:'numeric',timeZone:'Europe/London'}).format(new Date(value+'T00:00:00Z'));}
   function matrixSummary(rows,date=today()){
     const due=[],overdue=[];let missing=0,unchecked=0;
@@ -104,24 +108,25 @@
   }
   function renderMatrix(){
     if(!matrixCurrent()||!matrix.loaded)return;
-    const date=today(),summary=matrixSummary(matrix.rows,date),notice=el('coach-document-notice'),count=(n,label)=>`${n} ${label}${n===1?'':'s'}`;
+    const date=today(),summary=matrixSummary(matrix.rows,date),notice=el('coach-document-notice'),count=(n,label,plural=label+'s')=>`${n} ${n===1?label:plural}`;
     const compact=el('coach-documents-summary-status');if(compact){compact.textContent=[count(summary.overdue.length,'overdue document'),`${summary.due.length} renewal${summary.due.length===1?'':'s'} due`,count(summary.missing,'missing record'),count(summary.unchecked,'unchecked record')].join(' · ');compact.classList.toggle('qualification-error',!!summary.overdue.length);}
     if(notice){notice.hidden=!summary.overdue.length&&!summary.due.length;notice.classList.toggle('expired',!!summary.overdue.length);notice.classList.toggle('due',!summary.overdue.length);notice.innerHTML=`<strong>${summary.overdue.length?count(summary.overdue.length,'document')+' overdue':count(summary.due.length,'renewal')+' due within 60 days'}</strong>${summary.overdue.length&&summary.due.length?`<p>${esc(count(summary.due.length,'renewal'))} also due within 60 days.</p>`:''}<ul>${[...summary.overdue,...summary.due].slice(0,3).map(e=>`<li>${esc(e.name)} · ${esc(e.item.label)} · ${esc(status(e.record,date).label)} (${esc(documentDate(e.record.expires_on))})</li>`).join('')}</ul>${summary.overdue.length+summary.due.length>3?'<p>Filter to Renewals due for the full list.</p>':''}`;}
-    if(el('coach-document-status'))el('coach-document-status').textContent=`${count(matrix.rows.length,'coach')} · ${count(summary.missing,'missing record')} · ${count(summary.unchecked,'unchecked record')}. Updated ${new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/London',hour:'2-digit',minute:'2-digit'}).format(new Date())}.`;
+    if(el('coach-document-status'))el('coach-document-status').textContent=`${count(matrix.rows.length,'coach','coaches')} · ${count(summary.missing,'missing record')} · ${count(summary.unchecked,'unchecked record')}. Data loaded ${new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/London',day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}).format(new Date(matrix.loadedAt))}.`;
     const mode=el('coach-document-filter')?.value||'all',rank=p=>Math.min(...catalogue.map(item=>{const s=status(p.records.find(r=>r.kind===item.kind),date);return s.tone==='expired'?0:s.tone==='due'?1:s.tone==='missing'?2:3;}));
     const rows=matrix.rows.filter(p=>mode==='due'?p.records.some(r=>['due','expired'].includes(status(r,date).tone)):mode==='missing'?catalogue.some(item=>{const r=p.records.find(x=>x.kind===item.kind);return !r||!r.club_checked;}):true).sort((a,b)=>rank(a)-rank(b)||(a.full_name||'').localeCompare(b.full_name||'','en-GB'));
     if(!el('coach-document-table'))return;
     el('coach-document-table').innerHTML=rows.length?`<table class="coach-document-grid"><caption class="helper">Coach document expiry and renewal matrix</caption><thead><tr><th scope="col">Coach</th>${catalogue.map(item=>`<th scope="col">${esc(item.label)}</th>`).join('')}</tr></thead><tbody>${rows.map(p=>`<tr><th scope="row"><button type="button" class="text-button" data-matrix-coach="${esc(p.user_id)}">${esc(p.full_name||'Coach')}</button><small>${p.role==='assistant_coach'?'Assistant Coach':p.role==='club_admin'?'Club Admin · Coach':'Coach'}</small></th>${catalogue.map(item=>{const record=p.records.find(r=>r.kind===item.kind),s=status(record,date);return `<td><span class="qualification-state ${s.tone}">${esc(s.label)}</span><small>${record?`${item.kind==='dbs'?'Renewal':'Expiry'}: ${esc(documentDate(record.expires_on))}`:'Add a record'}</small>${record?`<small>${record.club_checked?'Club checked':'Needs club check'}</small>`:''}</td>`;}).join('')}</tr>`).join('')}</tbody></table>`:`<p class="muted">${matrix.rows.length?'No coaches match this filter.':'No coaching accounts yet. Approved coaches and assistants will appear here.'}</p>`;
+    watchMatrixScroll();
   }
   async function refreshMatrix(){
     const c=context();if(!c?.editable){clearMatrix();return;}
     const old=matrix;if(old&&!matrixCurrent(old))clearMatrix();
-    const version=++matrixVersion;matrix={...c,rows:[],loaded:false};if(el('coach-documents-summary-status'))el('coach-documents-summary-status').textContent='Loading coach documents…';
+    const version=++matrixVersion;matrix={...c,rows:[],loaded:false,loadedAt:null};resetMatrixScrollHint();if(el('coach-documents-summary-status'))el('coach-documents-summary-status').textContent='Loading coach documents…';
     el('coach-document-matrix')?.classList.remove('hidden');if(el('coach-document-table'))el('coach-document-table').innerHTML='';if(el('coach-document-notice')){el('coach-document-notice').innerHTML='';el('coach-document-notice').hidden=true;}if(el('coach-document-status'))el('coach-document-status').textContent='Loading coach documents…';
     try{const rows=await c.cloud.listCoachQualifications();if(version!==matrixVersion||!matrixCurrent())return;
       if(!Array.isArray(rows))throw Error('Invalid matrix');const seen=new Set();
       for(const p of rows){if(!p||typeof p.user_id!=='string'||!p.user_id||seen.has(p.user_id)||!['club_admin','coach','assistant_coach'].includes(p.role)||typeof p.full_name!=='string')throw Error('Invalid coach');response(p);seen.add(p.user_id);}
-      matrix.rows=rows;matrix.loaded=true;renderMatrix();
+      matrix.rows=rows;matrix.loadedAt=Date.now();matrix.loaded=true;renderMatrix();
     }catch(_){if(version===matrixVersion&&matrixCurrent()){matrix.rows=[];matrix.loaded=false;if(el('coach-documents-summary-status'))el('coach-documents-summary-status').textContent='Coach documents unavailable. Open the matrix to refresh; no expiry status can be confirmed.';if(el('coach-document-status'))el('coach-document-status').textContent='Coach documents unavailable. Refresh to retry; no expiry status can be confirmed.';}}
   }
   document.addEventListener('click',event=>{
@@ -140,6 +145,7 @@
   });
   el('coach-qualification-dialog')?.addEventListener('close',()=>{if(!el('coach-qualification-dialog')?.open)close();});
   el('coach-document-filter')?.addEventListener('change',renderMatrix);
+  window.addEventListener?.('resize',updateMatrixScrollHint);
   document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&matrixCurrent())refreshMatrix();});
   window.ClubHubCoachQualifications={syncAccess,open,close,refreshMatrix,matrixSummary,catalogue,today,validDate,suggestedExpiry,status,validate};
   syncAccess();
