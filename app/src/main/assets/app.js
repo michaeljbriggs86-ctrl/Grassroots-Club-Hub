@@ -2818,7 +2818,11 @@ function setCommunicationsTab(tab='inbox'){
   const admin=isClubOverviewMode();
   __communicationsTab=admin&&['inbox','notifications','notices'].includes(tab)?tab:'inbox';
   document.getElementById('communications-tabs')?.classList.toggle('hidden',!admin);
-  document.querySelectorAll('[data-communications-tab]').forEach(button=>button.classList.toggle('active',button.dataset.communicationsTab===__communicationsTab));
+  document.querySelectorAll('[data-communications-tab]').forEach(button=>{
+    const current=admin&&button.dataset.communicationsTab===__communicationsTab;
+    button.classList.toggle('active',current);
+    if(current)button.setAttribute('aria-current','page');else button.removeAttribute('aria-current');
+  });
   document.getElementById('communications-inbox-panel')?.classList.toggle('hidden',admin&&__communicationsTab!=='inbox');
   document.getElementById('communications-notifications-panel')?.classList.toggle('hidden',!admin||__communicationsTab!=='notifications');
   document.getElementById('communications-notices-panel')?.classList.toggle('hidden',!admin||__communicationsTab!=='notices');
@@ -3187,7 +3191,7 @@ function renderAnnouncements(){
   if(adminList){
     adminList.setAttribute?.('aria-busy',String(canReview&&__announcementLoading));
     const focused=document.activeElement,focusedId=adminList.contains?.(focused)?focused?.closest?.('[data-delete-announcement]')?.dataset.deleteAnnouncement:null;
-    const markup=canReview?__announcementRows.map(a=>{const expired=a.expires_at&&new Date(a.expires_at).getTime()<=Date.now();return `<article class="admin-announcement-row ${expired?'expired':''}"><div><strong>${esc(a.title)}</strong><span>${esc(announcementAudienceLabel(a))} · ${Number(a.read_count||0)}/${Number(a.target_count||0)} read${a.pinned?' · Pinned':''}${a.important?' · Important':''}${expired?' · Expired':''}</span><p>${esc(a.body)}</p></div><button type="button" class="inline-action delete" data-delete-announcement="${a.id}">Remove</button></article>`;}).join('')||(__announcementLoaded&&!__announcementError&&!__announcementLoading?'<div class="empty-state compact-empty">No club announcements yet.</div>':''):'';
+    const markup=canReview?__announcementRows.map(a=>{const expired=a.expires_at&&new Date(a.expires_at).getTime()<=Date.now();return `<article class="admin-announcement-row ${expired?'expired':''}"><div><strong>${esc(a.title)}</strong><span>${esc(announcementAudienceLabel(a))} · ${Number(a.read_count||0)}/${Number(a.target_count||0)} read${a.pinned?' · Pinned':''}${a.important?' · Important':''}${expired?' · Expired':''}</span><p>${esc(a.body)}</p></div><button type="button" class="inline-action delete" data-delete-announcement="${a.id}" aria-label="${esc(`Remove: ${a.title}`)}">Remove</button></article>`;}).join('')||(__announcementLoaded&&!__announcementError&&!__announcementLoading?'<div class="empty-state compact-empty">No club announcements yet.</div>':''):'';
     setStableHtml(adminList,markup);
     if(focusedId&&!focused?.isConnected){const replacement=[...(adminList.querySelectorAll?.('[data-delete-announcement]')||[])].find(button=>button.dataset.deleteAnnouncement===focusedId);(replacement||document.getElementById('admin-announcements-title'))?.focus();}
   }
