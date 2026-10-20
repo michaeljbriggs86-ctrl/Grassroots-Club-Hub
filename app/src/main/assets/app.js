@@ -5612,6 +5612,7 @@ async function refreshAdminClubOverview(quiet=false){
   if(quiet&&identity===__adminHomeIdentity&&Date.now()-__adminOverviewStamp<15000)return;
   const changed=identity!==__adminHomeIdentity;__adminHomeIdentity=identity;__adminOverviewStamp=Date.now();
   if(changed)clearAdminHome(true);
+  const restoreTeamFocus=document.activeElement===document.getElementById('admin-team-refresh');
   __adminTeamLoading=true;__adminTeamError='';renderAdminTeamReadState();
   window.ClubHubKickoffUpdates?.renderAdmin?.();
   void window.ClubHubKickoffUpdates?.refreshAdmin?.(quiet);
@@ -5639,7 +5640,7 @@ async function refreshAdminClubOverview(quiet=false){
     renderAdminHome(snap);
     if(meta){meta.textContent=snap.feedWarning?'Latest league fixtures unavailable. Check saved details before sharing.':'Updated '+new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/London',hour:'2-digit',minute:'2-digit'}).format(new Date());meta.classList.remove('hidden');}
   }catch(error){if(current()){const denied=[401,403].includes(Number(error?.status))||['42501','AUTH_CONTEXT_CHANGED'].includes(String(error?.code||error?.data?.code));clearAdminHome(false,!denied);__adminTeamError=__adminTeamSnapshot?'Teams could not be refreshed. Previously loaded teams are shown. Refresh teams to try again.':'Teams are unavailable. Refresh teams to try again.';adminHomeText('admin-overview-meta','Club home is unavailable. Tap Refresh to try again.');const grid=document.getElementById('admin-team-grid');if(grid&&!__adminTeamSnapshot)setStableHtml(grid,'<p class="muted">Teams unavailable · refresh to retry.</p>');for(const id of ['admin-home-request-status','admin-home-coverage-status','admin-home-message-status','admin-home-notice-status'])adminHomeText(id,'Unavailable · refresh to retry');}}
-  finally{if(version===__adminHomeLoadVersion){if(!current())clearAdminHome(true);__adminTeamLoading=false;renderAdminTeamReadState();if(button)button.disabled=false;}}
+  finally{if(version===__adminHomeLoadVersion){if(!current())clearAdminHome(true);__adminTeamLoading=false;renderAdminTeamReadState();if(button)button.disabled=false;if(restoreTeamFocus&&current()&&currentView==='club-teams'&&document.activeElement===document.body)document.getElementById('admin-team-refresh')?.focus();}}
 }
 
 let __teamMembersStamp=0;
