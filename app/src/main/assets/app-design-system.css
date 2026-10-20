@@ -2623,3 +2623,6 @@ html body .admin-onboarding-options .admin-onboarding-choice{
 
 /* A1 inbox: make the guarded Send state visible without changing other roles/actions. */
 #view-inbox #send-inbox-message:disabled{opacity:.5;cursor:not-allowed}
+
+/* Compliance state gates stay local to this existing Admin form. */
+#club-compliance-settings button:disabled{opacity:.5;cursor:not-allowed}

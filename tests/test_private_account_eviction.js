@@ -22,13 +22,14 @@ const cases=[
   const cloud={context:{profile:{user_id:'a',club_id:'club'}},session:{user:{id:'a'}},currentTeam:()=>({id:'one'}),[method]:()=>pending};
   const ctx={CLOUD_MODE:true,currentRole:'admin',window:{ClubHubCloud:cloud},document:{getElementById:node,activeElement:null},Date,Set,
    __seasonHistoryLoad:0,__auditHistoryLoad:0,__complianceLoad:0,
+   personProfileContextKey:()=>[cloud.session?.user?.id,cloud.context?.profile?.club_id,cloud.currentTeam()?.id,ctx.currentRole].join('|'),
    __appearanceStamp:0,__appearanceStats:[],__seasonArchives:[],__auditRows:[],__complianceStatus:name==='refreshDisputeReviewerPanel'?{is_current_user_reviewer:true}:null,
    isAdmin:()=>ctx.currentRole==='admin',isClubOverviewMode:()=>true,isAdminTeamPreviewMode:()=>false,isAdminCoachMode:()=>false,requireCoach:()=>true,
    renderSeasonPlayerStats:()=>renders++,renderSeasonHistory:()=>renders++,renderAuditHistory:()=>renders++,activePlayers:()=>[{name:'Fictional Child A',number:1}],
    toast(){},alert(){},esc:x=>String(x),miniJerseyHTML:()=>'',accessRoleLabel:r=>r,
    archiveStatsFromState:()=>({played:1,wins:1,draws:0,losses:0,gf:1,ga:0,topScorer:'Old private data'}),clubListingHtml:x=>x,matchScoreText:()=>'',formatDate:x=>x,
   };
-  vm.createContext(ctx);vm.runInContext(helpers+actualFunction(name),ctx,{filename:'actual-app-private-reader.js'});
+  vm.createContext(ctx);vm.runInContext(helpers+(['refreshCompliancePanel','loadComplianceAccountChoices'].includes(name)?source.slice(source.indexOf('const COMPLIANCE_FIELDS='),source.indexOf('async function refreshCompliancePanel()')):'')+actualFunction(name),ctx,{filename:'actual-app-private-reader.js'});
   const work=ctx[name](...args);await Promise.resolve();
   cloud.session={user:{id:'b'}};cloud.context={profile:{user_id:'b',club_id:'club'}};ctx.currentRole='parent';
   const reply=name==='refreshCompliancePanel'?{privateMarker:'Old private data'}:name==='openSeasonArchive'?{season:'2025/26',age_group:12,team_name:'Old private data',snapshot:{team_state:{matches:[],goals:[]}}}:[{privateMarker:'Old private data',player_name:'Fictional Child A',body:'Old private data',role:'parent',full_name:'Old private data',user_id:'old'}];

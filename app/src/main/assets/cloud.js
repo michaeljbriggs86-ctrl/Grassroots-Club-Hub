@@ -1018,7 +1018,7 @@
   async function listClubAccessAccounts(){
     if(role()!=='admin')return [];
     const data=await rpc('list_club_access_accounts',{});
-    return Array.isArray(data)?data:[];
+    if(!Array.isArray(data))throw new Error('Club accounts unavailable');return data;
   }
   async function removeClubCoach(userId){
     if(role()!=='admin')throw new Error('Club Admin access required');
@@ -1084,7 +1084,7 @@
   async function listDisputeMessages(threadId=null){return await rpc('list_dispute_messages',{p_thread_id:threadId||null});}
   async function upsertU11SafeguardingInfo({teamId,playerName,emergencyName='',emergencyPhone='',medicalInfo=''}={}){return await rpc('upsert_u11_safeguarding_info',{p_team_id:teamId,p_player_name:playerName,p_emergency_contact_name:emergencyName,p_emergency_contact_phone:emergencyPhone,p_medical_allergy_info:medicalInfo});}
   async function exportU11SafeguardingPack(teamId,playerNames=[]){return await rpc('export_u11_safeguarding_pack',{p_team_id:teamId,p_player_names:Array.isArray(playerNames)?playerNames:[]});}
-  async function listSafeguardingExportAudit(){if(role()!=='admin')return [];const d=await rpc('list_safeguarding_export_audit',{});return Array.isArray(d)?d:[];}
+  async function listSafeguardingExportAudit(){if(role()!=='admin')return [];const d=await rpc('list_safeguarding_export_audit',{});if(!Array.isArray(d))throw new Error('Export history unavailable');return d;}
   async function requestClubCancellation(){if(role()!=='admin')throw new Error('Club Admin access required');return await rpc('request_club_cancellation',{});}
   async function cancelClubCancellation(){if(role()!=='admin')throw new Error('Club Admin access required');return await rpc('cancel_club_cancellation',{});}
 
@@ -1230,12 +1230,12 @@
   async function listAuditHistory(teamId=null,limit=100){
     if(testModeActive()||role()!=='admin')return [];
     const data=await rpc('list_audit_history',{p_team_id:teamId||null,p_limit:Number(limit)||100});
-    return Array.isArray(data)?data:[];
+    if(!Array.isArray(data))throw new Error('Audit history unavailable');return data;
   }
   async function listSeasonArchives(teamId=null){
     if(testModeActive()||!['admin','coach','assistant_coach'].includes(role()))return [];
     const data=await rpc('list_season_archives',{p_team_id:teamId||null});
-    return Array.isArray(data)?data:[];
+    if(!Array.isArray(data))throw new Error('Season history unavailable');return data;
   }
   async function getSeasonArchive(archiveId){
     if(testModeActive()||!archiveId)return null;
