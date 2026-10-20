@@ -1,9 +1,9 @@
 // Production module: dates, roles, profile reads/writes, revisions, cancellation and stale contexts.
 const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
 const root=__dirname+'/../',source=fs.readFileSync(root+'app/src/main/assets/coach-qualifications.js','utf8');
-const nodes=new Map(),events=new Map(),writes=[],reads=[];let role='admin',clubMode=true,parentMode=false,confirm=true,clock=Date.parse('2026-10-11T10:00Z');
+const nodes=new Map(),events=new Map(),writes=[],reads=[];let focused='',role='admin',clubMode=true,parentMode=false,confirm=true,clock=Date.parse('2026-10-11T10:00Z');
 class Clock extends Date{constructor(...args){super(...(args.length?args:[clock]));}static now(){return clock;}}
-function node(id){if(!nodes.has(id)){const classes=new Set();nodes.set(id,{innerHTML:'',textContent:'',value:'',checked:false,disabled:false,hidden:false,open:false,handlers:{},classList:{add:x=>classes.add(x),remove:x=>classes.delete(x),contains:x=>classes.has(x),toggle:(x,on)=>on?classes.add(x):classes.delete(x)},addEventListener(type,fn){this.handlers[type]=fn;},showModal(){this.open=true;},close(){this.open=false;this.handlers.close?.();},focus(){},querySelectorAll(){return [];} });}return nodes.get(id);}
+function node(id){if(!nodes.has(id)){const classes=new Set();nodes.set(id,{innerHTML:'',textContent:'',value:'',checked:false,disabled:false,hidden:false,open:false,handlers:{},classList:{add:x=>classes.add(x),remove:x=>classes.delete(x),contains:x=>classes.has(x),toggle:(x,on)=>on?classes.add(x):classes.delete(x)},addEventListener(type,fn){this.handlers[type]=fn;},showModal(){this.open=true;},close(){this.open=false;this.handlers.close?.();},focus(){focused=id;},querySelectorAll(){return [];} });}return nodes.get(id);}
 const records=[{kind:'safeguarding',course:'fa_safeguarding_children',completed_on:'2025-01-01',expires_on:'2027-01-01',club_checked:true,checked_at:'2025-01-01T10:00:00Z'}];
 const cloud={session:{user:{id:'admin-a'}},context:{profile:{club_id:'club-a',full_name:'Admin'}},role:()=>role,actingAsParent:()=>parentMode,
  getCoachQualifications:async id=>{reads.push(id);return{records,revision:1};},saveCoachQualifications:async(id,records,revision)=>{writes.push({id,records,revision});return{records,revision:revision+1};}};
@@ -32,7 +32,34 @@ const defer=()=>{let resolve;return{promise:new Promise(r=>resolve=r),resolve:x=
  const slowRead=defer();cloud.getCoachQualifications=()=>slowRead.promise;const read=api.open('coach-a');parentMode=true;api.syncAccess();slowRead.resolve({records:[dbs],revision:5});await read;assert.equal(node('coach-qualification-dialog').open,false);assert.equal(node('coach-profile-self').classList.contains('hidden'),true,'staff in Parent view do not see qualifications');parentMode=false;
  role='coach';clubMode=false;cloud.session.user.id='coach-a';cloud.getCoachQualifications=async id=>{reads.push(id);return{records,revision:1};};await api.open('coach-a');assert.equal(node('coach-qualification-readonly').hidden,false);assert.doesNotMatch(node('coach-qualification-list').innerHTML,/data-edit-qualification/);const count=writes.length;edit('dbs');await submit();assert.equal(writes.length,count,'coach cannot edit or verify');const readCount=reads.length;await api.open('other-coach');assert.equal(reads.length,readCount,'coach cannot open colleagues');
  for(const r of ['parent','player','pending_coach']){role=r;api.syncAccess();await api.open('coach-a');assert.equal(reads.length,readCount);assert.equal(node('coach-profile-self').classList.contains('hidden'),true);}
- role='admin';clubMode=true;cloud.getCoachQualifications=async()=>{throw Error('missing RPC');};await api.open('coach-a');assert.match(node('coach-qualification-status').textContent,/unavailable/);assert.equal(node('coach-qualification-list').innerHTML,'','outage never shows not-recorded rows');
+ role='admin';clubMode=true;cloud.getCoachQualifications=async()=>{throw Error('missing RPC');};await api.open('coach-a');assert.match(node('coach-qualification-status').textContent,/could not be loaded/);assert.equal(node('coach-qualification-list').innerHTML,'','outage never shows not-recorded rows');
+ // Failed reads recover in place without writes or losing the selected subject.
+ assert.equal(node('coach-qualification-retry').hidden,false);
+ const beforeRetryWrites=writes.length,retryRead=defer();let retryReads=0;
+ cloud.getCoachQualifications=id=>{assert.equal(id,'coach-a');retryReads++;return retryRead.promise;};
+ click('#coach-qualification-retry');click('#coach-qualification-retry');
+ assert.equal(retryReads,1,'retry is single-flight');assert.equal(node('coach-qualification-retry').disabled,true);
+ assert.match(node('coach-qualification-status').textContent,/Loading/);
+ retryRead.resolve({records:[],revision:3});await tick();
+ assert.equal(node('coach-qualification-retry').hidden,true);assert.equal(focused,'coach-qualification-name');
+ assert.equal((node('coach-qualification-list').innerHTML.match(/Not recorded/g)||[]).length,3,'valid empty read renders missing records');
+ assert.equal(writes.length,beforeRetryWrites,'read recovery never writes');
+ cloud.getCoachQualifications=async()=>({records:null,revision:1});await api.open('coach-a','Selected coach');
+ assert.equal(node('coach-qualification-retry').hidden,false);assert.equal(node('coach-qualification-list').innerHTML,'');
+ click('#coach-qualification-retry');await tick();assert.equal(focused,'coach-qualification-retry','failed retry remains keyboard recoverable');
+ assert.equal(node('coach-qualification-retry').disabled,false);assert.equal(node('coach-qualification-name').textContent,'Coach profile · Selected coach');
+ const obsolete=defer();cloud.getCoachQualifications=()=>obsolete.promise;click('#coach-qualification-retry');
+ cloud.getCoachQualifications=async()=>({records,revision:6});await api.open('coach-b','New selected coach');
+ obsolete.resolve({records:[dbs],revision:2});await tick();
+ assert.equal(node('coach-qualification-name').textContent,'Coach profile · New selected coach');assert.doesNotMatch(node('coach-qualification-list').innerHTML,/DBS disclosure issued/,'old subject cannot replace the newer selection');
+ // Native Escape/close clears private DOM as well as invalidating pending reads.
+ node('coach-qualification-dialog').close();assert.equal(node('coach-qualification-list').innerHTML,'');assert.equal(node('coach-qualification-name').textContent,'Coach profile');assert.equal(node('coach-qualification-status').textContent,'');assert.equal(node('coach-qualification-retry').hidden,true);
+ cloud.getCoachQualifications=async()=>{throw Error('offline');};await api.open('coach-a');
+ const changed=defer();cloud.getCoachQualifications=()=>changed.promise;click('#coach-qualification-retry');parentMode=true;
+ changed.resolve({records:[dbs],revision:7});await tick();assert.equal(node('coach-qualification-dialog').open,false,'changed access detected on completion clears the dialog');assert.equal(node('coach-qualification-list').innerHTML,'');parentMode=false;
+ role='coach';clubMode=false;cloud.session.user.id='coach-a';cloud.getCoachQualifications=async()=>{throw Error('offline');};await api.open('coach-a');
+ cloud.getCoachQualifications=async id=>{assert.equal(id,'coach-a');return{records,revision:8};};click('#coach-qualification-retry');await tick();assert.equal(node('coach-qualification-readonly').hidden,false);assert.doesNotMatch(node('coach-qualification-list').innerHTML,/data-edit-qualification/,'own-staff recovery stays read only');
+ role='admin';clubMode=true;
  // Execute actual client wrappers, not just source assertions.
  const cloudSource=fs.readFileSync(root+'app/src/main/assets/cloud.js','utf8'),start=cloudSource.indexOf('  async function getCoachQualifications('),end=cloudSource.indexOf('  async function listClubCoaches(',start),rpcCalls=[];
  const rpcContext={role:()=>role,actingAsParent:()=>parentMode,rpc:async(name,payload)=>{rpcCalls.push({name,payload});return{records:[],revision:0};}};vm.createContext(rpcContext);vm.runInContext(cloudSource.slice(start,end),rpcContext);

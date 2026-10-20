@@ -32,7 +32,7 @@
   function context(){const cloud=window.ClubHubCloud,profile=cloud?.context?.profile,role=cloud?.role?.();if(!cloud?.session?.user?.id||!profile?.club_id||!['admin','coach','assistant_coach'].includes(role)||cloud?.actingAsParent?.())return null;return{cloud,user:cloud.session.user.id,club:profile.club_id,role,editable:role==='admin'&&typeof isClubOverviewMode==='function'&&isClubOverviewMode()};}
   function same(s=state){const c=context();return !!(s&&c&&c.cloud===s.cloud&&c.user===s.user&&c.club===s.club&&c.role===s.role&&c.editable===s.editable&&el('coach-qualification-dialog')?.open);}
   function message(text,error=false){const node=el('coach-qualification-status');if(node){node.textContent=text;node.classList.toggle('qualification-error',error);}}
-  function close(){const target=state?.target;loadVersion++;state=null;el('coach-qualification-editor')?.classList.add('hidden');const list=el('coach-qualification-list');if(list)list.innerHTML='';const name=el('coach-qualification-name');if(name)name.textContent='Coach profile';const form=el('coach-qualification-form');form?.reset?.();const dialog=el('coach-qualification-dialog');if(dialog?.open)dialog.close();if(target&&window.ClubHubPersonProfiles?.selectedSnapshot()?.userId===target)window.ClubHubPersonProfiles.refresh();}
+  function close(){const target=state?.target;loadVersion++;state=null;el('coach-qualification-editor')?.classList.add('hidden');const list=el('coach-qualification-list');if(list)list.innerHTML='';const name=el('coach-qualification-name');if(name)name.textContent='Coach profile';const form=el('coach-qualification-form');form?.reset?.();const retry=el('coach-qualification-retry');if(retry){retry.hidden=true;retry.disabled=false;}message('');const dialog=el('coach-qualification-dialog');if(dialog?.open)dialog.close();if(target&&window.ClubHubPersonProfiles?.selectedSnapshot()?.userId===target)window.ClubHubPersonProfiles.refresh();}
   function syncAccess(){const c=context(),button=el('coach-profile-self');button?.classList.toggle('hidden',!c);if(state&&!same())close();if(matrix&&!matrixCurrent())clearMatrix();el('coach-document-matrix')?.classList.toggle('hidden',!c?.editable);el('coach-documents-summary')?.classList.toggle('hidden',!c?.editable);}
   function render(){
     if(!same()||!state.loaded)return;
@@ -56,12 +56,18 @@
   }
   async function open(userId,name='Coach'){
     const c=context();if(!c||busy||(!c.editable&&userId!==c.user))return;
-    const version=++loadVersion;state={...c,target:userId,records:[],revision:0,loaded:false,editing:''};
+    state={...c,target:userId,records:[],revision:0,loaded:false,editing:'',loading:false,retryable:false};
     el('coach-qualification-name').textContent=`Coach profile · ${name}`;el('coach-qualification-list').innerHTML='';el('coach-qualification-editor').classList.add('hidden');el('coach-qualification-readonly').hidden=true;
-    const dialog=el('coach-qualification-dialog');if(!dialog.open)dialog.showModal();message('Loading qualifications…');
-    try{const data=response(await c.cloud.getCoachQualifications(userId));if(version!==loadVersion||!same())return;
-      state.records=data.records;state.revision=Number(data.revision);state.loaded=true;render();message('Recorded dates are checked by your club. FA Club Portal remains the source for acceptance.');
-    }catch(_){if(version===loadVersion&&same())message('Qualifications are unavailable. Try again later or contact your Club Admin.',true);}
+    const dialog=el('coach-qualification-dialog');if(!dialog.open)dialog.showModal();await readQualifications(state);
+  }
+  async function readQualifications(s,retrying=false){
+    if(state!==s||!same(s)||s.loading||busy||(retrying&&!s.retryable))return;
+    const version=++loadVersion;s.loading=true;s.retryable=false;
+    const retry=el('coach-qualification-retry');if(retry){retry.hidden=!retrying;retry.disabled=true;}message('Loading qualifications…');
+    try{const data=response(await s.cloud.getCoachQualifications(s.target));if(version!==loadVersion||state!==s||!same(s))return;
+      s.records=data.records;s.revision=Number(data.revision);s.loaded=true;render();message('Recorded dates are checked by your club. FA Club Portal remains the source for acceptance.');if(retry)retry.hidden=true;
+    }catch(_){if(version===loadVersion&&state===s&&same(s)){s.retryable=true;if(retry)retry.hidden=false;message('Qualifications could not be loaded. Retry qualifications to try again.',true);}}
+    finally{if(version===loadVersion&&state===s){s.loading=false;if(!same(s)){close();return;}if(retry)retry.disabled=false;if(retrying)(s.loaded?el('coach-qualification-name'):retry)?.focus();}}
   }
   function setBusy(value){busy=value;const form=el('coach-qualification-form');for(const field of form?.querySelectorAll('input,select,button')||[])field.disabled=value;}
   function userError(error){return String(error?.code)==='40001'?'This profile changed elsewhere. Close and reopen it before saving.':'Could not save qualifications. Close and reopen the profile, then try again.';}
@@ -125,13 +131,14 @@
     const row=event.target.closest?.('[data-edit-qualification]');if(row)edit(row.dataset.editQualification);
     if(event.target.closest?.('#coach-profile-self')){const c=context();if(c){if(window.ClubHubPersonProfiles)window.ClubHubPersonProfiles.open({kind:'member',id:c.user,source:'self'});else open(c.user,c.cloud.context.profile.full_name||'My profile');}}
     if(event.target.closest?.('#coach-qualification-close'))close();
+    if(event.target.closest?.('#coach-qualification-retry'))readQualifications(state,true);
   });
   el('coach-qualification-form')?.addEventListener('submit',save);el('coach-qualification-remove')?.addEventListener('click',remove);
   for(const id of ['coach-qualification-completed','coach-qualification-expiry','coach-qualification-course'])el(id)?.addEventListener('input',()=>{
     el('coach-qualification-checked').checked=false;
     if(id==='coach-qualification-completed'&&!el('coach-qualification-expiry').value){const item=catalogue.find(x=>x.kind===state?.editing);const years=item?.kind==='first_aid'&&el('coach-qualification-course').value!=='fa_ifaif'?0:item?.years;el('coach-qualification-expiry').value=suggestedExpiry(el('coach-qualification-completed').value,years);}
   });
-  el('coach-qualification-dialog')?.addEventListener('close',()=>{loadVersion++;state=null;});
+  el('coach-qualification-dialog')?.addEventListener('close',()=>{if(!el('coach-qualification-dialog')?.open)close();});
   el('coach-document-filter')?.addEventListener('change',renderMatrix);
   document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&matrixCurrent())refreshMatrix();});
   window.ClubHubCoachQualifications={syncAccess,open,close,refreshMatrix,matrixSummary,catalogue,today,validDate,suggestedExpiry,status,validate};

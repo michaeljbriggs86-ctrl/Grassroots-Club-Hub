@@ -1202,10 +1202,11 @@
   <div id="toast" class="toast" role="status"></div>
   <dialog id="coach-qualification-dialog" class="modal coach-qualification-dialog" aria-labelledby="coach-qualification-name">
     <div class="modal-body">
-      <div class="modal-heading"><h3 id="coach-qualification-name">Coach profile</h3><button type="button" class="secondary-button" id="coach-qualification-close">Close</button></div>
+      <div class="modal-heading"><h3 id="coach-qualification-name" tabindex="-1">Coach profile</h3><button type="button" class="secondary-button" id="coach-qualification-close">Close</button></div>
       <p>Qualification dates and renewals for this coach.</p>
       <p class="helper" id="coach-qualification-readonly" hidden>Your Club Admin maintains these records. Ask them to update any changes.</p>
       <p id="coach-qualification-status" role="status" aria-live="polite"></p>
+      <button type="button" class="secondary-button" id="coach-qualification-retry" hidden>Retry qualifications</button>
       <div id="coach-qualification-list"></div>
       <section id="coach-qualification-editor" class="hidden">
         <h4>Update qualification</h4>
