@@ -2652,7 +2652,7 @@ function leaveLinkedPage(next){
   if(currentView==='player-onboarding'&&next!=='player-onboarding')window.ClubHubPlayerOnboarding?.leave();
   if(currentView==='contacts'&&next!=='contacts'){const panel=document.getElementById('member-contacts-panel');if(panel)panel.open=false;resetContactDirectory();}
 }
-function enterLinkedPage(view){
+function enterLinkedPage(view,focusHeading=true){
   const page=LINKED_PAGES[view];if(!page||!linkedPageAllowed(view))return;
   const panel=document.getElementById(page.panel);if(panel?.tagName==='DETAILS')panel.open=true;
   if(view==='contacts'){syncContactDirectoryContext();if(panel)panel.open=true;refreshContactDirectory();}
@@ -2668,7 +2668,7 @@ function enterLinkedPage(view){
   else if(view==='audit-history')refreshAuditHistory(false);
   else if(view==='rules')renderUniversalClubConfiguration();
   else if(view==='team-stats'){renderDashboard();renderSeasonPlayerStats();}
-  document.getElementById(view+'-title')?.focus({preventScroll:true});
+  if(focusHeading)document.getElementById(view+'-title')?.focus({preventScroll:true});
 }
 
 // Keep only non-sensitive page choices in shareable URLs.
@@ -4010,15 +4010,53 @@ function addTournamentGame(id){const t=tournamentById(id);if(!t||!requireCoach()
 let __seasonArchives=[];
 let __auditRows=[];
 let __seasonHistoryLoad=0,__auditHistoryLoad=0;
+let __historyIdentity='',__historyCloud=null;
+let __seasonHistoryRead='idle',__auditHistoryRead='idle';
+function clearHistoryReadContext(){
+  ++__seasonHistoryLoad;++__auditHistoryLoad;__seasonArchives=[];__auditRows=[];
+  __seasonHistoryRead='idle';__auditHistoryRead='idle';__historyIdentity='';__historyCloud=null;
+  const sel=document.getElementById('season-history-select');if(sel)sel.value='';
+}
+function ensureHistoryReadContext(){
+  const key=personProfileContextKey(),cloud=window.ClubHubCloud;
+  if(key!==__historyIdentity||cloud!==__historyCloud){clearHistoryReadContext();__historyIdentity=key;__historyCloud=cloud;renderSeasonHistory();renderAuditHistory();}
+  return key;
+}
+function validateHistoryRows(rows){if(!Array.isArray(rows)||rows.some(row=>!row||typeof row!=='object'||Array.isArray(row)))throw new Error('History response unavailable');return rows;}
 function archiveStatsFromState(st={}){const matches=(st.matches||[]).filter(isPlayedMatch);const s=statsFor(matches);const goals={};(st.goals||[]).forEach(g=>goals[g.player]=(goals[g.player]||0)+Number(g.goals||0));const top=Object.entries(goals).sort((a,b)=>b[1]-a[1])[0];return {...s,topScorer:top?`${top[0]} · ${top[1]}`:'—'};}
-async function refreshSeasonHistory(silent=false){if(!CLOUD_MODE||!['admin','coach','assistant_coach'].includes(currentRole))return;const scope=privateAccountViewScope(),generation=++__seasonHistoryLoad;const current=()=>generation===__seasonHistoryLoad&&privateAccountViewCurrent(scope);try{const teamId=(isAdminTeamPreviewMode()||isAdminCoachMode())?window.ClubHubCloud?.currentTeam?.()?.id:null;const rows=await window.ClubHubCloud.listSeasonArchives(teamId||null);if(!current())return;__seasonArchives=rows;renderSeasonHistory();}catch(err){if(current()&&!silent)toast(err.message||'Could not load season history');}}
-function renderSeasonHistory(){const sel=document.getElementById('season-history-select'),sum=document.getElementById('season-history-summary');if(!sel)return;const keep=sel.value;sel.innerHTML=__seasonArchives.length?__seasonArchives.map(a=>`<option value="${esc(a.id)}">${esc(a.season)} · U${a.age_group} ${esc(a.team_name)}</option>`).join(''):'<option value="">No archived seasons yet</option>';if(keep&&__seasonArchives.some(a=>a.id===keep))sel.value=keep;if(sum)sum.innerHTML=__seasonArchives.length?`<strong>${__seasonArchives.length}</strong> archived season${__seasonArchives.length===1?'':'s'} available.`:'No season archives have been created yet.';}
+async function refreshSeasonHistory(silent=false){
+  if(!CLOUD_MODE||!['admin','coach','assistant_coach'].includes(currentRole))return;
+  const key=ensureHistoryReadContext();if(!key)return;
+  const scope=privateAccountViewScope(),generation=++__seasonHistoryLoad;
+  const current=()=>generation===__seasonHistoryLoad&&key===personProfileContextKey()&&privateAccountViewCurrent(scope);
+  __seasonHistoryRead='loading';renderSeasonHistory();
+  try{const teamId=(isAdminTeamPreviewMode()||isAdminCoachMode())?window.ClubHubCloud?.currentTeam?.()?.id:null;const rows=await window.ClubHubCloud.listSeasonArchives(teamId||null);if(!current())return;__seasonArchives=validateHistoryRows(rows);__seasonHistoryRead='loaded';renderSeasonHistory();}
+  catch(err){if(!current())return;if([401,403].includes(err?.status)){__seasonArchives=[];const sel=document.getElementById('season-history-select');if(sel)sel.value='';}__seasonHistoryRead='error';renderSeasonHistory();if(!silent)toast(err.message||'Could not load season history');}
+}
+function renderSeasonHistory(){
+  const sel=document.getElementById('season-history-select'),sum=document.getElementById('season-history-summary'),open=document.getElementById('open-season-archive');if(!sel)return;
+  const keep=sel.value,loaded=__seasonHistoryRead==='loaded',missing=!!keep&&__seasonArchives.length>0&&!__seasonArchives.some(a=>a.id===keep);
+  sel.innerHTML=(missing?`<option value="${esc(keep)}" disabled>Previously selected archive unavailable</option>`:'')+(__seasonArchives.length?__seasonArchives.map(a=>`<option value="${esc(a.id)}">${esc(a.season)} · U${esc(a.age_group)} ${esc(a.team_name)}</option>`).join(''):`<option value="">${loaded?'No team archives available':__seasonHistoryRead==='error'?'Season history unavailable':__seasonHistoryRead==='loading'?'Loading season history…':'Open this page to load season history'}</option>`);
+  if(keep&&__seasonArchives.length)sel.value=keep;
+  // Retained choices stay focusable during refresh; only verified data can open.
+  sel.disabled=!__seasonArchives.length;
+  if(open)open.disabled=!loaded||!__seasonArchives.some(a=>a.id===sel.value);
+  if(sum){sum.setAttribute('aria-busy',String(__seasonHistoryRead==='loading'));sum.textContent=__seasonHistoryRead==='loading'?'Loading season history…'+(__seasonArchives.length?' Previously loaded choices are unrefreshed.':''):__seasonHistoryRead==='error'?'Season history unavailable. Refresh to retry.'+(__seasonArchives.length?' Previously loaded choices are unrefreshed.':''):loaded?(__seasonArchives.length?`${__seasonArchives.length} team archive${__seasonArchives.length===1?'':'s'} available.${missing?' The selected archive is no longer available. Choose an archive.':''}`:'No season archives have been created yet.'):'Open this page to load season history.';}
+}
 async function openSeasonArchive(){const id=document.getElementById('season-history-select')?.value||'';if(!id)return toast('Choose an archived season');const scope=privateAccountViewScope();try{const a=await window.ClubHubCloud.getSeasonArchive(id);if(!privateAccountViewCurrent(scope))return;const st=a?.snapshot?.team_state||{},stats=archiveStatsFromState(st),matches=(st.matches||[]).slice().sort((x,y)=>(y.date||'').localeCompare(x.date||''));document.getElementById('season-archive-title').textContent=`${a.season} · U${a.age_group} ${a.team_name}`;document.getElementById('season-archive-body').innerHTML=`<div class="archive-stat-grid"><span><b>${stats.played}</b> Played</span><span><b>${stats.wins}</b> W</span><span><b>${stats.draws}</b> D</span><span><b>${stats.losses}</b> L</span><span><b>${stats.gf}</b> GF</span><span><b>${stats.ga}</b> GA</span></div><p class="muted">Top scorer: <strong>${esc(stats.topScorer)}</strong></p><div class="archive-match-list">${matches.map(m=>`<div class="archive-match-row"><span>${m.date?formatDate(m.date):'TBC'}</span><strong>${clubListingHtml(m.opponent||'Opponent')}</strong><span>${esc(m.competition||'')}</span><b>${matchScoreText(m)}</b></div>`).join('')||'<div class="empty-state compact-empty">No matches in this archive.</div>'}</div>`;document.getElementById('season-archive-dialog')?.showModal();}catch(err){if(privateAccountViewCurrent(scope))alert(err.message||err);}}
 async function archiveCurrentSeason(){if(!CLOUD_MODE||!isAdmin())return toast('Club Admin access required');if(!confirm(`Archive the current ${state.meta.season} season for all active teams? Existing archive snapshots for the same season will be refreshed.`))return;try{const n=await window.ClubHubCloud.archiveCurrentSeason(null);toast(`${n} team season${n===1?'':'s'} archived`);await refreshSeasonHistory(false);}catch(err){alert(err.message||err);}}
 function suggestedNextSeason(){const m=String(state.meta.season||'').match(/(20\d{2})\s*\/\s*(\d{2,4})/);if(!m)return'';const a=Number(m[1])+1;return `${a}/${String(a+1).slice(-2)}`;}
 async function rolloverSeason(){if(!CLOUD_MODE||!isAdmin())return toast('Club Admin access required');const input=document.getElementById('rollover-season-name');const next=String(input?.value||suggestedNextSeason()).trim();if(!next)return toast('Enter the new season');if(!confirm(`START ${next}?\n\nThe current season will be archived first. Match results, awards, attendance and fixture preparation will then reset for every active team. Squad and account links are kept.`))return;if(!confirm('This is a club-wide season rollover. Continue?'))return;try{const res=await window.ClubHubCloud.rolloverClubSeason(next);alert(`${plural(res?.teams||0,'team')} rolled into ${next}. The app will now reload.`);location.reload();}catch(err){alert(err.message||err);}}
-async function refreshAuditHistory(silent=false){if(!CLOUD_MODE||!isAdmin()||!isClubOverviewMode())return;const scope=privateAccountViewScope(),generation=++__auditHistoryLoad;const current=()=>generation===__auditHistoryLoad&&privateAccountViewCurrent(scope);try{const rows=await window.ClubHubCloud.listAuditHistory(null,100);if(!current())return;__auditRows=rows;renderAuditHistory();}catch(err){if(current()&&!silent)toast(err.message||'Could not load audit history');}}
-function renderAuditHistory(){const box=document.getElementById('audit-history-list');if(!box)return;box.innerHTML=__auditRows.map(r=>`<article class="audit-row"><div><strong>${esc(r.summary||r.action)}</strong><span>${esc(r.user_name||'System')}${r.team_name?' · '+esc(r.team_name):''}</span></div><div class="audit-meta"><span>${new Date(r.created_at).toLocaleString('en-GB',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})}</span></div></article>`).join('')||'<div class="empty-state compact-empty">No player or parent changes yet.</div>';}
+async function refreshAuditHistory(silent=false){
+  if(!CLOUD_MODE||!isAdmin()||!isClubOverviewMode())return;
+  const key=ensureHistoryReadContext();if(!key)return;
+  const scope=privateAccountViewScope(),generation=++__auditHistoryLoad;
+  const current=()=>generation===__auditHistoryLoad&&key===personProfileContextKey()&&privateAccountViewCurrent(scope);
+  __auditHistoryRead='loading';renderAuditHistory();
+  try{const rows=await window.ClubHubCloud.listAuditHistory(null,100);if(!current())return;__auditRows=validateHistoryRows(rows);__auditHistoryRead='loaded';renderAuditHistory();}
+  catch(err){if(!current())return;if([401,403].includes(err?.status))__auditRows=[];__auditHistoryRead='error';renderAuditHistory();if(!silent)toast(err.message||'Could not load audit history');}
+}
+function renderAuditHistory(){const box=document.getElementById('audit-history-list'),status=document.getElementById('audit-history-status');if(!box)return;if(status){status.setAttribute('aria-busy',String(__auditHistoryRead==='loading'));status.textContent=__auditHistoryRead==='loading'?'Loading audit history…'+(__auditRows.length?' Previously loaded changes are unrefreshed.':''):__auditHistoryRead==='error'?'Audit history unavailable. Refresh history to retry.'+(__auditRows.length?' Previously loaded changes are unrefreshed.':''):__auditHistoryRead==='loaded'?(__auditRows.length?'Recent changes loaded.':'No player or parent changes yet.'):'Open this page to load audit history.';}box.innerHTML=__auditRows.map(r=>`<article class="audit-row"><div><strong>${esc(r.summary||r.action)}</strong><span>${esc(r.user_name||'System')}${r.team_name?' · '+esc(r.team_name):''}</span></div><div class="audit-meta"><span>${new Date(r.created_at).toLocaleString('en-GB',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})}</span></div></article>`).join('');}
 
 function configuredAwardTypes(){
   const types=normalizeAwardTypes(state.awardTypes);
@@ -7044,7 +7082,7 @@ document.addEventListener('click',e=>{
   }
   if(e.target.closest('[data-more-awards]')){navigateMobileAwards();return;}
   const pageRefresh=e.target.closest('[data-page-refresh]');
-  if(pageRefresh){if(currentView===pageRefresh.dataset.pageRefresh)enterLinkedPage(currentView);return;}
+  if(pageRefresh){if(currentView===pageRefresh.dataset.pageRefresh)enterLinkedPage(currentView,false);return;}
   const pageLink=e.target.closest('[data-page-route]');
   if(pageLink){if(e.button>0||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey)return;e.preventDefault();navigate(pageLink.dataset.pageRoute);return;}
   const nav=e.target.closest('[data-nav]');
@@ -7156,6 +7194,7 @@ document.getElementById('tournament-dialog')?.addEventListener('cancel',event=>{
 window.addEventListener('clubhub-contacts-clear',tournamentContextCleared);
 document.getElementById('open-season-archive')?.addEventListener('click',openSeasonArchive);
 document.getElementById('refresh-audit-history')?.addEventListener('click',()=>refreshAuditHistory(false));
+document.getElementById('season-history-select')?.addEventListener('change',renderSeasonHistory);
 document.getElementById('archive-current-season')?.addEventListener('click',archiveCurrentSeason);
 document.getElementById('rollover-season')?.addEventListener('click',rolloverSeason);
 document.getElementById('match-form').addEventListener('submit',submitMatch);
@@ -7430,7 +7469,7 @@ window.addEventListener('clubhub-account-cleared',()=>{
   __matchAttendanceRows=[];__matchNoteLoaded=false;__matchAttendanceLoaded=false;__matchdayNoteStamp='';
   clearInboxContext();__inboxIdentity='';__inboxCloud=null;
   __adminOverviewRows=[];__adminCoachRows=[];__adminAccessRows=[];__clubResultsRows=[];__clubFixtureCards=[];
-  ++__seasonHistoryLoad;++__auditHistoryLoad;clearComplianceContext();__complianceIdentity='';__complianceCloud=null;__seasonArchives=[];__auditRows=[];__appearanceStats=[];__appearanceStamp=0;__matchEntryChoices=[];__matchEntryChoiceContext='';__clubCoachStamp=0;++__staffDirectoryLoad;++__accessDirectoryLoad;++__adminHomeLoadVersion;
+  clearHistoryReadContext();clearComplianceContext();__complianceIdentity='';__complianceCloud=null;__appearanceStats=[];__appearanceStamp=0;__matchEntryChoices=[];__matchEntryChoiceContext='';__clubCoachStamp=0;++__staffDirectoryLoad;++__accessDirectoryLoad;++__adminHomeLoadVersion;
   __staffRequestRows=[];__staffRequestSelected=null;__staffRequestIdentity='';__staffRequestCloud=null;++__staffRequestVersion;__staffRequestBusy=false;
   for(const id of ['parent-home-family-list','parent-family-linked-list','parent-home-match-info','parent-home-training','team-members-list','parent-link-player-list','parent-request-player-list','coach-availability-summary','match-attendance-list','coach-note-readonly','matchday-dashboard-note-readonly','detail-before-match-note','inbox-thread','inbox-contacts','member-contacts-list','member-contacts-self','coach-requests-list','staff-request-review-panel','coach-document-table','coach-onboarding-content','player-onboarding-content','admin-access-list','club-results-list','tournament-squad-list','reviewer-retained-thread','reviewer-dispute-list','safeguarding-export-audit','season-archive-body','season-archive-title','season-history-summary','audit-history-list','detail-goals-inputs','detail-assists-inputs','detail-award-fields','detail-booking-inputs','match-detail-summary','match-report-outcome','parent-request-review-parent','parent-request-review-email','parent-request-review-child','parent-link-title','app-confirm-body','app-confirm-detail','club-coaches-list','access-summary','cloud-account-controls','club-match-summary-body','tactics-bench','matchday-squad-options','matchday-dashboard-squad','matchday-dashboard-formation','matchday-dashboard-alert','match-entry-choices','season-player-stats-body','top-scorers','award-leaders','concern-result','compliance-status','club-cancel-status']){const el=document.getElementById(id);if(el){el.replaceChildren();delete el.__pitchkindMarkup;}}
   for(const id of ['inbox-contact-select','assign-coach-person','compliance-primary-user','compliance-backup-user','availability-player','team-player-invite-player','standalone-award-player','season-history-select','u11-safeguarding-player']){const select=document.getElementById(id);if(select){select.replaceChildren();select.value='';}}

@@ -29,13 +29,13 @@ const cases=[
    toast(){},alert(){},esc:x=>String(x),miniJerseyHTML:()=>'',accessRoleLabel:r=>r,
    archiveStatsFromState:()=>({played:1,wins:1,draws:0,losses:0,gf:1,ga:0,topScorer:'Old private data'}),clubListingHtml:x=>x,matchScoreText:()=>'',formatDate:x=>x,
   };
-  vm.createContext(ctx);vm.runInContext(helpers+(['refreshCompliancePanel','loadComplianceAccountChoices'].includes(name)?source.slice(source.indexOf('const COMPLIANCE_FIELDS='),source.indexOf('async function refreshCompliancePanel()')):'')+actualFunction(name),ctx,{filename:'actual-app-private-reader.js'});
-  const work=ctx[name](...args);await Promise.resolve();
+  vm.createContext(ctx);vm.runInContext(helpers+(['refreshSeasonHistory','refreshAuditHistory'].includes(name)?source.slice(source.indexOf('let __historyIdentity='),source.indexOf('function archiveStatsFromState')):'')+(['refreshCompliancePanel','loadComplianceAccountChoices'].includes(name)?source.slice(source.indexOf('const COMPLIANCE_FIELDS='),source.indexOf('async function refreshCompliancePanel()')):'')+actualFunction(name),ctx,{filename:'actual-app-private-reader.js'});
+  const work=ctx[name](...args);await Promise.resolve();const rendersBeforeReply=renders;
   cloud.session={user:{id:'b'}};cloud.context={profile:{user_id:'b',club_id:'club'}};ctx.currentRole='parent';
   const reply=name==='refreshCompliancePanel'?{privateMarker:'Old private data'}:name==='openSeasonArchive'?{season:'2025/26',age_group:12,team_name:'Old private data',snapshot:{team_state:{matches:[],goals:[]}}}:[{privateMarker:'Old private data',player_name:'Fictional Child A',body:'Old private data',role:'parent',full_name:'Old private data',user_id:'old'}];
   resolve(reply);
   await work;
-  assert.equal(opened,0,name+' cannot reopen a former private dialog');assert.equal(renders,0,name+' cannot render the prior account result');
+  assert.equal(opened,0,name+' cannot reopen a former private dialog');assert.equal(renders,rendersBeforeReply,name+' cannot render the prior account result');
   if(state)assert.deepEqual(JSON.parse(JSON.stringify(ctx[state])),initial,name+' cannot store the prior account result');
   for(const el of nodes.values())assert(!String(el.innerHTML).includes('Old private data'),name+' cannot repopulate cleared output');
   console.log('PASS '+name+' rejects an already-requested prior-account reply');

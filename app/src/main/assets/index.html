@@ -883,8 +883,8 @@
             <summary><span>Season history</span><span class="settings-chevron">⌄</span></summary>
             <div class="settings-accordion-body">
               <p class="muted">Archived seasons are read only and preserve the match record from before rollover.</p>
-              <div class="season-history-controls"><select id="season-history-select" aria-label="Archived season"><option value="">No archived seasons yet</option></select><button type="button" class="secondary-button compact" id="open-season-archive">View archive</button></div>
-              <div id="season-history-summary" class="archive-summary"></div>
+              <div class="season-history-controls"><select id="season-history-select" aria-label="Archived season" aria-describedby="season-history-summary" disabled><option value="">Open this page to load season history</option></select><button type="button" class="secondary-button compact" id="open-season-archive" disabled>View archive</button></div>
+              <div id="season-history-summary" class="archive-summary" role="status" aria-live="polite">Open this page to load season history.</div>
             </div>
           </details>
       </section>
@@ -896,7 +896,8 @@
             <div class="settings-accordion-body">
               <p class="muted">Club-wide player activity and parent access changes. Recent updates only.</p>
               <button type="button" class="secondary-button compact" id="refresh-audit-history">Refresh history</button>
-              <div id="audit-history-list" class="audit-history-list"><div class="empty-state compact-empty">Open this section to load history.</div></div>
+              <p id="audit-history-status" class="helper" role="status" aria-live="polite">Open this page to load audit history.</p>
+              <div id="audit-history-list" class="audit-history-list" aria-describedby="audit-history-status"></div>
             </div>
           </details>
       </section>

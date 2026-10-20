@@ -2626,3 +2626,6 @@ html body .admin-onboarding-options .admin-onboarding-choice{
 
 /* Compliance state gates stay local to this existing Admin form. */
 #club-compliance-settings button:disabled{opacity:.5;cursor:not-allowed}
+
+/* History read gates do not change controls elsewhere in the app. */
+#view-season-history #open-season-archive:disabled{opacity:.5;cursor:not-allowed}

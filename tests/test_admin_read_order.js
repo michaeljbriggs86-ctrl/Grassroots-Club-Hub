@@ -2,7 +2,7 @@
 const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
 const {deferred}=require('./helpers/cloud_client_harness');const app=fs.readFileSync('app/src/main/assets/app.js','utf8');
 function fixture(){
- const nodes={};for(const id of ['season-history-select','season-history-summary','audit-history-list','compliance-status','club-cancel-status','compliance-primary-reviewer','compliance-backup-reviewer','compliance-welfare-name','compliance-welfare-contact','compliance-county-fa','compliance-county-contact','compliance-fallback','safeguarding-export-audit'])nodes[id]={value:'b',innerHTML:'',textContent:'',checked:false};
+ const nodes={};for(const id of ['season-history-select','season-history-summary','audit-history-list','compliance-status','club-cancel-status','compliance-primary-reviewer','compliance-backup-reviewer','compliance-welfare-name','compliance-welfare-contact','compliance-county-fa','compliance-county-contact','compliance-fallback','safeguarding-export-audit'])nodes[id]={value:'b',innerHTML:'',textContent:'',checked:false,setAttribute(){}};
  const requests={};const cloud={context:{profile:{club_id:"club-a"}}};for(const method of ['listSeasonArchives','listAuditHistory','getClubComplianceStatus','listSafeguardingExportAudit']){requests[method]=[];cloud[method]=()=>{const d=deferred();requests[method].push(d);return d.promise;};}
  let key='account|club|team|admin';const toasts=[];const c={CLOUD_MODE:true,currentRole:'admin',personProfileContextKey:()=>key,window:{ClubHubCloud:cloud},document:{getElementById:id=>nodes[id],activeElement:null},privateAccountViewScope:()=>({key,cloud:c.window.ClubHubCloud}),privateAccountViewCurrent:s=>s.key===key&&s.cloud===c.window.ClubHubCloud,isAdmin:()=>true,isClubOverviewMode:()=>true,isAdminTeamPreviewMode:()=>false,isAdminCoachMode:()=>false,esc:String,toast:x=>toasts.push(x),Date,refreshDisputeReviewerPanel:async()=>{}};
  vm.createContext(c);vm.runInContext(app.slice(app.indexOf('let __seasonArchives=[];'),app.indexOf('function configuredAwardTypes()')),c);vm.runInContext(app.slice(app.indexOf('let __complianceStatus=null'),app.indexOf('async function refreshDisputeReviewerPanel()')),c);
@@ -15,6 +15,7 @@ async function tick(){await Promise.resolve();await Promise.resolve();}
   for(const outcome of ['resolve','reject']){
    const f=fixture(),a=f.c[fn](false),b=f.c[fn](false);f.requests[method][1].resolve([row('new')]);await b;f.requests[method][0][outcome](outcome==='resolve'?[row('old')]:Error('late error'));await a;assert.equal(f.state(state)[0].id,'new',fn+' latest response wins');assert.deepEqual(f.toasts,[]);
   }
+  {const f=fixture();let p=f.c[fn](true);f.requests[method][0].resolve([row('retained')]);await p;for(const invalid of [[null],[false],{},null]){p=f.c[fn](true);f.requests[method].at(-1).resolve(invalid);await p;assert.equal(f.state(state)[0].id,'retained');assert.equal(f.state(fn==='refreshSeasonHistory'?'__seasonHistoryRead':'__auditHistoryRead'),'error');}}
   for(const change of ['account','club','team','role','cloud']){
    const f=fixture(),p=f.c[fn](false);if(change==='cloud')f.c.window.ClubHubCloud={};else f.context(change);f.requests[method][0].resolve([row('private-old')]);await p;assert.equal(f.state(state).length,0);
   }
