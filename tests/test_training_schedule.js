@@ -19,7 +19,11 @@ const fields={
 const state={trainingSessions:[{id:'dated-1',date:'2026-10-08',time:'17:00',venue:'Indoor hall',note:''},{id:'dated-2',date:'2026-09-30',time:'17:00',endTime:'18:30',venue:'Local pitch',note:''}],trainingSchedule:{weekly:[],cancelled:[]}};
 let saves=0,resets=0;
 const messages=[];
-const context={state,Date,document:{getElementById:id=>fields[id]||null},
+const FixedDate=class extends Date {
+  constructor(...args){super(...(args.length?args:['2026-09-30T10:00:00']));}
+  static now(){return new Date('2026-09-30T10:00:00').getTime();}
+};
+const context={state,Date:FixedDate,document:{getElementById:id=>fields[id]||null},
   requireCoach:()=>true,uid:()=> 'tw-1',saveState:()=>{saves++;},toast:message=>{messages.push(message);},
   formatDate:x=>x,esc:x=>String(x).replaceAll('&','&amp;').replaceAll('<','&lt;')};
 vm.runInNewContext(`${app.slice(start,end)}\nthis.addWeekly=addWeeklyTraining;this.upcoming=upcomingTrainingSessions;this.parentRows=parentTrainingRowsHtml;this.schedule=parentTrainingScheduleHtml;`,context);
