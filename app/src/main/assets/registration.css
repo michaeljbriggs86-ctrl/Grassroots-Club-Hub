@@ -1,4 +1,5 @@
 /* Figma 222:5414 and 348:6674; existing Inter, club badge and theme tokens. */
+.registration-page .registration-feedback{white-space:pre-wrap;overflow-wrap:anywhere}
 .registration-page{margin:0;min-height:100vh;background:var(--bg);color:var(--ink);font:400 .875rem/1.45 var(--gch-font);--registration-panel:linear-gradient(125deg,rgba(255,255,255,.105),rgba(255,255,255,.055) 45%,rgba(255,255,255,.025));}
 .registration-page *{box-sizing:border-box;min-width:0}
 html[data-theme="light"] .registration-page{--registration-panel:linear-gradient(125deg,#fff,#f6faf7);--bg:#F3F6F4;--ink:#111715;--muted:#66756D;--line:#D8E0DA;--paper:#fff}
