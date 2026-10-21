@@ -16,12 +16,12 @@ harness=harness.replace(entry,`  if(u.pathname==='/onboarding-component.html'){r
 ${entry}`);
 const scenarios=async function(){
  await new Promise(r=>server.listen(0,'127.0.0.1',r));base='http://127.0.0.1:'+server.address().port;
- const browser=await chromium.launch({headless:true});const results=[],errors=[];
+ const browser=await chromium.launch({headless:true});const results=[],errors=[],invitationRequests=[],actionLayouts=[];
  fixture=await registrationFixture();
  try{
-  for(const theme of ['dark','light'])for(const width of [320,393,1440]){
+  for(const theme of ['dark','light'])for(const [width,height] of [[320,844],[393,844],[844,393],[1440,1000]]){
    console.log('Checking onboarding empty states',theme,width);
-   const page=await browser.newPage({viewport:{width,height:900}});page.on('pageerror',e=>errors.push(e.message));
+   const page=await browser.newPage({viewport:{width,height}});page.on('pageerror',e=>errors.push(e.message));page.on('request',r=>{if(new URL(r.url()).pathname==='/functions/v1/registration-invite')invitationRequests.push({method:r.method(),path:new URL(r.url()).pathname});});
    await page.route('**/*',route=>route.request().url().startsWith(base)?route.continue():route.abort());
    await fixture.owner();await fixture.q('update private.registration_packs set enabled=false');
    await page.goto(base+'/register.html');await page.getByRole('heading',{name:'Sign in for registration',exact:true}).waitFor();
@@ -41,7 +41,18 @@ const scenarios=async function(){
    assert.equal(await page.locator('[name="team_id"]').inputValue(),'');assert(await page.getByRole('button',{name:'Send registration email',exact:true}).isVisible());
    assert.equal(await page.evaluate(()=>document.activeElement.id),'registration-title');
    await checkLayout(page,width,theme+'-eligible-team-recovered');
-   await click(page,'Back to registrations');await page.getByRole('heading',{name:'Player registrations',exact:true}).waitFor();
+   const send=page.getByRole('button',{name:'Send registration email',exact:true}),back=page.getByRole('button',{name:'Back to registrations',exact:true});
+   for(const textScale of [100,200]){
+    await page.evaluate(v=>document.documentElement.style.fontSize=v+'%',textScale);
+    const layout=await page.locator('#registration-invite').evaluate(form=>{const send=form.querySelector('[type="submit"]'),back=form.querySelector('[data-action="list"]'),a=send.getBoundingClientRect(),b=back.getBoundingClientRect();return {sendType:send.type,backType:back.type,sendOwnsForm:send.form===form,backOwnsForm:back.form===form,gap:b.top-a.bottom,heights:[a.height,b.height],order:[...form.querySelectorAll('button')].map(n=>n.textContent.trim()),overflow:document.documentElement.scrollWidth>innerWidth+1};});
+    assert.equal(layout.sendType,'submit');assert.equal(layout.backType,'button');assert(layout.sendOwnsForm&&layout.backOwnsForm);assert.equal(layout.gap,16,'shared action rhythm separates Send and Back');assert(layout.heights.every(h=>h>=52));assert.deepEqual(layout.order,['Send registration email','Back to registrations']);assert(!layout.overflow);actionLayouts.push({theme,width,height,textScale,...layout});
+    await back.scrollIntoViewIfNeeded();await page.screenshot({path:path.join(out,`invite-actions-${theme}-${width}-${textScale}.png`)});
+   }
+   await page.evaluate(()=>document.documentElement.style.fontSize='100%');
+   await send.click();assert.equal(await page.evaluate(()=>document.activeElement.name),'team_id','native required team guard still focuses Team');assert.equal(invitationRequests.length,0);
+   await back.press('Enter');await page.getByRole('heading',{name:'Player registrations',exact:true}).waitFor();assert.equal(await page.evaluate(()=>document.activeElement.id),'registration-title','Back bypasses invalid form submission and restores list focus');
+   await click(page,'Invite a new player');await page.getByRole('heading',{name:'Registration invitation',exact:true}).waitFor();await page.locator('[name="team_id"]').selectOption({index:1});await page.locator('[name="email"]').fill('parent@example.invalid');
+   await page.locator('[name="email"]').press('Tab');assert.equal(await page.evaluate(()=>document.activeElement.textContent.trim()),'Send registration email','native Tab reaches submit first');await page.keyboard.press('Tab');assert.equal(await page.evaluate(()=>document.activeElement.textContent.trim()),'Back to registrations','native Tab reaches Back second');await page.keyboard.press('Enter');await page.getByRole('heading',{name:'Player registrations',exact:true}).waitFor();assert.equal(invitationRequests.length,0,'Back with valid fields never sends an invitation');
    await auth(page,fixture.parent,theme);await page.reload();await page.getByRole('heading',{name:'Your registrations',exact:true}).waitFor();
    assert.match(await page.locator('#registration-content').innerText(),/Open the original registration invitation/);assert.equal(await page.getByRole('button',{name:'Invite a new player',exact:true}).count(),0);
    await checkLayout(page,width,theme+'-parent-empty');
@@ -61,11 +72,11 @@ const scenarios=async function(){
    await page.evaluate(async()=>{window.__componentTeams=[{id:'fictional-team',ageGroup:'U9',teamName:'Example Greens'}];await ClubHubPlayerOnboarding.enter();});
    assert(!await select.isDisabled());assert.equal(await select.locator('option').count(),2);await select.selectOption('fictional-team');
    await page.getByRole('heading',{name:'Welcome the next player',exact:true}).waitFor();assert.equal(await page.evaluate(()=>window.__componentReads),1);
-   results.push({theme,width,portal:'actual built assets and SQL eligibility',component:'built standalone module, not full bootstrap',noInvitationWrites:true});await page.close();
+   results.push({theme,width,height,portal:'actual built assets and SQL eligibility',component:'built standalone module, not full bootstrap',noInvitationWrites:true,invalidSendGuard:true,nativeTabOrder:true,blankAndFilledBack:true});await page.close();
   }
   assert.deepEqual(errors,[]);assert(rpcActions.every(x=>x==='list'||x==='teams'),'only registration reads were made');
-  fs.writeFileSync(path.join(out,'checks.json'),JSON.stringify({browser:browser.version(),results,pageErrors:errors,rpcActions},null,2));
-  console.log('PASS built onboarding empty states: 6 SQL-backed portal theme/viewport cases, 100%/200% text reflow, eligibility recovery, failures, parent boundary and separate component-only zero-team cases; no invitations or access writes');
+  assert.deepEqual(invitationRequests,[]);fs.writeFileSync(path.join(out,'checks.json'),JSON.stringify({browser:browser.version(),results,actionLayouts,pageErrors:errors,rpcActions,invitationRequests},null,2));
+  console.log('PASS built onboarding and invitation actions: 8 SQL-backed portal theme/viewport cases; 16 measured action stacks at 100%/200% computed text, native required guard/Tab order/Back with blank and valid fields; eligibility recovery, failures, parent boundary and separate component-only zero-team cases; no invitation or access writes');
  }finally{await fixture.db.close();await browser.close();server.close();}
 };
 new Function('require','process',harness+"\nlet teamResponseMode='normal';const rpcActions=[];\n("+scenarios.toString()+")().catch(e=>{console.error(e);server.close();process.exitCode=1;});")(require,process);
