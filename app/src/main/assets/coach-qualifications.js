@@ -98,7 +98,26 @@
   function updateMatrixScrollHint(){const region=el('coach-document-table'),hint=el('coach-document-scroll-hint'),show=!!(matrixCurrent()&&matrix.loaded&&region?.querySelector?.('table')&&region.scrollWidth>region.clientWidth+1);if(hint)hint.hidden=!show;if(show)region?.setAttribute?.('aria-describedby','coach-document-scroll-hint');else region?.removeAttribute?.('aria-describedby');}
   function resetMatrixScrollHint(){matrixScrollObserver?.disconnect();if(el('coach-document-scroll-hint'))el('coach-document-scroll-hint').hidden=true;el('coach-document-table')?.removeAttribute?.('aria-describedby');}
   function watchMatrixScroll(){matrixScrollObserver?.disconnect();const region=el('coach-document-table'),table=region?.querySelector?.('table');if(region)matrixScrollObserver?.observe(region);if(table)matrixScrollObserver?.observe(table);updateMatrixScrollHint();}
-  function clearMatrix(){matrixVersion++;matrix=null;resetMatrixScrollHint();for(const id of ['coach-document-table','coach-document-notice'])if(el(id))el(id).innerHTML='';if(el('coach-document-status'))el('coach-document-status').textContent='';if(el('coach-document-notice'))el('coach-document-notice').hidden=true;if(el('coach-documents-summary-status'))el('coach-documents-summary-status').textContent='Coach documents unavailable. Open the matrix to refresh.';}
+  function matrixReadPosition(old){
+    const region=el('coach-document-table'),active=document.activeElement;
+    if(!matrixCurrent(old)||!region?.getClientRects?.().length)return null;
+    if(!old.loaded&&old.position&&(active===document.body||active===region))return old.position;
+    const coach=region.contains(active)?active.closest?.('[data-matrix-coach]'):null;
+    if(coach||active===region)return{coach:coach?.dataset.matrixCoach||null,left:region.scrollLeft,top:region.scrollTop,x:window.scrollX,y:window.scrollY};
+    return null;
+  }
+  function restoreMatrixReadPosition(s){
+    const position=s.position;s.position=null;
+    const region=el('coach-document-table'),active=document.activeElement;
+    if(!position||!matrixCurrent(s)||matrix!==s||!region?.getClientRects?.().length||(active!==document.body&&active!==region))return;
+    const target=s.loaded&&region.querySelector('table')?(position.coach?[...region.querySelectorAll('[data-matrix-coach]')].find(n=>n.dataset.matrixCoach===position.coach):region):null;
+    if(!target){el('coach-documents-title')?.focus();return;}
+    region.scrollLeft=position.left;region.scrollTop=position.top;
+    window.scrollTo?.({left:position.x,top:position.y,behavior:'instant'});target.focus({preventScroll:true});
+    if(target!==region){const bounds=target.getBoundingClientRect();if(bounds.top<0||bounds.bottom>window.innerHeight)target.scrollIntoView({block:'nearest',inline:'nearest',behavior:'instant'});}
+  }
+  function cancelMatrixReadPosition(){if(matrix)matrix.position=null;}
+  function clearMatrix(){cancelMatrixReadPosition();matrixVersion++;matrix=null;resetMatrixScrollHint();el('coach-document-table')?.setAttribute?.('aria-busy','false');for(const id of ['coach-document-table','coach-document-notice'])if(el(id))el(id).innerHTML='';if(el('coach-document-status'))el('coach-document-status').textContent='';if(el('coach-document-notice'))el('coach-document-notice').hidden=true;if(el('coach-documents-summary-status'))el('coach-documents-summary-status').textContent='Coach documents unavailable. Open the matrix to refresh.';}
   function documentDate(value){return new Intl.DateTimeFormat('en-GB',{day:'numeric',month:'short',year:'numeric',timeZone:'Europe/London'}).format(new Date(value+'T00:00:00Z'));}
   function matrixSummary(rows,date=today()){
     const due=[],overdue=[];let missing=0,unchecked=0;
@@ -121,13 +140,15 @@
   async function refreshMatrix(){
     const c=context();if(!c?.editable){clearMatrix();return;}
     const old=matrix;if(old&&!matrixCurrent(old))clearMatrix();
-    const version=++matrixVersion;matrix={...c,rows:[],loaded:false,loadedAt:null};resetMatrixScrollHint();if(el('coach-documents-summary-status'))el('coach-documents-summary-status').textContent='Loading coach documents…';
+    const position=matrixReadPosition(old);if(old)old.position=null;
+    const version=++matrixVersion,s=matrix={...c,rows:[],loaded:false,loadedAt:null,position};resetMatrixScrollHint();el('coach-document-table')?.setAttribute?.('aria-busy','true');if(el('coach-documents-summary-status'))el('coach-documents-summary-status').textContent='Loading coach documents…';
     el('coach-document-matrix')?.classList.remove('hidden');if(el('coach-document-table'))el('coach-document-table').innerHTML='';if(el('coach-document-notice')){el('coach-document-notice').innerHTML='';el('coach-document-notice').hidden=true;}if(el('coach-document-status'))el('coach-document-status').textContent='Loading coach documents…';
     try{const rows=await c.cloud.listCoachQualifications();if(version!==matrixVersion||!matrixCurrent())return;
       if(!Array.isArray(rows))throw Error('Invalid matrix');const seen=new Set();
       for(const p of rows){if(!p||typeof p.user_id!=='string'||!p.user_id||seen.has(p.user_id)||!['club_admin','coach','assistant_coach'].includes(p.role)||typeof p.full_name!=='string')throw Error('Invalid coach');response(p);seen.add(p.user_id);}
       matrix.rows=rows;matrix.loadedAt=Date.now();matrix.loaded=true;renderMatrix();
     }catch(_){if(version===matrixVersion&&matrixCurrent()){matrix.rows=[];matrix.loaded=false;if(el('coach-documents-summary-status'))el('coach-documents-summary-status').textContent='Coach documents unavailable. Open the matrix to refresh; no expiry status can be confirmed.';if(el('coach-document-status'))el('coach-document-status').textContent='Coach documents unavailable. Refresh to retry; no expiry status can be confirmed.';}}
+    finally{if(version===matrixVersion&&matrix===s&&matrixCurrent(s)){el('coach-document-table')?.setAttribute?.('aria-busy','false');restoreMatrixReadPosition(s);}else s.position=null;}
   }
   document.addEventListener('click',event=>{
     if(event.target.closest?.('#coach-document-refresh')){refreshMatrix();return;}
@@ -145,6 +166,8 @@
   });
   el('coach-qualification-dialog')?.addEventListener('close',()=>{if(!el('coach-qualification-dialog')?.open)close();});
   el('coach-document-filter')?.addEventListener('change',renderMatrix);
+  for(const type of ['pointerdown','wheel','touchmove','keydown'])document.addEventListener(type,cancelMatrixReadPosition,{capture:true,passive:true});
+  document.addEventListener('focusin',event=>{if(event.target!==document.body)cancelMatrixReadPosition();});
   window.addEventListener?.('resize',updateMatrixScrollHint);
   document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&matrixCurrent())refreshMatrix();});
   window.ClubHubCoachQualifications={syncAccess,open,close,refreshMatrix,matrixSummary,catalogue,today,validDate,suggestedExpiry,status,validate};
