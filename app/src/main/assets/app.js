@@ -5860,6 +5860,7 @@ async function refreshClubCoaches(quiet=false){
   finally{await people;}
 }
 function accessRoleLabel(role){return role==='club_admin'?'Club Admin':role==='assistant_coach'?'Assistant Coach':role==='coach'?'Coach':role==='player'?'Player':role==='pending_parent'?'Parent · pending':'Parent';}
+function isCoachingAccessAccount(row){return ['coach','assistant_coach'].includes(row.role)||(row.role==='club_admin'&&!!row.coach_team_id);}
 function renderAdminAccessManagement(){
   const list=document.getElementById('admin-access-list'),stats=document.getElementById('admin-access-stats'),filter=document.getElementById('admin-access-filter');if(!list)return;
   if(__adminAccessState==='idle'||__adminAccessState==='loading'){if(stats)stats.textContent='Loading club access…';setStableHtml(list,'<div class="empty-state compact-empty" role="status">Loading club access…</div>');return;}
@@ -5868,8 +5869,8 @@ function renderAdminAccessManagement(){
     setStableHtml(list,'<div class="empty-state compact-empty" role="status">Club access is temporarily unavailable. Use Refresh access to try again.</div>');
     return;
   }
-  const mode=filter?.value||'all',rows=__adminAccessRows.filter(r=>mode==='all'||(mode==='staff'?['coach','assistant_coach'].includes(r.role):mode==='parent'?r.role==='parent':r.role===mode));
-  const counts={admins:__adminAccessRows.filter(r=>r.role==='club_admin').length,staff:__adminAccessRows.filter(r=>['coach','assistant_coach'].includes(r.role)||(r.role==='club_admin'&&r.coach_team_id)).length,parents:__adminAccessRows.filter(r=>r.role==='parent').length,players:__adminAccessRows.filter(r=>r.role==='player').length,pending:__adminAccessRows.filter(r=>r.role==='pending_parent').length};
+  const mode=filter?.value||'all',rows=__adminAccessRows.filter(r=>mode==='all'||(mode==='staff'?isCoachingAccessAccount(r):mode==='parent'?r.role==='parent':r.role===mode));
+  const counts={admins:__adminAccessRows.filter(r=>r.role==='club_admin').length,staff:__adminAccessRows.filter(isCoachingAccessAccount).length,parents:__adminAccessRows.filter(r=>r.role==='parent').length,players:__adminAccessRows.filter(r=>r.role==='player').length,pending:__adminAccessRows.filter(r=>r.role==='pending_parent').length};
   if(stats)stats.innerHTML=`<span class="admin-access-stat">${plural(counts.admins,'Admin')}</span><span class="admin-access-stat">${counts.staff} coaching staff</span><span class="admin-access-stat">${plural(counts.parents,'parent')}</span><span class="admin-access-stat">${plural(counts.players,'player')}</span>${counts.pending?`<span class="admin-access-stat">${counts.pending} pending</span>`:''}`;
   setStableHtml(list,rows.map(r=>{const dual=r.role==='club_admin'&&r.coach_team_id,adminBase=r.role==='club_admin'?adminTitleLabel(r.club_title):'',role=dual?adminBase+' · Coach':(r.role==='club_admin'?adminBase:accessRoleLabel(r.role)),team=(r.age_group&&r.team_name)?`U${r.age_group} ${r.team_name}`:(r.role==='club_admin'?'Club-wide':'Team not assigned');return personNameButton(r.full_name||role,r.user_id,'access',r.team_id||'',role+' · '+team);}).join('')||'<div class="empty-state compact-empty">No accounts match this filter.</div>');
 }
