@@ -1,6 +1,7 @@
 /* Private registration portal. Answers and claim tokens stay in memory, never browser storage. */
 (()=>{'use strict';
  const cfg=window.CLUB_HUB_CLOUD||{},base=String(cfg.url||'').replace(/\/$/,''),SESSION='grassroots_hub_cloud_session_v1',THEME='grassrootsHub_theme_v1';
+ const fromOnboarding=new URLSearchParams(location.search).get('from')==='parent-onboarding';
  const hash=new URLSearchParams(location.hash.slice(1));let invite=hash.get('invite')||'',callback=hash.get('access_token')?Object.fromEntries(hash):null;
  // Remove invitation/session fragments before any request or screen rendering.
  if(location.hash)history.replaceState(null,'',location.pathname+location.search);
@@ -15,7 +16,8 @@
  const panel=(title,body)=>`<section class="panel"><h2>${esc(title)}</h2>${body}</section>`;
  const heading=(title,copy='')=>`<h1 id="registration-title" tabindex="-1">${esc(title)}</h1>${copy?`<p class="helper">${esc(copy)}</p>`:''}`;
  function render(html){$('registration-content').innerHTML=html;$('registration-title')?.focus({preventScroll:true});$('registration-signout').hidden=!user;}
- function clear(){serial++;reviewNotes={};reviewNotesKey='';reviewNoteKind='';app=null;draft={};reads.clear();dirty=false;busy=false;step=0;list=null;render('');}
+ function syncReturn(admin=false){const link=$('registration-return');if(!link)return;const onboarding=fromOnboarding&&admin===true;link.href=onboarding?'/?view=player-onboarding':'/';link.textContent=onboarding?'Back to Parent onboarding':'Back to club website';}
+ function clear(){serial++;reviewNotes={};reviewNotesKey='';reviewNoteKind='';app=null;draft={};reads.clear();dirty=false;busy=false;step=0;list=null;syncReturn();render('');}
  function syncReviewDrafts(){
   const key=app?.admin?JSON.stringify([identity(),app.id,app.club_id||app.team_id||app.team,app.revision,app.status]):'';
   if(key!==reviewNotesKey){reviewNotes={};reviewNotesKey=key;reviewNoteKind='';}
@@ -54,7 +56,7 @@
   }catch(e){status(e.message,true);render(heading('Continue registration')+panel('Your invitation',`<p>Sign in with the invited, verified email. Reopen the original invitation email if you have not claimed it yet.</p>`)+button('signin','Sign in with another account')+button('refresh','Retry'));}
  }
  async function renderList(){
-  list=await rpc('list');
+  list=await rpc('list');syncReturn(list?.admin);
   render(heading(list.admin?'Player registrations':'Your registrations','Saved applications and club decisions')+(list.admin?button('new-invite','Invite a new player',true):'')+(list.applications.length?list.applications.map(x=>panel(x.player_name||x.team,`<p>${esc(x.team)} · ${esc(x.season)}</p><p>${esc(x.email)}</p><p>Status: ${esc(x.status)}${list.admin?' · Email: '+esc(x.delivery):''}</p>${button('open','Open registration',false,`data-id="${esc(x.id)}"`)}`)).join(''):list.admin?panel('No registrations yet','<p>Invite a new player to send a registration link to a parent. Applications will appear here for club review.</p>'):panel('No applications','<p>Open the original registration invitation sent by the club to start. Saved registrations will appear here.</p>')));
  }
  async function open(id){app=await rpc('get',id);draft={...app.answers};reads=new Set(app.read_documents||[]);dirty=false;step=0;status('');renderApplication();}
