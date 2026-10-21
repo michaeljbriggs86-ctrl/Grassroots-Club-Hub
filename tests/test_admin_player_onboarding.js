@@ -30,7 +30,9 @@ const squad=[{name:'Invented Existing',number:1,role:'outfield',status:'active'}
  await flow.enter();assert.match(node('player-onboarding-content').innerHTML,/Start with a team/);
  teamChoices=[];await flow.enter();assert.match(node('player-onboarding-content').innerHTML,/No teams are available for parent onboarding in this view/);assert.doesNotMatch(node('player-onboarding-content').innerHTML,/Choose the squad/);assert.equal(node('player-onboarding-team').disabled,true);assert.equal(loadCalls,0,'no request is made for an unavailable team');
  teamChoices=[teamData.team];await flow.enter();assert.equal(node('player-onboarding-team').disabled,false);assert.match(node('player-onboarding-team').innerHTML,/Choose a team/);
- node('player-onboarding-team').value='team1';await events.change[0]({target:node('player-onboarding-team')});assert.match(node('player-onboarding-content').innerHTML,/Invite a new player/);
+ node('player-onboarding-team').value='team1';await events.change[0]({target:node('player-onboarding-team')});assert.match(node('player-onboarding-content').innerHTML,/Invite a parent/);
+ assert.match(node('player-onboarding-content').innerHTML,/No active squad player matches/);assert.match(node('player-onboarding-content').innerHTML,/aria-describedby="onboarding-request-guidance-0"/);assert.doesNotMatch(node('player-onboarding-content').innerHTML,/data-onboard-request="0"/);
+ assert.match(node('player-onboarding-content').innerHTML,/aria-label="Continue parent onboarding for Invented Existing"/);
  const click=action=>events.click[0]({target:{closest:selector=>selector==='[data-onboard-action]'?{dataset:{onboardAction:action}}:null}});
  click('new');assert.equal(location.href,'register.html?admin=1','new players use parent registration');
  const existing=()=>events.click[0]({target:{closest:selector=>selector==='[data-onboard-player]'?{dataset:{onboardPlayer:'0'}}:null}});existing();click('next');assert.match(node('player-onboarding-content').innerHTML,/Parent access/);

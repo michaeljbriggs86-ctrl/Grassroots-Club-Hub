@@ -1979,6 +1979,10 @@ html[data-theme] body .club-page-watermark{opacity:.015!important}
 .onboarding-queue article>div{min-width:0;overflow-wrap:anywhere}
 .onboarding-queue p{font-size:.875rem;line-height:1.4;margin:4px 0;color:var(--muted)}
 .onboarding-queue button{flex-shrink:0;min-height:44px}
+#player-onboarding-content .onboarding-queue article>div{flex:1}
+#player-onboarding-content .onboarding-queue button{width:auto}
+.onboarding-queue article.onboarding-request-unmatched{flex-direction:column;align-items:stretch}
+.onboarding-request-unmatched>a{display:flex;align-items:center;justify-content:center;box-sizing:border-box;min-height:48px;width:100%;white-space:normal;text-align:center;text-decoration:none}
 .onboarding-progress{list-style:none;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;padding:0;margin:0}
 .onboarding-progress li{display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;font-size:.75rem;color:var(--muted);overflow-wrap:anywhere}
 .onboarding-progress li>span{display:grid;place-items:center;width:36px;height:36px;border-radius:50%;background:var(--gch-soft-green);color:var(--gch-green-950);border:1px solid var(--gch-line);font-size:.875rem;font-weight:600}
