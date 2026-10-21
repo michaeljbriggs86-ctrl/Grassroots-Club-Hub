@@ -28,7 +28,7 @@ const scenarios=async function(){
    await auth(page,fixture.admin,theme);await page.reload();await page.getByRole('heading',{name:'Player registrations',exact:true}).waitFor();
    assert.match(await page.locator('#registration-content').innerText(),/No registrations yet/);
    assert.doesNotMatch(await page.locator('#registration-content').innerText(),/Open the original registration invitation/);
-   await click(page,'Invite a new player');await page.getByRole('heading',{name:'No teams available',exact:true}).waitFor();
+   await click(page,'Invite a parent');await page.getByRole('heading',{name:'No teams available',exact:true}).waitFor();
    assert.equal(await page.locator('#registration-invite').count(),0);assert.equal(await page.locator('[name="email"]').count(),0);
    const retryBox=await page.getByRole('button',{name:'Retry available teams',exact:true}).boundingBox(),backBox=await page.getByRole('button',{name:'Back to registrations',exact:true}).boundingBox();assert(backBox.y-retryBox.y-retryBox.height>=8,'empty-state recovery controls have a visible gap');
    await checkLayout(page,width,theme+'-no-eligible-team');
@@ -51,10 +51,10 @@ const scenarios=async function(){
    await page.evaluate(()=>document.documentElement.style.fontSize='100%');
    await send.click();assert.equal(await page.evaluate(()=>document.activeElement.name),'team_id','native required team guard still focuses Team');assert.equal(invitationRequests.length,0);
    await back.press('Enter');await page.getByRole('heading',{name:'Player registrations',exact:true}).waitFor();assert.equal(await page.evaluate(()=>document.activeElement.id),'registration-title','Back bypasses invalid form submission and restores list focus');
-   await click(page,'Invite a new player');await page.getByRole('heading',{name:'Registration invitation',exact:true}).waitFor();await page.locator('[name="team_id"]').selectOption({index:1});await page.locator('[name="email"]').fill('parent@example.invalid');
+   await click(page,'Invite a parent');await page.getByRole('heading',{name:'Registration invitation',exact:true}).waitFor();await page.locator('[name="team_id"]').selectOption({index:1});await page.locator('[name="email"]').fill('parent@example.invalid');
    await page.locator('[name="email"]').press('Tab');assert.equal(await page.evaluate(()=>document.activeElement.textContent.trim()),'Send registration email','native Tab reaches submit first');await page.keyboard.press('Tab');assert.equal(await page.evaluate(()=>document.activeElement.textContent.trim()),'Back to registrations','native Tab reaches Back second');await page.keyboard.press('Enter');await page.getByRole('heading',{name:'Player registrations',exact:true}).waitFor();assert.equal(invitationRequests.length,0,'Back with valid fields never sends an invitation');
    await auth(page,fixture.parent,theme);await page.reload();await page.getByRole('heading',{name:'Your registrations',exact:true}).waitFor();
-   assert.match(await page.locator('#registration-content').innerText(),/Open the original registration invitation/);assert.equal(await page.getByRole('button',{name:'Invite a new player',exact:true}).count(),0);
+   assert.match(await page.locator('#registration-content').innerText(),/Open the original registration invitation/);assert.equal(await page.getByRole('button',{name:'Invite a parent',exact:true}).count(),0);
    await checkLayout(page,width,theme+'-parent-empty');
    // Component-only zero-list rendering; this does not install a fake cloud
    // client or bypass the production app's bootstrap/access functions.

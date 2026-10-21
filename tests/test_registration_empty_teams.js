@@ -17,7 +17,7 @@ const api=window.__emptyTeamTest,body=()=>node('registration-content').innerHTML
  teams=[{id:'team-a',label:'U9 Example <script>',season:'2026/27'}];await api.newInvite();assert.match(body(),/name="team_id"|name="email"|Send registration email/);assert.match(body(),/Example &lt;script&gt;/);assert.doesNotMatch(body(),/Retry available teams/);
  const loaded=body();teams=null;await assert.rejects(api.newInvite,/Available teams could not be loaded/);assert.equal(body(),loaded,'malformed response is an error and does not render an empty state');
  failure=true;await assert.rejects(api.newInvite,/Fictional team service unavailable/);assert.equal(body(),loaded,'service failure retains current view');failure=null;
- admin=false;setAccount('parent-a');api.begin('parent-a');await api.renderList();assert.match(body(),/Open the original registration invitation/);assert.doesNotMatch(body(),/Invite a new player|No registrations yet/,'parents keep their own invitation guidance');
+ admin=false;setAccount('parent-a');api.begin('parent-a');await api.renderList();assert.match(body(),/Open the original registration invitation/);assert.doesNotMatch(body(),/Invite a parent|No registrations yet/,'parents keep their own invitation guidance');
  assert(calls.every(c=>c==='list'||c==='teams'),'only read actions were exercised');
  console.log('PASS registration empty teams: Admin/Parent guidance, empty versus malformed/failure, eligibility recovery, escaped labels and no invitation writes');
 })().catch(e=>{console.error(e);process.exitCode=1;});
