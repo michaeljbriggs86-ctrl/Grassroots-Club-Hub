@@ -1118,7 +1118,8 @@ html[data-theme="dark"] body.role-parent #view-home .screen-lead-card{
 #coach-qualification-form label{margin:0}
 #coach-qualification-form input[type=date],#coach-qualification-form select{width:100%;margin-top:6px;min-height:48px;font-size:16px}
 .qualification-date-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-#coach-qualification-form .qualification-check{display:flex;align-items:center;gap:12px;min-height:48px}
+#coach-qualification-form .qualification-check{display:flex;flex-direction:row;align-items:flex-start;gap:12px;min-height:48px}
+#coach-qualification-form .qualification-check input{flex:0 0 20px;width:20px;height:20px;min-height:20px;margin:3px 0 0}
 .qualification-actions{display:flex;flex-wrap:wrap;gap:10px}
 .qualification-actions>button{flex:1 1 150px;min-height:48px}
 #coach-qualification-source{display:inline-flex;align-items:center;min-height:44px}

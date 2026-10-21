@@ -1214,14 +1214,15 @@
         <h4>Update qualification</h4>
         <form id="coach-qualification-form" novalidate>
           <input type="hidden" id="coach-qualification-kind" />
-          <label>Qualification<select id="coach-qualification-course" required></select></label>
+          <label><span id="coach-qualification-course-label">Qualification</span><select id="coach-qualification-course" aria-labelledby="coach-qualification-course-label" aria-describedby="coach-qualification-course-error" required></select><span class="qualification-error" id="coach-qualification-course-error" hidden></span></label>
           <div class="qualification-date-fields">
-            <label><span id="coach-qualification-date-label">Completed</span><input type="date" id="coach-qualification-completed" required /></label>
-            <label><span id="coach-qualification-expiry-label">Expiry</span><input type="date" id="coach-qualification-expiry" required /></label>
+            <label><span id="coach-qualification-date-label">Completed</span><input type="date" id="coach-qualification-completed" aria-labelledby="coach-qualification-date-label" aria-describedby="coach-qualification-completed-error" required /><span class="qualification-error" id="coach-qualification-completed-error" hidden></span></label>
+            <label><span id="coach-qualification-expiry-label">Expiry</span><input type="date" id="coach-qualification-expiry" aria-labelledby="coach-qualification-expiry-label" aria-describedby="coach-qualification-expiry-error" required /><span class="qualification-error" id="coach-qualification-expiry-error" hidden></span></label>
           </div>
           <p class="helper" id="coach-qualification-help"></p>
           <a id="coach-qualification-source" href="https://learn.englandfootball.com/" target="_blank" rel="noopener">View official guidance</a>
           <label class="qualification-check"><input type="checkbox" id="coach-qualification-checked" /><span id="coach-qualification-check-label">Club has checked this qualification and its dates</span></label>
+          <p class="qualification-error" id="coach-qualification-form-error" tabindex="-1" hidden></p>
           <div class="qualification-actions"><button type="submit" class="primary-button">Save record</button><button type="button" class="secondary-button" id="coach-qualification-remove" hidden>Remove record</button></div>
         </form>
       </section>

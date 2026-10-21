@@ -17,10 +17,11 @@
     return {tone:'current',label:'In date'};
   }
   function validate(record,date=today()){
-    const item=catalogue.find(x=>x.kind===record.kind);if(!item||!Object.hasOwn(item.courses,record.course))throw Error('Choose a qualification from the list.');
-    if(!validDate(record.completed_on)||record.completed_on>date||record.completed_on<'1900-01-01')throw Error('Enter a valid issue or completion date, up to today.');
-    if(!record.expires_on)throw Error('Enter the recorded expiry or renewal date.');
-    if(record.expires_on&&(!validDate(record.expires_on)||record.expires_on<=record.completed_on))throw Error('Expiry or renewal must be after the issue or completion date.');
+    const invalid=(field,text)=>{throw Object.assign(Error(text),{qualificationField:field});};
+    const item=catalogue.find(x=>x.kind===record.kind);if(!item||!Object.hasOwn(item.courses,record.course))invalid('course','Choose a qualification from the list.');
+    if(!validDate(record.completed_on)||record.completed_on>date||record.completed_on<'1900-01-01')invalid('completed','Enter a valid issue or completion date, up to today.');
+    if(!record.expires_on)invalid('expiry','Enter the recorded expiry or renewal date.');
+    if(record.expires_on&&(!validDate(record.expires_on)||record.expires_on<=record.completed_on))invalid('expiry','Expiry or renewal must be after the issue or completion date.');
     return {kind:record.kind,course:record.course,completed_on:record.completed_on,expires_on:record.expires_on||null,club_checked:record.club_checked===true};
   }
   function response(data){
@@ -32,17 +33,25 @@
   function context(){const cloud=window.ClubHubCloud,profile=cloud?.context?.profile,role=cloud?.role?.();if(!cloud?.session?.user?.id||!profile?.club_id||!['admin','coach','assistant_coach'].includes(role)||cloud?.actingAsParent?.())return null;return{cloud,user:cloud.session.user.id,club:profile.club_id,role,editable:role==='admin'&&typeof isClubOverviewMode==='function'&&isClubOverviewMode()};}
   function same(s=state){const c=context();return !!(s&&c&&c.cloud===s.cloud&&c.user===s.user&&c.club===s.club&&c.role===s.role&&c.editable===s.editable&&el('coach-qualification-dialog')?.open);}
   function message(text,error=false){const node=el('coach-qualification-status');if(node){node.textContent=text;node.classList.toggle('qualification-error',error);}}
-  function close(){const target=state?.target;loadVersion++;state=null;el('coach-qualification-editor')?.classList.add('hidden');const list=el('coach-qualification-list');if(list)list.innerHTML='';const name=el('coach-qualification-name');if(name)name.textContent='Coach profile';const form=el('coach-qualification-form');form?.reset?.();const retry=el('coach-qualification-retry');if(retry){retry.hidden=true;retry.disabled=false;}message('');const dialog=el('coach-qualification-dialog');if(dialog?.open)dialog.close();if(target&&window.ClubHubPersonProfiles?.selectedSnapshot()?.userId===target)window.ClubHubPersonProfiles.refresh();}
+  function clearEditorError(field){const input=el('coach-qualification-'+field),error=el('coach-qualification-'+field+'-error');input?.removeAttribute?.('aria-invalid');if(error){error.textContent='';error.hidden=true;}}
+  function clearEditorErrors(){for(const field of ['course','completed','expiry','form'])clearEditorError(field);}
+  function editorError(text,field){
+    clearEditorErrors();message(text,true);
+    const input=['course','completed','expiry'].includes(field)?el('coach-qualification-'+field):null;
+    const error=el('coach-qualification-'+(input?field:'form')+'-error');if(error){error.textContent=text;error.hidden=false;}
+    const focus=input||error;if(input)input.setAttribute('aria-invalid','true');focus?.focus();focus?.scrollIntoView?.({block:'center'});
+  }
+  function close(){const target=state?.target;loadVersion++;state=null;clearEditorErrors();el('coach-qualification-editor')?.classList.add('hidden');const list=el('coach-qualification-list');if(list)list.innerHTML='';const name=el('coach-qualification-name');if(name)name.textContent='Coach profile';const form=el('coach-qualification-form');form?.reset?.();const retry=el('coach-qualification-retry');if(retry){retry.hidden=true;retry.disabled=false;}message('');const dialog=el('coach-qualification-dialog');if(dialog?.open)dialog.close();if(target&&window.ClubHubPersonProfiles?.selectedSnapshot()?.userId===target)window.ClubHubPersonProfiles.refresh();}
   function syncAccess(){const c=context(),button=el('coach-profile-self');button?.classList.toggle('hidden',!c);if(state&&!same())close();if(matrix&&!matrixCurrent())clearMatrix();el('coach-document-matrix')?.classList.toggle('hidden',!c?.editable);el('coach-documents-summary')?.classList.toggle('hidden',!c?.editable);}
   function render(){
     if(!same()||!state.loaded)return;
-    el('coach-qualification-list').innerHTML=catalogue.map(item=>{const record=state.records.find(r=>r.kind===item.kind),s=status(record);return `<article class="coach-qualification-row"><div><h4>${esc(item.label)}</h4><span class="qualification-state ${s.tone}">${esc(s.label)}</span>${record?`<p>${esc(item.courses[record.course]||'Qualification')}</p><p>${esc(item.dateLabel||'Completed')}: ${esc(record.completed_on)}<br>${esc(item.expiryLabel||'Expiry')}: ${record.expires_on?esc(record.expires_on):'No expiry recorded'}</p><p class="muted">${record.club_checked?'Club checked'+(record.checked_at?' · '+esc(String(record.checked_at).slice(0,10)):''):'Needs club check'}</p>`:''}</div>${state.editable?`<button type="button" class="secondary-button" data-edit-qualification="${item.kind}">${record?'Edit':'Add'}</button>`:''}</article>`;}).join('');
+    el('coach-qualification-list').innerHTML=catalogue.map(item=>{const record=state.records.find(r=>r.kind===item.kind),s=status(record);return `<article class="coach-qualification-row"><div><h4>${esc(item.label)}</h4><span class="qualification-state ${s.tone}">${esc(s.label)}</span>${record?`<p>${esc(item.courses[record.course]||'Qualification')}</p><p>${esc(item.dateLabel||'Completed')}: ${esc(record.completed_on)}<br>${esc(item.expiryLabel||'Expiry')}: ${record.expires_on?esc(record.expires_on):'No expiry recorded'}</p><p class="muted">${record.club_checked?'Club checked'+(record.checked_at?' · '+esc(String(record.checked_at).slice(0,10)):''):'Needs club check'}</p>`:''}</div>${state.editable?`<button type="button" class="secondary-button" data-edit-qualification="${item.kind}" aria-label="${record?'Edit':'Add'} ${esc(item.label)}">${record?'Edit':'Add'}</button>`:''}</article>`;}).join('');
     el('coach-qualification-readonly').hidden=state.editable;
   }
   function edit(kind){
     if(!same()||!state.loaded||!state.editable||busy)return;
     const item=catalogue.find(x=>x.kind===kind);if(!item)return;const record=state.records.find(r=>r.kind===kind);
-    state.editing=kind;el('coach-qualification-kind').value=kind;
+    clearEditorErrors();state.editing=kind;el('coach-qualification-kind').value=kind;
     el('coach-qualification-course').innerHTML=Object.entries(item.courses).map(([value,label])=>`<option value="${esc(value)}">${esc(label)}</option>`).join('');
     el('coach-qualification-course').value=record?.course||Object.keys(item.courses)[0];
     el('coach-qualification-completed').value=record?.completed_on||'';el('coach-qualification-completed').max=today();
@@ -56,7 +65,7 @@
   }
   async function open(userId,name='Coach'){
     const c=context();if(!c||busy||(!c.editable&&userId!==c.user))return;
-    state={...c,target:userId,records:[],revision:0,loaded:false,editing:'',loading:false,retryable:false};
+    clearEditorErrors();state={...c,target:userId,records:[],revision:0,loaded:false,editing:'',loading:false,retryable:false};
     el('coach-qualification-name').textContent=`Coach profile · ${name}`;el('coach-qualification-list').innerHTML='';el('coach-qualification-editor').classList.add('hidden');el('coach-qualification-readonly').hidden=true;
     const dialog=el('coach-qualification-dialog');if(!dialog.open)dialog.showModal();await readQualifications(state);
   }
@@ -70,18 +79,19 @@
     finally{if(version===loadVersion&&state===s){s.loading=false;if(!same(s)){close();return;}if(retry)retry.disabled=false;if(retrying)(s.loaded?el('coach-qualification-name'):retry)?.focus();}}
   }
   function setBusy(value){busy=value;const form=el('coach-qualification-form');for(const field of form?.querySelectorAll('input,select,button')||[])field.disabled=value;}
-  function userError(error){return String(error?.code)==='40001'?'This profile changed elsewhere. Close and reopen it before saving.':'Could not save qualifications. Close and reopen the profile, then try again.';}
+  function userError(error){return String(error?.code||error?.data?.code)==='40001'?'This profile changed elsewhere. Close and reopen it before saving.':'Could not save qualifications. Close and reopen the profile, then try again.';}
   async function write(records,s){
     if(!same(s)||state!==s||!s.editable)return;
     const version=loadVersion;
     try{const data=response(await s.cloud.saveCoachQualifications(s.target,records,s.revision));if(version!==loadVersion||state!==s||!same(s))return;
-      s.records=data.records;s.revision=Number(data.revision);render();el('coach-qualification-editor').classList.add('hidden');message('Qualifications saved.');refreshMatrix();
-    }catch(error){if(version===loadVersion&&state===s&&same(s))message(userError(error),true);}
+      s.records=data.records;s.revision=Number(data.revision);clearEditorErrors();render();el('coach-qualification-editor').classList.add('hidden');message('Qualifications saved.');refreshMatrix();
+    }catch(error){if(version===loadVersion&&state===s&&same(s))editorError(userError(error));}
   }
   async function save(event){
     event.preventDefault();if(busy||!same()||!state.loaded||!state.editable)return;
-    let record,records;try{record=validate({kind:state.editing,course:el('coach-qualification-course').value,completed_on:el('coach-qualification-completed').value,expires_on:el('coach-qualification-expiry').value,club_checked:el('coach-qualification-checked').checked});records=state.records.filter(r=>r.kind!==record.kind).map(r=>validate(r));records.push(record);}catch(error){message(error.message,true);return;}
-    const s=state;setBusy(true);message('Saving…');try{await write(records,s);}finally{setBusy(false);}
+    let record,records;try{record=validate({kind:state.editing,course:el('coach-qualification-course').value,completed_on:el('coach-qualification-completed').value,expires_on:el('coach-qualification-expiry').value,club_checked:el('coach-qualification-checked').checked});}catch(error){editorError(error.message,error.qualificationField);return;}
+    try{records=state.records.filter(r=>r.kind!==record.kind).map(r=>validate(r));records.push(record);}catch(error){editorError(error.message);return;}
+    const s=state;clearEditorErrors();setBusy(true);message('Saving…');try{await write(records,s);}finally{setBusy(false);}
   }
   async function remove(){
     if(busy||!same()||!state.editable||!state.loaded||!state.editing)return;
@@ -161,9 +171,11 @@
   });
   el('coach-qualification-form')?.addEventListener('submit',save);el('coach-qualification-remove')?.addEventListener('click',remove);
   for(const id of ['coach-qualification-completed','coach-qualification-expiry','coach-qualification-course'])el(id)?.addEventListener('input',()=>{
+    clearEditorError('form');clearEditorError(id.replace('coach-qualification-',''));if(id!=='coach-qualification-course'){clearEditorError('completed');clearEditorError('expiry');}
     el('coach-qualification-checked').checked=false;
     if(id==='coach-qualification-completed'&&!el('coach-qualification-expiry').value){const item=catalogue.find(x=>x.kind===state?.editing);const years=item?.kind==='first_aid'&&el('coach-qualification-course').value!=='fa_ifaif'?0:item?.years;el('coach-qualification-expiry').value=suggestedExpiry(el('coach-qualification-completed').value,years);}
   });
+  el('coach-qualification-checked')?.addEventListener('input',()=>clearEditorError('form'));
   el('coach-qualification-dialog')?.addEventListener('close',()=>{if(!el('coach-qualification-dialog')?.open)close();});
   el('coach-document-filter')?.addEventListener('change',renderMatrix);
   for(const type of ['pointerdown','wheel','touchmove','keydown'])document.addEventListener(type,cancelMatrixReadPosition,{capture:true,passive:true});
