@@ -1,0 +1,297 @@
+/* Approved Figma: NY8QhcuOWiEcD0pKDTsbP8 / 518:10264, 22 October 2026.
+   Discrete photographic scenery and garments; all data and controls stay native. */
+@font-face{font-family:"Barlow Condensed";src:url("graphics/barlow-condensed-bold.ttf") format("truetype");font-weight:700;font-style:normal;font-display:swap}
+@font-face{font-family:Anton;src:url("graphics/anton-regular.ttf") format("truetype");font-weight:400;font-style:normal;font-display:swap}
+:root{
+  --sh-canvas:#f3f6f4;--sh-copy:#111715;--sh-muted:#4f5f55;
+  --sh-panel:linear-gradient(160deg,#fff,#eef6f1);--sh-line:#d8e0da;
+  --sh-action:linear-gradient(170deg,#fff,#eef6f1);
+  --sh-shadow:0 14px 28px -18px rgba(17,23,21,.38),inset 0 1px 1px rgba(255,255,255,.8);
+  --sh-display:"Barlow Condensed",Inter,system-ui,sans-serif;
+}
+html[data-theme="dark"]{
+  --sh-canvas:#111715;--sh-copy:#fff;--sh-muted:rgba(255,255,255,.67);
+  --sh-panel:linear-gradient(165deg,rgba(38,48,43,.98),rgba(14,19,17,.99));
+  --sh-line:rgba(255,255,255,.12);--sh-action:linear-gradient(170deg,#26302b,#0e1311);
+  --sh-shadow:0 14px 26px -12px rgba(0,0,0,.55),inset 0 1px 1px rgba(255,255,255,.09);
+}
+html body:not(.auth-open){background:var(--sh-canvas)!important}
+html body:not(.auth-open) .app-shell{position:relative;isolation:isolate;background:var(--sh-canvas)!important;overflow:clip}
+html body:not(.auth-open) .app-shell::before{
+  content:"";position:absolute;z-index:-1;inset:0 0 auto;height:220px;pointer-events:none;
+  background:linear-gradient(180deg,rgba(5,8,6,.76),rgba(5,8,6,.45) 65%,var(--sh-canvas)),url("graphics/pitch-wide.webp") center 45%/cover no-repeat;
+}
+html body:not(.auth-open) .app-shell::after{
+  content:"";position:absolute;z-index:-2;inset:0;pointer-events:none;opacity:.045;
+  background:url("graphics/fabric.webp") center top/700px auto repeat;
+}
+html[data-theme="dark"] body:not(.auth-open) .app-shell::after{opacity:.045}
+html body:not(.auth-open):is(.view-home,.view-squad,.view-person,.view-club) .app-shell::before{
+  height:570px;background:linear-gradient(180deg,rgba(5,8,6,.78),rgba(5,8,6,.5) 16%,transparent 30%,transparent 65%,var(--sh-canvas) 100%),url("graphics/pitch-portrait.webp") center top/cover no-repeat;
+}
+html body:not(.auth-open).view-squad .app-shell::before,
+html body:not(.auth-open).view-club .app-shell::before{height:360px;background-size:auto,cover;background-image:linear-gradient(180deg,rgba(5,8,6,.78),rgba(5,8,6,.22) 45%,var(--sh-canvas)),url("graphics/pitch-wide.webp")}
+html body:not(.auth-open).view-person:has(.graphic-profile-hero) .app-shell::before{height:680px}
+html body:not(.auth-open) .hero,html body:not(.auth-open).admin-club-mode .hero{
+  background:transparent!important;border:0!important;box-shadow:none!important;min-height:0!important;
+  padding:calc(20px + var(--android-inset-top,0px)) 20px 16px!important;gap:12px;
+}
+html body:not(.auth-open) .hero::before,html body:not(.auth-open) .hero::after{display:none!important}
+html body:not(.auth-open) .hero-inner{gap:12px!important}
+html body:not(.auth-open) .hero .club-logo-wrap{width:42px!important;height:42px!important;background:transparent!important;border:0!important;box-shadow:none!important}
+html body:not(.auth-open) .hero-copy .eyebrow{font-family:Anton,Inter,sans-serif;font-size:1rem!important;line-height:1.1;letter-spacing:0!important;font-weight:400!important}
+html body:not(.auth-open) .hero-copy h1{font:600 .8125rem/1.4 Inter,system-ui,sans-serif!important;letter-spacing:0!important;margin-top:8px!important}
+html body:not(.auth-open) .hero-copy .season-line{font-size:.6875rem!important;line-height:1.4}
+html body:not(.auth-open) .hero-context-actions{gap:4px}
+html body:not(.auth-open) .hero-context-actions :is(button,.graphic-account-initials){color:#fff!important;background:rgba(17,23,21,.12)!important;border:1px solid rgba(255,255,255,.16)!important;border-radius:24px!important;min-height:44px}
+.graphic-account-initials{display:none;align-items:center;justify-content:center;width:44px;height:44px;flex:none;font-size:.75rem;font-weight:600;order:3}
+.graphic-account-initials:not(:empty){display:flex}
+html body:not(.auth-open) .hero-coaching-teams label{font-size:.75rem}
+html body:not(.auth-open) .hero-coaching-teams .hero-team-select{background:rgba(17,23,21,.4)!important;border-color:rgba(255,255,255,.18)!important;color:#fff!important}
+html body:not(.auth-open) .content{position:relative;padding:0 20px 100px!important}
+html body:not(.auth-open) .content .panel,
+html body:not(.auth-open) .content .page-link{background:var(--sh-panel)!important;border-color:var(--sh-line)!important;box-shadow:var(--sh-shadow)!important;border-radius:16px!important}
+html body:not(.auth-open) :is(.secondary-button,.page-link,.squad-view-tab){background:var(--sh-action)!important;border:1px solid var(--sh-line)!important;box-shadow:var(--sh-shadow)!important;color:var(--sh-copy)!important;border-radius:10px!important}
+html body:not(.auth-open) :is(.primary-button,.squad-view-tab.active,.mobile-primary-item[aria-current="page"],.top-nav-tab.active){background:linear-gradient(160deg,#0b5d35,#064526)!important;color:#fff!important;border-color:rgba(255,255,255,.12)!important;box-shadow:inset 0 1px 1px rgba(255,255,255,.12),0 6px 12px -6px rgba(0,0,0,.5)!important}
+html body:not(.auth-open) :is(.mobile-primary-nav,.bottom-nav){background:linear-gradient(180deg,#131b16,#090d0a)!important;border-color:rgba(255,255,255,.12)!important}
+html body:not(.auth-open) .mobile-primary-item{color:rgba(255,255,255,.67)!important;border-top:0!important;border-radius:14px;min-height:62px}
+html body:not(.auth-open) .mobile-primary-item[aria-current="page"]{color:#fff!important}
+html body:not(.auth-open) .content :is(h2,h3){letter-spacing:-.02em}
+
+/* One scene, three depth planes: field, independent shirt, native foreground. */
+.home-scene{position:relative;min-height:412px;display:flex;align-items:flex-end;margin:0 -20px;padding:0 24px 54px;box-sizing:border-box}
+.home-scene-copy{position:relative;z-index:2;width:48%;text-shadow:0 2px 4px rgba(0,0,0,.9);color:#fff}
+.home-scene-label{font-size:.8125rem;font-weight:700;margin:0 0 10px}
+html body #home-scene-title{font:700 clamp(2.25rem,9vw,3rem)/.98 var(--sh-display)!important;text-transform:uppercase;color:#fff!important;overflow-wrap:anywhere;margin:0}
+#home-scene-team:empty,#home-scene-role:empty{display:none}
+#home-scene-team,#home-scene-role{font-size:.75rem;line-height:1.5;margin:10px 0 0;color:rgba(255,255,255,.85)}
+.home-scene-shirt{position:absolute;width:min(84%,350px);right:-8px;top:12px;transform:rotate(3deg);z-index:1}
+.home-scene-shirt:empty{display:none}
+html body #view-home>.section-title-row{position:absolute!important;width:1px;height:1px;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+html body #view-home #home-next-match{position:relative;margin-top:-28px;margin-bottom:28px;gap:12px}
+html body #view-home #home-next-title{font-size:.6875rem;letter-spacing:.08em;font-weight:700;color:var(--sh-muted);margin:0 0 0 2px}
+html body .content #view-home #next-match-card{
+  padding:20px;border:1px solid var(--sh-line)!important;border-radius:16px!important;
+  background:var(--sh-panel)!important;color:var(--sh-copy)!important;box-shadow:var(--sh-shadow)!important;gap:16px;text-align:left;
+}
+html body #view-home #next-match-card .next-match-summary-team strong{font:700 clamp(1.25rem,5vw,1.75rem)/1.05 var(--sh-display)!important;text-transform:uppercase;color:var(--sh-copy)!important}
+html body #view-home .next-match-summary-versus{gap:10px}
+html body #view-home .next-match-summary-v{font:700 1.1rem var(--sh-display);color:var(--sh-muted)!important}
+html body #view-home .next-match-summary-date{border:0;border-radius:0;background:none!important;color:var(--sh-copy)!important;padding:0;font-size:.875rem;justify-self:start;font-weight:600}
+html body #view-home .next-match-summary-card:not(:disabled)::after{justify-self:end;color:var(--sh-copy)!important;font-size:.8125rem}
+html body #view-home #home-club-notices,
+html body #view-home #parent-home-family{background:transparent!important;border:0!important;box-shadow:none!important;padding:20px 0!important}
+html body #view-home #home-season-record{background:transparent!important;border-width:0 0 1px!important;border-radius:0!important;box-shadow:none!important}
+html body #view-home #home-season-record>summary{padding-inline:0}
+html body #view-home .home-season-group-label{margin-top:28px;color:var(--sh-copy);font-size:.75rem}
+html body #view-home #home-team-stats-link{background:var(--sh-action)!important;border:1px solid var(--sh-line)!important;box-shadow:var(--sh-shadow)!important;border-radius:10px!important}
+html body #view-home :is(#parent-home-family-title,#home-club-notices h3){font:700 1.875rem/1.1 var(--sh-display)!important;text-transform:uppercase;color:var(--sh-copy)!important}
+html body.role-parent .home-scene{min-height:330px;padding-bottom:50px}
+html body.role-parent .home-scene-copy{width:52%}
+html body.role-parent .home-scene-shirt{width:52%;top:34px;right:6px;transform:rotate(3deg)}
+html body.role-parent #view-home #home-next-match{margin-top:0}
+html body.role-parent #view-home #parent-home-match-info{background:transparent!important;border:0!important;box-shadow:none!important;padding:0!important}
+html body.role-parent #view-home #parent-home-training{background:var(--sh-panel)!important;border:1px solid var(--sh-line)!important}
+html body.role-parent .parent-home-reply{border-top:1px solid var(--sh-line);padding-block:16px}
+html body.role-parent .parent-child-row{padding-block:16px;border-bottom:1px solid var(--sh-line)}
+html body.role-parent .parent-home-family-actions{display:grid!important;grid-template-columns:minmax(0,1fr);gap:12px}
+html body.role-parent .parent-home-family-actions button{width:100%;min-height:48px;text-align:left;padding:14px 16px;background:var(--sh-action)!important;border:1px solid var(--sh-line)!important;color:var(--sh-copy)!important;border-radius:10px;box-shadow:var(--sh-shadow)}
+
+/* Transparent material, editable number / initials and unchanged official badge. */
+.graphic-shirt{display:block;position:relative;width:100%;aspect-ratio:240/288;isolation:isolate;pointer-events:none;color:#fff}
+.graphic-shirt-art{display:block;position:absolute;inset:0;width:100%;height:100%;object-fit:contain;filter:drop-shadow(-8px 20px 16px rgba(0,0,0,.58))}
+.graphic-shirt::before{content:"";position:absolute;z-index:-1;width:74%;height:9%;left:16%;bottom:-1%;border-radius:50%;background:rgba(0,0,0,.65);filter:blur(10px);transform:rotate(-4deg)}
+.graphic-shirt-number{position:absolute;top:24%;left:22%;width:56%;text-align:center;font:700 clamp(2rem,11vw,5rem)/1 var(--sh-display);color:#fff!important;transform:rotate(2deg);text-shadow:1px 2px 2px rgba(0,0,0,.22)}
+.graphic-shirt.goalkeeper{aspect-ratio:280/300}
+.graphic-shirt.goalkeeper .graphic-shirt-number{top:25%;font-size:clamp(2rem,10vw,5rem)}
+.graphic-shirt.coach .graphic-shirt-badge{position:absolute;left:59.2%;top:32.3%;width:12.9%;height:auto;object-fit:contain;filter:drop-shadow(0 1px 1px rgba(0,0,0,.4))}
+.graphic-shirt-initials{position:absolute;left:21.6%;top:33.7%;width:25%;font:700 clamp(1rem,5vw,1.65rem)/1.2 Inter,system-ui,sans-serif;text-align:center;color:#fff!important}
+.graphic-shirt.coach .graphic-shirt-art{filter:drop-shadow(-8px 20px 22px rgba(0,0,0,.65))}
+.parent-child-row .graphic-shirt{width:64px;flex:0 0 64px}
+.parent-child-row .graphic-shirt-number{font-size:1.5rem!important}
+html body :is(.mini-jersey,.jersey-icon).goalkeeper svg path{fill:#6023a6!important;stroke:#431780!important}
+html body :is(.mini-jersey,.jersey-icon).goalkeeper b{color:#fff!important}
+
+/* The squad directory keeps native name buttons and two independent kit identities. */
+html body #view-squad{position:relative}
+html body #view-squad>.section-title-row{min-height:142px;align-items:flex-end;margin:0 0 24px;padding-bottom:4px;max-width:70%}
+html body #view-squad>.section-title-row :is(h2,.kicker){color:#fff!important;text-shadow:0 2px 4px rgba(0,0,0,.8)}
+html body #view-squad>.section-title-row h2{font:700 3rem/.98 var(--sh-display)!important;text-transform:uppercase}
+html body #view-squad>#squad-workspace-description{font-size:.875rem;position:relative}
+.graphic-raised-crest{position:absolute;right:20px;top:56px;width:78px;aspect-ratio:1;border-radius:50%;padding:6px;box-sizing:border-box;background:linear-gradient(150deg,#eef6f1,#4f5f55 65%,#111715);box-shadow:-3px 10px 1px #111715,0 15px 14px rgba(0,0,0,.6),inset 0 1px 2px rgba(255,255,255,.7);transform:rotate(-8deg)}
+.graphic-raised-crest img{width:100%;height:100%;object-fit:contain;display:block;filter:drop-shadow(0 2px 2px rgba(0,0,0,.4))}
+html body #view-squad #squad-list{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:24px 18px!important;margin-top:30px}
+html body #view-squad #squad-list .workspace-directory-row{display:flex!important;flex-direction:column;align-items:stretch;gap:12px;padding:0!important;border:0!important;box-shadow:none!important;background:transparent!important;border-radius:0!important;color:var(--sh-copy)!important;min-width:0;width:100%;text-align:left}
+html body #view-squad #squad-list .workspace-directory-row>span[aria-hidden]:not(.graphic-shirt){display:none}
+html body #view-squad #squad-list .workspace-row-copy{width:100%;gap:4px}
+html body #view-squad #squad-list .workspace-row-copy strong{font-size:1rem;font-weight:700;line-height:1.4;color:var(--sh-copy)!important;white-space:normal}
+html body #view-squad #squad-list .workspace-row-copy small{font-size:.75rem;line-height:1.5;color:var(--sh-muted)!important}
+html body #view-squad #squad-list .graphic-shirt{width:100%;max-width:220px;margin:auto}
+html body #view-squad #squad-list .graphic-shirt.goalkeeper{aspect-ratio:240/288}
+html body #view-squad #squad-list .graphic-shirt-number{font-size:clamp(2.5rem,11vw,4rem)}
+html body #view-squad .squad-banner{background:transparent!important;border:0!important;border-radius:0!important;box-shadow:none!important;padding:16px 0!important}
+html body #view-squad .squad-count{display:flex;align-items:baseline;gap:5px}
+html body #view-squad .squad-count strong{font:700 1rem Inter,sans-serif;color:var(--sh-copy)!important}
+html body #view-squad .squad-count span{font-size:1rem;font-weight:600;color:var(--sh-copy)!important}
+html body #view-squad .squad-format-details{border:0;border-bottom:1px solid var(--sh-line);border-radius:0;background:transparent}
+html body #view-squad .squad-view-tabs{gap:0;border:0;background:transparent;padding:0}
+html body #view-squad .squad-view-tab{min-height:52px}
+html body #view-squad #add-player-btn{width:100%;margin-top:20px}
+
+/* Native profile data remains beneath its photographic identity. */
+html body #view-person:has(.graphic-profile-hero)>.section-title-row{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+html body #view-person:has(.graphic-profile-hero)>.person-profile-back{background:transparent!important;border:0!important;box-shadow:none!important;color:#fff!important;padding-left:0}
+html body #view-person .graphic-player-record{background:transparent!important;border:0!important;padding:0!important;box-shadow:none!important}
+html body #view-person .graphic-profile-hero{position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:16px;padding:12px 4px 24px;isolation:isolate;background:transparent!important;border:0!important}
+html body #view-person .graphic-profile-hero .player-profile-jersey{width:min(90%,320px);height:auto;margin:0 auto 0;background:none!important;border:0!important;box-shadow:none!important}
+html body #view-person .graphic-profile-hero .graphic-shirt-number{font-size:6rem}
+html body #view-person .graphic-profile-hero>div:last-child{width:100%;color:#fff;text-shadow:0 2px 4px rgba(0,0,0,.9)}
+html body #view-person .graphic-profile-hero>div:last-child strong{font:700 3.25rem/.98 var(--sh-display)!important;text-transform:uppercase;color:#fff!important}
+html body #view-person .graphic-profile-hero>div:last-child span{font-size:.875rem;color:#fff!important;display:block;margin-top:10px}
+html body #view-person .player-profile-stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 20px;margin:12px 0 20px}
+html body #view-person .player-profile-stats article{display:flex;flex-direction:column-reverse;align-items:flex-start;justify-content:flex-end;padding:20px 0;border:0!important;border-bottom:1px solid var(--sh-line)!important;border-radius:0!important;box-shadow:none!important;background:none!important;gap:4px;min-width:0}
+html body #view-person .player-profile-stats article strong{font:700 2.75rem/1 var(--sh-display)!important;color:var(--sh-copy)!important}
+html body #view-person .player-profile-stats article span{font-size:.875rem;line-height:1.5;color:var(--sh-muted)!important}
+
+/* Modest club scene; operational counts and their guarded actions remain native. */
+.graphic-admin-heading{position:relative;min-height:132px;grid-column:1/-1;display:flex;flex-direction:column;justify-content:flex-end;padding-bottom:24px;color:#fff}
+.graphic-admin-heading .kicker{color:#fff!important;font-size:.6875rem}
+html body .graphic-admin-heading h2{font:700 2.5rem/1 var(--sh-display)!important;text-transform:uppercase;margin:6px 96px 0 0;color:#fff!important;text-shadow:0 2px 4px rgba(0,0,0,.7)}
+.graphic-admin-heading .graphic-raised-crest{top:auto;bottom:28px;right:8px}
+html body #view-club #admin-club-overview>.admin-home-weekend{background:transparent!important;border:0!important;box-shadow:none!important;padding:0!important}
+html body #admin-club-overview .admin-home-weekend h3{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+html body #admin-club-overview .admin-home-weekend :is(strong,.kicker,.muted,.helper,.admin-home-metrics span){color:var(--sh-copy)!important}
+html body #admin-club-overview .admin-home-metrics{border:0;background:transparent;padding:16px 0;gap:16px}
+html body #admin-club-overview .admin-home-metrics strong{font:700 3rem/1 var(--sh-display)!important}
+html body #admin-club-overview .admin-home-metrics span{font-size:.8125rem;line-height:1.5;color:var(--sh-muted)!important}
+html body #admin-club-overview :is(.admin-home-people,.admin-home-communications){background:transparent!important;border:0!important;box-shadow:none!important;padding:20px 0!important}
+html body #admin-club-overview :is(.admin-home-people,.admin-home-communications) h3{font:700 2rem/1 var(--sh-display)!important;text-transform:uppercase}
+html body #admin-club-overview .admin-home-desk-row{background:transparent!important;border:0!important;border-bottom:1px solid var(--sh-line)!important;border-radius:0!important;padding:16px 0!important}
+
+/* An upcoming fixture is a field scene with raised, unchanged club crests. */
+html body #next-fixture-dialog{isolation:isolate;background:var(--sh-canvas)!important;border-color:var(--sh-line)!important;overflow:hidden}
+html body #next-fixture-dialog::before{content:"";position:absolute;inset:0 0 auto;height:510px;z-index:-1;pointer-events:none;background:linear-gradient(180deg,rgba(5,8,6,.65),transparent 40%,var(--sh-canvas)),url("graphics/pitch-portrait.webp") center 34%/cover no-repeat}
+html body #next-fixture-dialog .next-fixture-detail-shell{background:transparent!important}
+html body #next-fixture-dialog .modal-heading{background:transparent!important;border:0!important;color:#fff;padding:20px}
+html body #next-fixture-dialog .modal-heading :is(h3,button){color:#fff!important}
+html body #next-fixture-dialog .modal-heading h3{font-size:.75rem!important;text-transform:uppercase}
+html body #next-fixture-dialog #next-match-versus{background:transparent!important;border:0!important;box-shadow:none!important;padding:24px 0!important;min-height:220px;color:#fff!important}
+html body #next-fixture-dialog #next-match-versus :is(.match-team-badge,.club-identity-badge,.canonical-v11-badge,.canonical-match-badge,.club-badge-monogram){width:98px!important;height:98px!important;object-fit:contain;max-height:none!important;filter:drop-shadow(-2px 8px 0 #111715) drop-shadow(0 14px 8px rgba(0,0,0,.6))}
+html body #next-fixture-dialog #next-match-versus :is(strong,.match-team-name,.club-listing-name,.match-side-label,.match-versus-mark,.match-versus-label){color:#fff!important;text-shadow:0 2px 4px rgba(0,0,0,.9)}
+html body #next-fixture-dialog #next-match-versus :is(.match-side-label,.match-versus-mark){font-size:.875rem}
+html body #next-fixture-dialog .next-match-grid{background:transparent!important;border:0!important;box-shadow:none!important;padding:16px 0 24px!important;color:#fff!important}
+html body #next-fixture-dialog #next-match-when{font:700 1.875rem/1.2 var(--sh-display)!important;color:#fff!important;text-shadow:0 2px 4px rgba(0,0,0,.9)}
+html body #next-fixture-dialog .next-match-grid span{color:#fff!important;text-shadow:0 1px 4px #000}
+html body #next-fixture-dialog :is(.match-venue-card,.match-availability,.selkent-task-guide){background:var(--sh-panel)!important;border-color:var(--sh-line)!important;color:var(--sh-copy)!important;border-radius:12px!important}
+html body #next-fixture-dialog .next-fixture-action-bar{background:var(--sh-canvas)!important;border-top:1px solid var(--sh-line)!important}
+html body #next-fixture-dialog #next-match-calendar{background:rgba(17,23,21,.78)!important;color:#fff!important;border:1px solid rgba(255,255,255,.25);border-radius:10px;padding:12px}
+
+@media(min-width:600px){
+  html body #view-squad #squad-list{grid-template-columns:repeat(auto-fill,minmax(180px,1fr))!important;gap:32px!important}
+  .home-scene{min-height:440px}.home-scene-shirt{right:5%;width:350px}.home-scene-copy{width:42%}
+  html body.role-parent .home-scene-shirt{width:240px;right:8%}
+  html body #view-person .graphic-profile-hero{flex-direction:row-reverse;align-items:flex-end;min-height:400px}
+  html body #view-person .graphic-profile-hero .player-profile-jersey{width:320px;flex:0 0 320px}
+  html body #view-person .graphic-profile-hero>div:last-child{flex:1;padding-bottom:28px}
+  html body #view-person .player-profile-stats{grid-template-columns:repeat(4,minmax(0,1fr))}
+}
+@media(min-width:901px){
+  html body:not(.auth-open) .app-shell{min-height:100dvh;padding-left:220px;box-sizing:border-box}
+  html body:not(.auth-open) .app-shell::before{left:220px}
+  html body:not(.auth-open) .app-shell>.hero{position:relative;width:auto;min-height:104px!important;padding:24px 40px!important}
+  html body:not(.auth-open) .hero-inner{min-height:56px}
+  html body:not(.auth-open) .hero .club-logo-wrap{display:none}
+  html body:not(.auth-open) .hero-copy .eyebrow{font-size:.75rem!important;font-family:Inter,sans-serif;font-weight:600!important}
+  html body:not(.auth-open) .hero-copy h1{font-family:var(--sh-display)!important;font-size:1.75rem!important;font-weight:700!important}
+  html body:not(.auth-open) .app-shell>.top-nav-tabs{
+    position:fixed!important;inset:0 auto 0 0!important;width:220px!important;height:100dvh!important;box-sizing:border-box;display:flex!important;flex-direction:column;align-items:stretch;justify-content:flex-start;gap:16px;padding:220px 24px 32px!important;z-index:20;overflow:auto;border-right:1px solid var(--sh-line);border-bottom:0;background:linear-gradient(180deg,rgba(17,23,21,.72),#111715),url("graphics/fabric.webp") center top/auto 900px no-repeat!important;
+  }
+  html body:not(.auth-open) .top-nav-tabs::before{content:"SHOOTERS HILL AFC";position:absolute;top:100px;left:24px;right:24px;white-space:normal;font:400 1.75rem/1 Anton,sans-serif;color:#fff}
+  html body:not(.auth-open) .top-nav-tabs::after{content:"";position:absolute;top:32px;left:24px;width:60px;height:60px;background:url("shooters-hill-logo.png") center/contain no-repeat;filter:drop-shadow(0 4px 2px rgba(0,0,0,.5))}
+  html body:not(.auth-open) .top-nav-tabs .nav-item{width:100%;min-height:50px!important;border:0!important;border-radius:12px!important;color:#fff!important;text-align:left!important;justify-content:flex-start;padding:14px!important;flex:none!important;font-size:.875rem!important}
+  html body:not(.auth-open) .app-shell>.content{max-width:1800px;margin:auto;padding:0 40px 48px!important}
+  html body:not(.auth-open):is(.view-home,.view-squad,.view-person,.view-club) .app-shell::before{height:1020px;background-image:linear-gradient(180deg,rgba(5,8,6,.18),rgba(5,8,6,.45) 45%,var(--sh-canvas)),linear-gradient(90deg,rgba(5,8,6,.72),transparent 80%),url("graphics/pitch-wide.webp");background-size:auto,auto,cover;background-position:center,center,center top}
+  html body:not(.auth-open).view-home .hero-context-actions :is(button,.graphic-account-initials){color:#111715!important;border-color:rgba(17,23,21,.15)!important;background:rgba(255,255,255,.12)!important}
+  html body:not(.auth-open) #view-home.active{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:24px;position:relative}
+  html body:not(.auth-open) #view-home>.home-scene{grid-column:1/-1;grid-row:1;min-height:530px;margin:0 -12px;padding:40px 12px 360px;align-items:flex-start}
+  html body #home-scene-title{font-size:3.5rem!important}
+  html body #view-home .home-scene-copy{width:58%;max-width:640px}
+  html body #view-home .home-scene-shirt{width:34%;max-width:370px;right:0;top:60px}
+  html body #view-home .home-scene-shirt .graphic-shirt-initials{font-size:1.5rem}
+  html body:not(.auth-open) #view-home>#home-next-match{grid-column:1/8;grid-row:1;align-self:end;margin:180px 0 64px;z-index:3;gap:12px}
+  html body #view-home #next-match-card{min-height:210px}
+  html body #view-home #home-next-title{color:rgba(255,255,255,.8)}
+  html body #view-home #next-match-card .next-match-summary-team strong{font-size:2rem!important}
+  html body:not(.auth-open) #view-home>#home-club-notices{grid-column:7/13;grid-row:2/5;align-self:start;padding:24px!important;background:var(--sh-panel)!important;border:1px solid var(--sh-line)!important;box-shadow:var(--sh-shadow)!important}
+  html body:not(.auth-open) #view-home>#home-season-group-label{grid-column:1/7;grid-row:2;margin:0}
+  html body:not(.auth-open) #view-home>#home-season-record{grid-column:1/7;grid-row:3;margin:0}
+  html body:not(.auth-open) #view-home>#home-team-stats-link{grid-column:1/7;grid-row:4;margin:0}
+  html body:not(.auth-open).role-parent #view-home>.home-scene{min-height:390px;padding-bottom:60px}
+  html body:not(.auth-open).role-parent #view-home>#home-next-match{grid-column:1/8;grid-row:2;margin:0}
+  html body:not(.auth-open).role-parent #view-home>#home-club-notices{grid-row:3;grid-column:1/8}
+  html body:not(.auth-open).role-parent #view-home>#parent-home-family{grid-column:8/13;grid-row:2/4;padding:24px!important;background:var(--sh-panel)!important;border:1px solid var(--sh-line)!important}
+  html body #view-squad>.section-title-row{min-height:180px;max-width:70%}
+  html body #view-squad #squad-list{grid-template-columns:repeat(auto-fill,minmax(180px,1fr))!important;gap:40px!important}
+  html body #view-squad .graphic-raised-crest{top:68px;right:40px;width:108px}
+  .graphic-admin-heading{min-height:180px}
+  html body #view-club #admin-club-overview{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:24px}
+  html body #admin-club-overview>.admin-home-weekend{grid-column:1/8}
+  html body #admin-club-overview>:is(.admin-home-people,.admin-home-communications){grid-column:span 6}
+  html body #admin-club-overview>.admin-home-directory-link{grid-column:span 4}
+}
+@media(max-width:374px){
+  html body:not(.auth-open) .hero{padding-inline:16px!important}
+  html body:not(.auth-open) .content{padding-inline:16px!important}
+  .home-scene{margin-inline:-16px;padding-inline:20px;min-height:390px}
+  .home-scene-shirt{right:-12px;top:25px;width:86%}
+  html body #view-home #home-next-match{margin-top:-8px}
+  html body .hero-copy .eyebrow{font-size:.875rem!important}
+  .graphic-account-initials{display:none!important}
+  html body #view-squad #squad-list{gap:24px 14px!important}
+}
+@media(prefers-reduced-motion:reduce){.graphic-shirt{transition:none;animation:none}}
+
+/* Canonical fixture rows are shared by League, Cup and Friendly fixtures. */
+html body #view-home #next-match-home-teams .canonical-v11-side strong{font:700 clamp(1.25rem,5vw,1.75rem)/1.05 var(--sh-display)!important;text-transform:uppercase;color:var(--sh-copy)!important}
+html body #view-home #next-match-home-teams .canonical-v11-label{font-size:.6875rem;color:var(--sh-muted)!important;letter-spacing:.06em}
+html body #view-home #next-match-home-teams .canonical-v11-teams{gap:10px}
+html body #view-home #next-match-home-teams .canonical-v11-side{gap:10px}
+html body #view-home #next-match-home-teams .canonical-v11-v{color:var(--sh-muted)!important}
+html body #view-home #next-match-home-teams .canonical-v11-badge{width:42px;height:42px;flex-basis:42px;filter:drop-shadow(0 4px 2px rgba(0,0,0,.3))}
+
+/* Override retained layout-era selectors only in the reviewed graphic surfaces. */
+html[data-theme] body:not(.auth-open) .app-shell .content #view-home #next-match-card{background:var(--sh-panel)!important;border:1px solid var(--sh-line)!important;border-radius:16px!important;box-shadow:var(--sh-shadow)!important;color:var(--sh-copy)!important}
+html[data-theme] body:not(.auth-open) .app-shell .content #view-squad .squad-banner{background:transparent!important;border:0!important;box-shadow:none!important;border-radius:0!important;padding:16px 0!important}
+html[data-theme] body:not(.auth-open) .app-shell .content #view-squad .squad-format-details{background:transparent!important}
+@media(min-width:901px){
+  html[data-theme] body:not(.auth-open) .app-shell>#top-nav-tabs{position:fixed!important;inset:0 auto 0 0!important;width:220px!important;max-width:220px!important;height:100dvh!important;margin:0!important;border-radius:0!important;border-bottom:0!important}
+  html[data-theme] body:not(.auth-open) #top-nav-tabs .top-nav-tab.active{background:linear-gradient(160deg,#0b5d35,#064526)!important;color:#fff!important;box-shadow:inset 0 1px 1px rgba(255,255,255,.12)!important}
+}
+
+/* Complete the native role surfaces after the older, more specific theme rules. */
+html[data-theme] body:not(.auth-open) .app-shell .content #view-club #admin-club-overview>:is(.admin-home-weekend,.admin-home-people,.admin-home-communications){background:transparent!important;border:0!important;border-radius:0!important;box-shadow:none!important;padding:16px 0!important}
+html[data-theme] body:not(.auth-open) #view-club:has(#admin-club-overview:not(.hidden))>.section-title-row{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+html[data-theme] body:not(.auth-open) #view-club #admin-club-overview .admin-home-weekend :is(strong,.kicker,.muted,.helper,.admin-home-metrics span){color:var(--sh-copy)!important}
+html[data-theme] body:not(.auth-open) #view-club #admin-club-overview .admin-home-weekend :is(.primary-button,.secondary-button){background:var(--sh-action)!important;color:var(--sh-copy)!important;border:1px solid var(--sh-line)!important;box-shadow:var(--sh-shadow)!important;border-radius:10px!important}
+html[data-theme] body:not(.auth-open) #view-home #parent-home-match-info{background:transparent!important;border:0!important;box-shadow:none!important;padding:0!important}
+html[data-theme] body:not(.auth-open) .app-shell .content #view-home #next-match-card{border-radius:16px!important}
+html[data-theme] body:not(.auth-open) #view-squad>#squad-workspace-description{background:var(--sh-canvas);color:var(--sh-muted)!important;padding:14px 0;margin:0}
+html[data-theme] body #next-fixture-dialog .next-fixture-scroll{align-content:start;gap:16px}
+html[data-theme] body #next-fixture-dialog .modal-heading{min-height:64px;padding:12px 20px;align-items:center;background:transparent!important}
+html[data-theme] body #next-fixture-dialog .modal-heading h3:empty::before{content:"Match details"}
+html[data-theme] body #next-fixture-dialog .next-match-confirmed-bar:not(:has(>:not(.hidden):not([hidden]))){display:none}
+html[data-theme] body #next-fixture-dialog #next-match-versus{min-height:240px;padding:12px 0 24px!important;display:block}
+html[data-theme] body #next-fixture-dialog #next-match-versus .canonical-v11-label{color:#fff!important;text-shadow:0 1px 4px #111715}
+html[data-theme] body #next-fixture-dialog #next-match-versus .canonical-v11-teams{grid-template-columns:minmax(0,1fr) 22px minmax(0,1fr);align-items:center;gap:10px}
+html[data-theme] body #next-fixture-dialog #next-match-versus .canonical-v11-side{display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:18px;text-align:center;min-width:0}
+html[data-theme] body #next-fixture-dialog #next-match-versus .canonical-v11-side strong{font:700 1.625rem/1.05 var(--sh-display)!important;text-transform:uppercase;color:#fff!important;text-shadow:0 2px 4px #111715}
+html[data-theme] body #next-fixture-dialog #next-match-versus .canonical-v11-v{font:700 1.5rem var(--sh-display);color:#fff!important;text-shadow:0 2px 4px #111715}
+html[data-theme] body #next-fixture-dialog #next-match-versus .canonical-v11-badge{order:-1;display:flex;align-items:center;justify-content:center;flex:0 0 94px!important;width:94px!important;height:94px!important;min-width:94px;max-width:94px;border-radius:50%;padding:5px;box-sizing:border-box;background:linear-gradient(150deg,#eef6f1,#4f5f55 65%,#111715)!important;box-shadow:-2px 7px 0 #111715,0 15px 12px rgba(0,0,0,.65),inset 0 1px 2px rgba(255,255,255,.7);filter:none!important;transform:rotate(-5deg)}
+html[data-theme] body #next-fixture-dialog #next-match-versus .canonical-v11-badge>:is(img,span,a,button,svg){display:flex;align-items:center;justify-content:center;flex:0 0 84px!important;width:84px!important;height:84px!important;min-width:0!important;max-width:84px!important;max-height:84px!important;padding:0;border:0;box-shadow:none!important;object-fit:contain;filter:none!important}
+html[data-theme] body #next-fixture-dialog #next-match-versus .canonical-v11-badge img{display:block;width:84px!important;height:84px!important;max-width:84px!important;max-height:84px!important;object-fit:contain;filter:none!important}
+html[data-theme] body #next-fixture-dialog .next-match-grid>div{background:transparent!important;border:0!important;box-shadow:none!important;padding:0!important}
+html[data-theme] body #next-fixture-dialog .fixture-date-copy{display:grid;gap:8px}
+html[data-theme] body #next-fixture-dialog .fixture-date-with-calendar{flex-wrap:wrap;gap:14px}
+html[data-theme] body #next-fixture-dialog #next-match-when{font-size:1.875rem!important}
+html[data-theme] body #next-fixture-dialog #next-match-versus .canonical-v11-badge img{padding:0!important;border:0!important;border-radius:0!important;background:transparent!important}
+html[data-theme] body #view-person .graphic-profile-hero .graphic-shirt-number{color:#fff!important}

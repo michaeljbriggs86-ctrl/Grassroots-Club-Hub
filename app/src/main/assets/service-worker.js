@@ -1,5 +1,6 @@
-const CACHE = 'pitchkind-web-kickoff-responses-20261015';
+const CACHE = 'pitchkind-web-sunday-graphics-20261022';
 const ASSETS=['./','./index.html','./styles.css','./app-design-system.css','./cloud.css','./cloud-config.js','./cloud.js','./app.js','./coach-qualifications.js','./member-contact-import.js','./person-profiles.js','./onboarding.js','./onboarding.css','./manifest.json','./shooters-hill-logo.png', './club-badge-unavailable.svg','./football-login-adult.jpg','./football-login-player.jpg','./football-login-club.jpg','./football-pitch-hero.jpg','./football-pitch-hero-illustration.png','./static-feed-overlay.js'];
+ASSETS.push('./sunday-graphics.css','./graphics/pitch-portrait.webp','./graphics/pitch-wide.webp','./graphics/fabric.webp','./graphics/shirt-coach.webp','./graphics/shirt-goalkeeper.webp','./graphics/shirt-outfield.webp','./graphics/barlow-condensed-bold.ttf','./graphics/anton-regular.ttf');
 self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)).then(()=>self.skipWaiting())));
 self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
 self.addEventListener('fetch',e=>{ if(e.request.method!=='GET')return; e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request).then(resp=>{const copy=resp.clone();caches.open(CACHE).then(c=>c.put(e.request,copy));return resp;}).catch(()=>caches.match('./index.html')))); });

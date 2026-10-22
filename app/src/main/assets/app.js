@@ -651,6 +651,50 @@ function activePlayers(){ return state.squad.filter(p=>p.status==='active' && p.
 function rosterPlayers(){ return state.squad.filter(p=>p.name).sort((a,b)=>a.number-b.number); }
 function shirtFor(name){ return state.squad.find(p=>p.name===name)?.number ?? ''; }
 function playerForName(name){return state.squad.find(p=>p.name===name)||null;}
+// Large identity graphics are separate from the compact shirts used by tactics
+// and availability controls, so those controls keep their existing geometry.
+function graphicShirtHTML(person={},extraClass=''){
+  const role=person.role==='coach'?'coach':person.role==='goalkeeper'?'goalkeeper':'outfield';
+  const number=Number(person.number)>0?String(Number(person.number)):'';
+  const decoration=role==='coach'
+    ?`<img class="graphic-shirt-badge" src="shooters-hill-logo.png" alt="" decoding="async" /><span class="graphic-shirt-initials">${esc(person.initials||'')}</span>`
+    :`<span class="graphic-shirt-number">${esc(number)}</span>`;
+  return `<span class="graphic-shirt ${role}${extraClass?' '+esc(extraClass):''}" aria-hidden="true"><img class="graphic-shirt-art" src="graphics/shirt-${role}.webp" alt="" decoding="async" />${decoration}</span>`;
+}
+function graphicAccountInitials(){
+  return String(window.ClubHubCloud?.context?.profile?.full_name||'').trim().split(/\s+/).filter(Boolean).slice(0,2).map(part=>Array.from(part)[0]).join('').toLocaleUpperCase('en-GB');
+}
+function graphicLinkedPlayer(link){
+  // An approved link establishes the identity; a unique current roster match
+  // supplies its kit role. Unknown links never borrow another player's shirt.
+  const name=selkentNorm(link?.player_name||'');
+  const matches=state.squad.filter(player=>name&&selkentNorm(player.name)===name);
+  return matches.length===1&&['outfield','goalkeeper'].includes(matches[0].role)?matches[0]:null;
+}
+function renderGraphicIdentity(){
+  const cloud=window.ClubHubCloud,parent=CLOUD_MODE&&currentRole==='parent',meta=state.meta||{};
+  const initials=graphicAccountInitials(),teamName=matchTeamLabel(meta.teamName||'Team'),teamLabel=[meta.ageGroup,teamName].filter(Boolean).join(' ');
+  const fixture=parent?nextPublishedFixture():null,matchday=parent&&parentMatchdayReady(fixture);
+  const text=(id,value)=>{const element=document.getElementById(id);if(element)element.textContent=value;};
+  text('graphic-account-initials',initials);
+  text('home-scene-label',parent?'Family home':'Dashboard');
+  text('home-scene-title',parent?(matchday?'Your matchday':'Training this week'):teamName);
+  text('home-scene-team',teamLabel);
+  text('home-scene-role',[roleLabel(),meta.season].filter(Boolean).join(' · '));
+  const slot=document.getElementById('home-scene-shirt');if(!slot)return;
+  let shirt='';
+  if(parent){
+    const uid=String(cloud?.session?.user?.id||''),teamId=String(cloud?.currentTeam?.()?.id||'');
+    const linksCurrent=!!uid&&!!teamId&&__parentFamilyStatus==='ready'&&__parentFamilyKey===uid+':'+teamId;
+    const link=linksCurrent?__parentFamilyLinks.find(row=>String(row.parent_user_id)===uid&&(!row.team_id||String(row.team_id)===teamId)):null;
+    const player=link?graphicLinkedPlayer(link):null;
+    if(player)shirt=graphicShirtHTML(player);
+  }else if(!isClubOverviewMode()&&!isAdminTeamPreviewMode()&&isCoach()){
+    shirt=graphicShirtHTML({role:'coach',initials});
+  }
+  setStableHtml(slot,shirt);
+  slot.hidden=!shirt;
+}
 function miniJerseyHTML(number,role='outfield',extraClass=''){
   const n=Number(number)||'';const cls=role==='goalkeeper'?'goalkeeper':'outfield';
   return `<span class="mini-jersey ${cls} ${extraClass}" aria-label="Shirt number ${esc(n)}"><svg viewBox="0 0 64 58" aria-hidden="true"><path d="M22 6 28 2h8l6 4 14 8-7 12-7-4v32H22V22l-7 4-7-12 14-8Z"/></svg><b>${esc(n)}</b></span>`;
@@ -2368,6 +2412,7 @@ function addWeeklyTraining(event){
   event.target.reset();saveState();toast('Weekly training schedule saved');
 }
 function renderParentHomeMatchInfo(){
+  renderGraphicIdentity();
   const panel=document.getElementById('parent-home-match-info'),training=document.getElementById('parent-home-training'),card=document.getElementById('next-match-card'),title=document.getElementById('home-next-title');if(!panel||!training||!card)return;
   const parent=CLOUD_MODE&&currentRole==='parent',fixture=nextPublishedFixture(),confirmed=parentMatchdayReady(fixture),showMatch=parent&&confirmed;
   panel.classList.toggle('hidden',!showMatch);training.classList.toggle('hidden',!parent||showMatch);card.classList.toggle('hidden',parent&&!showMatch);
@@ -2400,7 +2445,9 @@ function renderParentFamilySummary(){
   const currentKey=String(window.ClubHubCloud?.session?.user?.id||'')+':'+String(team?.id||''),currentLinks=__parentFamilyKey===currentKey?__parentFamilyLinks:[];
   const rows=currentLinks.map(link=>{
     const name=String(link.player_name||'').trim();
-    return `<div class="parent-child-row"><span class="parent-child-initial" aria-hidden="true">${esc(name.charAt(0).toUpperCase())}</span><div><button type="button" class="person-name-button" data-player-profile="${esc(name)}">${esc(name)}</button><small>${esc(label)}${link.shirt_number?' · #'+esc(link.shirt_number):''}</small></div></div>`;
+    const player=__parentFamilyStatus==='ready'?graphicLinkedPlayer(link):null;
+    const identity=player?graphicShirtHTML(player,'graphic-shirt-linked-child'):`<span class="parent-child-initial" aria-hidden="true">${esc(name.charAt(0).toUpperCase())}</span>`;
+    return `<div class="parent-child-row">${identity}<div><button type="button" class="person-name-button" data-player-profile="${esc(name)}">${esc(name)}</button><small>${esc(label)}${link.shirt_number?' · #'+esc(link.shirt_number):''}</small></div></div>`;
   }).join('');
   const message=__parentFamilyKey!==currentKey||__parentFamilyStatus==='loading'?'Checking approved child links…':__parentFamilyStatus==='error'?'Child links could not be loaded. Refresh to try again.':'No child is linked to this team yet. Ask the coach to check your approved player link, or request another child or team.';
   const list=document.getElementById('parent-home-family-list'),accountList=document.getElementById('parent-family-linked-list');
@@ -3465,6 +3512,7 @@ function renderTeamIdentity(){
   document.getElementById('league-summary-name').textContent=state.division.name||'League';
   updateMatchEntryScoreLabels();
   document.title=adminClub?`${clubSettings().display_name||'Club'} Hub`:`${meta.teamName||'Team'} · ${clubSettings().display_name||'Club'}`;
+  renderGraphicIdentity();
 }
 
 function reflowDashboardFeaturePanels(){
@@ -5006,7 +5054,7 @@ function renderSquad(){
   const squad=rosterPlayers(),f=footballFormat();document.getElementById('squad-count').textContent=squad.length;const space=Math.max(0,f.registered-squad.length);const sc=document.getElementById('squad-space-count');if(sc)sc.textContent=`${space} registration space${space===1?'':'s'} remaining`;
   const preview=document.getElementById('squad-limits-preview');if(preview)preview.textContent=`${f.format} · ${f.onPitch} on pitch · limits from configuration`;
   const summary=document.getElementById('squad-format-summary');if(summary)summary.innerHTML=`<span>${f.format}</span><span>${f.onPitch} on pitch</span><span>Max registered ${f.registered}</span><span>Matchday ${f.matchday}</span>`;
-  document.getElementById('squad-list').innerHTML=squad.map(p=>{const role=p.role==='goalkeeper'?'Goalkeeper':'Outfield',status=p.status==='inactive'?' · Inactive':'';const ownPlayer=currentRole!=='player'||selkentNorm(window.ClubHubCloud?.context?.profile?.full_name||'')===selkentNorm(p.name);const copy=`<span class="workspace-row-copy"><strong>#${esc(p.number)} ${esc(p.name)}</strong><small>${role}${status}</small></span>`;return ownPlayer?`<button type="button" class="person-name-button workspace-directory-row" data-player-profile="${esc(p.name)}">${copy}<span aria-hidden="true">›</span></button>`:`<article class="workspace-directory-row">${copy}</article>`;}).join('')||'<div class="empty-state"><strong>No players yet</strong>Add players to build the squad.</div>';
+  document.getElementById('squad-list').innerHTML=squad.map(p=>{const role=p.role==='goalkeeper'?'Goalkeeper':'Outfield',status=p.status==='inactive'?' · Inactive':'';const ownPlayer=currentRole!=='player'||selkentNorm(window.ClubHubCloud?.context?.profile?.full_name||'')===selkentNorm(p.name);const copy=`${graphicShirtHTML(p)}<span class="workspace-row-copy"><strong>#${esc(p.number)} ${esc(p.name)}</strong><small>${role}${status}</small></span>`;return ownPlayer?`<button type="button" class="person-name-button workspace-directory-row graphic-squad-player" data-player-profile="${esc(p.name)}">${copy}<span aria-hidden="true">›</span></button>`:`<article class="workspace-directory-row graphic-squad-player">${copy}</article>`;}).join('')||'<div class="empty-state"><strong>No players yet</strong>Add players to build the squad.</div>';
   if(featureEnabled('tactics'))renderTacticsBoard();else setSquadPage(0);
 }
 
@@ -6490,7 +6538,7 @@ async function resolvePlayerProfile(target){
   else if(!['admin','coach','assistant_coach'].includes(currentRole))return null;
   const sum=playerSeasonSummary(p.name),ap=sum.appearance||appearanceStatFor(p.name),mini=restricted&&ageGroupNumber()<=11;
   const stats=[['Appearances',Number(ap.appearances||0)],['Attendance',attendancePercent(ap)+'%'],['Awards',sum.awards],...(!mini?[['Goals',sum.goals],['Assists',sum.assists],['Goal contributions',sum.goals+sum.assists]]:[]),...(!restricted?[['Starts',Number(ap.starts||0)],['No-shows',Number(ap.no_shows||0)]]:[])];
-  let html=`<section class="panel"><div class="player-profile-hero"><div class="player-profile-jersey">${jerseyHTML(p)}</div><div><strong>${esc(p.name)}</strong><span>Shirt ${esc(p.number)} · ${p.role==='goalkeeper'?'Goalkeeper':'Outfield'} · ${esc(state.meta.ageGroup||'')}</span></div></div><div class="player-profile-stats">${stats.map(([label,value])=>`<article><span>${esc(label)}</span><strong>${esc(value)}</strong></article>`).join('')}</div>${isCoach()?`<button type="button" class="secondary-button" data-edit-player="${esc(p.number)}">Edit player details</button>`:''}</section>`;
+  let html=`<section class="panel graphic-player-record"><div class="player-profile-hero graphic-profile-hero"><div class="player-profile-jersey">${graphicShirtHTML(p)}</div><div><strong>${esc(p.name)}</strong><span>Shirt ${esc(p.number)} · ${p.role==='goalkeeper'?'Goalkeeper':'Outfield'} · ${esc(state.meta.ageGroup||'')}</span></div></div><div class="player-profile-stats">${stats.map(([label,value])=>`<article><span>${esc(label)}</span><strong>${esc(value)}</strong></article>`).join('')}</div>${isCoach()?`<button type="button" class="secondary-button" data-edit-player="${esc(p.number)}">Edit player details</button>`:''}</section>`;
   const fixture=nextPublishedFixture();let canRespond=false,notice='';
   if(restricted&&linked&&fixture){
     try{const rows=await listFixtureAvailability(fixture),row=rows.find(r=>selkentNorm(r.player_name)===selkentNorm(p.name));canRespond=true;

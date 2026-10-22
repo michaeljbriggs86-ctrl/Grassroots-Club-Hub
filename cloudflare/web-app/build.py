@@ -19,7 +19,11 @@ DIST = HERE / "dist"
 ASSETS = (
     "index.html", "register.html", "registration.js", "registration.css", "manifest.json", "cloud-config.js", "cloud.js",
     "onboarding.js", "onboarding.css", "app.js", "coach-qualifications.js", "member-contact-import.js", "person-profiles.js", "registration-conduct.js", "player-onboarding.js", "coach-onboarding.js", "static-feed-overlay.js", "kickoff-updates.js",
-    "styles.css", "cloud.css", "app-design-system.css", "notifications.css",
+    "styles.css", "cloud.css", "app-design-system.css", "notifications.css", "sunday-graphics.css",
+    "graphics/pitch-portrait.webp", "graphics/pitch-wide.webp", "graphics/fabric.webp",
+    "graphics/shirt-coach.webp", "graphics/shirt-goalkeeper.webp", "graphics/shirt-outfield.webp",
+    "graphics/barlow-condensed-bold.ttf", "graphics/anton-regular.ttf",
+    "graphics/barlow-condensed-OFL.txt", "graphics/anton-OFL.txt",
     "inter-variable.woff2", "inter-OFL.txt",
     "shooters-hill-logo.png", "club-badge-unavailable.svg",
     "football-login-adult.jpg", "football-login-player.jpg",
@@ -54,6 +58,7 @@ def build() -> None:
     shutil.rmtree(DIST, ignore_errors=True)
     DIST.mkdir()
     for name in ASSETS:
+        (DIST / name).parent.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(SOURCE / name, DIST / name)
     subprocess.run(
         ["python3", str(ROOT / "verification/verify_pilot_scope.py"),

@@ -16,7 +16,7 @@ assert(start>0&&end>start);
 assert(html.includes('id="parent-home-family"')&&html.includes('id="parent-family-linked-list"')&&html.includes('id="parent-home-match-info"'));
 assert.match(css,/\.club-logo-wrap\{overflow:hidden;isolation:isolate\}/);
 
-const nodes=Object.fromEntries(['parent-home-family','parent-home-family-list','parent-family-linked-list','parent-home-match-info','parent-home-training','next-match-card','home-next-title'].map(id=>[id,{innerHTML:'',hidden:false,classList:{toggle(_name,hidden){nodes[id].hidden=hidden;}}}]));
+const nodes=Object.fromEntries(['parent-home-family','parent-home-family-list','parent-family-linked-list','parent-home-match-info','parent-home-training','next-match-card','home-next-title','home-scene-shirt','home-scene-label','home-scene-title','home-scene-team','home-scene-role','graphic-account-initials'].map(id=>[id,{innerHTML:'',hidden:false,classList:{toggle(_name,hidden){nodes[id].hidden=hidden;}}}]));
 let team={id:'one',ageGroup:'U9',teamName:'Valiants'};
 let resolveOld;
 const cloud={
@@ -29,16 +29,17 @@ const cloud={
 };
 const context={CLOUD_MODE:true,currentRole:'parent',window:{ClubHubCloud:cloud},
   document:{getElementById:id=>nodes[id]||null},matchTeamLabel:x=>x,formatDate:x=>x,
-  state:{selkent:{fixtures:[]},trainingSessions:[
+  state:{meta:{ageGroup:'U9',teamName:'Valiants',season:'2026/27'},squad:[{name:'Aavi',number:5,role:'outfield'}],selkent:{fixtures:[]},trainingSessions:[
     {id:'training-3',date:'2099-10-15',time:'18:00',venue:'Later pitch',note:''},
     {id:'training-1',date:'2099-10-01',time:'18:00',venue:'Local pitch',note:'Bring water'},
     {id:'training-2',date:'2099-10-08',time:'18:00',venue:'Second pitch',note:''},
   ]},
   esc:x=>String(x).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;'),
+  roleLabel:()=> 'Parent',isClubOverviewMode:()=>false,isAdminTeamPreviewMode:()=>false,isCoach:()=>false,
   nextPublishedFixture:()=>({id:'fixture-one',date:'2026-10-04'}),resolvedFixture:f=>({...f,time:f.time||'10:00',groundName:'Home ground'}),fixtureDetailsConfirmed:()=>true,parentMatchdayReady:()=>true,fixtureResponseKey:f=>f.id,matchdayArrivalTime:()=> '09:30',selkentNorm:x=>String(x).toLowerCase(),
   ageGroupNumber:()=>Number(team.ageGroup.replace(/\D/g,'')),cupGroupFixtureLines:g=>g.opponents.join(' / '),
   __availabilityFixture:'fixture-one',__availabilityTeamId:'one',__availabilityLoadStatus:'ready',__availabilityRows:[{player_name:'Aavi',status:'available'}],Date:Clock};
-vm.runInNewContext(`${take('function miniCupGroup(', 'function fixtureCompetitionLabel(')}\n${app.slice(start,end)}\nthis.family=refreshParentFamilySummary;this.render=renderParentFamilySummary;`,context);
+vm.runInNewContext(`${take('function graphicShirtHTML(', 'function miniJerseyHTML(')}\n${take('function setStableHtml(', '// Club lists share')}\n${take('function miniCupGroup(', 'function fixtureCompetitionLabel(')}\n${app.slice(start,end)}\nthis.family=refreshParentFamilySummary;this.render=renderParentFamilySummary;`,context);
 
 (async()=>{
   await context.family();

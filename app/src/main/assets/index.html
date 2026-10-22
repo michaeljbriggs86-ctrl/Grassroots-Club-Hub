@@ -14,6 +14,7 @@
   <link rel="stylesheet" href="onboarding.css" />
   <link rel="stylesheet" href="app-design-system.css" />
   <link rel="stylesheet" href="notifications.css" />
+  <link rel="stylesheet" href="sunday-graphics.css" />
   <title>Shooters Hill AFC</title>
 </head>
 <body class="splash-active">
@@ -57,6 +58,7 @@
       <div class="hero-pattern" aria-hidden="true"></div>
       <img class="hero-art" src="football-pitch-hero-illustration.png" alt="" aria-hidden="true" />
       <div class="hero-context-actions" role="group" aria-label="Profile and notifications">
+        <span class="graphic-account-initials" id="graphic-account-initials" aria-hidden="true"></span>
         <button type="button" class="hero-profile-button hidden" id="hero-profile-switch">Coach view</button>
         <button type="button" class="hero-profile-button hidden" id="hero-admin-preview-back">Admin view</button>
         <button type="button" class="hero-notification-button hidden" id="notification-bell" aria-label="Notifications" aria-haspopup="dialog"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg><span class="notification-badge hidden" id="notification-badge" aria-hidden="true">0</span></button>
@@ -98,6 +100,15 @@
 
     <main id="app" class="content" tabindex="-1">
       <section id="view-home" class="view active" data-view="home">
+        <div class="home-scene" aria-labelledby="home-scene-title">
+          <div class="home-scene-shirt" id="home-scene-shirt" aria-hidden="true"></div>
+          <div class="home-scene-copy">
+            <p class="home-scene-label" id="home-scene-label">Dashboard</p>
+            <h2 id="home-scene-title">Your team</h2>
+            <p id="home-scene-team"></p>
+            <p id="home-scene-role"></p>
+          </div>
+        </div>
         <div class="section-title-row">
           <div>
             <p class="kicker" id="dashboard-season-kicker">2026/27 season</p>
@@ -370,6 +381,7 @@
       </section>
 
       <section id="view-squad" class="view team-workspace" data-view="squad">
+        <div class="graphic-raised-crest" aria-hidden="true"><img src="shooters-hill-logo.png" alt="" /></div>
         <div class="section-title-row">
           <div><p class="kicker" id="squad-workspace-kicker">Your team · staff</p><h2 id="squad-team-name">Squad</h2></div>
         </div>
@@ -497,6 +509,7 @@
         </section></div>
 
         <section class="admin-club-overview admin-home" id="admin-club-overview">
+          <div class="graphic-admin-heading"><p class="kicker">Club overview</p><h2>This weekend</h2><div class="graphic-raised-crest" aria-hidden="true"><img src="shooters-hill-logo.png" alt="" /></div></div>
           <section class="panel screen-lead-card admin-home-weekend" aria-labelledby="admin-home-weekend-title">
             <div class="panel-heading"><div><p class="kicker">Club matchday</p><h3 id="admin-home-weekend-title">This weekend</h3><p class="muted" id="admin-home-weekend-dates"></p></div><button type="button" class="secondary-button" id="admin-home-refresh">Refresh</button></div>
             <p class="muted admin-overview-meta" id="admin-overview-meta" role="status">Loading club data…</p>

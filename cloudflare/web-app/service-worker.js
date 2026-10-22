@@ -1,10 +1,13 @@
 // Browser pilot: cache reviewed same-origin application files only.
 // Never intercept Supabase responses, Selkent feeds, or private API calls.
-const CACHE = 'pitchkind-web-kickoff-responses-20261015';
+const CACHE = 'pitchkind-web-sunday-graphics-20261022';
 const STATIC = [
   './', './index.html', './manifest.json', './cloud-config.js', './cloud.js',
   './onboarding.js', './onboarding.css', './app.js','./kickoff-updates.js','./coach-qualifications.js','./member-contact-import.js','./person-profiles.js', './registration-conduct.js', './player-onboarding.js', './coach-onboarding.js', './static-feed-overlay.js',
   './notifications.css','./styles.css', './cloud.css', './app-design-system.css',
+  './sunday-graphics.css', './graphics/pitch-portrait.webp', './graphics/pitch-wide.webp',
+  './graphics/fabric.webp', './graphics/shirt-coach.webp', './graphics/shirt-goalkeeper.webp',
+  './graphics/shirt-outfield.webp', './graphics/barlow-condensed-bold.ttf', './graphics/anton-regular.ttf',
   './inter-variable.woff2', './inter-OFL.txt',
   './pilot-rights-runtime.js', './shooters-hill-logo.png', './club-badge-unavailable.svg', './football-login-adult.jpg',
   './football-login-player.jpg', './football-login-club.jpg',

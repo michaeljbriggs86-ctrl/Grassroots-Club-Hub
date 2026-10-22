@@ -30,6 +30,7 @@ const cloud={context:{profile:own},session:{user:{id:'me'}},role:()=>ctx.current
 };ctx.ClubHubCloud=cloud;
 ctx.ClubHubCoachQualifications={close(){},validate:r=>r,catalogue:[{kind:'dbs',label:'Enhanced DBS',courses:{dbs:'Enhanced DBS'}},{kind:'safeguarding',label:'Safeguarding',courses:{}},{kind:'first_aid',label:'First aid',courses:{}}],status:r=>r?{label:'In date',tone:'current'}:{label:'Not recorded',tone:'missing'},open(){}};
 vm.createContext(ctx);vm.runInContext(moduleSource,ctx);
+vm.runInContext(app.slice(app.indexOf('function graphicShirtHTML('),app.indexOf('function miniJerseyHTML(')),ctx);
 vm.runInContext(app.slice(app.indexOf('let __contactDirectoryIdentity='),app.indexOf('let __inboxStamp=')),ctx);
 const ui=ctx.ClubHubPersonProfiles,tick=()=>new Promise(r=>setImmediate(r));
 const body=()=>node('person-profile-body').innerHTML;
