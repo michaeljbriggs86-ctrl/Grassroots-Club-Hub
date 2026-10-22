@@ -671,6 +671,36 @@ function graphicLinkedPlayer(link){
   const matches=state.squad.filter(player=>name&&selkentNorm(player.name)===name);
   return matches.length===1&&['outfield','goalkeeper'].includes(matches[0].role)?matches[0]:null;
 }
+// Keep the photographic backdrop behind the actual identity, including wrapped
+// headers and team selectors. This changes only an absolute background's height.
+let __graphicSceneObserver=null,__graphicSceneFrame=0,__graphicSceneObserved=[];
+function updateGraphicSceneLayout(){
+  if(__graphicSceneFrame)return;
+  __graphicSceneFrame=requestAnimationFrame(()=>{
+    __graphicSceneFrame=0;
+    const shell=document.querySelector('.app-shell');if(!shell)return;
+    const scene=document.querySelector('body.view-home #view-home.active>.home-scene,body.view-person #view-person.active .graphic-profile-hero');
+    const header=shell.querySelector(':scope>.hero');
+    const observed=[shell,header,scene].filter(Boolean);
+    if(typeof ResizeObserver==='function'){
+      if(!__graphicSceneObserver)__graphicSceneObserver=new ResizeObserver(updateGraphicSceneLayout);
+      if(observed.length!==__graphicSceneObserved.length||observed.some((node,index)=>node!==__graphicSceneObserved[index])){
+        __graphicSceneObserver.disconnect();
+        observed.forEach(node=>__graphicSceneObserver.observe(node));
+        __graphicSceneObserved=observed;
+      }
+    }
+    const bounds=scene?.getBoundingClientRect();
+    if(document.body.classList.contains('auth-open')||!bounds||!scene.getClientRects().length||bounds.height<=0){
+      shell.style.removeProperty('--sh-scene-height');return;
+    }
+    // Profile metadata can wrap to the final row; fade below it, into the stats.
+    const fadeTail=scene.classList.contains('graphic-profile-hero')?24:0;
+    const height=Math.ceil(bounds.bottom-shell.getBoundingClientRect().top+fadeTail);
+    if(Number.isFinite(height)&&height>0&&shell.style.getPropertyValue('--sh-scene-height')!==height+'px')shell.style.setProperty('--sh-scene-height',height+'px');
+  });
+}
+window.addEventListener('resize',updateGraphicSceneLayout,{passive:true});
 function renderGraphicIdentity(){
   const cloud=window.ClubHubCloud,parent=CLOUD_MODE&&currentRole==='parent',meta=state.meta||{};
   const initials=graphicAccountInitials(),teamName=matchTeamLabel(meta.teamName||'Team'),teamLabel=[meta.ageGroup,teamName].filter(Boolean).join(' ');
@@ -694,6 +724,7 @@ function renderGraphicIdentity(){
   }
   setStableHtml(slot,shirt);
   slot.hidden=!shirt;
+  updateGraphicSceneLayout();
 }
 function miniJerseyHTML(number,role='outfield',extraClass=''){
   const n=Number(number)||'';const cls=role==='goalkeeper'?'goalkeeper':'outfield';

@@ -3,7 +3,7 @@
   'use strict';
   let options,identity='',cloudIdentity=null,sequence=0,version=0,selected='',snapshot=null,pending=null;
   const targets=new Map(),el=id=>document.getElementById(id);
-  const clear=()=>{version++;snapshot=null;pending=null;const retry=el('person-profile-retry');if(retry)retry.hidden=true;const body=el('person-profile-body');if(body)body.innerHTML='';const title=el('person-profile-name');if(title)title.textContent='Person details';const status=el('person-profile-status');if(status)status.textContent='';};
+  const clear=()=>{version++;snapshot=null;pending=null;const retry=el('person-profile-retry');if(retry)retry.hidden=true;const body=el('person-profile-body');if(body)body.innerHTML='';const title=el('person-profile-name');if(title)title.textContent='Person details';const status=el('person-profile-status');if(status)status.textContent='';window.updateGraphicSceneLayout?.();};
   function syncAccess(){const key=options?.contextKey()||'',cloud=options?.cloud();if(key!==identity||cloud!==cloudIdentity){identity=key;cloudIdentity=cloud;targets.clear();selected='';clear();options?.onLeave?.();}return key;}
   function reset(){identity='';cloudIdentity=null;targets.clear();selected='';clear();options?.onLeave?.();}
   function isActive(){return options?.currentView()==='person';}
@@ -25,7 +25,7 @@
       const retry=el('person-profile-retry');if(retry)retry.hidden=!result.retryable;
       el('person-profile-name').focus({preventScroll:true});
     }catch(_){if(same(v,key,target)){el('person-profile-status').textContent='These details are unavailable for your current access. Return to the list or try again.';const retry=el('person-profile-retry');if(retry)retry.hidden=false;}}
-    finally{if(pending?.version===v)pending=null;}
+    finally{if(pending?.version===v)pending=null;window.updateGraphicSceneLayout?.();}
   }
   function open(target){
     if(!syncAccess()||!target)return;

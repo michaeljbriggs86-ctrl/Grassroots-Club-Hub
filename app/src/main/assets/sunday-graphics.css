@@ -297,24 +297,24 @@ html[data-theme] body #view-person .graphic-profile-hero .graphic-shirt-number{c
 /* Mike's larger shirts and smaller backdrop, 22 October. Figma561:10348.
    Native information overlaps the sleeve; the lower shirt fades into the scene.
    Full garment proportions keep numbers, initials and badge above the fade. */
-html body:not(.auth-open).view-person:has(.graphic-profile-hero) .app-shell::before{
-  --sh-profile-pitch:url("graphics/pitch-wide.webp");height:330px;
+html body:not(.auth-open):is(.view-home,.view-person:has(.graphic-profile-hero)) .app-shell::before{
+  --sh-profile-pitch:url("graphics/pitch-wide.webp");height:var(--sh-scene-height,330px);
   background-image:linear-gradient(180deg,rgba(5,8,6,.78),rgba(5,8,6,.5) 16%,rgba(5,8,6,.25) 50%,rgba(5,8,6,.45) calc(100% - 24px),var(--sh-canvas)),var(--sh-profile-pitch);
   background-size:auto,cover;background-position:center,center 60%;
 }
-html body:not(.auth-open).view-home .app-shell::before{height:280px}
+html body:not(.auth-open).view-home .app-shell::before{height:var(--sh-scene-height,280px)}
 html body:not(.auth-open):is(.view-squad,.view-club) .app-shell::before{height:300px}
 html body:not(.auth-open) #view-home>.home-scene,
 html body:not(.auth-open).role-parent #view-home>.home-scene{
-  display:grid;grid-template-columns:minmax(0,1fr) clamp(160px,50vw,204px);grid-template-rows:auto;align-items:center;
-  min-height:180px;margin:0 -20px;padding:0 20px 24px;gap:0;
+  display:grid;grid-template-columns:minmax(0,1fr) clamp(160px,50vw,204px);grid-template-rows:auto;align-items:start;
+  min-height:0;margin:0 -20px;padding:0 20px 8px;gap:0;
 }
 html body #view-home .home-scene-shirt{
   position:relative;grid-column:2;grid-row:1;justify-self:end;
-  width:100%;max-width:204px;height:clamp(156px,47vw,190px);
+  width:100%;max-width:204px;height:clamp(140px,40vw,160px);
   top:auto;right:auto;transform:none;overflow:hidden;z-index:0;
-  -webkit-mask-image:linear-gradient(#000 0 calc(100% - 36px),transparent 100%);
-  mask-image:linear-gradient(#000 0 calc(100% - 36px),transparent 100%);
+  -webkit-mask-image:linear-gradient(#000 0 calc(100% - 24px),transparent 100%);
+  mask-image:linear-gradient(#000 0 calc(100% - 24px),transparent 100%);
 }
 html body.role-parent #view-home .home-scene-shirt{width:100%;max-width:204px}
 html body #view-home .home-scene-copy,
@@ -328,6 +328,7 @@ html body #home-scene-title{font-size:clamp(1.75rem,7vw,2rem)!important}
 html body .home-scene-label{margin-bottom:6px}
 html body :is(#home-scene-team,#home-scene-role){margin-top:6px}
 html body #view-home #home-next-match{margin-top:0}
+html body #view-home .home-scene-shirt .graphic-shirt-art{object-position:center top}
 html body #view-home .home-scene-shirt .graphic-shirt-initials{font-size:1.125rem}
 html body #view-home .home-scene-shirt .graphic-shirt-number{font-size:3.5rem;transform:none}
 
@@ -337,21 +338,21 @@ html body #view-person .graphic-profile-hero{
 }
 html body #view-person .graphic-profile-hero .player-profile-jersey{
   display:block;position:relative;grid-column:2;grid-row:1;top:auto;right:auto;z-index:0;flex:none;
-  width:100%;max-width:204px;height:clamp(156px,47vw,190px);margin:0;overflow:hidden;justify-self:end;
-  -webkit-mask-image:linear-gradient(#000 0 calc(100% - 36px),transparent 100%);
-  mask-image:linear-gradient(#000 0 calc(100% - 36px),transparent 100%);
+  width:100%;max-width:204px;height:clamp(140px,40vw,160px);margin:0;overflow:hidden;justify-self:end;
+  -webkit-mask-image:linear-gradient(#000 0 calc(100% - 24px),transparent 100%);
+  mask-image:linear-gradient(#000 0 calc(100% - 24px),transparent 100%);
 }
 html body #view-person .graphic-profile-hero .graphic-shirt-number{font-size:3.5rem;transform:none}
 html body #view-person .graphic-profile-hero .graphic-shirt{margin:0}
 html body #view-person .graphic-profile-hero .graphic-shirt-art{object-position:center top}
 html body #view-person .graphic-profile-hero>div:last-child strong{font-size:2rem!important}
 
-/* Compact player-profile top. Figma565:10368; retain every native action. */
-html body:not(.auth-open).view-person:has(.graphic-profile-hero) .app-shell>.hero{
+/* Shared compact identity spacing. Figma572:10376; retain every native action. */
+html body:not(.auth-open):is(.view-home,.view-person:has(.graphic-profile-hero)) .app-shell>.hero{
   min-height:0!important;padding:calc(12px + var(--android-inset-top,0px)) 20px 8px!important;gap:8px;
 }
-html body:not(.auth-open).view-person:has(.graphic-profile-hero) .hero-copy h1{margin-top:4px!important}
-html body:not(.auth-open).view-person:has(.graphic-profile-hero) .hero-context-actions .hero-profile-button{
+html body:not(.auth-open):is(.view-home,.view-person:has(.graphic-profile-hero)) .hero-copy h1{margin-top:4px!important}
+html body:not(.auth-open):is(.view-home,.view-person:has(.graphic-profile-hero)) .hero-context-actions .hero-profile-button{
   width:auto;min-height:44px;padding:8px 10px;font-size:.8125rem;white-space:nowrap!important;
 }
 html body #view-person:has(.graphic-profile-hero)>.person-profile-back{
@@ -367,7 +368,7 @@ html body #view-person:has(.graphic-profile-hero):has(>#person-profile-status:em
 html body #view-person:has(>#person-profile-status:empty) .graphic-profile-hero>div:last-child{padding-top:44px}
 html body #view-person .player-profile-stats{position:relative;isolation:isolate;margin-top:4px}
 html body #view-person .player-profile-stats::before{
-  content:"";position:absolute;z-index:-1;inset:-20px -20px 0;pointer-events:none;
+  content:"";position:absolute;z-index:-1;inset:0 -20px 0;pointer-events:none;
   background:linear-gradient(180deg,transparent,var(--sh-canvas) 20px,var(--sh-canvas) calc(100% - 24px),transparent 100%);
 }
 html body:not(.auth-open).view-person:not(:has(.graphic-profile-hero)) .app-shell::before{display:none}
@@ -375,15 +376,15 @@ html body:not(.auth-open).view-person:not(:has(.graphic-profile-hero)) .app-shel
   background:linear-gradient(180deg,rgba(5,8,6,.78),rgba(5,8,6,.6)),url("graphics/pitch-wide.webp") center/cover no-repeat!important;
 }
 @media(max-width:500px){
-  html body:not(.auth-open).view-person:has(.graphic-profile-hero) .hero-context-actions:has(.hero-profile-button:not(.hidden):not([hidden])){
+  html body:not(.auth-open):is(.view-home,.view-person:has(.graphic-profile-hero)) .hero-context-actions:has(.hero-profile-button:not(.hidden):not([hidden])){
     display:grid;grid-template-columns:46px 46px;gap:4px;width:96px;align-items:center;
   }
-  html body:not(.auth-open).view-person:has(.graphic-profile-hero) .hero-context-actions .hero-profile-button{grid-column:1/-1;grid-row:1;justify-self:stretch}
-  html body:not(.auth-open).view-person:has(.graphic-profile-hero) .hero-context-actions .hero-notification-button{grid-column:2;grid-row:2;justify-self:end}
-  html body:not(.auth-open).view-person:has(.graphic-profile-hero) .hero-context-actions .graphic-account-initials{grid-column:1;grid-row:2;justify-self:start}
+  html body:not(.auth-open):is(.view-home,.view-person:has(.graphic-profile-hero)) .hero-context-actions .hero-profile-button{grid-column:1/-1;grid-row:1;justify-self:stretch}
+  html body:not(.auth-open):is(.view-home,.view-person:has(.graphic-profile-hero)) .hero-context-actions .hero-notification-button{grid-column:2;grid-row:2;justify-self:end}
+  html body:not(.auth-open):is(.view-home,.view-person:has(.graphic-profile-hero)) .hero-context-actions .graphic-account-initials{grid-column:1;grid-row:2;justify-self:start}
 }
 @media(min-width:901px){
-  html body:not(.auth-open).view-person:has(.graphic-profile-hero) .app-shell>.hero{padding:16px 40px!important}
+  html body:not(.auth-open):is(.view-home,.view-person:has(.graphic-profile-hero)) .app-shell>.hero{padding:16px 40px!important}
 }
 
 html body #view-squad #squad-list{grid-template-columns:repeat(auto-fill,minmax(min(100%,280px),1fr))!important;gap:16px!important}
@@ -410,9 +411,9 @@ html body #view-squad #squad-list .workspace-row-copy{
   html body:not(.auth-open).role-parent #view-home>.home-scene{margin-inline:-16px;padding-inline:16px}
 }
 @media(min-width:901px){
-  html body:not(.auth-open).view-home .app-shell::before{height:360px}
+  html body:not(.auth-open).view-home .app-shell::before{height:var(--sh-scene-height,360px)}
   html body:not(.auth-open) #view-home>.home-scene,
-  html body:not(.auth-open).role-parent #view-home>.home-scene{margin:0 -12px;padding:0 12px 24px;grid-template-columns:minmax(0,1fr) 240px 204px}
+  html body:not(.auth-open).role-parent #view-home>.home-scene{margin:0 -12px;padding:0 12px 8px;grid-template-columns:minmax(0,1fr) 240px 204px}
   html body #view-home .home-scene-copy{grid-column:2;width:calc(100% + 20px);justify-self:start}
   html body #view-home .home-scene-shirt{grid-column:3;right:auto;width:204px;max-width:204px;top:auto}
   html body.role-parent #view-home .home-scene-shirt{width:204px;max-width:204px}
