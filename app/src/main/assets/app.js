@@ -4568,7 +4568,7 @@ function openMatchDetails(matchId){
   const m=state.matches.find(x=>x.id===matchId);if(!m)return;
   document.getElementById('match-detail-id').value=m.id;
   document.getElementById('match-detail-title').textContent='Match details';
-  document.getElementById('match-detail-summary').innerHTML=`<strong>${formatDate(m.date)}</strong><span>${esc(m.competition||'Match')} · ${matchScoreText(m)}${matchStatus(m)!=='played'?' · '+statusLabel(m):''}</span>`;
+  document.getElementById('match-detail-summary').innerHTML=`<strong>${formatDate(m.date)}${m.time?` · Kick-off ${esc(m.time)}`:''}</strong><span>${esc(m.competition||'Match')} · ${matchScoreText(m)}${matchStatus(m)!=='played'?' · '+statusLabel(m):''}</span>`;
   renderMatchOverview(m);
   detailPlayerInputs('detail-goals-inputs',m.id,'goals');
   detailPlayerInputs('detail-assists-inputs',m.id,'assists');
@@ -6097,7 +6097,7 @@ function buildAdminFixtureRows(rows,feed=null,includePast=false){
     matches.forEach(f=>{const key=`${f.date}|${selkentNorm(f.opponent)}`;if(!seen.has(key)&&!adminFixtureHasResult(st,team,f,feed)){seen.add(key);out.push(f);}});
     (st.matches||[]).filter(m=>['scheduled','postponed'].includes(matchStatus(m))&&(includePast||!m.date||m.date>=now)).forEach(m=>{
       const duplicate=out.some(x=>x.team.id===team.id&&x.date===m.date&&selkentNorm(x.opponent)===selkentNorm(m.opponent));
-      if(!duplicate)out.push({team,source:'Team',date:m.date||'',time:m.time||'',opponent:m.opponent||'',venue:m.venue||'',competition:m.competition||m.type||'Match',status:matchStatus(m)});
+      if(!duplicate)out.push({team,source:'Team',date:m.date||'',time:m.time||'',opponent:m.opponent||'',venue:m.venue||'',groundName:m.groundName||'',address:m.address||'',competition:m.competition||m.type||'Match',status:matchStatus(m)});
     });
   }
   return out.sort(compareAdminFixtures);
@@ -7019,6 +7019,7 @@ function editMatch(id){
   refreshSelkentOpponentDirectory(false);
   updateTournamentMatchUI(m.tournamentId||'');if(document.getElementById('match-tournament'))document.getElementById('match-tournament').value=m.tournamentId||'';
   document.getElementById('match-venue').value=m.venue||'';
+  for(const [id,value] of [['match-time',m.time],['match-ground-name',m.groundName],['match-address',m.address]]){const input=document.getElementById(id);if(input)input.value=value||'';}
   document.getElementById('match-stage').value=m.stage||'';
   const editAway=String(m.venue||'').toUpperCase()==='A';
   document.getElementById('match-gf').value=Number(editAway?m.ga:m.gf||0);
@@ -7047,6 +7048,8 @@ async function submitMatch(e){
   const divisionEntry=__divisionEntryMode||isDivisionMatch({competition});
   const opponent=(divisionEntry?document.getElementById('match-opponent-select').value:document.getElementById('match-opponent').value).trim();
   const venue=document.getElementById('match-venue').value;
+  const time=String(document.getElementById('match-time')?.value??existing?.time??'').trim();
+  if(time&&!/^([01]\d|2[0-3]):[0-5]\d$/.test(time)){toast('Enter a valid kick-off time.');return;}
   const status=String(document.getElementById('match-status')?.value||'scheduled').toLowerCase();
   const homeScore=Number(document.getElementById('match-gf').value||0),awayScore=Number(document.getElementById('match-ga').value||0),isAway=String(venue||'').toUpperCase()==='A';
   if(divisionEntry&&(!opponent||!divisionOpponents().includes(opponent))){toast('Select an opponent from your Selkent division.');return;}
@@ -7064,6 +7067,7 @@ async function submitMatch(e){
     type:competition.includes('Tournament')?'Tournament':competition,
     tournamentId:/tournament/i.test(competition)?(document.getElementById('match-tournament')?.value||null):null,
     venue,
+    time,
     duration:existing?.duration ?? null,
     stage:document.getElementById('match-stage').value.trim(),
     gf:isAway?awayScore:homeScore,
@@ -7072,8 +7076,8 @@ async function submitMatch(e){
     notes:document.getElementById('match-notes').value.trim(),
     source:existing?.source||'manual',
     providerTeamIds:Array.isArray(existing?.providerTeamIds)?[...existing.providerTeamIds]:[],
-    groundName:existing?.groundName||'',
-    address:existing?.address||'',
+    groundName:String(document.getElementById('match-ground-name')?.value??existing?.groundName??'').trim(),
+    address:String(document.getElementById('match-address')?.value??existing?.address??'').trim(),
     homeKitColours:existing?.homeKitColours||'',
     awayKitColours:existing?.awayKitColours||''
   };

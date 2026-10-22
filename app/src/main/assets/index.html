@@ -352,9 +352,12 @@
               <label>Match status
                 <select id="match-status"><option value="scheduled">Scheduled</option><option value="played">Played</option><option value="postponed">Postponed</option><option value="abandoned">Abandoned</option></select>
               </label>
-              <label>Venue
+              <label>Home / away
                 <select id="match-venue"><option value="">Not set</option><option value="H">Home</option><option value="A">Away</option><option value="N">Neutral</option></select>
               </label>
+              <label>Kick-off time <span class="optional">optional</span><input id="match-time" type="time" step="60" /><small class="helper">Leave blank if the kick-off is still TBC.</small></label>
+              <label>Ground / venue name <span class="optional">optional</span><input id="match-ground-name" type="text" placeholder="e.g. Marathon Sports Ground" /></label>
+              <label>Address / postcode <span class="optional">optional</span><input id="match-address" type="text" placeholder="Ground address or postcode" /></label>
               <label id="match-tournament-wrap" class="hidden">Tournament event<select id="match-tournament"><option value="">Choose tournament</option></select></label>
               <label>Round / stage <span class="optional">optional</span><input id="match-stage" type="text" placeholder="e.g. Group A · Semi Final" /></label>
             </div>

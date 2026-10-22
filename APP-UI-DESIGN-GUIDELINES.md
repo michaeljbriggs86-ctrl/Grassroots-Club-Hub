@@ -21,6 +21,16 @@ ChatGPT, Claude, future AI systems, developers and contributors must treat this 
 
 When a screen or component conflicts with this document, the screen/component is the item that must change unless Mike explicitly approves an exception.
 
+### Standing authorisation to publish requested app changes (Mike, 2026-10-22)
+
+Mike has given standing authorisation to implement requested PitchKind / Shooters Hill AFC app changes, commit them, push directly to the existing GitHub repository's `main` branch and deploy them to the existing live website. No separate approval, per-commit confirmation or final "may I publish?" step is required for work within his requested scope. This includes the friendly kick-off and venue fix discussed on 2026-10-22.
+
+Complete the applicable Figma review, relevant tests and build checks, preserve concurrent changes, then publish and inspect the running artifact. These checks are work to perform autonomously, not reasons to request repeated permission. Independent verification and evidence requirements remain in force; distinguish publication from acceptance and never infer LIVE status from a push alone.
+
+This authorisation concerns app implementation and publication. Existing requirements for a new product/design departure, generated-image approval and changes outside the requested scope remain applicable. It does not alter tool-enforced permissions. If a tool actually blocks an action, report the specific rejection accurately; do not treat an additional approval as a project rule or try to bypass the tool's restriction.
+
+Record decisions and evidence in a NEW `97 - LOG INBOX` entry under protocol Section 10. Never edit the master handoff index, history or an existing entry.
+
 ### 1.1 Transition from the Grassroots Club Hub identity
 
 Version 1.4 is the target standard. Until Mike authorises the rename implementation in `AI-HANDOFF-LOG.md`, built and source versions that still carry the Grassroots Club Hub name, grass-O assets and the retired "More Than A Game" accent are in transition, not defective. Do not start a piecemeal rename of screens, strings or assets. Section 4.6 lists what this version does and does not authorise.
@@ -439,6 +449,8 @@ A UI change is not accepted unless all relevant answers are **yes**:
 If any required answer is **no**, the UI is not compliant.
 
 ## 17. Change record
+
+**2026-10-22 - Publication workflow amendment.** Mike confirmed standing authorisation to commit, push tested requested app changes to `main` and deploy to the existing website without a separate publication approval. Section 1 records the scope and retains design review, tests and evidence requirements. Visual tokens and asset rules are unchanged.
 
 **2026-09-20 - Version 1.4 - Branding decisions confirmed.**
 Records the decisions Mike confirmed on 2026-09-20 (relayed in AI-HANDOFF-LOG.md entry 19): the lock-up tagline ORGANISE | CONNECT | PLAY is confirmed; the "More Than A Game" accent is RETIRED (section 4.2 now states this, and it is removed from the imagery rule in 7.3 and the authentication rules in section 12; sections 1.1 and 16 now refer to it as retired); the `pitchkind-wt_` file prefix stays while trade-mark clearance is outstanding; the clear-space rule and the 200 px full-lock-up minimum are confirmed (section 4.5). Hero art from earlier builds has the retired accent baked in and must be regenerated when the identity is implemented (PLANNED, not started). The transition clause (1.1) has not been confirmed or rejected by Mike and stays as written. Trade-mark clearance is NOT completed. The previous version is archived as `SUPERSEDED - APP-UI-DESIGN-GUIDELINES_v1.3.md`.

@@ -1,7 +1,7 @@
 # PitchKind - Data Architecture Reference
 
 **Document state:** Current governing architecture reference in `00 - CURRENT MASTER`. The GitHub-root copy is a mirror; its presence and byte parity must be checked independently after any Termux push.
-**Last updated:** 2026-10-13
+**Last updated:** 2026-10-22
 **Refresh recovery contract added:** 2026-10-14; implementation/acceptance pending at design review.
 **Collaboration rules:** `AI-COLLABORATION-PROTOCOL.md`
 **Product name:** PitchKind (formerly Grassroots Club Hub). Mike authorised the visible PitchKind identity implementation on 2026-09-21. Internal identifiers including `com.grassrootsclubhub.universal`, the `grassrootsclubhub://` scheme, `ClubHubNative`, existing feed/repository paths, localStorage keys and `GCH-PIN` remain unchanged unless separately authorised. Trade-mark clearance is NOT completed.
@@ -32,6 +32,16 @@ If two documents or two AIs make conflicting status claims:
 
 `00 - CURRENT MASTER` is the canonical document location. Planning/TODO copies
 that conflict with this file must be marked superseded or archived.
+
+### Standing authorisation to publish requested app changes (Mike, 2026-10-22)
+
+Mike has given standing authorisation to implement requested PitchKind / Shooters Hill AFC app changes, commit them, push directly to the existing GitHub repository's `main` branch and deploy them to the existing live website. No separate approval, per-commit confirmation or final "may I publish?" step is required for work within his requested scope. This includes the friendly kick-off and venue fix discussed on 2026-10-22.
+
+Complete the applicable Figma review, relevant tests and build checks, preserve concurrent changes, then publish and inspect the running artifact. These checks are work to perform autonomously, not reasons to request repeated permission. Independent verification and evidence requirements remain in force; distinguish publication from acceptance and never infer LIVE status from a push alone.
+
+This authorisation concerns app implementation and publication. Existing requirements for a new product/design departure, generated-image approval and changes outside the requested scope remain applicable. It does not alter tool-enforced permissions. If a tool actually blocks an action, report the specific rejection accurately; do not treat an additional approval as a project rule or try to bypass the tool's restriction.
+
+Record decisions and evidence in a NEW `97 - LOG INBOX` entry under protocol Section 10. Never edit the master handoff index, history or an existing entry.
 
 ---
 

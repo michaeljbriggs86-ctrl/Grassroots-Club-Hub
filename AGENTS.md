@@ -1,5 +1,13 @@
 # Project instructions for all coding agents
 
+## Standing authorisation to publish requested app changes
+
+Mike confirmed on 22 October 2026: "No approval needed. Update the architect document and guidelines to reflect this."
+
+For requested PitchKind / Shooters Hill AFC app work, implement the change, complete the applicable Figma review and relevant tests/build checks, commit, push directly to `main`, and deploy to the existing live website without asking for separate commit/push/deploy approval. Preserve concurrent commits and inspect the actual running artifact before claiming LIVE status. The current friendly kick-off and venue fix is included in this authorisation.
+
+This standing permission covers publication within the requested scope. Existing product/design departure, generated-image approval and independent-verification requirements still apply. Tool-enforced permissions cannot be changed by project documentation; report any actual tool rejection accurately and never bypass it. Record decisions/evidence in a new Drive `97 - LOG INBOX` file; never edit existing log entries, the index or frozen history.
+
 ## Required Figma review before feature implementation
 
 Mike's instruction, 13 October 2026: "Ensure that any new features are subject to Figma review before implementation."

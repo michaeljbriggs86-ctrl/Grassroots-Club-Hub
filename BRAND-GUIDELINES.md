@@ -47,6 +47,16 @@ Claims about anything in this document use the protocol words: PLANNED, WRITTEN,
 
 No deviations without Mike's explicit approval, recorded by a new `LOG-ENTRY_...` file in `97 - LOG INBOX`. Nobody edits the index, the frozen history file or an existing entry (protocol section 10). `[v1.4 s1]` A page, asset or post that conflicts with this document is the thing that changes, unless Mike approves an exception.
 
+### Standing authorisation to publish requested app changes (Mike, 2026-10-22)
+
+Mike has given standing authorisation to implement requested PitchKind / Shooters Hill AFC app changes, commit them, push directly to the existing GitHub repository's `main` branch and deploy them to the existing live website. No separate approval, per-commit confirmation or final "may I publish?" step is required for work within his requested scope. This includes the friendly kick-off and venue fix discussed on 2026-10-22.
+
+Complete the applicable Figma review, relevant tests and build checks, preserve concurrent changes, then publish and inspect the running artifact. These checks are work to perform autonomously, not reasons to request repeated permission. Independent verification and evidence requirements remain in force; distinguish publication from acceptance and never infer LIVE status from a push alone.
+
+This authorisation concerns app implementation and publication. Existing requirements for a new product/design departure, generated-image approval and changes outside the requested scope remain applicable. It does not alter tool-enforced permissions. If a tool actually blocks an action, report the specific rejection accurately; do not treat an additional approval as a project rule or try to bypass the tool's restriction.
+
+Record decisions and evidence in a NEW `97 - LOG INBOX` entry under protocol Section 10. Never edit the master handoff index, history or an existing entry.
+
 ## 1. Brand in brief
 
 - **What PitchKind is:** a team app for grassroots football clubs. Football first, family and community focused, simple and trustworthy. `[v1.4 s3]`
@@ -506,6 +516,8 @@ An asset, page or post is not accepted unless all answers are yes.
 8. **Trade-mark filing** timing: separate from this document, still outstanding.
 
 ## 16. Change record
+
+**2026-10-22 - Publication workflow amendment.** Standing authorisation for requested app changes is recorded under section 0. No separate commit/push/deploy approval is required. This is a workflow amendment; generated-image approval and visual standards remain unchanged.
 
 **2026-09-20 - Version 0.1 - Draft.** Written from `APP-UI-DESIGN-GUIDELINES.md` v1.4 to cover every platform and to give ChatGPT a framework for generating images. Inherited rules are tagged with their source section. All new rules are tagged PROPOSED and have no force until approved. Records that the first holding page was non-compliant. Trade-mark clearance is NOT completed. Nothing in this document states or implies that PitchKind is legally cleared or registrable.
 
