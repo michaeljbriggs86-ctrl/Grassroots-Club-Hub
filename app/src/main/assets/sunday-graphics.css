@@ -296,71 +296,83 @@ html[data-theme] body #next-fixture-dialog #next-match-when{font-size:1.875rem!i
 html[data-theme] body #next-fixture-dialog #next-match-versus .canonical-v11-badge img{padding:0!important;border:0!important;border-radius:0!important;background:transparent!important}
 html[data-theme] body #view-person .graphic-profile-hero .graphic-shirt-number{color:#fff!important}
 
-/* Mike's compact garment refinement, 22 October. Figma551:10288.
-   Crop the lower torso behind native information; retain the full garment's
-   aspect ratio so numbers, initials and the original badge keep their positions. */
-html body:not(.auth-open).view-person:has(.graphic-profile-hero) .app-shell::before{height:460px}
+/* Mike's side-by-side refinement, 22 October. Figma554:10308.
+   Native information overlaps the sleeve, beside the compact upper shirt.
+   Full garment proportions keep numbers, initials and badge in place. */
+html body:not(.auth-open).view-person:has(.graphic-profile-hero) .app-shell::before{height:370px}
+html body:not(.auth-open).view-home .app-shell::before{height:320px}
 html body:not(.auth-open) #view-home>.home-scene,
 html body:not(.auth-open).role-parent #view-home>.home-scene{
-  display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:150px auto;align-items:stretch;
-  min-height:0;margin:0 -20px;padding:0 20px 24px;gap:0;
+  display:grid;grid-template-columns:minmax(0,1fr) clamp(128px,42vw,168px);grid-template-rows:auto;align-items:center;
+  min-height:180px;margin:0 -20px;padding:0 20px 24px;gap:0;
 }
 html body #view-home .home-scene-shirt{
-  width:min(68%,240px);max-width:240px;height:150px;
-  top:0;right:20px;transform:none;overflow:hidden;z-index:0;
+  position:relative;grid-column:2;grid-row:1;justify-self:end;
+  width:100%;max-width:168px;height:clamp(112px,34vw,140px);
+  top:auto;right:auto;transform:none;overflow:hidden;z-index:0;
 }
-html body.role-parent #view-home .home-scene-shirt{width:min(62%,200px);max-width:200px}
+html body.role-parent #view-home .home-scene-shirt{width:100%;max-width:168px}
 html body #view-home .home-scene-copy,
 html body #view-person .graphic-profile-hero>div:last-child{
-  position:relative;grid-column:1;grid-row:2;z-index:1;box-sizing:border-box;
-  width:100%;max-width:none;padding:16px;border-radius:16px;
+  position:relative;grid-column:1;grid-row:1;z-index:1;box-sizing:border-box;
+  width:calc(100% + 20px);max-width:none;padding:14px;border-radius:16px;
   background:linear-gradient(165deg,rgba(38,48,43,.98),rgba(14,19,17,.99));
   border:1px solid rgba(255,255,255,.12);box-shadow:var(--sh-shadow);
   color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.5);
 }
-html body #home-scene-title{font-size:clamp(2rem,8vw,2.5rem)!important}
+html body #home-scene-title{font-size:clamp(1.75rem,7vw,2rem)!important}
 html body .home-scene-label{margin-bottom:6px}
 html body :is(#home-scene-team,#home-scene-role){margin-top:6px}
 html body #view-home #home-next-match{margin-top:0}
-html body #view-home .home-scene-shirt .graphic-shirt-initials{font-size:1.125rem}
-html body #view-home .home-scene-shirt .graphic-shirt-number{font-size:3.5rem;transform:none}
+html body #view-home .home-scene-shirt .graphic-shirt-initials{font-size:1rem}
+html body #view-home .home-scene-shirt .graphic-shirt-number{font-size:3rem;transform:none}
 
 html body #view-person .graphic-profile-hero{
-  display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:150px auto;min-height:0;
-  gap:0;padding:0;overflow:hidden;
+  display:grid;grid-template-columns:minmax(0,1fr) clamp(128px,42vw,168px);grid-template-rows:auto;min-height:180px;
+  align-items:center;gap:0;padding:0;overflow:hidden;
 }
 html body #view-person .graphic-profile-hero .player-profile-jersey{
-  display:block;position:absolute;top:0;right:20px;z-index:0;flex:none;
-  width:min(72%,220px);height:150px;margin:0;overflow:hidden;
+  display:block;position:relative;grid-column:2;grid-row:1;top:auto;right:auto;z-index:0;flex:none;
+  width:100%;max-width:168px;height:clamp(112px,34vw,140px);margin:0;overflow:hidden;justify-self:end;
 }
-html body #view-person .graphic-profile-hero .graphic-shirt-number{font-size:4rem;transform:none}
-html body #view-person .graphic-profile-hero>div:last-child strong{font-size:2.5rem!important}
+html body #view-person .graphic-profile-hero .graphic-shirt-number{font-size:3rem;transform:none}
+html body #view-person .graphic-profile-hero>div:last-child strong{font-size:2rem!important}
 
+html body #view-squad #squad-list{grid-template-columns:repeat(auto-fill,minmax(min(100%,280px),1fr))!important;gap:16px!important}
 html body #view-squad #squad-list .workspace-directory-row{
-  --shirt-reveal:clamp(96px,30vw,112px);
-  position:relative;isolation:isolate;overflow:hidden;gap:0;
+  --shirt-reveal:112px;
+  position:relative;isolation:isolate;overflow:hidden;gap:0;min-height:132px;justify-content:center;
 }
 html body #view-squad #squad-list .graphic-shirt{
-  position:absolute;top:0;left:50%;width:min(100%,160px);max-width:160px;
-  margin:0;transform:translateX(-50%);z-index:0;
+  position:absolute;top:8px;left:auto;right:0;width:128px;max-width:128px;
+  margin:0;transform:none;z-index:0;
   clip-path:inset(0 0 calc(100% - var(--shirt-reveal)) 0);
 }
 html body #view-squad #squad-list .graphic-shirt-number{font-size:2.5rem;transform:none}
 html body #view-squad #squad-list .workspace-row-copy{
-  position:relative;z-index:1;box-sizing:border-box;margin-top:var(--shirt-reveal);
-  padding:12px;border:1px solid var(--sh-line);border-radius:12px;
+  position:relative;z-index:1;box-sizing:border-box;width:calc(100% - 108px);margin:8px 0;
+  padding:14px;border:1px solid var(--sh-line);border-radius:12px;
   background:var(--sh-panel);box-shadow:var(--sh-shadow);
 }
 @media(max-width:374px){
   html body:not(.auth-open) #view-home>.home-scene,
   html body:not(.auth-open).role-parent #view-home>.home-scene{margin-inline:-16px;padding-inline:16px}
-  html body #view-home .home-scene-shirt{right:16px}
 }
 @media(min-width:901px){
+  html body:not(.auth-open).view-home .app-shell::before{height:440px}
   html body:not(.auth-open) #view-home>.home-scene,
-  html body:not(.auth-open).role-parent #view-home>.home-scene{margin:0 -12px;padding:0 12px 24px}
-  html body #view-home .home-scene-copy{width:min(42%,360px);justify-self:end}
-  html body #view-home .home-scene-shirt{right:2%;width:240px;max-width:240px;top:0}
-  html body.role-parent #view-home .home-scene-shirt{width:200px;max-width:200px}
+  html body:not(.auth-open).role-parent #view-home>.home-scene{margin:0 -12px;padding:0 12px 24px;grid-template-columns:minmax(0,1fr) 240px 168px}
+  html body #view-home .home-scene-copy{grid-column:2;width:calc(100% + 20px);justify-self:start}
+  html body #view-home .home-scene-shirt{grid-column:3;right:auto;width:168px;max-width:168px;top:auto}
+  html body.role-parent #view-home .home-scene-shirt{width:168px;max-width:168px}
   html body:not(.auth-open) #view-home>#home-next-match{margin:0 0 24px;align-self:end}
+}
+@media(min-width:901px) and (max-width:1399px){
+  html body:not(.auth-open) .content #view-home.active{display:block}
+  html body:not(.auth-open) #view-home>.home-scene,
+  html body:not(.auth-open).role-parent #view-home>.home-scene{grid-template-columns:minmax(0,1fr) 168px}
+  html body #view-home .home-scene-copy{grid-column:1}
+  html body #view-home .home-scene-shirt{grid-column:2}
+  html body:not(.auth-open) #view-home>:is(#home-club-notices,#home-season-record,#home-team-stats-link,#parent-home-family){margin-bottom:24px}
+  html body:not(.auth-open) #view-home>#home-season-group-label{margin-bottom:12px}
 }

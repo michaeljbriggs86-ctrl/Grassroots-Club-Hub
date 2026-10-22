@@ -58,7 +58,7 @@ async function capture(page,label,width,theme,measurements,failures){
  for(const img of m.images)if(!img.loaded)issues.push('image failed: '+img.src);
  for(const c of m.controls)if(c.height<43.9)issues.push('short control: '+c.name+' '+c.height);
  for(const n of m.shirtNumbers)if(n.x<n.slot.x-1||n.right>n.slot.right+1||n.y<n.slot.y-1||n.bottom>n.slot.bottom+1)issues.push('shirt overlay outside garment slot');
- if(label==='squad'&&width<600&&m.squad.length>1&&Math.abs(m.squad[0].y-m.squad[1].y)>1)issues.push('squad is not two columns');
+ if(label==='squad'&&width<600&&m.squad.length>1&&Math.abs(m.squad[0].y-m.squad[1].y)<1)issues.push('phone squad names need full-width rows beside their shirts');
  if(label==='squad'&&m.garments.some(g=>g.display==='none'||g.height<100))issues.push('squad garment is hidden or collapsed');
  if(label.startsWith('match-')&&m.fixtureDebug){
   for(const badge of m.fixtureDebug.elements.filter(e=>e.selector==='.canonical-v11-badge'||e.selector==='.canonical-v11-badge > *')){
