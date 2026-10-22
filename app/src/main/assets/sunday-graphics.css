@@ -32,22 +32,8 @@ html body:not(.auth-open):is(.view-home,.view-squad,.view-person,.view-club) .ap
 html body:not(.auth-open).view-squad .app-shell::before,
 html body:not(.auth-open).view-club .app-shell::before{height:360px;background-size:auto,cover;background-image:linear-gradient(180deg,rgba(5,8,6,.78),rgba(5,8,6,.22) 45%,var(--sh-canvas)),url("graphics/pitch-wide.webp")}
 html body:not(.auth-open).view-person:has(.graphic-profile-hero) .app-shell::before{height:680px}
-html body:not(.auth-open) .hero,html body:not(.auth-open).admin-club-mode .hero{
-  background:transparent!important;border:0!important;box-shadow:none!important;min-height:0!important;
-  padding:calc(20px + var(--android-inset-top,0px)) 20px 16px!important;gap:12px;
-}
+html body:not(.auth-open) .hero,html body:not(.auth-open).admin-club-mode .hero{background:transparent!important;border:0!important;box-shadow:none!important}
 html body:not(.auth-open) .hero::before,html body:not(.auth-open) .hero::after{display:none!important}
-html body:not(.auth-open) .hero-inner{gap:12px!important}
-html body:not(.auth-open) .hero .club-logo-wrap{width:42px!important;height:42px!important;background:transparent!important;border:0!important;box-shadow:none!important}
-html body:not(.auth-open) .hero-copy .eyebrow{font-family:Anton,Inter,sans-serif;font-size:1rem!important;line-height:1.1;letter-spacing:0!important;font-weight:400!important}
-html body:not(.auth-open) .hero-copy h1{font:600 .8125rem/1.4 Inter,system-ui,sans-serif!important;letter-spacing:0!important;margin-top:8px!important}
-html body:not(.auth-open) .hero-copy .season-line{font-size:.6875rem!important;line-height:1.4}
-html body:not(.auth-open) .hero-context-actions{gap:4px}
-html body:not(.auth-open) .hero-context-actions :is(button,.graphic-account-initials){color:#fff!important;background:rgba(17,23,21,.12)!important;border:1px solid rgba(255,255,255,.16)!important;border-radius:24px!important;min-height:44px}
-.graphic-account-initials{display:none;align-items:center;justify-content:center;width:44px;height:44px;flex:none;font-size:.75rem;font-weight:600;order:3}
-.graphic-account-initials:not(:empty){display:flex}
-html body:not(.auth-open) .hero-coaching-teams label{font-size:.75rem}
-html body:not(.auth-open) .hero-coaching-teams .hero-team-select{background:rgba(17,23,21,.4)!important;border-color:rgba(255,255,255,.18)!important;color:#fff!important}
 html body:not(.auth-open) .content{position:relative;padding:0 20px 100px!important}
 html body:not(.auth-open) .content .panel,
 html body:not(.auth-open) .content .page-link{background:var(--sh-panel)!important;border-color:var(--sh-line)!important;box-shadow:var(--sh-shadow)!important;border-radius:16px!important}
@@ -196,11 +182,6 @@ html body #next-fixture-dialog #next-match-calendar{background:rgba(17,23,21,.78
 @media(min-width:901px){
   html body:not(.auth-open) .app-shell{min-height:100dvh;padding-left:220px;box-sizing:border-box}
   html body:not(.auth-open) .app-shell::before{left:220px}
-  html body:not(.auth-open) .app-shell>.hero{position:relative;width:auto;min-height:104px!important;padding:24px 40px!important}
-  html body:not(.auth-open) .hero-inner{min-height:56px}
-  html body:not(.auth-open) .hero .club-logo-wrap{display:none}
-  html body:not(.auth-open) .hero-copy .eyebrow{font-size:.75rem!important;font-family:Inter,sans-serif;font-weight:600!important}
-  html body:not(.auth-open) .hero-copy h1{font-family:var(--sh-display)!important;font-size:1.75rem!important;font-weight:700!important}
   html body:not(.auth-open) .app-shell>.top-nav-tabs{
     position:fixed!important;inset:0 auto 0 0!important;width:220px!important;height:100dvh!important;box-sizing:border-box;display:flex!important;flex-direction:column;align-items:stretch;justify-content:flex-start;gap:16px;padding:220px 24px 32px!important;z-index:20;overflow:auto;border-right:1px solid var(--sh-line);border-bottom:0;background:linear-gradient(180deg,rgba(17,23,21,.72),#111715),url("graphics/fabric.webp") center top/auto 900px no-repeat!important;
   }
@@ -209,7 +190,6 @@ html body #next-fixture-dialog #next-match-calendar{background:rgba(17,23,21,.78
   html body:not(.auth-open) .top-nav-tabs .nav-item{width:100%;min-height:50px!important;border:0!important;border-radius:12px!important;color:#fff!important;text-align:left!important;justify-content:flex-start;padding:14px!important;flex:none!important;font-size:.875rem!important}
   html body:not(.auth-open) .app-shell>.content{max-width:1800px;margin:auto;padding:0 40px 48px!important}
   html body:not(.auth-open):is(.view-home,.view-squad,.view-person,.view-club) .app-shell::before{height:1020px;background-image:linear-gradient(180deg,rgba(5,8,6,.18),rgba(5,8,6,.45) 45%,var(--sh-canvas)),linear-gradient(90deg,rgba(5,8,6,.72),transparent 80%),url("graphics/pitch-wide.webp");background-size:auto,auto,cover;background-position:center,center,center top}
-  html body:not(.auth-open).view-home .hero-context-actions :is(button,.graphic-account-initials){color:#111715!important;border-color:rgba(17,23,21,.15)!important;background:rgba(255,255,255,.12)!important}
   html body:not(.auth-open) #view-home.active{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:24px;position:relative}
   html body:not(.auth-open) #view-home>.home-scene{grid-column:1/-1;grid-row:1;min-height:530px;margin:0 -12px;padding:40px 12px 360px;align-items:flex-start}
   html body #home-scene-title{font-size:3.5rem!important}
@@ -238,7 +218,6 @@ html body #next-fixture-dialog #next-match-calendar{background:rgba(17,23,21,.78
   html body #admin-club-overview>.admin-home-directory-link{grid-column:span 4}
 }
 @media(max-width:374px){
-  html body:not(.auth-open) .hero{padding-inline:16px!important}
   html body:not(.auth-open) .content{padding-inline:16px!important}
   .home-scene{margin-inline:-16px;padding-inline:20px;min-height:390px}
   .home-scene-shirt{right:-12px;top:25px;width:86%}
@@ -347,14 +326,6 @@ html body #view-person .graphic-profile-hero .graphic-shirt{margin:0}
 html body #view-person .graphic-profile-hero .graphic-shirt-art{object-position:center top}
 html body #view-person .graphic-profile-hero>div:last-child strong{font-size:2rem!important}
 
-/* Shared compact identity spacing. Figma572:10376; retain every native action. */
-html body:not(.auth-open):is(.view-home,.view-person:has(.graphic-profile-hero)) .app-shell>.hero{
-  min-height:0!important;padding:calc(12px + var(--android-inset-top,0px)) 20px 8px!important;gap:8px;
-}
-html body:not(.auth-open):is(.view-home,.view-person:has(.graphic-profile-hero)) .hero-copy h1{margin-top:4px!important}
-html body:not(.auth-open):is(.view-home,.view-person:has(.graphic-profile-hero)) .hero-context-actions .hero-profile-button{
-  width:auto;min-height:44px;padding:8px 10px;font-size:.8125rem;white-space:nowrap!important;
-}
 html body #view-person:has(.graphic-profile-hero)>.person-profile-back{
   position:relative;z-index:2;
   display:inline-flex;align-items:center;justify-content:flex-start;width:auto;min-height:44px;
@@ -375,18 +346,6 @@ html body:not(.auth-open).view-person:not(:has(.graphic-profile-hero)) .app-shel
 html body:not(.auth-open).view-person:not(:has(.graphic-profile-hero)) .app-shell>.hero{
   background:linear-gradient(180deg,rgba(5,8,6,.78),rgba(5,8,6,.6)),url("graphics/pitch-wide.webp") center/cover no-repeat!important;
 }
-@media(max-width:500px){
-  html body:not(.auth-open):is(.view-home,.view-person:has(.graphic-profile-hero)) .hero-context-actions:has(.hero-profile-button:not(.hidden):not([hidden])){
-    display:grid;grid-template-columns:46px 46px;gap:4px;width:96px;align-items:center;
-  }
-  html body:not(.auth-open):is(.view-home,.view-person:has(.graphic-profile-hero)) .hero-context-actions .hero-profile-button{grid-column:1/-1;grid-row:1;justify-self:stretch}
-  html body:not(.auth-open):is(.view-home,.view-person:has(.graphic-profile-hero)) .hero-context-actions .hero-notification-button{grid-column:2;grid-row:2;justify-self:end}
-  html body:not(.auth-open):is(.view-home,.view-person:has(.graphic-profile-hero)) .hero-context-actions .graphic-account-initials{grid-column:1;grid-row:2;justify-self:start}
-}
-@media(min-width:901px){
-  html body:not(.auth-open):is(.view-home,.view-person:has(.graphic-profile-hero)) .app-shell>.hero{padding:16px 40px!important}
-}
-
 html body #view-squad #squad-list{grid-template-columns:repeat(auto-fill,minmax(min(100%,280px),1fr))!important;gap:16px!important}
 html body #view-squad #squad-list .workspace-directory-row{
   --shirt-reveal:140px;

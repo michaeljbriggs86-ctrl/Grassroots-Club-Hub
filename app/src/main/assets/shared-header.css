@@ -1,0 +1,72 @@
+/* Shared authenticated header. Figma 576:10655 / 576:10656.
+   Page routes share one size; controls and the original badge stay native. */
+:root{--sh-header-control:44px;--sh-header-switch:96px;--sh-header-identity:92px}
+html[data-theme] body:not(.auth-open) .app-shell>.hero{
+  display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:start;
+  min-height:0!important;padding:calc(12px + var(--android-inset-top,0px)) 20px 8px!important;gap:8px;
+}
+html[data-theme] body:not(.auth-open) .app-shell>.hero .hero-inner{
+  display:grid;grid-column:1;grid-row:1;grid-template-columns:var(--sh-header-identity) minmax(0,1fr)!important;
+  align-items:stretch;min-height:0;gap:12px!important;
+}
+html[data-theme] body:not(.auth-open) .app-shell>.hero .club-logo-wrap{
+  display:block;position:relative;align-self:stretch;width:var(--sh-header-identity)!important;
+  height:var(--sh-header-identity)!important;min-width:0;min-height:0;
+  background:transparent!important;border:0!important;box-shadow:none!important;
+}
+html[data-theme] body:not(.auth-open) .app-shell>.hero .club-logo{
+  position:absolute;inset:0;width:100%!important;height:100%!important;object-fit:contain!important;
+}
+html[data-theme] body:not(.auth-open) .app-shell>.hero .hero-copy{
+  display:flex;flex-direction:column;justify-content:space-between;min-height:var(--sh-header-identity);gap:4px;
+}
+html[data-theme] body:not(.auth-open) .app-shell>.hero .hero-copy>*{margin:0!important}
+html[data-theme] body:not(.auth-open) .app-shell>.hero .hero-copy .eyebrow{
+  font:400 .875rem/1.1 Anton,Inter,system-ui,sans-serif!important;letter-spacing:0!important;
+}
+html[data-theme] body:not(.auth-open) .app-shell>.hero .hero-copy h1{
+  margin:0!important;font:600 .8125rem/1.4 Inter,system-ui,sans-serif!important;letter-spacing:0!important;
+}
+html[data-theme] body:not(.auth-open) .app-shell>.hero .hero-copy .season-line{font-size:.6875rem!important;line-height:1.4!important}
+html[data-theme] body:not(.auth-open) .app-shell>.hero .hero-context-actions{
+  display:flex;flex-direction:row;align-items:start;justify-content:flex-end;gap:4px;
+  grid-column:2;grid-row:1;min-height:var(--sh-header-control);
+}
+html[data-theme] body:not(.auth-open) .app-shell>.hero .hero-context-actions :is(button,.graphic-account-initials){
+  box-sizing:border-box;flex:none;height:var(--sh-header-control);min-height:var(--sh-header-control);
+  color:#fff!important;background:rgba(17,23,21,.12)!important;border:1px solid rgba(255,255,255,.16)!important;
+  border-radius:24px!important;font-size:.8125rem;line-height:1.4;
+}
+html[data-theme] body:not(.auth-open) .app-shell>.hero .hero-context-actions .hero-profile-button{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:var(--sh-header-switch);min-width:var(--sh-header-switch);padding:0 10px;white-space:nowrap!important;
+}
+html[data-theme] body:not(.auth-open) .app-shell>.hero .hero-notification-button{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:var(--sh-header-control);min-width:var(--sh-header-control);padding:0;
+}
+.graphic-account-initials{display:none;align-items:center;justify-content:center;width:44px;height:44px;flex:none;font-size:.75rem;font-weight:600;order:3}
+.graphic-account-initials:not(:empty){display:flex}
+html[data-theme] body:not(.auth-open) .app-shell>.hero .hero-coaching-teams label{font-size:.75rem}
+html[data-theme] body:not(.auth-open) .app-shell>.hero .hero-team-select{
+  min-height:44px;background:rgba(17,23,21,.4)!important;border-color:rgba(255,255,255,.18)!important;color:#fff!important;
+}
+@media(max-width:500px){
+  html[data-theme] body:not(.auth-open) .app-shell>.hero .hero-context-actions:has(.hero-profile-button:not(.hidden):not([hidden])){
+    display:grid;grid-template-columns:44px 44px;column-gap:8px;row-gap:4px;width:96px;
+  }
+  html[data-theme] body:not(.auth-open) .app-shell>.hero .hero-context-actions .hero-profile-button{grid-column:1/-1;grid-row:1}
+  html[data-theme] body:not(.auth-open) .app-shell>.hero .hero-context-actions .hero-notification-button{grid-column:2;grid-row:2}
+  html[data-theme] body:not(.auth-open) .app-shell>.hero .hero-context-actions .graphic-account-initials{grid-column:1;grid-row:2}
+}
+@media(max-width:374px){
+  html[data-theme] body:not(.auth-open) .app-shell>.hero{--sh-header-identity:72px;grid-template-columns:minmax(0,1fr);padding-inline:16px!important}
+  html[data-theme] body:not(.auth-open) .app-shell>.hero .hero-context-actions,
+  html[data-theme] body:not(.auth-open) .app-shell>.hero .hero-context-actions:has(.hero-profile-button:not(.hidden):not([hidden])){
+    grid-column:1;grid-row:2;justify-self:end;display:flex;flex-direction:row;width:auto;gap:4px;
+  }
+  html[data-theme] body:not(.auth-open) .app-shell>.hero .hero-coaching-teams{grid-row:3}
+}
+@media(min-width:901px){
+  html[data-theme] body:not(.auth-open) .app-shell>.hero{padding-inline:40px!important}
+}
