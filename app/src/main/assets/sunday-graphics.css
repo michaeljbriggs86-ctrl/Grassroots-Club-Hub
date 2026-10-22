@@ -295,3 +295,72 @@ html[data-theme] body #next-fixture-dialog .fixture-date-with-calendar{flex-wrap
 html[data-theme] body #next-fixture-dialog #next-match-when{font-size:1.875rem!important}
 html[data-theme] body #next-fixture-dialog #next-match-versus .canonical-v11-badge img{padding:0!important;border:0!important;border-radius:0!important;background:transparent!important}
 html[data-theme] body #view-person .graphic-profile-hero .graphic-shirt-number{color:#fff!important}
+
+/* Mike's compact garment refinement, 22 October. Figma551:10288.
+   Crop the lower torso behind native information; retain the full garment's
+   aspect ratio so numbers, initials and the original badge keep their positions. */
+html body:not(.auth-open).view-person:has(.graphic-profile-hero) .app-shell::before{height:460px}
+html body:not(.auth-open) #view-home>.home-scene,
+html body:not(.auth-open).role-parent #view-home>.home-scene{
+  display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:150px auto;align-items:stretch;
+  min-height:0;margin:0 -20px;padding:0 20px 24px;gap:0;
+}
+html body #view-home .home-scene-shirt{
+  width:min(68%,240px);max-width:240px;height:150px;
+  top:0;right:20px;transform:none;overflow:hidden;z-index:0;
+}
+html body.role-parent #view-home .home-scene-shirt{width:min(62%,200px);max-width:200px}
+html body #view-home .home-scene-copy,
+html body #view-person .graphic-profile-hero>div:last-child{
+  position:relative;grid-column:1;grid-row:2;z-index:1;box-sizing:border-box;
+  width:100%;max-width:none;padding:16px;border-radius:16px;
+  background:linear-gradient(165deg,rgba(38,48,43,.98),rgba(14,19,17,.99));
+  border:1px solid rgba(255,255,255,.12);box-shadow:var(--sh-shadow);
+  color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.5);
+}
+html body #home-scene-title{font-size:clamp(2rem,8vw,2.5rem)!important}
+html body .home-scene-label{margin-bottom:6px}
+html body :is(#home-scene-team,#home-scene-role){margin-top:6px}
+html body #view-home #home-next-match{margin-top:0}
+html body #view-home .home-scene-shirt .graphic-shirt-initials{font-size:1.125rem}
+html body #view-home .home-scene-shirt .graphic-shirt-number{font-size:3.5rem;transform:none}
+
+html body #view-person .graphic-profile-hero{
+  display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:150px auto;min-height:0;
+  gap:0;padding:0;overflow:hidden;
+}
+html body #view-person .graphic-profile-hero .player-profile-jersey{
+  display:block;position:absolute;top:0;right:20px;z-index:0;flex:none;
+  width:min(72%,220px);height:150px;margin:0;overflow:hidden;
+}
+html body #view-person .graphic-profile-hero .graphic-shirt-number{font-size:4rem;transform:none}
+html body #view-person .graphic-profile-hero>div:last-child strong{font-size:2.5rem!important}
+
+html body #view-squad #squad-list .workspace-directory-row{
+  --shirt-reveal:clamp(96px,30vw,112px);
+  position:relative;isolation:isolate;overflow:hidden;gap:0;
+}
+html body #view-squad #squad-list .graphic-shirt{
+  position:absolute;top:0;left:50%;width:min(100%,160px);max-width:160px;
+  margin:0;transform:translateX(-50%);z-index:0;
+  clip-path:inset(0 0 calc(100% - var(--shirt-reveal)) 0);
+}
+html body #view-squad #squad-list .graphic-shirt-number{font-size:2.5rem;transform:none}
+html body #view-squad #squad-list .workspace-row-copy{
+  position:relative;z-index:1;box-sizing:border-box;margin-top:var(--shirt-reveal);
+  padding:12px;border:1px solid var(--sh-line);border-radius:12px;
+  background:var(--sh-panel);box-shadow:var(--sh-shadow);
+}
+@media(max-width:374px){
+  html body:not(.auth-open) #view-home>.home-scene,
+  html body:not(.auth-open).role-parent #view-home>.home-scene{margin-inline:-16px;padding-inline:16px}
+  html body #view-home .home-scene-shirt{right:16px}
+}
+@media(min-width:901px){
+  html body:not(.auth-open) #view-home>.home-scene,
+  html body:not(.auth-open).role-parent #view-home>.home-scene{margin:0 -12px;padding:0 12px 24px}
+  html body #view-home .home-scene-copy{width:min(42%,360px);justify-self:end}
+  html body #view-home .home-scene-shirt{right:2%;width:240px;max-width:240px;top:0}
+  html body.role-parent #view-home .home-scene-shirt{width:200px;max-width:200px}
+  html body:not(.auth-open) #view-home>#home-next-match{margin:0 0 24px;align-self:end}
+}
