@@ -36,6 +36,8 @@ const card={hidden:false,classList:{toggle(_name,hide){card.hidden=hide;}}};
 const title={textContent:''};
 ctx.ageGroupNumber=()=>9;
 Object.assign(ctx,{CLOUD_MODE:true,currentRole:'parent',nextPublishedFixture:()=>first,
+  // The graphic scene is tested separately; keep this fixture focused on Cup semantics.
+  renderGraphicIdentity:()=>{},
   document:{getElementById:id=>({'parent-home-match-info':panel,'parent-home-training':training,
     'next-match-card':card,'home-next-title':title})[id]},
   window:{ClubHubCloud:{currentTeam:()=>({id:'team'}),session:{user:{id:'parent'}}}},

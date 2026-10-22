@@ -25,6 +25,8 @@ function context(team,fixtures){
  clubIdentityBadgeHtml:n=>`<img alt="${n}"/>`,setStableHtml:(el,text)=>{if(el)el.innerHTML=text;},
  clubListingHtml:s=>s,kitWarningHtml:()=>'',kitToggleHtml:()=>'',matchTeamSideHtml:(_side,name)=>name,
  toast:()=>{},uid:()=> 'test-match',saveState:()=>{},auditEvent:()=>{},openMatchReport:id=>ctx.opened=id,
+ // The graphic scene is a decorative dependency; this fixture checks Cup behavior.
+ renderGraphicIdentity:()=>{},
  activePlayers:()=>[{name:'Aavi'}],renderParentHomeMatchInfo:()=>{},renderTacticsBoard:()=>{},renderMatchdayDashboard:()=>{},
  fixtureOverviewContext:f=>({homeTeam:team,awayTeam:f.opponent,ground:'Ground',address:'Address'}),
  nodes};
