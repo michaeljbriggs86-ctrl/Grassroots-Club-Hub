@@ -31,8 +31,9 @@ async function prepare(page,width,theme,admin=false){
 async function checks(page,width,theme){
  await prepare(page,width,theme);
  const bell=page.locator('#notification-bell');assert(await bell.isVisible(),'hero bell stays visible on phones');
- const geometry=await bell.evaluate(el=>{const b=el.getBoundingClientRect(),h=el.closest('.hero').getBoundingClientRect(),copy=document.querySelector('.hero-copy').getBoundingClientRect();return {bell:b.toJSON(),hero:h.toJSON(),copy:copy.toJSON(),overflow:document.documentElement.scrollWidth>innerWidth};});
- assert.equal(geometry.overflow,false);assert(geometry.bell.width>=44&&geometry.bell.height>=44);assert(geometry.bell.right<=geometry.hero.right&&geometry.bell.top>=geometry.hero.top);assert(geometry.copy.right<=geometry.bell.left+1,'hero text stays to the left of the aligned actions');
+ const geometry=await bell.evaluate(el=>{const b=el.getBoundingClientRect(),h=el.closest('.hero').getBoundingClientRect(),copy=document.querySelector('.hero-copy').getBoundingClientRect(),actions=el.closest('.hero-context-actions').getBoundingClientRect();return {bell:b.toJSON(),hero:h.toJSON(),copy:copy.toJSON(),actions:actions.toJSON(),overflow:document.documentElement.scrollWidth>innerWidth};});
+ assert.equal(geometry.overflow,false);assert(geometry.bell.width>=44&&geometry.bell.height>=44);assert(geometry.bell.right<=geometry.hero.right&&geometry.bell.top>=geometry.hero.top);
+ assert(geometry.copy.right<=geometry.actions.left+1||geometry.copy.bottom<=geometry.actions.top+1,'hero text does not overlap actions placed beside or below it: '+JSON.stringify(geometry));
  await page.screenshot({path:path.join(out,'hero-'+width+'-'+theme+'.png'),fullPage:false});
  await bell.click();await page.waitForFunction(()=>document.querySelectorAll('#notification-list .notification-item').length===3);
  assert.match(await bell.getAttribute('aria-label'),/2 unread/);assert.equal(await page.evaluate(()=>__notesFixture.marks.length),0,'opening never marks read');
