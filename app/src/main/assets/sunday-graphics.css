@@ -299,7 +299,11 @@ html[data-theme] body #view-person .graphic-profile-hero .graphic-shirt-number{c
 /* Mike's larger shirts and smaller backdrop, 22 October. Figma561:10348.
    Native information overlaps the sleeve; the lower shirt fades into the scene.
    Full garment proportions keep numbers, initials and badge above the fade. */
-html body:not(.auth-open).view-person:has(.graphic-profile-hero) .app-shell::before{height:350px}
+html body:not(.auth-open).view-person:has(.graphic-profile-hero) .app-shell::before{
+  --sh-profile-pitch:url("graphics/pitch-portrait.webp");height:330px;
+  background-image:linear-gradient(180deg,rgba(5,8,6,.78),rgba(5,8,6,.5) 16%,rgba(5,8,6,.25) 50%,rgba(5,8,6,.45) calc(100% - 24px),var(--sh-canvas)),var(--sh-profile-pitch);
+  background-size:auto,cover;background-position:center,center top;
+}
 html body:not(.auth-open).view-home .app-shell::before{height:280px}
 html body:not(.auth-open):is(.view-squad,.view-club) .app-shell::before{height:300px}
 html body:not(.auth-open) #view-home>.home-scene,
@@ -330,7 +334,7 @@ html body #view-home .home-scene-shirt .graphic-shirt-initials{font-size:1.125re
 html body #view-home .home-scene-shirt .graphic-shirt-number{font-size:3.5rem;transform:none}
 
 html body #view-person .graphic-profile-hero{
-  display:grid;grid-template-columns:minmax(0,1fr) clamp(160px,50vw,204px);grid-template-rows:auto;min-height:180px;
+  display:grid;grid-template-columns:minmax(0,1fr) clamp(160px,50vw,204px);grid-template-rows:auto;min-height:0;
   align-items:center;gap:0;padding:0;overflow:hidden;
 }
 html body #view-person .graphic-profile-hero .player-profile-jersey{
@@ -341,6 +345,37 @@ html body #view-person .graphic-profile-hero .player-profile-jersey{
 }
 html body #view-person .graphic-profile-hero .graphic-shirt-number{font-size:3.5rem;transform:none}
 html body #view-person .graphic-profile-hero>div:last-child strong{font-size:2rem!important}
+
+/* Compact player-profile top. Figma565:10368; retain every native action. */
+html body:not(.auth-open).view-person:has(.graphic-profile-hero) .app-shell>.hero{
+  min-height:0!important;padding:calc(12px + var(--android-inset-top,0px)) 20px 8px!important;gap:8px;
+}
+html body:not(.auth-open).view-person:has(.graphic-profile-hero) .hero-copy h1{margin-top:4px!important}
+html body:not(.auth-open).view-person:has(.graphic-profile-hero) .hero-context-actions .hero-profile-button{
+  width:auto;min-height:44px;padding:8px 10px;font-size:.8125rem;white-space:nowrap!important;
+}
+html body #view-person:has(.graphic-profile-hero)>.person-profile-back{
+  display:inline-flex;align-items:center;justify-content:flex-start;width:auto;min-height:44px;
+  margin:0 0 4px;padding:0;font-size:.8125rem;
+}
+html body #view-person #person-profile-status:empty{display:none;margin:0}
+html body #view-person .player-profile-stats{margin-top:4px}
+html body:not(.auth-open).view-person:not(:has(.graphic-profile-hero)) .app-shell::before{display:none}
+html body:not(.auth-open).view-person:not(:has(.graphic-profile-hero)) .app-shell>.hero{
+  background:linear-gradient(180deg,rgba(5,8,6,.78),rgba(5,8,6,.6)),url("graphics/pitch-wide.webp") center/cover no-repeat!important;
+}
+@media(max-width:500px){
+  html body:not(.auth-open).view-person:has(.graphic-profile-hero) .hero-context-actions:has(.hero-profile-button:not(.hidden):not([hidden])){
+    display:grid;grid-template-columns:46px 46px;gap:4px;width:96px;align-items:center;
+  }
+  html body:not(.auth-open).view-person:has(.graphic-profile-hero) .hero-context-actions .hero-profile-button{grid-column:1/-1;grid-row:1;justify-self:stretch}
+  html body:not(.auth-open).view-person:has(.graphic-profile-hero) .hero-context-actions .hero-notification-button{grid-column:2;grid-row:2;justify-self:end}
+  html body:not(.auth-open).view-person:has(.graphic-profile-hero) .hero-context-actions .graphic-account-initials{grid-column:1;grid-row:2;justify-self:start}
+}
+@media(min-width:901px){
+  html body:not(.auth-open).view-person:has(.graphic-profile-hero) .app-shell>.hero{padding:16px 40px!important}
+  html body:not(.auth-open).view-person:has(.graphic-profile-hero) .app-shell::before{--sh-profile-pitch:url("graphics/pitch-wide.webp")}
+}
 
 html body #view-squad #squad-list{grid-template-columns:repeat(auto-fill,minmax(min(100%,280px),1fr))!important;gap:16px!important}
 html body #view-squad #squad-list .workspace-directory-row{
