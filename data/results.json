@@ -1,9 +1,9 @@
 {
   "schema_version": 2,
   "provider": "Selkent",
-  "last_updated": "2026-10-22T02:19:57.703450+00:00",
-  "cup_results_last_updated": "2026-10-22T02:19:57.703450+00:00",
-  "cup_results_last_attempted": "2026-10-22T02:19:57.703450+00:00",
+  "last_updated": "2026-10-22T10:49:22.742726+00:00",
+  "cup_results_last_updated": "2026-10-22T10:49:22.742726+00:00",
+  "cup_results_last_attempted": "2026-10-22T10:49:22.742726+00:00",
   "cup_results_status": "verified_current",
   "fixture_agegroup_discovery_source": "selkent_divisions_all",
   "coverage": {
@@ -7467,6 +7467,16 @@
         {
           "date": "2026-10-25",
           "division_name": "Under 13D Silver",
+          "home": "Beacons White",
+          "away": "Woolwich Wanderers FC",
+          "provider_team_ids": [
+            "2089",
+            "2066"
+          ]
+        },
+        {
+          "date": "2026-10-25",
+          "division_name": "Under 13D Silver",
           "home": "Gipsy Hill FC Whites",
           "away": "Braves Sporting Club",
           "provider_team_ids": [
@@ -7502,16 +7512,6 @@
           "provider_team_ids": [
             "174",
             "2130"
-          ]
-        },
-        {
-          "date": "2026-10-25",
-          "division_name": "Under 13D Silver",
-          "home": "Woolwich Wanderers FC",
-          "away": "Beacons White",
-          "provider_team_ids": [
-            "2066",
-            "2089"
           ]
         }
       ],
