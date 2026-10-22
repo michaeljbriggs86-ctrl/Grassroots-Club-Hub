@@ -1,0 +1,197 @@
+/* Sunday component review: NY8QhcuOWiEcD0pKDTsbP8 / 546:10288.
+   Native select states: 546:10312, 546:10314 and light-theme equivalents.
+   22 October 2026. No replacement widgets, event handlers or visibility rules.
+   The named layer lets reviewed material properties supersede legacy unlayered
+   !important rules without increasing selector specificity across the app. */
+@layer club-shared {
+  /* Lead cards now use the shared raised material in both themes. Restore the
+     reviewed green and secondary actions over that material, rather than the
+     pale text inherited from the retired dark-only feature cards. */
+  body:not(.auth-open) :is(#matches-next-fixture,#matchday-dashboard) .primary-button {
+    background:linear-gradient(160deg,#0b5d35,#064526)!important;
+    color:#fff!important;
+    border:1px solid rgba(255,255,255,.12)!important;
+  }
+  body:not(.auth-open) :is(#matches-next-fixture,#matchday-dashboard) .secondary-button {
+    background:var(--sh-action)!important;
+    color:var(--sh-copy)!important;
+    border:1px solid var(--sh-line)!important;
+    box-shadow:var(--sh-inset-shadow)!important;
+  }
+  :where(body:not(.auth-open) .app-shell,body:not(.auth-open)>dialog,body.registration-page) {
+    --sh-control-surface:#fff;
+    --sh-control-material:linear-gradient(165deg,#fff,#eef6f1);
+    --sh-control-copy:#111715;
+    --sh-control-muted:#5b6b60;
+    --sh-control-line:#cbd8ce;
+    --sh-control-choice:#e3f1e8;
+    --sh-control-choice-copy:#064526;
+    --sh-control-focus:#0b6a3b;
+    --sh-control-highlight:rgba(255,255,255,.9);
+    --sh-control-shadow:0 4px 10px -8px rgba(17,23,21,.4),inset 0 1px 1px var(--sh-control-highlight);
+    --sh-control-scheme:light;
+    --gch-control-surface:var(--sh-control-surface);
+    --gch-control-copy:var(--sh-control-copy);
+    --gch-control-muted:var(--sh-control-muted);
+    --gch-control-line:var(--sh-control-line);
+    --gch-control-choice:var(--sh-control-choice);
+    --gch-control-choice-copy:var(--sh-control-choice-copy);
+    --gch-control-focus:var(--sh-control-focus);
+    --gch-picker-surface:var(--sh-control-surface);
+    --gch-picker-choice:var(--sh-control-choice);
+  }
+  html[data-theme="dark"] :where(body:not(.auth-open) .app-shell,body:not(.auth-open)>dialog,body.registration-page) {
+    --sh-control-surface:#19221c;
+    --sh-control-material:linear-gradient(165deg,#26302b,#101713);
+    --sh-control-copy:#f5f8f6;
+    --sh-control-muted:#b2c0b7;
+    --sh-control-line:#46584b;
+    --sh-control-choice:#234731;
+    --sh-control-choice-copy:#e5f8eb;
+    --sh-control-focus:#8ee09a;
+    --sh-control-highlight:rgba(255,255,255,.09);
+    --sh-control-shadow:0 4px 10px -8px rgba(0,0,0,.8),inset 0 1px 1px var(--sh-control-highlight);
+    --sh-control-scheme:dark;
+  }
+
+  :where(body:not(.auth-open) .app-shell,body:not(.auth-open)>dialog,body.registration-page) select {
+    box-sizing:border-box!important;
+    min-width:0!important;
+    min-height:52px!important;
+    height:auto!important;
+    padding:12px 16px!important;
+    border:1px solid var(--sh-control-line)!important;
+    border-radius:12px!important;
+    background:var(--sh-control-material)!important;
+    color:var(--sh-control-copy)!important;
+    box-shadow:var(--sh-control-shadow)!important;
+    font-family:Inter,system-ui,sans-serif!important;
+    font-size:1rem!important;
+    font-weight:400!important;
+    line-height:1.5!important;
+    text-align:start!important;
+    color-scheme:var(--sh-control-scheme)!important;
+    appearance:auto!important;
+    -webkit-appearance:auto!important;
+    cursor:pointer;
+  }
+  :where(body:not(.auth-open) .app-shell,body:not(.auth-open)>dialog,body.registration-page) select:focus-visible {
+    outline:2px solid var(--sh-control-focus)!important;
+    outline-offset:3px!important;
+  }
+  :where(body:not(.auth-open) .app-shell,body:not(.auth-open)>dialog,body.registration-page) select:disabled {
+    opacity:.6!important;
+    cursor:not-allowed!important;
+  }
+  :where(body:not(.auth-open) .app-shell,body:not(.auth-open)>dialog,body.registration-page) select[aria-invalid="true"] {
+    border-color:var(--error,#b64035)!important;
+  }
+  :where(body:not(.auth-open) .app-shell,body:not(.auth-open)>dialog,body.registration-page) select option {
+    background:var(--sh-control-surface)!important;
+    color:var(--sh-control-copy)!important;
+    font:inherit!important;
+  }
+  :where(body:not(.auth-open) .app-shell,body:not(.auth-open)>dialog,body.registration-page) select option:disabled {
+    color:var(--sh-control-muted)!important;
+  }
+
+  /* Supported browsers keep the native picker in the top layer, including in
+     dialogs. Other browsers keep their native arrow, keyboard and OS picker. */
+  @supports (appearance:base-select) and selector(select::picker(select)) {
+    :where(body:not(.auth-open) .app-shell,body:not(.auth-open)>dialog,body.registration-page) :is(select:not([multiple]):not([size]),select[size="1"]) {
+      appearance:base-select!important;
+      -webkit-appearance:base-select!important;
+      align-items:center!important;
+      gap:12px!important;
+      white-space:normal!important;
+      overflow-wrap:anywhere!important;
+    }
+    :where(body:not(.auth-open) .app-shell,body:not(.auth-open)>dialog,body.registration-page) select::picker(select) {
+      appearance:base-select!important;
+      box-sizing:border-box!important;
+      min-width:anchor-size(width)!important;
+      max-width:calc(100vw - 24px)!important;
+      max-height:min(360px,60dvh)!important;
+      padding:6px!important;
+      border:1px solid var(--sh-control-line)!important;
+      border-radius:12px!important;
+      background:var(--sh-control-surface)!important;
+      color:var(--sh-control-copy)!important;
+      box-shadow:0 18px 32px -14px rgba(0,0,0,.45),inset 0 1px 0 var(--sh-control-highlight)!important;
+      font:400 1rem/1.5 Inter,system-ui,sans-serif!important;
+      color-scheme:var(--sh-control-scheme)!important;
+      overflow-y:auto!important;
+      overscroll-behavior:contain!important;
+      scrollbar-gutter:stable!important;
+      scroll-padding:6px!important;
+    }
+    :where(body:not(.auth-open) .app-shell,body:not(.auth-open)>dialog,body.registration-page) select::picker-icon {
+      color:var(--sh-control-muted)!important;
+      flex-shrink:0!important;
+    }
+    :where(body:not(.auth-open) .app-shell,body:not(.auth-open)>dialog,body.registration-page) select:open {
+      outline:2px solid var(--sh-control-focus)!important;
+      outline-offset:3px!important;
+    }
+    :where(body:not(.auth-open) .app-shell,body:not(.auth-open)>dialog,body.registration-page) select option {
+      box-sizing:border-box!important;
+      min-height:48px!important;
+      padding:12px!important;
+      gap:12px!important;
+      border-radius:8px!important;
+      white-space:normal!important;
+      overflow-wrap:anywhere!important;
+    }
+    :where(body:not(.auth-open) .app-shell,body:not(.auth-open)>dialog,body.registration-page) select option:is(:checked,:hover,:focus) {
+      background:var(--sh-control-choice)!important;
+      color:var(--sh-control-choice-copy)!important;
+    }
+    :where(body:not(.auth-open) .app-shell,body:not(.auth-open)>dialog,body.registration-page) select option:checked {
+      font-weight:600!important;
+    }
+    :where(body:not(.auth-open) .app-shell,body:not(.auth-open)>dialog,body.registration-page) select option:focus-visible {
+      outline:2px solid var(--sh-control-focus)!important;
+      outline-offset:-2px!important;
+    }
+    :where(body:not(.auth-open) .app-shell,body:not(.auth-open)>dialog,body.registration-page) select option::checkmark {
+      color:var(--sh-control-choice-copy)!important;
+    }
+    :where(body:not(.auth-open) .app-shell,body:not(.auth-open)>dialog,body.registration-page) select option:disabled {
+      background:var(--sh-control-surface)!important;
+      color:var(--sh-control-muted)!important;
+      cursor:not-allowed!important;
+    }
+    :where(body:not(.auth-open) .app-shell,body:not(.auth-open)>dialog,body.registration-page) select optgroup {
+      color:var(--sh-control-muted)!important;
+      font:600 1rem/1.5 Inter,system-ui,sans-serif!important;
+    }
+  }
+
+  /* These remain native disclosures. In particular, no display rule can reveal
+     a summary hidden by a linked-page route or a role-restricted container. */
+  :where(body:not(.auth-open) .app-shell,body:not(.auth-open)>dialog) :is(details.settings-accordion,details.squad-format-details,details.home-season-details,details.availability-summary-group,details.training-later-dates,details.further-fixture-details,details.club-fixture-group,details.contact-edit,details.kickoff-weekend-details,details.weekend-share-accessible)>summary {
+    box-sizing:border-box!important;
+    min-height:52px!important;
+    padding:14px 16px!important;
+    border-radius:12px!important;
+    color:var(--sh-control-copy)!important;
+    font-family:Inter,system-ui,sans-serif!important;
+    font-size:1rem!important;
+    font-weight:600!important;
+    line-height:1.5!important;
+    cursor:pointer;
+    overflow-wrap:anywhere;
+  }
+  :where(body:not(.auth-open) .app-shell,body:not(.auth-open)>dialog) :is(details.settings-accordion,details.squad-format-details,details.home-season-details,details.availability-summary-group,details.training-later-dates,details.further-fixture-details,details.club-fixture-group,details.contact-edit,details.kickoff-weekend-details,details.weekend-share-accessible)>summary:focus-visible {
+    outline:2px solid var(--sh-control-focus)!important;
+    outline-offset:-3px!important;
+  }
+  :where(body:not(.auth-open) .app-shell,body:not(.auth-open)>dialog) :is(details.settings-accordion,details.squad-format-details,details.home-season-details,details.availability-summary-group)>summary::after,
+  :where(body:not(.auth-open) .app-shell,body:not(.auth-open)>dialog) .settings-chevron {
+    color:var(--sh-control-muted)!important;
+    font-weight:400!important;
+  }
+  :where(body:not(.auth-open) .app-shell,body:not(.auth-open)>dialog) :is(details.settings-accordion,details.squad-format-details,details.home-season-details,details.availability-summary-group,details.training-later-dates,details.further-fixture-details,details.club-fixture-group,details.contact-edit,details.kickoff-weekend-details,details.weekend-share-accessible)>summary::marker {
+    color:var(--sh-control-muted)!important;
+  }
+}

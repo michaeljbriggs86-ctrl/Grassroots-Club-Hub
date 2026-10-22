@@ -1,0 +1,133 @@
+/* Sunday consistency review: Figma NY8QhcuOWiEcD0pKDTsbP8 / 546:10288.
+   Passed 22 October 2026. Native result structures, actions and privacy stay intact. */
+:root{
+  --result-score-surface:#eef6f1;
+  --result-score-copy:#064526;
+  --result-neutral-surface:#edf0ee;
+  --result-neutral-copy:#4f5f55;
+  --result-loss-surface:#fff0f0;
+  --result-loss-copy:#a52626;
+}
+html[data-theme="dark"]{
+  --result-score-surface:#183c29;
+  --result-score-copy:#e8f7ed;
+  --result-neutral-surface:#2b3530;
+  --result-neutral-copy:#e5ece7;
+  --result-loss-surface:#3a2222;
+  --result-loss-copy:#ffb8b8;
+}
+
+/* Recorded games share a neutral material; outcome colour belongs to the score. */
+html body .competition-table-scroll:has(>.competition-games-table){
+  background:var(--sh-panel);border-color:var(--sh-line);color:var(--sh-copy);
+}
+html body .competition-games-table{background:transparent;color:var(--sh-copy)}
+html body .competition-games-table th,
+html[data-theme] body .competition-games-table th{
+  padding:12px 16px;background:transparent!important;border-color:var(--sh-line)!important;
+  color:var(--sh-muted)!important;font-size:.6875rem;font-weight:600;letter-spacing:.06em;
+}
+html body .competition-games-table tbody tr>td,
+html[data-theme] body .competition-games-table tbody tr[class]>td{
+  padding:12px 16px;background:transparent!important;border-color:var(--sh-line)!important;
+  color:var(--sh-copy)!important;font-size:.875rem;line-height:1.45;
+}
+html body .competition-games-table tbody tr:last-child>td{border-bottom:0}
+html body .competition-games-table .competition-game-link{
+  min-height:44px;padding:8px 0;color:var(--sh-copy)!important;
+  font-size:.875rem;font-weight:600;line-height:1.45;overflow-wrap:anywhere;
+}
+html body .competition-games-table .competition-game-link:hover{text-decoration:underline;text-underline-offset:3px}
+html body .competition-games-table .cup-round{color:var(--sh-muted);font-size:.75rem;font-weight:400;line-height:1.4}
+html body .competition-games-table td.table-empty{color:var(--sh-muted)!important;padding:20px 16px}
+
+/* The same score type and capsule run through lists, reports and programme cells. */
+html body :is(.competition-games-table .competition-result-pill,.division-result-cell){
+  display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;
+  min-width:72px;min-height:36px;padding:6px 12px;
+  border:1px solid var(--sh-line);border-radius:10px;
+  background:var(--result-neutral-surface)!important;color:var(--result-neutral-copy)!important;
+  box-shadow:inset 0 1px 1px rgba(255,255,255,.08);
+  font:700 1.5rem/1 var(--sh-display);font-variant-numeric:tabular-nums;white-space:nowrap;
+}
+html body :is(.competition-result-pill.W,.division-result-cell.W){
+  background:var(--result-score-surface)!important;color:var(--result-score-copy)!important;
+}
+html body :is(.competition-result-pill.L,.division-result-cell.L){
+  background:var(--result-loss-surface)!important;color:var(--result-loss-copy)!important;
+}
+
+/* Club results keep both team identities and their source home/away score order. */
+html body :is(.club-result-card,.club-result-summary),
+html[data-theme] body :is(.club-result-card,.club-result-summary),
+html[data-theme] body.club-watermark-ready .content :is(.club-result-card,.club-result-summary){
+  padding:16px!important;gap:8px;border:1px solid var(--sh-line)!important;border-radius:16px!important;
+  background:var(--sh-panel)!important;color:var(--sh-copy)!important;box-shadow:var(--sh-shadow)!important;
+}
+html body :is(.club-result-card,.club-result-summary) .club-match-card-team{gap:12px;min-height:44px}
+html body :is(.club-result-card,.club-result-summary) .club-match-card-team strong{
+  color:var(--sh-copy);font-size:.875rem;line-height:1.45;font-weight:600;
+}
+html body :is(.club-result-card,.club-result-summary) .club-card-score{
+  display:inline-flex;justify-content:center;align-items:center;flex:none;
+  min-width:40px;min-height:36px;padding:4px 8px;border:1px solid var(--sh-line);border-radius:10px;
+  background:var(--result-neutral-surface);color:var(--sh-copy);
+  box-shadow:inset 0 1px 1px rgba(255,255,255,.08);
+  font:700 1.5rem/1 var(--sh-display);font-variant-numeric:tabular-nums;
+}
+html body .club-result-card :is(.club-match-card-meta,.club-match-card-footer){
+  color:var(--sh-muted);font-size:.75rem;font-weight:400;line-height:1.45;
+}
+html body .club-result-card .club-match-card-footer{margin-top:4px;border-top:1px solid var(--sh-line);padding-top:4px}
+html body .club-result-card .club-card-link{color:var(--sh-copy)!important;font-weight:600}
+html body .club-results-day-heading{margin:12px 0 0;color:var(--sh-copy);font-size:.875rem;font-weight:600;line-height:1.45}
+
+/* The programme remains a Home / Away matrix rather than a duplicate timeline. */
+html body .division-matrix-head{
+  padding-bottom:12px;border-color:var(--sh-line);color:var(--sh-muted);font-size:.6875rem;font-weight:600;
+}
+html body .division-matrix-row{padding:12px 0;border-color:var(--sh-line)}
+html body :is(.division-team-link,.division-team-label){color:var(--sh-copy)!important;font-size:.875rem;font-weight:600;line-height:1.45}
+html body .division-result-cell{min-width:0;min-height:44px;padding:6px}
+html body .division-result-cell.status-abandoned{
+  background:var(--result-loss-surface)!important;color:var(--result-loss-copy)!important;
+  font:600 .75rem/1.4 Inter,system-ui,sans-serif;white-space:normal;
+}
+html body .programme-status{
+  min-height:44px;border-color:var(--sh-line)!important;border-radius:10px;
+  background:var(--result-neutral-surface)!important;color:var(--sh-muted)!important;
+  font-size:.75rem;font-weight:500;line-height:1.4;
+}
+html body .programme-status.postponed{background:var(--result-loss-surface)!important;color:var(--result-loss-copy)!important}
+
+/* Historical records use the same quiet row and score treatment without new actions. */
+html body .archive-match-list{gap:0}
+html body .archive-match-row{
+  grid-template-columns:86px minmax(0,1fr) minmax(90px,.7fr) max-content;
+  padding:12px 0;border-color:var(--sh-line);color:var(--sh-copy);font-size:.875rem;line-height:1.45;
+}
+html body .archive-match-row>span{color:var(--sh-muted);font-size:.75rem}
+html body .archive-match-row>strong{font-weight:600;overflow-wrap:anywhere}
+html body .archive-match-row>b{
+  justify-self:end;min-width:58px;padding:6px 8px;border:1px solid var(--sh-line);border-radius:10px;
+  background:var(--result-neutral-surface);color:var(--sh-copy);text-align:center;
+  font:700 1.5rem/1 var(--sh-display);font-variant-numeric:tabular-nums;
+}
+
+@media(max-width:720px){
+  html body .archive-match-row{grid-template-columns:72px minmax(0,1fr) max-content}
+}
+@media(max-width:560px){
+  /* Keep the reviewed two-line Cups rhythm and its existing grid-area mapping. */
+  html body .competition-games-table tbody tr:not(.match-result-actions)>td{
+    border:0!important;padding:12px 0 2px 8px!important;font-size:.75rem!important;
+  }
+  html body .competition-games-table tbody tr:not(.match-result-actions)>td:nth-child(1){padding-left:16px!important;color:var(--sh-muted)!important}
+  html body .competition-games-table tbody tr:not(.match-result-actions)>td:nth-child(3){padding:4px 12px 12px 16px!important;font-size:.875rem!important}
+  html body .competition-games-table tbody tr:not(.match-result-actions)>td:nth-child(5){padding:12px 16px 12px 8px!important}
+  html body .competition-games-table tbody tr+tr:not(.match-result-actions){border-color:var(--sh-line)}
+  html body .grouped-results-table .competition-games-table tbody tr:not(.match-result-actions)>td:nth-child(2){padding:4px 12px 12px 16px!important;font-size:.875rem!important}
+  html body .grouped-results-table .competition-games-table tbody tr:not(.match-result-actions)>td:nth-child(3){padding:12px 0 2px 8px!important;font-size:.75rem!important;color:var(--sh-muted)!important}
+  html body .grouped-results-table .competition-games-table tbody tr:not(.match-result-actions)>td:nth-child(4){padding:12px 16px 12px 8px!important}
+  html body .competition-games-table td.table-empty{display:block;padding:20px 16px!important}
+}

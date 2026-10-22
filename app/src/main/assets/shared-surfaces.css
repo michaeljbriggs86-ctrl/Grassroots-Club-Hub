@@ -1,0 +1,254 @@
+/* Shared surface follow-through, reviewed 22 October 2026.
+   Figma NY8QhcuOWiEcD0pKDTsbP8: 546:10288 / 546:10294 / 546:10335.
+   The important layer reconciles older important declarations without changing
+   display, visibility, permissions, form actions, or the graphic scene layout. */
+@layer club-shared {
+  :root {
+    --sh-inset-shadow:inset 0 1px 1px rgba(255,255,255,.8);
+    --sh-dialog-shadow:0 24px 60px -20px rgba(17,23,21,.4);
+  }
+  html[data-theme="dark"] {
+    --sh-inset-shadow:inset 0 1px 1px rgba(255,255,255,.07);
+    --sh-dialog-shadow:0 24px 60px -16px rgba(0,0,0,.7);
+  }
+
+  /* Raised containers share one material. The excluded wrappers deliberately
+     expose the field, garments, or a collection of independently raised cards. */
+  body:not(.auth-open) :where(
+    .panel:not(:is(
+      #home-club-notices,
+      #parent-home-family,
+      #home-season-record,
+      #parent-home-match-info,
+      #home-player-stats,
+      .graphic-player-record,
+      .squad-banner,
+      .club-matches-browser,
+      #admin-club-overview>.admin-home-weekend,
+      #admin-club-overview>.admin-home-people,
+      #admin-club-overview>.admin-home-communications
+    )),
+    .match-card,
+    .record-card,
+    .inbox-card,
+    .admin-team-card,
+    .admin-age-group,
+    .member-contact-card:not(.person-profile-body .member-contact-card),
+    .club-match-card,
+    .further-fixture-card,
+    .club-cup-feature,
+    .club-notice:not(.important),
+    .notification-item,
+    .kickoff-push-panel,
+    .kickoff-admin-card,
+    .admin-onboarding-choice,
+    .detail-feature-section,
+    #match-detail-versus,
+    #match-report-hub,
+    #match-report-outcome
+  ) {
+    --ink:var(--sh-copy)!important;
+    --muted:var(--sh-muted)!important;
+    background:var(--sh-panel)!important;
+    color:var(--sh-copy)!important;
+    border:1px solid var(--sh-line)!important;
+    border-radius:16px!important;
+    box-shadow:var(--sh-shadow)!important;
+  }
+
+  /* Restore breathing room where the old nested-card rules removed side pads. */
+  body:not(.auth-open) :is(
+    .admin-team-card,
+    .member-contact-card:not(.person-profile-body .member-contact-card)
+  ) {
+    padding:16px!important;
+  }
+
+  /* Directories and subordinate content sit one level below their container.
+     Shirt identities and the interactive tactics canvas retain their geometry. */
+  body:not(.auth-open) :where(
+    .admin-directory-row,
+    .admin-request-row,
+    .admin-home-team,
+    .admin-profile-row,
+    .workspace-directory-row:not(.graphic-squad-player):not(#squad-list .workspace-directory-row),
+    .team-member-row:not(.pending),
+    .parent-child-row,
+    .onboarding-parent-check,
+    .admin-dashboard-summary .admin-stat,
+    .admin-health-group:not(.warn),
+    .club-kit-grid article,
+    .detail-match-summary,
+    .detail-player-row,
+    .detail-booking-row,
+    .coach-note-readonly
+  ) {
+    background:var(--sh-action)!important;
+    color:var(--sh-copy)!important;
+    border:1px solid var(--sh-line)!important;
+    border-radius:10px!important;
+    box-shadow:var(--sh-inset-shadow)!important;
+  }
+  body:not(.auth-open) .panel .team-member-row {
+    padding:12px!important;
+  }
+  body:not(.auth-open) .availability-summary-group {
+    background:var(--sh-action)!important;
+    color:var(--sh-copy)!important;
+    border-radius:10px!important;
+    box-shadow:var(--sh-inset-shadow)!important;
+  }
+
+  /* Existing rows remain rows, including their current first/last separators. */
+  body:not(.auth-open) :is(
+    .coach-qualification-row,
+    .onboarding-queue article,
+    .parent-training-row,
+    .training-later-dates,
+    .readonly-detail-row,
+    #match-detail-dialog .attendance-player-row
+  ) {
+    background:transparent!important;
+    border-color:var(--sh-line)!important;
+    border-radius:0!important;
+    box-shadow:none!important;
+  }
+
+  /* The Matches lead cards use the same raised material and readable ink in
+     both themes; their information hierarchy and native controls stay intact. */
+  body:not(.auth-open) :is(#matches-next-fixture,#matchday-dashboard,.club-cup-feature) {
+    --ink:var(--sh-copy)!important;
+    --muted:var(--sh-muted)!important;
+    color:var(--sh-copy)!important;
+  }
+  body:not(.auth-open) :is(#matches-next-fixture,#matchday-dashboard) :is(
+    .next-fixture-versus,
+    .next-match-grid>div,
+    .next-match-kits,
+    .match-venue-card,
+    .match-kit-correction,
+    .matchday-dashboard-grid>article
+  ) {
+    background:var(--sh-action)!important;
+    color:var(--sh-copy)!important;
+    border:1px solid var(--sh-line)!important;
+    border-radius:10px!important;
+    box-shadow:var(--sh-inset-shadow)!important;
+  }
+  body:not(.auth-open) :is(#matches-next-fixture,#matchday-dashboard) :is(
+    h3,
+    .next-match-grid strong,
+    .next-match-kits strong,
+    .match-venue-card strong,
+    .match-kit-correction>summary,
+    .canonical-match-team strong,
+    .canonical-v11-side strong,
+    .matchday-dashboard-grid>article>strong
+  ) {
+    color:var(--sh-copy)!important;
+  }
+  body:not(.auth-open) :is(#matches-next-fixture,#matchday-dashboard) :is(
+    .kicker,
+    .muted,
+    .helper,
+    .canonical-match-fixture-label,
+    .canonical-match-v,
+    .canonical-v11-label,
+    .canonical-v11-v,
+    .matchday-dashboard-kits,
+    .next-match-grid span,
+    .next-match-kits span,
+    .match-venue-card span,
+    .match-venue-card small,
+    .match-team-kit,
+    .matchday-dashboard-grid>article>span
+  ) {
+    color:var(--sh-muted)!important;
+  }
+
+  /* Dialogs sit outside .content. Match details use the same raised and inset
+     materials, while the photographic upcoming-fixture header stays open. */
+  body:not(.auth-open) dialog.modal {
+    background:var(--sh-panel)!important;
+    color:var(--sh-copy)!important;
+    border:1px solid var(--sh-line)!important;
+    border-radius:16px!important;
+    box-shadow:var(--sh-dialog-shadow)!important;
+  }
+  body:not(.auth-open) dialog.modal:not(#next-fixture-dialog)>.modal-heading,
+  body:not(.auth-open) #club-match-summary-dialog .modal-heading {
+    background:var(--sh-canvas)!important;
+    border-color:var(--sh-line)!important;
+  }
+  body:not(.auth-open) dialog.modal:not(.notification-modal) .modal-actions {
+    background:var(--sh-canvas)!important;
+    border-color:var(--sh-line)!important;
+  }
+  body:not(.auth-open) dialog.modal :is(
+    .match-venue-card,
+    .fixture-kit-toggle,
+    .match-availability,
+    .selkent-task-guide
+  ) {
+    background:var(--sh-panel)!important;
+    color:var(--sh-copy)!important;
+    border:1px solid var(--sh-line)!important;
+    border-radius:16px!important;
+    box-shadow:var(--sh-shadow)!important;
+  }
+  body:not(.auth-open) #match-detail-dialog :is(
+    .detail-match-summary strong,
+    .detail-match-summary span,
+    #match-detail-versus strong,
+    #match-detail-versus .match-team-name,
+    #match-detail-versus .club-listing-name
+  ) {
+    color:var(--sh-copy)!important;
+  }
+  body:not(.auth-open) #match-detail-versus :is(
+    .canonical-v11-label,
+    .canonical-v11-v,
+    .canonical-match-v,
+    .match-versus-label,
+    .match-side-label,
+    .match-versus-mark,
+    .match-kit-secondary small
+  ) {
+    color:var(--sh-muted)!important;
+  }
+
+  /* Priority, unread, pending, warning and error cues remain distinct. Only
+     their shared geometry/depth changes; pills, bubbles and tactics are untouched. */
+  body:not(.auth-open) :is(
+    .club-notice.important,
+    .read-only-card,
+    .admin-health-group.warn
+  ) {
+    border-radius:16px!important;
+    box-shadow:var(--sh-shadow)!important;
+  }
+  body:not(.auth-open) :is(
+    .team-member-row.pending,
+    .notification-status,
+    .notification-empty,
+    .empty-detail-options,
+    .kickoff-error,
+    .match-action-status,
+    #match-action-notice,
+    #tournament-action-notice
+  ) {
+    border-radius:10px!important;
+    box-shadow:var(--sh-inset-shadow)!important;
+  }
+  body:not(.auth-open) .notification-item.unread {
+    background:linear-gradient(160deg,var(--gch-control-choice),var(--sh-canvas))!important;
+    border-color:var(--gch-control-choice-copy)!important;
+    border-inline-start-width:4px!important;
+  }
+  body:not(.auth-open) .club-notice.unread {
+    border-inline-start:4px solid #218a21!important;
+  }
+  body:not(.auth-open) .admin-team-card.active-team {
+    border-color:var(--gch-control-focus)!important;
+  }
+}

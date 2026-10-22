@@ -313,7 +313,9 @@ async function screenshotCorrectionsChecks(page,width,theme){
  assert(await page.locator('#matchday-dashboard').isVisible(),'coach can use preparation in Matches');
  assert.equal(await page.locator('#matchday-dashboard-title').innerText(),'Next match prep');
  assert(await page.locator('#matchday-open-tactics').isVisible());
- assert.equal(await page.locator('#matches-next-versus').evaluate(el=>getComputedStyle(el).backgroundColor),'rgba(17, 23, 21, 0.38)','fixture identity stays dark behind white text in both themes');
+ const identity=await page.locator('#matches-next-versus').evaluate(el=>({surface:getComputedStyle(el).backgroundImage,copy:getComputedStyle(el.querySelector('strong')).color}));
+ assert(identity.surface.includes('gradient'),'fixture identity uses the shared inset material');
+ assert.equal(identity.copy,theme==='dark'?'rgb(255, 255, 255)':'rgb(17, 23, 21)','fixture identity copy follows its theme surface');
  await page.evaluate(()=>{const host=document.getElementById('matches-next-kit-warning');host.innerHTML=kitWarningHtml({kitWarning:'Kit clash likely. Confirm shirt colours with the opposition before kick-off.',awayTeam:'Example Blues'});host.classList.remove('hidden');});
  assert.equal(await page.locator('#matches-next-kit-warning .kit-clash-warning').count(),1,'one warning surface');
  assert.equal(await page.locator('#matches-next-kit-warning.kit-clash-warning').count(),0,'warning host is unstyled');
@@ -357,7 +359,7 @@ async function screenshotCorrectionsChecks(page,width,theme){
  });
  const picker=page.locator('#assign-coach-person');await picker.scrollIntoViewIfNeeded();await picker.click();
  const surfaces=await picker.evaluate(el=>({open:el.matches(':open'),background:getComputedStyle(el,'::picker(select)').backgroundColor,option:getComputedStyle(el.options[2]).backgroundColor,maxHeight:getComputedStyle(el,'::picker(select)').maxHeight}));
- assert(surfaces.open,'native picker opens');assert.equal(surfaces.background,theme==='dark'?'rgb(17, 23, 21)':'rgb(255, 255, 255)','floating picker is opaque');
+ assert(surfaces.open,'native picker opens');assert.equal(surfaces.background,theme==='dark'?'rgb(25, 34, 28)':'rgb(255, 255, 255)','floating picker uses the reviewed opaque shared surface');
  assert.equal(surfaces.option,surfaces.background,'unselected options are opaque');
  const onboarding=await page.evaluate(()=>{const shell=document.createElement('div');shell.className='universal-onboarding';const select=document.createElement('select');select.innerHTML='<option>Example club</option>';shell.append(select);document.body.append(shell);const result={background:getComputedStyle(select,'::picker(select)').backgroundColor,copy:getComputedStyle(select,'::picker(select)').color};shell.remove();return result;});assert.equal(onboarding.background,'rgb(255, 255, 255)','white onboarding form keeps a white picker in either theme');assert.equal(onboarding.copy,'rgb(17, 23, 21)','onboarding picker retains dark readable text');
  await page.screenshot({path:path.join(out,`staff-dropdown-${width}-${theme}.png`)});

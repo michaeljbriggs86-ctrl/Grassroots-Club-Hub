@@ -20,6 +20,7 @@ ASSETS = (
     "index.html", "register.html", "registration.js", "registration.css", "manifest.json", "cloud-config.js", "cloud.js",
     "onboarding.js", "onboarding.css", "app.js", "coach-qualifications.js", "member-contact-import.js", "person-profiles.js", "registration-conduct.js", "player-onboarding.js", "coach-onboarding.js", "static-feed-overlay.js", "kickoff-updates.js",
     "styles.css", "cloud.css", "app-design-system.css", "notifications.css", "sunday-graphics.css",
+    "shared-surfaces.css", "shared-results.css", "shared-controls.css", "shared-navigation.css",
     "graphics/pitch-portrait.webp", "graphics/pitch-wide.webp", "graphics/fabric.webp",
     "graphics/shirt-coach.webp", "graphics/shirt-goalkeeper.webp", "graphics/shirt-outfield.webp",
     "graphics/barlow-condensed-bold.ttf", "graphics/anton-regular.ttf",
