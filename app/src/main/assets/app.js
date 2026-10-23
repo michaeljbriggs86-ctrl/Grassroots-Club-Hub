@@ -2138,7 +2138,7 @@ function matchdayShareFixture(f){
   return {fixture:selected||f,group,confirmed:!!selected&&fixtureDetailsConfirmed(selected),details:selected?resolvedFixture(selected):{}};
 }
 function matchdayShareCaption(f={},d={},names={},ctx={}){
-  const arrival=matchdayArrivalTime(d.time)||'Unconfirmed',choice=fixtureKitChoice(f),kit=kitColourDisplayText(ctx.ownProfile?.[choice]||ctx.ownProfile?.home||'TBC'),map=mapsShareHref(d.groundName,d.address);
+  const arrival=matchdayArrivalTime(d.time)||'Unconfirmed',choice=fixtureKitChoice(f),kit=kitColourDisplayText(ctx.ownProfile?.[choice]||ctx.ownProfile?.home||'TBC'),map=d.groundName&&d.address&&!/Unconfirmed|TBC/i.test(d.groundName+' '+d.address)?mapsShareHref(d.groundName,d.address):'';
   const group=typeof miniCupGroup==='function'?miniCupGroup(f):null;
   const games=group?group.fixtures.map(row=>{const n=homeFixtureTeamNames(row);return `${n.home} v ${n.away}`;}):[`${names.home||'Home'} v ${names.away||'Away'}`];
   const lines=[...(group?[fixtureCompetitionLabel(f)]:[]),...games,shareDateText(f.date),`${group?'Group start':'Kick-off'}: ${d.time||'Unconfirmed'}`,`Arrival: ${arrival}`,`Venue: ${d.groundName||'Unconfirmed'}`,d.address||'',`Our kit: ${choice==='away'?'Away':'Home'} - ${kit}`];
@@ -2299,7 +2299,7 @@ async function shareNextMatchImage(manualMatch=null){
   if(!canConfirmFixtureDetails()){pendingMatchdayWebShare=null;return toast('Coach access is required');}
   const isManual=!!manualMatch&&typeof manualMatch==='object';
   const f=isManual?manualMatch:nextPublishedFixture();if(!f){pendingMatchdayWebShare=null;return toast('No fixture available');}
-  const selection=isManual?{fixture:f,group:null,confirmed:true,details:{...f,time:f.time||'',groundName:f.groundName||'',address:f.address||''}}:matchdayShareFixture(f);
+  const selection=isManual?{fixture:f,group:null,confirmed:true,details:{...f,time:f.time||'Unconfirmed',groundName:f.groundName||'Unconfirmed',address:f.address||'Unconfirmed'}}:matchdayShareFixture(f);
   const {fixture,group,confirmed}=selection,d=selection.details;
   if(!isManual&&(!confirmed||!matchdayArrivalTime(d.time)||!d.groundName||!d.address)){pendingMatchdayWebShare=null;toast(group?'Confirm group start time, venue and kit before sharing matchday info':'Confirm kick-off, venue and kit before sharing matchday info');document.getElementById('next-match-confirm-time')?.focus();return;}
   const ctx=fixtureOverviewContext(d),names=homeFixtureTeamNames(fixture),arrival=matchdayArrivalTime(d.time)||'Unconfirmed',caption=matchdayShareCaption(fixture,d,names,ctx);
