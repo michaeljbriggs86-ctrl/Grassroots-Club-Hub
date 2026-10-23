@@ -2194,9 +2194,9 @@ async function shareCardBadge(g,x,y,name,colours){
   g.save();g.translate(x,y);g.scale(.72,.72);
   try{await drawShareClubIdentity(g,0,0,name,colours);}finally{g.restore();}
 }
-// Figma 239:6031: full names wrap at a readable size and determine export height.
-function matchdayImageText(g,text,width,size,weight=400){
-  const font=`${weight} ${size}px ${shareCardFontFamily()}`,lines=[];
+// Figma 582:10729: Sunday-morning match graphics; full text determines export height.
+function matchdayImageText(g,text,width,size,weight=400,family=shareCardFontFamily(),lineHeight=Math.round(size*1.3)){
+  const font=`${weight} ${size}px ${family}`,lines=[];
   g.font=font;
   for(const paragraph of String(text||'').split('\n')){
     let line='';
@@ -2210,57 +2210,76 @@ function matchdayImageText(g,text,width,size,weight=400){
     }
     if(line)lines.push(line);
   }
-  const lineHeight=Math.round(size*1.3);
   return {font,lines,lineHeight,height:lines.length*lineHeight};
 }
 function drawMatchdayImageText(g,block,x,y,colour,align='left'){
-  g.save();g.font=block.font;g.fillStyle=colour;g.textAlign=align;g.textBaseline='top';
-  block.lines.forEach((line,i)=>g.fillText(line,x,y+i*block.lineHeight));g.restore();
+  g.save();g.font=block.font;g.fillStyle=colour;g.textAlign=align;g.textBaseline='alphabetic';
+  const metrics=g.measureText(block.lines[0]||'Mg'),ascent=metrics.fontBoundingBoxAscent,descent=metrics.fontBoundingBoxDescent;
+  const baseline=Number.isFinite(ascent)&&Number.isFinite(descent)?(block.lineHeight-ascent-descent)/2+ascent:block.lineHeight*.8;
+  block.lines.forEach((line,i)=>g.fillText(line,x,y+baseline+i*block.lineHeight));g.restore();
+}
+function drawMatchdayPitch(g,image,width,height){
+  if(!image)return;
+  const scale=Math.max(width/image.naturalWidth,height/image.naturalHeight),w=image.naturalWidth*scale,h=image.naturalHeight*scale;
+  g.save();g.beginPath();g.rect(0,0,width,height);g.clip();
+  g.drawImage(image,(width-w)/2,(height-h)/2,w,h);g.restore();
+}
+function drawMatchdayTimeSurface(g,y,height,dark){
+  const surface=g.createLinearGradient(60,y,1020,y+height);
+  surface.addColorStop(0,dark?'#26302B':'#FFFFFF');surface.addColorStop(1,dark?'#0E1311':'#EEF6F1');
+  g.save();g.shadowColor=dark?'rgba(0,0,0,.42)':'rgba(17,23,21,.16)';g.shadowBlur=48;g.shadowOffsetY=18;
+  g.beginPath();g.roundRect(60,y,960,height,24);g.fillStyle=surface;g.fill();g.restore();
+  g.save();g.beginPath();g.roundRect(60,y,960,height,24);g.strokeStyle=dark?'rgba(255,255,255,.09)':'#D8E0DA';g.lineWidth=1.5;g.stroke();g.restore();
 }
 async function renderMatchdayShareCanvas(canvas,f,fixture,group,d,ctx,arrival,theme){
-  canvas.width=1080;const g=canvas.getContext('2d'),dark=theme!=='light';
-  const palette={bg:dark?'#111715':'#F3F6F4',ink:dark?'#FFFFFF':'#111715',muted:dark?'rgba(255,255,255,.67)':'#66756D',accent:dark?'#E8F7ED':'#0D6A3A',pale:'#E8F7ED',forest:'#064526'};
-  const title=matchdayImageText(g,'Matchday details',720,72,700),date=matchdayImageText(g,shareDateText(f.date),720,48,600),competition=matchdayImageText(g,fixtureCompetitionLabel(fixture),720,42);
-  const headerHeight=Math.max(192,title.height+12+date.height+12+competition.height),rows=group?group.fixtures:[fixture];
-  const games=rows.map((row,i)=>{const names=homeFixtureTeamNames(row);return {row,names,context:fixtureOverviewContext(row),label:group?matchdayImageText(g,`Group game ${i+1}`,960,42,600):null,home:matchdayImageText(g,names.home,432,54,700),away:matchdayImageText(g,names.away,432,54,700)};});
-  const side=matchdayImageText(g,'Home',432,36,600),awaySide=matchdayImageText(g,'Away',432,36,600),versus=matchdayImageText(g,'v',96,54,600);
-  games.forEach(game=>game.height=(game.label?game.label.height+24:0)+144+24+side.height+24+Math.max(game.home.height,game.away.height));
-  const arrivalLabel=matchdayImageText(g,'Arrival',432,42,600),startLabel=matchdayImageText(g,group?'Group start':'Kick-off',432,42,600),arrivalText=matchdayImageText(g,arrival,432,108,700),startText=matchdayImageText(g,d.time,432,108,700),clockHeight=96+arrivalLabel.height+12+arrivalText.height;
-  const venueLabel=matchdayImageText(g,'Venue',960,42,600),ground=matchdayImageText(g,d.groundName,960,54,700),address=matchdayImageText(g,d.address,960,42),choice=fixtureKitChoice(fixture),kit=matchdayImageText(g,choice==='away'?'Wear away kit':'Wear home kit',960,48,600),note=group?matchdayImageText(g,'Games are back-to-back. Order may change.',960,42):null;
+  // Canvas fonts must be loaded before measuring, including on an offline/native page.
+  const fonts=typeof document!=='undefined'?document.fonts:null;
+  const fontReady=fonts?.load?Promise.all(['400 120px Anton','400 42px Inter','600 36px Inter','700 54px Inter'].map(font=>fonts.load(font))).catch(()=>{}):Promise.resolve();
+  const pitchReady=typeof loadShareBadgeImage==='function'?loadShareBadgeImage('graphics/pitch-wide.webp'):Promise.resolve(null);
+  const [,pitch]=await Promise.all([fontReady,pitchReady]);
+  canvas.width=1080;const g=canvas.getContext('2d'),dark=theme!=='light',bodyFamily=shareCardFontFamily(),displayFamily=`Anton,${bodyFamily}`;
+  const palette={bg:dark?'#111715':'#F3F6F4',ink:dark?'#FFFFFF':'#111715',muted:dark?'rgba(255,255,255,.67)':'#4F5F55',accent:dark?'#E8F7ED':'#0D6A3A',line:dark?'rgba(255,255,255,.12)':'#D8E0DA'};
+  const body=(text,width,size=42,weight=400,lineHeight=56)=>matchdayImageText(g,text,width,size,weight,bodyFamily,lineHeight);
+  const display=(text,width,size,lineHeight)=>matchdayImageText(g,text,width,size,400,displayFamily,lineHeight);
+  const brand=body('SHOOTERS HILL AFC',864,32,600,44),title=display('MATCHDAY',960,120,132),date=body(shareDateText(f.date),960),competition=body(fixtureCompetitionLabel(fixture),960,36,600,48);
+  const titleY=132,dateY=titleY+title.height+12,competitionY=dateY+date.height+12,headerHeight=Math.max(440,competitionY+competition.height+48);
+  const side=body('Home',432,32,600,44),awaySide=body('Away',432,32,600,44),versus=display('V',96,64,76),rows=group?group.fixtures:[fixture];
+  const games=rows.map((row,i)=>{
+    const names=homeFixtureTeamNames(row),label=group?body(`Group game ${i+1}`,960,32,600,44):null,home=display(names.home,432,64,76),away=display(names.away,432,64,76);
+    return {row,names,label,home,away,context:fixtureOverviewContext(row),height:(label?label.height+18:0)+144+18+side.height+18+Math.max(home.height,away.height)};
+  });
+  const arrivalLabel=body('Arrival',420,32,600,44),startLabel=body(group?'Group start':'Kick-off',420,32,600,44),arrivalText=display(arrival,420,112,124),startText=display(d.time,420,112,124),clockHeight=72+Math.max(arrivalLabel.height,startLabel.height)+12+Math.max(arrivalText.height,startText.height);
+  const venueLabel=body('VENUE',960,32,600,44),ground=body(d.groundName,960,54,700,68),address=body(d.address,960),choice=fixtureKitChoice(fixture),kit=body(choice==='away'?'Wear away kit':'Wear home kit',960),note=group?body('Games are back-to-back. Order may change.',960):null;
   const venueHeight=venueLabel.height+12+ground.height+12+address.height;
-  canvas.height=120+headerHeight+48+games.reduce((sum,game)=>sum+game.height+48,0)+clockHeight+48+venueHeight+48+kit.height+(note?48+note.height:0);
+  canvas.height=headerHeight+48+games.reduce((sum,game)=>sum+game.height+48,0)+clockHeight+48+venueHeight+48+3+24+kit.height+(note?48+note.height:0)+60;
   g.fillStyle=palette.bg;g.fillRect(0,0,canvas.width,canvas.height);
-  const backdrop=g.createLinearGradient(0,0,0,720);
-  backdrop.addColorStop(0,dark?'rgba(6,69,38,.65)':'#E8F7ED');backdrop.addColorStop(1,dark?'rgba(6,69,38,0)':'rgba(232,247,237,0)');
-  g.fillStyle=backdrop;g.fillRect(0,0,canvas.width,canvas.height);
-  const badgeSrc=typeof verifiedTeamBadgeUrl==='function'?verifiedTeamBadgeUrl(ctx.ownTeam):'',watermark=badgeSrc?await loadShareBadgeImage(badgeSrc):null;
-  if(watermark){
-    const scale=2160/Math.max(watermark.naturalWidth,watermark.naturalHeight),w=watermark.naturalWidth*scale,h=watermark.naturalHeight*scale;
-    g.save();g.globalAlpha=dark?.045:.035;g.translate(864,canvas.height*.60);
-    if(badgeSrc==='shooters-hill-logo.png'){g.beginPath();g.arc(0,0,Math.min(w,h)/2,0,Math.PI*2);g.clip();}
-    g.rotate(reviewedBadgeRotation(badgeSrc)*Math.PI/180);g.drawImage(watermark,-w/2,-h/2,w,h);g.restore();
-  }
-  const heroHeight=60+headerHeight+24,hero=g.createLinearGradient(0,0,1080,heroHeight);hero.addColorStop(0,'#0B5D35');hero.addColorStop(1,palette.forest);g.fillStyle=hero;g.fillRect(0,0,1080,heroHeight);
-  let y=60;drawMatchdayImageText(g,title,60,y,'#FFFFFF');y+=title.height+12;drawMatchdayImageText(g,date,60,y,'#FFFFFF');y+=date.height+12;drawMatchdayImageText(g,competition,60,y,'rgba(255,255,255,.8)');
-  g.save();g.translate(924,156);g.scale(192/188,192/188);try{await drawShareClubIdentity(g,0,0,ctx.ownTeam,ctx.ownProfile?.home);}finally{g.restore();}
-  y=60+headerHeight+48;
+  g.fillStyle='#064526';g.fillRect(0,0,1080,headerHeight);drawMatchdayPitch(g,pitch,1080,headerHeight);
+  const shade=g.createLinearGradient(0,0,0,headerHeight);shade.addColorStop(0,'rgba(17,23,21,.42)');shade.addColorStop(1,'rgba(17,23,21,.96)');g.fillStyle=shade;g.fillRect(0,0,1080,headerHeight);
+  g.save();g.translate(96,84);g.scale(72/188,72/188);try{await drawShareClubIdentity(g,0,0,ctx.ownTeam,ctx.ownProfile?.home);}finally{g.restore();}
+  drawMatchdayImageText(g,brand,156,62,'#FFFFFF');drawMatchdayImageText(g,title,60,titleY,'#FFFFFF');drawMatchdayImageText(g,date,60,dateY,'#FFFFFF');drawMatchdayImageText(g,competition,60,competitionY,'#E8F7ED');
+  let y=headerHeight+48;
   const clock=()=>{
-    const surface=g.createLinearGradient(60,y,1020,y+clockHeight);surface.addColorStop(0,'#FFFFFF');surface.addColorStop(1,palette.pale);
-    g.save();g.shadowColor=dark?'rgba(6,69,38,.30)':'rgba(6,69,38,.14)';g.shadowBlur=60;g.shadowOffsetY=24;
-    g.beginPath();g.roundRect(60,y,960,clockHeight,60);g.fillStyle=surface;g.fill();g.restore();
-    drawMatchdayImageText(g,arrivalLabel,324,y+48,palette.forest,'center');drawMatchdayImageText(g,startLabel,756,y+48,palette.forest,'center');drawMatchdayImageText(g,arrivalText,324,y+48+arrivalLabel.height+12,palette.forest,'center');drawMatchdayImageText(g,startText,756,y+48+startLabel.height+12,palette.forest,'center');y+=clockHeight+48;
+    drawMatchdayTimeSurface(g,y,clockHeight,dark);
+    drawMatchdayImageText(g,arrivalLabel,306,y+36,palette.muted,'center');drawMatchdayImageText(g,startLabel,774,y+36,palette.muted,'center');
+    const timeY=y+36+Math.max(arrivalLabel.height,startLabel.height)+12;
+    drawMatchdayImageText(g,arrivalText,306,timeY,palette.ink,'center');drawMatchdayImageText(g,startText,774,timeY,palette.ink,'center');y+=clockHeight+48;
   };
   if(group)clock();
   for(const game of games){
-    const top=y;if(game.label){drawMatchdayImageText(g,game.label,60,y,palette.accent);y+=game.label.height+24;}
-    for(const [x,name,colours] of [[276,game.names.home,game.context.homeKit],[804,game.names.away,game.context.awayKit]]){g.save();g.translate(x,y+72);g.scale(144/188,144/188);try{await drawShareClubIdentity(g,0,0,name,colours);}finally{g.restore();}}
-    drawMatchdayImageText(g,versus,540,y+168,palette.accent,'center');y+=168;drawMatchdayImageText(g,side,276,y,palette.muted,'center');drawMatchdayImageText(g,awaySide,804,y,palette.muted,'center');y+=side.height+24;
+    const top=y;if(game.label){drawMatchdayImageText(g,game.label,60,y,palette.accent);y+=game.label.height+18;}
+    for(const [x,name,colours] of [[276,game.names.home,game.context.homeKit],[804,game.names.away,game.context.awayKit]]){
+      g.save();g.shadowColor='rgba(0,0,0,.25)';g.shadowBlur=24;g.shadowOffsetY=8;g.translate(x,y+72);g.scale(144/188,144/188);
+      try{await drawShareClubIdentity(g,0,0,name,colours);}finally{g.restore();}
+    }
+    drawMatchdayImageText(g,versus,540,y+34,palette.accent,'center');y+=144+18;
+    drawMatchdayImageText(g,side,276,y,palette.muted,'center');drawMatchdayImageText(g,awaySide,804,y,palette.muted,'center');y+=side.height+18;
     drawMatchdayImageText(g,game.home,276,y,palette.ink,'center');drawMatchdayImageText(g,game.away,804,y,palette.ink,'center');y=top+game.height+48;
   }
   if(!group)clock();
-  drawMatchdayImageText(g,venueLabel,60,y,palette.accent);y+=venueLabel.height+12;drawMatchdayImageText(g,ground,60,y,palette.ink);y+=ground.height+12;drawMatchdayImageText(g,address,60,y,palette.muted);y+=address.height+48;drawMatchdayImageText(g,kit,60,y,palette.ink);y+=kit.height;
+  drawMatchdayImageText(g,venueLabel,60,y,palette.accent);y+=venueLabel.height+12;drawMatchdayImageText(g,ground,60,y,palette.ink);y+=ground.height+12;drawMatchdayImageText(g,address,60,y,palette.muted);y+=address.height+48;
+  g.fillStyle=palette.line;g.fillRect(60,y,960,3);y+=27;drawMatchdayImageText(g,kit,60,y,palette.ink);y+=kit.height;
   if(note){y+=48;drawMatchdayImageText(g,note,60,y,palette.muted);y+=note.height;}
-  return {width:canvas.width,height:canvas.height,contentBottom:y,games:games.length,theme:dark?'dark':'light'};
+  return {width:canvas.width,height:canvas.height,contentBottom:y,games:games.length,theme:dark?'dark':'light',style:'sunday-matchday-20261023',pitchLoaded:!!pitch};
 }
 let pendingMatchdayWebShare=null,matchdayWebShareBusy=false,matchdaySharePreparing=false;
 async function openMatchdayWebShare(data){

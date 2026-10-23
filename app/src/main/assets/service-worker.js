@@ -1,4 +1,4 @@
-const CACHE = 'pitchkind-web-global-header-20261022';
+const CACHE = 'pitchkind-web-matchday-graphics-20261023';
 const ASSETS=['./','./index.html','./styles.css','./app-design-system.css','./cloud.css','./cloud-config.js','./cloud.js','./app.js','./coach-qualifications.js','./member-contact-import.js','./person-profiles.js','./onboarding.js','./onboarding.css','./manifest.json','./shooters-hill-logo.png', './club-badge-unavailable.svg','./football-login-adult.jpg','./football-login-player.jpg','./football-login-club.jpg','./football-pitch-hero.jpg','./football-pitch-hero-illustration.png','./static-feed-overlay.js'];
 ASSETS.push('./sunday-graphics.css','./graphics/pitch-portrait.webp','./graphics/pitch-wide.webp','./graphics/fabric.webp','./graphics/shirt-coach.webp','./graphics/shirt-goalkeeper.webp','./graphics/shirt-outfield.webp','./graphics/barlow-condensed-bold.ttf','./graphics/anton-regular.ttf');
 ASSETS.push('./shared-surfaces.css','./shared-results.css','./shared-controls.css','./shared-navigation.css', './shared-header.css');
