@@ -121,7 +121,7 @@
     --muted:var(--sh-muted)!important;
     color:var(--sh-copy)!important;
   }
-  body:not(.auth-open) :is(#matches-next-fixture,#matchday-dashboard) :is(
+  body:not(.auth-open) #matchday-dashboard :is(
     .next-fixture-versus,
     .next-match-grid>div,
     .next-match-kits,
@@ -164,6 +164,175 @@
     .matchday-dashboard-grid>article>span
   ) {
     color:var(--sh-muted)!important;
+  }
+
+  /* Matches scene restoration, 23 October 2026. Figma 592:10773 / 593:10783.
+     Stay in the shared important layer: an unlayered Sunday rule cannot beat
+     the older layered inset material. Native markup, order and gates remain.
+     The background spans the first three content rows, so Cup groups and
+     wrapped names grow the field instead of overflowing a fixed-height hero. */
+  body:not(.auth-open) #matches-next-fixture {
+    --sh-fixture-crest:clamp(64px,24vw,94px);
+    position:relative;
+    isolation:isolate;
+    overflow:hidden;
+    grid-template-columns:minmax(0,1fr)!important;
+    gap:20px!important;
+    padding:20px!important;
+    border-radius:12px!important;
+  }
+  body:not(.auth-open) #matches-next-fixture::before {
+    content:"";
+    grid-column:1;
+    grid-row:1 / span 3;
+    z-index:-1;
+    margin:-20px -20px 0;
+    pointer-events:none;
+    background:linear-gradient(180deg,rgba(5,8,6,.75),rgba(5,8,6,.22) 45%,#111715),url("graphics/pitch-portrait.webp") center/cover no-repeat;
+  }
+  body:not(.auth-open) #matches-next-fixture>.panel-heading {
+    grid-area:1 / 1;
+    margin:0!important;
+    padding:0!important;
+    background:transparent!important;
+    border:0!important;
+    box-shadow:none!important;
+  }
+  body:not(.auth-open) #matches-next-fixture>.panel-heading :is(.kicker,h3) {
+    color:#fff!important;
+    text-shadow:0 2px 4px rgba(0,0,0,.8);
+  }
+  body:not(.auth-open) #matches-next-fixture>.panel-heading h3 {
+    margin:6px 0 0!important;
+    font:700 1.375rem/1.2 var(--sh-display)!important;
+    text-transform:uppercase;
+    overflow-wrap:anywhere;
+  }
+  body:not(.auth-open) #matches-next-fixture #matches-next-versus {
+    grid-area:2 / 1;
+    min-width:0;
+    margin:0!important;
+    padding:0!important;
+    background:transparent!important;
+    border:0!important;
+    border-radius:0!important;
+    box-shadow:none!important;
+  }
+  body:not(.auth-open) #matches-next-fixture :is(.canonical-v11-rows,.canonical-v13-rows) {
+    gap:24px!important;
+  }
+  body:not(.auth-open) #matches-next-fixture .canonical-v11-fixture {
+    min-width:0;
+    gap:18px!important;
+  }
+  body:not(.auth-open) #matches-next-fixture .canonical-v11-label {
+    color:#fff!important;
+    text-shadow:0 1px 4px #111715;
+  }
+  body:not(.auth-open) #matches-next-fixture .canonical-v11-teams {
+    grid-template-columns:minmax(0,1fr) auto minmax(0,1fr)!important;
+    align-items:start!important;
+    gap:12px!important;
+  }
+  body:not(.auth-open) #matches-next-fixture .canonical-v11-side {
+    flex-direction:column!important;
+    align-items:center!important;
+    justify-content:flex-start!important;
+    gap:18px!important;
+    min-width:0;
+    text-align:center!important;
+  }
+  body:not(.auth-open) #matches-next-fixture .canonical-v11-side strong {
+    font:700 clamp(1.375rem,5vw,1.625rem)/1.15 var(--sh-display)!important;
+    color:#fff!important;
+    text-transform:uppercase;
+    text-shadow:0 2px 4px #111715;
+    overflow-wrap:anywhere;
+  }
+  /* The older grouped ink rule inherits its most specific article selector.
+     Name the actual scene host so light-theme copy stays white over the field. */
+  body:not(.auth-open) #matches-next-fixture #matches-next-versus :is(strong,.canonical-v11-label,.canonical-v11-v),
+  body:not(.auth-open) #matches-next-fixture .next-match-grid .fixture-date-copy>span,
+  body:not(.auth-open) #matches-next-fixture #matches-next-when {
+    color:#fff!important;
+  }
+  body:not(.auth-open) #matches-next-fixture .canonical-v11-v {
+    align-self:start;
+    margin-top:calc(var(--sh-fixture-crest)/2 - .75rem);
+    font:700 1.5rem/1 var(--sh-display);
+    color:#fff!important;
+    text-shadow:0 2px 4px #111715;
+  }
+  body:not(.auth-open) #matches-next-fixture :is(.canonical-v11-badge,.canonical-v13-badge-fallback) {
+    order:-1;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex:0 0 var(--sh-fixture-crest)!important;
+    width:var(--sh-fixture-crest)!important;
+    height:var(--sh-fixture-crest)!important;
+    min-width:0!important;
+    max-width:100%!important;
+    padding:5px!important;
+    box-sizing:border-box;
+    border:0!important;
+    border-radius:50%!important;
+    background:linear-gradient(150deg,#eef6f1,#4f5f55 65%,#111715)!important;
+    box-shadow:-2px 7px 0 #111715,0 15px 12px rgba(0,0,0,.65),inset 0 1px 2px rgba(255,255,255,.7)!important;
+    filter:none!important;
+    transform:rotate(-5deg);
+    color:#fff!important;
+  }
+  body:not(.auth-open) #matches-next-fixture .canonical-v11-badge :is(img,.club-identity-badge) {
+    flex:0 0 auto!important;
+    width:calc(var(--sh-fixture-crest) - 10px)!important;
+    height:calc(var(--sh-fixture-crest) - 10px)!important;
+    min-width:0!important;
+    max-width:100%!important;
+    max-height:100%!important;
+    padding:0!important;
+    border:0!important;
+    border-radius:0!important;
+    background:transparent!important;
+    box-shadow:none!important;
+    object-fit:contain;
+    filter:none!important;
+  }
+  body:not(.auth-open) #matches-next-fixture>.next-match-grid {
+    grid-area:3 / 1;
+    grid-template-columns:minmax(0,1fr)!important;
+    margin:0!important;
+    padding:0 0 20px!important;
+  }
+  body:not(.auth-open) #matches-next-fixture :is(.next-match-grid>div,.match-venue-card) {
+    min-width:0;
+    padding:0!important;
+    background:transparent!important;
+    border:0!important;
+    border-radius:0!important;
+    box-shadow:none!important;
+  }
+  body:not(.auth-open) #matches-next-fixture .next-match-grid :is(span,strong) {
+    color:#fff!important;
+    text-shadow:0 2px 4px #111715;
+  }
+  body:not(.auth-open) #matches-next-fixture #matches-next-when {
+    font:700 1.75rem/1.2 var(--sh-display)!important;
+    overflow-wrap:anywhere;
+  }
+  body:not(.auth-open) #matches-next-fixture .fixture-date-copy {
+    gap:8px!important;
+  }
+  body:not(.auth-open) #matches-next-fixture .match-venue-card>div {
+    gap:6px!important;
+  }
+  body:not(.auth-open) #matches-next-fixture .match-venue-card strong {
+    font-size:1rem!important;
+    line-height:1.5!important;
+  }
+  body:not(.auth-open) #matches-next-fixture .match-venue-card small {
+    font-size:.75rem!important;
+    line-height:1.5!important;
   }
 
   /* Dialogs sit outside .content. Match details use the same raised and inset

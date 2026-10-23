@@ -87,6 +87,7 @@ jobs:
           node verification/browser/verify_parent_availability.cjs "$RUNNER_TEMP/visual-review/node_modules/playwright" "$RUNNER_TEMP/visual-review-output/parent-availability"
           node verification/browser/verify_visual_rollout.cjs "$RUNNER_TEMP/visual-review/node_modules/playwright" "$RUNNER_TEMP/visual-review-output"
           node verification/browser/verify_shared_components.cjs "$RUNNER_TEMP/visual-review/node_modules/playwright" "$RUNNER_TEMP/visual-review-output/shared-components"
+          node verification/browser/verify_matches_scene.cjs "$RUNNER_TEMP/visual-review/node_modules/playwright" "$RUNNER_TEMP/visual-review-output/matches-scene"
           node verification/browser/verify_hero_context.cjs "$RUNNER_TEMP/visual-review/node_modules/playwright" "$RUNNER_TEMP/visual-review-output/hero-context"
           node verification/browser/verify_cup_freshness.cjs "$RUNNER_TEMP/visual-review/node_modules/playwright" "$RUNNER_TEMP/visual-review-output/cup-freshness"
           node verification/browser/verify_match_action_commit.cjs "$RUNNER_TEMP/visual-review/node_modules/playwright" "$RUNNER_TEMP/visual-review-output/match-action-commit"
