@@ -124,12 +124,13 @@
         <section class="home-next-match" id="home-next-match">
           <p class="kicker" id="home-next-title">Next match</p>
           <button type="button" class="panel next-match-card next-match-summary-card screen-lead-card" id="next-match-card" aria-haspopup="dialog" aria-controls="next-fixture-dialog">
+            <div class="home-fixture-heading"><span id="home-fixture-kicker">Next match</span><time class="next-match-summary-date" id="next-match-home-date">Date TBC</time></div>
             <div class="next-match-summary-versus" id="next-match-home-teams" aria-label="Next match teams">
               <div class="next-match-summary-team"><span class="next-match-summary-visual">—</span><strong>Team TBC</strong></div>
               <span class="next-match-summary-v">V</span>
               <div class="next-match-summary-team"><span class="next-match-summary-visual">—</span><strong>Team TBC</strong></div>
             </div>
-            <time class="next-match-summary-date" id="next-match-home-date">Date TBC</time>
+            <div class="home-fixture-footer"><span id="home-fixture-meta">Kick-off TBC</span><span class="home-fixture-details" aria-hidden="true">Details ↗</span></div>
           </button>
           <div class="panel parent-home-training screen-lead-card hidden" id="parent-home-training"></div>
           <div class="panel parent-home-match-info screen-lead-card hidden" id="parent-home-match-info"></div>
@@ -152,7 +153,7 @@
 
         <p class="kicker home-season-group-label" id="home-season-group-label">This season</p>
         <details class="panel home-season-details" id="home-season-record">
-          <summary><strong>Season record</strong><span>League progress and match totals</span></summary>
+          <summary><strong>Season record</strong><span>Overall · Friendlies · League</span></summary>
           <div class="home-season-details-body">
         <div class="record-card knight-panel dashboard-record-retired">
           <div class="record-heading" id="primary-record-heading">League record</div>
@@ -203,7 +204,7 @@
 
 
 
-        <a class="page-link" id="home-team-stats-link" href="?view=team-stats" data-page-route="team-stats"><span><strong>Player &amp; team stats</strong><small>Form, awards and season player contribution</small></span><span aria-hidden="true">›</span></a>
+        <a class="page-link" id="home-team-stats-link" href="?view=team-stats" data-page-route="team-stats"><span><strong>Player &amp; team stats</strong><small>Form, awards and season player contribution</small></span><span aria-hidden="true">↗</span></a>
       </section>
 
       <section id="view-matches" class="view" data-view="matches">

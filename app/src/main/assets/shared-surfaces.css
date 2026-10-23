@@ -1,7 +1,8 @@
 /* Shared surface follow-through, reviewed 22 October 2026.
    Figma NY8QhcuOWiEcD0pKDTsbP8: 546:10288 / 546:10294 / 546:10335.
    The important layer reconciles older important declarations without changing
-   display, visibility, permissions, form actions, or the graphic scene layout. */
+   native visibility gates, permissions and form actions. Graphic restoration is
+   scoped to its original Figma components below. */
 @layer club-shared {
   :root {
     --sh-inset-shadow:inset 0 1px 1px rgba(255,255,255,.8);
@@ -333,6 +334,292 @@
   body:not(.auth-open) #matches-next-fixture .match-venue-card small {
     font-size:.75rem!important;
     line-height:1.5!important;
+  }
+
+  /* Original Home composition, Figma 572:10407 / 572:10424, 23 October.
+     The preview is the compact club/opponent component, not the full versus
+     graphic. Expanded records retain their native data and disclosure. */
+  body:not(.auth-open) #view-home #next-match-card {
+    grid-template-columns:minmax(0,1fr)!important;
+    gap:14px!important;
+    min-height:165px!important;
+    padding:20px!important;
+    text-align:left!important;
+  }
+  body:not(.auth-open) #view-home #next-match-card::after {
+    content:none!important;
+  }
+  body:not(.auth-open) #view-home #next-match-card:focus-visible {
+    outline:2px solid var(--sh-control-focus,#145c36)!important;
+    outline-offset:3px!important;
+  }
+  body:not(.auth-open):not(.role-parent) #view-home #home-next-title {
+    position:absolute!important;
+    width:1px!important;
+    height:1px!important;
+    margin:-1px!important;
+    padding:0!important;
+    overflow:hidden!important;
+    clip-path:inset(50%);
+    white-space:nowrap;
+  }
+  body:not(.auth-open):not(.role-parent) #view-home #home-next-match {
+    gap:0!important;
+  }
+  body:not(.auth-open) #next-match-card :is(.home-fixture-heading,.home-fixture-footer) {
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    min-width:0;
+  }
+  body:not(.auth-open) #next-match-card #home-fixture-kicker {
+    font:700 .6875rem/1.5 Inter,system-ui,sans-serif!important;
+    color:var(--sh-copy)!important;
+    text-transform:uppercase;
+  }
+  body:not(.auth-open) #next-match-card #next-match-home-date {
+    margin:0!important;
+    padding:0!important;
+    border:0!important;
+    background:transparent!important;
+    color:var(--sh-copy)!important;
+    font:700 .75rem/1.4 Inter,system-ui,sans-serif!important;
+    text-align:right!important;
+    text-transform:uppercase;
+    overflow-wrap:anywhere;
+  }
+  body:not(.auth-open) #next-match-card #next-match-home-teams {
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr)!important;
+    gap:14px!important;
+    min-width:0;
+  }
+  body:not(.auth-open) #next-match-card .home-fixture-row {
+    display:grid;
+    gap:6px;
+    min-width:0;
+  }
+  body:not(.auth-open) #next-match-card .home-fixture-own {
+    display:flex;
+    align-items:center;
+    gap:12px;
+    min-width:0;
+  }
+  body:not(.auth-open) #next-match-card .home-fixture-badge {
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex:0 0 46px!important;
+    width:46px!important;
+    height:46px!important;
+  }
+  body:not(.auth-open) #next-match-card .home-fixture-badge :is(img,svg,.club-identity-badge) {
+    width:46px!important;
+    height:46px!important;
+    min-width:0!important;
+    max-width:46px!important;
+    max-height:46px!important;
+    padding:0!important;
+    border:0!important;
+    background:transparent!important;
+    object-fit:contain;
+  }
+  body:not(.auth-open) #next-match-card .home-fixture-copy {
+    display:grid;
+    gap:2px;
+    min-width:0;
+    text-align:left;
+    overflow-wrap:anywhere;
+  }
+  body:not(.auth-open) #next-match-card .home-fixture-copy strong,
+  body:not(.auth-open) #next-match-card .home-fixture-empty {
+    font:700 1.6875rem/.98 var(--sh-display)!important;
+    color:var(--sh-copy)!important;
+    text-transform:uppercase;
+  }
+  body:not(.auth-open) #next-match-card .home-fixture-opponent {
+    font:400 .8125rem/1.4 Inter,system-ui,sans-serif!important;
+    color:var(--sh-muted)!important;
+  }
+  body:not(.auth-open) #next-match-card .home-fixture-game-label {
+    font:700 .6875rem/1.4 Inter,system-ui,sans-serif!important;
+    color:var(--sh-muted)!important;
+    text-transform:uppercase;
+  }
+  body:not(.auth-open) #next-match-card .home-fixture-footer {
+    padding-top:14px;
+    border-top:1px solid var(--sh-line);
+  }
+  body:not(.auth-open) #next-match-card #home-fixture-meta {
+    font:700 .6875rem/1.5 Inter,system-ui,sans-serif!important;
+    color:var(--sh-muted)!important;
+    text-transform:uppercase;
+    overflow-wrap:anywhere;
+  }
+  body:not(.auth-open) #next-match-card .home-fixture-details {
+    flex-shrink:0;
+    font:700 .75rem/1.4 Inter,system-ui,sans-serif!important;
+    color:var(--sh-copy)!important;
+    white-space:nowrap;
+  }
+  body:not(.auth-open) #next-match-card:disabled .home-fixture-details {
+    visibility:hidden;
+  }
+  body:not(.auth-open) #view-home #home-season-record>summary {
+    gap:5px 8px!important;
+    min-height:53px!important;
+    padding:0 0 10px!important;
+  }
+  body:not(.auth-open) #view-home #home-season-group-label::before {
+    content:"02";
+    margin-right:16px;
+  }
+  body:not(.auth-open) #view-home #home-season-record>summary strong {
+    font:600 .875rem/1.8 Inter,system-ui,sans-serif!important;
+    color:var(--sh-muted)!important;
+  }
+  body:not(.auth-open) #view-home #home-season-record>summary span {
+    font:400 .75rem/1.5 Inter,system-ui,sans-serif!important;
+    color:var(--sh-muted)!important;
+  }
+  body:not(.auth-open) #view-home #home-season-record>summary::after {
+    font-size:18px!important;
+    color:var(--sh-copy)!important;
+  }
+  body:not(.auth-open) #home-season-record>.home-season-details-body {
+    padding:20px 0 0!important;
+    border-color:var(--sh-line)!important;
+  }
+  body:not(.auth-open) #home-season-record .running-count-grid {
+    grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr))!important;
+    gap:16px!important;
+    margin-bottom:16px!important;
+  }
+  body:not(.auth-open) #home-season-record :is(.running-count-card,#league-summary-card) {
+    padding:20px!important;
+    margin:0!important;
+  }
+  body:not(.auth-open) #home-season-record .running-count-card .kicker {
+    margin:0!important;
+    font:700 .75rem/1.5 Inter,system-ui,sans-serif!important;
+    color:var(--sh-muted)!important;
+  }
+  body:not(.auth-open) #home-season-record .running-main strong {
+    font:700 2rem/1 var(--sh-display)!important;
+  }
+  body:not(.auth-open) #home-season-record #league-played-count {
+    font:700 1.75rem/1 var(--sh-display)!important;
+  }
+  body:not(.auth-open) #home-season-record .league-progress-ring {
+    width:auto!important;
+    height:auto!important;
+    min-width:62px;
+    min-height:62px;
+    padding:12px!important;
+    aspect-ratio:1;
+  }
+  body:not(.auth-open) #home-season-record :is(.running-split,.running-goals) {
+    flex-wrap:wrap;
+    gap:12px;
+    border-color:var(--sh-line)!important;
+  }
+  body:not(.auth-open) #home-season-record :is(.running-split,.running-goals) b {
+    font:700 1.25rem/1 var(--sh-display)!important;
+  }
+  body:not(.auth-open) #view-home #home-team-stats-link {
+    min-height:50px!important;
+    padding:14px!important;
+  }
+  body:not(.auth-open) #view-home #home-team-stats-link strong {
+    font:700 .8125rem/1.5 Inter,system-ui,sans-serif!important;
+  }
+  body:not(.auth-open) #view-home #home-team-stats-link>span:last-child {
+    font-size:18px!important;
+    line-height:1!important;
+    color:var(--sh-copy)!important;
+  }
+  body:not(.auth-open) #view-home #home-team-stats-link small {
+    position:absolute;
+    width:1px;
+    height:1px;
+    overflow:hidden;
+    clip-path:inset(50%);
+  }
+  /* Staff Home572 places its open notices after season/stats. Parent527 keeps
+     Team updates before the family, so neither its order nor material changes. */
+  body:not(.auth-open):not(.role-parent) #home-club-notices>.panel-heading {
+    margin:0 0 12px!important;
+  }
+  body:not(.auth-open):not(.role-parent) #home-club-notices>.panel-heading .kicker {
+    position:absolute;
+    width:1px;
+    height:1px;
+    overflow:hidden;
+    clip-path:inset(50%);
+  }
+  body:not(.auth-open):not(.role-parent) #home-club-notices>.panel-heading h3 {
+    margin:0!important;
+    font:700 .75rem/1.5 Inter,system-ui,sans-serif!important;
+    color:var(--sh-copy)!important;
+    text-transform:uppercase;
+  }
+  body:not(.auth-open):not(.role-parent) #home-club-notices>.panel-heading h3::before {
+    content:"03";
+    margin-right:16px;
+  }
+  body:not(.auth-open):not(.role-parent) #home-club-notices .club-notice {
+    display:grid;
+    grid-template-columns:minmax(0,1fr) auto;
+    gap:10px;
+    padding:16px 0!important;
+    background:transparent!important;
+    border:0!important;
+    border-bottom:1px solid var(--sh-line)!important;
+    border-radius:0!important;
+    box-shadow:none!important;
+    color:var(--sh-copy)!important;
+  }
+  body:not(.auth-open):not(.role-parent) #home-club-notices .club-notice-head {
+    display:contents!important;
+  }
+  body:not(.auth-open):not(.role-parent) #home-club-notices .club-notice-head>div {
+    grid-area:1 / 1 / 2 / -1;
+  }
+  body:not(.auth-open):not(.role-parent) #home-club-notices .club-notice-head strong {
+    font:600 1rem/1.4 Inter,system-ui,sans-serif!important;
+  }
+  body:not(.auth-open):not(.role-parent) #home-club-notices .club-notice>p {
+    grid-area:2 / 1 / 3 / -1;
+    margin:0!important;
+    font:400 .8125rem/1.5 Inter,system-ui,sans-serif!important;
+    color:var(--sh-muted)!important;
+  }
+  body:not(.auth-open):not(.role-parent) #home-club-notices .club-notice>time {
+    grid-area:3 / 1;
+    align-self:center;
+  }
+  body:not(.auth-open):not(.role-parent) #home-club-notices .club-notice-head>:is(button,small) {
+    grid-area:3 / 2;
+    align-self:center;
+    font-size:.75rem!important;
+  }
+  body:not(.auth-open):not(.role-parent) #home-club-notices .club-notice-head>button {
+    min-height:44px!important;
+    font-weight:700!important;
+    color:var(--sh-copy)!important;
+  }
+  body:not(.auth-open).view-home #club-page-watermark {
+    display:none!important;
+  }
+  @media(max-width:900px) {
+    body:not(.auth-open):not(.role-parent) #view-home.active {
+      display:flex!important;
+      flex-direction:column;
+    }
+    body:not(.auth-open):not(.role-parent) #view-home>#home-club-notices {
+      order:1;
+    }
   }
 
   /* Dialogs sit outside .content. Match details use the same raised and inset

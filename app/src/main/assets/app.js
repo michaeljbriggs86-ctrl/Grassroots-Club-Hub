@@ -8021,12 +8021,36 @@ function removeOpponentKitRowsV13(root=document) {
   for (const node of root.querySelectorAll(selectors.join(","))) node.remove();
 }
 
+// Original compact Home preview: Figma 519:10354 / 572:10407. The canonical
+// fixture model still owns selection, timing and Cup order; only this preview
+// uses the club/opponent hierarchy. Dialogs retain their full versus rows.
+function renderHomeFixturePreview(f,model){
+  const host=document.getElementById('next-match-home-teams'),date=document.getElementById('next-match-home-date'),meta=document.getElementById('home-fixture-meta');
+  if(!host||!date||!meta)return; // Older cached HTML keeps its canonical preview.
+  if(!f){
+    setStableHtml(host,'<div class="home-fixture-empty">Fixture TBC</div>');
+    date.textContent='Date TBC';date.removeAttribute('datetime');date.removeAttribute('aria-label');meta.textContent='Kick-off TBC';return;
+  }
+  const data=canonicalCardRowData(f),own=matchTeamLabel(ownTeamDisplayName()),venue=v=>({H:'Home',A:'Away',N:'Neutral'}[String(v||'').toUpperCase()]||'Venue TBC');
+  const rows=data.rows.map(row=>{
+    const away=String(row.fixture.venue||'').toUpperCase()==='A',opponent=away?row.home:row.away;
+    const label=data.group?`<span class="home-fixture-game-label">${esc(row.label)} · ${esc(venue(row.fixture.venue))}</span>`:'';
+    return `<div class="home-fixture-row">${label}<div class="home-fixture-own"><span class="home-fixture-badge">${clubIdentityBadgeHtml(own)}</span><span class="home-fixture-copy"><strong>${esc(own)}</strong><span class="home-fixture-opponent">v ${esc(opponent)}</span></span></div></div>`;
+  }).join('');
+  setStableHtml(host,rows);
+  date.textContent=f.date?new Intl.DateTimeFormat('en-GB',{day:'numeric',month:'short'}).format(new Date(f.date+'T12:00:00')):'Date TBC';
+  if(f.date){date.setAttribute('datetime',f.date);date.setAttribute('aria-label',formatDate(f.date));}else{date.removeAttribute('datetime');date.removeAttribute('aria-label');}
+  const venues=[...new Set(data.rows.map(row=>venue(row.fixture.venue)))],location=data.group?(venues.length===1?venues[0]:''):venue(f.venue);
+  meta.textContent=[location,model.group?(model.time?'Group starts '+model.time:'Group start TBC'):(model.time?'Kick-off '+model.time:'Kick-off TBC')].filter(Boolean).join(' · ');
+}
+
 function applyCanonicalRecoveryV13(prefix, f) {
   const matchesCard=prefix==="matches-next"?document.getElementById("matches-next-fixture"):null;
   const dashboardHost=prefix==="next-match"?document.getElementById("next-match-home-teams"):null;
   if(!f){
     matchesCard?.classList.remove("canonical-v14-cup-group");
     dashboardHost?.classList.remove("canonical-v14-dashboard-host");
+    if(prefix==="next-match"&&document.getElementById('home-fixture-meta'))renderHomeFixturePreview(null);
     if(prefix==="matches-next"){
       const map=document.getElementById("matches-next-map");
       if(map){map.classList.add("hidden");map.removeAttribute("href");}
@@ -8053,6 +8077,7 @@ function applyCanonicalRecoveryV13(prefix, f) {
     if(typeof setMapPreview==="function"){const embedHref=hasVenue&&typeof mapsEmbedHref==="function"?mapsEmbedHref(d.ground,d.address):"";setMapPreview(prefix+"-map-preview",prefix+"-map-frame",embedHref);}
   }
   const cleanupRoots=containers.length?containers:(matchesCard?[matchesCard]:[document]);for(const root of cleanupRoots)removeOpponentKitRowsV13(root);
+  if(prefix==="next-match"&&document.getElementById('home-fixture-meta'))renderHomeFixturePreview(f,d);
 }
 
 function canonicalRecoveryNextEventV13() {
