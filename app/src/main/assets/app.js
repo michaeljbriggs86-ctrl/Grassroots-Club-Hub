@@ -2138,10 +2138,10 @@ function matchdayShareFixture(f){
   return {fixture:selected||f,group,confirmed:!!selected&&fixtureDetailsConfirmed(selected),details:selected?resolvedFixture(selected):{}};
 }
 function matchdayShareCaption(f={},d={},names={},ctx={}){
-  const arrival=matchdayArrivalTime(d.time),choice=fixtureKitChoice(f),kit=kitColourDisplayText(ctx.ownProfile?.[choice]||ctx.ownProfile?.home||'TBC'),map=mapsShareHref(d.groundName,d.address);
+  const arrival=matchdayArrivalTime(d.time)||'Unconfirmed',choice=fixtureKitChoice(f),kit=kitColourDisplayText(ctx.ownProfile?.[choice]||ctx.ownProfile?.home||'TBC'),map=mapsShareHref(d.groundName,d.address);
   const group=typeof miniCupGroup==='function'?miniCupGroup(f):null;
   const games=group?group.fixtures.map(row=>{const n=homeFixtureTeamNames(row);return `${n.home} v ${n.away}`;}):[`${names.home||'Home'} v ${names.away||'Away'}`];
-  const lines=[...(group?[fixtureCompetitionLabel(f)]:[]),...games,shareDateText(f.date),`${group?'Group start':'Kick-off'}: ${d.time}`,`Arrival: ${arrival}`,`Venue: ${d.groundName}`,d.address||'',`Our kit: ${choice==='away'?'Away':'Home'} - ${kit}`];
+  const lines=[...(group?[fixtureCompetitionLabel(f)]:[]),...games,shareDateText(f.date),`${group?'Group start':'Kick-off'}: ${d.time||'Unconfirmed'}`,`Arrival: ${arrival}`,`Venue: ${d.groundName||'Unconfirmed'}`,d.address||'',`Our kit: ${choice==='away'?'Away':'Home'} - ${kit}`];
   if(map)lines.push(`Maps: ${map}`);
   return lines.filter(Boolean).join('\n');
 }
@@ -2293,12 +2293,16 @@ async function openMatchdayWebShare(data){
     toast('Could not open share options. Please try again');
   }finally{matchdayWebShareBusy=false;}
 }
-async function shareNextMatchImage(){
+async function shareNextMatchImage(manualMatch=null){
   let ownsPreparation=false;
   try{
   if(!canConfirmFixtureDetails()){pendingMatchdayWebShare=null;return toast('Coach access is required');}
-  const f=nextPublishedFixture();if(!f){pendingMatchdayWebShare=null;return toast('No fixture available');}const {fixture,group,confirmed,details:d}=matchdayShareFixture(f);if(!confirmed||!matchdayArrivalTime(d.time)||!d.groundName||!d.address){pendingMatchdayWebShare=null;toast(group?'Confirm group start time, venue and kit before sharing matchday info':'Confirm kick-off, venue and kit before sharing matchday info');document.getElementById('next-match-confirm-time')?.focus();return;}
-  const ctx=fixtureOverviewContext(d),names=homeFixtureTeamNames(fixture),arrival=matchdayArrivalTime(d.time),caption=matchdayShareCaption(fixture,d,names,ctx);
+  const isManual=!!manualMatch&&typeof manualMatch==='object';
+  const f=isManual?manualMatch:nextPublishedFixture();if(!f){pendingMatchdayWebShare=null;return toast('No fixture available');}
+  const selection=isManual?{fixture:f,group:null,confirmed:true,details:{...f,time:f.time||'',groundName:f.groundName||'',address:f.address||''}}:matchdayShareFixture(f);
+  const {fixture,group,confirmed}=selection,d=selection.details;
+  if(!isManual&&(!confirmed||!matchdayArrivalTime(d.time)||!d.groundName||!d.address)){pendingMatchdayWebShare=null;toast(group?'Confirm group start time, venue and kit before sharing matchday info':'Confirm kick-off, venue and kit before sharing matchday info');document.getElementById('next-match-confirm-time')?.focus();return;}
+  const ctx=fixtureOverviewContext(d),names=homeFixtureTeamNames(fixture),arrival=matchdayArrivalTime(d.time)||'Unconfirmed',caption=matchdayShareCaption(fixture,d,names,ctx);
   const theme=document.documentElement?.dataset?.theme||'dark';
   const shareKey=JSON.stringify([theme,caption,(group?group.fixtures:[fixture]).map(row=>{const n=homeFixtureTeamNames(row);return typeof verifiedTeamBadgeUrl==='function'?[verifiedTeamBadgeUrl(n.home),verifiedTeamBadgeUrl(n.away)]:[];})]);
   if(matchdayWebShareBusy)return toast('Share options are already open');
@@ -4574,6 +4578,7 @@ function saveClubKitProfile(){
 function configureMatchDetailActions(m){
   const coach=!!m&&isCoach(),played=!!m&&isPlayedMatch(m);
   const edit=document.getElementById('edit-match-detail'),remove=document.getElementById('delete-match-detail'),report=document.getElementById('play-match-detail');
+  const share=document.getElementById('share-match-detail');if(share){share.classList.toggle('hidden',!coach||played);share.dataset.shareMatch=coach&&!played?m.id:'';}
   const canEdit=coach&&(!played||(!isLeagueMatch(m)&&!isDivisionMatch(m)));
   if(edit){edit.classList.toggle('hidden',!canEdit);edit.textContent=played?'Edit result':'Edit fixture';edit.dataset.editMatch=canEdit?m.id:'';}
   const canRemove=coach&&!isProviderOwnedMatch(m);
@@ -7351,8 +7356,9 @@ document.getElementById('matches-next-details')?.addEventListener('click',openNe
 document.getElementById('next-match-ground-select')?.addEventListener('change',syncFixtureGroundEditor);
 document.getElementById('fixture-confirm-details')?.addEventListener('click',saveFixtureConfirmation);
 document.getElementById('next-match-edit')?.addEventListener('click',()=>{const f=nextPublishedFixture();if(!f||!canConfirmFixtureDetails()||!fixtureDetailsConfirmed(f))return;__fixtureEditingKey=fixtureKitSelectionKey(f);renderFixtureConfirmationEditor(f);document.getElementById('next-match-edit')?.classList.add('hidden');document.getElementById('next-match-confirm-time')?.focus();});
-document.getElementById('next-match-share')?.addEventListener('click',shareNextMatchImage);
-document.getElementById('matches-next-share')?.addEventListener('click',shareNextMatchImage);
+document.getElementById('next-match-share')?.addEventListener('click',()=>shareNextMatchImage());
+document.getElementById('share-match-detail')?.addEventListener('click',()=>{const id=document.getElementById('share-match-detail')?.dataset.shareMatch;const match=(state.matches||[]).find(row=>row.id===id);if(match&&isCoach()&&!isPlayedMatch(match))shareNextMatchImage(match);});
+document.getElementById('matches-next-share')?.addEventListener('click',()=>shareNextMatchImage());
 bindAdminFixtureWeekendNavigation();
 document.getElementById('admin-fixtures-age')?.addEventListener('change',event=>{__adminFixtureAge=event.target.value||'all';__adminFixtureCategory='';__adminFixtureDay='';renderAdminFixtures();syncNavigationUrl();});
 document.getElementById('admin-fixtures-share')?.addEventListener('click',()=>openAdminWeekendShare(__adminFixtureWeekend));
