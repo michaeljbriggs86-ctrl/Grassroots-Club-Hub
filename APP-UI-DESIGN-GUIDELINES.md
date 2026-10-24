@@ -466,3 +466,27 @@ Following installed-device review of v2.2.5, Mike rejected the remaining blank h
 
 **2026-09-19 - Version 1.0**
 Mike designated the app-wide green/white, realistic-football, responsive design shown in the approved visual references as the exact basis for Grassroots Club Hub moving forward. No deviations or exceptions are permitted without explicit discussion and agreement.
+
+---
+
+## October 2026 adopted UI reconciliation — 2026-10-24
+
+**Authority:** Mike approved the 2026-10-23 targeted guideline rewrite on 2026-10-24. This section takes precedence over older September mock-up, transition and component wording **where it addresses the same subject**, without changing privacy, accessibility, exact-file badge rights, or platform trademark restrictions.
+
+### Figma scope, identity and design precedence
+PitchKind remains the platform identity. The signed-in Shooters Hill AFC club experience uses the approved unchanged club crest and club name. Do not indiscriminately replace club identity with the platform logo. Legacy internal identifiers do not imply approval for a technical rename. Historical September app-wide/auth screenshots are not blanket acceptance criteria for the October website.
+
+For a screen, use the expressly approved screen-specific Figma node and later shared-component nodes **only for the component they replace**. Never invent a new Figma board to justify a mismatched implementation. Architecture controls access/data; UI rules cannot override safeguarding or the U7–U11 public-score boundary.
+
+- Original Home composition: https://www.figma.com/design/NY8QhcuOWiEcD0pKDTsbP8?node-id=519-10267 ; later compact Home: node 572:10377. Home next-fixture is one compact raised card with a single own-team crest and stacked primary/opponent typography, not the Matches lead scene. The closed Season-record summary is open and unboxed; expanded contents remain a bounded adaptation because original Figma does not specify them.
+- Matches lead composition: https://www.figma.com/design/NY8QhcuOWiEcD0pKDTsbP8?node-id=592-10773 . Its field, raised crests, match/date and venue layout is distinct from Home. Preserve Cup group order, home/away/neutral accuracy, fixture chronology, manual-friendly venue/kick-off editing and explicit unconfirmed timing where appropriate.
+- Shared header: https://www.figma.com/design/NY8QhcuOWiEcD0pKDTsbP8?node-id=576-10655 . Standard top-right buttons are 44px; role/profile switch 96px wide; ordinary crest/identity region 92px, narrow <=374px variant 72px with actions reflowing as necessary. Do not clip long names.
+- Shared bottom navigation: https://www.figma.com/design/NY8QhcuOWiEcD0pKDTsbP8?node-id=546-10288 . Ordinary dock 66px, 4px padding, equal 58px targets and 11px Inter labels; approved 320px five-destination exception 82px dock, 66px targets, 8px padding, 10px labels. Maintain per-role destinations and accessible safe areas.
+- Player/coach profiles: approved compressed pitch/shirt composition with larger original shirt assets, unboxed name/number overlap and shirt fading *behind* an opaque lower information/statistics foreground. Do not reveal sky/grass at the shirt hem or alter badges/kit art.
+- Shared controls, matching types of result rows, forms, dropdowns, overlays, responsive breakpoints, dark/light materials and desktop layout must be consistent by component purpose; **not every card is the same layout**. Avoid legacy native selects, nested-card clutter and mobile-width desktop columns.
+
+### Release and acceptance
+Compare the identified approved Figma screen, exact built assets, live served revision and role-specific authenticated behaviour. Source tests, static CSS readback, synthetic route QA, producer review and independent Claude acceptance are distinct claims. A deploy is not automatically an authenticated feature acceptance. Maintain all original imagery, contrast, privacy and touch-target requirements.
+
+The 2026-09-19 references remain historical. This amendment is adopted design direction, **not** evidence that each affected screen has been accepted in production.
+
