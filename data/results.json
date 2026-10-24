@@ -1,9 +1,9 @@
 {
   "schema_version": 2,
   "provider": "Selkent",
-  "last_updated": "2026-10-24T09:59:16.096812+00:00",
-  "cup_results_last_updated": "2026-10-24T09:59:16.096812+00:00",
-  "cup_results_last_attempted": "2026-10-24T09:59:16.096812+00:00",
+  "last_updated": "2026-10-24T15:03:39.138696+00:00",
+  "cup_results_last_updated": "2026-10-24T15:03:39.138696+00:00",
+  "cup_results_last_attempted": "2026-10-24T15:03:39.138696+00:00",
   "cup_results_status": "verified_current",
   "fixture_agegroup_discovery_source": "selkent_divisions_all",
   "coverage": {
@@ -9804,7 +9804,7 @@
         },
         {
           "division_name": "Under 12A Silver",
-          "updated_at_text": "18/10/26 13:43:38",
+          "updated_at_text": "24/10/26 14:57:35",
           "source_order_authoritative_for_ties": false,
           "source_disclaimer": "Note: Table does not yet take account of rules for determining winner if teams on equal points",
           "rows": [
@@ -25621,7 +25621,7 @@
         },
         {
           "division_name": "Under 16C Silver",
-          "updated_at_text": "18/10/26 11:50:57",
+          "updated_at_text": "24/10/26 14:14:02",
           "source_order_authoritative_for_ties": false,
           "source_disclaimer": "Note: Table does not yet take account of rules for determining winner if teams on equal points",
           "rows": [
@@ -28361,7 +28361,7 @@
         },
         {
           "division_name": "Senior Division Two",
-          "updated_at_text": "18/10/26 17:21:54",
+          "updated_at_text": "24/10/26 12:30:12",
           "source_order_authoritative_for_ties": false,
           "source_disclaimer": "Note: Table does not yet take account of rules for determining winner if teams on equal points",
           "rows": [
@@ -28419,6 +28419,19 @@
             },
             {
               "row_order": 5,
+              "provider_team_id": 904,
+              "provider_division_id": 4296,
+              "team_name": "Vikings FC",
+              "played": 4,
+              "won": 2,
+              "drawn": 1,
+              "lost": 1,
+              "gf": 8,
+              "ga": 12,
+              "points": 5
+            },
+            {
+              "row_order": 6,
               "provider_team_id": 1009,
               "provider_division_id": 4296,
               "team_name": "Istead United Colts",
@@ -28431,7 +28444,7 @@
               "points": 4
             },
             {
-              "row_order": 6,
+              "row_order": 7,
               "provider_team_id": 2055,
               "provider_division_id": 4296,
               "team_name": "Bridon Ropes",
@@ -28441,19 +28454,6 @@
               "lost": 2,
               "gf": 15,
               "ga": 14,
-              "points": 3
-            },
-            {
-              "row_order": 7,
-              "provider_team_id": 904,
-              "provider_division_id": 4296,
-              "team_name": "Vikings FC",
-              "played": 3,
-              "won": 1,
-              "drawn": 1,
-              "lost": 1,
-              "gf": 8,
-              "ga": 12,
               "points": 3
             },
             {
@@ -28487,10 +28487,10 @@
               "provider_team_id": 370,
               "provider_division_id": 4296,
               "team_name": "Junior Reds Titans",
-              "played": 2,
+              "played": 3,
               "won": 0,
               "drawn": 0,
-              "lost": 2,
+              "lost": 3,
               "gf": 1,
               "ga": 10,
               "points": 0
