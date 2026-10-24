@@ -311,6 +311,18 @@ html body #view-home .home-scene-shirt .graphic-shirt-art{object-position:center
 html body #view-home .home-scene-shirt .graphic-shirt-initials{font-size:1.125rem}
 html body #view-home .home-scene-shirt .graphic-shirt-number{font-size:3.5rem;transform:none}
 
+/* Coach shirt follows the profile foreground: cover the hem and pitch
+   together, keeping the native dashboard copy above the fade. */
+html body #view-home>.home-scene:has(.graphic-shirt.coach){isolation:isolate}
+html body #view-home>.home-scene:has(.graphic-shirt.coach) .home-scene-shirt{
+  -webkit-mask-image:none;mask-image:none;
+}
+html body #view-home>.home-scene:has(.graphic-shirt.coach)::after{
+  content:"";position:absolute;z-index:1;inset:auto 0 0;height:32px;pointer-events:none;
+  background:linear-gradient(180deg,transparent,var(--sh-canvas) 24px);
+}
+html body #view-home>.home-scene:has(.graphic-shirt.coach) .home-scene-copy{z-index:2}
+
 html body #view-person .graphic-profile-hero{
   display:grid;grid-template-columns:minmax(0,1fr) clamp(160px,50vw,204px);grid-template-rows:auto;min-height:0;
   align-items:start;gap:0;padding:0;overflow:visible;
