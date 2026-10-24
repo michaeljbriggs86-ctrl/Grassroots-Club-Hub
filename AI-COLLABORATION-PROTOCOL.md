@@ -331,3 +331,18 @@ custom instruction; the protocol cannot enforce it.
   never re-typed (entry 22). Approved by Mike. Adoption by ChatGPT not
   yet confirmed. Superseded copy archived as
   `SUPERSEDED - AI-COLLABORATION-PROTOCOL_2026-09-20-early.md`.
+
+---
+
+## October 2026 adopted workflow clarification — 2026-10-24
+
+Mike approved the targeted governing-guidelines rewrite on 2026-10-24. This clarification preserves the original Section 10 immutable log protocol, independent verification requirement, status vocabulary and safeguarding gates.
+
+The 2026-10-22 standing authorisation means requested in-scope Shooters Hill AFC/PitchKind app fixes may be reviewed against current Figma, tested, committed and pushed to main and deployed without another per-commit approval request. It does **not** authorise unrelated scope expansion, new child-data access, unlicensed badge use, new product direction or bypassing a real tool/security block.
+
+Document authority is deliberately divided: ARCHITECTURE.md controls implementation/data authority and roles; APP-UI-DESIGN-GUIDELINES.md controls app-visible design and interaction; BRAND-GUIDELINES.md extends brand/imagery rules across public and external platforms; this protocol controls change, evidence and handoff. Prefer cross-references rather than inconsistent full-length duplicate rules.
+
+Always distinguish (1) written source, (2) isolated tests, (3) inspected built artifact, (4) actual live serving, (5) authenticated user-flow acceptance and (6) independent Claude review. Producer QA cannot be called independent acceptance. Date each claim and preserve known test failures.
+
+Create new entries only in `97 - LOG INBOX`, named `LOG-ENTRY_YYYY-MM-DD_HHMM_chatgpt_<slug>.md` using real Europe/London time; never modify the master AI-HANDOFF-LOG.md, its frozen history or any existing entry. Before relying on the log, read the master by name/folder and every unprocessed inbox item. Stop if two canonical AI-HANDOFF-LOG.md files are found.
+
