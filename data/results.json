@@ -1,9 +1,9 @@
 {
   "schema_version": 2,
   "provider": "Selkent",
-  "last_updated": "2026-10-24T02:23:38.340229+00:00",
-  "cup_results_last_updated": "2026-10-24T02:23:38.340229+00:00",
-  "cup_results_last_attempted": "2026-10-24T02:23:38.340229+00:00",
+  "last_updated": "2026-10-24T09:59:16.096812+00:00",
+  "cup_results_last_updated": "2026-10-24T09:59:16.096812+00:00",
+  "cup_results_last_attempted": "2026-10-24T09:59:16.096812+00:00",
   "cup_results_status": "verified_current",
   "fixture_agegroup_discovery_source": "selkent_divisions_all",
   "coverage": {
@@ -10095,7 +10095,7 @@
         },
         {
           "division_name": "Under 12B Orange",
-          "updated_at_text": "18/10/26 14:31:58",
+          "updated_at_text": "24/10/26 10:11:18",
           "source_order_authoritative_for_ties": false,
           "source_disclaimer": "Note: Table does not yet take account of rules for determining winner if teams on equal points",
           "rows": [
@@ -10114,6 +10114,19 @@
             },
             {
               "row_order": 2,
+              "provider_team_id": 609,
+              "provider_division_id": 4252,
+              "team_name": "Cray Wanderers Wolves",
+              "played": 3,
+              "won": 2,
+              "drawn": 0,
+              "lost": 1,
+              "gf": 15,
+              "ga": 3,
+              "points": 4
+            },
+            {
+              "row_order": 3,
               "provider_team_id": 481,
               "provider_division_id": 4252,
               "team_name": "Erith & Belvedere Selkent",
@@ -10126,7 +10139,7 @@
               "points": 4
             },
             {
-              "row_order": 3,
+              "row_order": 4,
               "provider_team_id": 750,
               "provider_division_id": 4252,
               "team_name": "Teviot Rangers Gold",
@@ -10139,7 +10152,7 @@
               "points": 4
             },
             {
-              "row_order": 4,
+              "row_order": 5,
               "provider_team_id": 556,
               "provider_division_id": 4252,
               "team_name": "Vikings FC Red",
@@ -10152,7 +10165,7 @@
               "points": 4
             },
             {
-              "row_order": 5,
+              "row_order": 6,
               "provider_team_id": 252,
               "provider_division_id": 4252,
               "team_name": "AFC Lewisham Blue",
@@ -10162,19 +10175,6 @@
               "lost": 2,
               "gf": 5,
               "ga": 8,
-              "points": 2
-            },
-            {
-              "row_order": 6,
-              "provider_team_id": 609,
-              "provider_division_id": 4252,
-              "team_name": "Cray Wanderers Wolves",
-              "played": 2,
-              "won": 1,
-              "drawn": 0,
-              "lost": 1,
-              "gf": 4,
-              "ga": 2,
               "points": 2
             },
             {
@@ -10234,12 +10234,12 @@
               "provider_team_id": 695,
               "provider_division_id": 4252,
               "team_name": "Sutton Athletic Greens",
-              "played": 2,
+              "played": 3,
               "won": 0,
               "drawn": 0,
-              "lost": 2,
-              "gf": 0,
-              "ga": 13,
+              "lost": 3,
+              "gf": 1,
+              "ga": 24,
               "points": 0
             }
           ],
@@ -11786,6 +11786,15 @@
           "away": "Erith & Belvedere Selkent",
           "homeGoals": 2,
           "awayGoals": 3,
+          "provider_division_id": 4252,
+          "division_name": "Under 12B Orange"
+        },
+        {
+          "date": "2026-10-18",
+          "home": "Sutton Athletic Greens",
+          "away": "Cray Wanderers Wolves",
+          "homeGoals": 1,
+          "awayGoals": 11,
           "provider_division_id": 4252,
           "division_name": "Under 12B Orange"
         },
@@ -15379,7 +15388,7 @@
         },
         {
           "division_name": "Under 14 B Navy",
-          "updated_at_text": "18/10/26 15:10:23",
+          "updated_at_text": "24/10/26 08:50:23",
           "source_order_authoritative_for_ties": false,
           "source_disclaimer": "Note: Table does not yet take account of rules for determining winner if teams on equal points",
           "rows": [
@@ -15922,7 +15931,7 @@
         },
         {
           "division_name": "Under 14C Silver",
-          "updated_at_text": "18/10/26 16:54:15",
+          "updated_at_text": "24/10/26 10:32:11",
           "source_order_authoritative_for_ties": false,
           "source_disclaimer": "Note: Table does not yet take account of rules for determining winner if teams on equal points",
           "rows": [
@@ -15954,6 +15963,19 @@
             },
             {
               "row_order": 3,
+              "provider_team_id": 475,
+              "provider_division_id": 4277,
+              "team_name": "S.E. Eagles FC",
+              "played": 3,
+              "won": 1,
+              "drawn": 1,
+              "lost": 1,
+              "gf": 7,
+              "ga": 5,
+              "points": 3
+            },
+            {
+              "row_order": 4,
               "provider_team_id": 743,
               "provider_division_id": 4277,
               "team_name": "Teviot Rangers WHITE",
@@ -15966,7 +15988,7 @@
               "points": 3
             },
             {
-              "row_order": 4,
+              "row_order": 5,
               "provider_team_id": 705,
               "provider_division_id": 4277,
               "team_name": "The Bosco FC Dons",
@@ -15979,7 +16001,7 @@
               "points": 3
             },
             {
-              "row_order": 5,
+              "row_order": 6,
               "provider_team_id": 464,
               "provider_division_id": 4277,
               "team_name": "Athenlay FC",
@@ -15992,7 +16014,7 @@
               "points": 2
             },
             {
-              "row_order": 6,
+              "row_order": 7,
               "provider_team_id": 524,
               "provider_division_id": 4277,
               "team_name": "Dulwich Hamlet JFC",
@@ -16005,7 +16027,7 @@
               "points": 2
             },
             {
-              "row_order": 7,
+              "row_order": 8,
               "provider_team_id": 642,
               "provider_division_id": 4277,
               "team_name": "Hillyfielders Falcons",
@@ -16016,19 +16038,6 @@
               "gf": 2,
               "ga": 5,
               "points": 2
-            },
-            {
-              "row_order": 8,
-              "provider_team_id": 475,
-              "provider_division_id": 4277,
-              "team_name": "S.E. Eagles FC",
-              "played": 2,
-              "won": 0,
-              "drawn": 1,
-              "lost": 1,
-              "gf": 2,
-              "ga": 4,
-              "points": 1
             },
             {
               "row_order": 9,
@@ -16048,12 +16057,12 @@
               "provider_team_id": 1028,
               "provider_division_id": 4277,
               "team_name": "London Legends Blue",
-              "played": 1,
+              "played": 2,
               "won": 0,
               "drawn": 0,
-              "lost": 1,
-              "gf": 0,
-              "ga": 2,
+              "lost": 2,
+              "gf": 1,
+              "ga": 7,
               "points": 0
             }
           ],
@@ -17007,6 +17016,15 @@
           "away": "Athenlay FC",
           "homeGoals": 3,
           "awayGoals": 2,
+          "provider_division_id": 4277,
+          "division_name": "Under 14C Silver"
+        },
+        {
+          "date": "2026-10-18",
+          "home": "London Legends Blue",
+          "away": "S.E. Eagles FC",
+          "homeGoals": 1,
+          "awayGoals": 5,
           "provider_division_id": 4277,
           "division_name": "Under 14C Silver"
         },
