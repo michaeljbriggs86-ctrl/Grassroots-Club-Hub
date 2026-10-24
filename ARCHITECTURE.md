@@ -983,3 +983,18 @@ The governing UI standard advances to version 1.2 with marker `approved-app-ui-2
 v2.2.7 separates platform identity from club identity: product branding owns launcher/PWA icon, splash, authentication, club-creation onboarding, Settings/About and neutral fallback states; verified club badges remain authoritative on signed-in club/team surfaces. The source also removes generated-initials badge fallback and prevents club configuration from mutating the product splash.
 
 Source verification: **65/65 brand-system checks** plus JavaScript syntax checks. v2.2.7 remains **NOT BUILT / NOT INSPECTED** until an APK from the exact source archive is produced and directly inspected. No league, age-group, parser, backend or public-data source-of-truth scope changes were introduced.
+
+---
+
+## October 2026 adopted operational-context reconciliation — 2026-10-24
+
+**Status of this section:** approved documentation direction; individual release statuses must still be independently evidenced. This section supersedes earlier statements identifying test.pitchkind.com or September Android APK snapshots as the *current* Shooters Hill user-facing target.
+
+The current Shooters Hill AFC web application target is https://shootershillafc.app/. The former test.pitchkind.com protected pilot and Android v2.2.x states are dated historical observations. Do not promote current deployment, role acceptance or build status based only on a source commit, successful CI, served CSS or unauthenticated sign-in screen; record actual revision, runtime checks, date and remaining independent review separately.
+
+**Preserve Section 2 as the single source-of-truth register.** It continues to govern Selkent feeds, club identity, fixtures/results and private records. Before adding clubs, age groups, scraper/data types or pipelines, check the register for an existing authority. Preserve U7–U11 public-results and standings restrictions, private data access and badge provenance/rights boundaries.
+
+Current operational workflows requiring individually dated status/evidence (not a blanket LIVE claim) include: manual friendly fixture venue/kick-off and share, chronological Next Match and Cup handling; Admin/Coach/Assistant Coach/Parent roles and approval-based onboarding; Coach single Confirm, parent attending/unavailable and discreet Admin seen/outstanding notices; safeguarding documents/expiry tracking and scoped club contacts; shared Figma header, dock, Home, Matches, profiles and desktop layout. Payments, annual kit orders and moderated media remain separately scoped and must not be presented as deployed without artifact-level evidence.
+
+The 2026-10-23 Home restoration log records live asset readback and producer tests, **not authenticated role-route production acceptance or formal independent Claude acceptance**. Broader pre-existing share-helper and notification CSS assertion failures were recorded separately. Refresh CURRENT-STATUS-MANIFEST.md from verified current evidence before using it as a live release index; its 2026-10-01 pilot checkpoint is historical. Retain all previous counts as timestamped feed snapshots only.
+
