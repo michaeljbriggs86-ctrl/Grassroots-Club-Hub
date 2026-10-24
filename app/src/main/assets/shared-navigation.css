@@ -90,7 +90,9 @@
   @media (max-width:374px) {
     /* The explicit small five-destination component has larger touch cells. */
     body:not(.auth-open) #mobile-primary-nav:is(.has-table-tab,.has-onboarding-tab) {
-      gap:4px!important;
+      /* Leave room for Inter glyph rounding in the newer native browser;
+         keep the reviewed eight-pixel dock inset and ten-pixel labels. */
+      gap:3px!important;
       min-height:calc(82px + max(var(--android-inset-bottom,0px),env(safe-area-inset-bottom)))!important;
       padding:8px max(8px,env(safe-area-inset-right)) calc(8px + max(var(--android-inset-bottom,0px),env(safe-area-inset-bottom))) max(8px,env(safe-area-inset-left))!important;
     }

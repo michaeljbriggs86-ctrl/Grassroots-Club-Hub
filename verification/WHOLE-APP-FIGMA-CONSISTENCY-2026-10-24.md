@@ -43,3 +43,7 @@ Existing native Home66, Matches42, More30 and shared-component checks pass. Stan
 A separate `Shared Figma consistency matrix` CI workflow runs these current native guards independently of the existing UI job, which still stops on four known share source-extraction assertions. The existing notification checker also compares backgroundColor despite gradient surfaces. Do not claim every repository workflow is green.
 
 These are local actual-build supporting checks. Production static files and deployment revision must be checked separately. The live sign-in page rejected the supplied credentials, so authenticated production role verification remains unavailable; formal independent Claude acceptance remains open. A known standalone long unbroken heading clipping limitation is not described as fixed. No whole-app exact-pixel or backend-security acceptance is claimed.
+
+## Final visual and browser follow-up
+
+Staff request review keeps its native Back action below the decision area, so its title/kicker need the same protected white photo treatment as other top-of-field headings. A focused both-theme/phone/200% review closes that contrast issue. Newer Chromium CI also found a fractional-width Onboarding label wrap at320px. The five-destination dock gap is3px (previously4), retaining its8px inset,10px labels and66px targets. Native single-line/within-cell legend guards retain that browser fix. Cache revision20261024b ships the follow-up together.

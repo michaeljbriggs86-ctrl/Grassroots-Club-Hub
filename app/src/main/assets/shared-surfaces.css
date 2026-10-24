@@ -759,6 +759,12 @@
     color:#fff!important;
     text-shadow:0 2px 4px rgba(0,0,0,.85)!important;
   }
+  /* This linked review keeps its native Back action below the decision area,
+     so its heading also sits over the field rather than below a top back row. */
+  body:not(.auth-open) #view-staff-request-review > .section-title-row :is(h2,.kicker) {
+    color:#fff!important;
+    text-shadow:0 2px 4px rgba(0,0,0,.85)!important;
+  }
   /* The content shell already owns the phone gutters. Avoid a second20px
      inset around the native match form; its reviewed720px desktop cap stays. */
   body:not(.auth-open) #view-add { padding:0!important; }

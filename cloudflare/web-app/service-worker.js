@@ -1,6 +1,6 @@
 // Browser pilot: cache reviewed same-origin application files only.
 // Never intercept Supabase responses, Selkent feeds, or private API calls.
-const CACHE = 'pitchkind-web-shared-figma-20261024';
+const CACHE = 'pitchkind-web-shared-figma-20261024b';
 const STATIC = [
   './', './index.html', './manifest.json', './cloud-config.js', './cloud.js',
   './onboarding.js', './onboarding.css', './app.js','./kickoff-updates.js','./coach-qualifications.js','./member-contact-import.js','./person-profiles.js', './registration-conduct.js', './player-onboarding.js', './coach-onboarding.js', './static-feed-overlay.js',
