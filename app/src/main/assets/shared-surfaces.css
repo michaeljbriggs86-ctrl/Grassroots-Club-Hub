@@ -624,6 +624,11 @@
 
   /* Dialogs sit outside .content. Match details use the same raised and inset
      materials, while the photographic upcoming-fixture header stays open. */
+  body:not(.auth-open) dialog.modal:not(:where(#match-detail-dialog.report-wizard-mode)) {
+    /* Avoid the browser's em-based dialog maximum reducing the available
+       width as text grows. Existing per-dialog width caps remain intact. */
+    max-width:calc(100vw - 24px)!important;
+  }
   body:not(.auth-open) dialog.modal {
     background:var(--sh-panel)!important;
     color:var(--sh-copy)!important;
@@ -706,5 +711,90 @@
   }
   body:not(.auth-open) .admin-team-card.active-team {
     border-color:var(--gch-control-focus)!important;
+  }
+}
+
+/* Whole-app family reconciliation, 24 October 2026.
+   Review: 97 / 1QzCN4dVbqG2EGKD5doaUCQJYhEQoT6Q2.
+   Current shared546 materials and titles complement the existing reviewed
+   workflows; photographic scenes and their explicit typography stay separate. */
+@layer club-shared {
+  /* A flex basis meant for horizontal headers became a tall blank item when
+     an older mobile form changed its header to a column. Reset the item basis,
+     and allow title/actions to wrap in their existing native order. */
+  body:not(.auth-open) .view:not(:is(#view-home,#view-squad,#view-person,#view-club)) > .section-title-row {
+    display:flex!important;
+    flex-direction:row!important;
+    flex-wrap:wrap!important;
+    align-items:center!important;
+    gap:12px 16px!important;
+    min-height:0!important;
+    margin-bottom:20px!important;
+  }
+  body:not(.auth-open) .view > .section-title-row > div,
+  body:not(.auth-open) .view .panel-heading > div {
+    flex:1 1 auto!important;
+    min-width:0!important;
+    min-height:0!important;
+    height:auto!important;
+  }
+  /* More/Appearance/Notifications use reviewed Inter30 page headings. Apply
+     that ordinary workspace family without replacing the distinct scene heads. */
+  body:not(.auth-open) .view:not(:is(#view-home,#view-matches,#view-squad,#view-person,#view-club)) > .section-title-row h2 {
+    margin:0!important;
+    font:700 1.875rem/1.2 Inter,system-ui,sans-serif!important;
+    letter-spacing:-.025em!important;
+    overflow-wrap:anywhere;
+  }
+  body:not(.auth-open) .view:not(:is(#view-home,#view-matches,#view-squad,#view-person,#view-club)) :is(.panel > h3,.panel > .panel-heading h3) {
+    margin:0!important;
+    font:700 1.5rem/1.4 var(--sh-display)!important;
+    letter-spacing:normal!important;
+    color:var(--sh-copy)!important;
+    overflow-wrap:anywhere;
+  }
+  /* Primary-page titles sit over the protected field image in both themes.
+     Linked pages start below the back control on the ordinary canvas. */
+  body:not(.auth-open) .view:not(.linked-page):not(:is(#view-home,#view-squad,#view-person,#view-club)) > .section-title-row :is(h2,.kicker) {
+    color:#fff!important;
+    text-shadow:0 2px 4px rgba(0,0,0,.85)!important;
+  }
+  /* The content shell already owns the phone gutters. Avoid a second20px
+     inset around the native match form; its reviewed720px desktop cap stays. */
+  body:not(.auth-open) #view-add { padding:0!important; }
+  body:not(.auth-open) #view-more .more-tool-group > h3 {
+    font:700 1.5rem/1.4 var(--sh-display)!important;
+    color:var(--sh-copy)!important;
+    letter-spacing:normal!important;
+  }
+  body:not(.auth-open) #view-squad .squad-view-tab {
+    min-height:44px!important;
+  }
+
+  /* Retained native interior families use the reviewed inset material rather
+     than unrelated old flat cards. Priority/error/status variants keep theirs. */
+  body:not(.auth-open) :where(
+    .onboarding-review,
+    .onboarding-metrics > div,
+    .onboarding-progress,
+    .archive-summary,
+    #coach-qualification-editor
+  ) {
+    background:var(--sh-action)!important;
+    color:var(--sh-copy)!important;
+    border:1px solid var(--sh-line)!important;
+    border-radius:10px!important;
+    box-shadow:var(--sh-inset-shadow)!important;
+  }
+  body:not(.auth-open) :is(.onboarding-review,.onboarding-metrics,.onboarding-progress) :is(p,small) {
+    color:var(--sh-muted)!important;
+    font-family:Inter,system-ui,sans-serif!important;
+    font-weight:400!important;
+    line-height:1.4!important;
+  }
+  /* The modal body and editor already own the qualification form gutters.
+     Remove the inherited .modal form padding rather than shrinking fields. */
+  body:not(.auth-open) #coach-qualification-form {
+    padding:0!important;
   }
 }

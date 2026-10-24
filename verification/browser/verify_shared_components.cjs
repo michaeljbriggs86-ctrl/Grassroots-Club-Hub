@@ -1,4 +1,6 @@
 // Shared presentation checks against built assets and real native routes.
+// Result families follow reviewed Figma546:10300/10341 full cards and
+// 546:10309/10350 comparison rows; primary actions548:10300/10305.
 // Fictional in-memory API data only; no authenticated or external services.
 // Run after cloudflare/web-app/build.py. External services are blocked.
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),http=require('node:http');
@@ -60,7 +62,17 @@ async function seedResults(page){
  await page.evaluate(()=>document.fonts.ready);
 }
 async function styles(page,selector){
- return page.locator(selector).first().evaluate(el=>{const s=getComputedStyle(el),r=el.getBoundingClientRect();return {selector:el.id||el.className,background:s.backgroundImage,color:s.color,radius:s.borderRadius,border:s.borderColor,shadow:s.boxShadow,font:s.fontFamily,fontSize:s.fontSize,appearance:s.appearance,customizableNativeSelect:CSS.supports('appearance','base-select'),width:r.width,height:r.height};});
+ return page.locator(selector).first().evaluate(el=>{const s=getComputedStyle(el),r=el.getBoundingClientRect();return {selector:el.id||el.className,background:s.backgroundImage,backgroundColor:s.backgroundColor,color:s.color,radius:s.borderRadius,border:s.borderColor,borderWidth:s.borderWidth,padding:s.padding,shadow:s.boxShadow,font:s.fontFamily,fontSize:s.fontSize,fontWeight:s.fontWeight,appearance:s.appearance,customizableNativeSelect:CSS.supports('appearance','base-select'),width:r.width,height:r.height};});
+}
+function assertPlainScore(score,font,size,weight,label){
+ assert(score.font.includes(font),label+' uses its reviewed family: '+JSON.stringify(score));
+ assert.equal(score.fontSize,size,label+' uses its reviewed size');
+ assert.equal(score.fontWeight,weight,label+' uses its reviewed weight');
+ assert.equal(score.background,'none',label+' has no score capsule image');
+ assert.equal(score.backgroundColor,'rgba(0, 0, 0, 0)',label+' has no score capsule fill');
+ assert.equal(score.borderWidth,'0px',label+' has no score capsule border');
+ assert.equal(score.radius,'0px',label+' has no score capsule corners');
+ assert.equal(score.padding,'0px',label+' has no score capsule padding');
 }
 async function capture(page,label,width,theme,measurements){
  const g=await page.evaluate(()=>({viewport:innerWidth,documentWidth:document.documentElement.scrollWidth}));
@@ -101,15 +113,16 @@ async function navigation(page,role,width,theme,expected){
    await capture(page,'coach-nav',width,theme,measurements);
    await navigation(page,'coach',width,theme,['Home','Matches','Table','Squad','More']);
    await page.evaluate(()=>navigate('matches',false));
-   const leadActions=await page.locator(':is(#matches-next-fixture,#matchday-dashboard) :is(.primary-button,.secondary-button):visible').evaluateAll(els=>els.map(el=>({label:el.textContent.trim(),primary:el.classList.contains('primary-button'),color:getComputedStyle(el).color,background:getComputedStyle(el).backgroundImage})));
+   const leadActions=await page.locator(':is(#matches-next-fixture,#matchday-dashboard) :is(.primary-button,.secondary-button):visible').evaluateAll(els=>els.map(el=>({label:el.textContent.trim(),primary:el.classList.contains('primary-button'),color:getComputedStyle(el).color,background:getComputedStyle(el).backgroundImage,backgroundColor:getComputedStyle(el).backgroundColor})));
    assert(leadActions.some(x=>x.primary)&&leadActions.some(x=>!x.primary),'render real primary and secondary actions in Matches lead cards');
-   for(const action of leadActions){if(action.primary){assert.equal(action.color,'rgb(255, 255, 255)','primary lead action uses readable white copy: '+action.label);const colours=[...action.background.matchAll(/rgba?\((\d+),\s*(\d+),\s*(\d+)/g)].map(m=>m.slice(1).map(Number));assert(action.background.includes('gradient')&&colours.length>=2&&colours.every(([r,g,b])=>g>r&&g>b),'primary lead action retains a green gradient: '+JSON.stringify(action));}else{assert.equal(action.color,theme==='light'?'rgb(17, 23, 21)':'rgb(255, 255, 255)','secondary lead action copy contrasts with its theme: '+action.label);assert(action.background.includes('gradient'),'secondary lead actions share raised material');}}
+   for(const action of leadActions){if(action.primary){assert.equal(action.color,'rgb(255, 255, 255)','primary lead action uses readable white copy: '+action.label);assert.equal(action.background,'none','primary lead action follows solid Figma548 material: '+action.label);assert.equal(action.backgroundColor,'rgb(11, 93, 53)','primary lead action uses approved #0b5d35: '+action.label);}else{assert.equal(action.color,theme==='light'?'rgb(17, 23, 21)':'rgb(255, 255, 255)','secondary lead action copy contrasts with its theme: '+action.label);assert(action.background.includes('gradient'),'secondary lead actions share raised material');}}
    assert.equal((await styles(page,'#matches-screen-title')).color,'rgb(255, 255, 255)','Matches title stays readable over field imagery in both themes');
    assert.equal(await page.locator('#league-match-list [data-details-match="shared-league"]').count(),1);
    assert.equal(await page.locator('#cup-games-body [data-details-match="shared-cup"]').count(),1);
    const scoreSelectors=['#league-match-list .competition-result-pill','#cup-games-body .competition-result-pill','#division-opponents .division-result-cell','#tournament-event-list .competition-result-pill'];
    const scores=[];for(const selector of scoreSelectors){assert(await page.locator(selector).first().isVisible(),selector+' rendered by existing route');scores.push(await styles(page,selector));}
-   assert(scores.every(s=>s.font.includes('Barlow Condensed')),'team/Cup/matrix scores share display type: '+JSON.stringify(scores));
+   for(const i of [0,1,3])assertPlainScore(scores[i],'Inter','14px','600','comparison score '+scoreSelectors[i]);
+   const matrix=scores[2];assert(matrix.font.includes('Barlow Condensed'),'interactive programme keeps its miniature display-score family');assert.equal(matrix.fontSize,'24px','interactive programme retains legible display size');assert(matrix.height>=44,'interactive programme retains its native44px target');assert.equal(matrix.radius,'10px','interactive programme retains separate button geometry');
    await page.locator('#cup-games-panel > summary').click();assert(!await page.locator('#cup-games-body').isVisible(),'native disclosure closes');
    await page.locator('#cup-games-panel > summary').click();assert(await page.locator('#cup-games-body').isVisible(),'native disclosure reopens');
    await page.locator('#league-match-list').scrollIntoViewIfNeeded();await capture(page,'team-results',width,theme,measurements);
@@ -128,14 +141,14 @@ async function navigation(page,role,width,theme,expected){
    const directory=await styles(page,'#team-members-list .admin-directory-row');assert.equal(directory.radius,'10px','directory rows share inset geometry');assert(directory.background.includes('gradient'),'directory retains material depth');await capture(page,'team-access',width,theme,measurements);
    await page.evaluate(()=>navigate('season-history',false));await page.waitForFunction(()=>document.querySelector('#open-season-archive').disabled===false);
    await page.locator('#open-season-archive').click();await page.locator('#season-archive-dialog').waitFor({state:'visible'});
-   const archive=await styles(page,'.archive-match-row b');assert(archive.font.includes('Barlow Condensed'),'archive scores use shared score typography');
+   const archive=await styles(page,'.archive-match-row b');assertPlainScore(archive,'Inter','14px','600','read-only archive comparison score');
    await capture(page,'archive',width,theme,measurements);await page.locator('#season-archive-dialog [data-close-dialog]').first().click();
    await page.evaluate(async()=>{navigate('club-results',false);await refreshClubResults(false);__clubResultsWeekend=adminFixtureWeekendKey('2026-10-18');__clubResultsAge='all';__clubResultsCompetition='all';renderClubResultsBrowser();});
    await page.locator('.club-result-card').first().waitFor({state:'visible'});
-   const club=await styles(page,'.club-result-card'),clubScore=await styles(page,'.club-result-card .club-card-score');assert(club.background.includes('gradient'),'club results use raised shared material');assert.equal(club.radius,'16px');assert(clubScore.font.includes('Barlow Condensed'));
+   const club=await styles(page,'.club-result-card'),clubScore=await styles(page,'.club-result-card .club-card-score');assert(club.background.includes('gradient'),'club results use raised shared material');assert.equal(club.radius,'16px');assertPlainScore(clubScore,'Barlow Condensed','30px','700','full club result score');
    await capture(page,'club-results',width,theme,measurements);
-   await page.locator('.club-result-card button[data-club-result-detail]').first().click();await page.locator('#club-match-summary-dialog').waitFor({state:'visible'});await capture(page,'result-summary',width,theme,measurements);await page.locator('#club-match-summary-dialog [data-close-dialog]').first().click();
-   materials.push({width,theme,leadActions,scores,control,contact,contactPanel,directory,archive,club,clubScore});
+   await page.locator('.club-result-card button[data-club-result-detail]').first().click();await page.locator('#club-match-summary-dialog').waitFor({state:'visible'});const clubSummaryScore=await styles(page,'#club-match-summary-dialog .club-result-summary .club-card-score');assertPlainScore(clubSummaryScore,'Barlow Condensed','30px','700','full result summary score');await capture(page,'result-summary',width,theme,measurements);await page.locator('#club-match-summary-dialog [data-close-dialog]').first().click();
+   materials.push({width,theme,leadActions,scores,control,contact,contactPanel,directory,archive,club,clubScore,clubSummaryScore});
    await navigation(page,'admin',width,theme,['Home','Matches','Staff','Onboarding','More']);await capture(page,'admin-nav',width,theme,measurements);
    await navigation(page,'parent',width,theme,['Home','Schedule','Inbox','More']);
    await page.evaluate(()=>navigate('matches',false));assert.equal(await page.locator('#league-match-list [data-details-match]').count(),0,'parent result data remains absent');assert.equal(await page.locator('#cup-games-body [data-details-match]').count(),0,'parent Cup results remain absent');
@@ -144,6 +157,6 @@ async function navigation(page,role,width,theme,expected){
   }
   await prepare(page,'coach',320,'dark');await seedResults(page);await page.evaluate(()=>{document.documentElement.style.fontSize='200%';navigate('appearance',false);});await capture(page,'appearance-text200',320,'dark',measurements);
   assert.deepEqual(errors,[],'runtime errors');assert.deepEqual(externalWrites,[],'no external writes');
-  console.log('PASS shared components: actual built role navigation, native select/disclosure interaction, team/Cup/Club/archive/matrix score type, both themes and phone/desktop/zoom, parent restrictions.');
+  console.log('PASS shared components: actual built role navigation, native select/disclosure interaction, Figma comparison/full-card/programme score families, solid primary actions, both themes and phone/desktop/zoom, parent restrictions.');
  }finally{fs.writeFileSync(path.join(out,'measurements.json'),JSON.stringify({date:new Date().toISOString(),measurements,materials,errors,externalWrites},null,2));await browser.close();await new Promise(r=>server.close(r));}
 })().catch(error=>{console.error(error);server.close();process.exitCode=1;});

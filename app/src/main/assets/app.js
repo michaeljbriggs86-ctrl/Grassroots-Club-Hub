@@ -2680,6 +2680,8 @@ function syncMobileNavigation(selectedView=currentView){
   nav.classList.toggle('has-table-tab',showTable);
   const selected=club&&selectedView==='club'?(__clubTab==='coaches'?'club-coaches':__clubTab==='overview'?'club':'club-matches'):club&&selectedView==='club-fixtures'||club&&selectedView==='club-results'?'club-matches':selectedView;
   const primary=club?[['Home','club'],['Matches','club-matches'],['Staff','club-coaches']]:parent?[['Home','home'],['Schedule','matches'],['Inbox','inbox'],['Table','league']]:[['Home','home'],['Matches','matches'],['Squad','squad'],['Table','league']];
+  const primaryTargets=new Set(primary.map(([,target])=>target));
+  if(club)primaryTargets.add('onboarding');
   nav.querySelectorAll('[data-mobile-tab]').forEach(button=>{
     if(button.dataset.mobileTab==='onboarding'){
       button.hidden=!club;
@@ -2697,7 +2699,7 @@ function syncMobileNavigation(selectedView=currentView){
       if(button.dataset.mobileTab==='2')button.querySelector('use')?.setAttribute('href',parent?'#mobile-icon-inbox':'#mobile-icon-team');
     }
     const key=button.dataset.mobileTab==='more'?'more':button.dataset.mobileTarget;
-    const active=key===selected||(key==='more'&&!primary.some(([,target])=>target===selected));
+    const active=key===selected||(key==='more'&&!primaryTargets.has(selected));
     if(active)button.setAttribute('aria-current','page');
     else button.removeAttribute('aria-current');
   });

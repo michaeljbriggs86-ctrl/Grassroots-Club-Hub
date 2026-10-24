@@ -1,0 +1,55 @@
+name: Shared Figma consistency matrix
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'app/src/main/assets/**'
+      - 'cloudflare/web-app/build.py'
+      - 'cloudflare/web-app/service-worker.js'
+      - 'verification/browser/verify_whole_app_materials.cjs'
+      - 'verification/browser/verify_shared_components.cjs'
+      - '.github/workflows/shared-figma-materials.yml'
+  pull_request:
+    paths:
+      - 'app/src/main/assets/**'
+      - 'cloudflare/web-app/build.py'
+      - 'cloudflare/web-app/service-worker.js'
+      - 'verification/browser/verify_whole_app_materials.cjs'
+      - 'verification/browser/verify_shared_components.cjs'
+      - '.github/workflows/shared-figma-materials.yml'
+permissions:
+  contents: read
+jobs:
+  native-materials:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Build the actual app and install the native browser
+        run: |
+          python cloudflare/web-app/build.py
+          npm install --prefix "$RUNNER_TEMP/shared-figma" --no-audit --no-fund playwright@1.64.0
+          "$RUNNER_TEMP/shared-figma/node_modules/.bin/playwright" install --with-deps chromium
+      - name: Check all native role pages and common component purposes
+        env:
+          PITCHKIND_MATERIAL_VERIFY: '1'
+        run: |
+          PITCHKIND_MATERIAL_WIDTH=320 node verification/browser/verify_whole_app_materials.cjs "$RUNNER_TEMP/shared-figma/node_modules/playwright" "$RUNNER_TEMP/shared-figma-output/phone-320"
+          PITCHKIND_MATERIAL_WIDTH=393 node verification/browser/verify_whole_app_materials.cjs "$RUNNER_TEMP/shared-figma/node_modules/playwright" "$RUNNER_TEMP/shared-figma-output/phone-393"
+          PITCHKIND_MATERIAL_WIDTH=1440 PITCHKIND_MATERIAL_ROLES=coach,admin PITCHKIND_MATERIAL_ROUTES=more,appearance,training-settings,feature-settings,my-account,inbox,add,coach-onboarding,player-onboarding node verification/browser/verify_whole_app_materials.cjs "$RUNNER_TEMP/shared-figma/node_modules/playwright" "$RUNNER_TEMP/shared-figma-output/desktop-forms"
+          PITCHKIND_MATERIAL_WIDTH=320 PITCHKIND_MATERIAL_TEXT200=1 PITCHKIND_MATERIAL_ONBOARDING=1 PITCHKIND_MATERIAL_ROLES=coach,admin PITCHKIND_MATERIAL_ROUTES=more,appearance,training-settings,inbox,add,coach-onboarding,player-onboarding node verification/browser/verify_whole_app_materials.cjs "$RUNNER_TEMP/shared-figma/node_modules/playwright" "$RUNNER_TEMP/shared-figma-output/text-200"
+          node verification/browser/verify_shared_components.cjs "$RUNNER_TEMP/shared-figma/node_modules/playwright" "$RUNNER_TEMP/shared-figma-output/shared-components"
+      - name: Preserve native measurements and rendered evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: shared-figma-${{ github.run_id }}
+          path: ${{ runner.temp }}/shared-figma-output
+          if-no-files-found: error
+          retention-days: 7
