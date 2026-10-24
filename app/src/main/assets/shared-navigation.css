@@ -90,11 +90,11 @@
   @media (max-width:374px) {
     /* The explicit small five-destination component has larger touch cells. */
     body:not(.auth-open) #mobile-primary-nav:is(.has-table-tab,.has-onboarding-tab) {
-      /* Leave room for Inter glyph rounding in the newer native browser;
-         keep the reviewed eight-pixel dock inset and ten-pixel labels. */
+      /* Chromium156 rounds the loaded Inter label to61px. Preserve its10px
+         type and equal targets, with a one-pixel horizontal inset adaptation. */
       gap:0!important;
       min-height:calc(82px + max(var(--android-inset-bottom,0px),env(safe-area-inset-bottom)))!important;
-      padding:8px max(8px,env(safe-area-inset-right)) calc(8px + max(var(--android-inset-bottom,0px),env(safe-area-inset-bottom))) max(8px,env(safe-area-inset-left))!important;
+      padding:8px max(7px,env(safe-area-inset-right)) calc(8px + max(var(--android-inset-bottom,0px),env(safe-area-inset-bottom))) max(7px,env(safe-area-inset-left))!important;
     }
     body:not(.auth-open) #mobile-primary-nav:is(.has-table-tab,.has-onboarding-tab) .mobile-primary-item {
       min-height:66px!important;
