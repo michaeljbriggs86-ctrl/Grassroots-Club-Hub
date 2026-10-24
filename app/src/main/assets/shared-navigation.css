@@ -92,12 +92,13 @@
     body:not(.auth-open) #mobile-primary-nav:is(.has-table-tab,.has-onboarding-tab) {
       /* Leave room for Inter glyph rounding in the newer native browser;
          keep the reviewed eight-pixel dock inset and ten-pixel labels. */
-      gap:3px!important;
+      gap:0!important;
       min-height:calc(82px + max(var(--android-inset-bottom,0px),env(safe-area-inset-bottom)))!important;
       padding:8px max(8px,env(safe-area-inset-right)) calc(8px + max(var(--android-inset-bottom,0px),env(safe-area-inset-bottom))) max(8px,env(safe-area-inset-left))!important;
     }
     body:not(.auth-open) #mobile-primary-nav:is(.has-table-tab,.has-onboarding-tab) .mobile-primary-item {
       min-height:66px!important;
+      padding:0!important;
       font-size:.625rem!important;
     }
     body:not(.auth-open):has(#mobile-primary-nav:is(.has-table-tab,.has-onboarding-tab)) .app-shell>.content {
