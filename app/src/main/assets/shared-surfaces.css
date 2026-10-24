@@ -189,7 +189,7 @@
     z-index:-1;
     margin:-20px -20px 0;
     pointer-events:none;
-    background:linear-gradient(180deg,rgba(5,8,6,.75),rgba(5,8,6,.22) 45%,#111715),url("graphics/pitch-portrait.webp") center/cover no-repeat;
+    background:linear-gradient(180deg,rgba(5,8,6,.75),rgba(5,8,6,.22) 45%,#111715),url("graphics/match-pitch-portrait.webp") 66% center/cover no-repeat;
   }
   body:not(.auth-open) #matches-next-fixture>.panel-heading {
     grid-area:1 / 1;

@@ -56,13 +56,14 @@ async function measure(page){
   const buttons=[...card.querySelectorAll('button')].filter(visible).map(el=>({id:el.id,text:el.textContent.trim(),...style(el)}));
   const nodes=[card,...card.querySelectorAll('*')];
   const sceneImages=nodes.flatMap(el=>[getComputedStyle(el).backgroundImage,getComputedStyle(el,'::before').backgroundImage,getComputedStyle(el,'::after').backgroundImage]).filter(s=>s.includes('pitch-portrait.webp')||s.includes('pitch-wide.webp'));
+  const headerScene=getComputedStyle(document.querySelector('.app-shell'),'::before').backgroundImage;
   const badges=[...card.querySelectorAll('.canonical-v11-badge')].map(el=>({...style(el),image:el.querySelector('img')?.getAttribute('src')}));
   const matchups=[...card.querySelectorAll('.canonical-v11-teams')].map(el=>({versus:rect(el.querySelector('.canonical-v11-v')),badges:[...el.querySelectorAll('.canonical-v11-badge')].map(rect)}));
   const names=[...card.querySelectorAll('.canonical-v11-side strong')].map(el=>({text:el.textContent,...style(el)}));
   const sceneCopy=[...card.querySelectorAll('.panel-heading .kicker,.panel-heading h3,.canonical-v11-label,.canonical-v11-v,.fixture-date-copy span,#matches-next-when')].filter(visible).map(el=>({text:el.textContent.trim(),...style(el)}));
   const calendar=document.getElementById('matches-next-calendar'),map=document.getElementById('matches-next-map-preview');
   const f=nextPublishedFixture();
-  return{viewport:innerWidth,documentWidth:document.documentElement.scrollWidth,cardVisible:visible(card),placeholderVisible:visible(document.getElementById('parent-matches-placeholder')),card:style(card),surfaces,buttons,sceneImages,badges,matchups,names,sceneCopy,labels:[...card.querySelectorAll('.canonical-v11-label')].map(el=>el.textContent.trim()),rows:card.querySelectorAll('.canonical-v11-fixture').length,shareVisible:visible(document.getElementById('matches-next-share')),playedVisible:visible(document.getElementById('matches-next-played')),copyVisible:visible(document.getElementById('matches-next-copy')),calendar:{visible:visible(calendar),hidden:calendar.hidden,classes:calendar.className},mapVisible:visible(map),mapSrc:document.getElementById('matches-next-map-frame').getAttribute('src'),when:document.getElementById('matches-next-when').textContent,ground:document.getElementById('matches-next-ground').textContent,nextFixture:f?{date:f.date,opponent:f.opponent,competition:f.competition}:null};
+  return{viewport:innerWidth,documentWidth:document.documentElement.scrollWidth,cardVisible:visible(card),placeholderVisible:visible(document.getElementById('parent-matches-placeholder')),card:style(card),surfaces,buttons,sceneImages,headerScene,badges,matchups,names,sceneCopy,labels:[...card.querySelectorAll('.canonical-v11-label')].map(el=>el.textContent.trim()),rows:card.querySelectorAll('.canonical-v11-fixture').length,shareVisible:visible(document.getElementById('matches-next-share')),playedVisible:visible(document.getElementById('matches-next-played')),copyVisible:visible(document.getElementById('matches-next-copy')),calendar:{visible:visible(calendar),hidden:calendar.hidden,classes:calendar.className},mapVisible:visible(map),mapSrc:document.getElementById('matches-next-map-frame').getAttribute('src'),when:document.getElementById('matches-next-when').textContent,ground:document.getElementById('matches-next-ground').textContent,nextFixture:f?{date:f.date,opponent:f.opponent,competition:f.competition}:null};
  });
 }
 function check(s,m){
@@ -72,6 +73,8 @@ function check(s,m){
  assert.equal(m.placeholderVisible,s.role==='parent'&&!s.confirmed,label+': unconfirmed parent placeholder');
  if(!m.cardVisible)return;
  assert(m.sceneImages.length,label+': approved field photograph is present on card');
+ assert(m.sceneImages.some(s=>s.includes('/graphics/match-pitch-portrait.webp')),label+': fixture uses the approved distinct touchline image');
+ assert(m.headerScene.includes('/graphics/pitch-wide.webp')&&!m.headerScene.includes('match-pitch-portrait.webp'),label+': original masthead photograph remains distinct');
  for(const surface of m.surfaces){
   assert.equal(surface.background,'none',label+': information remains open '+surface.selector);
   assert.equal(surface.backgroundColor,'rgba(0, 0, 0, 0)',label+': no inset fill '+surface.selector);

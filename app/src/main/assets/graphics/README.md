@@ -46,3 +46,13 @@ License files: `barlow-condensed-OFL.txt` and `anton-OFL.txt`. Barlow Condensed 
 ## Verification
 
 Each encoded image was decoded successfully and checked against its intended dimensions and colour mode. All three garment alpha channels were compared byte-for-byte against their original PNG alpha channels. Font metadata was parsed to confirm the Barlow Condensed Bold and Anton Regular family/style identities. These checks verify the files only; integration and rendered-layout verification are separate.
+
+## Distinct Matches fixture background — 24 October 2026
+
+Mike approved the native corner-touchline preview with “Continue” on24October2026, following the request to avoid repeating the masthead photo. `match-pitch-portrait.webp` is used only by the Matches lead card at66%centre/cover. The header, dialogs and all original pitch/shirt/badge files remain unchanged. This is approval for this artwork/scope; formal independent Claude acceptance remains separate.
+
+- Source: [unchanged generated PNG](https://drive.google.com/file/d/1El4-B6Hb0Mh1DLLqZdwY81h0hQ6tJEpS/view?usp=drivesdk), built-in imagegen,1918×820RGB. No model identifier or seed was exposed.
+- [Brief/provenance](https://drive.google.com/file/d/17IUxe4gNaY2peLslCReEW5fZ0ldt7HF5/view?usp=drivesdk); [native review](https://drive.google.com/file/d/1AufsOkxDebogW7EuLKaWwQXzFsqwcaIU/view?usp=drivesdk); [specific artwork approval](https://drive.google.com/file/d/1XPOzHkifYW_oUtZWYPDimVnfOxq4zWWd/view?usp=drivesdk).
+- WebP quality90, method6; full source dimensions retained, no resizing/retouching/recolouring/compositing. Encoded bytes: 381456.
+- PNG SHA-256: `d57a31b7674612608cd60d63b9a994c13693d69a827ef3fe4ffea6f6ed4617e6`.
+- WebP SHA-256: `05b06d99073e94d99b7fe6c28a61bd4f04e4d62a3f00a3bcc9b562c361917323`.
