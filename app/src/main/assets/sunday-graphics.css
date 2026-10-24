@@ -278,7 +278,7 @@ html[data-theme] body #view-person .graphic-profile-hero .graphic-shirt-number{c
    Full garment proportions keep numbers, initials and badge above the fade. */
 html body:not(.auth-open):is(.view-home,.view-person:has(.graphic-profile-hero)) .app-shell::before{
   --sh-profile-pitch:url("graphics/pitch-wide.webp");height:var(--sh-scene-height,330px);
-  background-image:linear-gradient(180deg,rgba(5,8,6,.78),rgba(5,8,6,.5) 16%,rgba(5,8,6,.25) 50%,rgba(5,8,6,.45) calc(100% - 24px),var(--sh-canvas)),var(--sh-profile-pitch);
+  background-image:linear-gradient(180deg,rgba(5,8,6,.78),rgba(5,8,6,.5) 16%,rgba(5,8,6,.25) 50%,rgba(5,8,6,.45) calc(100% - 24px),var(--sh-scene-foreground,var(--sh-canvas))),var(--sh-profile-pitch);
   background-size:auto,cover;background-position:center,center 60%;
 }
 html body:not(.auth-open).view-home .app-shell::before{height:var(--sh-scene-height,280px)}
@@ -313,13 +313,17 @@ html body #view-home .home-scene-shirt .graphic-shirt-number{font-size:3.5rem;tr
 
 /* Coach shirt follows the profile foreground: cover the hem and pitch
    together, keeping the native dashboard copy above the fade. */
+html body:not(.auth-open).view-home .app-shell:has(#view-home>.home-scene .graphic-shirt.coach){
+  --sh-scene-foreground:#111715;
+}
 html body #view-home>.home-scene:has(.graphic-shirt.coach){isolation:isolate}
 html body #view-home>.home-scene:has(.graphic-shirt.coach) .home-scene-shirt{
   -webkit-mask-image:none;mask-image:none;
 }
 html body #view-home>.home-scene:has(.graphic-shirt.coach)::after{
-  content:"";position:absolute;z-index:1;inset:auto 0 0;height:32px;pointer-events:none;
-  background:linear-gradient(180deg,transparent,var(--sh-canvas) 24px);
+  content:"";position:absolute;z-index:1;inset:auto 0 -24px;height:56px;pointer-events:none;
+  /* Keep the hem dark; blend to the page canvas only below the garment. */
+  background:linear-gradient(180deg,transparent,var(--sh-scene-foreground) 24px,var(--sh-scene-foreground) 32px,var(--sh-canvas));
 }
 html body #view-home>.home-scene:has(.graphic-shirt.coach) .home-scene-copy{z-index:2}
 
