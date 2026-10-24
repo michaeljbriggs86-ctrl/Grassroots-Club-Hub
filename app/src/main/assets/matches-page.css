@@ -1,0 +1,185 @@
+/* Matches page: original Coach Matches 490:10237, preparation 490:10268.
+   The current page heading follows 592; shared materials/actions follow 546.
+   Reviewed in 97 log 15BufL2FgCb0Z6TCtJgIQqL5MJXRC_DxY before implementation.
+   Date/time, Maps, notification actions and wider reflow remain bounded native
+   additions. No fixed panel height, new controls or visibility gates. */
+@layer club-shared {
+  body:not(.auth-open) #view-matches > .section-title-row h2 {
+    font:700 2rem/1.05 var(--sh-display)!important;
+    letter-spacing:normal!important;
+  }
+
+  body:not(.auth-open) #view-matches #matchday-dashboard {
+    box-sizing:border-box;
+    min-width:0;
+    padding:16px!important;
+    gap:12px!important;
+    border:1px solid var(--sh-line)!important;
+    border-radius:20px!important;
+    background:var(--sh-panel)!important;
+    color:var(--sh-copy)!important;
+    box-shadow:var(--sh-shadow)!important;
+  }
+  body:not(.auth-open) #view-matches #matchday-dashboard:not(.hidden):not([hidden]) {
+    display:flex!important;
+    flex-direction:column!important;
+    align-items:stretch!important;
+  }
+  body:not(.auth-open) #view-matches #matchday-dashboard .matchday-dashboard-heading {
+    display:flex!important;
+    flex-direction:column!important;
+    align-items:stretch!important;
+    gap:8px!important;
+    margin:0!important;
+    padding:0!important;
+    border:0!important;
+    background:transparent!important;
+    box-shadow:none!important;
+  }
+  body:not(.auth-open) #view-matches #matchday-dashboard .matchday-dashboard-heading > div {
+    flex:0 1 auto!important;
+    height:auto!important;
+    min-height:0!important;
+  }
+  /* The original heading contains its title once. Keep the redundant native
+     kicker available to assistive technology without another visible line. */
+  body:not(.auth-open) #view-matches #matchday-dashboard-kicker {
+    position:absolute!important;
+    width:1px!important;
+    height:1px!important;
+    margin:-1px!important;
+    padding:0!important;
+    border:0!important;
+    overflow:hidden!important;
+    clip-path:inset(50%)!important;
+    white-space:nowrap!important;
+  }
+  body:not(.auth-open) #view-matches #matchday-dashboard-title {
+    margin:0!important;
+    color:var(--sh-copy)!important;
+    font:600 1.125rem/1.45 Inter,system-ui,sans-serif!important;
+    letter-spacing:normal!important;
+    text-transform:none!important;
+    overflow-wrap:anywhere;
+  }
+  body:not(.auth-open) #view-matches #matchday-dashboard-status {
+    box-sizing:border-box;
+    align-self:stretch!important;
+    width:100%!important;
+    max-width:100%!important;
+    padding:8px!important;
+    border:0!important;
+    border-radius:8px!important;
+    font:400 .75rem/1.45 Inter,system-ui,sans-serif!important;
+    letter-spacing:normal!important;
+    white-space:normal!important;
+    overflow-wrap:anywhere;
+  }
+  body:not(.auth-open) #view-matches #matchday-dashboard-status:not(.changed):not(.issue) {
+    background:var(--sh-action)!important;
+    color:var(--sh-muted)!important;
+    box-shadow:none!important;
+  }
+
+  body:not(.auth-open) #view-matches #matchday-dashboard .matchday-dashboard-grid {
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    gap:12px 16px!important;
+    margin:0!important;
+    padding:0!important;
+  }
+  body:not(.auth-open) #view-matches #matchday-dashboard .matchday-dashboard-grid > article {
+    grid-column:1 / -1!important;
+    min-width:0;
+    gap:2px!important;
+    padding:0!important;
+    border:0!important;
+    border-radius:0!important;
+    background:transparent!important;
+    color:var(--sh-copy)!important;
+    box-shadow:none!important;
+  }
+  /* Never set article display: native suppression of the duplicate fixture
+     row remains authoritative when the lead fixture is present. */
+  body:not(.auth-open) #view-matches #matchday-dashboard .matchday-dashboard-grid > article:has(> #matchday-dashboard-squad),
+  body:not(.auth-open) #view-matches #matchday-dashboard .matchday-dashboard-grid > article:has(> #matchday-dashboard-formation) {
+    grid-column:auto!important;
+  }
+  body:not(.auth-open) #view-matches #matchday-dashboard .matchday-dashboard-grid > article > span {
+    color:var(--sh-muted)!important;
+    font:400 .75rem/1.45 Inter,system-ui,sans-serif!important;
+    letter-spacing:normal!important;
+    text-transform:none!important;
+    overflow-wrap:anywhere;
+  }
+  body:not(.auth-open) #view-matches #matchday-dashboard .matchday-dashboard-grid > article > strong {
+    color:var(--sh-copy)!important;
+    font:600 1rem/1.45 Inter,system-ui,sans-serif!important;
+    letter-spacing:normal!important;
+    overflow-wrap:anywhere;
+  }
+  body:not(.auth-open) #view-matches #matchday-dashboard .matchday-dashboard-grid > article > small {
+    color:var(--sh-muted)!important;
+    font:400 .75rem/1.45 Inter,system-ui,sans-serif!important;
+    letter-spacing:normal!important;
+    overflow-wrap:anywhere;
+  }
+
+  body:not(.auth-open) #view-matches #matchday-dashboard .matchday-dashboard-actions {
+    gap:12px!important;
+    margin:0!important;
+    padding:0!important;
+  }
+  body:not(.auth-open) #view-matches #matchday-dashboard .matchday-dashboard-actions:not(.hidden):not([hidden]) {
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr)!important;
+  }
+  body:not(.auth-open) #view-matches #matchday-dashboard .matchday-dashboard-actions > :is(button,a) {
+    box-sizing:border-box;
+    min-width:0;
+    width:100%!important;
+    min-height:52px!important;
+    padding:12px 16px!important;
+    border-radius:12px!important;
+    font:600 .875rem/1.42857143 Inter,system-ui,sans-serif!important;
+    white-space:normal!important;
+    overflow-wrap:anywhere;
+  }
+
+  body:not(.auth-open) #view-matches #matchday-dashboard .matchday-dashboard-note {
+    margin:0!important;
+    padding:0!important;
+    border:0!important;
+    border-radius:0!important;
+    background:transparent!important;
+    box-shadow:none!important;
+  }
+  body:not(.auth-open) #view-matches #matchday-dashboard .matchday-dashboard-note > summary {
+    min-height:44px!important;
+    gap:8px!important;
+    padding:0!important;
+    color:var(--sh-muted)!important;
+    font:600 .875rem/1.45 Inter,system-ui,sans-serif!important;
+  }
+  body:not(.auth-open) #view-matches #matchday-dashboard .matchday-dashboard-note > summary::after {
+    color:var(--sh-muted)!important;
+  }
+  body:not(.auth-open) #view-matches #matchday-dashboard .coach-note-readonly {
+    margin:6px 0 0!important;
+    padding:0!important;
+    border:0!important;
+    border-radius:0!important;
+    background:transparent!important;
+    color:var(--sh-copy)!important;
+    box-shadow:none!important;
+    font:400 .875rem/1.45 Inter,system-ui,sans-serif!important;
+  }
+
+  @media (min-width:901px) {
+    body:not(.auth-open) #view-matches #matchday-dashboard .matchday-dashboard-actions:not(.hidden):not([hidden]) {
+      grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    }
+    body:not(.auth-open) #view-matches #matchday-dashboard #matchday-open-tactics {
+      grid-column:1 / -1;
+    }
+  }
+}

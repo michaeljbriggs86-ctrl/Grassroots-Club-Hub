@@ -3139,7 +3139,7 @@ async function refreshMatchAvailability(quiet=true){
     if(warning){warning.innerHTML='Some replies could not load. <button type="button" class="text-button compact" data-availability-retry>Retry</button>';warning.classList.remove('hidden');}
     renderTacticsBoard();renderMatchdayDashboard();renderParentHomeMatchInfo();focusParentHomeReply();if(!quiet)toast('Some replies could not load. Retry.');return;
   }
-  const count=document.getElementById('match-availability-count');if(count)count.textContent=`${__availabilityRows.length} update${__availabilityRows.length===1?'':'s'}`;
+  const count=document.getElementById('match-availability-count');if(count)count.innerHTML=`<b class="availability-response-number">${__availabilityRows.length}</b><span> update${__availabilityRows.length===1?'':'s'}</span>`;
   if(['parent','player'].includes(currentRole)){
     const select=document.getElementById('availability-player'),ownId=window.ClubHubCloud?.session?.user?.id||'';
     const mineLinks=currentRole==='player'?links:links.filter(x=>String(x.parent_user_id)===String(ownId));
@@ -8044,6 +8044,24 @@ function renderHomeFixturePreview(f,model){
   meta.textContent=[location,model.group?(model.time?'Group starts '+model.time:'Group start TBC'):(model.time?'Kick-off '+model.time:'Kick-off TBC')].filter(Boolean).join(' · ');
 }
 
+// Original Sunday dialog 519:10559. Canonical fixture data, H/A order and all
+// existing action/permission handlers remain authoritative; this is presentation.
+function renderSundayFixtureDialog(f,model){
+  const dialog=document.getElementById('next-fixture-dialog'),host=document.getElementById('next-match-versus');
+  if(!dialog?.classList.contains('sunday-fixture-dialog')||!host||!f)return;
+  const data=canonicalCardRowData(f),own=matchTeamLabel(ownTeamDisplayName());
+  const side=(name,kind)=>`<span class="canonical-v11-side sunday-${kind}"><span class="canonical-v11-badge">${clubIdentityBadgeHtml(name)}</span><strong>${kind==='opponent'?'<span class="sunday-dialog-name-prefix">v </span>':''}${esc(name)}</strong></span>`;
+  const rows=data.rows.map(row=>{
+    const homeOwn=row.home===own,ownName=homeOwn?row.home:row.away,opponent=homeOwn?row.away:row.home;
+    const location=({H:'Home',A:'Away',N:'Neutral'}[String(row.fixture.venue||'').toUpperCase()]||'Venue TBC');
+    return `<div class="sunday-dialog-row canonical-v11-fixture" role="group" aria-label="${esc(row.home)} versus ${esc(row.away)}"><div class="sunday-dialog-fixture-labels"><span class="canonical-v11-label">${data.group?'Group game · ':''}${esc(model.competition)} · ${esc(location)}</span><time class="sunday-dialog-date" datetime="${esc(f.date||'')}" aria-label="${esc(model.date)}">${esc(f.date?new Intl.DateTimeFormat('en-GB',{weekday:'long',day:'numeric',month:'long'}).format(new Date(f.date+'T12:00:00')):'Date TBC')}</time></div><div class="sunday-dialog-identities canonical-v11-teams">${homeOwn?side(ownName,'own'):side(opponent,'opponent')}<b class="canonical-v11-v" aria-hidden="true">V</b>${homeOwn?side(opponent,'opponent'):side(ownName,'own')}</div></div>`;
+  }).join('');
+  const confirmed=data.rows.some(row=>fixtureDetailsConfirmed(row.fixture));
+  setStableHtml(host,rows+`<div class="sunday-dialog-timing"><strong class="sunday-dialog-kickoff">${esc(model.time||'TBC')}</strong><span class="sunday-dialog-time-context"><b class="sunday-dialog-time-label">${model.group?'Group starts':'Kick-off'}</b><span>${confirmed?'Details confirmed':'Awaiting confirmation'}</span></span></div>`);
+  dialog.classList.toggle('sunday-cup-dialog',!!data.group);
+  const title=document.getElementById('next-match-opponent');if(title)title.textContent='Match details';
+}
+
 function applyCanonicalRecoveryV13(prefix, f) {
   const matchesCard=prefix==="matches-next"?document.getElementById("matches-next-fixture"):null;
   const dashboardHost=prefix==="next-match"?document.getElementById("next-match-home-teams"):null;
@@ -8078,6 +8096,7 @@ function applyCanonicalRecoveryV13(prefix, f) {
   }
   const cleanupRoots=containers.length?containers:(matchesCard?[matchesCard]:[document]);for(const root of cleanupRoots)removeOpponentKitRowsV13(root);
   if(prefix==="next-match"&&document.getElementById('home-fixture-meta'))renderHomeFixturePreview(f,d);
+  if(prefix==="next-match"&&typeof renderSundayFixtureDialog==='function')renderSundayFixtureDialog(f,d);
 }
 
 function canonicalRecoveryNextEventV13() {
