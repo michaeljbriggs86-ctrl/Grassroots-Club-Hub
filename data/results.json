@@ -1,9 +1,9 @@
 {
   "schema_version": 2,
   "provider": "Selkent",
-  "last_updated": "2026-10-24T15:03:39.138696+00:00",
-  "cup_results_last_updated": "2026-10-24T15:03:39.138696+00:00",
-  "cup_results_last_attempted": "2026-10-24T15:03:39.138696+00:00",
+  "last_updated": "2026-10-24T19:59:09.712333+00:00",
+  "cup_results_last_updated": "2026-10-24T19:59:09.712333+00:00",
+  "cup_results_last_attempted": "2026-10-24T19:59:09.712333+00:00",
   "cup_results_status": "verified_current",
   "fixture_agegroup_discovery_source": "selkent_divisions_all",
   "coverage": {
@@ -24356,21 +24356,11 @@
         {
           "date": "2026-11-01",
           "division_name": "U16 Friendly",
-          "home": "Falconwood FC Grey",
+          "home": "Mayow Park Rangers FC White",
           "away": "S.E. Eagles FC",
           "provider_team_ids": [
-            "872",
+            "499",
             "553"
-          ]
-        },
-        {
-          "date": "2026-11-01",
-          "division_name": "U16 London Cup",
-          "home": "Dulwich Village Orange",
-          "away": "Bredhurst Juniors (Non-Selkent)",
-          "provider_team_ids": [
-            "276",
-            "2231"
           ]
         },
         {
@@ -24381,6 +24371,16 @@
           "provider_team_ids": [
             "913",
             "616"
+          ]
+        },
+        {
+          "date": "2026-11-01",
+          "division_name": "Under 16A",
+          "home": "Dulwich Village Orange",
+          "away": "Falconwood FC Grey",
+          "provider_team_ids": [
+            "276",
+            "872"
           ]
         },
         {
