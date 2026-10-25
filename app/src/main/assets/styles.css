@@ -1867,3 +1867,7 @@ body.admin-club-mode .club-logo-wrap{border:1px solid #d6e2d8;box-shadow:0 4px 1
 .admin-assign-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
 @media(max-width:520px){.admin-assign-row{grid-template-columns:1fr}}
 html[data-theme="dark"] .admin-assign-team{background:#18211b;border-color:#2c3a31}
+
+/* Outcome uses the existing report field/control family. */
+.match-report-outcome-field{display:grid;gap:8px;margin-bottom:16px;font-size:14px;font-weight:600}
+.match-report-outcome-field input,.match-report-outcome-field select{width:100%;min-height:48px}

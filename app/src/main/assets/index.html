@@ -234,7 +234,7 @@
           <div class="fixture-map-preview hidden" id="matches-next-map-preview"><iframe id="matches-next-map-frame" title="Next fixture venue map" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe><a class="map-link hidden" id="matches-next-map" href="#" aria-label="Open next fixture venue in Maps">Open in Maps</a></div>
           <div class="hidden" id="matches-next-kit-warning"></div>
           <div class="next-match-kits hidden"><span>Match details</span><strong id="matches-next-kits">Kit colours and away details will appear when confirmed.</strong></div>
-          <div class="next-match-links matches-next-actions"><button type="button" class="primary-button compact match-played-action hidden" id="matches-next-played" data-requires-edit>Match played</button><button type="button" class="secondary-button compact" id="matches-next-details">Match details</button><button type="button" class="secondary-button compact hidden match-share-icon" id="matches-next-share" aria-label="Share match details" title="Share match details"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8.7 10.5l6.6-4M8.7 13.5l6.6 4"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="5" r="3"/><circle cx="18" cy="19" r="3"/></svg></button><button type="button" class="secondary-button compact hidden" id="matches-next-copy">Copy match details</button></div>
+          <div class="next-match-links matches-next-actions"><button type="button" class="primary-button compact match-played-action hidden" id="matches-next-played" data-requires-edit>Record match</button><button type="button" class="secondary-button compact" id="matches-next-details">Match details</button><button type="button" class="secondary-button compact hidden match-share-icon" id="matches-next-share" aria-label="Share match details" title="Share match details"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8.7 10.5l6.6-4M8.7 13.5l6.6 4"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="5" r="3"/><circle cx="18" cy="19" r="3"/></svg></button><button type="button" class="secondary-button compact hidden" id="matches-next-copy">Copy match details</button></div>
         </section>
 
         <section class="panel matchday-dashboard canonical-match-card-active hidden" id="matchday-dashboard">
@@ -1060,12 +1060,16 @@
       <section id="match-report-outcome" class="hidden" role="status" aria-live="polite" tabindex="-1"></section>
       <section id="match-action-outcome" class="hidden" role="status" aria-live="polite" aria-atomic="true" tabindex="-1"></section>
       <section class="detail-feature-section match-report-score-section hidden" id="match-report-score-section">
+        <label class="match-report-outcome-field">Match outcome<select id="match-report-status"><option value="played">Played</option><option value="abandoned">Abandoned</option></select></label>
+        <div id="match-report-abandoned" class="hidden"><p class="helper">Abandoned matches have no final result. Attendance and private notes can still be recorded.</p><label class="match-report-outcome-field">Reason (optional)<input id="match-report-abandoned-reason" type="text" maxlength="500" placeholder="For example, weather" /></label></div>
+        <div id="match-report-final-score">
         <div class="panel-heading"><div><h3>Final score</h3><span class="helper">Enter the final score</span></div></div>
         <div class="match-report-score-grid">
           <label><span id="match-report-home-label">Home</span><input id="match-report-gf" type="number" min="0" step="1" inputmode="numeric" value="0" /></label>
           <label><span id="match-report-away-label">Away</span><input id="match-report-ga" type="number" min="0" step="1" inputmode="numeric" value="0" /></label>
         </div>
         <div class="report-club-record"><h4>Club record</h4><p id="match-report-club-score"></p><p class="helper" id="match-report-score-privacy"></p></div>
+        </div>
       </section>
       <section class="detail-feature-section" id="detail-goals-section" data-detail-feature="goals"><div class="panel-heading"><h3>Goalscorers</h3><span class="helper">Goals</span></div><div id="detail-goals-inputs" class="detail-player-grid"></div></section>
       <section class="detail-feature-section" id="detail-assists-section" data-detail-feature="assists"><div class="panel-heading"><h3>Assists</h3><span class="helper">Assists</span></div><div id="detail-assists-inputs" class="detail-player-grid"></div></section>
@@ -1080,7 +1084,7 @@
         <button type="button" class="secondary-button hidden" id="match-report-back">Back</button>
         <button type="button" class="secondary-button hidden" id="edit-match-detail" data-edit-match="">Edit fixture</button>
         <button type="button" class="secondary-button hidden match-share-icon" id="share-match-detail" data-share-match="" aria-label="Share fixture" title="Share fixture"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8.7 10.5l6.6-4M8.7 13.5l6.6 4"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="5" r="3"/><circle cx="18" cy="19" r="3"/></svg></button>
-        <button type="button" class="primary-button hidden" id="play-match-detail" data-match-played="">Match played</button>
+        <button type="button" class="primary-button hidden" id="play-match-detail" data-match-played="">Record match</button>
         <button type="button" class="danger-button hidden" id="delete-match-detail" data-delete-match="">Remove</button>
         <button type="button" class="danger-button hidden" id="undo-match-played">Undo match played</button>
         <button type="button" class="secondary-button" id="match-detail-cancel" data-close-dialog>Cancel</button>

@@ -643,7 +643,7 @@ function resultOf(m){
 }
 function resultClass(r){return r==='W'?'result-W':r==='D'?'result-D':r==='L'?'result-L':r==='PST'?'status-postponed':r==='ABD'?'status-abandoned':r==='SCH'?'status-scheduled':'';}
 function statusLabel(m){const s=matchStatus(m);return s==='postponed'?'Postponed':s==='abandoned'?'Abandoned':s==='scheduled'?'Scheduled':'Played';}
-function matchScoreText(m){const s=matchStatus(m);if(miniResultsRestrictedView()&&['played','abandoned'].includes(s))return'Played';if(s==='postponed'||s==='scheduled')return'—';if(s==='abandoned')return `${Number(m.gf||0)}–${Number(m.ga||0)} ABD`;return `${Number(m.gf||0)}–${Number(m.ga||0)}`;}
+function matchScoreText(m){const s=matchStatus(m);if(s==='abandoned')return'Abandoned';if(miniResultsRestrictedView()&&s==='played')return'Played';if(s==='postponed'||s==='scheduled')return'—';return `${Number(m.gf||0)}–${Number(m.ga||0)}`;}
 function resultForNamedTeam(home,away,hg,ag,teamName){const own=normalizeTeamKey(teamName||'');const h=normalizeTeamKey(home||''),a=normalizeTeamKey(away||'');const same=(side)=>!!own&&(side===own||(own.length>=4&&(side.endsWith(' '+own)||side.includes(own)))||(side.length>=4&&own.includes(side)));hg=Number(hg||0);ag=Number(ag||0);if(same(h))return hg>ag?'W':hg<ag?'L':'D';if(same(a))return ag>hg?'W':ag<hg?'L':'D';return hg===ag?'D':'';}
 function formatDate(iso){ if(!iso) return ''; return new Intl.DateTimeFormat('en-GB',{day:'numeric',month:'short',year:'2-digit'}).format(new Date(iso+'T12:00:00')); }
 function esc(str=''){ return String(str).replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c])); }
@@ -1515,7 +1515,7 @@ function furtherFixtureCardHtml(f,index){
   </div></div><div class="further-fixture-quick"><details class="further-fixture-details"><summary>Match details</summary><div class="further-fixture-body">
     <div class="match-versus">${matchTeamSideHtml('Home',ctx.homeTeam,ctx.homeKit)}<div class="match-versus-mark">V</div>${matchTeamSideHtml('Away',ctx.awayTeam,ctx.awayKit)}</div>
     ${toggle}<div class="match-venue-card"><div><span>Venue</span><strong>${esc(ground)}</strong><small>${esc(address)}</small></div></div>
-  </div></details></div>${warning}${confirmed&&ctx.mapHref?`<a class="map-link compact" href="${esc(ctx.mapHref)}" target="_blank" rel="noopener">Open in Maps</a>`:''}${canConfirmFixtureDetails()&&matchDayReached(f)?`<button type="button" data-further-match-played="${index}">Match played</button>`:''}</article>`;
+  </div></details></div>${warning}${confirmed&&ctx.mapHref?`<a class="map-link compact" href="${esc(ctx.mapHref)}" target="_blank" rel="noopener">Open in Maps</a>`:''}${canConfirmFixtureDetails()&&matchDayReached(f)?`<button type="button" data-further-match-played="${index}">Record match</button>`:''}</article>`;
 }
 function groupedUpcomingFixtures(fixtures=upcomingFixtures()){
   const seen=new Set(),events=[];
@@ -2363,7 +2363,7 @@ function syncMatchPlayedActionV141(f){
   const button=document.getElementById('matches-next-played');if(!button)return;
   const group=f?miniCupGroup(f):null;
   button.classList.toggle('hidden',!f||!canConfirmFixtureDetails()||!matchDayReached(f));
-  button.textContent=group?'Record group result':'Match played';
+  button.textContent=group?'Record group result':'Record match';
 }
 // Results can only be recorded from the fixture's own date (device local time). Undated rows stay recordable.
 function matchDayReached(f={}){
@@ -3723,6 +3723,7 @@ function programmeParentView(){return CLOUD_MODE&&currentRole==='parent';}
 function homeAwayScoreForMatch(match={}){const away=String(match.venue||'').toUpperCase()==='A';return {home:away?Number(match.ga||0):Number(match.gf||0),away:away?Number(match.gf||0):Number(match.ga||0)};}
 function renderDivisionResultCell(match){
   const played=!!match&&['played','abandoned'].includes(matchStatus(match));
+  if(programmeParentView()&&matchStatus(match)==='abandoned')return '<span class="programme-status">Abandoned</span>';
   if(programmeParentView())return `<span class="programme-status ${played?'played':'not-played'}">${played?'Played':'Not played'}</span>`;
   if(!match||matchStatus(match)==='scheduled')return '<span class="programme-status not-played">Not played</span>';
   if(matchStatus(match)==='postponed')return '<span class="programme-status postponed">Postponed</span>';
@@ -3758,7 +3759,7 @@ function matchCardHTML(m){
   const editableNonLeague=isCoach()&&isPlayedMatch(m)&&!isLeagueMatch(m)&&!isDivisionMatch(m);
   const editableScheduled=isCoach()&&!isPlayedMatch(m);
   const editAction=editableScheduled?`<button class="inline-action" data-edit-match="${m.id}">Edit fixture</button>`:editableNonLeague?`<button class="inline-action" data-edit-match="${m.id}">Edit result</button>`:'';
-  const playedAction=isCoach()&&status==='scheduled'&&matchDayReached(m)?`<button class="primary-button compact match-played-action" type="button" data-match-played="${m.id}">Match played</button>`:'';
+  const playedAction=isCoach()&&status==='scheduled'&&matchDayReached(m)?`<button class="primary-button compact match-played-action" type="button" data-match-played="${m.id}">Record match</button>`:'';
   const removeAction=isCoach()&&!isProviderOwnedMatch(m)?`<button class="inline-action delete" type="button" data-delete-match="${m.id}">Remove</button>`:'';
   const actions=`<div class="match-actions"><button class="inline-action" data-details-match="${m.id}">Details</button>${editAction}${playedAction}${removeAction}</div>`;
   return `<article class="match-card ${resultClass(r)}"><div class="result-badge ${r}">${r}</div><div><div class="match-opponent">${clubListingHtml(m.opponent)}</div><div class="match-meta">${formatDate(m.date)}${venue}${stage}${statusMeta}</div>${details}</div><div class="match-score">${matchScoreText(m)}</div>${actions}</article>`;
@@ -4294,6 +4295,14 @@ function reportScoreLabels(m){
   document.getElementById('match-report-score-privacy').textContent=ageGroupNumber()<=11?'This result is a private staff record. U7–U11 parent views do not show the score or a table.':'This report follows the team’s existing result permissions.';
   updateReportClubScore();
 }
+function reportMatchStatus(){return document.getElementById('match-report-status')?.value==='abandoned'?'abandoned':'played';}
+function updateReportMatchStatus(){
+  const abandoned=reportMatchStatus()==='abandoned';
+  document.getElementById('match-report-final-score')?.classList.toggle('hidden',abandoned);
+  document.getElementById('match-report-abandoned')?.classList.toggle('hidden',!abandoned);
+  for(const id of ['match-report-gf','match-report-ga']){const input=document.getElementById(id);if(input)input.disabled=abandoned;}
+  if(__matchReportMode){const m=state.matches.find(x=>x.id===document.getElementById('match-detail-id')?.value);__matchReportSteps=matchReportStepDefinitions(m,abandoned);__matchReportStep=0;applyMatchReportStep();}
+}
 function updateReportClubScore(){const m=state.matches.find(x=>x.id===document.getElementById('match-detail-id')?.value);if(!m)return;const home=document.getElementById('match-report-gf').value,away=document.getElementById('match-report-ga').value,isAway=String(m.venue||'').toUpperCase()==='A';document.getElementById('match-report-club-score').textContent=ownTeamDisplayName()+' · GF '+(isAway?away:home)+' · GA '+(isAway?home:away);}
 function showMatchReportHub(){
   __matchReportHub=true;const box=document.getElementById('match-report-hub');box.classList.remove('hidden');
@@ -4322,17 +4331,17 @@ function isFinalCupGameOfRound(m){
   const key=cupProgressKey(m);
   return state.matches.some(x=>x.id!==m.id&&x.date===m.date&&x.status==='played'&&['cup','vase'].includes(competitionBucket(x))&&cupProgressKey(x)===key);
 }
-function matchReportStepDefinitions(m=null){
+function matchReportStepDefinitions(m=null,abandoned=__matchReportMode&&reportMatchStatus()==='abandoned'){
   const staff=CLOUD_MODE&&['admin','coach','assistant_coach'].includes(currentRole);
   return [
-    {key:'score',label:'Score',section:'match-report-score-section',enabled:true},
+    {key:'score',label:'Outcome',section:'match-report-score-section',enabled:true},
     {key:'attendance',label:'Attendance',section:'match-attendance-section',enabled:staff},
     {key:'goals',label:'Goals',section:'detail-goals-section',enabled:featureEnabled('goals')},
     {key:'assists',label:'Assists',section:'detail-assists-section',enabled:featureEnabled('assists')},
     {key:'awards',label:'Awards',section:'detail-awards-section',enabled:featureEnabled('awards')},
     {key:'notes',label:'Coach notes',section:'coach-note-section',enabled:staff},
     {key:'through',label:'Round',section:'match-through-section',enabled:staff&&isFinalCupGameOfRound(m)}
-  ].filter(step=>step.enabled);
+  ].filter(step=>step.enabled&&(!abandoned||!['goals','assists','awards','through'].includes(step.key)));
 }
 function applyMatchReportStep(){
   if(!__matchReportMode)return;
@@ -4365,7 +4374,7 @@ function resetMatchReportMode(){
 }
 function changeMatchReportStep(delta){
   if(!__matchReportMode)return;
-  if(delta>0&&__matchReportSteps[__matchReportStep]?.key==='score'){
+  if(delta>0&&__matchReportSteps[__matchReportStep]?.key==='score'&&reportMatchStatus()==='played'){
     const gf=Number(document.getElementById('match-report-gf')?.value),ga=Number(document.getElementById('match-report-ga')?.value);
     if(!Number.isFinite(gf)||!Number.isFinite(ga)||gf<0||ga<0){toast('Enter a valid scoreline');return;}
   }
@@ -4380,18 +4389,20 @@ function openMatchReport(matchId){
   __matchDetailDirty=false;
   const m=state.matches.find(x=>x.id===matchId);if(!m)return;
   configureMatchDetailActions(null);
+  const outcome=document.getElementById('match-report-status');if(outcome)outcome.value=matchStatus(m)==='abandoned'?'abandoned':'played';
+  const reason=document.getElementById('match-report-abandoned-reason');if(reason)reason.value=m.abandonmentReason||'';
   __matchReportMode=true;__matchReportStep=0;__matchReportSteps=matchReportStepDefinitions(m);
   const throughBox=document.getElementById('match-through-checkbox');if(throughBox)throughBox.checked=!!(state.cupProgress||{})[cupProgressKey(m)]?.through;
   const throughLabel=document.getElementById('match-through-label');if(throughLabel)throughLabel.textContent=cupNameAndRound(m).name+(cupNameAndRound(m).round?' · '+cupNameAndRound(m).round:'');
   document.getElementById('match-detail-id').value=m.id;
-  document.getElementById('match-detail-title').textContent=`Match played · ${matchTeamLabel(m.opponent)}`;
+  document.getElementById('match-detail-title').textContent=`Record match · ${matchTeamLabel(m.opponent)}`;
   document.getElementById('match-detail-summary').innerHTML=`<strong>${esc(homeFixtureTeamNames(m).home)} v ${esc(homeFixtureTeamNames(m).away)}</strong><span>${formatDate(m.date)} · ${esc(m.competition||'Match')} · ${String(m.venue||'').toUpperCase()==='H'?'Home':String(m.venue||'').toUpperCase()==='A'?'Away':'Neutral'}</span>`;
   renderMatchOverview(m);
   refreshMatchOverviewDirectory(m);
   const reportAway=String(m.venue||'').toUpperCase()==='A';
   document.getElementById('match-report-gf').value=Number(reportAway?m.ga:m.gf||0);
   document.getElementById('match-report-ga').value=Number(reportAway?m.gf:m.ga||0);
-  reportScoreLabels(m);
+  reportScoreLabels(m);updateReportMatchStatus();
   detailPlayerInputs('detail-goals-inputs',m.id,'goals');
   detailPlayerInputs('detail-assists-inputs',m.id,'assists');
   renderAwardFields('detail-award-fields',m.id);
@@ -4592,7 +4603,7 @@ function saveClubKitProfile(){
 function configureMatchDetailActions(m){
   const coach=!!m&&isCoach(),played=!!m&&isPlayedMatch(m);
   const edit=document.getElementById('edit-match-detail'),remove=document.getElementById('delete-match-detail'),report=document.getElementById('play-match-detail');
-  const share=document.getElementById('share-match-detail');if(share){share.classList.toggle('hidden',!coach||played);share.dataset.shareMatch=coach&&!played?m.id:'';}
+  const share=document.getElementById('share-match-detail'),canShare=coach&&['scheduled','postponed'].includes(matchStatus(m));if(share){share.classList.toggle('hidden',!canShare);share.dataset.shareMatch=canShare?m.id:'';}
   const canEdit=coach&&(!played||(!isLeagueMatch(m)&&!isDivisionMatch(m)));
   if(edit){edit.classList.toggle('hidden',!canEdit);edit.textContent=played?'Edit result':'Edit fixture';edit.dataset.editMatch=canEdit?m.id:'';}
   const canRemove=coach&&!isProviderOwnedMatch(m);
@@ -4606,7 +4617,7 @@ function openMatchDetails(matchId){
   const m=state.matches.find(x=>x.id===matchId);if(!m)return;
   document.getElementById('match-detail-id').value=m.id;
   document.getElementById('match-detail-title').textContent='Match details';
-  document.getElementById('match-detail-summary').innerHTML=`<strong>${formatDate(m.date)}${m.time?` · Kick-off ${esc(m.time)}`:''}</strong><span>${esc(m.competition||'Match')} · ${matchScoreText(m)}${matchStatus(m)!=='played'?' · '+statusLabel(m):''}</span>`;
+  document.getElementById('match-detail-summary').innerHTML=`<strong>${formatDate(m.date)}${m.time?` · Kick-off ${esc(m.time)}`:''}</strong><span>${esc(m.competition||'Match')} · ${matchScoreText(m)}${['scheduled','postponed'].includes(matchStatus(m))?' · '+statusLabel(m):''}${matchStatus(m)==='abandoned'&&m.abandonmentReason?' · '+esc(m.abandonmentReason):''}</span>`;
   renderMatchOverview(m);
   detailPlayerInputs('detail-goals-inputs',m.id,'goals');
   detailPlayerInputs('detail-assists-inputs',m.id,'assists');
@@ -4641,22 +4652,23 @@ async function saveMatchDetails(e){
   e.preventDefault();if(!requireCoach()||__matchReportSaveBusy)return;
   const id=document.getElementById('match-detail-id').value;const m=state.matches.find(x=>x.id===id);if(!m)return;const reportMode=__matchReportMode;const epoch=__matchDetailEpoch,key=matchDetailContext(),cloud=window.ClubHubCloud;
   const note=document.getElementById('coach-match-note')?.value||'',attendance=[...document.querySelectorAll('#match-attendance-list [data-attendance-player]')].map(el=>({player_name:el.dataset.attendancePlayer,status:el.dataset.status||''})).filter(r=>r.status);
-  const beforeMatch=JSON.parse(JSON.stringify(m));if(reportMode){const homeScore=Number(document.getElementById('match-report-gf')?.value),awayScore=Number(document.getElementById('match-report-ga')?.value),away=String(m.venue||'').toUpperCase()==='A';if(!Number.isInteger(homeScore)||!Number.isInteger(awayScore)||homeScore<0||awayScore<0){toast('Enter a valid whole-number scoreline');return;}m.gf=away?awayScore:homeScore;m.ga=away?homeScore:awayScore;m.status='played';}const beforeDetails={goals:state.goals.filter(x=>x.matchId===id),assists:(state.assists||[]).filter(x=>x.matchId===id),bookings:(state.bookings||[]).filter(x=>x.matchId===id),awards:state.awards.filter(x=>x.matchId===id),homeKitColours:beforeMatch.homeKitColours||'',awayKitColours:beforeMatch.awayKitColours||''};
+  const abandoned=reportMode&&reportMatchStatus()==='abandoned';
+  const beforeMatch=JSON.parse(JSON.stringify(m));if(abandoned){m.status='abandoned';m.abandonmentReason=String(document.getElementById('match-report-abandoned-reason')?.value||'').trim().slice(0,500);}else if(reportMode){const homeScore=Number(document.getElementById('match-report-gf')?.value),awayScore=Number(document.getElementById('match-report-ga')?.value),away=String(m.venue||'').toUpperCase()==='A';if(!Number.isInteger(homeScore)||!Number.isInteger(awayScore)||homeScore<0||awayScore<0){toast('Enter a valid whole-number scoreline');return;}m.gf=away?awayScore:homeScore;m.ga=away?homeScore:awayScore;m.status='played';delete m.abandonmentReason;}const beforeDetails={goals:state.goals.filter(x=>x.matchId===id),assists:(state.assists||[]).filter(x=>x.matchId===id),bookings:(state.bookings||[]).filter(x=>x.matchId===id),awards:state.awards.filter(x=>x.matchId===id),homeKitColours:beforeMatch.homeKitColours||'',awayKitColours:beforeMatch.awayKitColours||''};
   if(reportMode&&__matchReportSteps.some(st=>st.key==='through')){state.cupProgress=normaliseCupProgress(state.cupProgress);state.cupProgress[cupProgressKey(m)]={through:!!document.getElementById('match-through-checkbox')?.checked,at:new Date().toISOString()};}
-  if(featureEnabled('goals')){
+  if(!abandoned&&featureEnabled('goals')){
     state.goals=state.goals.filter(x=>x.matchId!==id);
     document.querySelectorAll('#detail-goals-inputs input[data-player]').forEach(i=>{const n=Number(i.value||0);if(n>0)state.goals.push({id:uid('g'),matchId:id,player:i.dataset.player,goals:n});});
   }
-  if(featureEnabled('assists')){
+  if(!abandoned&&featureEnabled('assists')){
     state.assists=(state.assists||[]).filter(x=>x.matchId!==id);
     document.querySelectorAll('#detail-assists-inputs input[data-player]').forEach(i=>{const n=Number(i.value||0);if(n>0)state.assists.push({id:uid('as'),matchId:id,player:i.dataset.player,assists:n});});
   }
-  if(featureEnabled('bookings')&&document.getElementById('detail-booking-inputs')){
+  if(!abandoned&&featureEnabled('bookings')&&document.getElementById('detail-booking-inputs')){
     state.bookings=(state.bookings||[]).filter(x=>x.matchId!==id);
     const map={};document.querySelectorAll('#detail-booking-inputs input[data-player]').forEach(i=>{map[i.dataset.player]=map[i.dataset.player]||{yellow:0,red:0};map[i.dataset.player][i.dataset.card]=Number(i.value||0);});
     Object.entries(map).forEach(([player,c])=>{if(c.yellow||c.red)state.bookings.push({id:uid('b'),matchId:id,player,yellow:c.yellow,red:c.red});});
   }
-  if(featureEnabled('awards'))saveAwardFields('detail-award-fields',m);
+  if(!abandoned&&featureEnabled('awards'))saveAwardFields('detail-award-fields',m);
   const saveButton=document.getElementById('save-match-details');__matchReportSaveBusy=true;
   const controls=[...document.querySelectorAll('#match-detail-form input,#match-detail-form textarea,#match-detail-form select,#match-detail-form button')],disabled=controls.map(el=>el.disabled);controls.forEach(el=>el.disabled=true);
   const parts=[{label:'Match data',status:'not saved'},{label:'Attendance',status:CLOUD_MODE?'not saved':'not applicable'},{label:'Private coaching notes',status:CLOUD_MODE?'not saved':'not applicable'}];
@@ -4672,7 +4684,7 @@ async function saveMatchDetails(e){
     }
     if(!sameMatchDetail(id,epoch,key))return;
     const savedMatch=state.matches.find(x=>x.id===id)||m;
-    if(reportMode&&matchStatus(beforeMatch)!=='played')auditEvent('match_played','match',id,`Marked match played vs ${savedMatch.opponent}`,beforeMatch,savedMatch);
+    if(reportMode&&matchStatus(beforeMatch)!==matchStatus(savedMatch))auditEvent(abandoned?'match_abandoned':'match_played','match',id,`Marked match ${abandoned?'abandoned':'played'} vs ${savedMatch.opponent}`,beforeMatch,savedMatch);
     const afterDetails={goals:state.goals.filter(x=>x.matchId===id),assists:(state.assists||[]).filter(x=>x.matchId===id),bookings:(state.bookings||[]).filter(x=>x.matchId===id),awards:state.awards.filter(x=>x.matchId===id),homeKitColours:savedMatch.homeKitColours||'',awayKitColours:savedMatch.awayKitColours||''};auditEvent('match_details_updated','match_details',id,`Updated match details vs ${savedMatch.opponent}`,beforeDetails,afterDetails);
     showMatchReportOutcome(parts);renderNextMatch();
   }catch{if(sameMatchDetail(id,epoch,key)){parts[0].message='Stored on this device; the club has not confirmed the save. Your report is still here.';showMatchReportOutcome(parts);}}
@@ -7111,6 +7123,7 @@ async function submitMatch(e){
     gf:isAway?awayScore:homeScore,
     ga:isAway?homeScore:awayScore,
     status,
+    ...(status==='abandoned'&&existing?.abandonmentReason?{abandonmentReason:existing.abandonmentReason}:{}),
     notes:document.getElementById('match-notes').value.trim(),
     source:existing?.source||'manual',
     providerTeamIds:Array.isArray(existing?.providerTeamIds)?[...existing.providerTeamIds]:[],
@@ -7393,6 +7406,7 @@ document.getElementById('matchday-notify-squad')?.addEventListener('click',notif
 document.getElementById('person-profile-body')?.addEventListener('click',event=>{const button=event.target.closest('[data-profile-availability]');if(button)saveProfileAvailability(button.dataset.profileAvailability);});
 document.getElementById('match-search').addEventListener('input',applyMatchFilter);
 document.getElementById('match-gf').addEventListener('input',updateGoalCheck);
+document.getElementById('match-report-status')?.addEventListener('change',updateReportMatchStatus);
 document.getElementById('match-status')?.addEventListener('change',updateMatchStatusUI);
 document.getElementById('match-venue')?.addEventListener('change',updateGoalCheck);
 document.getElementById('match-competition')?.addEventListener('change',()=>{updateTournamentMatchUI();configureOpponentAgeGroup();refreshSelkentOpponentDirectory(false);});
