@@ -62,11 +62,11 @@
 .kickoff-admin-panel .panel-heading{flex-wrap:wrap;gap:16px}
 .kickoff-admin-panel button{min-height:52px;min-width:0;padding:12px 16px;white-space:normal;overflow-wrap:anywhere;font-size:14px;line-height:1.4}
 .kickoff-admin-list{display:grid;gap:0}
-.kickoff-admin-card{min-width:0;padding:12px 0;border:0;border-bottom:1px solid var(--line);border-radius:0;background:transparent;color:var(--ink);box-shadow:none}
+.kickoff-admin-card{display:block;min-width:0;padding:12px 0;border:0;border-bottom:1px solid var(--line);border-radius:0;background:transparent;color:var(--ink);box-shadow:none}
 .kickoff-admin-card:last-child{border-bottom:0;padding-bottom:0}
 .kickoff-admin-card :is(.kickoff-admin-team,.kickoff-admin-when,.kickoff-admin-count){margin:4px 0 0;line-height:1.4;overflow-wrap:anywhere}
 .kickoff-admin-card .kickoff-admin-team{margin-top:0;font-size:12px;color:var(--muted)}
-.kickoff-admin-card .kickoff-admin-opponent{margin:4px 0 0;font:700 24px/1.1 "Barlow Condensed",Inter,sans-serif;text-transform:uppercase;letter-spacing:0;overflow-wrap:anywhere;color:var(--ink)}
+#kickoff-admin-panel .kickoff-admin-card .kickoff-admin-opponent{margin:4px 0 0;font:700 24px/1.1 "Barlow Condensed",Inter,sans-serif;text-transform:uppercase;letter-spacing:0;overflow-wrap:anywhere;color:var(--ink)}
 .kickoff-admin-when{font-size:12px;color:var(--muted)}
 .kickoff-admin-count{font-size:13px}
 .kickoff-admin-details>summary{display:flex;align-items:center;gap:8px;min-height:44px;width:fit-content;max-width:100%;box-sizing:border-box;cursor:pointer;list-style:none;font-size:14px;line-height:1.4;color:var(--ink)}
