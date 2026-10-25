@@ -141,7 +141,7 @@ html body #view-person .player-profile-stats article span{font-size:.875rem;line
 .graphic-admin-heading{position:relative;min-height:132px;grid-column:1/-1;display:flex;flex-direction:column;justify-content:flex-end;padding-bottom:24px;color:#fff}
 .graphic-admin-heading .kicker{color:#fff!important;font-size:.6875rem}
 html body .graphic-admin-heading h2{font:700 2.5rem/1 var(--sh-display)!important;text-transform:uppercase;margin:6px 96px 0 0;color:#fff!important;text-shadow:0 2px 4px rgba(0,0,0,.7)}
-.graphic-admin-heading .graphic-raised-crest{top:auto;bottom:28px;right:8px}
+.graphic-admin-heading .graphic-raised-crest{top:auto;bottom:28px;right:8px;box-shadow:0 3px 6px rgba(0,0,0,.2),inset 0 1px 2px rgba(255,255,255,.7)}
 html body #view-club #admin-club-overview>.admin-home-weekend{background:transparent!important;border:0!important;box-shadow:none!important;padding:0!important}
 html body #admin-club-overview .admin-home-weekend h3{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
 html body #admin-club-overview .admin-home-weekend :is(strong,.kicker,.muted,.helper,.admin-home-metrics span){color:var(--sh-copy)!important}

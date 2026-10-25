@@ -35,9 +35,10 @@ async function responseState(page, stateName) {
       if (stateName === 'loading') return new Promise(() => {});
       if (stateName === 'error') throw Error('Fictional read failure');
       if (stateName === 'empty') return [];
-      return [{update_id:'fictional-update',team_id:'fictional-team',team_name:'Example Greens',revision:1,
+      const rows=[{update_id:'fictional-update',team_id:'fictional-team',team_name:'Example Greens',revision:1,
         details:{date:'2099-10-25',time:'10:30',opponent:'Example visiting team with a longer club name',ground:'Example playing fields',status:'confirmed'},
         coaches:[{user_id:'fictional-coach',name:'Taylor Example',revision_current:true,acknowledged_at:null}],parents:{available:3,pending:2}}];
+      return stateName==='multiple'?[...rows,...rows.map(r=>({...r,update_id:'fictional-second',team_name:'Example Blues'})),...rows.map(r=>({...r,update_id:'fictional-third',team_name:'Example Navy'}))]:rows;
     };
     ClubHubKickoffUpdates.setAdminWeekend(adminShareWeekendDates());
     if (stateName === 'loading') void ClubHubKickoffUpdates.refreshAdmin(false);
@@ -67,7 +68,7 @@ async function measure(page) {
     const widths=process.env.PITCHKIND_GRID_BASELINE==='1'?[1363]:[320,393,768,900,901,1024,1199,1200,1363,1399,1400,1440,1920];
     for(const theme of ['dark','light'])for(const width of widths) {
       await prepare(page,'admin',width,theme);
-      for(const stateName of ['loading','empty','error','populated']) {
+      for(const stateName of ['loading','empty','error','populated','multiple']) {
         await responseState(page,stateName);const m=await measure(page);cases.push({theme,width,stateName,...m});
         assert(m.documentWidth<=m.viewport+1,`${width}/${theme}: viewport containment`);
         assert(m.panel.width>=Math.min(288,m.grid.width)-1,`${width}/${theme}: response panel has readable width, got ${m.panel.width}`);
@@ -77,7 +78,20 @@ async function measure(page) {
         for(const label of m.seenColors)readableOnCanvas(label.color,m.canvas,`${width}/${theme}: ${label.text}`);
         if(width>=1200){assert(Math.abs(m.weekend.y-m.panel.y)<1,`${width}: operational sections share row`);assert(m.panel.x>=m.weekend.right,`${width}: operational columns do not overlap`);}
         else if(width>=901){assert(Math.abs(m.panel.width-m.grid.width)<1,`${width}: smaller desktop stacks full width`);assert(m.panel.y>=m.weekend.bottom,`${width}: response section below weekend`);}
-        if(stateName==='populated')assert.equal(m.articles,1,'native response renderer uses fictional API row');
+        if(stateName==='populated'||stateName==='multiple'){
+          assert.equal(m.articles,stateName==='multiple'?3:1,'native fixture count');
+          const overview=await page.locator('.kickoff-admin-card').first().innerText();
+          assert(overview.includes('Coaches · 0/1 seen')&&overview.includes('3 available')&&overview.includes('2 pending'),'accurate aggregate overview');
+          assert(!overview.includes('Taylor Example')&&!overview.includes('Example playing fields'),'full detail collapsed by default');
+          const compact=await page.locator('.kickoff-admin-card').first().evaluate(el=>({height:el.getBoundingClientRect().height,shadow:getComputedStyle(el).boxShadow,font:getComputedStyle(el.querySelector('h4')).fontFamily,target:el.querySelector('summary').getBoundingClientRect().height}));
+          assert(compact.height<250,'single collapsed fixture stays compact');assert.equal(compact.shadow,'none','no nested raised card');assert(compact.font.includes('Barlow Condensed'),'fixture display typography');assert(compact.target>=44,'details touch target');
+          await page.locator('.kickoff-admin-details>summary').first().click();
+          assert((await page.locator('.kickoff-admin-card').first().innerText()).includes('Taylor Example'),'details shows coach names');
+          await page.locator('.kickoff-admin-details>summary').first().click();
+        }
+        const header=await page.locator('.app-shell>.hero').evaluate(el=>{const logo=el.querySelector('.club-logo-wrap'),copy=el.querySelector('.hero-copy');return{badge:logo.getBoundingClientRect().width,height:logo.getBoundingClientRect().height,copy:getComputedStyle(copy).justifyContent,align:getComputedStyle(copy).alignSelf,gap:getComputedStyle(copy).gap};});
+        assert.equal(header.badge,width<374?72:92,'original badge width');assert.equal(header.height,header.badge,'original badge height');assert.equal(header.copy,'flex-start','header lines packed at start');assert.equal(header.align,'start');assert.equal(header.gap,'4px');
+        assert.equal(await page.locator('.admin-home-footer').count(),0,'duplicate footer shortcuts removed');
         if(stateName==='error')assert(m.status.includes('Could not load'),'native read failure remains visible');
         if([320,901,1363,1440].includes(width)&&['error','populated'].includes(stateName))await page.screenshot({path:path.join(out,`${width}-${theme}-${stateName}.png`),fullPage:true});
       }
