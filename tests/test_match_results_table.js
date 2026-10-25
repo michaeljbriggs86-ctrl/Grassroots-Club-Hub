@@ -36,9 +36,10 @@ assert.doesNotMatch(h,/match-detail-badges|⚽|★|⭐|▣/,'stat icons are abse
 assert.equal(ctx.state.goals[0].goals,2,'rendering leaves recorded statistics intact');
 assert.equal(ctx.state.awards.length,1);
 assert.doesNotMatch(h,/match-result-actions|data-edit-match|data-delete-match|data-match-played|>Scheduled<|>SCH<|Status \/ result/,'no extra action line or visible status text');
-for(const status of ['scheduled','postponed','abandoned']){
+for(const status of ['scheduled','postponed']){
  assert.equal(ctx.matchResultCellHTML({...friendly,status}),'<span aria-label="No result">—</span>','non-final scores are not presented as results');
 }
+assert.equal(ctx.matchResultCellHTML({...friendly,status:'abandoned'}),'<span class="competition-result-pill">Abandoned</span>','abandoned rows show status without a final score');
 ctx.miniResultsRestrictedView=()=>true;
 assert.doesNotMatch(ctx.matchResultCellHTML(friendly),/2–3/,'restricted results stay private');
 ctx.miniResultsRestrictedView=()=>false;

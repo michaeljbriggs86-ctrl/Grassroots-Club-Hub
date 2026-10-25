@@ -3766,6 +3766,7 @@ function matchCardHTML(m){
 }
 /* Results stay compact; fixture status, statistics and coach actions live in Details. */
 function matchResultCellHTML(m){
+  if(matchStatus(m)==='abandoned')return '<span class="competition-result-pill">Abandoned</span>';
   if(!isPlayedMatch(m))return '<span aria-label="No result">—</span>';
   const r=resultOf(m),text=miniResultsRestrictedView()?'Result private':`${r} ${Number(m.gf||0)}–${Number(m.ga||0)}`;
   return `<span class="competition-result-pill ${r}">${text}</span>`;
