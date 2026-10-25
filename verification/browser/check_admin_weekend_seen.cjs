@@ -197,12 +197,16 @@ async function run(playwrightModule=process.argv[2]||'playwright',output=process
   const metrics=await container().evaluate(el=>{
    const hero=el.closest('.admin-home-weekend'),style=getComputedStyle(hero),color=value=>{const probe=document.createElement('span');probe.style.color=value;hero.append(probe);const result=getComputedStyle(probe).color.match(/[\d.]+/g).map(Number);probe.remove();return result;};
    const lum=rgb=>rgb.slice(0,3).map(value=>value/255).map(value=>value<=.04045?value/12.92:((value+.055)/1.055)**2.4).reduce((sum,value,i)=>sum+value*[.2126,.7152,.0722][i],0);
-   const backgrounds=['--gch-green-800','--gch-green-950','--gch-ink'].map(name=>color(style.getPropertyValue(name)));
+   // The current Sunday/Figma weekend section is transparent over the theme
+   // canvas. Measure its rendered material, not the retired green hero colours.
+   const canvas=color(style.getPropertyValue('--sh-canvas'));
+   const paints=style.backgroundImage.match(/rgba?\([^)]+\)|#[\da-f]{3,8}\b/gi)||[style.backgroundColor];
+   const backgrounds=paints.map(paint=>{const rgb=color(paint),alpha=rgb[3]??1;return rgb.slice(0,3).map((value,i)=>value*alpha+canvas[i]*(1-alpha));});
    const contrast=node=>{const s=getComputedStyle(node),rgb=color(s.color),opacity=Number(s.opacity)*(rgb[3]??1);return Math.min(...backgrounds.map(bg=>{const foreground=rgb.slice(0,3).map((value,i)=>value*opacity+bg[i]*(1-opacity)),a=lum(foreground),b=lum(bg);return (Math.max(a,b)+.05)/(Math.min(a,b)+.05);}));};
    return {overflow:el.scrollWidth>el.clientWidth+1,viewportOverflow:document.documentElement.scrollWidth>innerWidth+1,summaryHeight:el.querySelector('summary').getBoundingClientRect().height,summaryContrast:contrast(el.querySelector('summary')),contextContrast:contrast(el.querySelector('.kickoff-weekend-context')),contextFontSize:getComputedStyle(el.querySelector('.kickoff-weekend-context')).fontSize,heroBackground:style.backgroundImage,groups:[...el.querySelectorAll('[data-kickoff-weekend-group]')].map(n=>({group:n.dataset.kickoffWeekendGroup,overflow:n.scrollWidth>n.clientWidth+1}))};
   });
   assert.equal(metrics.overflow,false);assert.equal(metrics.viewportOverflow,false);assert(metrics.summaryHeight>=44,'native summary retains44px target');assert(metrics.groups.every(g=>!g.overflow));await capture('expanded-'+width+'-'+theme);
-  assert(metrics.summaryContrast>=4.5,'summary contrast across the green hero gradient');assert(metrics.contextContrast>=4.5,'context contrast includes its opacity');assert.equal(metrics.contextFontSize,'12px');
+  assert(metrics.summaryContrast>=4.5,'summary contrast across its actual theme material');assert(metrics.contextContrast>=4.5,'context contrast includes its opacity');assert.equal(metrics.contextFontSize,'12px');
   if(width===320){
    await container().evaluate(el=>{const sizes=[...el.querySelectorAll('*')].map(node=>[node,parseFloat(getComputedStyle(node).fontSize)]);for(const [node,size] of sizes){node.dataset.beforeStyle=node.getAttribute('style')||'';node.style.fontSize=size*2+'px';}});
    const enlarged=await container().evaluate(el=>({overflow:el.scrollWidth>el.clientWidth+1,clipped:[...el.querySelectorAll('summary,li')].filter(n=>n.scrollHeight>n.clientHeight+1).length}));

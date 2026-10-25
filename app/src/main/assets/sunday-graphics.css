@@ -198,7 +198,7 @@ html body #next-fixture-dialog #next-match-calendar{background:rgba(17,23,21,.78
   html body #view-home .home-scene-shirt .graphic-shirt-initials{font-size:1.5rem}
   html body:not(.auth-open) #view-home>#home-next-match{grid-column:1/8;grid-row:1;align-self:end;margin:180px 0 64px;z-index:3;gap:12px}
   html body #view-home #next-match-card{min-height:210px}
-  html body #view-home #home-next-title{color:rgba(255,255,255,.8)}
+  html body #view-home #home-next-title{color:var(--sh-muted)}
   html body #view-home #next-match-card .next-match-summary-team strong{font-size:2rem!important}
   html body:not(.auth-open) #view-home>#home-club-notices{grid-column:7/13;grid-row:2/5;align-self:start;padding:24px!important;background:var(--sh-panel)!important;border:1px solid var(--sh-line)!important;box-shadow:var(--sh-shadow)!important}
   html body:not(.auth-open) #view-home>#home-season-group-label{grid-column:1/7;grid-row:2;margin:0}
@@ -212,10 +212,16 @@ html body #next-fixture-dialog #next-match-calendar{background:rgba(17,23,21,.78
   html body #view-squad #squad-list{grid-template-columns:repeat(auto-fill,minmax(180px,1fr))!important;gap:40px!important}
   html body #view-squad .graphic-raised-crest{top:68px;right:40px;width:108px}
   .graphic-admin-heading{min-height:180px}
-  html body #view-club #admin-club-overview{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:24px}
-  html body #admin-club-overview>.admin-home-weekend{grid-column:1/8}
+  html body #view-club #admin-club-overview{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));align-items:start;gap:24px}
+  /* Every operational panel needs an explicit span: auto takes one narrow track.
+     Keep small desktop workspaces readable before introducing the paired spread. */
+  html body:not(.auth-open) #view-club #admin-club-overview>:is(.admin-home-weekend,#kickoff-admin-panel){grid-column:1/-1}
   html body #admin-club-overview>:is(.admin-home-people,.admin-home-communications){grid-column:span 6}
   html body #admin-club-overview>.admin-home-directory-link{grid-column:span 4}
+}
+@media(min-width:1200px){
+  html body:not(.auth-open) #view-club #admin-club-overview:has(>#kickoff-admin-panel:not([hidden]))>.admin-home-weekend{grid-column:1/8}
+  html body:not(.auth-open) #view-club #admin-club-overview>#kickoff-admin-panel{grid-column:8/-1}
 }
 @media(max-width:374px){
   html body:not(.auth-open) .content{padding-inline:16px!important}
@@ -247,6 +253,7 @@ html[data-theme] body:not(.auth-open) .app-shell .content #view-squad .squad-for
 
 /* Complete the native role surfaces after the older, more specific theme rules. */
 html[data-theme] body:not(.auth-open) .app-shell .content #view-club #admin-club-overview>:is(.admin-home-weekend,.admin-home-people,.admin-home-communications){background:transparent!important;border:0!important;border-radius:0!important;box-shadow:none!important;padding:16px 0!important}
+html[data-theme] body:not(.auth-open) .app-shell .content #view-club #admin-club-overview>.admin-home-weekend{color:var(--sh-copy)!important}
 html[data-theme] body:not(.auth-open) #view-club:has(#admin-club-overview:not(.hidden))>.section-title-row{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
 html[data-theme] body:not(.auth-open) #view-club #admin-club-overview .admin-home-weekend :is(strong,.kicker,.muted,.helper,.admin-home-metrics span){color:var(--sh-copy)!important}
 html[data-theme] body:not(.auth-open) #view-club #admin-club-overview .admin-home-weekend :is(.primary-button,.secondary-button){background:var(--sh-action)!important;color:var(--sh-copy)!important;border:1px solid var(--sh-line)!important;box-shadow:var(--sh-shadow)!important;border-radius:10px!important}
