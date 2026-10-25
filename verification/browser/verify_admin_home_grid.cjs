@@ -82,8 +82,12 @@ async function measure(page) {
     await prepare(page,'coach',1363,'dark');assert(!await page.locator('#kickoff-admin-panel').isVisible(),'coach cannot see admin response panel');
     for(const theme of ['dark','light']){
       await prepare(page,'parent',1363,theme);assert(!await page.locator('#kickoff-admin-panel').isVisible(),'parent cannot see admin response panel');
-      const label=await page.locator('#home-next-title').evaluate(el=>({color:getComputedStyle(el).color,muted:getComputedStyle(el).getPropertyValue('--sh-muted').trim()}));
-      assert.equal(label.color,theme==='light'?'rgb(79, 95, 85)':'rgba(255, 255, 255, 0.67)','Parent Home label uses its theme token below the pitch scene');
+      const label=await page.locator('#home-next-title').evaluate(el=>({color:getComputedStyle(el).color,canvas:getComputedStyle(el).getPropertyValue('--sh-canvas').trim()}));
+      const channels=label.color.match(/[\d.]+/g).map(Number),bg=label.canvas.slice(1).match(/../g).map(n=>parseInt(n,16));
+      const alpha=channels[3]??1,fg=bg.map((c,i)=>channels[i]*alpha+c*(1-alpha));
+      const luminance=rgb=>rgb.map(c=>{c/=255;return c<=.04045?c/12.92:((c+.055)/1.055)**2.4;}).reduce((sum,c,i)=>sum+c*[.2126,.7152,.0722][i],0);
+      const a=luminance(fg),b=luminance(bg),contrast=(Math.max(a,b)+.05)/(Math.min(a,b)+.05);
+      assert(contrast>=4.5,`Parent Home ${theme} label must contrast with its canvas, got ${contrast}: ${label.color}`);
     }
     assert.deepEqual(errors,[],'no native runtime errors');assert.deepEqual(externalWrites,[],'no external writes');
     console.log(`PASS Admin Home responsive grid: ${cases.length} native state/theme/width cases, hidden state, role gates and Review fixtures navigation`);
