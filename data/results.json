@@ -1,9 +1,9 @@
 {
   "schema_version": 2,
   "provider": "Selkent",
-  "last_updated": "2026-10-25T17:05:52.289530+00:00",
-  "cup_results_last_updated": "2026-10-25T17:05:52.289530+00:00",
-  "cup_results_last_attempted": "2026-10-25T17:05:52.289530+00:00",
+  "last_updated": "2026-10-25T19:37:42.819503+00:00",
+  "cup_results_last_updated": "2026-10-25T19:37:42.819503+00:00",
+  "cup_results_last_attempted": "2026-10-25T19:37:42.819503+00:00",
   "cup_results_status": "verified_current",
   "fixture_agegroup_discovery_source": "selkent_divisions_all",
   "coverage": {
@@ -10227,12 +10227,25 @@
         },
         {
           "division_name": "Under 12B Silver",
-          "updated_at_text": "25/10/26 12:17:26",
+          "updated_at_text": "25/10/26 18:22:46",
           "source_order_authoritative_for_ties": false,
           "source_disclaimer": "Note: Table does not yet take account of rules for determining winner if teams on equal points",
           "rows": [
             {
               "row_order": 1,
+              "provider_team_id": 49,
+              "provider_division_id": 4253,
+              "team_name": "Russellers Whites",
+              "played": 4,
+              "won": 3,
+              "drawn": 0,
+              "lost": 1,
+              "gf": 13,
+              "ga": 12,
+              "points": 6
+            },
+            {
+              "row_order": 2,
               "provider_team_id": 521,
               "provider_division_id": 4253,
               "team_name": "Dulwich Hamlet JFC Pink",
@@ -10245,7 +10258,7 @@
               "points": 5
             },
             {
-              "row_order": 2,
+              "row_order": 3,
               "provider_team_id": 239,
               "provider_division_id": 4253,
               "team_name": "Dulwich Village White",
@@ -10258,7 +10271,7 @@
               "points": 4
             },
             {
-              "row_order": 3,
+              "row_order": 4,
               "provider_team_id": 292,
               "provider_division_id": 4253,
               "team_name": "Fisher Youth",
@@ -10268,19 +10281,6 @@
               "lost": 0,
               "gf": 12,
               "ga": 1,
-              "points": 4
-            },
-            {
-              "row_order": 4,
-              "provider_team_id": 49,
-              "provider_division_id": 4253,
-              "team_name": "Russellers Whites",
-              "played": 3,
-              "won": 2,
-              "drawn": 0,
-              "lost": 1,
-              "gf": 8,
-              "ga": 9,
               "points": 4
             },
             {
@@ -10366,12 +10366,12 @@
               "provider_team_id": 704,
               "provider_division_id": 4253,
               "team_name": "The Bosco FC Dons",
-              "played": 3,
+              "played": 4,
               "won": 0,
               "drawn": 0,
-              "lost": 3,
-              "gf": 3,
-              "ga": 13,
+              "lost": 4,
+              "gf": 6,
+              "ga": 18,
               "points": 0
             }
           ],
@@ -10709,7 +10709,7 @@
         },
         {
           "division_name": "Under 12C Silver",
-          "updated_at_text": "25/10/26 13:54:21",
+          "updated_at_text": "25/10/26 18:09:12",
           "source_order_authoritative_for_ties": false,
           "source_disclaimer": "Note: Table does not yet take account of rules for determining winner if teams on equal points",
           "rows": [
@@ -10728,6 +10728,32 @@
             },
             {
               "row_order": 2,
+              "provider_team_id": 192,
+              "provider_division_id": 4256,
+              "team_name": "Junior Reds Athletic",
+              "played": 5,
+              "won": 3,
+              "drawn": 1,
+              "lost": 1,
+              "gf": 19,
+              "ga": 14,
+              "points": 7
+            },
+            {
+              "row_order": 3,
+              "provider_team_id": 173,
+              "provider_division_id": 4256,
+              "team_name": "KSI Coaching FC Navy",
+              "played": 5,
+              "won": 2,
+              "drawn": 3,
+              "lost": 0,
+              "gf": 18,
+              "ga": 10,
+              "points": 7
+            },
+            {
+              "row_order": 4,
               "provider_team_id": 946,
               "provider_division_id": 4256,
               "team_name": "Deptford United Flamingoes",
@@ -10737,32 +10763,6 @@
               "lost": 1,
               "gf": 17,
               "ga": 4,
-              "points": 6
-            },
-            {
-              "row_order": 3,
-              "provider_team_id": 192,
-              "provider_division_id": 4256,
-              "team_name": "Junior Reds Athletic",
-              "played": 4,
-              "won": 3,
-              "drawn": 0,
-              "lost": 1,
-              "gf": 17,
-              "ga": 12,
-              "points": 6
-            },
-            {
-              "row_order": 4,
-              "provider_team_id": 173,
-              "provider_division_id": 4256,
-              "team_name": "KSI Coaching FC Navy",
-              "played": 4,
-              "won": 2,
-              "drawn": 2,
-              "lost": 0,
-              "gf": 16,
-              "ga": 8,
               "points": 6
             },
             {
@@ -11923,6 +11923,15 @@
           "division_name": "Under 12B Orange"
         },
         {
+          "date": "2026-10-25",
+          "home": "The Bosco FC Dons",
+          "away": "Russellers Whites",
+          "homeGoals": 3,
+          "awayGoals": 5,
+          "provider_division_id": 4253,
+          "division_name": "Under 12B Silver"
+        },
+        {
           "date": "2026-10-18",
           "home": "Dulwich Village Orange",
           "away": "Dulwich Village White",
@@ -12450,6 +12459,15 @@
           "away": "Dulwich Hamlet JFC Navy",
           "homeGoals": 0,
           "awayGoals": 4,
+          "provider_division_id": 4256,
+          "division_name": "Under 12C Silver"
+        },
+        {
+          "date": "2026-10-25",
+          "home": "Junior Reds Athletic",
+          "away": "KSI Coaching FC Navy",
+          "homeGoals": 2,
+          "awayGoals": 2,
           "provider_division_id": 4256,
           "division_name": "Under 12C Silver"
         },
@@ -15440,7 +15458,7 @@
         },
         {
           "division_name": "Under 14 A Silver",
-          "updated_at_text": "25/10/26 15:47:37",
+          "updated_at_text": "25/10/26 18:12:39",
           "source_order_authoritative_for_ties": false,
           "source_disclaimer": "Note: Table does not yet take account of rules for determining winner if teams on equal points",
           "rows": [
@@ -25855,7 +25873,7 @@
         },
         {
           "division_name": "Under 16B Navy",
-          "updated_at_text": "25/10/26 12:29:38",
+          "updated_at_text": "25/10/26 18:45:43",
           "source_order_authoritative_for_ties": false,
           "source_disclaimer": "Note: Table does not yet take account of rules for determining winner if teams on equal points",
           "rows": [
@@ -25968,16 +25986,29 @@
               "provider_team_id": 210,
               "provider_division_id": 4287,
               "team_name": "Foots Cray Lions",
-              "played": 4,
+              "played": 5,
               "won": 1,
               "drawn": 1,
-              "lost": 2,
-              "gf": 7,
-              "ga": 13,
+              "lost": 3,
+              "gf": 11,
+              "ga": 18,
               "points": 3
             },
             {
               "row_order": 10,
+              "provider_team_id": 871,
+              "provider_division_id": 4287,
+              "team_name": "Falconwood FC White",
+              "played": 4,
+              "won": 1,
+              "drawn": 0,
+              "lost": 3,
+              "gf": 9,
+              "ga": 18,
+              "points": 2
+            },
+            {
+              "row_order": 11,
               "provider_team_id": 740,
               "provider_division_id": 4287,
               "team_name": "Teviot Rangers BLUE",
@@ -25988,19 +26019,6 @@
               "gf": 13,
               "ga": 10,
               "points": 2
-            },
-            {
-              "row_order": 11,
-              "provider_team_id": 871,
-              "provider_division_id": 4287,
-              "team_name": "Falconwood FC White",
-              "played": 3,
-              "won": 0,
-              "drawn": 0,
-              "lost": 3,
-              "gf": 4,
-              "ga": 14,
-              "points": 0
             }
           ],
           "provider_division_id": 4287
@@ -26572,6 +26590,15 @@
           "awayGoals": 2,
           "provider_division_id": 4286,
           "division_name": "Under 16A"
+        },
+        {
+          "date": "2026-10-25",
+          "home": "Foots Cray Lions",
+          "away": "Falconwood FC White",
+          "homeGoals": 4,
+          "awayGoals": 5,
+          "provider_division_id": 4287,
+          "division_name": "Under 16B Navy"
         },
         {
           "date": "2026-10-25",
