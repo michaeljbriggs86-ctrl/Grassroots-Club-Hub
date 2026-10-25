@@ -39,6 +39,7 @@ async function responseState(page, stateName) {
         details:{date:'2099-10-25',time:'10:30',opponent:'Example visiting team with a longer club name',ground:'Example playing fields',status:'confirmed'},
         coaches:[{user_id:'fictional-coach',name:'Taylor Example',revision_current:true,acknowledged_at:null}],parents:{available:3,pending:2}}];
     };
+    ClubHubKickoffUpdates.setAdminWeekend(adminShareWeekendDates());
     if (stateName === 'loading') void ClubHubKickoffUpdates.refreshAdmin(false);
     else await ClubHubKickoffUpdates.refreshAdmin(false);
   }, stateName);
