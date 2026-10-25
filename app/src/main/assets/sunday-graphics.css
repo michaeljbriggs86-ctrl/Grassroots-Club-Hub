@@ -253,6 +253,7 @@ html[data-theme] body:not(.auth-open) .app-shell .content #view-squad .squad-for
 
 /* Complete the native role surfaces after the older, more specific theme rules. */
 html[data-theme] body:not(.auth-open) .app-shell .content #view-club #admin-club-overview>:is(.admin-home-weekend,.admin-home-people,.admin-home-communications){background:transparent!important;border:0!important;border-radius:0!important;box-shadow:none!important;padding:16px 0!important}
+html[data-theme] body:not(.auth-open) .app-shell .content #view-club #admin-club-overview>.admin-home-weekend{color:var(--sh-copy)!important}
 html[data-theme] body:not(.auth-open) #view-club:has(#admin-club-overview:not(.hidden))>.section-title-row{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
 html[data-theme] body:not(.auth-open) #view-club #admin-club-overview .admin-home-weekend :is(strong,.kicker,.muted,.helper,.admin-home-metrics span){color:var(--sh-copy)!important}
 html[data-theme] body:not(.auth-open) #view-club #admin-club-overview .admin-home-weekend :is(.primary-button,.secondary-button){background:var(--sh-action)!important;color:var(--sh-copy)!important;border:1px solid var(--sh-line)!important;box-shadow:var(--sh-shadow)!important;border-radius:10px!important}

@@ -6,6 +6,13 @@ const {chromium} = require(process.argv[2] || 'playwright');
 const root = path.resolve('cloudflare/web-app/dist');
 const out = path.resolve(process.argv[3] || 'admin-home-grid-review');
 fs.mkdirSync(out, {recursive:true});
+function readableOnCanvas(color,canvas,label) {
+  const channels=color.match(/[\d.]+/g).map(Number),bg=canvas.slice(1).match(/../g).map(n=>parseInt(n,16));
+  const alpha=channels[3]??1,fg=bg.map((c,i)=>channels[i]*alpha+c*(1-alpha));
+  const luminance=rgb=>rgb.map(c=>{c/=255;return c<=.04045?c/12.92:((c+.055)/1.055)**2.4;}).reduce((sum,c,i)=>sum+c*[.2126,.7152,.0722][i],0);
+  const a=luminance(fg),b=luminance(bg),contrast=(Math.max(a,b)+.05)/(Math.min(a,b)+.05);
+  assert(contrast>=4.5,`${label}: normal text contrasts with its canvas, got ${contrast}: ${color}`);
+}
 let base;
 const helper = fs.readFileSync('verification/browser/verify_shared_components.cjs','utf8');
 const prepare = eval('(' + helper.slice(helper.indexOf('async function prepare('),helper.indexOf('async function seedResults(')).trim() + ')');
@@ -44,7 +51,9 @@ async function measure(page) {
     return {viewport:innerWidth,documentWidth:document.documentElement.scrollWidth,grid:box(panel.parentElement),panel:box(panel),weekend:box(weekend),
       title:box(document.getElementById('kickoff-admin-title')),button:box(panel.querySelector('[data-kickoff-admin-refresh]')),
       people:box(document.getElementById('admin-home-people')),status:document.getElementById('kickoff-admin-status').textContent,
-      articles:panel.querySelectorAll('.kickoff-admin-card').length,hidden:panel.hidden};
+      articles:panel.querySelectorAll('.kickoff-admin-card').length,hidden:panel.hidden,
+      canvas:getComputedStyle(weekend).getPropertyValue('--sh-canvas').trim(),
+      seenColors:[...weekend.querySelectorAll('#kickoff-weekend-seen p,#kickoff-weekend-seen summary')].filter(el=>el.getClientRects().length).map(el=>({text:el.textContent,color:getComputedStyle(el).color}))};
   });
 }
 (async () => {
@@ -63,6 +72,8 @@ async function measure(page) {
         assert(m.panel.width>=Math.min(288,m.grid.width)-1,`${width}/${theme}: response panel has readable width, got ${m.panel.width}`);
         for(const b of [m.title,m.button])assert(b.x>=m.panel.x-1&&b.right<=m.panel.right+1,`${width}/${theme}: response title/action inside panel`);
         assert(m.button.height>=52,`${width}/${theme}: native response target`);
+        assert(m.seenColors.length,'native weekend acknowledgement status rendered');
+        for(const label of m.seenColors)readableOnCanvas(label.color,m.canvas,`${width}/${theme}: ${label.text}`);
         if(width>=1200){assert(Math.abs(m.weekend.y-m.panel.y)<1,`${width}: operational sections share row`);assert(m.panel.x>=m.weekend.right,`${width}: operational columns do not overlap`);}
         else if(width>=901){assert(Math.abs(m.panel.width-m.grid.width)<1,`${width}: smaller desktop stacks full width`);assert(m.panel.y>=m.weekend.bottom,`${width}: response section below weekend`);}
         if(stateName==='populated')assert.equal(m.articles,1,'native response renderer uses fictional API row');
@@ -83,11 +94,7 @@ async function measure(page) {
     for(const theme of ['dark','light']){
       await prepare(page,'parent',1363,theme);assert(!await page.locator('#kickoff-admin-panel').isVisible(),'parent cannot see admin response panel');
       const label=await page.locator('#home-next-title').evaluate(el=>({color:getComputedStyle(el).color,canvas:getComputedStyle(el).getPropertyValue('--sh-canvas').trim()}));
-      const channels=label.color.match(/[\d.]+/g).map(Number),bg=label.canvas.slice(1).match(/../g).map(n=>parseInt(n,16));
-      const alpha=channels[3]??1,fg=bg.map((c,i)=>channels[i]*alpha+c*(1-alpha));
-      const luminance=rgb=>rgb.map(c=>{c/=255;return c<=.04045?c/12.92:((c+.055)/1.055)**2.4;}).reduce((sum,c,i)=>sum+c*[.2126,.7152,.0722][i],0);
-      const a=luminance(fg),b=luminance(bg),contrast=(Math.max(a,b)+.05)/(Math.min(a,b)+.05);
-      assert(contrast>=4.5,`Parent Home ${theme} label must contrast with its canvas, got ${contrast}: ${label.color}`);
+      readableOnCanvas(label.color,label.canvas,`Parent Home ${theme} activity label`);
     }
     assert.deepEqual(errors,[],'no native runtime errors');assert.deepEqual(externalWrites,[],'no external writes');
     console.log(`PASS Admin Home responsive grid: ${cases.length} native state/theme/width cases, hidden state, role gates and Review fixtures navigation`);
