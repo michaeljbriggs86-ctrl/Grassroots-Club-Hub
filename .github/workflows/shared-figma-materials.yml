@@ -8,6 +8,7 @@ on:
       - 'cloudflare/web-app/service-worker.js'
       - 'verification/browser/verify_whole_app_materials.cjs'
       - 'verification/browser/verify_shared_components.cjs'
+      - 'verification/browser/verify_admin_home_grid.cjs'
       - '.github/workflows/shared-figma-materials.yml'
   pull_request:
     paths:
@@ -16,6 +17,7 @@ on:
       - 'cloudflare/web-app/service-worker.js'
       - 'verification/browser/verify_whole_app_materials.cjs'
       - 'verification/browser/verify_shared_components.cjs'
+      - 'verification/browser/verify_admin_home_grid.cjs'
       - '.github/workflows/shared-figma-materials.yml'
 permissions:
   contents: read
@@ -40,6 +42,7 @@ jobs:
         env:
           PITCHKIND_MATERIAL_VERIFY: '1'
         run: |
+          node verification/browser/verify_admin_home_grid.cjs "$RUNNER_TEMP/shared-figma/node_modules/playwright" "$RUNNER_TEMP/shared-figma-output/admin-home-grid"
           PITCHKIND_MATERIAL_WIDTH=320 node verification/browser/verify_whole_app_materials.cjs "$RUNNER_TEMP/shared-figma/node_modules/playwright" "$RUNNER_TEMP/shared-figma-output/phone-320"
           PITCHKIND_MATERIAL_WIDTH=393 node verification/browser/verify_whole_app_materials.cjs "$RUNNER_TEMP/shared-figma/node_modules/playwright" "$RUNNER_TEMP/shared-figma-output/phone-393"
           PITCHKIND_MATERIAL_WIDTH=1440 PITCHKIND_MATERIAL_ROLES=coach,admin PITCHKIND_MATERIAL_ROUTES=more,appearance,training-settings,feature-settings,my-account,inbox,add,coach-onboarding,player-onboarding node verification/browser/verify_whole_app_materials.cjs "$RUNNER_TEMP/shared-figma/node_modules/playwright" "$RUNNER_TEMP/shared-figma-output/desktop-forms"

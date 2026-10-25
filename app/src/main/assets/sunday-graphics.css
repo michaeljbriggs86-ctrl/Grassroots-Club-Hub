@@ -212,10 +212,16 @@ html body #next-fixture-dialog #next-match-calendar{background:rgba(17,23,21,.78
   html body #view-squad #squad-list{grid-template-columns:repeat(auto-fill,minmax(180px,1fr))!important;gap:40px!important}
   html body #view-squad .graphic-raised-crest{top:68px;right:40px;width:108px}
   .graphic-admin-heading{min-height:180px}
-  html body #view-club #admin-club-overview{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:24px}
-  html body #admin-club-overview>.admin-home-weekend{grid-column:1/8}
+  html body #view-club #admin-club-overview{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));align-items:start;gap:24px}
+  /* Every operational panel needs an explicit span: auto takes one narrow track.
+     Keep small desktop workspaces readable before introducing the paired spread. */
+  html body:not(.auth-open) #view-club #admin-club-overview>:is(.admin-home-weekend,#kickoff-admin-panel){grid-column:1/-1}
   html body #admin-club-overview>:is(.admin-home-people,.admin-home-communications){grid-column:span 6}
   html body #admin-club-overview>.admin-home-directory-link{grid-column:span 4}
+}
+@media(min-width:1200px){
+  html body:not(.auth-open) #view-club #admin-club-overview:has(>#kickoff-admin-panel:not([hidden]))>.admin-home-weekend{grid-column:1/8}
+  html body:not(.auth-open) #view-club #admin-club-overview>#kickoff-admin-panel{grid-column:8/-1}
 }
 @media(max-width:374px){
   html body:not(.auth-open) .content{padding-inline:16px!important}
