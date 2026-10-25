@@ -434,9 +434,10 @@ check(
     and 'Add score</button>' not in app[app.find('function renderDivisionResultCell'):app.find('function matchCardHTML')],
 )
 check(
-    'parent programme exposes Played Not played only',
+    'parent programme exposes score-free Played, Not played and Abandoned status',
     "${played?'Played':'Not played'}" in app
-    and "if(miniResultsRestrictedView()&&['played','abandoned'].includes(s))return'Played';" in app
+    and "if(miniResultsRestrictedView()&&s==='played')return'Played';" in app
+    and "if(s==='abandoned')return'Abandoned';" in app
     and "matchHeading.textContent=miniResultsRestrictedView()?'Matches'" in app,
 )
 check(
