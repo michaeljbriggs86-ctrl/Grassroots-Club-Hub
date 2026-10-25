@@ -7,6 +7,7 @@
  let scope='',push={loading:false,busy:false,available:false,on:false,key:'',error:''},pushVersion=0,pushStamp=0;
  let admin={scope:'',rows:[],loading:false,error:'',stamp:0,version:0,weekend:''};
  let adminWeekend={scope:'',dates:[],open:false};
+ const adminDetails=new Set();
  const identity=()=>[cloud()?.session?.user?.id||'',cloud()?.context?.profile?.club_id||'',cloud()?.role?.()||'',cloud()?.actingAsParent?.()?'parent':'staff',cloud()?.currentTeam?.()?.id||''].join('|');
  const adult=()=>!!cloud()?.session?.user?.id&&['club_admin','admin','coach','assistant_coach','parent'].includes(cloud()?.context?.profile?.role||cloud()?.role?.());
  const parentCapacity=()=>cloud()?.role?.()==='parent'||!!cloud()?.actingAsParent?.();
@@ -15,7 +16,7 @@
  const notificationStamp=()=>typeof __notificationStamp==='undefined'?0:__notificationStamp;
  const notificationUnavailable=()=>typeof __notificationLoading!=='undefined'&&__notificationLoading||typeof __notificationError!=='undefined'&&!!__notificationError;
  function clearAdminWeekend(){adminWeekend={scope:'',dates:[],open:false};const container=document.getElementById('kickoff-weekend-seen');if(container){container.hidden=true;container.innerHTML='';}}
- function resetAdmin(){const version=admin.version+1;admin={scope:'',rows:[],loading:false,error:'',stamp:0,version,weekend:''};clearAdminWeekend();const panel=document.getElementById('kickoff-admin-panel');if(panel){panel.hidden=true;const list=panel.querySelector('[data-kickoff-admin-list]');if(list)list.innerHTML='';const status=panel.querySelector('[data-kickoff-admin-status]');if(status)status.textContent='';}}
+ function resetAdmin(){adminDetails.clear();const version=admin.version+1;admin={scope:'',rows:[],loading:false,error:'',stamp:0,version,weekend:''};clearAdminWeekend();const panel=document.getElementById('kickoff-admin-panel');if(panel){panel.hidden=true;const list=panel.querySelector('[data-kickoff-admin-list]');if(list)list.innerHTML='';const status=panel.querySelector('[data-kickoff-admin-status]');if(status)status.textContent='';}}
  function reset(){scope=identity();busy.clear();errors.clear();cards.clear();blocked.clear();resetAdmin();++pushVersion;pushStamp=0;push={loading:false,busy:false,available:false,on:false,key:'',error:''};}
  function sync(){if(scope!==identity())reset();}
  function redraw(){if(typeof renderNotificationCenter==='function')renderNotificationCenter();}
@@ -136,12 +137,16 @@
   const rolled=syncAdminWeekend();renderAdminWeekend();if(rolled)scheduleAdminRefresh();if(!panel)return;
   panel.hidden=false;
   const status=panel.querySelector('[data-kickoff-admin-status]'),list=panel.querySelector('[data-kickoff-admin-list]'),button=panel.querySelector('[data-kickoff-admin-refresh]');
-  const message=admin.loading?'Loading latest responses…':admin.error||(!admin.stamp?'Loading latest responses…':'Responses are for these exact fixture details. Opening an email does not acknowledge them.');
+  const message=admin.loading?'Loading latest responses…':admin.error||(!admin.stamp?'Loading latest responses…':'Latest fixture responses.');
   if(status)status.textContent=message;if(button)button.disabled=admin.loading;panel.setAttribute('aria-busy',String(admin.loading));
   if(!list)return;
+  const disclosures=[...list.querySelectorAll('[data-kickoff-admin-detail]')];
+  if(disclosures.length){adminDetails.clear();for(const detail of disclosures)if(detail.open)adminDetails.add(detail.dataset.kickoffAdminDetail);}
   const html=admin.error?'<div class="notification-empty"><strong>Could not load latest responses</strong><p>Refresh responses to try again.</p></div>':admin.rows.length?admin.rows.map(row=>{
-   const coaches=Array.isArray(row.coaches)?row.coaches:[],seen=coaches.filter(coach=>coach.revision_current===true&&coach.acknowledged_at).length,parents=row.parents||{};
-   return `<article class="kickoff-admin-card" data-kickoff-admin-update="${esc(row.update_id)}"><strong>${esc(row.details?.opponent||'Upcoming fixture')}</strong>${actionContext(row)}<div class="kickoff-admin-coaches"><strong>Coaches · ${seen} of ${coaches.length} acknowledged</strong>${coaches.map(coach=>`<p><span>${esc(coach.name||'Coach')}</span><span>${coach.revision_current===true&&coach.acknowledged_at?'Seen and acknowledged · '+esc(stamp(coach.acknowledged_at)):'Awaiting acknowledgement'}</span></p>`).join('')||'<p>No assigned coaches</p>'}</div><div class="kickoff-admin-parents"><strong>Parent availability</strong><p>${Number(parents.available)||0} available · ${Number(parents.unavailable)||0} unavailable · ${Number(parents.pending)||0} no response${Number(parents.changed)?` · ${Number(parents.changed)} need a new response`:''}</p></div></article>`;
+   const coaches=Array.isArray(row.coaches)?row.coaches:[],seen=coaches.filter(coach=>coach.revision_current===true&&coach.acknowledged_at).length,parents=row.parents||{},d=row.details||{},key=String(row.update_id)+':'+row.revision;
+   const date=/^\d{4}-\d{2}-\d{2}$/.test(d.date||'')?new Date(d.date+'T12:00:00Z').toLocaleDateString('en-GB',{day:'numeric',month:'short',timeZone:'UTC'}):d.date;
+   const when=[date,d.time||'Kick-off unconfirmed',d.status==='provisional'?'Provisional':d.status==='confirmed'?'Confirmed':''].filter(Boolean).map(esc).join(' · ');
+   return `<article class="kickoff-admin-card" data-kickoff-admin-update="${esc(row.update_id)}"><p class="kickoff-admin-team">${esc(row.team_name||'Team')}</p><h4 class="kickoff-admin-opponent">${esc(d.opponent||'Upcoming fixture')}</h4><p class="kickoff-admin-when">${when}</p><p class="kickoff-admin-count">Coaches · ${seen}/${coaches.length} seen</p><p class="kickoff-admin-count">Parents · ${Number(parents.available)||0} available · ${Number(parents.unavailable)||0} unavailable · ${Number(parents.pending)||0} pending${Number(parents.changed)?` · ${Number(parents.changed)} need a new response`:''}</p><details class="kickoff-admin-details" data-kickoff-admin-detail="${esc(key)}"${adminDetails.has(key)?' open':''}><summary aria-label="Details for ${esc(row.team_name||'Team')} v ${esc(d.opponent||'Upcoming fixture')}">Details</summary>${actionContext(row)}<div class="kickoff-admin-coaches"><strong>Coaches · ${seen} of ${coaches.length} acknowledged</strong>${coaches.map(coach=>`<p><span>${esc(coach.name||'Coach')}</span><span>${coach.revision_current===true&&coach.acknowledged_at?'Seen and acknowledged · '+esc(stamp(coach.acknowledged_at)):'Awaiting acknowledgement'}</span></p>`).join('')||'<p>No assigned coaches</p>'}</div><p class="kickoff-helper">Opening an email does not acknowledge these details.</p></details></article>`;
   }).join(''):admin.stamp?'<div class="notification-empty"><strong>No upcoming kick-off updates yet</strong><p>Coach acknowledgements appear here after times are released.</p></div>':'';
   if(list.innerHTML!==html)list.innerHTML=html;
  }

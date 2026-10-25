@@ -18,7 +18,7 @@ html[data-theme] body:not(.auth-open) .app-shell>.hero .club-logo{
   position:absolute;inset:0;width:100%!important;height:100%!important;object-fit:contain!important;
 }
 html[data-theme] body:not(.auth-open) .app-shell>.hero .hero-copy{
-  display:flex;flex-direction:column;justify-content:space-between;min-height:var(--sh-header-identity);gap:4px;
+  display:flex;flex-direction:column;justify-content:flex-start;align-self:start;min-height:0;gap:4px;
 }
 html[data-theme] body:not(.auth-open) .app-shell>.hero .hero-copy>*{margin:0!important}
 html[data-theme] body:not(.auth-open) .app-shell>.hero .hero-copy .eyebrow{
