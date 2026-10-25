@@ -80,7 +80,11 @@ async function measure(page) {
     await prepare(page,'admin',1363,'dark');await responseState(page,'empty');
     await page.locator('[data-admin-home-action="fixtures"]').click();await page.waitForFunction(()=>__clubTab==='fixtures');
     await prepare(page,'coach',1363,'dark');assert(!await page.locator('#kickoff-admin-panel').isVisible(),'coach cannot see admin response panel');
-    await prepare(page,'parent',1363,'dark');assert(!await page.locator('#kickoff-admin-panel').isVisible(),'parent cannot see admin response panel');
+    for(const theme of ['dark','light']){
+      await prepare(page,'parent',1363,theme);assert(!await page.locator('#kickoff-admin-panel').isVisible(),'parent cannot see admin response panel');
+      const label=await page.locator('#home-next-title').evaluate(el=>({color:getComputedStyle(el).color,muted:getComputedStyle(el).getPropertyValue('--sh-muted').trim()}));
+      assert.equal(label.color,theme==='light'?'rgb(79, 95, 85)':'rgba(255, 255, 255, 0.67)','Parent Home label uses its theme token below the pitch scene');
+    }
     assert.deepEqual(errors,[],'no native runtime errors');assert.deepEqual(externalWrites,[],'no external writes');
     console.log(`PASS Admin Home responsive grid: ${cases.length} native state/theme/width cases, hidden state, role gates and Review fixtures navigation`);
   } finally {fs.writeFileSync(path.join(out,'measurements.json'),JSON.stringify({date:new Date().toISOString(),cases,errors,externalWrites},null,2));await browser.close();server.close();}

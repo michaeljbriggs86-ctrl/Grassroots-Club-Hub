@@ -198,7 +198,7 @@ html body #next-fixture-dialog #next-match-calendar{background:rgba(17,23,21,.78
   html body #view-home .home-scene-shirt .graphic-shirt-initials{font-size:1.5rem}
   html body:not(.auth-open) #view-home>#home-next-match{grid-column:1/8;grid-row:1;align-self:end;margin:180px 0 64px;z-index:3;gap:12px}
   html body #view-home #next-match-card{min-height:210px}
-  html body #view-home #home-next-title{color:rgba(255,255,255,.8)}
+  html body #view-home #home-next-title{color:var(--sh-muted)}
   html body #view-home #next-match-card .next-match-summary-team strong{font-size:2rem!important}
   html body:not(.auth-open) #view-home>#home-club-notices{grid-column:7/13;grid-row:2/5;align-self:start;padding:24px!important;background:var(--sh-panel)!important;border:1px solid var(--sh-line)!important;box-shadow:var(--sh-shadow)!important}
   html body:not(.auth-open) #view-home>#home-season-group-label{grid-column:1/7;grid-row:2;margin:0}
