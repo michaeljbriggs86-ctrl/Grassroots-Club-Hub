@@ -3,7 +3,7 @@
 :root{--sh-header-control:44px;--sh-header-switch:96px;--sh-header-identity:92px;--sh-page-gutter:20px;--sh-page-max:1800px;--sh-page-start:12px;--sh-section-gap:20px}
 /* Shared page rail, reviewed in Figma 576:10656 / 636:11003, 26 October.
    Reserve the native scrollbar so short and long routes keep the same rail. */
-html{scrollbar-gutter:stable}
+@media(min-width:901px){html{scrollbar-gutter:stable}}
 html[data-theme] body:not(.auth-open) .app-shell>:is(.hero,.content){
   box-sizing:border-box;width:100%;max-width:var(--sh-page-max);margin-inline:auto;
   padding-inline-start:max(var(--sh-page-gutter),env(safe-area-inset-left))!important;
