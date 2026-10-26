@@ -1,6 +1,6 @@
 // Browser pilot: cache reviewed same-origin application files only.
 // Never intercept Supabase responses, Selkent feeds, or private API calls.
-const CACHE = 'pitchkind-web-admin-compact-20261025b';
+const CACHE = 'pitchkind-web-team-stats-20261026a';
 const STATIC = [
   './', './index.html', './manifest.json', './cloud-config.js', './cloud.js',
   './onboarding.js', './onboarding.css', './app.js','./kickoff-updates.js','./coach-qualifications.js','./member-contact-import.js','./person-profiles.js', './registration-conduct.js', './player-onboarding.js', './coach-onboarding.js', './static-feed-overlay.js',
@@ -15,7 +15,7 @@ const STATIC = [
   './football-login-player.jpg', './football-login-club.jpg',
   './football-pitch-hero.jpg', './football-pitch-hero-illustration.png',
 ];
-STATIC.push('./matches-page.css','./fixture-dialog.css','./graphics/fixture/own-rim.svg','./graphics/fixture/own-mount.svg','./graphics/fixture/opponent-rim.svg','./graphics/fixture/opponent-mount.svg','./graphics/fixture/green-reflection.svg','./graphics/fixture/ground-shadow.svg');
+STATIC.push('./matches-page.css','./fixture-dialog.css','./team-stats.css','./graphics/fixture/own-rim.svg','./graphics/fixture/own-mount.svg','./graphics/fixture/opponent-rim.svg','./graphics/fixture/opponent-mount.svg','./graphics/fixture/green-reflection.svg','./graphics/fixture/ground-shadow.svg');
 const ALLOWED = new Set(STATIC.map(path => new URL(path, self.registration.scope).pathname));
 self.addEventListener('install', event => event.waitUntil(
   caches.open(CACHE).then(cache => cache.addAll(STATIC)).then(() => self.skipWaiting())

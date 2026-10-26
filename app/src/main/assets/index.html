@@ -22,6 +22,7 @@
   <link rel="stylesheet" href="shared-header.css" />
   <link rel="stylesheet" href="matches-page.css" />
   <link rel="stylesheet" href="fixture-dialog.css" />
+  <link rel="stylesheet" href="team-stats.css" />
   <title>Shooters Hill AFC</title>
 </head>
 <body class="splash-active">
@@ -750,33 +751,33 @@
           <div class="home-season-details-body">
         <div class="dashboard-grid">
           <section class="panel">
-            <div class="panel-heading"><h3>Overall recent form</h3><button class="text-button" data-nav="matches">All matches</button></div>
+            <div class="panel-heading"><h3>Recent form</h3><button class="stats-action" data-nav="matches">All matches</button></div>
             <div id="recent-form" class="form-row"></div>
             <div id="recent-matches" class="mini-list"></div>
           </section>
 
           <section class="panel" data-feature-panel="goals">
-            <div class="panel-heading"><h3>Top scorers</h3><span class="shield-mini">⚽</span></div>
+            <div class="panel-heading"><h3>Top scorers</h3></div>
             <div id="top-scorers" class="ranking-list"></div>
           </section>
 
           <section class="panel" data-feature-panel="assists">
-            <div class="panel-heading"><h3>Top assists</h3><span class="shield-mini">A</span></div>
+            <div class="panel-heading"><h3>Top assists</h3></div>
             <div id="top-assists" class="ranking-list"></div>
           </section>
 
           <section class="panel" data-feature-panel="awards">
-            <div class="panel-heading"><h3>Player awards</h3><span class="shield-mini">★</span></div>
+            <div class="panel-heading"><h3>Player awards</h3></div>
             <div id="award-leaders" class="ranking-list"></div>
             <details class="award-history-inline">
               <summary>Award history</summary>
-              <div class="award-history-actions"><button class="text-button" id="add-award-btn" data-requires-edit>+ Add award</button></div>
+              <div class="award-history-actions"><button class="stats-action" id="add-award-btn" data-requires-edit>+ Add award</button></div>
               <div id="awards-list" class="award-list"></div>
             </details>
           </section>
 
           <section class="panel" data-feature-panel="bookings">
-            <div class="panel-heading"><h3>Discipline</h3><span class="shield-mini">▣</span></div>
+            <div class="panel-heading"><h3>Discipline</h3></div>
             <div id="booking-leaders" class="ranking-list"></div>
           </section>
         </div>
