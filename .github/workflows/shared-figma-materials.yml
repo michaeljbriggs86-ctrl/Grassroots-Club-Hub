@@ -63,3 +63,28 @@ jobs:
           path: ${{ runner.temp }}/shared-figma-output
           if-no-files-found: error
           retention-days: 7
+  coach-fabric-review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Review print using the existing runner Chrome
+        env:
+          PITCHKIND_CHROMIUM: /usr/bin/google-chrome
+        run: |
+          python cloudflare/web-app/build.py
+          npm install --prefix "$RUNNER_TEMP/fabric-review" --no-audit --no-fund --ignore-scripts playwright@1.64.0
+          node verification/browser/review_coach_fabric.cjs "$RUNNER_TEMP/fabric-review/node_modules/playwright" "$RUNNER_TEMP/coach-fabric"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coach-fabric-${{ github.run_id }}
+          path: ${{ runner.temp }}/coach-fabric
+          if-no-files-found: error
+          retention-days: 7
