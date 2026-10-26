@@ -25,6 +25,14 @@
   body:not(.auth-open) #view-squad :is(.squad-format-details,#squad-list) {margin:0!important}
   body:not(.auth-open) #view-squad .squad-format-details>summary {padding:8px 0!important;min-height:44px!important}
   body:not(.auth-open) #view-more .more-intro {margin:0 0 var(--sh-section-gap)}
+  body:not(.auth-open) #view-home>#home-season-group-label {margin:0 0 12px!important}
+  @media(max-width:1399px) {
+    body:not(.auth-open) #view-home>#home-next-match {margin-bottom:var(--sh-section-gap)!important}
+  }
+  @media(min-width:1400px) {
+    body:not(.auth-open) #view-home.active {row-gap:var(--sh-section-gap)!important}
+    body:not(.auth-open) #view-home>#home-next-match {margin-bottom:0!important}
+  }
   :root {
     --sh-inset-shadow:inset 0 1px 1px rgba(255,255,255,.8);
     --sh-dialog-shadow:0 24px 60px -20px rgba(17,23,21,.4);
