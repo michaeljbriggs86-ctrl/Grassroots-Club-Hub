@@ -47,7 +47,7 @@ const server=http.createServer((req,res)=>{
     assert(m.documentWidth<=m.clientWidth+1,label+' no document overflow');
     for(const s of m.squad)assert(close(s.x,m.active.x)&&close(s.width,m.active.width),label+' aligned '+s.s);
     rails.push({left:m.hero.x,width:m.hero.width,clientWidth:m.clientWidth});measurements.push({width,theme,mode,...m});
-    if(mode==='populated'&&[320,393,1440].includes(width))await page.screenshot({path:path.join(out,`${view}-${width}-${theme}.png`),fullPage:false});
+    if(mode==='populated'&&[320,393,700,1440].includes(width))await page.screenshot({path:path.join(out,`${view}-${width}-${theme}.png`),fullPage:false});
    }
    assert(rails.every(r=>Math.abs(r.left-rails[0].left)<1&&Math.abs(r.width-rails[0].width)<1&&r.clientWidth===rails[0].clientWidth),`${width} ${theme} ${mode}: navigating short/long pages keeps rails stable`);
    // Verify actual primary controls still change routes after the layout pass.

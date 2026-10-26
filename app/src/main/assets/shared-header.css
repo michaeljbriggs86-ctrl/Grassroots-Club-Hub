@@ -21,7 +21,7 @@ html[data-theme] body:not(.auth-open) #view-home>.home-scene{
 @media(min-width:901px){:root{--sh-page-gutter:40px}}
 html[data-theme] body:not(.auth-open) .app-shell>.hero{
   display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:start;
-  min-height:0!important;padding:calc(12px + var(--android-inset-top,0px)) 20px 8px!important;gap:8px;
+  min-height:0!important;padding-block:calc(12px + var(--android-inset-top,0px)) 8px!important;gap:8px;
 }
 html[data-theme] body:not(.auth-open) .app-shell>.hero .hero-inner{
   display:grid;grid-column:1;grid-row:1;grid-template-columns:var(--sh-header-identity) minmax(0,1fr)!important;
@@ -78,13 +78,10 @@ html[data-theme] body:not(.auth-open) .app-shell>.hero .hero-team-select{
   html[data-theme] body:not(.auth-open) .app-shell>.hero .hero-context-actions .graphic-account-initials{grid-column:1;grid-row:2}
 }
 @media(max-width:374px){
-  html[data-theme] body:not(.auth-open) .app-shell>.hero{--sh-header-identity:72px;grid-template-columns:minmax(0,1fr);padding-inline:16px!important}
+  html[data-theme] body:not(.auth-open) .app-shell>.hero{--sh-header-identity:72px;grid-template-columns:minmax(0,1fr)}
   html[data-theme] body:not(.auth-open) .app-shell>.hero .hero-context-actions,
   html[data-theme] body:not(.auth-open) .app-shell>.hero .hero-context-actions:has(.hero-profile-button:not(.hidden):not([hidden])){
     grid-column:1;grid-row:2;justify-self:end;display:flex;flex-direction:row;width:auto;gap:4px;
   }
   html[data-theme] body:not(.auth-open) .app-shell>.hero .hero-coaching-teams{grid-row:3}
-}
-@media(min-width:901px){
-  html[data-theme] body:not(.auth-open) .app-shell>.hero{padding-inline:40px!important}
 }
