@@ -1,9 +1,9 @@
 {
   "schema_version": 2,
   "provider": "Selkent",
-  "last_updated": "2026-10-26T02:11:21.964332+00:00",
-  "cup_results_last_updated": "2026-10-26T02:11:21.964332+00:00",
-  "cup_results_last_attempted": "2026-10-26T02:11:21.964332+00:00",
+  "last_updated": "2026-10-26T11:49:51.887661+00:00",
+  "cup_results_last_updated": "2026-10-26T11:49:51.887661+00:00",
+  "cup_results_last_attempted": "2026-10-26T11:49:51.887661+00:00",
   "cup_results_status": "verified_current",
   "fixture_agegroup_discovery_source": "selkent_divisions_all",
   "coverage": {
@@ -14582,7 +14582,7 @@
         },
         {
           "division_name": "Under 14 A Silver",
-          "updated_at_text": "25/10/26 18:12:39",
+          "updated_at_text": "26/10/26 08:52:54",
           "source_order_authoritative_for_ties": false,
           "source_disclaimer": "Note: Table does not yet take account of rules for determining winner if teams on equal points",
           "rows": [
@@ -14601,6 +14601,19 @@
             },
             {
               "row_order": 2,
+              "provider_team_id": 1053,
+              "provider_division_id": 4272,
+              "team_name": "Long Lane Pumas",
+              "played": 4,
+              "won": 2,
+              "drawn": 1,
+              "lost": 1,
+              "gf": 16,
+              "ga": 8,
+              "points": 5
+            },
+            {
+              "row_order": 3,
               "provider_team_id": 268,
               "provider_division_id": 4272,
               "team_name": "Dulwich Village Yellow",
@@ -14613,7 +14626,7 @@
               "points": 4
             },
             {
-              "row_order": 3,
+              "row_order": 4,
               "provider_team_id": 35,
               "provider_division_id": 4272,
               "team_name": "Rotherhithe FC",
@@ -14624,19 +14637,6 @@
               "gf": 19,
               "ga": 12,
               "points": 4
-            },
-            {
-              "row_order": 4,
-              "provider_team_id": 1053,
-              "provider_division_id": 4272,
-              "team_name": "Long Lane Pumas",
-              "played": 3,
-              "won": 1,
-              "drawn": 1,
-              "lost": 1,
-              "gf": 13,
-              "ga": 8,
-              "points": 3
             },
             {
               "row_order": 5,
@@ -14669,12 +14669,12 @@
               "provider_team_id": 254,
               "provider_division_id": 4272,
               "team_name": "AFC Lewisham Blue",
-              "played": 2,
+              "played": 3,
               "won": 1,
               "drawn": 0,
-              "lost": 1,
+              "lost": 2,
               "gf": 4,
-              "ga": 5,
+              "ga": 8,
               "points": 2
             },
             {
@@ -15789,6 +15789,15 @@
           "awayGoals": 4,
           "provider_division_id": 4271,
           "division_name": "Under 14 A Navy"
+        },
+        {
+          "date": "2026-10-25",
+          "home": "Long Lane Pumas",
+          "away": "AFC Lewisham Blue",
+          "homeGoals": 3,
+          "awayGoals": 0,
+          "provider_division_id": 4272,
+          "division_name": "Under 14 A Silver"
         },
         {
           "date": "2026-10-25",
@@ -30132,6 +30141,16 @@
         },
         {
           "date": "2026-11-08",
+          "division_name": "U10X Friendly",
+          "home": "Beacons Blue",
+          "away": "Dartford FC White",
+          "provider_team_ids": [
+            "928",
+            "356"
+          ]
+        },
+        {
+          "date": "2026-11-08",
           "division_name": "Under 10X A Navy",
           "home": "AFC Lewisham Yellow",
           "away": "Cray Wanderers Panthers",
@@ -34033,12 +34052,42 @@
         },
         {
           "date": "2026-11-08",
+          "division_name": "U14X Friendly",
+          "home": "AFC Green Court Knights",
+          "away": "Bermondsey Utd FC",
+          "provider_team_ids": [
+            "590",
+            "10"
+          ]
+        },
+        {
+          "date": "2026-11-08",
+          "division_name": "U14X Friendly",
+          "home": "Dartford Royals gold",
+          "away": "AFC Lewisham",
+          "provider_team_ids": [
+            "335",
+            "2242"
+          ]
+        },
+        {
+          "date": "2026-11-08",
           "division_name": "U14X Kent Girls Cup",
           "home": "Cuxton Panthers (Non-Selkent)",
           "away": "Crayford Arrows Girls Red",
           "provider_team_ids": [
             "2262",
             "1059"
+          ]
+        },
+        {
+          "date": "2026-11-08",
+          "division_name": "U14X Kent Plate",
+          "home": "AFC Shortlands U14 T (Non-Selkent)",
+          "away": "Stansfeld (Fratres) FC",
+          "provider_team_ids": [
+            "2310",
+            "2069"
           ]
         },
         {
@@ -34204,16 +34253,6 @@
         {
           "date": "2026-11-08",
           "division_name": "Under14X A",
-          "home": "Stansfeld (Fratres) FC",
-          "away": "Dartford Royals gold",
-          "provider_team_ids": [
-            "2069",
-            "335"
-          ]
-        },
-        {
-          "date": "2026-11-08",
-          "division_name": "Under14X A",
           "home": "Teviot Rangers RED",
           "away": "Dulwich Village Black",
           "provider_team_ids": [
@@ -34365,50 +34404,50 @@
           "date": "2026-11-15",
           "division_name": "Under14X A",
           "home": "Cray Wanderers Lions",
-          "away": "Long Lane Jaguars",
+          "away": "Dartford Royals gold",
           "provider_team_ids": [
             "614",
-            "1052"
+            "335"
           ]
         },
         {
           "date": "2026-11-15",
           "division_name": "Under14X A",
           "home": "Cray Wanderers Tigers",
-          "away": "Teviot Rangers RED",
+          "away": "Long Lane Jaguars",
           "provider_team_ids": [
             "617",
-            "748"
+            "1052"
           ]
         },
         {
           "date": "2026-11-15",
           "division_name": "Under14X A",
-          "home": "Dartford Royals gold",
-          "away": "Dulwich Village Orange",
+          "home": "Dulwich Village Orange",
+          "away": "Dulwich Village Black",
           "provider_team_ids": [
-            "335",
-            "266"
-          ]
-        },
-        {
-          "date": "2026-11-15",
-          "division_name": "Under14X A",
-          "home": "Dulwich Village Black",
-          "away": "London Legends Gold",
-          "provider_team_ids": [
-            "267",
-            "1025"
+            "266",
+            "267"
           ]
         },
         {
           "date": "2026-11-15",
           "division_name": "Under14X A",
           "home": "Ebbsfleet United Red",
-          "away": "Stansfeld (Fratres) FC",
+          "away": "Teviot Rangers RED",
           "provider_team_ids": [
             "668",
-            "2069"
+            "748"
+          ]
+        },
+        {
+          "date": "2026-11-15",
+          "division_name": "Under14X A",
+          "home": "Stansfeld (Fratres) FC",
+          "away": "London Legends Gold",
+          "provider_team_ids": [
+            "2069",
+            "1025"
           ]
         }
       ],
