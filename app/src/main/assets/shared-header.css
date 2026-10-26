@@ -1,6 +1,24 @@
 /* Shared authenticated header. Figma 576:10655 / 576:10656.
    Page routes share one size; controls and the original badge stay native. */
-:root{--sh-header-control:44px;--sh-header-switch:96px;--sh-header-identity:92px}
+:root{--sh-header-control:44px;--sh-header-switch:96px;--sh-header-identity:92px;--sh-page-gutter:20px;--sh-page-max:1800px;--sh-page-start:12px;--sh-section-gap:20px}
+/* Shared page rail, reviewed in Figma 576:10656 / 636:11003, 26 October.
+   Reserve the native scrollbar so short and long routes keep the same rail. */
+html{scrollbar-gutter:stable}
+html[data-theme] body:not(.auth-open) .app-shell>:is(.hero,.content){
+  box-sizing:border-box;width:100%;max-width:var(--sh-page-max);margin-inline:auto;
+  padding-inline-start:max(var(--sh-page-gutter),env(safe-area-inset-left))!important;
+  padding-inline-end:max(var(--sh-page-gutter),env(safe-area-inset-right))!important;
+}
+html[data-theme] body:not(.auth-open) .app-shell>.content{padding-top:var(--sh-page-start)!important}
+html[data-theme] body:not(.auth-open) .content>:is(#view-home,#view-matches,#view-squad,#view-more){
+  width:100%;max-width:none;margin-inline:0;padding-inline:0;
+}
+html[data-theme] body:not(.auth-open) #view-squad #squad-list-page{max-width:none;margin-inline:0}
+html[data-theme] body:not(.auth-open) #view-home>.home-scene{
+  margin-inline:calc(-1 * var(--sh-page-gutter));padding-inline:var(--sh-page-gutter);
+}
+@media(max-width:374px){:root{--sh-page-gutter:16px}}
+@media(min-width:901px){:root{--sh-page-gutter:40px}}
 html[data-theme] body:not(.auth-open) .app-shell>.hero{
   display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:start;
   min-height:0!important;padding:calc(12px + var(--android-inset-top,0px)) 20px 8px!important;gap:8px;

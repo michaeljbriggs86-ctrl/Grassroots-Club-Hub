@@ -4,6 +4,27 @@
    native visibility gates, permissions and form actions. Graphic restoration is
    scoped to its original Figma components below. */
 @layer club-shared {
+  /* The shell owns page spacing; primary routes must not add title spacers
+     or a second centred rail. Their reviewed scenes and artwork stay native. */
+  body:not(.auth-open) :is(#view-matches,#view-squad,#view-more)>.section-title-row {
+    min-height:0!important;max-width:none!important;
+    align-items:center!important;margin:0 0 var(--sh-section-gap)!important;padding-block:0!important;
+  }
+  body:not(.auth-open) :is(#view-matches,#view-squad,#view-more)>.section-title-row>div {
+    display:flex;flex-direction:column;gap:6px;
+  }
+  body:not(.auth-open) :is(#view-matches,#view-squad,#view-more)>.section-title-row :is(h2,.kicker) {
+    margin:0!important;
+  }
+  body:not(.auth-open) #view-squad>.section-title-row {padding-inline-end:82px!important}
+  body:not(.auth-open) #view-squad>.graphic-raised-crest {top:0!important;right:0!important}
+  body:not(.auth-open) #view-squad .squad-view-tabs {margin:0 0 var(--sh-section-gap)!important}
+  body:not(.auth-open) #view-squad .squad-view-page {gap:12px}
+  body:not(.auth-open) #view-squad .squad-banner {padding:0!important;margin:0!important}
+  body:not(.auth-open) #view-squad .squad-count {margin:0}
+  body:not(.auth-open) #view-squad :is(.squad-format-details,#squad-list) {margin:0!important}
+  body:not(.auth-open) #view-squad .squad-format-details>summary {padding:8px 0!important;min-height:44px!important}
+  body:not(.auth-open) #view-more .more-intro {margin:0 0 var(--sh-section-gap)}
   :root {
     --sh-inset-shadow:inset 0 1px 1px rgba(255,255,255,.8);
     --sh-dialog-shadow:0 24px 60px -20px rgba(17,23,21,.4);
