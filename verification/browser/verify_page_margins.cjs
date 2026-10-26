@@ -38,7 +38,10 @@ const server=http.createServer((req,res)=>{
     assert.equal(m.padding,gutter,label+' shared left gutter');assert.equal(m.paddingRight,gutter,label+' shared right gutter');
     assert(close(m.hero.x,m.content.x)&&close(m.hero.width,m.content.width),label+' header and content share maximum width');
     assert(close(m.active.x,m.content.x+gutter),label+' no nested page inset');assert(close(m.active.width,m.content.width-2*gutter),label+' no nested page cap');
-    assert(close(m.anchor.x,m.active.x),label+' heading aligns to content');assert(close(m.anchor.y,m.hero.bottom+12),label+' title starts 12px below header');
+    // The approved >=1400px Home composition places identity beside its
+    // foreground fixture; its page rail is shared, its internal grid is not.
+    if(view!=='home'||width<1400)assert(close(m.anchor.x,m.active.x),label+' heading aligns to content: '+JSON.stringify(m));
+    assert(close(m.anchor.y,m.hero.bottom+12),label+' title starts 12px below header: '+JSON.stringify(m));
     if(m.title){assert.equal(m.title.minHeight,'0px',label+' no blank title spacer');assert.equal(m.title.marginBottom,'20px',label+' shared title gap');}
     assert.equal(m.badge.width,width<=374?72:92,label+' unchanged badge size');
     assert(m.documentWidth<=m.clientWidth+1,label+' no document overflow');
