@@ -26,6 +26,7 @@
   body:not(.auth-open) #view-squad .squad-format-details>summary {padding:8px 0!important;min-height:44px!important}
   body:not(.auth-open) #view-more .more-intro {margin:0 0 var(--sh-section-gap)}
   body:not(.auth-open) #view-home>#home-season-group-label {margin:0 0 12px!important}
+  body:not(.auth-open) #view-home #next-match-card {margin:0!important}
   @media(max-width:1399px) {
     body:not(.auth-open) #view-home>#home-next-match {margin-bottom:var(--sh-section-gap)!important}
   }

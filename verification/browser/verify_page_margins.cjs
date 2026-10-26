@@ -34,6 +34,10 @@ const server=http.createServer((req,res)=>{
      const anchor=view==='home'?active.querySelector('.home-scene-copy'):title;
      return {view,viewport:innerWidth,clientWidth:document.documentElement.clientWidth,documentWidth:document.documentElement.scrollWidth,content:rect(content),hero:rect(hero),active:rect(active),anchor:rect(anchor),padding:parseFloat(style.paddingLeft),paddingRight:parseFloat(style.paddingRight),badge:rect(document.querySelector('.club-logo')),title:view==='home'?null:{...rect(title),minHeight:getComputedStyle(title).minHeight,marginBottom:getComputedStyle(title).marginBottom},squad:view==='squad'?['.squad-view-tabs','#squad-list-page','.squad-banner','.squad-format-details','#squad-list'].map(s=>({s,...rect(active.querySelector(s))})):[]};
     },view);
+    if(view==='home')m.fixtureToSeasonGap=await page.evaluate(()=>{
+     const card=document.getElementById('next-match-card'),label=document.getElementById('home-season-group-label');
+     return card.getClientRects().length&&label.getClientRects().length?label.getBoundingClientRect().top-card.getBoundingClientRect().bottom:null;
+    });
     const label=`${view} ${width} ${theme} ${mode}`,gutter=width<=374?16:width>=901?40:20,close=(a,b)=>Math.abs(a-b)<1;
     assert.equal(m.padding,gutter,label+' shared left gutter');assert.equal(m.paddingRight,gutter,label+' shared right gutter');
     assert(close(m.hero.x,m.content.x)&&close(m.hero.width,m.content.width),label+' header and content share maximum width');
@@ -43,6 +47,7 @@ const server=http.createServer((req,res)=>{
     if(view!=='home'||width<1400)assert(close(m.anchor.x,m.active.x),label+' heading aligns to content: '+JSON.stringify(m));
     assert(close(m.anchor.y,m.hero.bottom+12),label+' title starts 12px below header: '+JSON.stringify(m));
     if(m.title){assert.equal(m.title.minHeight,'0px',label+' no blank title spacer');assert.equal(m.title.marginBottom,'20px',label+' shared title gap');}
+    if(m.fixtureToSeasonGap!==undefined&&m.fixtureToSeasonGap!==null)assert(close(m.fixtureToSeasonGap,20),label+' single section gap below fixture: '+m.fixtureToSeasonGap);
     assert.equal(m.badge.width,width<=374?72:92,label+' unchanged badge size');
     assert(m.documentWidth<=m.clientWidth+1,label+' no document overflow');
     for(const s of m.squad)assert(close(s.x,m.active.x)&&close(s.width,m.active.width),label+' aligned '+s.s);
