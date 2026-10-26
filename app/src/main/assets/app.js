@@ -731,6 +731,9 @@ function miniJerseyHTML(number,role='outfield',extraClass=''){
   return `<span class="mini-jersey ${cls} ${extraClass}" aria-label="Shirt number ${esc(n)}"><svg viewBox="0 0 64 58" aria-hidden="true"><path d="M22 6 28 2h8l6 4 14 8-7 12-7-4v32H22V22l-7 4-7-12 14-8Z"/></svg><b>${esc(n)}</b></span>`;
 }
 function playerJerseyHTML(name,fallback='') {const p=playerForName(name);return miniJerseyHTML(p?.number||fallback,p?.role||'outfield');}
+// Plain squad references for the statistics page; shared kit artwork elsewhere is unchanged.
+function statsPlayerNumberHTML(player){const number=Number(player?.number);return Number.isFinite(number)&&number>0?`<span class="stats-player-number" aria-label="Shirt number ${esc(number)}">${esc(number)}</span>`:'';}
+
 function isLeagueMatch(m){ return String(m.competition||'').trim().toLowerCase()==='league'; }
 function isFriendlyMatch(m){ return String(m.competition||'').trim().toLowerCase()==='friendly'; }
 function competitionBucket(m){const s=String(m?.competition||m?.type||'').toLowerCase();if(s.includes('vase'))return'vase';if(s.includes('shield'))return'shield';if(s.includes('cup'))return'cup';return'';}
@@ -3048,7 +3051,7 @@ function renderSeasonPlayerStats(){
   const showContribution=showGoals||showAssists,showStarts=ageGroupNumber()>=12;
   const columns=[
     {key:'player',label:'Player',show:true},
-    {key:'apps',label:'App',show:true},
+    {key:'apps',label:'Apps',show:true},
     {key:'starts',label:'Starts',show:showStarts},
     {key:'att',label:'Att%',show:true},
     {key:'g',label:'G',show:showGoals},
@@ -3057,7 +3060,7 @@ function renderSeasonPlayerStats(){
     {key:'aw',label:'Awards',show:showAwards},
     {key:'picks',label:'Picks',show:requiresMatchdaySelection()}
   ].filter(c=>c.show);
-  if(head)head.innerHTML=columns.map(c=>`<th>${c.label}</th>`).join('');
+  if(head)head.innerHTML=columns.map(c=>`<th scope="col">${c.label}</th>`).join('');
   if(helper){
     const bits=['appearances'];if(showStarts)bits.push('starts');bits.push('attendance');if(showGoals)bits.push('goals');if(showAssists)bits.push('assists');if(showAwards)bits.push('awards');helper.textContent=bits.join(' · ');
   }
@@ -3069,15 +3072,15 @@ function renderSeasonPlayerStats(){
   const rows=activePlayers().map(p=>{const ap=appearanceStatFor(p.name);return {p,ap,g:goalMap[p.name]||0,a:assistMap[p.name]||0,aw:awardMap[p.name]||0,picks:pickMap[tacticsPlayerId(p)]||0};})
     .sort((x,y)=>Number(y.ap.appearances||0)-Number(x.ap.appearances||0)||(y.g+y.a)-(x.g+x.a)||y.aw-x.aw||x.p.number-y.p.number);
   body.innerHTML=rows.map(r=>`<tr>${columns.map(c=>{
-    if(c.key==='player')return `<td><span class="season-player-name">${miniJerseyHTML(r.p.number,r.p.role,'compact')}<button type="button" class="person-name-button" data-player-profile="${esc(r.p.name)}">${esc(r.p.name)}</button></span></td>`;
-    if(c.key==='apps')return `<td><b>${Number(r.ap.appearances||0)}</b></td>`;
-    if(c.key==='starts')return `<td>${Number(r.ap.starts||0)}</td>`;
-    if(c.key==='att')return `<td>${attendancePercent(r.ap)}%</td>`;
-    if(c.key==='g')return `<td>${r.g}</td>`;
-    if(c.key==='a')return `<td>${r.a}</td>`;
-    if(c.key==='ga')return `<td><b>${r.g+r.a}</b></td>`;
-    if(c.key==='aw')return `<td>${r.aw}</td>`;
-    return `<td>${r.picks}</td>`;
+    if(c.key==='player')return `<td class="stats-player-cell"><span class="season-player-name">${statsPlayerNumberHTML(r.p)}<button type="button" class="person-name-button" data-player-profile="${esc(r.p.name)}">${esc(r.p.name)}</button></span></td>`;
+    if(c.key==='apps')return `<td data-label="Apps"><b>${Number(r.ap.appearances||0)}</b></td>`;
+    if(c.key==='starts')return `<td data-label="Starts">${Number(r.ap.starts||0)}</td>`;
+    if(c.key==='att')return `<td data-label="Attendance">${attendancePercent(r.ap)}%</td>`;
+    if(c.key==='g')return `<td data-label="Goals">${r.g}</td>`;
+    if(c.key==='a')return `<td data-label="Assists">${r.a}</td>`;
+    if(c.key==='ga')return `<td data-label="G+A"><b>${r.g+r.a}</b></td>`;
+    if(c.key==='aw')return `<td data-label="Awards">${r.aw}</td>`;
+    return `<td data-label="Picks">${r.picks}</td>`;
   }).join('')}</tr>`).join('')||`<tr><td colspan="${columns.length}" class="table-empty">No active players yet.</td></tr>`;
 }
 
@@ -3638,22 +3641,22 @@ function renderDashboard(){
   const officialMatchIds=new Set(state.matches.filter(isPlayedMatch).map(m=>m.id));
   state.goals.filter(g=>officialMatchIds.has(g.matchId)).forEach(g=>scoring[g.player]=(scoring[g.player]||0)+Number(g.goals||0));
   const scorerRows=Object.entries(scoring).sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0])).slice(0,5);
-  document.getElementById('top-scorers').innerHTML=scorerRows.map(([name,n],i)=>`<div class="rank-item"><div class="rank-left">${playerJerseyHTML(name,i+1)}<span class="rank-name">${esc(name)}</span></div><span class="rank-value">${n}</span></div>`).join('') || '<div class="empty-state">No goals logged.</div>';
+  document.getElementById('top-scorers').innerHTML=scorerRows.map(([name,n],i)=>`<div class="rank-item"><div class="rank-left">${statsPlayerNumberHTML(playerForName(name))}<span class="rank-name">${esc(name)}</span></div><span class="rank-value">${n}</span></div>`).join('') || '<div class="empty-state">No goals logged.</div>';
 
   const assisting={};
   (state.assists||[]).filter(a=>officialMatchIds.has(a.matchId)).forEach(a=>assisting[a.player]=(assisting[a.player]||0)+Number(a.assists||0));
   const assistRows=Object.entries(assisting).sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0])).slice(0,5);
-  const assistBox=document.getElementById('top-assists');if(assistBox)assistBox.innerHTML=assistRows.map(([name,n],i)=>`<div class="rank-item"><div class="rank-left">${playerJerseyHTML(name,i+1)}<span class="rank-name">${esc(name)}</span></div><span class="rank-value">${n}</span></div>`).join('') || '<div class="empty-state">No assists logged.</div>';
+  const assistBox=document.getElementById('top-assists');if(assistBox)assistBox.innerHTML=assistRows.map(([name,n],i)=>`<div class="rank-item"><div class="rank-left">${statsPlayerNumberHTML(playerForName(name))}<span class="rank-name">${esc(name)}</span></div><span class="rank-value">${n}</span></div>`).join('') || '<div class="empty-state">No assists logged.</div>';
 
   const discipline={};
   (state.bookings||[]).forEach(b=>{discipline[b.player]=discipline[b.player]||{yellow:0,red:0};discipline[b.player].yellow+=Number(b.yellow||0);discipline[b.player].red+=Number(b.red||0);});
   const bookingRows=Object.entries(discipline).sort((a,b)=>(b[1].red*3+b[1].yellow)-(a[1].red*3+a[1].yellow)||a[0].localeCompare(b[0])).slice(0,5);
-  const bookingBox=document.getElementById('booking-leaders');if(bookingBox)bookingBox.innerHTML=bookingRows.map(([name,c],i)=>`<div class="rank-item"><div class="rank-left">${playerJerseyHTML(name,i+1)}<span class="rank-name">${esc(name)}</span></div><span class="rank-value">${c.yellow}Y${c.red?' · '+c.red+'R':''}</span></div>`).join('') || '<div class="empty-state">No bookings logged.</div>';
+  const bookingBox=document.getElementById('booking-leaders');if(bookingBox)bookingBox.innerHTML=bookingRows.map(([name,c],i)=>`<div class="rank-item"><div class="rank-left">${statsPlayerNumberHTML(playerForName(name))}<span class="rank-name">${esc(name)}</span></div><span class="rank-value">${c.yellow}Y${c.red?' · '+c.red+'R':''}</span></div>`).join('') || '<div class="empty-state">No bookings logged.</div>';
 
   const awards={};
   state.awards.forEach(a=>awards[a.player]=(awards[a.player]||0)+1);
   const awardRows=Object.entries(awards).sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0])).slice(0,5);
-  document.getElementById('award-leaders').innerHTML=awardRows.map(([name,n],i)=>`<div class="rank-item"><div class="rank-left">${playerJerseyHTML(name,i+1)}<span class="rank-name">${esc(name)}</span></div><span class="rank-value">${n}</span></div>`).join('') || '<div class="empty-state">No awards logged.</div>';
+  document.getElementById('award-leaders').innerHTML=awardRows.map(([name,n],i)=>`<div class="rank-item"><div class="rank-left">${statsPlayerNumberHTML(playerForName(name))}<span class="rank-name">${esc(name)}</span></div><span class="rank-value">${n}</span></div>`).join('') || '<div class="empty-state">No awards logged.</div>';
 }
 
 function renderLeagueTable(){
