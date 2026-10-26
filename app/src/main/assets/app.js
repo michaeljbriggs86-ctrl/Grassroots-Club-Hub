@@ -3044,26 +3044,32 @@ async function refreshAppearanceStats(quiet=true){
 }
 function attendancePercent(stat){const recorded=Number(stat?.recorded||0);return recorded?Math.round(Number(stat?.appearances||0)*100/recorded):0;}
 
+let __seasonStatsObserver=null;
+function syncSeasonStatsOverflow(){
+  const wrap=document.getElementById('season-player-table-wrap'),hint=document.getElementById('season-player-stats-scroll-hint');if(!wrap)return;
+  const overflow=wrap.clientWidth>0&&wrap.scrollWidth>wrap.clientWidth+1;
+  if(hint)hint.hidden=!overflow;wrap.tabIndex=overflow?0:-1;
+}
 function renderSeasonPlayerStats(){
   const body=document.getElementById('season-player-stats-body'),head=document.getElementById('season-player-stats-head'),helper=document.getElementById('season-player-stats-helper');
   if(!body)return;
   const showGoals=featureEnabled('goals'),showAssists=featureEnabled('assists'),showAwards=featureEnabled('awards');
-  const showContribution=showGoals||showAssists,showStarts=ageGroupNumber()>=12;
+  const showContribution=showGoals&&showAssists,showStarts=ageGroupNumber()>=12;
   const columns=[
     {key:'player',label:'Player',show:true},
     {key:'apps',label:'Apps',show:true},
     {key:'starts',label:'Starts',show:showStarts},
-    {key:'att',label:'Att%',show:true},
-    {key:'g',label:'G',show:showGoals},
-    {key:'a',label:'A',show:showAssists},
+    {key:'att',label:'Attend.',show:true},
+    {key:'g',label:'Goals',show:showGoals},
+    {key:'a',label:'Assists',show:showAssists},
     {key:'ga',label:'G+A',show:showContribution},
     {key:'aw',label:'Awards',show:showAwards},
     {key:'picks',label:'Picks',show:requiresMatchdaySelection()}
   ].filter(c=>c.show);
-  if(head)head.innerHTML=columns.map(c=>`<th scope="col">${c.label}</th>`).join('');
-  if(helper){
-    const bits=['appearances'];if(showStarts)bits.push('starts');bits.push('attendance');if(showGoals)bits.push('goals');if(showAssists)bits.push('assists');if(showAwards)bits.push('awards');helper.textContent=bits.join(' · ');
-  }
+  const labels={apps:'Appearances',att:'Attendance',ga:'Goals + assists',picks:'Matchday selections'};
+  if(head)head.innerHTML=columns.map(c=>`<th scope="col" title="${esc(labels[c.key]||c.label)}">${c.label}</th>`).join('');
+  const cols=document.getElementById('season-player-stats-cols');
+  if(cols)cols.innerHTML=columns.map(c=>`<col class="${c.key==='player'?'stats-name-col':'stats-metric-col'}">`).join('');
   const goalMap={},assistMap={},awardMap={},pickMap={};
   if(showGoals)(state.goals||[]).forEach(x=>goalMap[x.player]=(goalMap[x.player]||0)+Number(x.goals||0));
   if(showAssists)(state.assists||[]).forEach(x=>assistMap[x.player]=(assistMap[x.player]||0)+Number(x.assists||0));
@@ -3071,6 +3077,8 @@ function renderSeasonPlayerStats(){
   Object.values(state.tactics?.matchdaySelections||{}).forEach(arr=>(Array.isArray(arr)?arr:[]).forEach(id=>pickMap[id]=(pickMap[id]||0)+1));
   const rows=activePlayers().map(p=>{const ap=appearanceStatFor(p.name);return {p,ap,g:goalMap[p.name]||0,a:assistMap[p.name]||0,aw:awardMap[p.name]||0,picks:pickMap[tacticsPlayerId(p)]||0};})
     .sort((x,y)=>Number(y.ap.appearances||0)-Number(x.ap.appearances||0)||(y.g+y.a)-(x.g+x.a)||y.aw-x.aw||x.p.number-y.p.number);
+  if(helper)helper.textContent=[`${rows.length} player${rows.length===1?'':'s'}`,state.meta?.season].filter(Boolean).join(' · ');
+  const table=body.closest('table');if(table)table.style.setProperty('--stats-table-min',rows.length?(5.5+(columns.length-1)*3)+'rem':'0px');
   body.innerHTML=rows.map(r=>`<tr>${columns.map(c=>{
     if(c.key==='player')return `<td class="stats-player-cell"><span class="season-player-name">${statsPlayerNumberHTML(r.p)}<button type="button" class="person-name-button" data-player-profile="${esc(r.p.name)}">${esc(r.p.name)}</button></span></td>`;
     if(c.key==='apps')return `<td data-label="Apps"><b>${Number(r.ap.appearances||0)}</b></td>`;
@@ -3082,6 +3090,10 @@ function renderSeasonPlayerStats(){
     if(c.key==='aw')return `<td data-label="Awards">${r.aw}</td>`;
     return `<td data-label="Picks">${r.picks}</td>`;
   }).join('')}</tr>`).join('')||`<tr><td colspan="${columns.length}" class="table-empty">No active players yet.</td></tr>`;
+  const wrap=document.getElementById('season-player-table-wrap');
+  if(wrap&&typeof ResizeObserver==='function'&&!__seasonStatsObserver){__seasonStatsObserver=new ResizeObserver(syncSeasonStatsOverflow);__seasonStatsObserver.observe(wrap);}
+  if(typeof requestAnimationFrame==='function')requestAnimationFrame(syncSeasonStatsOverflow);else syncSeasonStatsOverflow();
+
 }
 
 function availabilityStatusForPlayer(name){
