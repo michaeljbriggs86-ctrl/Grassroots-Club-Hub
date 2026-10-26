@@ -11,6 +11,7 @@ on:
       - 'verification/browser/verify_admin_home_grid.cjs'
       - 'verification/browser/verify_team_stats.cjs'
       - 'verification/browser/verify_page_margins.cjs'
+      - 'verification/browser/verify_coach_print.cjs'
       - '.github/workflows/shared-figma-materials.yml'
   pull_request:
     paths:
@@ -22,6 +23,7 @@ on:
       - 'verification/browser/verify_admin_home_grid.cjs'
       - 'verification/browser/verify_team_stats.cjs'
       - 'verification/browser/verify_page_margins.cjs'
+      - 'verification/browser/verify_coach_print.cjs'
       - '.github/workflows/shared-figma-materials.yml'
 permissions:
   contents: read
@@ -46,6 +48,7 @@ jobs:
         env:
           PITCHKIND_MATERIAL_VERIFY: '1'
         run: |
+          node verification/browser/verify_coach_print.cjs "$RUNNER_TEMP/shared-figma/node_modules/playwright" "$RUNNER_TEMP/shared-figma-output/coach-print"
           node verification/browser/verify_page_margins.cjs "$RUNNER_TEMP/shared-figma/node_modules/playwright" "$RUNNER_TEMP/shared-figma-output/page-margins"
           node verification/browser/verify_team_stats.cjs "$RUNNER_TEMP/shared-figma/node_modules/playwright" "$RUNNER_TEMP/shared-figma-output/team-stats"
           node verification/browser/verify_admin_home_grid.cjs "$RUNNER_TEMP/shared-figma/node_modules/playwright" "$RUNNER_TEMP/shared-figma-output/admin-home-grid"

@@ -89,8 +89,11 @@ html body.role-parent .parent-home-family-actions button{width:100%;min-height:4
 .graphic-shirt-number{position:absolute;top:24%;left:22%;width:56%;text-align:center;font:700 clamp(2rem,11vw,5rem)/1 var(--sh-display);color:#fff!important;transform:rotate(2deg);text-shadow:none}
 .graphic-shirt.goalkeeper{aspect-ratio:280/300}
 .graphic-shirt.goalkeeper .graphic-shirt-number{top:25%;font-size:clamp(2rem,10vw,5rem)}
-.graphic-shirt.coach .graphic-shirt-badge{position:absolute;left:59.2%;top:32.3%;width:12.9%;height:auto;object-fit:contain;filter:none}
-.graphic-shirt-initials{position:absolute;left:21.6%;top:33.7%;width:25%;font:700 clamp(1rem,5vw,1.65rem)/1.2 Inter,system-ui,sans-serif;text-align:center;color:#fff!important}
+/* Figma 509:10231: print follows the actual garment, not its old letterbox.
+   The chest marks share one centre line and scale with the shirt width. */
+.graphic-shirt.coach{aspect-ratio:1211/1299;container-type:inline-size}
+.graphic-shirt.coach .graphic-shirt-badge{position:absolute;left:65.65%;top:36.5%;width:12.916667%;height:auto;object-fit:contain;transform:translate(-50%,-50%);opacity:.96;filter:none}
+.graphic-shirt-initials{position:absolute;left:33.5%;top:36.5%;width:25%;transform:translate(-50%,-50%);font:600 14px/1 Inter,system-ui,sans-serif;font-size:7.083333cqw;letter-spacing:.075em;text-align:center;color:#fff!important;opacity:.93;text-shadow:none;white-space:nowrap}
 .parent-child-row .graphic-shirt{width:64px;flex:0 0 64px}
 .parent-child-row .graphic-shirt-number{font-size:1.5rem!important}
 html body :is(.mini-jersey,.jersey-icon).goalkeeper svg path{fill:#6023a6!important;stroke:#431780!important}
@@ -195,7 +198,6 @@ html body #next-fixture-dialog #next-match-calendar{background:rgba(17,23,21,.78
   html body #home-scene-title{font-size:3.5rem!important}
   html body #view-home .home-scene-copy{width:58%;max-width:640px}
   html body #view-home .home-scene-shirt{width:34%;max-width:370px;right:0;top:60px}
-  html body #view-home .home-scene-shirt .graphic-shirt-initials{font-size:1.5rem}
   html body:not(.auth-open) #view-home>#home-next-match{grid-column:1/8;grid-row:1;align-self:end;margin:180px 0 64px;z-index:3;gap:12px}
   html body #view-home #next-match-card{min-height:210px}
   html body #view-home #home-next-title{color:var(--sh-muted)}
@@ -315,7 +317,6 @@ html body .home-scene-label{margin-bottom:6px}
 html body :is(#home-scene-team,#home-scene-role){margin-top:6px}
 html body #view-home #home-next-match{margin-top:0}
 html body #view-home .home-scene-shirt .graphic-shirt-art{object-position:center top}
-html body #view-home .home-scene-shirt .graphic-shirt-initials{font-size:1.125rem}
 html body #view-home .home-scene-shirt .graphic-shirt-number{font-size:3.5rem;transform:none}
 
 /* Coach shirt follows the profile foreground: cover the hem and pitch
