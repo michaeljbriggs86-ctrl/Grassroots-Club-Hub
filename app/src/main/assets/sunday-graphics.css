@@ -102,7 +102,7 @@ html body.role-parent .parent-home-family-actions button{width:100%;min-height:4
     background-image:url("graphics/shirt-coach.webp");background-repeat:no-repeat;
     background-size:400% auto;background-position:28% 35.484%;
     background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent;
-    color:transparent!important;filter:grayscale(1) brightness(3) contrast(.4) brightness(2)
+    color:transparent!important;filter:grayscale(1) brightness(3) contrast(.5) brightness(1.8)
   }
 }
 .parent-child-row .graphic-shirt{width:64px;flex:0 0 64px}
