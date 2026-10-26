@@ -3048,7 +3048,7 @@ let __seasonStatsObserver=null;
 function syncSeasonStatsOverflow(){
   const wrap=document.getElementById('season-player-table-wrap'),hint=document.getElementById('season-player-stats-scroll-hint');if(!wrap)return;
   const overflow=wrap.clientWidth>0&&wrap.scrollWidth>wrap.clientWidth+1;
-  if(hint)hint.hidden=!overflow;wrap.tabIndex=overflow?0:-1;
+  if(hint)hint.hidden=!overflow;wrap.tabIndex=overflow?0:-1;wrap.dataset.overflow=String(overflow);
 }
 function renderSeasonPlayerStats(){
   const body=document.getElementById('season-player-stats-body'),head=document.getElementById('season-player-stats-head'),helper=document.getElementById('season-player-stats-helper');
