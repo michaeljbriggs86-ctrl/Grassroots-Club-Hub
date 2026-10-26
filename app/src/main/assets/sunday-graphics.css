@@ -89,11 +89,22 @@ html body.role-parent .parent-home-family-actions button{width:100%;min-height:4
 .graphic-shirt-number{position:absolute;top:24%;left:22%;width:56%;text-align:center;font:700 clamp(2rem,11vw,5rem)/1 var(--sh-display);color:#fff!important;transform:rotate(2deg);text-shadow:none}
 .graphic-shirt.goalkeeper{aspect-ratio:280/300}
 .graphic-shirt.goalkeeper .graphic-shirt-number{top:25%;font-size:clamp(2rem,10vw,5rem)}
-/* Figma 509:10231: print follows the actual garment, not its old letterbox.
-   The chest marks share one centre line and scale with the shirt width. */
+/* Figma 509:10231: chest marks follow the original garment proportions.
+   Clip the same photograph into the initials, aligned to their shirt position:
+   its actual knit and fold light become the transfer's material, not flat UI ink. */
 .graphic-shirt.coach{aspect-ratio:1211/1299;container-type:inline-size}
 .graphic-shirt.coach .graphic-shirt-badge{position:absolute;left:65.65%;top:36.5%;width:12.916667%;height:auto;object-fit:contain;transform:translate(-50%,-50%);opacity:.96;filter:none}
-.graphic-shirt-initials{position:absolute;left:33.5%;top:36.5%;width:25%;transform:translate(-50%,-50%);font:600 14px/1 Inter,system-ui,sans-serif;font-size:7.083333cqw;letter-spacing:.075em;text-align:center;color:#fff!important;opacity:.93;text-shadow:none;white-space:nowrap}
+.graphic-shirt-initials{position:absolute;left:33.5%;top:36.5%;width:25%;height:7.5cqw;transform:translate(-50%,-50%) rotate(-3deg) skewX(-3deg);font:600 14px/1.125 Inter,system-ui,sans-serif;font-size:6.666667cqw;letter-spacing:.04em;text-align:center;color:#dfe3df!important;text-shadow:none;white-space:nowrap}
+@supports ((background-clip:text) or (-webkit-background-clip:text)){
+  .graphic-shirt-initials{
+    /* 25%-wide, 18/240-high chest window onto the full 1211x1299 shirt.
+       Percentage background positions account for the window's own size. */
+    background-image:url("graphics/shirt-coach.webp");background-repeat:no-repeat;
+    background-size:400% auto;background-position:28% 35.484%;
+    background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent;
+    color:transparent!important;filter:grayscale(1) brightness(3) contrast(.4) brightness(2)
+  }
+}
 .parent-child-row .graphic-shirt{width:64px;flex:0 0 64px}
 .parent-child-row .graphic-shirt-number{font-size:1.5rem!important}
 html body :is(.mini-jersey,.jersey-icon).goalkeeper svg path{fill:#6023a6!important;stroke:#431780!important}

@@ -46,6 +46,7 @@ jobs:
         env:
           PITCHKIND_MATERIAL_VERIFY: '1'
         run: |
+          node verification/browser/review_coach_fabric.cjs "$RUNNER_TEMP/shared-figma/node_modules/playwright" "$RUNNER_TEMP/shared-figma-output/coach-fabric"
           node verification/browser/verify_page_margins.cjs "$RUNNER_TEMP/shared-figma/node_modules/playwright" "$RUNNER_TEMP/shared-figma-output/page-margins"
           node verification/browser/verify_team_stats.cjs "$RUNNER_TEMP/shared-figma/node_modules/playwright" "$RUNNER_TEMP/shared-figma-output/team-stats"
           node verification/browser/verify_admin_home_grid.cjs "$RUNNER_TEMP/shared-figma/node_modules/playwright" "$RUNNER_TEMP/shared-figma-output/admin-home-grid"
