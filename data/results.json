@@ -1,9 +1,9 @@
 {
   "schema_version": 2,
   "provider": "Selkent",
-  "last_updated": "2026-10-27T02:48:08.882537+00:00",
-  "cup_results_last_updated": "2026-10-27T02:48:08.882537+00:00",
-  "cup_results_last_attempted": "2026-10-27T02:48:08.882537+00:00",
+  "last_updated": "2026-10-27T11:15:12.730636+00:00",
+  "cup_results_last_updated": "2026-10-27T11:15:12.730636+00:00",
+  "cup_results_last_attempted": "2026-10-27T11:15:12.730636+00:00",
   "cup_results_status": "verified_current",
   "fixture_agegroup_discovery_source": "selkent_divisions_all",
   "coverage": {
@@ -7269,6 +7269,16 @@
         {
           "date": "2026-11-01",
           "division_name": "U12 London Cup",
+          "home": "AFC Greenwich Boroug (Non-Selkent)",
+          "away": "Welling United Navy",
+          "provider_team_ids": [
+            "2172",
+            "953"
+          ]
+        },
+        {
+          "date": "2026-11-01",
+          "division_name": "U12 London Cup",
           "home": "Bexley Ballers Football Club",
           "away": "Regans FC Black",
           "provider_team_ids": [
@@ -7319,10 +7329,10 @@
         {
           "date": "2026-11-01",
           "division_name": "Under 12A Navy",
-          "home": "Welling United Navy",
+          "home": "Swanscombe Tigers Yellow",
           "away": "Ballon Dor FC",
           "provider_team_ids": [
-            "953",
+            "719",
             "811"
           ]
         },
@@ -17163,21 +17173,21 @@
         {
           "date": "2026-11-01",
           "division_name": "U13 Selkent Cup One - Round 2",
-          "home": "Eagles & Stars FC",
-          "away": "Blackheath Rhinos Black",
+          "home": "Dulwich Hamlet JFC Navy",
+          "away": "Lewisham Project Gold",
           "provider_team_ids": [
-            "687",
-            "858"
+            "522",
+            "209"
           ]
         },
         {
           "date": "2026-11-01",
           "division_name": "U13 Selkent Cup One - Round 2",
-          "home": "Lewisham Project Gold",
-          "away": "Dulwich Hamlet JFC Navy",
+          "home": "Eagles & Stars FC",
+          "away": "Blackheath Rhinos Black",
           "provider_team_ids": [
-            "209",
-            "522"
+            "687",
+            "858"
           ]
         },
         {
@@ -20484,6 +20494,16 @@
         {
           "date": "2026-11-01",
           "division_name": "U15 London Cup",
+          "home": "Dulwich Hamlet JFC",
+          "away": "City Select FC (Non-Selkent)",
+          "provider_team_ids": [
+            "525",
+            "2226"
+          ]
+        },
+        {
+          "date": "2026-11-01",
+          "division_name": "U15 London Cup",
           "home": "Dulwich Village Orange",
           "away": "Five Stars Football (Non-Selkent)",
           "provider_team_ids": [
@@ -20654,16 +20674,6 @@
         {
           "date": "2026-11-01",
           "division_name": "Under 15C Silver",
-          "home": "Dulwich Hamlet JFC",
-          "away": "Total FC",
-          "provider_team_ids": [
-            "525",
-            "179"
-          ]
-        },
-        {
-          "date": "2026-11-01",
-          "division_name": "Under 15C Silver",
           "home": "EWD Eagles Youth",
           "away": "Beacons Red",
           "provider_team_ids": [
@@ -20793,22 +20803,22 @@
         },
         {
           "date": "2026-11-08",
-          "division_name": "U15 Friendly",
-          "home": "SE Dons Football Club Tigers",
-          "away": "Bridon Ropes",
-          "provider_team_ids": [
-            "618",
-            "2053"
-          ]
-        },
-        {
-          "date": "2026-11-08",
           "division_name": "U15 Kent Plate",
           "home": "Erith & Belvedere Selkent",
           "away": "Sandwich Town U15 (Non-Selkent)",
           "provider_team_ids": [
             "480",
             "2279"
+          ]
+        },
+        {
+          "date": "2026-11-08",
+          "division_name": "U15 London Cup",
+          "home": "Teviot Rangers WHITE",
+          "away": "Winner of Tie 4 (Non-Selkent)",
+          "provider_team_ids": [
+            "742",
+            "2216"
           ]
         },
         {
@@ -20844,10 +20854,10 @@
         {
           "date": "2026-11-08",
           "division_name": "Under 15A",
-          "home": "Teviot Rangers WHITE",
+          "home": "SE Dons Football Club Tigers",
           "away": "Ebbsfleet United White",
           "provider_team_ids": [
-            "742",
+            "618",
             "661"
           ]
         },
@@ -23388,20 +23398,40 @@
         {
           "date": "2026-11-01",
           "division_name": "U16 London Cup",
+          "home": "Baldon Sports Blue",
+          "away": "Sporting CP London U (Non-Selkent)",
+          "provider_team_ids": [
+            "913",
+            "2312"
+          ]
+        },
+        {
+          "date": "2026-11-01",
+          "division_name": "U16 London Cup",
+          "home": "Cray Valley (PM) FC Black",
+          "away": "Broomwood FC (Youth) (Non-Selkent)",
+          "provider_team_ids": [
+            "303",
+            "2314"
+          ]
+        },
+        {
+          "date": "2026-11-01",
+          "division_name": "U16 London Cup",
           "home": "Dulwich Village Orange",
-          "away": "Bredhurst Juniors (Non-Selkent)",
+          "away": "Spotlight FC U16 Spo (Non-Selkent)",
           "provider_team_ids": [
             "276",
-            "2231"
+            "2313"
           ]
         },
         {
           "date": "2026-11-01",
           "division_name": "Under 16A",
-          "home": "Baldon Sports Blue",
+          "home": "Athenlay FC",
           "away": "Cray Wanderers Lions",
           "provider_team_ids": [
-            "913",
+            "467",
             "616"
           ]
         },
@@ -23409,20 +23439,20 @@
           "date": "2026-11-01",
           "division_name": "Under 16A",
           "home": "Dynamo Youth",
-          "away": "Ebbsfleet United White",
+          "away": "Falconwood FC Grey",
           "provider_team_ids": [
             "539",
-            "662"
+            "872"
           ]
         },
         {
           "date": "2026-11-01",
           "division_name": "Under 16A",
           "home": "Welling United Blue",
-          "away": "Athenlay FC",
+          "away": "Ebbsfleet United White",
           "provider_team_ids": [
             "981",
-            "467"
+            "662"
           ]
         },
         {
@@ -23443,16 +23473,6 @@
           "provider_team_ids": [
             "52",
             "408"
-          ]
-        },
-        {
-          "date": "2026-11-01",
-          "division_name": "Under 16B Navy",
-          "home": "Cray Valley (PM) FC Black",
-          "away": "Welling United white",
-          "provider_team_ids": [
-            "303",
-            "982"
           ]
         },
         {
@@ -27017,16 +27037,6 @@
           ]
         },
         {
-          "date": "2026-11-01",
-          "division_name": "Senior London Cup",
-          "home": "Old Wilsonians Youth (Non-Selkent)",
-          "away": "Slade Green Knights",
-          "provider_team_ids": [
-            "2272",
-            "102"
-          ]
-        },
-        {
           "date": "2026-11-08",
           "division_name": "Senior Division One",
           "home": "Dulwich Village White",
@@ -27119,16 +27129,6 @@
         {
           "date": "2026-11-15",
           "division_name": "Senior Division One",
-          "home": "Dulwich Village Orange",
-          "away": "Parkwood Rangers PFA",
-          "provider_team_ids": [
-            "1042",
-            "155"
-          ]
-        },
-        {
-          "date": "2026-11-15",
-          "division_name": "Senior Division One",
           "home": "Hillyfielders Hawks",
           "away": "Dulwich Village White",
           "provider_team_ids": [
@@ -27140,10 +27140,10 @@
           "date": "2026-11-15",
           "division_name": "Senior Division One",
           "home": "Sutton Athletic",
-          "away": "FC Elmstead",
+          "away": "Parkwood Rangers PFA",
           "provider_team_ids": [
             "693",
-            "123"
+            "155"
           ]
         },
         {
@@ -27194,6 +27194,16 @@
           "provider_team_ids": [
             "904",
             "1009"
+          ]
+        },
+        {
+          "date": "2026-11-15",
+          "division_name": "Senior Kent Cup",
+          "home": "Crockenhill FC Swans (Non-Selkent)",
+          "away": "FC Elmstead",
+          "provider_team_ids": [
+            "2311",
+            "123"
           ]
         }
       ],
