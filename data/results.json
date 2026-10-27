@@ -1,9 +1,9 @@
 {
   "schema_version": 2,
   "provider": "Selkent",
-  "last_updated": "2026-10-27T11:15:12.730636+00:00",
-  "cup_results_last_updated": "2026-10-27T11:15:12.730636+00:00",
-  "cup_results_last_attempted": "2026-10-27T11:15:12.730636+00:00",
+  "last_updated": "2026-10-27T17:01:19.381374+00:00",
+  "cup_results_last_updated": "2026-10-27T17:01:19.381374+00:00",
+  "cup_results_last_attempted": "2026-10-27T17:01:19.381374+00:00",
   "cup_results_status": "verified_current",
   "fixture_agegroup_discovery_source": "selkent_divisions_all",
   "coverage": {
@@ -5070,10 +5070,10 @@
           "date": "2026-11-14",
           "division_name": "U10 Selkent Cup One - Round 2",
           "home": "Cray Wanderers Eagles",
-          "away": "Hayden Youth Pumas",
+          "away": "Erith Town Black",
           "provider_team_ids": [
             "605",
-            "430"
+            "374"
           ]
         },
         {
@@ -5184,16 +5184,6 @@
           "provider_team_ids": [
             "948",
             "484"
-          ]
-        },
-        {
-          "date": "2026-11-14",
-          "division_name": "U10 Selkent Cup One - Round 2",
-          "home": "Hayden Youth Pumas",
-          "away": "Erith Town Black",
-          "provider_team_ids": [
-            "430",
-            "374"
           ]
         },
         {
@@ -7529,6 +7519,16 @@
         {
           "date": "2026-11-01",
           "division_name": "Under 12C Navy",
+          "home": "AFC Green Court Knights",
+          "away": "Istead United Colts",
+          "provider_team_ids": [
+            "589",
+            "692"
+          ]
+        },
+        {
+          "date": "2026-11-01",
+          "division_name": "Under 12C Navy",
           "home": "Castle Hill United FC",
           "away": "Northumberland Heath",
           "provider_team_ids": [
@@ -7544,16 +7544,6 @@
           "provider_team_ids": [
             "14",
             "1073"
-          ]
-        },
-        {
-          "date": "2026-11-01",
-          "division_name": "Under 12C Navy",
-          "home": "Istead United Colts",
-          "away": "AFC Green Court Knights",
-          "provider_team_ids": [
-            "692",
-            "589"
           ]
         },
         {
@@ -18330,7 +18320,7 @@
         },
         {
           "division_name": "Under 13B",
-          "updated_at_text": "25/10/26 14:44:18",
+          "updated_at_text": "27/10/26 15:44:38",
           "source_order_authoritative_for_ties": false,
           "source_disclaimer": "Note: Table does not yet take account of rules for determining winner if teams on equal points",
           "rows": [
@@ -33871,12 +33861,12 @@
       "fixtures": [
         {
           "date": "2026-11-01",
-          "division_name": "U14X Friendly",
-          "home": "Newpark Football Club",
-          "away": "Sporting Club Thamesmead Red",
+          "division_name": "U14X London Cup",
+          "home": "London Legends Gold",
+          "away": "Phoenix Sports Lions",
           "provider_team_ids": [
-            "563",
-            "220"
+            "1025",
+            "896"
           ]
         },
         {
@@ -33952,21 +33942,21 @@
         {
           "date": "2026-11-01",
           "division_name": "Under 14X B",
-          "home": "Junior Reds Valiants",
-          "away": "Hillyfielders Eagles",
+          "home": "Dulwich Village Blue",
+          "away": "Newpark Football Club",
           "provider_team_ids": [
-            "2074",
-            "638"
+            "274",
+            "563"
           ]
         },
         {
           "date": "2026-11-01",
           "division_name": "Under 14X B",
-          "home": "Phoenix Sports Lions",
-          "away": "Dulwich Village Blue",
+          "home": "Junior Reds Valiants",
+          "away": "Hillyfielders Eagles",
           "provider_team_ids": [
-            "896",
-            "274"
+            "2074",
+            "638"
           ]
         },
         {
@@ -34032,11 +34022,11 @@
         {
           "date": "2026-11-01",
           "division_name": "Under14X A",
-          "home": "Cray Wanderers Lions",
-          "away": "London Legends Gold",
+          "home": "Dulwich Village Black",
+          "away": "Cray Wanderers Lions",
           "provider_team_ids": [
-            "614",
-            "1025"
+            "267",
+            "614"
           ]
         },
         {
