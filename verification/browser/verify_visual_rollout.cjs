@@ -71,8 +71,8 @@ async function teamChecks(page,theme){
  await page.screenshot({path:path.join(out,`team-stats-${theme}.png`),fullPage:true});
  await page.locator('#view-team-stats .page-back').click();await page.evaluate(()=>openMatchDetails('review-fixture'));
  await page.locator('#match-detail-dialog').waitFor({state:'visible'});
- const modal=await page.locator('#match-detail-dialog').evaluate(el=>({background:getComputedStyle(el).backgroundImage,saveBackground:getComputedStyle(el.querySelector('#save-match-details')).backgroundImage,fixtureBackground:getComputedStyle(el.querySelector('#match-detail-versus')).backgroundImage}));
- assert(modal.background.includes('gradient')&&modal.saveBackground.includes('gradient')&&modal.fixtureBackground.includes('gradient'),'match dialog and its actions use the shared gradients: '+JSON.stringify(modal));
+ const modal=await page.locator('#match-detail-dialog').evaluate(el=>({background:getComputedStyle(el).backgroundImage,saveBackground:getComputedStyle(el.querySelector('#save-match-details')).backgroundImage,saveColour:getComputedStyle(el.querySelector('#save-match-details')).backgroundColor,fixtureBackground:getComputedStyle(el.querySelector('#match-detail-versus')).backgroundImage}));
+ assert(modal.background.includes('gradient')&&modal.saveBackground==='none'&&modal.saveColour==='rgb(11, 93, 53)'&&modal.fixtureBackground.includes('gradient'),'match dialog uses shared panels and the approved solid primary action: '+JSON.stringify(modal));
  const attendance=page.locator('#match-attendance-list .attendance-switch').first();
  await attendance.waitFor({state:'visible'});const before=await attendance.getAttribute('aria-pressed');await attendance.click();assert.notEqual(await attendance.getAttribute('aria-pressed'),before,'attendance retains its real event handler');
  assert.equal(await page.locator('#coach-match-note').isVisible(),true,'coach notes must be reviewed in the connected coach view');
