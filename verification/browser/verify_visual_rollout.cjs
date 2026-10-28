@@ -305,7 +305,7 @@ async function screenshotCorrectionsChecks(page,width,theme){
  assert.equal(dashboard.matchRadius,'16px','foreground fixture uses the approved card radius');
  assert.equal(dashboard.actionRadius,'10px','stats link uses the approved action radius');
  assert(Math.abs(dashboard.cardLeft-dashboard.otherLeft)<1,'Home fixture and season actions share their left edge');
- if(width<=900)assert(Math.abs(dashboard.cardRight-dashboard.otherRight)<1,'phone and tablet Home cards share both edges');
+ if(width<1400)assert(Math.abs(dashboard.cardRight-dashboard.otherRight)<1,'single-column Home cards share both edges below the desktop grid breakpoint');
  else assert(dashboard.cardRight>dashboard.otherRight,'approved desktop fixture is wider than the lower season column');
  assert(dashboard.document<=dashboard.viewport+1,'dashboard reflows');
  await page.screenshot({path:path.join(out,`dashboard-spacing-${width}-${theme}.png`),fullPage:true});
@@ -313,9 +313,9 @@ async function screenshotCorrectionsChecks(page,width,theme){
  assert(await page.locator('#matchday-dashboard').isVisible(),'coach can use preparation in Matches');
  assert.equal(await page.locator('#matchday-dashboard-title').innerText(),'Next match prep');
  assert(await page.locator('#matchday-open-tactics').isVisible());
- const identity=await page.locator('#matches-next-versus').evaluate(el=>({surface:getComputedStyle(el).backgroundImage,copy:getComputedStyle(el.querySelector('strong')).color}));
- assert(identity.surface.includes('gradient'),'fixture identity uses the shared inset material');
- assert.equal(identity.copy,theme==='dark'?'rgb(255, 255, 255)':'rgb(17, 23, 21)','fixture identity copy follows its theme surface');
+ const identity=await page.locator('#matches-next-versus').evaluate(el=>({surface:getComputedStyle(el).backgroundImage,colour:getComputedStyle(el).backgroundColor,copy:getComputedStyle(el.querySelector('strong')).color}));
+ assert.equal(identity.surface,'none','fixture identity stays transparent over the reviewed photographic scene');assert.equal(identity.colour,'rgba(0, 0, 0, 0)');
+ assert.equal(identity.copy,'rgb(255, 255, 255)','fixture identity remains white over the field in both themes');
  await page.evaluate(()=>{const host=document.getElementById('matches-next-kit-warning');host.innerHTML=kitWarningHtml({kitWarning:'Kit clash likely. Confirm shirt colours with the opposition before kick-off.',awayTeam:'Example Blues'});host.classList.remove('hidden');});
  assert.equal(await page.locator('#matches-next-kit-warning .kit-clash-warning').count(),1,'one warning surface');
  assert.equal(await page.locator('#matches-next-kit-warning.kit-clash-warning').count(),0,'warning host is unstyled');

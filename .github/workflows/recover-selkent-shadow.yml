@@ -1,0 +1,36 @@
+name: Recover private Selkent snapshot
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/recover_selkent_shadow.sh'
+      - '.github/workflows/recover-selkent-shadow.yml'
+permissions:
+  contents: read
+concurrency:
+  group: recover-selkent-shadow
+  cancel-in-progress: false
+jobs:
+  recover:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install and test existing collector runtime
+        run: |
+          python -m pip install requests beautifulsoup4
+          cd cloudflare/selkent-shadow
+          npm install --no-package-lock
+          npm run test:runtime
+      - name: Refresh existing private snapshot after independent checks
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/recover_selkent_shadow.sh
