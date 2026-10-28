@@ -1647,12 +1647,14 @@ function upcomingFixtures(){
       seen.add(group.key);
       // Private completion never participates in the youth parent group path.
       if(parent||group.fixtures.some(row=>!fixtureIsReported(row)))events.push(group.fixtures[0]);
-    }else if(!fixtureIsReported(f))events.push(f);
+    }else if(parent||!fixtureIsReported(f))events.push(f);
   }
   // Manually scheduled matches belong in the same next-fixture timeline as provider fixtures.
   // Keep provider fixtures authoritative when a manually recorded match refers to one.
   const providerKeys=new Set((state.selkent?.fixtures||[]).map(f=>[f.date,normalizeTeamKey(f.opponent||''),String(f.venue||'').toUpperCase()].join('|')));
-  for(const m of state.matches||[]){
+  // Parent timelines use the score-free provider fixture projection only.
+  // Staff match records must not participate in parent rendering.
+  for(const m of parent?[]:state.matches||[]){
     if(matchStatus(m)!=='scheduled'||isProviderOwnedMatch(m)||!m.date||!m.opponent)continue;
     if(new Date(m.date+'T12:00:00')<today)continue;
     const key=[m.date,normalizeTeamKey(m.opponent),String(m.venue||'').toUpperCase()].join('|');

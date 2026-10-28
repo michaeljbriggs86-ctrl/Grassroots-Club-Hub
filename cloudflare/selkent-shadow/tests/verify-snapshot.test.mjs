@@ -93,3 +93,47 @@ test('rejects extra result targets absent from the matching public feed', () => 
   value.target_count++;
   assert.throws(() => verifySnapshot(value, FEED, NOW), /differ from the matching public feed/);
 });
+
+// Exercise the CI output contract, including the invalid-snapshot fail-closed path.
+test('CI defers only a validated version mismatch and never emits readiness for invalid snapshots', async () => {
+  const { mkdtemp, writeFile, readFile, rm } = await import('node:fs/promises');
+  const { tmpdir } = await import('node:os');
+  const { join } = await import('node:path');
+  const { spawnSync } = await import('node:child_process');
+  const dir = await mkdtemp(join(tmpdir(), 'selkent-readiness-'));
+  try {
+    const now = Date.now(), feed = structuredClone(FEED), value = snapshot();
+    feed.last_updated = new Date(now - 60_000).toISOString();
+    value.canonical_feed_last_updated = feed.last_updated;
+    value.collected_at = value.scheduled_at = new Date(now).toISOString();
+    const run = async () => {
+      const output = join(dir, 'output'), summary = join(dir, 'summary');
+      await writeFile(join(dir, 'snapshot.json'), JSON.stringify(value));
+      await writeFile(join(dir, 'feed.json'), JSON.stringify(feed));
+      await writeFile(output, ''); await writeFile(summary, '');
+      const result = spawnSync(process.execPath, ['cloudflare/selkent-shadow/verify-snapshot.mjs',
+        join(dir, 'snapshot.json'), join(dir, 'feed.json'), '420'], {
+        encoding: 'utf8', env: { ...process.env, GITHUB_OUTPUT: output, GITHUB_STEP_SUMMARY: summary },
+      });
+      return { ...result, output: await readFile(output, 'utf8'), summary: await readFile(summary, 'utf8') };
+    };
+    let result = await run();
+    assert.equal(result.status, 0, result.stderr);
+    assert.equal(result.output, 'candidate_ready=true\n');
+    feed.last_updated = new Date(now - 30_000).toISOString();
+    result = await run();
+    assert.equal(result.status, 0, result.stderr);
+    assert.equal(result.output, 'candidate_ready=false\n');
+    assert.match(result.summary, /deferred/);
+    assert.match(result.summary, /existing R2 feed is retained/);
+    value.collected_at = new Date(now - 421 * 60_000).toISOString();
+    result = await run();
+    assert.notEqual(result.status, 0);
+    assert.equal(result.output, '');
+    value.collected_at = new Date(now).toISOString();
+    delete value.payloads[Object.keys(value.payloads)[0]];
+    result = await run();
+    assert.notEqual(result.status, 0);
+    assert.equal(result.output, '');
+  } finally { await rm(dir, { recursive: true, force: true }); }
+});

@@ -4,7 +4,7 @@ const source=fs.readFileSync('app/src/main/assets/app.js','utf8');
 const mapStart=source.indexOf("function mapsShareHref(...parts)");
 const mapEnd=source.indexOf('function allDivisionTeams()',mapStart);
 const start=source.indexOf("function matchdayArrivalTime(time='')");
-const end=source.indexOf('async function shareNextMatchImage()',start);
+const end=source.indexOf('function matchdayShareFixture(',start);
 assert(mapStart>=0&&mapEnd>mapStart&&start>=0&&end>start,'matchday share helper source not found');
 const box={mapQuery:(...parts)=>parts.map(x=>String(x||'').trim()).filter(Boolean).join(', ')};
 vm.createContext(box);

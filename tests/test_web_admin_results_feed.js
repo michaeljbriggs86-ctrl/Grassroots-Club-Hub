@@ -64,7 +64,7 @@ assert.equal(verifiedClubResultsFeed({...feed,coverage:{published_results:{parse
 renderAdminRecentResults(rows,true);
 assert.equal(elements.get('admin-results-count').textContent,'3');
 assert.doesNotMatch(html,/admin-results-breakdown|Selkent published|team recorded/);
-assert.match(html,/data-admin-summary="results">Club results<\/button>/);
+assert.match(html,/data-page-route="club-results"><span><strong>Club results<\/strong>/);
 assert.doesNotMatch(html,/id="admin-results-count"/);
 const recentHtml=elements.get('admin-recent-results').innerHTML;
 assert.doesNotMatch(recentHtml,/Selkent published|Team recorded/);

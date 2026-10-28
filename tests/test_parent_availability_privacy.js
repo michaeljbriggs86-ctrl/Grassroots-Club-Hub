@@ -10,7 +10,7 @@ const end=app.indexOf('async function saveParentAvailability(',start);
 assert(start>0&&end>start);
 let fixture={id:'fixture-one'},teamId='team-one',fail=false;
 const cls=()=>({add(){},remove(){},toggle(){}});
-const panel={classList:cls()},count={textContent:''},buttons=['available','unsure','unavailable'].map(status=>({dataset:{availabilityStatus:status},disabled:false,selected:false,classList:{remove(){},toggle(name,chosen){if(name==='selected')this.owner.selected=chosen;}}}));
+const panel={classList:cls()},count={textContent:'',set innerHTML(value){this.textContent=value.replace(/<[^>]+>/g,'');}},buttons=['available','unsure','unavailable'].map(status=>({dataset:{availabilityStatus:status},disabled:false,selected:false,classList:{remove(){},toggle(name,chosen){if(name==='selected')this.owner.selected=chosen;}}}));
 buttons.forEach(b=>b.classList.owner=b);
 const select={disabled:false,options:[],_value:'',set innerHTML(markup){this.markup=markup;this.options=[...markup.matchAll(/<option value="([^"]*)"/g)].map(x=>x[1]);this._value=this.options[0]||'';},get innerHTML(){return this.markup||'';},get value(){return this._value;},set value(v){this._value=v;}};
 const nodes={'match-availability-panel':panel,'parent-availability-controls':{classList:cls()},'coach-availability-summary':{classList:cls(),replaceChildren(){}},'match-availability-count':count,'availability-player':select,'availability-reminder-send':{classList:cls()}};

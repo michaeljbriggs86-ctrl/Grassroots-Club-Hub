@@ -31,7 +31,7 @@ function context(team,fixtures){
  fixtureOverviewContext:f=>({homeTeam:team,awayTeam:f.opponent,ground:'Ground',address:'Address'}),
  nodes};
  vm.createContext(ctx);
- vm.runInContext(take('function fixtureLinkedMatch(', 'function fixtureFingerprint(')+take('function homeFixtureTeamNames(', 'function groundOptionsForFixture(')+take('function fixtureOverride(', 'function pilotKitDefaults(')+take('function cupGroupFixtureLines(', 'async function syncSelkent(')+take('function canonicalCardFixtureRows(', 'function canonicalMatchCardData(')+take('function adoptLegacyTacticsFixture(', 'function tacticsMatchPlan(){')+take('function syncMatchPlayedActionV141(', 'function renderMatchPageNextFixture('),ctx);
+ vm.runInContext(app.match(/function isProviderOwnedMatch[^\n]+/)[0]+take('function fixtureLinkedMatch(', 'function fixtureFingerprint(')+take('function homeFixtureTeamNames(', 'function groundOptionsForFixture(')+take('function fixtureOverride(', 'function pilotKitDefaults(')+take('function cupGroupFixtureLines(', 'async function syncSelkent(')+take('function canonicalCardFixtureRows(', 'function canonicalMatchCardData(')+take('function adoptLegacyTacticsFixture(', 'function tacticsMatchPlan(){')+take('function syncMatchPlayedActionV141(', 'function renderMatchPageNextFixture('),ctx);
  return ctx;
 }
 function games(ctx){return ctx.miniCupGroup(ctx.state.selkent.fixtures[0]).fixtures;}
@@ -70,7 +70,7 @@ async function run(){
   for(const id of ['next-match-home-teams','next-match-versus','matches-next-versus','parent-home-match-info']){assert.equal((c.nodes.get(id).innerHTML.match(/Group game/g)||[]).length,2,id);assert.doesNotMatch(c.nodes.get(id).innerHTML,/Recorded|score|data-further-match-played|Add to calendar/);}
   assert.match(c.nodes.get('next-match-home-date').textContent,/Group starts 13:45/);assert.match(c.nodes.get('matches-next-when').textContent,/Group starts 13:45/);
   // The existing ordinary parent access remains an explicitly separate contract.
-  const ordinary={date:'2026-10-04',competition:'League',opponent:'League opponent',venue:'H'};c.state.selkent.fixtures=[ordinary];assert.throws(()=>c.upcomingFixtures(),/Parent group accessed private matches/);c.state.selkent.fixtures=[...fixtures];
+  const ordinary={date:'2026-10-04',competition:'League',opponent:'League opponent',venue:'H'};c.state.selkent.fixtures=[ordinary];assert.equal(c.upcomingFixtures().length,1,'ordinary parent fixtures also avoid private matches');c.state.selkent.fixtures=[...fixtures];
 
   now='2026-10-05T12:00:00Z';assert.equal(c.nextPublishedFixture(),null);now='2026-10-04T12:00:00Z';
  }

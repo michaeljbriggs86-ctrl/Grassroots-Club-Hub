@@ -67,6 +67,7 @@ jobs:
             pitchkind-selkent-shadow/shadow/latest.json \
             --remote --file "$RUNNER_TEMP/selkent-shadow-latest.json"
       - name: Check freshness, completeness and public feed targets
+        id: snapshot
         run: |
           node cloudflare/selkent-shadow/verify-snapshot.mjs \
             "$RUNNER_TEMP/selkent-shadow-latest.json" data/results.json \
@@ -80,6 +81,7 @@ jobs:
           node cloudflare/selkent-shadow/compare_fixture_preview.mjs \
             "$RUNNER_TEMP/selkent-shadow-latest.json" data/results.json
       - name: Build and independently compare private schema-v2 candidate
+        if: steps.snapshot.outputs.candidate_ready == 'true'
         run: |
           node cloudflare/selkent-shadow/build-candidate.mjs \
             "$RUNNER_TEMP/selkent-shadow-latest.json" data/results.json \

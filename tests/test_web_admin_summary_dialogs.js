@@ -35,7 +35,7 @@ assert.equal(navigations.length,3,'non-overview roles cannot open club-wide summ
 assert.equal(scrolls.length,1);
 assert.equal(focuses.length,1);
 for(const kind of ['fixtures','results']){
-  assert.match(html,new RegExp(`data-admin-summary="${kind}"`));
+  assert.match(html,kind==='fixtures'?/data-admin-summary="fixtures"/:/data-page-route="club-results"/);
   assert.match(html,new RegExp(`id="club-${kind}-panel"`));
 }
 console.log('PASS Club Admin summary page navigation, focus, role gate and reduced-motion scrolling');

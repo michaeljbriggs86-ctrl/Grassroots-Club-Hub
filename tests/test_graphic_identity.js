@@ -28,6 +28,9 @@ const context={
   isClubOverviewMode:()=>clubOverview,isAdminTeamPreviewMode:()=>preview,
   isCoach:()=>['coach','assistant_coach'].includes(context.currentRole),
 };
+// Layout scheduling is a browser dependency; these cases exercise identity/privacy.
+context.requestAnimationFrame=()=>1;
+context.window.addEventListener=()=>{};
 vm.createContext(context);
 vm.runInContext(`${take('function graphicShirtHTML(', 'function miniJerseyHTML(')}\n${take('function setStableHtml(', '// Club lists share')}`,context);
 const shirt=()=>nodes['home-scene-shirt'];

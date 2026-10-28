@@ -10,6 +10,8 @@ on:
       - '.github/workflows/stage-selkent-candidate-r2.yml'
       - 'cloudflare/selkent-shadow/verify-publication.mjs'
       - 'cloudflare/selkent-shadow/tests/verify-publication.test.mjs'
+      - 'cloudflare/selkent-shadow/verify-snapshot.mjs'
+      - 'cloudflare/selkent-shadow/tests/verify-snapshot.test.mjs'
 
 permissions:
   contents: read
@@ -53,7 +55,8 @@ jobs:
           npx --yes wrangler@4.142.0 r2 object get \
             pitchkind-selkent-shadow/shadow/latest.json \
             --remote --file "$RUNNER_TEMP/selkent-shadow-latest.json"
-      - name: Verify and build private candidate
+      - name: Verify private snapshot and candidate readiness
+        id: snapshot
         env:
           # The collector runs every six hours. GitHub can start this :55 job
           # hours late; keep the existing seven-hour bound between collections.
@@ -61,6 +64,11 @@ jobs:
         run: |
           node cloudflare/selkent-shadow/verify-snapshot.mjs \
             "$RUNNER_TEMP/selkent-shadow-latest.json" data/results.json "$FRESHNESS_LIMIT"
+          python cloudflare/selkent-shadow/compare_snapshot.py \
+            "$RUNNER_TEMP/selkent-shadow-latest.json" data/results.json
+      - name: Build and independently verify aligned candidate
+        if: steps.snapshot.outputs.candidate_ready == 'true'
+        run: |
           node cloudflare/selkent-shadow/build-candidate.mjs \
             "$RUNNER_TEMP/selkent-shadow-latest.json" data/results.json \
             "$RUNNER_TEMP/selkent-candidate.json"
@@ -71,11 +79,13 @@ jobs:
             "$RUNNER_TEMP/selkent-shadow-latest.json" data/results.json \
             "$RUNNER_TEMP/selkent-candidate.json"
       - name: Create private staging bucket if needed
+        if: steps.snapshot.outputs.candidate_ready == 'true'
         run: |
           if ! npx --yes wrangler@4.142.0 r2 bucket info "$BUCKET"; then
             npx --yes wrangler@4.142.0 r2 bucket create "$BUCKET"
           fi
       - name: Read current private publication if present
+        if: steps.snapshot.outputs.candidate_ready == 'true'
         run: |
           object_path="$BUCKET/feed/results.json"
           if npx --yes wrangler@4.142.0 r2 object get "$object_path" \
@@ -95,6 +105,7 @@ jobs:
             echo "No current private publication; first verified write follows"
           fi
       - name: Publish candidate and compare R2 readback
+        if: steps.snapshot.outputs.candidate_ready == 'true'
         run: |
           object_path="$BUCKET/feed/results.json"
           npx --yes wrangler@4.142.0 r2 object put "$object_path" \

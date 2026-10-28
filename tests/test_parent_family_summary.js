@@ -39,6 +39,9 @@ const context={CLOUD_MODE:true,currentRole:'parent',window:{ClubHubCloud:cloud},
   nextPublishedFixture:()=>({id:'fixture-one',date:'2026-10-04'}),resolvedFixture:f=>({...f,time:f.time||'10:00',groundName:'Home ground'}),fixtureDetailsConfirmed:()=>true,parentMatchdayReady:()=>true,fixtureResponseKey:f=>f.id,matchdayArrivalTime:()=> '09:30',selkentNorm:x=>String(x).toLowerCase(),
   ageGroupNumber:()=>Number(team.ageGroup.replace(/\D/g,'')),cupGroupFixtureLines:g=>g.opponents.join(' / '),
   __availabilityFixture:'fixture-one',__availabilityTeamId:'one',__availabilityLoadStatus:'ready',__availabilityRows:[{player_name:'Aavi',status:'available'}],Date:Clock};
+// Layout scheduling is a browser dependency; these cases exercise identity/privacy.
+context.requestAnimationFrame=()=>1;
+context.window.addEventListener=()=>{};
 vm.runInNewContext(`${take('function graphicShirtHTML(', 'function miniJerseyHTML(')}\n${take('function setStableHtml(', '// Club lists share')}\n${take('function miniCupGroup(', 'function fixtureCompetitionLabel(')}\n${app.slice(start,end)}\nthis.family=refreshParentFamilySummary;this.render=renderParentFamilySummary;`,context);
 
 (async()=>{

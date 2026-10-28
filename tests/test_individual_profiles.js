@@ -29,6 +29,8 @@ const cloud={context:{profile:own},session:{user:{id:'me'}},role:()=>ctx.current
  getCoachQualifications:async id=>{qualificationReads.push(id);return{records:[{kind:'dbs',course:'dbs',completed_on:'2025-01-01',expires_on:'2028-01-01',club_checked:true}]};},
 };ctx.ClubHubCloud=cloud;
 ctx.ClubHubCoachQualifications={close(){},validate:r=>r,catalogue:[{kind:'dbs',label:'Enhanced DBS',courses:{dbs:'Enhanced DBS'}},{kind:'safeguarding',label:'Safeguarding',courses:{}},{kind:'first_aid',label:'First aid',courses:{}}],status:r=>r?{label:'In date',tone:'current'}:{label:'Not recorded',tone:'missing'},open(){}};
+// Layout scheduling is a browser dependency; these cases exercise identity/privacy.
+ctx.requestAnimationFrame=()=>1;
 vm.createContext(ctx);vm.runInContext(moduleSource,ctx);
 vm.runInContext(app.slice(app.indexOf('function graphicShirtHTML('),app.indexOf('function miniJerseyHTML(')),ctx);
 vm.runInContext(app.slice(app.indexOf('let __contactDirectoryIdentity='),app.indexOf('let __inboxStamp=')),ctx);

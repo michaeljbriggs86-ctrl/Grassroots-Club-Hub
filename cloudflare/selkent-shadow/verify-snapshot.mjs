@@ -1,4 +1,4 @@
-import { readFile } from 'node:fs/promises';
+import { appendFile, readFile } from 'node:fs/promises';
 import { pathToFileURL } from 'node:url';
 import { targetsFromFeed } from './src/index.mjs';
 
@@ -100,6 +100,23 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
     readFile(process.argv[3], 'utf8').then(JSON.parse),
   ]);
   // Never print private HTML or store the raw snapshot as a CI artifact.
-  console.log(JSON.stringify(verifySnapshot(snapshot, feed, Date.now(),
-    process.argv[4] === undefined ? 120 : Number(process.argv[4]))));
+  const result = verifySnapshot(snapshot, feed, Date.now(),
+    process.argv[4] === undefined ? 120 : Number(process.argv[4]));
+  console.log(JSON.stringify(result));
+  // The public scraper and private collector run independently. A valid but
+  // different feed version can be checked for parser parity, but must never
+  // build or publish a candidate against the wrong canonical target list.
+  const ready = result.feed_target_match === 'verified';
+  if (process.env.GITHUB_OUTPUT) {
+    await appendFile(process.env.GITHUB_OUTPUT, `candidate_ready=${ready}\n`);
+  }
+  if (!ready) {
+    const message = 'Candidate publication deferred: the private snapshot and current public feed use different versions. ' +
+      'Freshness and parser checks still apply; the existing R2 feed is retained. ' +
+      'Candidate comparison/publication will resume on an aligned collection.';
+    console.log(message);
+    if (process.env.GITHUB_STEP_SUMMARY) {
+      await appendFile(process.env.GITHUB_STEP_SUMMARY, `### Selkent candidate deferred\n\n${message}\n`);
+    }
+  }
 }
