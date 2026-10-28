@@ -40,7 +40,9 @@ permissions:
   contents: read
 jobs:
   ui-regressions:
-    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    # Direct pushes already start this check. Follow the publisher only when
+    # it was itself started by the scraper's token-authored feed update.
+    if: github.event_name != 'workflow_run' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'workflow_run')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
