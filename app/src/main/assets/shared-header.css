@@ -57,7 +57,7 @@ html[data-theme] body:not(.auth-open) .app-shell>.hero .hero-context-actions :is
 }
 html[data-theme] body:not(.auth-open) .app-shell>.hero .hero-context-actions .hero-profile-button{
   display:inline-flex;align-items:center;justify-content:center;
-  width:var(--sh-header-switch);min-width:var(--sh-header-switch);padding:0 10px;white-space:nowrap!important;
+  width:var(--sh-header-switch);min-width:var(--sh-header-switch);height:auto;min-height:var(--sh-header-control);padding:4px 10px;white-space:normal!important;overflow-wrap:anywhere;
 }
 html[data-theme] body:not(.auth-open) .app-shell>.hero .hero-notification-button{
   display:inline-flex;align-items:center;justify-content:center;

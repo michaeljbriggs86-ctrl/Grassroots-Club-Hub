@@ -35,7 +35,7 @@ const scenarios=async function(){
    state='empty';await p.locator('#refresh-club-inbox').click();await p.getByText('Your draft is still here. Choose an available recipient before sending.',{exact:true}).waitFor();assert(await send.isDisabled());
    const layout=await p.locator('#view-inbox').evaluate(el=>({theme:document.documentElement.dataset.theme,overflow:document.documentElement.scrollWidth>innerWidth+1,helper:el.querySelector('#inbox-compose-hint').textContent,description:el.querySelector('#send-inbox-message').getAttribute('aria-describedby')}));
    assert.equal(layout.theme,theme);assert(!layout.overflow);assert.equal(layout.description,'inbox-compose-hint');
-   assert.equal(await send.evaluate(el=>getComputedStyle(el).opacity),'0.5');
+   assert.equal(await send.evaluate(el=>getComputedStyle(el).opacity),'0.6');
    await send.scrollIntoViewIfNeeded();await p.mouse.wheel(0,300);await p.waitForFunction(()=>{const r=document.getElementById('send-inbox-message').getBoundingClientRect();return r.y>=0&&r.bottom<innerHeight-50;});
    const actionBox=await send.boundingBox();assert(actionBox&&actionBox.y>=0&&actionBox.y+actionBox.height<p.viewportSize().height-50,'guarded Send remains reachable above mobile navigation');
    await p.screenshot({path:path.join(out,`draft-${role}-${theme}-${width}.png`),fullPage:true});
