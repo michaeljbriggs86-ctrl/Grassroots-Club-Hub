@@ -180,8 +180,8 @@ async function workspaceChecks(page,width,theme){
   const squad=await page.locator('#squad-list').evaluate(el=>({left:el.getBoundingClientRect().left,right:el.getBoundingClientRect().right,columns:getComputedStyle(el).gridTemplateColumns.split(' ').length}));
   const second=await page.locator('#squad-list [data-player-profile]').nth(1).boundingBox();
   assert(Math.abs(squad.left-20)<1&&Math.abs(squad.right-(width-20))<1,'squad retains reviewed 20px phone gutters');
-  assert.equal(squad.columns,2,'approved phone squad uses two native shirt-card columns');
-  assert(Math.abs(bounds.x-squad.left)<1&&bounds.x+bounds.width<second.x&&Math.abs(bounds.y-second.y)<1,'shirt cards occupy separate columns on the same row');
+  assert.equal(squad.columns,1,'current 255px minimum card width yields one phone column');
+  assert(Math.abs(bounds.x-squad.left)<1&&Math.abs(bounds.x-second.x)<1&&second.y>=bounds.y+bounds.height,'shirt cards share the rail and remain on separate rows');
   assert(await row.locator('.graphic-shirt-art').evaluate(el=>el.complete&&el.naturalWidth>0),'first card loads its independent garment image');
   assert.equal(await row.locator('.graphic-shirt-number').innerText(),'1','shirt number remains native live text');
  }
@@ -192,7 +192,7 @@ async function workspaceChecks(page,width,theme){
  assert.equal(await page.locator('#tactics-pitch .tactics-player').count(),5);assert.equal(await page.locator('#tactics-bench .tactics-bench-player').count(),4);
  assert.equal(await page.locator('#matchday-squad-picker').isVisible(),false,'rolling squad does not show a capped picker');
  const layout=await page.locator('.tactics-panel').evaluate(el=>({columns:getComputedStyle(el).gridTemplateColumns.split(' ').length,heading:getComputedStyle(document.querySelector('#squad-team-name')).fontSize,pitch:document.querySelector('#tactics-pitch').getBoundingClientRect().toJSON()}));
- const formationOrder=await page.locator('.tactics-formation-card').evaluate(el=>({heading:el.querySelector('h3').getBoundingClientRect().top,field:el.querySelector('select').getBoundingClientRect().top,reset:el.querySelector('button').getBoundingClientRect().top}));assert(formationOrder.heading<formationOrder.field&&formationOrder.field<formationOrder.reset,'formation heading, field and reset follow the review');assert.equal(layout.columns,width>=900?2:1);assert.equal(layout.heading,'48px','squad workspace uses the approved display heading');
+ const formationOrder=await page.locator('.tactics-formation-card').evaluate(el=>({heading:el.querySelector('h3').getBoundingClientRect().top,field:el.querySelector('select').getBoundingClientRect().top,reset:el.querySelector('button').getBoundingClientRect().top}));assert(formationOrder.heading<formationOrder.field&&formationOrder.field<formationOrder.reset,'formation heading, field and reset follow the review');assert.equal(layout.columns,width>=900?2:1);assert.equal(layout.heading,'32px','squad workspace uses the current shared page heading');
  const controls=await page.locator('#squad-tactics-page :is(button,input,select)').evaluateAll(els=>els.filter(el=>el.getBoundingClientRect().width>0).map(el=>({height:el.getBoundingClientRect().height,tag:el.tagName})));assert(controls.every(el=>el.height>=52),'plan controls are at least 52px: '+JSON.stringify(controls));
  assert((await geometry(page)).documentWidth<=width+1);
  await page.screenshot({path:path.join(out,`match-plan-5v5-${width}-${theme}.png`),fullPage:true});

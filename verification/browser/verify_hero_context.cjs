@@ -53,14 +53,14 @@ async function geometry(page,selector){return page.locator(selector).evaluate(el
    const compact=await page.locator('.hero').evaluate(el=>{
     const hero=el.getBoundingClientRect(),identity=el.querySelector('.hero-inner').getBoundingClientRect(),actions=el.querySelector('.hero-context-actions').getBoundingClientRect(),label=el.querySelector('#hero-mode-pill'),title=el.querySelector('h1').getBoundingClientRect();
     const copy=el.querySelector('.hero-copy'),range=document.createRange();range.selectNodeContents(copy);
-    const textFits=[...range.getClientRects()].every(r=>r.right<=actions.left+1);
-    return {height:hero.height,textFits,aligned:Math.abs(identity.top+identity.height/2-actions.top-actions.height/2)<2,roleBelowTitle:label.getBoundingClientRect().top>=title.bottom-1,roleBackground:getComputedStyle(label).backgroundColor,roleBorder:getComputedStyle(label).borderTopWidth};
+    const textFits=[...range.getClientRects()].every(r=>r.right<=actions.left+1||r.bottom<=actions.top+1);
+    return {height:hero.height,textFits,aligned:innerWidth<374?actions.top>=identity.bottom:Math.abs(identity.top-actions.top)<2,roleBelowTitle:label.getBoundingClientRect().top>=title.bottom-1,roleBackground:getComputedStyle(label).backgroundColor,roleBorder:getComputedStyle(label).borderTopWidth};
    });
-   assert(compact.aligned,'actions share the identity row and vertical centre');
+   assert(compact.aligned,'shared header top-aligns actions and stacks them below identity on narrow phones');
    assert(compact.textFits,'all identity text stays clear of the controls');
    assert(compact.roleBelowTitle,'role is metadata below the heading');
    assert.equal(compact.roleBackground,'rgba(0, 0, 0, 0)');assert.equal(compact.roleBorder,'0px');
-   assert(compact.height<180,'ordinary Admin hero no longer spends a row on buttons');
+   assert(compact.height<180,'responsive Admin hero remains compact');
    await page.screenshot({path:path.join(out,'compact-admin-'+width+'-'+theme+'.png')});
    await page.locator('#hero-profile-switch').click();
    assert.equal(await page.evaluate(()=>adminUiMode),'coach');

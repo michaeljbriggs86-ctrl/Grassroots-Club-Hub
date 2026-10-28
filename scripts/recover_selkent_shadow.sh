@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Replay the existing collector privately, then restore its existing R2 key only
+# Replay the production handler entrypoint privately, then restore its existing R2 key only
 # after completeness and independent parser checks. No public endpoint is added.
 set -euo pipefail
 repo_root=$(git rev-parse --show-toplevel)
