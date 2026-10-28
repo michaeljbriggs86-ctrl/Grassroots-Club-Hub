@@ -574,6 +574,7 @@ function normalizeState(data={}){
       fixtureOverrides: data.selkent?.fixtureOverrides && typeof data.selkent.fixtureOverrides==='object' ? data.selkent.fixtureOverrides : {},
       directoryDetails: data.selkent?.directoryDetails && typeof data.selkent.directoryDetails==='object' ? data.selkent.directoryDetails : {},
       fixtures: Array.isArray(data.selkent?.fixtures) ? data.selkent.fixtures : [],
+      scheduledFixtures: scheduledFixtureProjection(data.matches),
       results: Array.isArray(data.selkent?.results) ? data.selkent.results : [],
       table: Array.isArray(data.selkent?.table) ? data.selkent.table : []
     },
@@ -592,6 +593,16 @@ function normalizeState(data={}){
     awardTypes: normalizeAwardTypes(data.awardTypes),
     awards: resolveMiniPerformanceDisplay(Array.isArray(data.awards) ? data.awards : starter.awards,squad)
   };
+}
+// A derived read model of existing authorized team state, never another feed.
+// Parent timelines consume fixture details without touching staff match records.
+function scheduledFixtureProjection(matches=[]){
+  const fields=['id','date','time','opponent','opponentAgeGroup','venue','competition','type','groundName','address','homeKitColours','awayKitColours','kitColours'];
+  return (Array.isArray(matches)?matches:[]).filter(m=>m&&String(m.status||'').toLowerCase()==='scheduled'&&!/selkent|github-static|static-fixture/i.test(String(m.source||''))).map(m=>{
+    const fixture={source:'manual',status:'scheduled'};
+    for(const key of fields)if(typeof m[key]==='string'||typeof m[key]==='number')fixture[key]=String(m[key]);
+    return fixture;
+  });
 }
 function normalizeAwardTypes(raw){
   let list=Array.isArray(raw)?raw.map(x=>String(x||'').replace(/\s+/g,' ').trim()).filter(Boolean):[];
@@ -1652,9 +1663,9 @@ function upcomingFixtures(){
   // Manually scheduled matches belong in the same next-fixture timeline as provider fixtures.
   // Keep provider fixtures authoritative when a manually recorded match refers to one.
   const providerKeys=new Set((state.selkent?.fixtures||[]).map(f=>[f.date,normalizeTeamKey(f.opponent||''),String(f.venue||'').toUpperCase()].join('|')));
-  // Parent timelines use the score-free provider fixture projection only.
+  // Parent timelines use only the derived score-free schedule projection.
   // Staff match records must not participate in parent rendering.
-  for(const m of parent?[]:state.matches||[]){
+  for(const m of parent?(state.selkent?.scheduledFixtures||[]):state.matches||[]){
     if(matchStatus(m)!=='scheduled'||isProviderOwnedMatch(m)||!m.date||!m.opponent)continue;
     if(new Date(m.date+'T12:00:00')<today)continue;
     const key=[m.date,normalizeTeamKey(m.opponent),String(m.venue||'').toUpperCase()].join('|');
