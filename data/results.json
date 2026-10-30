@@ -1,9 +1,9 @@
 {
   "schema_version": 2,
   "provider": "Selkent",
-  "last_updated": "2026-10-30T03:23:06.245785+00:00",
-  "cup_results_last_updated": "2026-10-30T03:23:06.245785+00:00",
-  "cup_results_last_attempted": "2026-10-30T03:23:06.245785+00:00",
+  "last_updated": "2026-10-30T11:51:31.955174+00:00",
+  "cup_results_last_updated": "2026-10-30T11:51:31.955174+00:00",
+  "cup_results_last_attempted": "2026-10-30T11:51:31.955174+00:00",
   "cup_results_status": "verified_current",
   "fixture_agegroup_discovery_source": "selkent_divisions_all",
   "coverage": {
@@ -18872,7 +18872,7 @@
         },
         {
           "division_name": "Under 13D Orange",
-          "updated_at_text": "18/10/26 14:24:23",
+          "updated_at_text": "30/10/26 08:27:21",
           "source_order_authoritative_for_ties": false,
           "source_disclaimer": "Note: Table does not yet take account of rules for determining winner if teams on equal points",
           "rows": [
@@ -18904,6 +18904,19 @@
             },
             {
               "row_order": 3,
+              "provider_team_id": 105,
+              "provider_division_id": 4265,
+              "team_name": "Abbeymead FC",
+              "played": 4,
+              "won": 2,
+              "drawn": 1,
+              "lost": 1,
+              "gf": 11,
+              "ga": 4,
+              "points": 5
+            },
+            {
+              "row_order": 4,
               "provider_team_id": 417,
               "provider_division_id": 4265,
               "team_name": "Chislehurst Wanderers Tigers",
@@ -18914,19 +18927,6 @@
               "gf": 6,
               "ga": 4,
               "points": 4
-            },
-            {
-              "row_order": 4,
-              "provider_team_id": 105,
-              "provider_division_id": 4265,
-              "team_name": "Abbeymead FC",
-              "played": 3,
-              "won": 1,
-              "drawn": 1,
-              "lost": 1,
-              "gf": 11,
-              "ga": 4,
-              "points": 3
             },
             {
               "row_order": 5,
@@ -18959,10 +18959,10 @@
               "provider_team_id": 474,
               "provider_division_id": 4265,
               "team_name": "S.E. Eagles FC Gold",
-              "played": 3,
+              "played": 4,
               "won": 1,
               "drawn": 0,
-              "lost": 2,
+              "lost": 3,
               "gf": 3,
               "ga": 7,
               "points": 2
