@@ -1,9 +1,9 @@
 {
   "schema_version": 2,
   "provider": "Selkent",
-  "last_updated": "2026-10-31T11:24:42.065797+00:00",
-  "cup_results_last_updated": "2026-10-31T11:24:42.065797+00:00",
-  "cup_results_last_attempted": "2026-10-31T11:24:42.065797+00:00",
+  "last_updated": "2026-10-31T16:30:59.263492+00:00",
+  "cup_results_last_updated": "2026-10-31T16:30:59.263492+00:00",
+  "cup_results_last_attempted": "2026-10-31T16:30:59.263492+00:00",
   "cup_results_status": "verified_current",
   "fixture_agegroup_discovery_source": "selkent_divisions_all",
   "coverage": {
@@ -10712,7 +10712,7 @@
         },
         {
           "division_name": "Under 12D Silver",
-          "updated_at_text": "25/10/26 14:23:14",
+          "updated_at_text": "31/10/26 14:07:30",
           "source_order_authoritative_for_ties": false,
           "source_disclaimer": "Note: Table does not yet take account of rules for determining winner if teams on equal points",
           "rows": [
@@ -10749,11 +10749,11 @@
               "team_name": "Total FC",
               "played": 5,
               "won": 2,
-              "drawn": 3,
-              "lost": 0,
-              "gf": 21,
-              "ga": 14,
-              "points": 7
+              "drawn": 2,
+              "lost": 1,
+              "gf": 17,
+              "ga": 10,
+              "points": 6
             },
             {
               "row_order": 4,
@@ -10770,6 +10770,19 @@
             },
             {
               "row_order": 5,
+              "provider_team_id": 933,
+              "provider_division_id": 4259,
+              "team_name": "Beacons Black",
+              "played": 3,
+              "won": 2,
+              "drawn": 0,
+              "lost": 1,
+              "gf": 5,
+              "ga": 5,
+              "points": 4
+            },
+            {
+              "row_order": 6,
               "provider_team_id": 1065,
               "provider_division_id": 4259,
               "team_name": "Gipsy Hill FC Whites",
@@ -10782,7 +10795,7 @@
               "points": 4
             },
             {
-              "row_order": 6,
+              "row_order": 7,
               "provider_team_id": 245,
               "provider_division_id": 4259,
               "team_name": "Junior Reds Valiants",
@@ -10795,7 +10808,7 @@
               "points": 4
             },
             {
-              "row_order": 7,
+              "row_order": 8,
               "provider_team_id": 460,
               "provider_division_id": 4259,
               "team_name": "Athenlay RYE",
@@ -10808,7 +10821,7 @@
               "points": 4
             },
             {
-              "row_order": 8,
+              "row_order": 9,
               "provider_team_id": 82,
               "provider_division_id": 4259,
               "team_name": "Blackheath Village",
@@ -10819,19 +10832,6 @@
               "gf": 9,
               "ga": 11,
               "points": 4
-            },
-            {
-              "row_order": 9,
-              "provider_team_id": 933,
-              "provider_division_id": 4259,
-              "team_name": "Beacons Black",
-              "played": 3,
-              "won": 1,
-              "drawn": 1,
-              "lost": 1,
-              "gf": 9,
-              "ga": 9,
-              "points": 3
             },
             {
               "row_order": 10,
@@ -12746,15 +12746,6 @@
           "away": "Junior Reds Valiants",
           "homeGoals": 5,
           "awayGoals": 2,
-          "provider_division_id": 4259,
-          "division_name": "Under 12D Silver"
-        },
-        {
-          "date": "2026-09-27",
-          "home": "Beacons Black",
-          "away": "Total FC",
-          "homeGoals": 4,
-          "awayGoals": 4,
           "provider_division_id": 4259,
           "division_name": "Under 12D Silver"
         },
