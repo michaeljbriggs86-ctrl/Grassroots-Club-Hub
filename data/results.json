@@ -1,9 +1,9 @@
 {
   "schema_version": 2,
   "provider": "Selkent",
-  "last_updated": "2026-11-01T19:39:26.265330+00:00",
-  "cup_results_last_updated": "2026-11-01T19:39:26.265330+00:00",
-  "cup_results_last_attempted": "2026-11-01T19:39:26.265330+00:00",
+  "last_updated": "2026-11-01T21:30:04.157427+00:00",
+  "cup_results_last_updated": "2026-11-01T21:30:04.157427+00:00",
+  "cup_results_last_attempted": "2026-11-01T21:30:04.157427+00:00",
   "cup_results_status": "verified_current",
   "fixture_agegroup_discovery_source": "selkent_divisions_all",
   "coverage": {
@@ -10560,7 +10560,7 @@
         },
         {
           "division_name": "Under 12D Orange",
-          "updated_at_text": "01/11/26 16:14:44",
+          "updated_at_text": "01/11/26 20:10:24",
           "source_order_authoritative_for_ties": false,
           "source_disclaimer": "Note: Table does not yet take account of rules for determining winner if teams on equal points",
           "rows": [
@@ -10579,6 +10579,19 @@
             },
             {
               "row_order": 2,
+              "provider_team_id": 798,
+              "provider_division_id": 4258,
+              "team_name": "Metrogas FC Blue",
+              "played": 6,
+              "won": 4,
+              "drawn": 0,
+              "lost": 2,
+              "gf": 29,
+              "ga": 17,
+              "points": 8
+            },
+            {
+              "row_order": 3,
               "provider_team_id": 2107,
               "provider_division_id": 4258,
               "team_name": "South Darenth Blues",
@@ -10591,7 +10604,7 @@
               "points": 8
             },
             {
-              "row_order": 3,
+              "row_order": 4,
               "provider_team_id": 331,
               "provider_division_id": 4258,
               "team_name": "Dartford Royals white",
@@ -10601,19 +10614,6 @@
               "lost": 3,
               "gf": 17,
               "ga": 18,
-              "points": 6
-            },
-            {
-              "row_order": 4,
-              "provider_team_id": 798,
-              "provider_division_id": 4258,
-              "team_name": "Metrogas FC Blue",
-              "played": 5,
-              "won": 3,
-              "drawn": 0,
-              "lost": 2,
-              "gf": 23,
-              "ga": 15,
               "points": 6
             },
             {
@@ -10686,12 +10686,12 @@
               "provider_team_id": 817,
               "provider_division_id": 4258,
               "team_name": "Woolwich Starlings FC",
-              "played": 3,
+              "played": 4,
               "won": 1,
               "drawn": 0,
-              "lost": 2,
-              "gf": 3,
-              "ga": 11,
+              "lost": 3,
+              "gf": 5,
+              "ga": 17,
               "points": 2
             },
             {
@@ -12772,6 +12772,15 @@
           "home": "Dartford Royals white",
           "away": "Eversley Rangers White",
           "homeGoals": 1,
+          "awayGoals": 2,
+          "provider_division_id": 4258,
+          "division_name": "Under 12D Orange"
+        },
+        {
+          "date": "2026-11-01",
+          "home": "Metrogas FC Blue",
+          "away": "Woolwich Starlings FC",
+          "homeGoals": 6,
           "awayGoals": 2,
           "provider_division_id": 4258,
           "division_name": "Under 12D Orange"
