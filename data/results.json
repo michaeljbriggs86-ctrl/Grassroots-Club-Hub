@@ -1,9 +1,9 @@
 {
   "schema_version": 2,
   "provider": "Selkent",
-  "last_updated": "2026-11-01T21:30:04.157427+00:00",
-  "cup_results_last_updated": "2026-11-01T21:30:04.157427+00:00",
-  "cup_results_last_attempted": "2026-11-01T21:30:04.157427+00:00",
+  "last_updated": "2026-11-01T23:07:06.485344+00:00",
+  "cup_results_last_updated": "2026-11-01T23:07:06.485344+00:00",
+  "cup_results_last_attempted": "2026-11-01T23:07:06.485344+00:00",
   "cup_results_status": "verified_current",
   "fixture_agegroup_discovery_source": "selkent_divisions_all",
   "coverage": {
@@ -18991,7 +18991,7 @@
       "standings": [
         {
           "division_name": "Under 13A",
-          "updated_at_text": "01/11/26 12:34:50",
+          "updated_at_text": "01/11/26 21:36:52",
           "source_order_authoritative_for_ties": false,
           "source_disclaimer": "Note: Table does not yet take account of rules for determining winner if teams on equal points",
           "rows": [
@@ -19075,6 +19075,19 @@
             },
             {
               "row_order": 7,
+              "provider_team_id": 1048,
+              "provider_division_id": 4260,
+              "team_name": "Omarie Youth Red",
+              "played": 4,
+              "won": 1,
+              "drawn": 1,
+              "lost": 2,
+              "gf": 6,
+              "ga": 6,
+              "points": 3
+            },
+            {
+              "row_order": 8,
               "provider_team_id": 687,
               "provider_division_id": 4260,
               "team_name": "Eagles & Stars FC",
@@ -19087,7 +19100,7 @@
               "points": 1
             },
             {
-              "row_order": 8,
+              "row_order": 9,
               "provider_team_id": 209,
               "provider_division_id": 4260,
               "team_name": "Lewisham Project Gold",
@@ -19100,29 +19113,16 @@
               "points": 1
             },
             {
-              "row_order": 9,
-              "provider_team_id": 1048,
-              "provider_division_id": 4260,
-              "team_name": "Omarie Youth Red",
-              "played": 3,
-              "won": 0,
-              "drawn": 1,
-              "lost": 2,
-              "gf": 3,
-              "ga": 6,
-              "points": 1
-            },
-            {
               "row_order": 10,
               "provider_team_id": 151,
               "provider_division_id": 4260,
               "team_name": "Parkwood Rangers Lions",
-              "played": 3,
+              "played": 4,
               "won": 0,
               "drawn": 1,
-              "lost": 2,
+              "lost": 3,
               "gf": 1,
-              "ga": 8,
+              "ga": 11,
               "points": 1
             }
           ],
@@ -19969,6 +19969,15 @@
           "home": "Next Level FC Whites",
           "away": "Next Level FC Black",
           "homeGoals": 4,
+          "awayGoals": 3,
+          "provider_division_id": 4260,
+          "division_name": "Under 13A"
+        },
+        {
+          "date": "2026-11-01",
+          "home": "Parkwood Rangers Lions",
+          "away": "Omarie Youth Red",
+          "homeGoals": 0,
           "awayGoals": 3,
           "provider_division_id": 4260,
           "division_name": "Under 13A"
