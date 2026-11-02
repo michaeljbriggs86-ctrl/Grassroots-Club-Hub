@@ -1,9 +1,9 @@
 {
   "schema_version": 2,
   "provider": "Selkent",
-  "last_updated": "2026-11-02T03:12:20.008144+00:00",
-  "cup_results_last_updated": "2026-11-02T03:12:20.008144+00:00",
-  "cup_results_last_attempted": "2026-11-02T03:12:20.008144+00:00",
+  "last_updated": "2026-11-02T14:06:57.545789+00:00",
+  "cup_results_last_updated": "2026-11-02T14:06:57.545789+00:00",
+  "cup_results_last_attempted": "2026-11-02T14:06:57.545789+00:00",
   "cup_results_status": "verified_current",
   "fixture_agegroup_discovery_source": "selkent_divisions_all",
   "coverage": {
@@ -1992,16 +1992,6 @@
       "fixtures": [
         {
           "date": "2026-11-08",
-          "division_name": "U9 Friendly",
-          "home": "Eversley Rangers",
-          "away": "KSI Coaching FC White",
-          "provider_team_ids": [
-            "676",
-            "167"
-          ]
-        },
-        {
-          "date": "2026-11-08",
           "division_name": "Under 9C Navy",
           "home": "Ebbsfleet United Blue",
           "away": "Junior Reds Titans",
@@ -2063,21 +2053,21 @@
         {
           "date": "2026-11-08",
           "division_name": "Under 9C Silver",
-          "home": "Dynamo Youth Silver",
-          "away": "Kekoa Red",
+          "home": "Kekoa Red",
+          "away": "KSI Coaching FC White",
           "provider_team_ids": [
-            "2134",
-            "990"
+            "990",
+            "167"
           ]
         },
         {
           "date": "2026-11-08",
           "division_name": "Under 9C Silver",
           "home": "Palace Knights Yellow",
-          "away": "Chislehurst Wanderers Tigers",
+          "away": "Dynamo Youth Silver",
           "provider_team_ids": [
             "796",
-            "411"
+            "2134"
           ]
         },
         {
@@ -2114,10 +2104,10 @@
           "date": "2026-11-08",
           "division_name": "Under 9D Navy",
           "home": "Erith Town Selkent",
-          "away": "Shooters Hill AFC Valiants",
+          "away": "Slade Green Knights",
           "provider_team_ids": [
             "338",
-            "972"
+            "93"
           ]
         },
         {
@@ -2153,10 +2143,10 @@
         {
           "date": "2026-11-08",
           "division_name": "Under 9D Navy",
-          "home": "Slade Green Knights",
+          "home": "Shooters Hill AFC Valiants",
           "away": "Eversley Rangers Red",
           "provider_team_ids": [
-            "93",
+            "972",
             "2100"
           ]
         },
@@ -2513,11 +2503,11 @@
         {
           "date": "2026-11-15",
           "division_name": "Under 9D Navy",
-          "home": "Shooters Hill AFC Valiants",
-          "away": "Slade Green Knights",
+          "home": "Slade Green Knights",
+          "away": "Shooters Hill AFC Valiants",
           "provider_team_ids": [
-            "972",
-            "93"
+            "93",
+            "972"
           ]
         },
         {
@@ -3137,10 +3127,10 @@
         {
           "date": "2026-11-08",
           "division_name": "Under 10D Silver",
-          "home": "Braves Sporting Club",
+          "home": "Deptford United",
           "away": "Athenlay",
           "provider_team_ids": [
-            "784",
+            "348",
             "455"
           ]
         },
@@ -3157,21 +3147,21 @@
         {
           "date": "2026-11-08",
           "division_name": "Under 10D Silver",
-          "home": "KSI Coaching FC Navy",
-          "away": "Greenwich Peninsula Tigers",
+          "home": "Greenwich Peninsula Tigers",
+          "away": "KSI Coaching FC Navy",
           "provider_team_ids": [
-            "170",
-            "2110"
+            "2110",
+            "170"
           ]
         },
         {
           "date": "2026-11-08",
           "division_name": "Under 10D Silver",
           "home": "Lewisham Youth",
-          "away": "Deptford United",
+          "away": "Braves Sporting Club",
           "provider_team_ids": [
             "56",
-            "348"
+            "784"
           ]
         },
         {
@@ -4088,10 +4078,20 @@
           "date": "2026-11-15",
           "division_name": "Under 10D Silver",
           "home": "Athenlay",
-          "away": "Wildcats FS Club Tigers",
+          "away": "Wildcats FS Club Jaguars",
           "provider_team_ids": [
             "455",
-            "241"
+            "1083"
+          ]
+        },
+        {
+          "date": "2026-11-15",
+          "division_name": "Under 10D Silver",
+          "home": "Braves Sporting Club",
+          "away": "Greenwich Peninsula Tigers",
+          "provider_team_ids": [
+            "784",
+            "2110"
           ]
         },
         {
@@ -4107,21 +4107,11 @@
         {
           "date": "2026-11-15",
           "division_name": "Under 10D Silver",
-          "home": "Greenwich Peninsula Tigers",
-          "away": "Braves Sporting Club",
+          "home": "Junior Reds Titans",
+          "away": "Wildcats FS Club Tigers",
           "provider_team_ids": [
-            "2110",
-            "784"
-          ]
-        },
-        {
-          "date": "2026-11-15",
-          "division_name": "Under 10D Silver",
-          "home": "Wildcats FS Club Jaguars",
-          "away": "Junior Reds Titans",
-          "provider_team_ids": [
-            "1083",
-            "2080"
+            "2080",
+            "241"
           ]
         },
         {
@@ -5065,11 +5055,11 @@
         {
           "date": "2026-11-08",
           "division_name": "U12 Friendly",
-          "home": "Junior Reds Athletic",
-          "away": "Woolwich Starlings FC",
+          "home": "Russellers Whites",
+          "away": "Junior Reds Athletic",
           "provider_team_ids": [
-            "192",
-            "817"
+            "49",
+            "192"
           ]
         },
         {
@@ -11716,7 +11706,7 @@
       "standings": [
         {
           "division_name": "Under 14 A Navy",
-          "updated_at_text": "01/11/26 17:34:56",
+          "updated_at_text": "02/11/26 10:46:34",
           "source_order_authoritative_for_ties": false,
           "source_disclaimer": "Note: Table does not yet take account of rules for determining winner if teams on equal points",
           "rows": [
@@ -11725,13 +11715,13 @@
               "provider_team_id": 801,
               "provider_division_id": 4271,
               "team_name": "Metrogas FC YELLOW",
-              "played": 5,
-              "won": 4,
+              "played": 6,
+              "won": 5,
               "drawn": 1,
               "lost": 0,
-              "gf": 39,
-              "ga": 9,
-              "points": 9
+              "gf": 53,
+              "ga": 10,
+              "points": 11
             },
             {
               "row_order": 2,
@@ -11803,12 +11793,12 @@
               "provider_team_id": 1006,
               "provider_division_id": 4271,
               "team_name": "Welling United Red",
-              "played": 3,
+              "played": 4,
               "won": 0,
               "drawn": 1,
-              "lost": 2,
-              "gf": 1,
-              "ga": 11,
+              "lost": 3,
+              "gf": 2,
+              "ga": 25,
               "points": 1
             },
             {
@@ -12939,6 +12929,15 @@
           "away": "Ebbsfleet United White",
           "homeGoals": 0,
           "awayGoals": 8,
+          "provider_division_id": 4271,
+          "division_name": "Under 14 A Navy"
+        },
+        {
+          "date": "2026-11-01",
+          "home": "Welling United Red",
+          "away": "Metrogas FC YELLOW",
+          "homeGoals": 1,
+          "awayGoals": 14,
           "provider_division_id": 4271,
           "division_name": "Under 14 A Navy"
         },
@@ -17965,6 +17964,17 @@
         },
         {
           "date": "2026-11-01",
+          "home": "Greenwich Peninsula Pumas",
+          "away": "Ballers SE Yellow",
+          "homeGoals": 2,
+          "awayGoals": 9,
+          "competition": "Selkent Cup Two",
+          "round": "Round 1",
+          "provider_cup_id": "cupCombined8-1",
+          "provider_match_ref": "AF"
+        },
+        {
+          "date": "2026-11-01",
           "home": "Dartford Royals yellow",
           "away": "Hayden Youth Panthers",
           "homeGoals": 1,
@@ -18016,10 +18026,10 @@
           "date": "2026-11-08",
           "division_name": "U15 London Cup",
           "home": "Teviot Rangers WHITE",
-          "away": "Winner of Tie 4 (Non-Selkent)",
+          "away": "Cockfosters FC (Non-Selkent)",
           "provider_team_ids": [
             "742",
-            "2216"
+            "2315"
           ]
         },
         {
@@ -19168,7 +19178,7 @@
         },
         {
           "division_name": "Under 15D Navy",
-          "updated_at_text": "01/11/26 15:22:16",
+          "updated_at_text": "02/11/26 13:27:59",
           "source_order_authoritative_for_ties": false,
           "source_disclaimer": "Note: Table does not yet take account of rules for determining winner if teams on equal points",
           "rows": [
@@ -20833,11 +20843,11 @@
         {
           "date": "2026-11-08",
           "division_name": "Under 16A",
-          "home": "Cray Wanderers Lions",
-          "away": "Dulwich Village Orange",
+          "home": "Dulwich Village Orange",
+          "away": "Falconwood FC Grey",
           "provider_team_ids": [
-            "616",
-            "276"
+            "276",
+            "872"
           ]
         },
         {
@@ -20853,10 +20863,10 @@
         {
           "date": "2026-11-08",
           "division_name": "Under 16A",
-          "home": "Falconwood FC Grey",
+          "home": "Welling United Blue",
           "away": "Baldon Sports Blue",
           "provider_team_ids": [
-            "872",
+            "981",
             "913"
           ]
         },
@@ -27047,16 +27057,6 @@
         },
         {
           "date": "2026-11-15",
-          "division_name": "U10X Friendly",
-          "home": "Total FC",
-          "away": "Hayden Youth Lions",
-          "provider_team_ids": [
-            "2116",
-            "428"
-          ]
-        },
-        {
-          "date": "2026-11-15",
           "division_name": "U10X Selkent Cup Two - Round 2",
           "home": "AFC Green Court Knights",
           "away": "Old Roan FC Navy",
@@ -27358,10 +27358,20 @@
         {
           "date": "2026-11-15",
           "division_name": "Under 10X D Navy",
-          "home": "IEXEL F.C Gold",
+          "home": "Cray Wanderers Falcons",
+          "away": "IEXEL F.C Gold",
+          "provider_team_ids": [
+            "600",
+            "12"
+          ]
+        },
+        {
+          "date": "2026-11-15",
+          "division_name": "Under 10X D Navy",
+          "home": "Hayden Youth Lions",
           "away": "Teviot Rangers Blue",
           "provider_team_ids": [
-            "12",
+            "428",
             "760"
           ]
         },
