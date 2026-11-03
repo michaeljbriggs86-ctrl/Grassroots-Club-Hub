@@ -1,9 +1,9 @@
 {
   "schema_version": 2,
   "provider": "Selkent",
-  "last_updated": "2026-11-02T14:06:57.545789+00:00",
-  "cup_results_last_updated": "2026-11-02T14:06:57.545789+00:00",
-  "cup_results_last_attempted": "2026-11-02T14:06:57.545789+00:00",
+  "last_updated": "2026-11-03T00:11:32.110309+00:00",
+  "cup_results_last_updated": "2026-11-03T00:11:32.110309+00:00",
+  "cup_results_last_attempted": "2026-11-03T00:11:32.110309+00:00",
   "cup_results_status": "verified_current",
   "fixture_agegroup_discovery_source": "selkent_divisions_all",
   "coverage": {
@@ -4321,16 +4321,6 @@
         {
           "date": "2026-11-08",
           "division_name": "U11 Selkent Cup Two - Round 1",
-          "home": "AFC Green Court Dukes",
-          "away": "Baldon Sports Lions",
-          "provider_team_ids": [
-            "586",
-            "2140"
-          ]
-        },
-        {
-          "date": "2026-11-08",
-          "division_name": "U11 Selkent Cup Two - Round 1",
           "home": "AFC Green Court Knights",
           "away": "Blackheath Rhinos Yellow",
           "provider_team_ids": [
@@ -4472,10 +4462,10 @@
           "date": "2026-11-08",
           "division_name": "U11 Selkent Cup Two - Round 1",
           "home": "Sporting Club Thamesmead Black",
-          "away": "AFC Green Court Dukes",
+          "away": "Baldon Sports Lions",
           "provider_team_ids": [
             "221",
-            "586"
+            "2140"
           ]
         },
         {
@@ -20843,6 +20833,16 @@
         {
           "date": "2026-11-08",
           "division_name": "Under 16A",
+          "home": "Baldon Sports Blue",
+          "away": "Welling United Blue",
+          "provider_team_ids": [
+            "913",
+            "981"
+          ]
+        },
+        {
+          "date": "2026-11-08",
+          "division_name": "Under 16A",
           "home": "Dulwich Village Orange",
           "away": "Falconwood FC Grey",
           "provider_team_ids": [
@@ -20858,16 +20858,6 @@
           "provider_team_ids": [
             "662",
             "137"
-          ]
-        },
-        {
-          "date": "2026-11-08",
-          "division_name": "Under 16A",
-          "home": "Welling United Blue",
-          "away": "Baldon Sports Blue",
-          "provider_team_ids": [
-            "981",
-            "913"
           ]
         },
         {
@@ -30043,10 +30033,10 @@
         {
           "date": "2026-11-08",
           "division_name": "U14X Friendly",
-          "home": "AFC Green Court Knights",
+          "home": "AFC Lewisham",
           "away": "Bermondsey Utd FC",
           "provider_team_ids": [
-            "590",
+            "2242",
             "10"
           ]
         },
@@ -30088,6 +30078,16 @@
           "provider_team_ids": [
             "2295",
             "2074"
+          ]
+        },
+        {
+          "date": "2026-11-08",
+          "division_name": "U14X Kent Plate",
+          "home": "Ramsgate FC U13 Silv (Non-Selkent)",
+          "away": "AFC Green Court Knights",
+          "provider_team_ids": [
+            "2316",
+            "590"
           ]
         },
         {
