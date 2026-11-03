@@ -1,9 +1,9 @@
 {
   "schema_version": 2,
   "provider": "Selkent",
-  "last_updated": "2026-11-03T13:14:15.422417+00:00",
-  "cup_results_last_updated": "2026-11-03T13:14:15.422417+00:00",
-  "cup_results_last_attempted": "2026-11-03T13:14:15.422417+00:00",
+  "last_updated": "2026-11-03T22:41:55.636578+00:00",
+  "cup_results_last_updated": "2026-11-03T22:41:55.636578+00:00",
+  "cup_results_last_attempted": "2026-11-03T22:41:55.636578+00:00",
   "cup_results_status": "verified_current",
   "fixture_agegroup_discovery_source": "selkent_divisions_all",
   "coverage": {
@@ -2043,16 +2043,6 @@
         {
           "date": "2026-11-08",
           "division_name": "Under 9C Silver",
-          "home": "AFC Lewisham White",
-          "away": "ShooterBallers FC",
-          "provider_team_ids": [
-            "2111",
-            "2146"
-          ]
-        },
-        {
-          "date": "2026-11-08",
-          "division_name": "Under 9C Silver",
           "home": "Kekoa Red",
           "away": "KSI Coaching FC White",
           "provider_team_ids": [
@@ -2228,16 +2218,6 @@
           "provider_team_ids": [
             "579",
             "796"
-          ]
-        },
-        {
-          "date": "2026-11-15",
-          "division_name": "U9 Selkent Cup Two - Round 2",
-          "home": "AFC Lewisham White",
-          "away": "Kekoa Red",
-          "provider_team_ids": [
-            "2111",
-            "990"
           ]
         },
         {
@@ -2428,16 +2408,6 @@
           "provider_team_ids": [
             "968",
             "287"
-          ]
-        },
-        {
-          "date": "2026-11-15",
-          "division_name": "U9 Selkent Cup Two - Round 2",
-          "home": "The Bosco FC Dons",
-          "away": "AFC Lewisham White",
-          "provider_team_ids": [
-            "402",
-            "2111"
           ]
         },
         {
@@ -12339,7 +12309,7 @@
         },
         {
           "division_name": "Under 14C Orange",
-          "updated_at_text": "01/11/26 15:22:57",
+          "updated_at_text": "03/11/26 18:33:20",
           "source_order_authoritative_for_ties": false,
           "source_disclaimer": "Note: Table does not yet take account of rules for determining winner if teams on equal points",
           "rows": [
@@ -14776,6 +14746,16 @@
         {
           "date": "2026-11-08",
           "division_name": "U13 Selkent Cup Two - Round 1",
+          "home": "Lewisham Borough VIPERS",
+          "away": "Mighty Warriors FC",
+          "provider_team_ids": [
+            "217",
+            "999"
+          ]
+        },
+        {
+          "date": "2026-11-08",
+          "division_name": "U13 Selkent Cup Two - Round 1",
           "home": "Woolwich Wanderers FC",
           "away": "Total FC",
           "provider_team_ids": [
@@ -14896,16 +14876,6 @@
         {
           "date": "2026-11-08",
           "division_name": "Under 13C Silver",
-          "home": "Blackheath Rhinos Blue",
-          "away": "Mighty Warriors FC",
-          "provider_team_ids": [
-            "859",
-            "999"
-          ]
-        },
-        {
-          "date": "2026-11-08",
-          "division_name": "Under 13C Silver",
           "home": "Blue Stars Elite FC",
           "away": "Ballers SE Yellow",
           "provider_team_ids": [
@@ -14927,10 +14897,10 @@
           "date": "2026-11-08",
           "division_name": "Under 13C Silver",
           "home": "Palace Knights",
-          "away": "Lewisham Borough VIPERS",
+          "away": "Blackheath Rhinos Blue",
           "provider_team_ids": [
             "791",
-            "217"
+            "859"
           ]
         },
         {
@@ -24245,6 +24215,16 @@
         {
           "date": "2026-11-08",
           "division_name": "Senior Division One",
+          "home": "Dulwich Village Orange",
+          "away": "Hillyfielders Hawks",
+          "provider_team_ids": [
+            "1042",
+            "645"
+          ]
+        },
+        {
+          "date": "2026-11-08",
+          "division_name": "Senior Division One",
           "home": "Dulwich Village White",
           "away": "Docklands",
           "provider_team_ids": [
@@ -24313,16 +24293,6 @@
           ]
         },
         {
-          "date": "2026-11-08",
-          "division_name": "Senior Selkent Cup - Round 1",
-          "home": "Junior Reds Titans",
-          "away": "Dulwich Village Orange",
-          "provider_team_ids": [
-            "370",
-            "1042"
-          ]
-        },
-        {
           "date": "2026-11-15",
           "division_name": "Senior Division One",
           "home": "Crayford Arrows",
@@ -24360,16 +24330,6 @@
           "provider_team_ids": [
             "320",
             "102"
-          ]
-        },
-        {
-          "date": "2026-11-15",
-          "division_name": "Senior Division Two",
-          "home": "EWD Eagles Youth",
-          "away": "Junior Reds Titans",
-          "provider_team_ids": [
-            "2135",
-            "370"
           ]
         },
         {
@@ -24548,51 +24508,38 @@
         },
         {
           "division_name": "Senior Division Two",
-          "updated_at_text": "01/11/26 16:45:02",
+          "updated_at_text": "03/11/26 15:54:26",
           "source_order_authoritative_for_ties": false,
           "source_disclaimer": "Note: Table does not yet take account of rules for determining winner if teams on equal points",
           "rows": [
             {
               "row_order": 1,
-              "provider_team_id": 1032,
-              "provider_division_id": 4296,
-              "team_name": "Fleetdown United",
-              "played": 5,
-              "won": 5,
-              "drawn": 0,
-              "lost": 0,
-              "gf": 23,
-              "ga": 1,
-              "points": 10
-            },
-            {
-              "row_order": 2,
               "provider_team_id": 320,
               "provider_division_id": 4296,
               "team_name": "Cray Valley (PM) FC",
-              "played": 4,
-              "won": 4,
+              "played": 3,
+              "won": 3,
               "drawn": 0,
               "lost": 0,
-              "gf": 18,
+              "gf": 11,
               "ga": 5,
-              "points": 8
+              "points": 6
+            },
+            {
+              "row_order": 2,
+              "provider_team_id": 1032,
+              "provider_division_id": 4296,
+              "team_name": "Fleetdown United",
+              "played": 3,
+              "won": 3,
+              "drawn": 0,
+              "lost": 0,
+              "gf": 6,
+              "ga": 1,
+              "points": 6
             },
             {
               "row_order": 3,
-              "provider_team_id": 904,
-              "provider_division_id": 4296,
-              "team_name": "Vikings FC",
-              "played": 5,
-              "won": 3,
-              "drawn": 1,
-              "lost": 1,
-              "gf": 13,
-              "ga": 16,
-              "points": 7
-            },
-            {
-              "row_order": 4,
               "provider_team_id": 1009,
               "provider_division_id": 4296,
               "team_name": "Istead United Colts",
@@ -24605,7 +24552,7 @@
               "points": 6
             },
             {
-              "row_order": 5,
+              "row_order": 4,
               "provider_team_id": 2055,
               "provider_division_id": 4296,
               "team_name": "Bridon Ropes",
@@ -24618,20 +24565,7 @@
               "points": 6
             },
             {
-              "row_order": 6,
-              "provider_team_id": 102,
-              "provider_division_id": 4296,
-              "team_name": "Slade Green Knights",
-              "played": 5,
-              "won": 2,
-              "drawn": 2,
-              "lost": 1,
-              "gf": 18,
-              "ga": 7,
-              "points": 6
-            },
-            {
-              "row_order": 7,
+              "row_order": 5,
               "provider_team_id": 631,
               "provider_division_id": 4296,
               "team_name": "Hayden Youth Sharks",
@@ -24642,6 +24576,32 @@
               "gf": 19,
               "ga": 11,
               "points": 5
+            },
+            {
+              "row_order": 6,
+              "provider_team_id": 904,
+              "provider_division_id": 4296,
+              "team_name": "Vikings FC",
+              "played": 4,
+              "won": 2,
+              "drawn": 1,
+              "lost": 1,
+              "gf": 13,
+              "ga": 16,
+              "points": 5
+            },
+            {
+              "row_order": 7,
+              "provider_team_id": 102,
+              "provider_division_id": 4296,
+              "team_name": "Slade Green Knights",
+              "played": 4,
+              "won": 1,
+              "drawn": 2,
+              "lost": 1,
+              "gf": 8,
+              "ga": 6,
+              "points": 4
             },
             {
               "row_order": 8,
@@ -24667,19 +24627,6 @@
               "lost": 5,
               "gf": 8,
               "ga": 29,
-              "points": 0
-            },
-            {
-              "row_order": 10,
-              "provider_team_id": 370,
-              "provider_division_id": 4296,
-              "team_name": "Junior Reds Titans",
-              "played": 5,
-              "won": 0,
-              "drawn": 0,
-              "lost": 5,
-              "gf": 1,
-              "ga": 34,
               "points": 0
             }
           ],
@@ -24878,7 +24825,7 @@
         },
         {
           "date": "2026-11-01",
-          "home": "Junior Reds Titans",
+          "home": "Junior Reds Titans (withdrawn)",
           "away": "Fleetdown United",
           "homeGoals": 0,
           "awayGoals": 17,
@@ -24905,7 +24852,7 @@
         },
         {
           "date": "2026-10-25",
-          "home": "Junior Reds Titans",
+          "home": "Junior Reds Titans (withdrawn)",
           "away": "Cray Valley (PM) FC",
           "homeGoals": 0,
           "awayGoals": 7,
@@ -24977,7 +24924,7 @@
         },
         {
           "date": "2026-10-11",
-          "home": "Junior Reds Titans",
+          "home": "Junior Reds Titans (withdrawn)",
           "away": "Slade Green Knights",
           "homeGoals": 1,
           "awayGoals": 10,
