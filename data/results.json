@@ -1,9 +1,9 @@
 {
   "schema_version": 2,
   "provider": "Selkent",
-  "last_updated": "2026-11-03T00:11:32.110309+00:00",
-  "cup_results_last_updated": "2026-11-03T00:11:32.110309+00:00",
-  "cup_results_last_attempted": "2026-11-03T00:11:32.110309+00:00",
+  "last_updated": "2026-11-03T13:14:15.422417+00:00",
+  "cup_results_last_updated": "2026-11-03T13:14:15.422417+00:00",
+  "cup_results_last_attempted": "2026-11-03T13:14:15.422417+00:00",
   "cup_results_status": "verified_current",
   "fixture_agegroup_discovery_source": "selkent_divisions_all",
   "coverage": {
@@ -21300,25 +21300,12 @@
       "standings": [
         {
           "division_name": "Under 16A",
-          "updated_at_text": "01/11/26 13:33:26",
+          "updated_at_text": "03/11/26 09:04:36",
           "source_order_authoritative_for_ties": false,
           "source_disclaimer": "Note: Table does not yet take account of rules for determining winner if teams on equal points",
           "rows": [
             {
               "row_order": 1,
-              "provider_team_id": 872,
-              "provider_division_id": 4286,
-              "team_name": "Falconwood FC Grey",
-              "played": 5,
-              "won": 4,
-              "drawn": 0,
-              "lost": 1,
-              "gf": 18,
-              "ga": 7,
-              "points": 8
-            },
-            {
-              "row_order": 2,
               "provider_team_id": 913,
               "provider_division_id": 4286,
               "team_name": "Baldon Sports Blue",
@@ -21331,7 +21318,7 @@
               "points": 6
             },
             {
-              "row_order": 3,
+              "row_order": 2,
               "provider_team_id": 662,
               "provider_division_id": 4286,
               "team_name": "Ebbsfleet United White",
@@ -21341,6 +21328,19 @@
               "lost": 0,
               "gf": 9,
               "ga": 2,
+              "points": 6
+            },
+            {
+              "row_order": 3,
+              "provider_team_id": 872,
+              "provider_division_id": 4286,
+              "team_name": "Falconwood FC Grey",
+              "played": 4,
+              "won": 3,
+              "drawn": 0,
+              "lost": 1,
+              "gf": 15,
+              "ga": 7,
               "points": 6
             },
             {
@@ -21400,12 +21400,12 @@
               "provider_team_id": 539,
               "provider_division_id": 4286,
               "team_name": "Dynamo Youth",
-              "played": 6,
+              "played": 5,
               "won": 0,
               "drawn": 0,
-              "lost": 6,
+              "lost": 5,
               "gf": 8,
-              "ga": 27,
+              "ga": 24,
               "points": 0
             },
             {
@@ -21988,15 +21988,6 @@
           "away": "Cray Wanderers Lions",
           "homeGoals": 1,
           "awayGoals": 1,
-          "provider_division_id": 4286,
-          "division_name": "Under 16A"
-        },
-        {
-          "date": "2026-11-01",
-          "home": "Dynamo Youth",
-          "away": "Falconwood FC Grey",
-          "homeGoals": 0,
-          "awayGoals": 3,
           "provider_division_id": 4286,
           "division_name": "Under 16A"
         },
@@ -30857,7 +30848,7 @@
         },
         {
           "division_name": "Under 14X C Silver",
-          "updated_at_text": "01/11/26 16:11:31",
+          "updated_at_text": "03/11/26 07:20:25",
           "source_order_authoritative_for_ties": false,
           "source_disclaimer": "Note: Table does not yet take account of rules for determining winner if teams on equal points",
           "rows": [
@@ -30902,6 +30893,19 @@
             },
             {
               "row_order": 4,
+              "provider_team_id": 10,
+              "provider_division_id": 4270,
+              "team_name": "Bermondsey Utd FC",
+              "played": 5,
+              "won": 3,
+              "drawn": 0,
+              "lost": 2,
+              "gf": 32,
+              "ga": 10,
+              "points": 6
+            },
+            {
+              "row_order": 5,
               "provider_team_id": 220,
               "provider_division_id": 4270,
               "team_name": "Sporting Club Thamesmead Red",
@@ -30912,19 +30916,6 @@
               "gf": 21,
               "ga": 6,
               "points": 6
-            },
-            {
-              "row_order": 5,
-              "provider_team_id": 10,
-              "provider_division_id": 4270,
-              "team_name": "Bermondsey Utd FC",
-              "played": 4,
-              "won": 2,
-              "drawn": 0,
-              "lost": 2,
-              "gf": 23,
-              "ga": 10,
-              "points": 4
             },
             {
               "row_order": 6,
@@ -30970,12 +30961,12 @@
               "provider_team_id": 273,
               "provider_division_id": 4270,
               "team_name": "Dulwich Village Red",
-              "played": 3,
+              "played": 4,
               "won": 0,
               "drawn": 0,
-              "lost": 3,
+              "lost": 4,
               "gf": 4,
-              "ga": 11,
+              "ga": 20,
               "points": 0
             }
           ],
@@ -31538,6 +31529,15 @@
           "away": "Mayow Park Rangers FC",
           "homeGoals": 3,
           "awayGoals": 7,
+          "provider_division_id": 4270,
+          "division_name": "Under 14X C Silver"
+        },
+        {
+          "date": "2026-11-01",
+          "home": "Bermondsey Utd FC",
+          "away": "Dulwich Village Red",
+          "homeGoals": 9,
+          "awayGoals": 0,
           "provider_division_id": 4270,
           "division_name": "Under 14X C Silver"
         },
