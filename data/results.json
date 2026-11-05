@@ -1,9 +1,9 @@
 {
   "schema_version": 2,
   "provider": "Selkent",
-  "last_updated": "2026-11-05T13:41:56.780024+00:00",
-  "cup_results_last_updated": "2026-11-05T13:41:56.780024+00:00",
-  "cup_results_last_attempted": "2026-11-05T13:41:56.780024+00:00",
+  "last_updated": "2026-11-05T23:01:54.406966+00:00",
+  "cup_results_last_updated": "2026-11-05T23:01:54.406966+00:00",
+  "cup_results_last_attempted": "2026-11-05T23:01:54.406966+00:00",
   "cup_results_status": "verified_current",
   "fixture_agegroup_discovery_source": "selkent_divisions_all",
   "coverage": {
@@ -30669,12 +30669,25 @@
         },
         {
           "division_name": "Under 14X C Navy",
-          "updated_at_text": "01/11/26 14:01:02",
+          "updated_at_text": "05/11/26 15:48:28",
           "source_order_authoritative_for_ties": false,
           "source_disclaimer": "Note: Table does not yet take account of rules for determining winner if teams on equal points",
           "rows": [
             {
               "row_order": 1,
+              "provider_team_id": 343,
+              "provider_division_id": 4269,
+              "team_name": "Erith Town Red",
+              "played": 6,
+              "won": 4,
+              "drawn": 1,
+              "lost": 1,
+              "gf": 16,
+              "ga": 13,
+              "points": 9
+            },
+            {
+              "row_order": 2,
               "provider_team_id": 127,
               "provider_division_id": 4269,
               "team_name": "Crayford Arrows Red",
@@ -30687,7 +30700,7 @@
               "points": 8
             },
             {
-              "row_order": 2,
+              "row_order": 3,
               "provider_team_id": 1059,
               "provider_division_id": 4269,
               "team_name": "Crayford Arrows Girls Red",
@@ -30697,19 +30710,6 @@
               "lost": 2,
               "gf": 12,
               "ga": 8,
-              "points": 7
-            },
-            {
-              "row_order": 3,
-              "provider_team_id": 343,
-              "provider_division_id": 4269,
-              "team_name": "Erith Town Red",
-              "played": 5,
-              "won": 3,
-              "drawn": 1,
-              "lost": 1,
-              "gf": 16,
-              "ga": 13,
               "points": 7
             },
             {
@@ -30782,10 +30782,10 @@
               "provider_team_id": 398,
               "provider_division_id": 4269,
               "team_name": "Castle Hill United FC",
-              "played": 3,
+              "played": 4,
               "won": 0,
               "drawn": 0,
-              "lost": 3,
+              "lost": 4,
               "gf": 4,
               "ga": 20,
               "points": 0
