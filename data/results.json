@@ -1,9 +1,9 @@
 {
   "schema_version": 2,
   "provider": "Selkent",
-  "last_updated": "2026-11-06T04:02:11.121201+00:00",
-  "cup_results_last_updated": "2026-11-06T04:02:11.121201+00:00",
-  "cup_results_last_attempted": "2026-11-06T04:02:11.121201+00:00",
+  "last_updated": "2026-11-06T13:25:54.412654+00:00",
+  "cup_results_last_updated": "2026-11-06T13:25:54.412654+00:00",
+  "cup_results_last_attempted": "2026-11-06T13:25:54.412654+00:00",
   "cup_results_status": "verified_current",
   "fixture_agegroup_discovery_source": "selkent_divisions_all",
   "coverage": {
@@ -27937,7 +27937,7 @@
       "standings": [
         {
           "division_name": "Under12X A Navy",
-          "updated_at_text": "01/11/26 12:21:02",
+          "updated_at_text": "06/11/26 08:21:15",
           "source_order_authoritative_for_ties": false,
           "source_disclaimer": "Note: Table does not yet take account of rules for determining winner if teams on equal points",
           "rows": [
@@ -28034,41 +28034,54 @@
             },
             {
               "row_order": 8,
-              "provider_team_id": 657,
-              "provider_division_id": 4242,
-              "team_name": "Sutton Dynamo FC",
-              "played": 3,
-              "won": 1,
-              "drawn": 0,
-              "lost": 2,
-              "gf": 5,
-              "ga": 8,
-              "points": 2
-            },
-            {
-              "row_order": 9,
               "provider_team_id": 678,
               "provider_division_id": 4242,
               "team_name": "Eversley Rangers",
-              "played": 3,
-              "won": 0,
+              "played": 4,
+              "won": 1,
               "drawn": 0,
               "lost": 3,
               "gf": 8,
               "ga": 24,
-              "points": 0
+              "points": 2
+            },
+            {
+              "row_order": 9,
+              "provider_team_id": 657,
+              "provider_division_id": 4242,
+              "team_name": "Sutton Dynamo FC",
+              "played": 4,
+              "won": 1,
+              "drawn": 0,
+              "lost": 3,
+              "gf": 5,
+              "ga": 8,
+              "points": 2
             }
           ],
           "provider_division_id": 4242
         },
         {
           "division_name": "Under 12X A Silver",
-          "updated_at_text": "01/11/26 13:01:48",
+          "updated_at_text": "06/11/26 08:21:28",
           "source_order_authoritative_for_ties": false,
           "source_disclaimer": "Note: Table does not yet take account of rules for determining winner if teams on equal points",
           "rows": [
             {
               "row_order": 1,
+              "provider_team_id": 2081,
+              "provider_division_id": 4243,
+              "team_name": "Regans FC Silver",
+              "played": 4,
+              "won": 4,
+              "drawn": 0,
+              "lost": 0,
+              "gf": 11,
+              "ga": 4,
+              "points": 8
+            },
+            {
+              "row_order": 2,
               "provider_team_id": 47,
               "provider_division_id": 4243,
               "team_name": "Russellers Blues",
@@ -28081,7 +28094,7 @@
               "points": 7
             },
             {
-              "row_order": 2,
+              "row_order": 3,
               "provider_team_id": 310,
               "provider_division_id": 4243,
               "team_name": "Samuel Montagu Green",
@@ -28094,27 +28107,14 @@
               "points": 7
             },
             {
-              "row_order": 3,
-              "provider_team_id": 2081,
-              "provider_division_id": 4243,
-              "team_name": "Regans FC Silver",
-              "played": 3,
-              "won": 3,
-              "drawn": 0,
-              "lost": 0,
-              "gf": 11,
-              "ga": 4,
-              "points": 6
-            },
-            {
               "row_order": 4,
               "provider_team_id": 362,
               "provider_division_id": 4243,
               "team_name": "Dartford FC Black",
-              "played": 4,
+              "played": 5,
               "won": 1,
               "drawn": 0,
-              "lost": 3,
+              "lost": 4,
               "gf": 6,
               "ga": 16,
               "points": 2
@@ -28176,12 +28176,25 @@
         },
         {
           "division_name": "Under 12X B Navy",
-          "updated_at_text": "01/11/26 13:36:09",
+          "updated_at_text": "06/11/26 08:24:14",
           "source_order_authoritative_for_ties": false,
           "source_disclaimer": "Note: Table does not yet take account of rules for determining winner if teams on equal points",
           "rows": [
             {
               "row_order": 1,
+              "provider_team_id": 665,
+              "provider_division_id": 4244,
+              "team_name": "Ebbsfleet United White",
+              "played": 6,
+              "won": 5,
+              "drawn": 0,
+              "lost": 1,
+              "gf": 17,
+              "ga": 11,
+              "points": 10
+            },
+            {
+              "row_order": 2,
               "provider_team_id": 118,
               "provider_division_id": 4244,
               "team_name": "Crayford Arrows Black",
@@ -28194,20 +28207,20 @@
               "points": 8
             },
             {
-              "row_order": 2,
-              "provider_team_id": 665,
+              "row_order": 3,
+              "provider_team_id": 431,
               "provider_division_id": 4244,
-              "team_name": "Ebbsfleet United White",
-              "played": 5,
-              "won": 4,
+              "team_name": "Hayden Youth Magpies",
+              "played": 4,
+              "won": 3,
               "drawn": 0,
               "lost": 1,
-              "gf": 17,
-              "ga": 11,
-              "points": 8
+              "gf": 6,
+              "ga": 4,
+              "points": 6
             },
             {
-              "row_order": 3,
+              "row_order": 4,
               "provider_team_id": 2245,
               "provider_division_id": 4244,
               "team_name": "Welling United White",
@@ -28220,27 +28233,14 @@
               "points": 5
             },
             {
-              "row_order": 4,
-              "provider_team_id": 431,
-              "provider_division_id": 4244,
-              "team_name": "Hayden Youth Magpies",
-              "played": 3,
-              "won": 2,
-              "drawn": 0,
-              "lost": 1,
-              "gf": 6,
-              "ga": 4,
-              "points": 4
-            },
-            {
               "row_order": 5,
               "provider_team_id": 820,
               "provider_division_id": 4244,
               "team_name": "Metrogas FC White",
-              "played": 4,
+              "played": 5,
               "won": 2,
               "drawn": 0,
-              "lost": 2,
+              "lost": 3,
               "gf": 9,
               "ga": 10,
               "points": 4
@@ -28289,10 +28289,10 @@
               "provider_team_id": 2121,
               "provider_division_id": 4244,
               "team_name": "Metrogas FC Black",
-              "played": 4,
+              "played": 5,
               "won": 1,
               "drawn": 0,
-              "lost": 3,
+              "lost": 4,
               "gf": 6,
               "ga": 13,
               "points": 2
@@ -28302,7 +28302,7 @@
         },
         {
           "division_name": "Under 12X B Silver",
-          "updated_at_text": "01/11/26 13:33:02",
+          "updated_at_text": "06/11/26 08:22:00",
           "source_order_authoritative_for_ties": false,
           "source_disclaimer": "Note: Table does not yet take account of rules for determining winner if teams on equal points",
           "rows": [
@@ -28363,16 +28363,29 @@
               "provider_team_id": 311,
               "provider_division_id": 4245,
               "team_name": "Samuel Montagu Yellow",
-              "played": 4,
+              "played": 5,
               "won": 2,
               "drawn": 1,
-              "lost": 1,
+              "lost": 2,
               "gf": 6,
               "ga": 3,
               "points": 5
             },
             {
               "row_order": 6,
+              "provider_team_id": 2123,
+              "provider_division_id": 4245,
+              "team_name": "AFC Lewisham White",
+              "played": 5,
+              "won": 2,
+              "drawn": 0,
+              "lost": 3,
+              "gf": 9,
+              "ga": 23,
+              "points": 4
+            },
+            {
+              "row_order": 7,
               "provider_team_id": 757,
               "provider_division_id": 4245,
               "team_name": "Teviot Rangers Red",
@@ -28383,19 +28396,6 @@
               "gf": 11,
               "ga": 13,
               "points": 4
-            },
-            {
-              "row_order": 7,
-              "provider_team_id": 2123,
-              "provider_division_id": 4245,
-              "team_name": "AFC Lewisham White",
-              "played": 4,
-              "won": 1,
-              "drawn": 0,
-              "lost": 3,
-              "gf": 9,
-              "ga": 23,
-              "points": 2
             },
             {
               "row_order": 8,
