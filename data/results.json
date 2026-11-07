@@ -1,9 +1,9 @@
 {
   "schema_version": 2,
   "provider": "Selkent",
-  "last_updated": "2026-11-07T12:03:52.454872+00:00",
-  "cup_results_last_updated": "2026-11-07T12:03:52.454872+00:00",
-  "cup_results_last_attempted": "2026-11-07T12:03:52.454872+00:00",
+  "last_updated": "2026-11-07T21:13:28.047916+00:00",
+  "cup_results_last_updated": "2026-11-07T21:13:28.047916+00:00",
+  "cup_results_last_attempted": "2026-11-07T21:13:28.047916+00:00",
   "cup_results_status": "verified_current",
   "fixture_agegroup_discovery_source": "selkent_divisions_all",
   "coverage": {
@@ -11224,6 +11224,16 @@
           "provider_team_ids": [
             "254",
             "43"
+          ]
+        },
+        {
+          "date": "2026-11-15",
+          "division_name": "U14 Friendly",
+          "home": "Shooters Hill AFC Cannons",
+          "away": "Blackheath Rhinos White",
+          "provider_team_ids": [
+            "979",
+            "863"
           ]
         },
         {
@@ -30186,6 +30196,16 @@
           "provider_team_ids": [
             "127",
             "950"
+          ]
+        },
+        {
+          "date": "2026-11-15",
+          "division_name": "U14X Friendly",
+          "home": "Stansfeld (Fratres) FC",
+          "away": "Welling United Red",
+          "provider_team_ids": [
+            "2069",
+            "947"
           ]
         },
         {
