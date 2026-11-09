@@ -1,9 +1,9 @@
 {
   "schema_version": 2,
   "provider": "Selkent",
-  "last_updated": "2026-11-09T03:30:57.662876+00:00",
-  "cup_results_last_updated": "2026-11-09T03:30:57.662876+00:00",
-  "cup_results_last_attempted": "2026-11-09T03:30:57.662876+00:00",
+  "last_updated": "2026-11-09T14:38:31.425873+00:00",
+  "cup_results_last_updated": "2026-11-09T14:38:31.425873+00:00",
+  "cup_results_last_attempted": "2026-11-09T14:38:31.425873+00:00",
   "cup_results_status": "verified_current",
   "fixture_agegroup_discovery_source": "selkent_divisions_all",
   "coverage": {
@@ -4394,7 +4394,7 @@
         },
         {
           "division_name": "Under 12C Silver",
-          "updated_at_text": "08/11/26 15:24:32",
+          "updated_at_text": "09/11/26 06:41:58",
           "source_order_authoritative_for_ties": false,
           "source_disclaimer": "Note: Table does not yet take account of rules for determining winner if teams on equal points",
           "rows": [
@@ -4481,16 +4481,29 @@
               "provider_team_id": 932,
               "provider_division_id": 4256,
               "team_name": "Beacons White",
-              "played": 5,
+              "played": 6,
               "won": 2,
               "drawn": 1,
-              "lost": 2,
-              "gf": 20,
-              "ga": 19,
+              "lost": 3,
+              "gf": 22,
+              "ga": 22,
               "points": 5
             },
             {
               "row_order": 8,
+              "provider_team_id": 2243,
+              "provider_division_id": 4256,
+              "team_name": "Mighty Warriors FC Jupiter",
+              "played": 4,
+              "won": 1,
+              "drawn": 3,
+              "lost": 0,
+              "gf": 14,
+              "ga": 13,
+              "points": 5
+            },
+            {
+              "row_order": 9,
               "provider_team_id": 2142,
               "provider_division_id": 4256,
               "team_name": "AFC Lewisham Yellow",
@@ -4503,7 +4516,7 @@
               "points": 3
             },
             {
-              "row_order": 9,
+              "row_order": 10,
               "provider_team_id": 945,
               "provider_division_id": 4256,
               "team_name": "Deptford United Falcons",
@@ -4516,7 +4529,7 @@
               "points": 3
             },
             {
-              "row_order": 10,
+              "row_order": 11,
               "provider_team_id": 1061,
               "provider_division_id": 4256,
               "team_name": "Junior Reds Sabres",
@@ -4526,19 +4539,6 @@
               "lost": 4,
               "gf": 16,
               "ga": 20,
-              "points": 3
-            },
-            {
-              "row_order": 11,
-              "provider_team_id": 2243,
-              "provider_division_id": 4256,
-              "team_name": "Mighty Warriors FC Jupiter",
-              "played": 3,
-              "won": 0,
-              "drawn": 3,
-              "lost": 0,
-              "gf": 11,
-              "ga": 11,
               "points": 3
             },
             {
@@ -6760,6 +6760,15 @@
           "division_name": "Under 12C Silver"
         },
         {
+          "date": "2026-11-08",
+          "home": "Mighty Warriors FC Jupiter",
+          "away": "Beacons White",
+          "homeGoals": 3,
+          "awayGoals": 2,
+          "provider_division_id": 4256,
+          "division_name": "Under 12C Silver"
+        },
+        {
           "date": "2026-11-01",
           "home": "Beacons White",
           "away": "Greenwich Peninsula Jaguars",
@@ -8853,7 +8862,7 @@
         },
         {
           "division_name": "Under 14 A Silver",
-          "updated_at_text": "08/11/26 16:05:22",
+          "updated_at_text": "09/11/26 07:50:32",
           "source_order_authoritative_for_ties": false,
           "source_disclaimer": "Note: Table does not yet take account of rules for determining winner if teams on equal points",
           "rows": [
@@ -8872,6 +8881,19 @@
             },
             {
               "row_order": 2,
+              "provider_team_id": 1053,
+              "provider_division_id": 4272,
+              "team_name": "Long Lane Pumas",
+              "played": 6,
+              "won": 3,
+              "drawn": 1,
+              "lost": 2,
+              "gf": 21,
+              "ga": 12,
+              "points": 7
+            },
+            {
+              "row_order": 3,
               "provider_team_id": 254,
               "provider_division_id": 4272,
               "team_name": "AFC Lewisham Blue",
@@ -8884,7 +8906,7 @@
               "points": 6
             },
             {
-              "row_order": 3,
+              "row_order": 4,
               "provider_team_id": 135,
               "provider_division_id": 4272,
               "team_name": "Red Devils",
@@ -8897,30 +8919,17 @@
               "points": 6
             },
             {
-              "row_order": 4,
+              "row_order": 5,
               "provider_team_id": 35,
               "provider_division_id": 4272,
               "team_name": "Rotherhithe FC",
-              "played": 5,
+              "played": 6,
               "won": 3,
               "drawn": 0,
-              "lost": 2,
-              "gf": 24,
-              "ga": 12,
+              "lost": 3,
+              "gf": 26,
+              "ga": 16,
               "points": 6
-            },
-            {
-              "row_order": 5,
-              "provider_team_id": 1053,
-              "provider_division_id": 4272,
-              "team_name": "Long Lane Pumas",
-              "played": 5,
-              "won": 2,
-              "drawn": 1,
-              "lost": 2,
-              "gf": 17,
-              "ga": 10,
-              "points": 5
             },
             {
               "row_order": 6,
@@ -10121,6 +10130,15 @@
           "away": "On Target F.C.",
           "homeGoals": 2,
           "awayGoals": 5,
+          "provider_division_id": 4272,
+          "division_name": "Under 14 A Silver"
+        },
+        {
+          "date": "2026-11-08",
+          "home": "Long Lane Pumas",
+          "away": "Rotherhithe FC",
+          "homeGoals": 4,
+          "awayGoals": 2,
           "provider_division_id": 4272,
           "division_name": "Under 14 A Silver"
         },
