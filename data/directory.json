@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-11-02T01:23:10.257737+00:00",
+  "last_updated": "2026-11-09T01:31:04.036061+00:00",
   "clubs": [
     {
       "club_id": 514,
@@ -1181,7 +1181,6 @@
       "agegroup_id": 3,
       "division_name": "Under 9C Silver",
       "teams": [
-        "AFC Lewisham White",
         "Chislehurst Wanderers Tigers",
         "Dulwich Hamlet JFC Pink",
         "Dynamo Youth Silver",
@@ -1193,7 +1192,7 @@
         "The Bosco FC Dons",
         "Wildcats FS Club Lions"
       ],
-      "team_count_label": "11 teams"
+      "team_count_label": "10 teams"
     },
     {
       "age_group": "U9",
@@ -2703,12 +2702,11 @@
         "Fleetdown United",
         "Hayden Youth Sharks",
         "Istead United Colts",
-        "Junior Reds Titans",
         "Kingsdale Red",
         "Slade Green Knights",
         "Vikings FC"
       ],
-      "team_count_label": "10 teams"
+      "team_count_label": "9 teams"
     }
   ],
   "team_club_links": [
@@ -3621,11 +3619,6 @@
       "team_name": "Northumberland Heath",
       "club_id": 520,
       "club_name": "Northumberland Heath"
-    },
-    {
-      "team_name": "AFC Lewisham White",
-      "club_id": 234,
-      "club_name": "AFC Lewisham"
     },
     {
       "team_name": "Chislehurst Wanderers Tigers",
@@ -7911,11 +7904,6 @@
       "team_name": "Istead United Colts",
       "club_id": 290,
       "club_name": "Istead United Colts"
-    },
-    {
-      "team_name": "Junior Reds Titans",
-      "club_id": 292,
-      "club_name": "Junior Reds"
     },
     {
       "team_name": "Kingsdale Red",
