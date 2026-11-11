@@ -1,9 +1,9 @@
 {
   "schema_version": 2,
   "provider": "Selkent",
-  "last_updated": "2026-11-11T13:09:46.957008+00:00",
-  "cup_results_last_updated": "2026-11-11T13:09:46.957008+00:00",
-  "cup_results_last_attempted": "2026-11-11T13:09:46.957008+00:00",
+  "last_updated": "2026-11-11T23:50:33.957187+00:00",
+  "cup_results_last_updated": "2026-11-11T23:50:33.957187+00:00",
+  "cup_results_last_attempted": "2026-11-11T23:50:33.957187+00:00",
   "cup_results_status": "verified_current",
   "fixture_agegroup_discovery_source": "selkent_divisions_all",
   "coverage": {
@@ -23415,6 +23415,16 @@
         {
           "date": "2026-11-29",
           "division_name": "U15 Friendly",
+          "home": "Junior Reds Valiants",
+          "away": "Swanscombe Tigers Yellows",
+          "provider_team_ids": [
+            "39",
+            "1012"
+          ]
+        },
+        {
+          "date": "2026-11-29",
+          "division_name": "U15 Friendly",
           "home": "Sutton Athletic Whites",
           "away": "Mighty Warriors FC Mars",
           "provider_team_ids": [
@@ -23615,10 +23625,10 @@
         {
           "date": "2026-11-29",
           "division_name": "U15 Selkent Cup Two - Round 1",
-          "home": "South Darenth Purples",
+          "home": "The Bosco FC Dons",
           "away": "Welling United White",
           "provider_team_ids": [
-            "187",
+            "706",
             "963"
           ]
         },
@@ -23685,11 +23695,11 @@
         {
           "date": "2026-11-29",
           "division_name": "Under 15D Navy",
-          "home": "Beacons Blue",
-          "away": "Swanscombe Tigers Yellows",
+          "home": "South Darenth Purples",
+          "away": "Beacons Blue",
           "provider_team_ids": [
-            "937",
-            "1012"
+            "187",
+            "937"
           ]
         },
         {
@@ -23700,16 +23710,6 @@
           "provider_team_ids": [
             "58",
             "737"
-          ]
-        },
-        {
-          "date": "2026-11-29",
-          "division_name": "Under 15D Silver",
-          "home": "The Bosco FC Dons",
-          "away": "Junior Reds Valiants",
-          "provider_team_ids": [
-            "706",
-            "39"
           ]
         }
       ],
@@ -26307,11 +26307,11 @@
         {
           "date": "2026-11-15",
           "division_name": "U16 Selkent Cup Two - Round 1",
-          "home": "Kent United FC",
-          "away": "Hayden Youth Panthers",
+          "home": "Hayden Youth Panthers",
+          "away": "Kent United FC",
           "provider_team_ids": [
-            "501",
-            "629"
+            "629",
+            "501"
           ]
         },
         {
