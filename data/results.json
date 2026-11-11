@@ -1,9 +1,9 @@
 {
   "schema_version": 2,
   "provider": "Selkent",
-  "last_updated": "2026-11-11T03:39:03.374585+00:00",
-  "cup_results_last_updated": "2026-11-11T03:39:03.374585+00:00",
-  "cup_results_last_attempted": "2026-11-11T03:39:03.374585+00:00",
+  "last_updated": "2026-11-11T13:09:46.957008+00:00",
+  "cup_results_last_updated": "2026-11-11T13:09:46.957008+00:00",
+  "cup_results_last_attempted": "2026-11-11T13:09:46.957008+00:00",
   "cup_results_status": "verified_current",
   "fixture_agegroup_discovery_source": "selkent_divisions_all",
   "coverage": {
@@ -26417,6 +26417,16 @@
         {
           "date": "2026-11-22",
           "division_name": "Under 16A",
+          "home": "Baldon Sports Blue",
+          "away": "Cray Wanderers Lions",
+          "provider_team_ids": [
+            "913",
+            "616"
+          ]
+        },
+        {
+          "date": "2026-11-22",
+          "division_name": "Under 16A",
           "home": "Dynamo Youth",
           "away": "Dulwich Village Orange",
           "provider_team_ids": [
@@ -26628,10 +26638,10 @@
           "date": "2026-11-29",
           "division_name": "Under 16A",
           "home": "Baldon Sports Blue",
-          "away": "Ebbsfleet United White",
+          "away": "Dynamo Youth",
           "provider_team_ids": [
             "913",
-            "662"
+            "539"
           ]
         },
         {
@@ -26642,6 +26652,16 @@
           "provider_team_ids": [
             "276",
             "467"
+          ]
+        },
+        {
+          "date": "2026-11-29",
+          "division_name": "Under 16A",
+          "home": "Falconwood FC Grey",
+          "away": "Ebbsfleet United White",
+          "provider_team_ids": [
+            "872",
+            "662"
           ]
         },
         {
