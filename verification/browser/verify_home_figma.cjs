@@ -153,8 +153,17 @@ async function interact(page,s){
  if(s.role==='coach'){
   await page.evaluate(()=>{window.__homeShares=[];window.ClubHubNative={shareMatchCard:(data,caption)=>__homeShares.push({prefix:data.slice(0,22),caption})};});
   await page.locator('#next-match-share').click();
-  if(s.confirmed){await page.waitForFunction(()=>window.__homeShares.length===1);assert.equal(await page.evaluate(()=>__homeShares[0].prefix),'data:image/png;base64,','Home detail share still renders native PNG');}
-  else{assert.equal(await page.evaluate(()=>__homeShares.length),0,'unconfirmed fixture cannot be shared');}
+  const picker=page.locator('#match-share-kit-dialog');
+  if(s.confirmed){
+   await picker.waitFor({state:'visible'});
+   assert(await page.locator('#match-share-kit-home').isChecked(),'home kit selected by default');
+   await page.locator('#match-share-kit-image').click();
+   await page.waitForFunction(()=>window.__homeShares.length===1);
+   assert.equal(await page.evaluate(()=>__homeShares[0].prefix),'data:image/png;base64,','Home share generates native PNG');
+  }else{
+   assert.equal(await page.evaluate(()=>__homeShares.length),0,'unconfirmed fixture cannot share');
+   assert(!await picker.isVisible(),'unconfirmed fixture cannot open kit chooser');
+  }
  }
  await page.locator('#next-fixture-dialog [data-close-dialog]').first().click();assert(!await page.locator('#next-fixture-dialog').isVisible(),'native close returns to Home');
 }

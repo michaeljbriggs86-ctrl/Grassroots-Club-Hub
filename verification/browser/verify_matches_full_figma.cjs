@@ -126,8 +126,19 @@ async function inspectScrollableContent(page,s,id){
 async function shareGuard(page,s){
  await page.evaluate(()=>{window.__fullFigmaShares=[];window.ClubHubNative={shareMatchCard:(data,caption)=>__fullFigmaShares.push({prefix:data.slice(0,22),caption})};});
  await page.locator('#next-match-share').click();
- if(s.confirmed){await page.waitForFunction(()=>__fullFigmaShares.length===1);const item=await page.evaluate(()=>__fullFigmaShares[0]);assert.equal(item.prefix,'data:image/png;base64,','native actual PNG still generated');assert(item.caption.includes('Example')&&item.caption.includes(s.manual?'09:45':'10:30'),'share retains true native timing/venue');}
- else assert.equal(await page.evaluate(()=>__fullFigmaShares.length),0,'unconfirmed fixture does not generate a share');
+ const picker=page.locator('#match-share-kit-dialog');
+ if(s.confirmed){
+  await picker.waitFor({state:'visible'});
+  assert(await page.locator('#match-share-kit-home').isChecked(),'home kit selected before sharing');
+  await page.locator('#match-share-kit-image').click();
+  await page.waitForFunction(()=>__fullFigmaShares.length===1);
+  const item=await page.evaluate(()=>__fullFigmaShares[0]);
+  assert.equal(item.prefix,'data:image/png;base64,','native PNG generated after kit choice');
+  assert(item.caption.includes('Example')&&item.caption.includes(s.manual?'09:45':'10:30'),'share retains fixture details');
+ }else{
+  assert.equal(await page.evaluate(()=>__fullFigmaShares.length),0,'unconfirmed fixture does not share');
+  assert(!await picker.isVisible(),'unconfirmed fixture cannot open chooser');
+ }
 }
 (async()=>{
  await new Promise(r=>server.listen(0,'127.0.0.1',r));base='http://127.0.0.1:'+server.address().port;
