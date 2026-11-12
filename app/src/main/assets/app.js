@@ -4505,7 +4505,8 @@ function kitToggleHtml(f={},ctx={}){
   const key=fixtureKitSelectionKey(f),choice=fixtureKitChoice(f),awayKnown=knownKit(ctx.ownProfile?.away);
   return `<div class="fixture-kit-toggle"><span>Our shirt</span><div role="group" aria-label="Choose our shirt for this fixture"><button type="button" class="${choice==='home'?'active':''}" data-fixture-kit-select="${esc(key)}" data-kit-choice="home">Home</button><button type="button" class="${choice==='away'?'active':''}" data-fixture-kit-select="${esc(key)}" data-kit-choice="away" ${awayKnown?'':'disabled'}>Away${awayKnown?'':' · not set'}</button></div></div>`;
 }
-function setFixtureKitChoice(key,choice,{silent=false}={}){
+function setFixtureKitChoice(key,choice){
+  const silent=arguments[2]?.silent===true;
   if(!(isCoach()||isAdmin()))return;
   const all=[...upcomingFixtures(),...(state.matches||[])],f=all.find(x=>fixtureKitSelectionKey(x)===key);if(!f)return toast('Fixture is no longer available');
   const ctx=fixtureOverviewContext(f);if(choice==='away'&&!knownKit(ctx.ownProfile?.away))return toast('Add the away shirt colours first');
