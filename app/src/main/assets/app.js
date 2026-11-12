@@ -4505,7 +4505,7 @@ function kitToggleHtml(f={},ctx={}){
   const key=fixtureKitSelectionKey(f),choice=fixtureKitChoice(f),awayKnown=knownKit(ctx.ownProfile?.away);
   return `<div class="fixture-kit-toggle"><span>Our shirt</span><div role="group" aria-label="Choose our shirt for this fixture"><button type="button" class="${choice==='home'?'active':''}" data-fixture-kit-select="${esc(key)}" data-kit-choice="home">Home</button><button type="button" class="${choice==='away'?'active':''}" data-fixture-kit-select="${esc(key)}" data-kit-choice="away" ${awayKnown?'':'disabled'}>Away${awayKnown?'':' · not set'}</button></div></div>`;
 }
-function setFixtureKitChoice(key,choice){
+function setFixtureKitChoice(key,choice,{silent=false}={}){
   if(!(isCoach()||isAdmin()))return;
   const all=[...upcomingFixtures(),...(state.matches||[])],f=all.find(x=>fixtureKitSelectionKey(x)===key);if(!f)return toast('Fixture is no longer available');
   const ctx=fixtureOverviewContext(f);if(choice==='away'&&!knownKit(ctx.ownProfile?.away))return toast('Add the away shirt colours first');
@@ -4514,7 +4514,8 @@ function setFixtureKitChoice(key,choice){
   saveState();auditEvent('fixture_kit_changed','fixture',key,`Selected ${choice==='away'?'away':'home'} shirt for ${f.opponent||'fixture'}`,before,state.selkent.fixtureKitSelections[key]);
   renderNextMatch();renderMatchPageNextFixture();renderSelkentFixtures();renderMatchdayDashboard();
   const openId=document.getElementById('match-detail-id')?.value||'',m=(state.matches||[]).find(x=>x.id===openId);if(document.getElementById('match-detail-dialog')?.open&&m)renderMatchOverview(m);
-  toast(`${choice==='away'?'Away':'Home'} shirt selected`);
+  if(!silent)toast(`${choice==='away'?'Away':'Home'} shirt selected`);
+  return true;
 }
 function clubTeamLink(teamName='',extra='',showBadge=true){return `<button type="button" class="club-detail-link ${extra}" data-club-details-team="${esc(teamName)}">${showBadge?clubListingHtml(teamName):esc(matchTeamLabel(teamName))}</button>`;}
 function kitWarningHtml(ctx){if(!ctx?.kitWarning||!(isCoach()||isAdmin()))return'';const review=(isAdmin()||isCoach())?`<button type="button" class="text-button compact" data-club-details-team="${esc(ctx.awayTeam)}">Review shirts</button>`:'';return `<div class="kit-clash-warning"><span>${esc(ctx.kitWarning)}</span>${review}</div>`;}
@@ -7416,9 +7417,9 @@ document.getElementById('matches-next-details')?.addEventListener('click',openNe
 document.getElementById('next-match-ground-select')?.addEventListener('change',syncFixtureGroundEditor);
 document.getElementById('fixture-confirm-details')?.addEventListener('click',saveFixtureConfirmation);
 document.getElementById('next-match-edit')?.addEventListener('click',()=>{const f=nextPublishedFixture();if(!f||!canConfirmFixtureDetails()||!fixtureDetailsConfirmed(f))return;__fixtureEditingKey=fixtureKitSelectionKey(f);renderFixtureConfirmationEditor(f);document.getElementById('next-match-edit')?.classList.add('hidden');document.getElementById('next-match-confirm-time')?.focus();});
-document.getElementById('next-match-share')?.addEventListener('click',()=>shareNextMatchImage());
-document.getElementById('share-match-detail')?.addEventListener('click',()=>{const id=document.getElementById('share-match-detail')?.dataset.shareMatch;const match=(state.matches||[]).find(row=>row.id===id);if(match&&isCoach()&&!isPlayedMatch(match))shareNextMatchImage(match);});
-document.getElementById('matches-next-share')?.addEventListener('click',()=>shareNextMatchImage());
+document.getElementById('next-match-share')?.addEventListener('click',()=>openMatchKitSharePicker());
+document.getElementById('share-match-detail')?.addEventListener('click',()=>{const id=document.getElementById('share-match-detail')?.dataset.shareMatch;const match=(state.matches||[]).find(row=>row.id===id);if(match&&isCoach()&&!isPlayedMatch(match))openMatchKitSharePicker(match);});
+document.getElementById('matches-next-share')?.addEventListener('click',()=>openMatchKitSharePicker());
 bindAdminFixtureWeekendNavigation();
 document.getElementById('admin-fixtures-age')?.addEventListener('change',event=>{__adminFixtureAge=event.target.value||'all';__adminFixtureCategory='';__adminFixtureDay='';renderAdminFixtures();syncNavigationUrl();});
 document.getElementById('admin-fixtures-share')?.addEventListener('click',()=>openAdminWeekendShare(__adminFixtureWeekend));
@@ -7429,8 +7430,8 @@ document.getElementById('admin-weekend-share-days')?.addEventListener('click',ev
 document.getElementById('admin-weekend-share-team')?.addEventListener('change',event=>{if(event.target.value!=='')jumpAdminWeekendGraphic(event.target.value);});
 document.getElementById('admin-weekend-share-save')?.addEventListener('click',saveAdminWeekendGraphic);
 document.getElementById('admin-weekend-share-dialog')?.addEventListener('close',()=>{++__adminWeekendShareLoad;__adminWeekendShare=null;document.getElementById('admin-weekend-share-text')?.classList.add('hidden');renderAdminWeekendShare();});
-document.getElementById('next-match-copy')?.addEventListener('click',copyNextMatchDetails);
-document.getElementById('matches-next-copy')?.addEventListener('click',copyNextMatchDetails);
+document.getElementById('next-match-copy')?.addEventListener('click',()=>openMatchKitSharePicker());
+document.getElementById('matches-next-copy')?.addEventListener('click',()=>openMatchKitSharePicker());
 document.getElementById('next-match-calendar')?.addEventListener('click',()=>addFixtureToCalendar());
 document.getElementById('matches-next-calendar')?.addEventListener('click',()=>addFixtureToCalendar());
 document.getElementById('matches-next-played')?.addEventListener('click',openNextFixtureMatchReport);

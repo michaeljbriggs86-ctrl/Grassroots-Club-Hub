@@ -22,6 +22,7 @@
   <link rel="stylesheet" href="shared-header.css" />
   <link rel="stylesheet" href="matches-page.css" />
   <link rel="stylesheet" href="fixture-dialog.css" />
+  <link rel="stylesheet" href="match-share-kit-picker.css" />
   <link rel="stylesheet" href="team-stats.css" />
   <title>Shooters Hill AFC</title>
 </head>
@@ -966,6 +967,34 @@
     </div>
   </dialog>
 
+  <dialog id="match-share-kit-dialog" class="modal match-share-kit-dialog" aria-labelledby="match-share-kit-title">
+    <div class="match-share-kit-shell">
+      <p class="match-share-kit-kicker">MATCH SHARING · STAFF</p>
+      <div class="match-share-kit-header"><h2 id="match-share-kit-title">Choose match kit</h2><button type="button" class="icon-button small" id="match-share-kit-cancel-top" data-close-dialog aria-label="Cancel sharing">×</button></div>
+      <p class="match-share-kit-fixture"><span id="match-share-kit-fixture"></span><br /><span id="match-share-kit-when"></span></p>
+      <fieldset class="match-share-kit-options" id="match-share-kit-options">
+        <legend>Our kit for this fixture</legend>
+        <label class="match-share-kit-option">
+          <input type="radio" name="match-share-kit" id="match-share-kit-home" value="home" />
+          <span class="match-share-kit-visual" id="match-share-kit-home-visual" aria-hidden="true"></span>
+          <span class="match-share-kit-copy"><strong>Home kit</strong><small id="match-share-kit-home-colours"></small></span><span class="match-share-kit-selected">✓ Selected</span>
+        </label>
+        <label class="match-share-kit-option">
+          <input type="radio" name="match-share-kit" id="match-share-kit-away" value="away" />
+          <span class="match-share-kit-visual" id="match-share-kit-away-visual" aria-hidden="true"></span>
+          <span class="match-share-kit-copy"><strong>Away kit</strong><small id="match-share-kit-away-colours"></small></span><span class="match-share-kit-selected">✓ Selected</span>
+        </label>
+      </fieldset>
+      <p class="match-share-kit-help">The chosen kit appears on the match image and in the shared details. Your team's default kits stay unchanged.</p>
+      <p class="match-share-kit-help hidden" id="match-share-kit-missing">Away shirt unavailable. Add the away kit colours in Club details first.</p>
+      <div class="match-share-kit-actions">
+        <button type="button" class="primary-button" id="match-share-kit-image">Share match image</button>
+        <button type="button" class="secondary-button" id="match-share-kit-copy">Copy details</button>
+        <button type="button" class="secondary-button" id="match-share-kit-cancel">Cancel</button>
+      </div>
+    </div>
+  </dialog>
+
   <dialog id="next-fixture-dialog" class="modal next-fixture-modal sunday-fixture-dialog" aria-labelledby="next-match-opponent">
     <div class="next-fixture-detail-shell">
       <div class="modal-heading"><h3 id="next-match-opponent">Upcoming match details</h3><button type="button" class="icon-button small" data-close-dialog aria-label="Close">×</button></div>
@@ -1276,6 +1305,7 @@
   <script src="coach-onboarding.js"></script>
   <script src="kickoff-updates.js"></script>
   <script src="app.js"></script>
+  <script src="match-share-kit-picker.js"></script>
   <script src="static-feed-overlay.js"></script>
 </body>
 </html>
