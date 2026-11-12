@@ -116,10 +116,17 @@ async function interact(page,s){
  if(s.role==='coach'){
   await page.evaluate(()=>{window.__matchesShares=[];window.ClubHubNative={shareMatchCard:(data,caption)=>__matchesShares.push({prefix:data.slice(0,22),caption})};});
   await page.locator('#matches-next-share').click();
+  await page.locator('#match-share-kit-dialog').waitFor({state:'visible'});
+  assert(await page.locator('#match-share-kit-home').isChecked(),'existing home kit preselected in share chooser');
+  assert(!await page.locator('#match-share-kit-away').isDisabled(),'away kit can be selected');
+  await page.locator('.match-share-kit-option').nth(1).click();
+  assert(await page.locator('#match-share-kit-away').isChecked(),'away kit selected before share');
+  await page.locator('#match-share-kit-image').click();
   await page.waitForFunction(()=>window.__matchesShares.length===1);
   const share=await page.evaluate(()=>window.__matchesShares[0]);
   assert.equal(share.prefix,'data:image/png;base64,','native share still renders actual PNG');
   assert(share.caption.includes('Example Playing Fields')&&share.caption.includes('10:30'),'share retains fixture information');
+  assert(share.caption.includes('Our kit: Away'),'selected kit reaches caption');
  }
 }
 async function manualShare(page){
@@ -128,7 +135,11 @@ async function manualShare(page){
  await page.locator('#match-detail-dialog').waitFor({state:'visible'});
  assert(await page.locator('#share-match-detail').isVisible(),'manually created fixture retains share action');
  await page.evaluate(()=>{window.__manualShares=[];window.ClubHubNative={shareMatchCard:(data,caption)=>__manualShares.push({prefix:data.slice(0,22),caption})};});
- await page.locator('#share-match-detail').click();await page.waitForFunction(()=>window.__manualShares.length===1);
+ await page.locator('#share-match-detail').click();
+  await page.locator('#match-share-kit-dialog').waitFor({state:'visible'});
+  assert((await page.locator('#match-share-kit-fixture').textContent()).includes('Meadow United'),'manual picker points at selected friendly');
+  await page.locator('#match-share-kit-image').click();
+  await page.waitForFunction(()=>window.__manualShares.length===1);
  const share=await page.evaluate(()=>window.__manualShares[0]);
  assert.equal(share.prefix,'data:image/png;base64,','manual fixture still produces PNG');
  assert(share.caption.includes('Meadow United')&&share.caption.includes('09:45'),'manual share uses selected fixture details');
