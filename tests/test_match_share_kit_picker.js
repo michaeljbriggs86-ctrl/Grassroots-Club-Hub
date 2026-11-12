@@ -18,6 +18,7 @@ function mock(){
  const writes=[],exports=[],copies=[],texts=[],messages=[],nodes={},events={};
  function node(id){if(!nodes[id])nodes[id]={id,innerHTML:'',textContent:'',checked:false,disabled:false,open:false,value:'',style:{},classList:{toggle(){}},setAttribute(){},focus(){},addEventListener(k,fn){events[id+':'+k]=fn},showModal(){this.open=true},close(){this.open=false;events['match-share-kit-dialog:close']?.()}};return nodes[id]}
  const home=node('match-share-kit-home'),awayRadio=node('match-share-kit-away'),dialog=node('match-share-kit-dialog');
+ home.value='home';awayRadio.value='away';
  dialog.querySelectorAll=()=>[{querySelector:()=>home,classList:{toggle(){}},setAttribute(){}},{querySelector:()=>awayRadio,classList:{toggle(){}},setAttribute(){}}];
  const document={getElementById:node,querySelector:()=>awayRadio.checked?awayRadio:home,createElement:()=>({style:{},select(){},remove(){}}),body:{appendChild(){}},execCommand:()=>true};
  const state={matches:[manual],selkent:{fixtureKitSelections:{}}};
