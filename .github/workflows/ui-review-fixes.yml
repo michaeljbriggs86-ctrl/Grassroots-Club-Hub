@@ -81,11 +81,13 @@ jobs:
           node web/db-drafts/test/run-member-contact-import.cjs "$RUNNER_TEMP/member-contact-sql/node_modules/@electric-sql/pglite"
       - name: Check fail-closed viewer age projection in throwaway PostgreSQL
         run: node web/db-drafts/test/run-viewer-age-privacy.cjs "$RUNNER_TEMP/member-contact-sql/node_modules/@electric-sql/pglite"
-      - name: Render login, dialogs and statistics in Chromium
+      - name: Verify match sharing kit choice in Chromium
         run: |
           npm install --prefix "$RUNNER_TEMP/visual-review" --no-audit --no-fund playwright@1.64.0
           "$RUNNER_TEMP/visual-review/node_modules/.bin/playwright" install --with-deps chromium
           node verification/browser/verify_matches_scene.cjs "$RUNNER_TEMP/visual-review/node_modules/playwright" "$RUNNER_TEMP/visual-review-output/matches-scene"
+      - name: Render login, dialogs and statistics in Chromium
+        run: |
           node verification/browser/verify_parent_registration.cjs "$RUNNER_TEMP/visual-review/node_modules/playwright" "$RUNNER_TEMP/visual-review-output/parent-registration" "$RUNNER_TEMP/member-contact-sql/node_modules/@electric-sql/pglite"
           node verification/browser/verify_parent_availability.cjs "$RUNNER_TEMP/visual-review/node_modules/playwright" "$RUNNER_TEMP/visual-review-output/parent-availability"
           node verification/browser/verify_visual_rollout.cjs "$RUNNER_TEMP/visual-review/node_modules/playwright" "$RUNNER_TEMP/visual-review-output"
