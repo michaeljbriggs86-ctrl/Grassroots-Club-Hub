@@ -118,7 +118,18 @@ async function interact(page,s){
   await page.locator('#matches-next-share').click();
   await page.locator('#match-share-kit-dialog').waitFor({state:'visible'});
   assert(await page.locator('#match-share-kit-home').isChecked(),'existing home kit preselected in share chooser');
-  assert(!await page.locator('#match-share-kit-away').isDisabled(),'away kit can be selected');
+  assert(await page.locator('#match-share-kit-away').isDisabled(),'unrecorded away kit cannot be shared');
+  await page.locator('#match-share-kit-cancel').click();
+  assert(!await page.locator('#match-share-kit-dialog').isVisible(),'cancel closes kit chooser');
+  await page.evaluate(()=>{
+    const key=selkentNorm(ownTeamDisplayName());
+    state.selkent.kitProfiles=state.selkent.kitProfiles||{};
+    state.selkent.kitProfiles[key]={home:'Green and white',away:'Blue and white'};
+  });
+  await page.locator('#matches-next-share').click();
+  await page.locator('#match-share-kit-dialog').waitFor({state:'visible'});
+  assert(!await page.locator('#match-share-kit-away').isDisabled(),'recorded away kit is selectable');
+  assert.equal(await page.locator('#match-share-kit-away-colours').textContent(),'Blue and white','away colours come from the fixture team profile');
   await page.locator('.match-share-kit-option').nth(1).click();
   assert(await page.locator('#match-share-kit-away').isChecked(),'away kit selected before share');
   await page.locator('#match-share-kit-image').click();
