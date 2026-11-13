@@ -20,7 +20,7 @@ function mock(){
  const home=node('match-share-kit-home'),awayRadio=node('match-share-kit-away'),dialog=node('match-share-kit-dialog');
  home.value='home';awayRadio.value='away';
  dialog.querySelectorAll=()=>[{querySelector:()=>home,classList:{toggle(){}},setAttribute(){}},{querySelector:()=>awayRadio,classList:{toggle(){}},setAttribute(){}}];
- const document={getElementById:node,querySelector:()=>awayRadio.checked?awayRadio:home,createElement:()=>({style:{},select(){},remove(){}}),body:{appendChild(){}},execCommand:()=>true};
+ const document={getElementById:node,querySelector:()=>home, /* Deliberately stale generic selector; Away ID must win. */createElement:()=>({style:{},select(){},remove(){}}),body:{appendChild(){}},execCommand:()=>true};
  const state={matches:[manual],selkent:{fixtureKitSelections:{}}};
  const env={document,state,navigator:{clipboard:{writeText:async s=>texts.push(s)}},toast:s=>messages.push(s),
   canConfirmFixtureDetails:()=>staff,isCoach:()=>staff,isPlayedMatch:()=>false,nextPublishedFixture:()=>current,
