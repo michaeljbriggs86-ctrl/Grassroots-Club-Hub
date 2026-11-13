@@ -83,7 +83,8 @@ async function finishMatchKitShare(mode){
       toast('Match details have changed. Open sharing again');
       return;
     }
-    const choice=document.querySelector('input[name="match-share-kit"]:checked')?.value==='away'?'away':'home';
+    // Read the specific control: other fixture dialogs can contain a home-kit input.
+    const choice=document.getElementById('match-share-kit-away')?.checked===true?'away':'home';
     const own=fixtureOverviewContext(latest.details);
     if(choice==='away'&&!knownKit(own.ownProfile?.away)){
       toast('Add the away shirt colours in Club details first');return;
