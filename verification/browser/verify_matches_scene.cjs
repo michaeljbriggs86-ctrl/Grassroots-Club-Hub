@@ -137,7 +137,12 @@ async function interact(page,s){
   const share=await page.evaluate(()=>window.__matchesShares[0]);
   assert.equal(share.prefix,'data:image/png;base64,','native share still renders actual PNG');
   assert(share.caption.includes('Example Playing Fields')&&share.caption.includes('10:30'),'share retains fixture information');
-  assert(share.caption.includes('Our kit: Away'),'selected kit reaches caption');
+  const selected=await page.evaluate(()=>{
+    const f=nextPublishedFixture();
+    return {choice:fixtureKitChoice(f),key:fixtureKitSelectionKey(f),selections:state.selkent.fixtureKitSelections,caption:window.__matchesShares[0]?.caption};
+  });
+  assert.equal(selected.choice,'away','kit saved against fixture: '+JSON.stringify(selected));
+  assert(share.caption.includes('Our kit: Away'),'selected kit reaches caption: '+JSON.stringify(selected));
  }
 }
 async function manualShare(page){
