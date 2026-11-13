@@ -2277,9 +2277,11 @@ async function renderMatchdayShareCanvas(canvas,f,fixture,group,d,ctx,arrival,th
     return {row,names,label,home,away,context:fixtureOverviewContext(row),height:(label?label.height+18:0)+144+18+side.height+18+Math.max(home.height,away.height)};
   });
   const arrivalLabel=body('Arrival',420,32,600,44),startLabel=body(group?'Group start':'Kick-off',420,32,600,44),arrivalText=display(arrival,420,112,124),startText=display(d.time,420,112,124),clockHeight=72+Math.max(arrivalLabel.height,startLabel.height)+12+Math.max(arrivalText.height,startText.height);
-  const venueLabel=body('VENUE',960,32,600,44),ground=body(d.groundName,960,54,700,68),address=body(d.address,960),choice=fixtureKitChoice(fixture),kit=body(choice==='away'?'Wear away kit':'Wear home kit',960),note=group?body('Games are back-to-back. Order may change.',960):null;
-  const venueHeight=venueLabel.height+12+ground.height+12+address.height;
-  canvas.height=headerHeight+48+games.reduce((sum,game)=>sum+game.height+48,0)+clockHeight+48+venueHeight+48+3+24+kit.height+(note?48+note.height:0)+60;
+  // The export must show the same per-fixture shirt choice and colours as its caption.
+  const venueLabel=body('VENUE',960,32,600,44),ground=body(d.groundName,960,54,700,68),address=body(d.address,960),choice=fixtureKitChoice(fixture),kitColours=ctx.ownProfile?.[choice]||ctx.ownProfile?.home||'TBC';
+  const kitTitle=body(choice==='away'?'Wear away kit':'Wear home kit',660,42,400,56),kitColoursText=body(kitColourDisplayText(kitColours),660,35,400,48),kitPanelHeight=Math.max(180,36+kitTitle.height+12+kitColoursText.height+28);
+  const note=group?body('Games are back-to-back. Order may change.',960):null,venueHeight=venueLabel.height+12+ground.height+12+address.height;
+  canvas.height=headerHeight+48+games.reduce((sum,game)=>sum+game.height+48,0)+clockHeight+48+venueHeight+48+3+24+kitPanelHeight+(note?48+note.height:0)+60;
   g.fillStyle=palette.bg;g.fillRect(0,0,canvas.width,canvas.height);
   g.fillStyle='#064526';g.fillRect(0,0,1080,headerHeight);drawMatchdayPitch(g,pitch,1080,headerHeight);
   const shade=g.createLinearGradient(0,0,0,headerHeight);shade.addColorStop(0,'rgba(17,23,21,.42)');shade.addColorStop(1,'rgba(17,23,21,.96)');g.fillStyle=shade;g.fillRect(0,0,1080,headerHeight);
@@ -2305,7 +2307,14 @@ async function renderMatchdayShareCanvas(canvas,f,fixture,group,d,ctx,arrival,th
   }
   if(!group)clock();
   drawMatchdayImageText(g,venueLabel,60,y,palette.accent);y+=venueLabel.height+12;drawMatchdayImageText(g,ground,60,y,palette.ink);y+=ground.height+12;drawMatchdayImageText(g,address,60,y,palette.muted);y+=address.height+48;
-  g.fillStyle=palette.line;g.fillRect(60,y,960,3);y+=27;drawMatchdayImageText(g,kit,60,y,palette.ink);y+=kit.height;
+  // Reviewed Figma 655:11523: show the chosen shirt in the exported match graphic.
+  g.fillStyle=palette.line;g.fillRect(60,y,960,3);y+=27;
+  g.save();g.beginPath();g.roundRect(60,y,960,kitPanelHeight,24);g.fillStyle=dark?'#26302B':'#FFFFFF';g.fill();g.strokeStyle=palette.line;g.lineWidth=2;g.stroke();g.restore();
+  drawShareJersey(g,172,y+kitPanelHeight/2,kitColours,.90);
+  const kitTextY=y+Math.max(25,Math.floor((kitPanelHeight-kitTitle.height-kitColoursText.height-12)/2));
+  drawMatchdayImageText(g,kitTitle,316,kitTextY,palette.ink);
+  drawMatchdayImageText(g,kitColoursText,316,kitTextY+kitTitle.height+12,palette.muted);
+  y+=kitPanelHeight;
   if(note){y+=48;drawMatchdayImageText(g,note,60,y,palette.muted);y+=note.height;}
   return {width:canvas.width,height:canvas.height,contentBottom:y,games:games.length,theme:dark?'dark':'light',style:'sunday-matchday-20261023',pitchLoaded:!!pitch};
 }
