@@ -4,7 +4,8 @@ const {chromium}=require(process.argv[2]||'playwright');
 const assets=path.resolve('app/src/main/assets'),out=path.resolve(process.argv[3]||'matchday-share-review');fs.mkdirSync(out,{recursive:true});
 const source=fs.readFileSync(path.join(assets,'app.js'),'utf8');
 const take=(a,b)=>{const start=source.indexOf(a),end=source.indexOf(b,start);assert(start>=0&&end>start,`canvas helper ${a} exists`);return source.slice(start,end);};
-const helpers=take('function reviewedBadgeRotation(','function clubIdentityName(')+take('async function loadShareBadgeImage(','function matchdayShareFixture(')+take('function shareCardFontFamily(','let pendingMatchdayWebShare=');
+// Exercise the real shirt painter, its colour parser and the kit label formatter in Chromium.
+const helpers=take('function reviewedBadgeRotation(','function clubIdentityName(')+take('function kitColourDisplayText(','function clubPlaceholderBadgeData(')+take('function shareCardWrap(','async function loadShareBadgeImage(')+take('async function loadShareBadgeImage(','function matchdayShareFixture(')+take('function shareCardFontFamily(','let pendingMatchdayWebShare=')+take('function kitColourPair(','function kitIconHtml(')+take('function knownKit(','function kitsClash(');
 const allowed=new Map([['inter-variable.woff2','font/woff2'],['graphics/anton-regular.ttf','font/ttf'],['graphics/pitch-wide.webp','image/webp'],['shooters-hill-logo.png','image/png'],['club-badge-unavailable.svg','image/svg+xml']]);
 const html='<style>@font-face{font-family:Inter;src:url(/inter-variable.woff2);font-weight:100 900}@font-face{font-family:Anton;src:url(/graphics/anton-regular.ttf);font-weight:400}body{margin:0;font-family:Inter}canvas{display:block;width:320px;height:auto}</style>';
 let failPitch=false;
@@ -19,19 +20,24 @@ async function renderCase({theme,variant}){
  const away=variant==='long'?'Example Wanderers Football Club Under 13 United':'Example United';
  const fixture={date:'2026-10-25',names:{home,away},score:'PRIVATE_SCORE',players:['PRIVATE_CHILD'],notes:'PRIVATE_NOTE'},group=variant==='cup'?{fixtures:[fixture,{...fixture,names:{home,away:'Opponent TBC'}},{...fixture,names:{home,away:'Example Athletic Blues'}}]}:null;
  const d={time:variant==='single'?'09:30':'12:45',groundName:variant==='long'?'Example Community Sports and Recreation Ground (rear entrance)':'Example Sports Ground',address:variant==='long'?'Example Sports Complex, 123 Example Avenue, Example Town, EX1 2AB':'Example Lane, London, EX1 2AB'},arrival=variant==='single'?'09:00':'12:15';
- const canvas=document.createElement('canvas'),g=canvas.getContext('2d'),text=[],images=[],blocks=[],originalText=g.fillText.bind(g),originalImage=g.drawImage.bind(g),originalBlock=matchdayImageText;
+ const canvas=document.createElement('canvas'),g=canvas.getContext('2d'),text=[],images=[],blocks=[],shirts=[],originalText=g.fillText.bind(g),originalImage=g.drawImage.bind(g),originalBlock=matchdayImageText,originalShirt=drawShareJersey;
  g.fillText=(value,x,y)=>{const m=g.measureText(value);text.push({value,left:x-m.actualBoundingBoxLeft,right:x+m.actualBoundingBoxRight,top:y-m.actualBoundingBoxAscent,bottom:y+m.actualBoundingBoxDescent,y,font:g.font});originalText(value,x,y);};
  g.drawImage=(image,...args)=>{images.push({src:image.src,width:image.naturalWidth,height:image.naturalHeight,args});originalImage(image,...args);};
  window.matchdayImageText=(...args)=>{const block=originalBlock(...args);blocks.push({source:String(args[1]),font:block.font,lines:[...block.lines]});return block;};
- let geometry;try{geometry=await renderMatchdayShareCanvas(canvas,fixture,fixture,group,d,{ownTeam:'Shooters Hill AFC Example Greens',ownProfile:{home:'Green'}},arrival,theme);}finally{window.matchdayImageText=originalBlock;}
+  window.drawShareJersey=(ctx,x,y,colours,scale)=>{shirts.push({x,y,colours,scale});return originalShirt(ctx,x,y,colours,scale);};
+ let geometry;try{geometry=await renderMatchdayShareCanvas(canvas,fixture,fixture,group,d,{ownTeam:'Shooters Hill AFC Example Greens',ownProfile:{home:'Green and white',away:'Blue and white'}},arrival,theme);}finally{window.matchdayImageText=originalBlock;window.drawShareJersey=originalShirt;}
  document.body.replaceChildren(canvas);
- const games=group?group.fixtures:[fixture],expected=[['MATCHDAY','Anton'],['SHOOTERS HILL AFC','Inter'],[shareDateText(fixture.date),'Inter'],[competition,'Inter'],[arrival,'Anton'],[d.time,'Anton'],['Arrival','Inter'],[group?'Group start':'Kick-off','Inter'],['Home','Inter'],['Away','Inter'],['V','Anton'],['VENUE','Inter'],[d.groundName,'Inter'],[d.address,'Inter'],[variant==='long'?'Wear away kit':'Wear home kit','Inter']];
+  const shirtPixels=shirts.map(s=>Array.from(g.getImageData(Math.round(s.x),Math.round(s.y),1,1).data).slice(0,3));
+ const games=group?group.fixtures:[fixture],expected=[['MATCHDAY','Anton'],['SHOOTERS HILL AFC','Inter'],[shareDateText(fixture.date),'Inter'],[competition,'Inter'],[arrival,'Anton'],[d.time,'Anton'],['Arrival','Inter'],[group?'Group start':'Kick-off','Inter'],['Home','Inter'],['Away','Inter'],['V','Anton'],['VENUE','Inter'],[d.groundName,'Inter'],[d.address,'Inter'],[variant==='long'?'Wear away kit':'Wear home kit','Inter'],[variant==='long'?'Blue and white':'Green and white','Inter']];
  for(const [i,row] of games.entries()){expected.push([row.names.home,'Anton'],[row.names.away,'Anton']);if(group)expected.push([`Group game ${i+1}`,'Inter']);}
  if(group)expected.push(['Games are back-to-back. Order may change.','Inter']);
- return {...geometry,text,images,blocks,expected,arrival,time:d.time,fonts:{anton:document.fonts.check('400 120px Anton'),inter:document.fonts.check('400 42px Inter')},png:canvas.toDataURL('image/png')};
+ return {...geometry,text,images,blocks,shirts,shirtPixels,expected,arrival,time:d.time,fonts:{anton:document.fonts.check('400 120px Anton'),inter:document.fonts.check('400 42px Inter')},png:canvas.toDataURL('image/png')};
 }
 function checkResult(result,{theme,variant,pitch=true}){
- assert.equal(result.width,1080);assert.equal(result.height-result.contentBottom,60,'footer padding retained');assert.equal(result.style,'sunday-matchday-20261023');assert.equal(result.pitchLoaded,pitch,'pitch load state is explicit');assert.equal(result.theme,theme);assert(result.fonts.anton&&result.fonts.inter,'both font faces loaded');
+ const selectedColours=variant==='long'?'Blue and white':'Green and white';
+  assert.deepEqual(result.shirts.map(x=>x.colours),[selectedColours],'exactly the chosen fixture shirt is drawn');
+  assert.deepEqual(result.shirtPixels[0],variant==='long'?[45,95,184]:[22,136,72],'selected kit colour is visible in actual exported PNG pixels');
+  assert.equal(result.width,1080);assert.equal(result.height-result.contentBottom,60,'footer padding retained');assert.equal(result.style,'sunday-matchday-20261023');assert.equal(result.pitchLoaded,pitch,'pitch load state is explicit');assert.equal(result.theme,theme);assert(result.fonts.anton&&result.fonts.inter,'both font faces loaded');
  assert(result.text.every(t=>t.left>=59&&t.right<=1021&&t.top>=0&&t.bottom<=result.height),'all actual glyph bounds stay inside export');
  assert(result.text.every(t=>!t.value.includes('…')),'names and addresses are never truncated');assert(!JSON.stringify(result.text).includes('PRIVATE_'),'private fixture canaries are absent');
  const compact=s=>s.replace(/\s/g,'');
