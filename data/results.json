@@ -1,9 +1,9 @@
 {
   "schema_version": 2,
   "provider": "Selkent",
-  "last_updated": "2026-11-16T03:39:16.356125+00:00",
-  "cup_results_last_updated": "2026-11-16T03:39:16.356125+00:00",
-  "cup_results_last_attempted": "2026-11-16T03:39:16.356125+00:00",
+  "last_updated": "2026-11-16T14:14:10.462460+00:00",
+  "cup_results_last_updated": "2026-11-16T14:14:10.462460+00:00",
+  "cup_results_last_attempted": "2026-11-16T14:14:10.462460+00:00",
   "cup_results_status": "verified_current",
   "fixture_agegroup_discovery_source": "selkent_divisions_all",
   "coverage": {
@@ -1954,10 +1954,10 @@
           "date": "2026-11-22",
           "division_name": "U9 Friendly",
           "home": "Longfield Tigers FC",
-          "away": "Blackheath Rhinos White",
+          "away": "Deptford United",
           "provider_team_ids": [
             "2061",
-            "849"
+            "944"
           ]
         },
         {
@@ -2133,10 +2133,10 @@
         {
           "date": "2026-11-22",
           "division_name": "Under 9D Silver",
-          "home": "Deptford United",
+          "home": "Blackheath Rhinos White",
           "away": "Baldon Sports Tigers",
           "provider_team_ids": [
-            "944",
+            "849",
             "2152"
           ]
         },
@@ -3831,16 +3831,6 @@
         {
           "date": "2026-11-22",
           "division_name": "U11 Friendly",
-          "home": "Chislehurst Wanderers Lions",
-          "away": "Mighty Warriors FC Galaxy",
-          "provider_team_ids": [
-            "415",
-            "998"
-          ]
-        },
-        {
-          "date": "2026-11-22",
-          "division_name": "U11 Friendly",
           "home": "Dartford Royals blue",
           "away": "KSI Coaching FC Navy",
           "provider_team_ids": [
@@ -3862,10 +3852,10 @@
           "date": "2026-11-22",
           "division_name": "Under 11B",
           "home": "Ballers SE Blue",
-          "away": "L.I.C. FC LIC Stars",
+          "away": "Erith Town Yellow",
           "provider_team_ids": [
             "71",
-            "44"
+            "699"
           ]
         },
         {
@@ -3881,31 +3871,31 @@
         {
           "date": "2026-11-22",
           "division_name": "Under 11B",
-          "home": "KSI Coaching FC White",
-          "away": "ST Sports FC United",
+          "home": "Kekoa Red",
+          "away": "KSI Coaching FC White",
           "provider_team_ids": [
-            "2108",
-            "6"
+            "993",
+            "2108"
           ]
         },
         {
           "date": "2026-11-22",
           "division_name": "Under 11B",
           "home": "Metrogas FC Blue",
-          "away": "Kekoa Red",
+          "away": "L.I.C. FC LIC Stars",
           "provider_team_ids": [
             "819",
-            "993"
+            "44"
           ]
         },
         {
           "date": "2026-11-22",
           "division_name": "Under 11B",
           "home": "On Target F.C.",
-          "away": "Erith Town Yellow",
+          "away": "Chislehurst Wanderers Lions",
           "provider_team_ids": [
             "403",
-            "699"
+            "415"
           ]
         },
         {
@@ -4121,11 +4111,11 @@
         {
           "date": "2026-11-22",
           "division_name": "Under 11D Red",
-          "home": "Red Devils",
-          "away": "S.E. Eagles FC",
+          "home": "S.E. Eagles FC",
+          "away": "Red Devils",
           "provider_team_ids": [
-            "133",
-            "473"
+            "473",
+            "133"
           ]
         },
         {
@@ -4895,11 +4885,11 @@
         {
           "date": "2026-11-22",
           "division_name": "U12 Selkent Cup Two - Prelim Round",
-          "home": "Mighty Warriors FC Jupiter",
-          "away": "Kekoa",
+          "home": "Kekoa",
+          "away": "Mighty Warriors FC Jupiter",
           "provider_team_ids": [
-            "2243",
-            "992"
+            "992",
+            "2243"
           ]
         },
         {
@@ -5256,9 +5246,19 @@
           "date": "2026-11-22",
           "division_name": "Under 12C Silver",
           "home": "Beacons White",
-          "away": "Deptford United Falcons",
+          "away": "Junior Reds Athletic",
           "provider_team_ids": [
             "932",
+            "192"
+          ]
+        },
+        {
+          "date": "2026-11-22",
+          "division_name": "Under 12C Silver",
+          "home": "Deptford United Flamingoes",
+          "away": "Deptford United Falcons",
+          "provider_team_ids": [
+            "946",
             "945"
           ]
         },
@@ -5270,16 +5270,6 @@
           "provider_team_ids": [
             "520",
             "494"
-          ]
-        },
-        {
-          "date": "2026-11-22",
-          "division_name": "Under 12C Silver",
-          "home": "Junior Reds Athletic",
-          "away": "Deptford United Flamingoes",
-          "provider_team_ids": [
-            "192",
-            "946"
           ]
         },
         {
