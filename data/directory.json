@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-11-09T01:31:04.036061+00:00",
+  "last_updated": "2026-11-16T01:40:10.109519+00:00",
   "clubs": [
     {
       "club_id": 514,
@@ -2545,10 +2545,9 @@
         "Dynamo Youth",
         "Ebbsfleet United White",
         "Falconwood FC Grey",
-        "Red Devils",
         "Welling United Blue"
       ],
-      "team_count_label": "9 teams"
+      "team_count_label": "8 teams"
     },
     {
       "age_group": "U16",
@@ -7479,11 +7478,6 @@
       "team_name": "Falconwood FC Grey",
       "club_id": 517,
       "club_name": "Falconwood FC"
-    },
-    {
-      "team_name": "Red Devils",
-      "club_id": 320,
-      "club_name": "Red Devils"
     },
     {
       "team_name": "Welling United Blue",
