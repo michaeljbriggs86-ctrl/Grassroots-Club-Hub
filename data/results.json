@@ -1,9 +1,9 @@
 {
   "schema_version": 2,
   "provider": "Selkent",
-  "last_updated": "2026-11-16T14:14:10.462460+00:00",
-  "cup_results_last_updated": "2026-11-16T14:14:10.462460+00:00",
-  "cup_results_last_attempted": "2026-11-16T14:14:10.462460+00:00",
+  "last_updated": "2026-11-17T01:16:51.195403+00:00",
+  "cup_results_last_updated": "2026-11-17T01:16:51.195403+00:00",
+  "cup_results_last_attempted": "2026-11-17T01:16:51.195403+00:00",
   "cup_results_status": "verified_current",
   "fixture_agegroup_discovery_source": "selkent_divisions_all",
   "coverage": {
@@ -6505,7 +6505,7 @@
         },
         {
           "division_name": "Under 12B Orange",
-          "updated_at_text": "15/11/26 11:44:40",
+          "updated_at_text": "16/11/26 15:58:52",
           "source_order_authoritative_for_ties": false,
           "source_disclaimer": "Note: Table does not yet take account of rules for determining winner if teams on equal points",
           "rows": [
@@ -31217,7 +31217,7 @@
         },
         {
           "division_name": "Under 12X B Silver",
-          "updated_at_text": "15/11/26 17:09:45",
+          "updated_at_text": "16/11/26 15:49:10",
           "source_order_authoritative_for_ties": false,
           "source_disclaimer": "Note: Table does not yet take account of rules for determining winner if teams on equal points",
           "rows": [
