@@ -1,9 +1,9 @@
 {
   "schema_version": 2,
   "provider": "Selkent",
-  "last_updated": "2026-11-17T01:16:51.195403+00:00",
-  "cup_results_last_updated": "2026-11-17T01:16:51.195403+00:00",
-  "cup_results_last_attempted": "2026-11-17T01:16:51.195403+00:00",
+  "last_updated": "2026-11-17T15:06:40.177058+00:00",
+  "cup_results_last_updated": "2026-11-17T15:06:40.177058+00:00",
+  "cup_results_last_attempted": "2026-11-17T15:06:40.177058+00:00",
   "cup_results_status": "verified_current",
   "fixture_agegroup_discovery_source": "selkent_divisions_all",
   "coverage": {
@@ -16417,6 +16417,26 @@
         },
         {
           "date": "2026-11-29",
+          "division_name": "U13 Kent Plate",
+          "home": "Iwade Herons U13 Rov (Non-Selkent)",
+          "away": "Hayden Youth Panthers",
+          "provider_team_ids": [
+            "2331",
+            "476"
+          ]
+        },
+        {
+          "date": "2026-11-29",
+          "division_name": "U13 Kent Plate",
+          "home": "Lordswood U13 Black (Non-Selkent)",
+          "away": "Hayden Youth Pumas",
+          "provider_team_ids": [
+            "2330",
+            "477"
+          ]
+        },
+        {
+          "date": "2026-11-29",
           "division_name": "Under 13A",
           "home": "Bexley Ballers Football Club",
           "away": "Parkwood Rangers Lions",
@@ -16478,16 +16498,6 @@
         {
           "date": "2026-11-29",
           "division_name": "Under 13B",
-          "home": "Chislehurst Wanderers Lions",
-          "away": "Hayden Youth Pumas",
-          "provider_team_ids": [
-            "416",
-            "477"
-          ]
-        },
-        {
-          "date": "2026-11-29",
-          "division_name": "Under 13B",
           "home": "Dulwich Hamlet JFC Navy",
           "away": "Ballers SE Blue",
           "provider_team_ids": [
@@ -16543,16 +16553,6 @@
           "provider_team_ids": [
             "959",
             "281"
-          ]
-        },
-        {
-          "date": "2026-11-29",
-          "division_name": "Under 13C Navy",
-          "home": "S.E. Lions FC Blues",
-          "away": "Hayden Youth Panthers",
-          "provider_team_ids": [
-            "442",
-            "476"
           ]
         },
         {
@@ -26058,7 +26058,7 @@
         },
         {
           "division_name": "Under 17 Division Two",
-          "updated_at_text": "15/11/26 17:03:29",
+          "updated_at_text": "17/11/26 12:05:23",
           "source_order_authoritative_for_ties": false,
           "source_disclaimer": "Note: Table does not yet take account of rules for determining winner if teams on equal points",
           "rows": [
@@ -28129,10 +28129,10 @@
           "date": "2026-11-21",
           "division_name": "U8X Selkent Cup One - Round 1",
           "home": "Cray Valley (PM) FC Black",
-          "away": "Hayden Youth Bulls",
+          "away": "ShooterBallers FC Black",
           "provider_team_ids": [
             "306",
-            "421"
+            "2138"
           ]
         },
         {
@@ -28173,16 +28173,6 @@
           "provider_team_ids": [
             "324",
             "219"
-          ]
-        },
-        {
-          "date": "2026-11-21",
-          "division_name": "U8X Selkent Cup One - Round 1",
-          "home": "Hayden Youth Bulls",
-          "away": "ShooterBallers FC Black",
-          "provider_team_ids": [
-            "421",
-            "2138"
           ]
         },
         {
