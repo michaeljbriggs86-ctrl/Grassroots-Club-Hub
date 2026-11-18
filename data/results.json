@@ -1,9 +1,9 @@
 {
   "schema_version": 2,
   "provider": "Selkent",
-  "last_updated": "2026-11-17T15:06:40.177058+00:00",
-  "cup_results_last_updated": "2026-11-17T15:06:40.177058+00:00",
-  "cup_results_last_attempted": "2026-11-17T15:06:40.177058+00:00",
+  "last_updated": "2026-11-18T00:11:04.770706+00:00",
+  "cup_results_last_updated": "2026-11-18T00:11:04.770706+00:00",
+  "cup_results_last_attempted": "2026-11-18T00:11:04.770706+00:00",
   "cup_results_status": "verified_current",
   "fixture_agegroup_discovery_source": "selkent_divisions_all",
   "coverage": {
@@ -5464,6 +5464,16 @@
         },
         {
           "date": "2026-11-29",
+          "division_name": "U12 Kent Plate",
+          "home": "Castle Colts U13 Ath (Non-Selkent)",
+          "away": "Ebbsfleet United Red",
+          "provider_team_ids": [
+            "2333",
+            "667"
+          ]
+        },
+        {
+          "date": "2026-11-29",
           "division_name": "Under 12A Navy",
           "home": "Bexley Ballers Football Club",
           "away": "Dartford FC White",
@@ -5506,10 +5516,10 @@
           "date": "2026-11-29",
           "division_name": "Under 12A Navy",
           "home": "Welling United Navy",
-          "away": "Ebbsfleet United Red",
+          "away": "Ballon Dor FC",
           "provider_team_ids": [
             "953",
-            "667"
+            "811"
           ]
         },
         {
@@ -11727,11 +11737,11 @@
         {
           "date": "2026-11-22",
           "division_name": "U14 Selkent Cup One - Round 1",
-          "home": "Rotherhithe FC",
-          "away": "Regans FC Black",
+          "home": "Regans FC Black",
+          "away": "Rotherhithe FC",
           "provider_team_ids": [
-            "35",
-            "461"
+            "461",
+            "35"
           ]
         },
         {
@@ -16397,22 +16407,12 @@
         },
         {
           "date": "2026-11-29",
-          "division_name": "U13 Friendly",
-          "home": "Blackheath Rhinos Black",
-          "away": "L.I.C. FC",
+          "division_name": "U13 Kent Plate",
+          "home": "Fleetdown United",
+          "away": "Junior Reds (Youth) (Non-Selkent)",
           "provider_team_ids": [
-            "858",
-            "45"
-          ]
-        },
-        {
-          "date": "2026-11-29",
-          "division_name": "U13 Friendly",
-          "home": "Woolwich Wanderers FC",
-          "away": "S.E. Eagles FC Gold",
-          "provider_team_ids": [
-            "2066",
-            "474"
+            "1002",
+            "2332"
           ]
         },
         {
@@ -16459,19 +16459,9 @@
           "date": "2026-11-29",
           "division_name": "Under 13A",
           "home": "Next Level FC Black",
-          "away": "Fleetdown United",
-          "provider_team_ids": [
-            "440",
-            "1002"
-          ]
-        },
-        {
-          "date": "2026-11-29",
-          "division_name": "Under 13A",
-          "home": "Next Level FC Whites",
           "away": "Eagles & Stars FC",
           "provider_team_ids": [
-            "961",
+            "440",
             "687"
           ]
         },
@@ -16488,21 +16478,31 @@
         {
           "date": "2026-11-29",
           "division_name": "Under 13B",
-          "home": "Baldon Sports Pumas",
-          "away": "Riverview FC",
+          "home": "Blackheath Rhinos Black",
+          "away": "Ballers SE Blue",
           "provider_team_ids": [
-            "920",
-            "351"
+            "858",
+            "73"
+          ]
+        },
+        {
+          "date": "2026-11-29",
+          "division_name": "Under 13B",
+          "home": "Chislehurst Wanderers Lions",
+          "away": "Baldon Sports Pumas",
+          "provider_team_ids": [
+            "416",
+            "920"
           ]
         },
         {
           "date": "2026-11-29",
           "division_name": "Under 13B",
           "home": "Dulwich Hamlet JFC Navy",
-          "away": "Ballers SE Blue",
+          "away": "Riverview FC",
           "provider_team_ids": [
             "522",
-            "73"
+            "351"
           ]
         },
         {
@@ -16699,20 +16699,20 @@
           "date": "2026-11-29",
           "division_name": "Under 13D Silver",
           "home": "Braves Sporting Club",
-          "away": "Dulwich Hamlet JFC Pink",
+          "away": "Gipsy Hill FC Whites",
           "provider_team_ids": [
             "783",
-            "523"
+            "1064"
           ]
         },
         {
           "date": "2026-11-29",
           "division_name": "Under 13D Silver",
           "home": "Greenwich Peninsula Pumas",
-          "away": "Vikings FC Red",
+          "away": "KSI Coaching FC Navy",
           "provider_team_ids": [
             "735",
-            "2130"
+            "174"
           ]
         },
         {
@@ -16728,11 +16728,11 @@
         {
           "date": "2026-11-29",
           "division_name": "Under 13D Silver",
-          "home": "KSI Coaching FC Navy",
-          "away": "Gipsy Hill FC Whites",
+          "home": "Woolwich Wanderers FC",
+          "away": "Dulwich Hamlet JFC Pink",
           "provider_team_ids": [
-            "174",
-            "1064"
+            "2066",
+            "523"
           ]
         }
       ],
@@ -20040,16 +20040,6 @@
         {
           "date": "2026-11-22",
           "division_name": "Under 15D Navy",
-          "home": "Castle Hill United FC",
-          "away": "South Darenth Purples",
-          "provider_team_ids": [
-            "397",
-            "187"
-          ]
-        },
-        {
-          "date": "2026-11-22",
-          "division_name": "Under 15D Navy",
           "home": "Crayford Arrows Cannons",
           "away": "Sutton Athletic Greens",
           "provider_team_ids": [
@@ -20405,16 +20395,6 @@
           "provider_team_ids": [
             "741",
             "768"
-          ]
-        },
-        {
-          "date": "2026-11-29",
-          "division_name": "Under 15D Navy",
-          "home": "South Darenth Purples",
-          "away": "Beacons Blue",
-          "provider_team_ids": [
-            "187",
-            "937"
           ]
         },
         {
@@ -20993,25 +20973,12 @@
         },
         {
           "division_name": "Under 15D Navy",
-          "updated_at_text": "15/11/26 16:26:05",
+          "updated_at_text": "17/11/26 17:22:52",
           "source_order_authoritative_for_ties": false,
           "source_disclaimer": "Note: Table does not yet take account of rules for determining winner if teams on equal points",
           "rows": [
             {
               "row_order": 1,
-              "provider_team_id": 549,
-              "provider_division_id": 4284,
-              "team_name": "Dartford Royals white",
-              "played": 8,
-              "won": 7,
-              "drawn": 0,
-              "lost": 1,
-              "gf": 33,
-              "ga": 5,
-              "points": 14
-            },
-            {
-              "row_order": 2,
               "provider_team_id": 506,
               "provider_division_id": 4284,
               "team_name": "Guru Nanak Youth",
@@ -21024,20 +20991,20 @@
               "points": 13
             },
             {
-              "row_order": 3,
-              "provider_team_id": 963,
+              "row_order": 2,
+              "provider_team_id": 549,
               "provider_division_id": 4284,
-              "team_name": "Welling United White",
-              "played": 8,
-              "won": 5,
-              "drawn": 1,
-              "lost": 2,
+              "team_name": "Dartford Royals white",
+              "played": 7,
+              "won": 6,
+              "drawn": 0,
+              "lost": 1,
               "gf": 25,
-              "ga": 12,
-              "points": 11
+              "ga": 5,
+              "points": 12
             },
             {
-              "row_order": 4,
+              "row_order": 3,
               "provider_team_id": 597,
               "provider_division_id": 4284,
               "team_name": "AFC Green Court Knights",
@@ -21050,20 +21017,7 @@
               "points": 10
             },
             {
-              "row_order": 5,
-              "provider_team_id": 598,
-              "provider_division_id": 4284,
-              "team_name": "AFC Green Court Dukes",
-              "played": 8,
-              "won": 4,
-              "drawn": 1,
-              "lost": 3,
-              "gf": 33,
-              "ga": 13,
-              "points": 9
-            },
-            {
-              "row_order": 6,
+              "row_order": 4,
               "provider_team_id": 433,
               "provider_division_id": 4284,
               "team_name": "Sutton Athletic Greens",
@@ -21074,6 +21028,32 @@
               "gf": 24,
               "ga": 18,
               "points": 9
+            },
+            {
+              "row_order": 5,
+              "provider_team_id": 963,
+              "provider_division_id": 4284,
+              "team_name": "Welling United White",
+              "played": 7,
+              "won": 4,
+              "drawn": 1,
+              "lost": 2,
+              "gf": 17,
+              "ga": 10,
+              "points": 9
+            },
+            {
+              "row_order": 6,
+              "provider_team_id": 598,
+              "provider_division_id": 4284,
+              "team_name": "AFC Green Court Dukes",
+              "played": 6,
+              "won": 2,
+              "drawn": 1,
+              "lost": 3,
+              "gf": 18,
+              "ga": 13,
+              "points": 5
             },
             {
               "row_order": 7,
@@ -21103,19 +21083,6 @@
             },
             {
               "row_order": 9,
-              "provider_team_id": 397,
-              "provider_division_id": 4284,
-              "team_name": "Castle Hill United FC",
-              "played": 5,
-              "won": 1,
-              "drawn": 0,
-              "lost": 4,
-              "gf": 3,
-              "ga": 12,
-              "points": 2
-            },
-            {
-              "row_order": 10,
               "provider_team_id": 20,
               "provider_division_id": 4284,
               "team_name": "IEXEL F.C Black",
@@ -21128,6 +21095,19 @@
               "points": 2
             },
             {
+              "row_order": 10,
+              "provider_team_id": 397,
+              "provider_division_id": 4284,
+              "team_name": "Castle Hill United FC",
+              "played": 4,
+              "won": 0,
+              "drawn": 0,
+              "lost": 4,
+              "gf": 3,
+              "ga": 12,
+              "points": 0
+            },
+            {
               "row_order": 11,
               "provider_team_id": 131,
               "provider_division_id": 4284,
@@ -21138,19 +21118,6 @@
               "lost": 6,
               "gf": 9,
               "ga": 29,
-              "points": 0
-            },
-            {
-              "row_order": 12,
-              "provider_team_id": 187,
-              "provider_division_id": 4284,
-              "team_name": "South Darenth Purples",
-              "played": 5,
-              "won": 0,
-              "drawn": 0,
-              "lost": 5,
-              "gf": 2,
-              "ga": 31,
               "points": 0
             }
           ],
@@ -22406,7 +22373,7 @@
         },
         {
           "date": "2026-11-15",
-          "home": "South Darenth Purples",
+          "home": "South Darenth Purples (withdrawn)",
           "away": "AFC Green Court Dukes",
           "homeGoals": 0,
           "awayGoals": 10,
@@ -22461,7 +22428,7 @@
         {
           "date": "2026-11-08",
           "home": "Dartford Royals white",
-          "away": "South Darenth Purples",
+          "away": "South Darenth Purples (withdrawn)",
           "homeGoals": 8,
           "awayGoals": 0,
           "provider_division_id": 4284,
@@ -22496,7 +22463,7 @@
         },
         {
           "date": "2026-11-01",
-          "home": "South Darenth Purples",
+          "home": "South Darenth Purples (withdrawn)",
           "away": "Welling United White",
           "homeGoals": 2,
           "awayGoals": 8,
@@ -22668,7 +22635,7 @@
         {
           "date": "2026-09-27",
           "home": "AFC Green Court Dukes",
-          "away": "South Darenth Purples",
+          "away": "South Darenth Purples (withdrawn)",
           "homeGoals": 5,
           "awayGoals": 0,
           "provider_division_id": 4284,
@@ -33299,32 +33266,32 @@
         },
         {
           "date": "2026-11-29",
-          "division_name": "U14X Friendly",
-          "home": "Athenlay FC",
-          "away": "Welling United Purple",
+          "division_name": "U14X Kent Plate",
+          "home": "Fleetdown United (Non-Selkent)",
+          "away": "Junior Reds Valiants",
           "provider_team_ids": [
-            "462",
-            "903"
+            "2329",
+            "2074"
           ]
         },
         {
           "date": "2026-11-29",
           "division_name": "Under 14X B",
           "home": "AFC Lewisham",
-          "away": "Dulwich Village Blue",
+          "away": "Welling United Red",
           "provider_team_ids": [
             "2242",
-            "274"
+            "947"
           ]
         },
         {
           "date": "2026-11-29",
           "division_name": "Under 14X B",
-          "home": "Junior Reds Valiants",
-          "away": "Welling United Red",
+          "home": "Dulwich Village Blue",
+          "away": "Welling United orange",
           "provider_team_ids": [
-            "2074",
-            "947"
+            "274",
+            "902"
           ]
         },
         {
@@ -33341,10 +33308,10 @@
           "date": "2026-11-29",
           "division_name": "Under 14X B",
           "home": "Phoenix Sports Lions",
-          "away": "Welling United orange",
+          "away": "Athenlay FC",
           "provider_team_ids": [
             "896",
-            "902"
+            "462"
           ]
         },
         {
