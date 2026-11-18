@@ -427,7 +427,7 @@
     if(!ageEntry)throw new Error(`No ${ageCode()} entry in static Selkent results feed`);
     const previous=(typeof window.nextPublishedFixture==='function')?window.nextPublishedFixture():null;
     const rows=adaptStaticFixtures(ageEntry);
-    state.selkent.fixtures=rows;
+    state.selkent.fixtures=typeof window.mergeFixtureReportHistory==='function'?window.mergeFixtureReportHistory(rows):rows;
     state.selkent.fixtureSource=FIXTURE_SOURCE;
     state.selkent.fixturesGeneratedAt=results.last_updated||'';
     state.selkent.lastFixtureScan=new Date().toISOString();
@@ -555,7 +555,7 @@
       }catch(_){
         if(!canApplyFeedMutation(scope))return false;
         /* Migration-only safety fallback. A validated static fixture feed is authoritative. */
-        try{const fixtureData=await liveFixtureFallback();if(!fixtureData||!canApplyFeedMutation(scope))return false;state.selkent.fixtures=fixtureData.fixtures||[];state.selkent.fixtureSource='selkent-live-fallback';state.selkent.lastFixtureScan=new Date().toISOString();}catch(__){/* keep last-known-good fixtures */}
+        try{const fixtureData=await liveFixtureFallback();if(!fixtureData||!canApplyFeedMutation(scope))return false;const rows=fixtureData.fixtures||[];state.selkent.fixtures=typeof window.mergeFixtureReportHistory==='function'?window.mergeFixtureReportHistory(rows):rows;state.selkent.fixtureSource='selkent-live-fallback';state.selkent.lastFixtureScan=new Date().toISOString();}catch(__){/* keep last-known-good fixtures */}
       }
       if(!canApplyFeedMutation(scope))return false;
 
@@ -661,3 +661,4 @@
   /* Start before the existing delayed automatic Selkent sync fires. */
   Promise.resolve().then(primeStaticFeeds);
 })();
+

@@ -24,6 +24,7 @@ on:
       - 'tests/test_publish_pilot_badges.py'
       - 'tests/test_stage_pilot_badges_r2.py'
       - 'tests/test_pilot_badge_data_delivery.js'
+      - 'tests/test_past_fixture_reporting.js'
       - 'scripts/stage_pilot_badges_r2.py'
       - 'scripts/publish_pilot_badges.py'
       - 'scripts/pilot_badge_transparency.py'
@@ -92,6 +93,7 @@ jobs:
           node --test cloudflare/web-app/tests/selkent-feed.test.mjs
           node --test cloudflare/web-app/tests/pilot-hosts.test.mjs
           node tests/test_pilot_badge_data_delivery.js
+          node tests/test_past_fixture_reporting.js
           python scripts/stage_pilot_badges_r2.py --check
           python3 cloudflare/web-app/build.py
           cd cloudflare/web-app && npx --yes wrangler@4.142.0 deploy --dry-run

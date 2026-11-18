@@ -1590,7 +1590,7 @@ async function syncSelkent(silent=false){
     }
     const previousNext=nextPublishedFixture();
     state.selkent=state.selkent||cloneStarter().selkent;
-    state.selkent.fixtures=fixtureData.fixtures||[];
+    state.selkent.fixtures=mergeFixtureReportHistory(fixtureData.fixtures||[]);
     state.selkent.lastFixtureScan=new Date().toISOString();
     await ensureFixtureKitColours(nextPublishedFixture());
     if(!mayApply())return false;
@@ -1637,6 +1637,46 @@ function fixtureIsReported(f={}){
   if(m&&['played','abandoned'].includes(matchStatus(m)))return true;
   const self=normalizeTeamKey(state.division?.teamName||state.meta?.teamName||'');
   return (state.selkent?.results||[]).some(r=>r.date===f.date&&[r.home,r.away].some(name=>normalizeTeamKey(name)===self)&&[r.home,r.away].some(name=>normalizeTeamKey(name)===normalizeTeamKey(f.opponent||'')));
+}
+function mergeFixtureReportHistory(published=[],previous=state.selkent?.fixtures||[],now=new Date()){
+  const rows=Array.isArray(published)?[...published]:[];
+  // A retired provider row remains a staff reporting choice. Parent/player
+  // schedules keep the provider's current projection and never read this history.
+  if(CLOUD_MODE&&(!['admin','coach','assistant_coach'].includes(currentRole)||window.ClubHubCloud?.actingAsParent?.()))return rows;
+  const today=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+  const past=date=>/^\d{4}-\d{2}-\d{2}$/.test(String(date||''))&&date<today&&Number.isFinite(Date.parse(date+'T12:00:00Z'))&&new Date(date+'T12:00:00Z').toISOString().slice(0,10)===date;
+  const key=f=>[f?.date||'',selkentNorm(f?.opponent||'tbc'),String(f?.venue||'').toUpperCase(),selkentNorm(f?.competition||'fixture')].join('|');
+  const seen=new Set(rows.map(key));
+  const retain=f=>{if(!f||!past(f.date)||!String(f.opponent||'').trim()||!['H','A'].includes(String(f.venue||'').toUpperCase()))return;const id=key(f);if(!seen.has(id)){seen.add(id);rows.push(f);}};
+  for(const f of Array.isArray(previous)?previous:[])retain(f);
+  const own=selkentNorm(window.ClubHubCloud?.currentTeam?.()?.leagueName||state.division?.teamName||state.meta?.teamName||'');
+  if(!own)return rows;
+  const candidates=[];
+  // Recover dates already dropped by an older client only when its retained
+  // confirmation supplies exact provider identities and original evidence.
+  for(const [id,o] of Object.entries(state.selkent?.fixtureOverrides||{})){
+    const parts=id.split('|');
+    if(parts.length!==4||!past(parts[0])||seen.has(id)||!o||!o.confirmedAt||o.source!=='selkent_confirmation_email_screenshot'||selkentNorm(o.sourceFixtureStatus)!=='confirmed')continue;
+    if(!/^https:\/\/drive\.google\.com\/file\/d\/[A-Za-z0-9_-]+(?:\/view)?(?:\?[^\s]*)?$/.test(String(o.sourceEvidenceUrl||''))||!/^[a-f0-9]{64}$/i.test(String(o.sourceEvidenceSha256||'')))continue;
+    const home=String(o.sourceHome||'').trim(),away=String(o.sourceAway||'').trim(),homeOwn=selkentNorm(home)===own,awayOwn=selkentNorm(away)===own;
+    if(homeOwn===awayOwn||!home||!away)continue;
+    const venue=homeOwn?'H':'A',opponent=homeOwn?away:home,sourceCompetition=String(o.sourceCompetition||'').trim();
+    if(venue!==parts[2]||selkentNorm(opponent)!==parts[1]||!sourceCompetition)continue;
+    const league=['league','division'].includes(parts[3]);
+    if(league&&/\b(?:cup|vase)\b/i.test(sourceCompetition))continue;
+    const competition=league?(parts[3]==='league'?'League':'Division'):sourceCompetition;
+    const f={date:parts[0],time:'',opponent,venue,competition,source:'selkent-confirmation'};
+    if(key(f)===id)candidates.push(f);
+  }
+  // The legacy linker can fall back to a lone date/opponent record regardless
+  // of H-A. Withhold ambiguous recovery; keep every existing row accessible.
+  const identities=new Map(),identity=f=>[f?.date||'',normalizeTeamKey(f?.opponent||'')].join('|');
+  for(const f of [...rows,...(state.matches||[]),...candidates]){
+    const id=identity(f);if(!identities.has(id))identities.set(id,new Set());
+    identities.get(id).add(String(f?.venue||'').toUpperCase()+'|'+selkentNorm(f?.competition||f?.type||'fixture'));
+  }
+  for(const f of candidates)if(identities.get(identity(f)).size===1)retain(f);
+  return rows;
 }
 // Parents stop seeing a matchday (and its Respond prompts) this long after kick-off or group start.
 const PARENT_MATCHDAY_WINDOW_MS=3*60*60*1000;
@@ -1707,6 +1747,7 @@ function fixtureCompetitionLabel(f={}){
 function openFixtureMatchReport(f){
   if(!requireCoach())return;if(!f)return toast('No published fixture available');
   let m=fixtureLinkedMatch(f);
+  if(!matchDayReached(f)&&(!m||['scheduled','postponed'].includes(matchStatus(m))))return toast('Match reports open on match day.');
   if(!m){
     const competition=f.competition||((isPublishedLeagueTeam())?'League':'Division');
     m={id:uid('m'),date:f.date||new Date().toISOString().slice(0,10),opponent:f.opponent||'Opponent',competition,type:competition,tournamentId:null,venue:String(f.venue||'').toUpperCase(),duration:null,stage:'',gf:0,ga:0,status:'scheduled',notes:'',source:'selkent-fixture',providerTeamIds:Array.isArray(f.providerTeamIds)?[...f.providerTeamIds]:[]};
@@ -1895,7 +1936,7 @@ async function scanUpcomingFixtures(silent=true){
     const parsed=parseSelkentHtml(page.html,page.url);
     const before=JSON.stringify(state.selkent.fixtures||[]);
     const previousNext=nextPublishedFixture();
-    state.selkent.fixtures=parsed.fixtures||[];
+    state.selkent.fixtures=mergeFixtureReportHistory(parsed.fixtures||[]);
     state.selkent.lastFixtureScan=new Date().toISOString();
     const next=nextPublishedFixture();
     const colourChanged=await ensureFixtureKitColours(next);
@@ -7017,7 +7058,8 @@ function renderLeagueQuickView(){
   const remote=sanitizeRemoteStandings(state.selkent?.table||[]);const table=remote.length?remote:calculateLeagueTable();
   const body=document.getElementById('league-quick-table-body');if(body)body.innerHTML=table.map((r,i)=>`<tr class="${normalizeTeamKey(r.team)===normalizeTeamKey(state.division.teamName)?'our-team-row':''}"><td>${i+1}</td><td class="team-cell">${clubListingHtml(r.team)}</td><td>${r.p}</td><td>${r.w}</td><td>${r.d}</td><td>${r.l}</td><td>${r.gf}</td><td>${r.ga}</td><td>${r.gd}</td><td>${r.pts}</td></tr>`).join('')||'<tr><td colspan="10" class="table-empty">Table TBC</td></tr>';
   const meta=document.getElementById('league-quick-table-meta');if(meta)meta.textContent=(state.selkent?.table||[]).length?'Official league table':'League table TBC.';
-  const fixtures=[...(state.selkent?.fixtures||[])].sort((a,b)=>(a.date||'9999').localeCompare(b.date||'9999'));
+  const today=new Date();today.setHours(0,0,0,0);
+  const fixtures=(state.selkent?.fixtures||[]).filter(f=>!f.date||new Date(f.date+'T12:00:00')>=today).sort((a,b)=>(a.date||'9999').localeCompare(b.date||'9999'));
   const fc=document.getElementById('league-quick-fixture-count');if(fc)fc.textContent=String(fixtures.length);
   const fb=document.getElementById('league-quick-fixtures');if(fb)fb.innerHTML=fixtures.slice(0,16).map(f=>{const detail=state.selkent?.directoryDetails?.[selkentNorm(f.opponent)]||{};const map=f.venue==='A'?mapsHref(f.groundName||detail.groundName,f.address||detail.address):mapsHref(f.groundName,f.address);return `<div class="synced-fixture"><span class="synced-fixture-date">${f.date?formatDate(f.date):'TBC'}${f.time?' · '+esc(f.time):''}</span><span class="synced-fixture-opponent">${clubListingHtml(f.opponent)}</span><span class="synced-fixture-venue">${f.venue==='A'?'Away':'Home'}</span>${map?`<a class="map-link compact" href="${esc(map)}">Open in Maps</a>`:''}</div>`;}).join('')||'<div class="empty-state compact-empty">No fixtures released yet.</div>';
 }
@@ -7025,10 +7067,10 @@ function renderLeagueQuickView(){
 let __matchEntryChoices=[],__matchEntryChoiceContext='';
 function openMatchEntryChooser(){
   if(!requireCoach())return;__matchEntryChoiceContext=matchDetailContext();
-  const fixtures=state.selkent?.fixtures||[],records=state.matches||[],choices=fixtures.map(f=>({fixture:f,match:fixtureLinkedMatch(f)}));
+  const fixtures=mergeFixtureReportHistory(state.selkent?.fixtures||[]),records=state.matches||[],choices=fixtures.map(f=>({fixture:f,match:fixtureLinkedMatch(f)}));
   records.filter(m=>!choices.some(c=>c.match?.id===m.id)).forEach(m=>choices.push({match:m}));
   __matchEntryChoices=choices.filter(c=>matchDayReached(c.match||c.fixture)).sort((a,b)=>String((b.match||b.fixture).date||'').localeCompare(String((a.match||a.fixture).date||'')));
-  document.getElementById('match-entry-choices').innerHTML=__matchEntryChoices.map((choice,index)=>{const m=choice.match||choice.fixture,names=homeFixtureTeamNames(m);return `<button type="button" class="secondary-button report-section-link" data-match-entry-choice="${index}"><span><strong>${esc(names.home)} v ${esc(names.away)}</strong><small>${esc(formatDate(m.date))} · ${m.venue==='A'?'Away':m.venue==='H'?'Home':'Neutral'} · ${esc(m.competition||'Match')} · ${esc(statusLabel(m))}</small></span><span aria-hidden="true">›</span></button>`;}).join('')||'<p class="helper">No recordable fixtures yet. Match reports open on match day.</p>';
+  document.getElementById('match-entry-choices').innerHTML=__matchEntryChoices.map((choice,index)=>{const m=choice.match||choice.fixture,names=homeFixtureTeamNames(m);return `<button type="button" class="secondary-button report-section-link" data-match-entry-choice="${index}"><span><strong>${esc(names.home)} v ${esc(names.away)}</strong><small>${esc(formatDate(m.date))} · ${m.venue==='A'?'Away':m.venue==='H'?'Home':'Neutral'} · ${esc(m.competition||'Match')} · ${esc(choice.match?statusLabel(m):'Not recorded')}</small></span><span aria-hidden="true">›</span></button>`;}).join('')||'<p class="helper">No recordable fixtures yet. Match reports open on match day.</p>';
   document.getElementById('match-entry-chooser').showModal();
 }
 function updateMatchEntryScoreLabels(){
@@ -8242,3 +8284,4 @@ if(typeof document!=='undefined'&&typeof window!=='undefined'){
   if(document.readyState==='loading')window.addEventListener?.('DOMContentLoaded',startClubPageWatermark,{once:true});
   else startClubPageWatermark();
 }
+

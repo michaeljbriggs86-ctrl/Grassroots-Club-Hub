@@ -71,7 +71,7 @@ function appGuardSetup(mode){
  // reimplementation. The function list is intentionally restricted to the real
  // data/enrichment/scan/import paths exercised below.
  for(const match of appSource.matchAll(/^function (\w*(?:FeedMutation|BackgroundMutation|ProviderMutation)\w*)\(/gm))vm.runInNewContext(appFunction(match[1]),context);
- vm.runInNewContext(['fetchClubDirectoryDetails','ensureFixtureKitColours','scanUpcomingFixtures','stableSyncedMatchId','syncOwnLeagueMatchesFromSelkent'].map(appFunction).join('\n'),context);
+ vm.runInNewContext(['mergeFixtureReportHistory','fetchClubDirectoryDetails','ensureFixtureKitColours','scanUpcomingFixtures','stableSyncedMatchId','syncOwnLeagueMatchesFromSelkent'].map(appFunction).join('\n'),context);
  let run;
  if(['fetch','json','page'].includes(mode)){
   if(mode==='page')delete detail.home_ground;
