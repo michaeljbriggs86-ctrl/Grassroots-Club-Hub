@@ -2,18 +2,20 @@ const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('nod
 const app=fs.readFileSync('app/src/main/assets/app.js','utf8');
 const take=(start,end)=>{const a=app.indexOf(start),b=app.indexOf(end,a);assert(a>=0&&b>a);return app.slice(a,b);};
 const norm=x=>String(x||'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
+const NOW='2099-10-10T12:00:00Z';
+class Clock extends Date{constructor(...args){super(...(args.length?args:[NOW]));}static now(){return Date.parse(NOW);}}
 const first={date:'2099-10-10',competition:'U9 Selkent Cup Two - Round 1',opponent:'Chislehurst Wanderers Panthers',venue:'A',providerTeamIds:['opponent-one','our-team']};
 const second={...first,opponent:'Lewisham Borough Cobras',venue:'H',providerTeamIds:['our-team','opponent-two']};
 let team='team-one',serial=0;
 const dialog={innerHTML:'',showModal(){this.open=true;},close(){this.open=false;}};
-const c={CLOUD_MODE:true,currentRole:'coach',state:{meta:{teamName:'Shooters Hill AFC Valiants'},division:{teamName:'Shooters Hill AFC Valiants'},matches:[],selkent:{fixtures:[first,second,{...first}],results:[],fixtureOverrides:{}}},
+const c={Date:Clock,CLOUD_MODE:true,currentRole:'coach',state:{meta:{teamName:'Shooters Hill AFC Valiants'},division:{teamName:'Shooters Hill AFC Valiants'},matches:[],selkent:{fixtures:[first,second,{...first}],results:[],fixtureOverrides:{}}},
  document:{getElementById:()=>dialog},window:{ClubHubCloud:{currentTeam:()=>({id:team})}},
  selkentNorm:norm,normalizeTeamKey:norm,ageGroupNumber:()=>9,matchTeamLabel:x=>x,ownTeamDisplayName:()=> 'Shooters Hill AFC Valiants',
  canConfirmFixtureDetails:()=>c.currentRole==='coach',requireCoach:()=>c.currentRole==='coach',fixtureDetailsConfirmed:()=>false,
  matchStatus:m=>m.status||'scheduled',isPublishedLeagueTeam:()=>false,formatDate:x=>x,esc:x=>String(x||''),
  clubIdentityBadgeHtml:n=>`<img alt="${n}"/>`,uid:()=> 'match-'+(++serial),saveState:()=>{},auditEvent:()=>{},toast:()=>{},openMatchReport:id=>c.opened=id};
 vm.createContext(c);
-vm.runInContext(take('function fixtureLinkedMatch(', 'function fixtureFingerprint(')+take('function homeFixtureTeamNames(', 'function canConfirmFixtureDetails('),c);
+vm.runInContext(take('function fixtureLinkedMatch(', 'function fixtureFingerprint(')+take('function homeFixtureTeamNames(', 'function canConfirmFixtureDetails(')+take('function matchDayReached(', '\n}\n')+'\n}',c);
 const html=c.cupGroupResultChooserHtml(first),rows=[...html.matchAll(/<article[^>]*>([\s\S]*?)<\/article>/g)].map(x=>x[1]);
 assert.equal(rows.length,2,'duplicate provider row does not add a result card');
 assert.equal((html.match(/data-cup-result-row=/g)||[]).length,2);
