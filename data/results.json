@@ -1,9 +1,9 @@
 {
   "schema_version": 2,
   "provider": "Selkent",
-  "last_updated": "2026-11-19T04:55:29.055351+00:00",
-  "cup_results_last_updated": "2026-11-19T04:55:29.055351+00:00",
-  "cup_results_last_attempted": "2026-11-19T04:55:29.055351+00:00",
+  "last_updated": "2026-11-19T14:53:21.719462+00:00",
+  "cup_results_last_updated": "2026-11-19T14:53:21.719462+00:00",
+  "cup_results_last_attempted": "2026-11-19T14:53:21.719462+00:00",
   "cup_results_status": "verified_current",
   "fixture_agegroup_discovery_source": "selkent_divisions_all",
   "coverage": {
@@ -17566,7 +17566,7 @@
         },
         {
           "division_name": "Under 13D Silver",
-          "updated_at_text": "15/11/26 18:32:54",
+          "updated_at_text": "19/11/26 12:19:36",
           "source_order_authoritative_for_ties": false,
           "source_disclaimer": "Note: Table does not yet take account of rules for determining winner if teams on equal points",
           "rows": [
@@ -17637,19 +17637,6 @@
             },
             {
               "row_order": 6,
-              "provider_team_id": 2066,
-              "provider_division_id": 4266,
-              "team_name": "Woolwich Wanderers FC",
-              "played": 5,
-              "won": 2,
-              "drawn": 1,
-              "lost": 2,
-              "gf": 13,
-              "ga": 7,
-              "points": 5
-            },
-            {
-              "row_order": 7,
               "provider_team_id": 735,
               "provider_division_id": 4266,
               "team_name": "Greenwich Peninsula Pumas",
@@ -17662,7 +17649,7 @@
               "points": 4
             },
             {
-              "row_order": 8,
+              "row_order": 7,
               "provider_team_id": 860,
               "provider_division_id": 4266,
               "team_name": "Blackheath Rhinos Grey",
@@ -17675,7 +17662,7 @@
               "points": 4
             },
             {
-              "row_order": 9,
+              "row_order": 8,
               "provider_team_id": 2130,
               "provider_division_id": 4266,
               "team_name": "Vikings FC Red",
@@ -17686,6 +17673,19 @@
               "gf": 10,
               "ga": 15,
               "points": 4
+            },
+            {
+              "row_order": 9,
+              "provider_team_id": 2066,
+              "provider_division_id": 4266,
+              "team_name": "Woolwich Wanderers FC",
+              "played": 4,
+              "won": 1,
+              "drawn": 1,
+              "lost": 2,
+              "gf": 9,
+              "ga": 7,
+              "points": 3
             },
             {
               "row_order": 10,
@@ -17705,12 +17705,12 @@
               "provider_team_id": 443,
               "provider_division_id": 4266,
               "team_name": "S.E. Lions FC Gold",
-              "played": 6,
+              "played": 5,
               "won": 0,
               "drawn": 2,
-              "lost": 4,
+              "lost": 3,
               "gf": 7,
-              "ga": 16,
+              "ga": 12,
               "points": 2
             }
           ],
@@ -19092,15 +19092,6 @@
           "away": "Beacons White",
           "homeGoals": 2,
           "awayGoals": 3,
-          "provider_division_id": 4266,
-          "division_name": "Under 13D Silver"
-        },
-        {
-          "date": "2026-11-15",
-          "home": "Woolwich Wanderers FC",
-          "away": "S.E. Lions FC Gold",
-          "homeGoals": 4,
-          "awayGoals": 0,
           "provider_division_id": 4266,
           "division_name": "Under 13D Silver"
         },
@@ -29409,10 +29400,10 @@
           "date": "2026-11-21",
           "division_name": "U10X Selkent Cup One - Round 2",
           "home": "Cray Wanderers Panthers",
-          "away": "Newpark Football Club",
+          "away": "Baldon Sports Lions",
           "provider_team_ids": [
             "591",
-            "890"
+            "905"
           ]
         },
         {
@@ -29523,16 +29514,6 @@
           "provider_team_ids": [
             "826",
             "67"
-          ]
-        },
-        {
-          "date": "2026-11-21",
-          "division_name": "U10X Selkent Cup One - Round 2",
-          "home": "Newpark Football Club",
-          "away": "Baldon Sports Lions",
-          "provider_team_ids": [
-            "890",
-            "905"
           ]
         },
         {
