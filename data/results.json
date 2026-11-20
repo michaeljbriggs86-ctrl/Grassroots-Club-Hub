@@ -1,9 +1,9 @@
 {
   "schema_version": 2,
   "provider": "Selkent",
-  "last_updated": "2026-11-20T14:34:53.661232+00:00",
-  "cup_results_last_updated": "2026-11-20T14:34:53.661232+00:00",
-  "cup_results_last_attempted": "2026-11-20T14:34:53.661232+00:00",
+  "last_updated": "2026-11-20T23:29:42.123140+00:00",
+  "cup_results_last_updated": "2026-11-20T23:29:42.123140+00:00",
+  "cup_results_last_attempted": "2026-11-20T23:29:42.123140+00:00",
   "cup_results_status": "verified_current",
   "fixture_agegroup_discovery_source": "selkent_divisions_all",
   "coverage": {
@@ -5025,6 +5025,16 @@
         {
           "date": "2026-11-22",
           "division_name": "Under 12B Orange",
+          "home": "AFC Lewisham Blue",
+          "away": "Vikings FC Red",
+          "provider_team_ids": [
+            "252",
+            "556"
+          ]
+        },
+        {
+          "date": "2026-11-22",
+          "division_name": "Under 12B Orange",
           "home": "Cray Wanderers Cobras",
           "away": "Erith & Belvedere Selkent",
           "provider_team_ids": [
@@ -5060,16 +5070,6 @@
           "provider_team_ids": [
             "750",
             "65"
-          ]
-        },
-        {
-          "date": "2026-11-22",
-          "division_name": "Under 12B Orange",
-          "home": "Vikings FC Red",
-          "away": "AFC Lewisham Blue",
-          "provider_team_ids": [
-            "556",
-            "252"
           ]
         },
         {
@@ -16398,11 +16398,11 @@
         {
           "date": "2026-11-22",
           "division_name": "Under 13D Silver",
-          "home": "Vikings FC Red",
-          "away": "Woolwich Wanderers FC",
+          "home": "Woolwich Wanderers FC",
+          "away": "Vikings FC Red",
           "provider_team_ids": [
-            "2130",
-            "2066"
+            "2066",
+            "2130"
           ]
         },
         {
