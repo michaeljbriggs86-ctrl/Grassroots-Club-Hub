@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-11-16T01:40:10.109519+00:00",
+  "last_updated": "2026-11-23T02:24:16.606610+00:00",
   "clubs": [
     {
       "club_id": 514,
@@ -2508,12 +2508,11 @@
         "Dartford Royals white",
         "Guru Nanak Youth",
         "IEXEL F.C Black",
-        "South Darenth Purples",
         "Sutton Athletic Greens",
         "Swanscombe Tigers Yellows",
         "Welling United White"
       ],
-      "team_count_label": "12 teams"
+      "team_count_label": "11 teams"
     },
     {
       "age_group": "U15",
@@ -7373,11 +7372,6 @@
       "team_name": "IEXEL F.C Black",
       "club_id": 506,
       "club_name": "IEXEL F.C"
-    },
-    {
-      "team_name": "South Darenth Purples",
-      "club_id": 325,
-      "club_name": "South Darenth"
     },
     {
       "team_name": "Sutton Athletic Greens",
