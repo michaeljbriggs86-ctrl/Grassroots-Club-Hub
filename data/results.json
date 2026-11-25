@@ -1,9 +1,9 @@
 {
   "schema_version": 2,
   "provider": "Selkent",
-  "last_updated": "2026-11-24T16:42:12.296692+00:00",
-  "cup_results_last_updated": "2026-11-24T16:42:12.296692+00:00",
-  "cup_results_last_attempted": "2026-11-24T16:42:12.296692+00:00",
+  "last_updated": "2026-11-25T01:45:26.495010+00:00",
+  "cup_results_last_updated": "2026-11-25T01:45:26.495010+00:00",
+  "cup_results_last_attempted": "2026-11-25T01:45:26.495010+00:00",
   "cup_results_status": "verified_current",
   "fixture_agegroup_discovery_source": "selkent_divisions_all",
   "coverage": {
@@ -19525,7 +19525,7 @@
           "home": "Metrogas FC YELLOW",
           "away": "Bexley Ballers Football Club",
           "homeGoals": 1,
-          "awayGoals": 2,
+          "awayGoals": 3,
           "competition": "Selkent Cup One",
           "round": "Round 1",
           "provider_cup_id": "cupCombined7-0",
@@ -20135,11 +20135,11 @@
         {
           "date": "2026-11-29",
           "division_name": "Under 13D Navy",
-          "home": "Dartford Royals yellow",
-          "away": "Guru Nanak Youth",
+          "home": "Guru Nanak Youth",
+          "away": "Dartford Royals yellow",
           "provider_team_ids": [
-            "334",
-            "503"
+            "503",
+            "334"
           ]
         },
         {
@@ -32841,6 +32841,16 @@
         {
           "date": "2026-11-29",
           "division_name": "Senior Division Two",
+          "home": "Cray Valley (PM) FC",
+          "away": "Vikings FC",
+          "provider_team_ids": [
+            "320",
+            "904"
+          ]
+        },
+        {
+          "date": "2026-11-29",
+          "division_name": "Senior Division Two",
           "home": "Kingsdale Red",
           "away": "Hayden Youth Sharks",
           "provider_team_ids": [
@@ -32859,16 +32869,6 @@
           ]
         },
         {
-          "date": "2026-11-29",
-          "division_name": "Senior Division Two",
-          "home": "Vikings FC",
-          "away": "Cray Valley (PM) FC",
-          "provider_team_ids": [
-            "904",
-            "320"
-          ]
-        },
-        {
           "date": "2026-12-06",
           "division_name": "Senior Division One",
           "home": "Dulwich Village Orange",
@@ -32882,10 +32882,10 @@
           "date": "2026-12-06",
           "division_name": "Senior Division One",
           "home": "Dulwich Village White",
-          "away": "FC Elmstead",
+          "away": "Eversley Rangers White",
           "provider_team_ids": [
             "1043",
-            "123"
+            "899"
           ]
         },
         {
@@ -32946,6 +32946,16 @@
           "provider_team_ids": [
             "102",
             "2055"
+          ]
+        },
+        {
+          "date": "2026-12-06",
+          "division_name": "Senior Kent Cup",
+          "home": "Spitfire United. (Non-Selkent)",
+          "away": "FC Elmstead",
+          "provider_team_ids": [
+            "2334",
+            "123"
           ]
         },
         {
