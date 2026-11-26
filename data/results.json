@@ -1,9 +1,9 @@
 {
   "schema_version": 2,
   "provider": "Selkent",
-  "last_updated": "2026-11-26T01:18:34.280781+00:00",
-  "cup_results_last_updated": "2026-11-26T01:18:34.280781+00:00",
-  "cup_results_last_attempted": "2026-11-26T01:18:34.280781+00:00",
+  "last_updated": "2026-11-26T15:59:13.672748+00:00",
+  "cup_results_last_updated": "2026-11-26T15:59:13.672748+00:00",
+  "cup_results_last_attempted": "2026-11-26T15:59:13.672748+00:00",
   "cup_results_status": "verified_current",
   "fixture_agegroup_discovery_source": "selkent_divisions_all",
   "coverage": {
@@ -5374,16 +5374,6 @@
           "provider_team_ids": [
             "852",
             "490"
-          ]
-        },
-        {
-          "date": "2026-12-13",
-          "division_name": "Under 10D White",
-          "home": "Kidbrooke Kings",
-          "away": "Baldon Sports Panthers",
-          "provider_team_ids": [
-            "438",
-            "906"
           ]
         }
       ],
@@ -31140,21 +31130,21 @@
         {
           "date": "2026-11-29",
           "division_name": "Under 17 Division Two",
-          "home": "Istead United Colts",
-          "away": "Newpark Football Club",
-          "provider_team_ids": [
-            "691",
-            "561"
-          ]
-        },
-        {
-          "date": "2026-11-29",
-          "division_name": "Under 17 Division Two",
           "home": "Mayow Park Rangers FC",
           "away": "Blackheath Rhinos White",
           "provider_team_ids": [
             "565",
             "869"
+          ]
+        },
+        {
+          "date": "2026-11-29",
+          "division_name": "Under 17 Division Two",
+          "home": "Newpark Football Club",
+          "away": "Istead United Colts",
+          "provider_team_ids": [
+            "561",
+            "691"
           ]
         },
         {
@@ -36692,16 +36682,6 @@
           "provider_team_ids": [
             "842",
             "349"
-          ]
-        },
-        {
-          "date": "2026-12-13",
-          "division_name": "Under 10X C Navy",
-          "home": "Sutton Dynamo FC",
-          "away": "Cray Wanderers Piranhas",
-          "provider_team_ids": [
-            "655",
-            "593"
           ]
         },
         {
